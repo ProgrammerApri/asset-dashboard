@@ -1,6 +1,6 @@
 {
    "name": "fito",
-   "homepage": "https://fito.dexignlab.com/react/",
+   "homepage": ".",
    "version": "0.1.0",
    "private": true,
    "dependencies": {

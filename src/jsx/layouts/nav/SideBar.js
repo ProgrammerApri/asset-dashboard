@@ -51,11 +51,9 @@ class SideBar extends Component {
       /// Active menu
       let deshBoard = [
             "",
-            "workout-statistic",
-            "workout-plan",
-            "distance-map",
-            "diet-food-menu",
-            "personal-record",
+         ],
+         lokasi = [
+            "lokasi",
          ],
          app = [
             "app-profile",
@@ -126,33 +124,30 @@ class SideBar extends Component {
                      }`}
                   >
                      <Link
-                        className="has-arrow ai-icon"
-                        to="#"
+                        className="ai-icon"
+                        to=""
                         aria-expanded="false"
                      >
                         <i className="flaticon-381-networking"></i>
                         <span className="nav-text">Dashboard</span>
                      </Link>
+                  </li>
+                  <li
+                     className={`${
+                        lokasi.includes(path.slice(1)) ? "mm-active" : ""
+                     }`}
+                  >
+                     <Link
+                        className="has-arrow ai-icon"
+                        to="#"
+                        aria-expanded="false"
+                     >
+                        <i className="flaticon-381-location"></i>
+                        <span className="nav-text">Lokasi</span>
+                     </Link>
                      <ul aria-expanded="false">
                         <li>
-                           <Link to="/">Dashboard</Link>
-                        </li>
-                        <li>
-                           <Link to="/workout-statistic">
-                              Workout Statistic
-                           </Link>
-                        </li>
-                        <li>
-                           <Link to="/workout-plan">Workout Plan</Link>
-                        </li>
-                        <li>
-                           <Link to="/distance-map">Distance Map</Link>
-                        </li>
-                        <li>
-                           <Link to="/diet-food-menu">DIet Food Menu</Link>
-                        </li>
-                        <li>
-                           <Link to="/personal-record">Personal Record</Link>
+                           <Link to="/lokasi">Daftar Lokasi</Link>
                         </li>
                      </ul>
                   </li>

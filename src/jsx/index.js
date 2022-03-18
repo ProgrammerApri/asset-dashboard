@@ -1,7 +1,7 @@
 import React from "react";
 
 /// React router dom
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
 
 /// Css
 import "./index.css";
@@ -26,11 +26,6 @@ import Widget from "./pages/Widget";
 
 /// Deshboard
 import Home from "./components/Dashboard/Home";
-import WorkoutStatistic from "./components/Dashboard/WorkoutStatistic";
-import WorkoutPlan from "./components/Dashboard/WorkoutPlan";
-import DistanceMap from "./components/Dashboard/DistanceMap";
-import DietFoodMenu from "./components/Dashboard/DietFoodMenu";
-import PersonalRecord from "./components/Dashboard/PersonalRecord";
 
 /// Bo
 import UiAlert from "./components/bootstrap/Alert";
@@ -95,16 +90,14 @@ import MainSweetAlert from "./components/PluginsMenu/Sweet Alert/SweetAlert";
 import Toastr from "./components/PluginsMenu/Toastr/Toastr";
 import JqvMap from "./components/PluginsMenu/Jqv Map/JqvMap";
 import RechartJs from "./components/charts/rechart";
+import Lokasi from "./components/Lokasi/Lokasi";
 
 const Markup = () => {
    const routes = [
       /// Deshborad
       { url: "", component: Home },
-      { url: "workout-statistic", component: WorkoutStatistic },
-      { url: "workout-plan", component: WorkoutPlan },
-      { url: "distance-map", component: DistanceMap },
-      { url: "diet-food-menu", component: DietFoodMenu },
-      { url: "personal-record", component: PersonalRecord },
+      /// Lokasi
+      {url: "lokasi", component: Lokasi},
       /// Bootstrap
       { url: "ui-alert", component: UiAlert },
       { url: "ui-badge", component: UiBadge },
@@ -184,7 +177,7 @@ const Markup = () => {
    ];
 
    return (
-      <Router basename="/react">
+      <Router>
          <div id="main-wrapper" className="show">
             <Nav />
 

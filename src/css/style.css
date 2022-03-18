@@ -12202,7 +12202,7 @@ html[dir="rtl"] [direction="rtl"][data-sidebar-style="compact"]:not([data-layout
   height: 100%;
   position: absolute;
   top: 0;
-  padding-top: 120px;
+  padding-top: 80px;
   z-index: 3;
   background-color: #FBFBFB;
   transition: all .2s ease;

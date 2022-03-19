@@ -5,9 +5,7 @@ import DaftarLokasi from "./DaftarLokasi";
 const Lokasi = () => {
    return (
       <Fragment>
-         <div className="row">
-            <DaftarLokasi></DaftarLokasi>
-         </div>
+         <DaftarLokasi></DaftarLokasi>
       </Fragment>
    );
 };

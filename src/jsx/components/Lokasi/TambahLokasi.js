@@ -23,24 +23,32 @@ const TambahLokasi = () => {
               <div className="basic-form">
                 <form onSubmit={(e) => e.preventDefault()}>
                   <div className="form-group">
-                    <div className="row sm-6">
-                      <div className="form-row col-sm-6">
-                        <div className="col-sm-6">
-                          <fieldset disabled>
-                            <input
-                              type="text"
-                              className="form-control"
-                              value={"A01"}
-                            />
-                          </fieldset>
-                        </div>
-                        <div className="col-sm-6">
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Lokasi Kolam"
-                          />
-                        </div>
+                      <div className="form-row">
+                      <div className="col-sm-6">
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Penanggungjawab"
+                        />
+                      </div>
+                      <div className="col-sm-6">
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Penanggungjawab"
+                        />
+                      </div>
+                      </div>
+                  </div>
+
+                  <div className="form-group">
+                    <div className="form-row">
+                      <div className="col-sm-6">
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Penanggungjawab"
+                        />
                       </div>
                       <div className="col-sm-6">
                         <input
@@ -51,27 +59,7 @@ const TambahLokasi = () => {
                       </div>
                     </div>
                   </div>
-                  
-                  <div className="form-group">
-                      <div className="form-row">
-                          <div className="col-sm-6">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Penanggungjawab"
-                        />
-                      </div>
-                      <div className="col-sm-6">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Penanggungjawab"
-                        />
-                      </div>
-                      </div>
-                      
-                  </div>
-                  
+
                   <Button variant="primary">Simpan</Button>
                 </form>
               </div>

@@ -17,8 +17,10 @@ import testimonial from "../../../images/testimonial/1.jpg";
 import testimonial2 from "../../../images/testimonial/2.jpg";
 import testimonial3 from "../../../images/testimonial/3.jpg";
 
-import { Dropdown, Tab, Nav } from "react-bootstrap";
+import { Dropdown, Tab, Nav, Button } from "react-bootstrap";
 import CircleProgress from "../CircleProgress/circleProgress";
+
+import ApexRadialBar from "../charts/apexcharts/RadialBar";
 
 // import Ext from "../../layouts/Ext";
 
@@ -28,7 +30,7 @@ const ApexLine4 = loadable(() =>
 const ApexNagetivePosative = loadable(() =>
   pMinDelay(import("../charts/apexcharts/NagetivePositive2"), 500)
 );
-const ApexRedialBar = loadable(() =>
+const ApexRedial = loadable(() =>
   pMinDelay(import("../charts/apexcharts/RadialBar"), 500)
 );
 
@@ -82,8 +84,12 @@ const Home = () => {
   };
   return (
     <>
+      <div className="tittle-row">
+        <h4 className="text-black fs-18 mb-3">Inventory</h4>
+        <Button variant="primary btn-xxs mb-3">Lihat Semua</Button>
+      </div>
       <div className="row">
-        <div className="col-xl col-md-6">
+        <div className="col-xl col-md-4 col-sm-6">
           <div className="card">
             <div className="card-body p-4">
               <CircleProgress
@@ -104,15 +110,15 @@ const Home = () => {
                   </svg>
                 }
               />
-              <h2 className="fs-24 text-black font-w600 mb-0">42%</h2>
-              <span className="fs-14">Weekly Progress</span>
+              <h2 className="fs-24 text-black font-w600 mb-0">42 Kg</h2>
+              <span className="fs-14">IRAWAN 681 V</span>
             </div>
           </div>
         </div>
-        <div className="col-xl col-md-6 col-sm-6">
+        <div className="col-xl col-md-4 col-sm-6">
           <div className="card">
             <div className="card-body p-4">
-            <CircleProgress
+              <CircleProgress
                 percent={75}
                 color={"#ff285c"}
                 icon={
@@ -137,35 +143,18 @@ const Home = () => {
                   </svg>
                 }
               />
-              <h2 className="fs-24 text-black font-w600 mb-0">67cal</h2>
-              <span className="fs-14">Calories Burn</span>
+              <h2 className="fs-24 text-black font-w600 mb-0">10 Jrigen</h2>
+              <span className="fs-14">Super NB 5 ltr</span>
             </div>
           </div>
         </div>
         <div className="col-xl col-md-4 col-sm-6">
           <div className="card">
             <div className="card-body p-4">
-              <div className="d-inline-block mb-4 ml--12 position-relative donut-chart-sale">
-                <span
-                  className="donut1"
-                  data-peity='{ "fill": ["rgb(255, 213, 174)", "rgba(255, 255, 255, 1)"],   "innerRadius": 45, "radius": 10}'
-                  style={{ display: "none" }}
-                >
-                  5/8
-                </span>
-                <svg className="peity" height={110} width={110}>
-                  <path
-                    d="M 55 0 A 55 55 0 1 1 16.109127034739892 93.89087296526012 L 23.180194846605364 86.81980515339464 A 45 45 0 1 0 55 10"
-                    data-value={5}
-                    fill="rgb(255, 213, 174)"
-                  />
-                  <path
-                    d="M 16.109127034739892 93.89087296526012 A 55 55 0 0 1 54.99999999999999 0 L 54.99999999999999 10 A 45 45 0 0 0 23.180194846605364 86.81980515339464"
-                    data-value={3}
-                    fill="rgba(255, 255, 255, 1)"
-                  />
-                </svg>
-                <small className="text-primary">
+              <CircleProgress
+                percent={75}
+                color={"#ff285c"}
+                icon={
                   <svg
                     width={40}
                     height={40}
@@ -185,33 +174,20 @@ const Home = () => {
                       </clipPath>
                     </defs>
                   </svg>
-                </small>
-                <span className="circle bg-warning" />
-              </div>
-              <h2 className="fs-24 text-black font-w600 mb-0">5 Left</h2>
-              <span className="fs-14">Diet Programs</span>
+                }
+              />
+              <h2 className="fs-24 text-black font-w600 mb-0">23 Pack</h2>
+              <span className="fs-14">Ragi Tape</span>
             </div>
           </div>
         </div>
         <div className="col-xl col-md-4 col-sm-6">
           <div className="card">
             <div className="card-body p-4">
-              <div className="d-inline-block mb-4 ml--12 position-relative donut-chart-sale">
-                <span
-                  className="donut1"
-                  data-peity='{ "fill": ["rgb(238, 252, 255)", "rgba(255, 255, 255, 1)"],   "innerRadius": 45, "radius": 10}'
-                  style={{ display: "none" }}
-                >
-                  8/8
-                </span>
-                <svg className="peity" height={110} width={110}>
-                  <path
-                    d="M 55 0 A 55 55 0 1 1 54.99 0 L 54.99 10 A 45 45 0 1 0 55 10"
-                    data-value={8}
-                    fill="rgb(238, 252, 255)"
-                  />
-                </svg>
-                <small className="text-primary">
+              <CircleProgress
+                percent={75}
+                color={"#ff285c"}
+                icon={
                   <svg
                     width={40}
                     height={40}
@@ -231,34 +207,20 @@ const Home = () => {
                       </clipPath>
                     </defs>
                   </svg>
-                </small>
-                <span className="circle bg-info" />
-              </div>
-              <h2 className="fs-24 text-black font-w600 mb-0">8 Hours</h2>
-              <span className="fs-14">Sleeping Potency</span>
+                }
+              />
+              <h2 className="fs-24 text-black font-w600 mb-0">91 Kg</h2>
+              <span className="fs-14">IRAWAN 683 SP</span>
             </div>
           </div>
         </div>
-
         <div className="col-xl col-md-4 col-sm-6">
           <div className="card">
             <div className="card-body p-4">
-              <div className="d-inline-block mb-4 ml--12 position-relative donut-chart-sale">
-                <span
-                  className="donut1"
-                  data-peity='{ "fill": ["rgb(242, 255, 253)", "rgba(255, 255, 255, 1)"],   "innerRadius": 45, "radius": 10}'
-                  style={{ display: "none" }}
-                >
-                  8/8
-                </span>
-                <svg className="peity" height={110} width={110}>
-                  <path
-                    d="M 55 0 A 55 55 0 1 1 54.99 0 L 54.99 10 A 45 45 0 1 0 55 10"
-                    data-value={8}
-                    fill="rgb(242, 255, 253)"
-                  />
-                </svg>
-                <small className="text-primary">
+              <CircleProgress
+                percent={75}
+                color={"#ff285c"}
+                icon={
                   <svg
                     width={40}
                     height={40}
@@ -271,15 +233,19 @@ const Home = () => {
                       fill="white"
                     />
                   </svg>
-                </small>
-                <span className="circle bg-success" />
-              </div>
-              <h2 className="fs-24 text-black font-w600 mb-0">974 Person</h2>
-              <span className="fs-14">Total Members</span>
+                }
+              />
+              <h2 className="fs-24 text-black font-w600 mb-0">141 Sak</h2>
+              <span className="fs-14">Samponen 25 kg</span>
             </div>
           </div>
         </div>
+      </div>
 
+      <div className="tittle-row">
+        <h4 className="text-black fs-18 mb-3">Produksi</h4>
+      </div>
+      <div className="row">
         <div className="col-xl-9 col-xxl-8">
           <div className="card">
             <div className="card-header flex-wrap pb-0 border-0">
@@ -419,19 +385,13 @@ const Home = () => {
         <div className="col-xl-3 col-xxl-4 col-md-6">
           <div className="card">
             <div className="card-header border-0 pb-0">
-              <h4 className="text-black fs-20 mb-0">Workout Progress</h4>
+              <h4 className="text-black fs-20 mb-0">Status Panen</h4>
             </div>
             <div className="card-body text-center">
-              <ApexRedialBar />
+              <ApexRadialBar series={80}/>
               <p className="fs-14">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do{" "}
+                Status panen kolam A1-6 adalah Parsial ke 4
               </p>
-              <Link
-                to="/workout-statistic"
-                className="btn btn-outline-primary rounded"
-              >
-                Set Target
-              </Link>
             </div>
           </div>
         </div>
@@ -613,691 +573,18 @@ const Home = () => {
                   variant=""
                   className="btn rounded border border-light dropdown-toggle"
                 >
-                  Weekly
+                  Kolam A
                 </Dropdown.Toggle>
                 <Dropdown.Menu className="dropdown-menu dropdown-menu-right">
-                  <Dropdown.Item>Link 1</Dropdown.Item>
-                  <Dropdown.Item>Link 2</Dropdown.Item>
-                  <Dropdown.Item>Link 3</Dropdown.Item>
+                  <Dropdown.Item>Kolam B</Dropdown.Item>
+                  <Dropdown.Item>Kolam C</Dropdown.Item>
+                  <Dropdown.Item>Kolam D</Dropdown.Item>
                 </Dropdown.Menu>
               </Dropdown>
             </div>
             <div className="card-body">
               <ApexNagetivePosative />
             </div>
-          </div>
-        </div>
-        <div className="col-xl-12">
-          <div className="card">
-            <Tab.Container defaultActiveKey="breakfast">
-              <div className="card-header d-sm-flex d-block pb-0 border-0">
-                <div className="mr-auto pr-3">
-                  <h4 className="text-black fs-20">Featured Diet Menus</h4>
-                  <p className="fs-13 mb-0 text-black">
-                    Lorem ipsum dolor sit amet, consectetur
-                  </p>
-                </div>
-                <div className="card-action card-tabs mt-3 mt-sm-0 mt-3 mb-sm-0 mb-3 mt-sm-0">
-                  <Nav as="ul" className="nav nav-tabs" role="tablist">
-                    <Nav.Item className="nav-item">
-                      <Nav.Link data-toggle="tab" eventKey="breakfast">
-                        Breakfast
-                      </Nav.Link>
-                    </Nav.Item>
-                    <Nav.Item className="nav-item">
-                      <Nav.Link eventKey="lunch">Lunch</Nav.Link>
-                    </Nav.Item>
-                    <Nav.Item className="nav-item">
-                      <Nav.Link eventKey="dinner">Dinner</Nav.Link>
-                    </Nav.Item>
-                  </Nav>
-                </div>
-                <Link
-                  to="/diet-food-menu"
-                  className="btn btn-primary rounded d-none d-lg-block ml-0 ml-md-5"
-                >
-                  View More
-                </Link>
-              </div>
-              <div className="card-body fito-home-slider">
-                <Tab.Content className="tab-content">
-                  <Tab.Pane role="tabpanel" eventKey="breakfast">
-                    <div className="featured-menus owl-carousel">
-                      <Slider {...settings}>
-                        <div className="items">
-                          <div className="d-sm-flex p-3 border border-light rounded">
-                            <Link to="/ecom-product-detail">
-                              <img
-                                className="mr-4 food-image rounded"
-                                src={menu03}
-                                alt=""
-                                width={160}
-                              />
-                            </Link>
-                            <div>
-                              <div className="d-flex align-items-center mb-2">
-                                <img
-                                  className="rounded-circle mr-2 profile-image"
-                                  src={testimonial3}
-                                  alt=""
-                                  width={30}
-                                />
-                                <span className="fs-14 text-primary">
-                                  Ilham
-                                </span>
-                              </div>
-                              <h6 className="fs-16 mb-4">
-                                <Link
-                                  to="/ecom-product-detail"
-                                  className="text-black"
-                                >
-                                  Sweet Orange Fruits with Lemon
-                                </Link>
-                              </h6>
-                              <ul>
-                                <li className="mb-2">
-                                  <i className="las la-clock scale5 mr-3" />
-                                  <span className="fs-14 text-black">
-                                    4-6 mins{" "}
-                                  </span>
-                                </li>
-                                <li>
-                                  <i
-                                    className="fa fa-star-o mr-3 scale5 text-warning"
-                                    aria-hidden="true"
-                                  />
-                                  <span className="fs-14 text-black font-w500">
-                                    176 Reviews
-                                  </span>
-                                </li>
-                              </ul>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="items">
-                          <div className="d-sm-flex p-3 border border-light rounded">
-                            <Link to="/ecom-product-detail">
-                              <img
-                                className="mr-4 food-image rounded"
-                                src={menu01}
-                                alt=""
-                                width={160}
-                              />
-                            </Link>
-                            <div>
-                              <div className="d-flex align-items-center mb-2">
-                                <img
-                                  className="rounded-circle mr-2 profile-image"
-                                  src={testimonial}
-                                  alt=""
-                                  width={30}
-                                />
-                                <span className="fs-14 text-primary">
-                                  Andrew
-                                </span>
-                              </div>
-                              <h6 className="fs-16 mb-4">
-                                <Link
-                                  to="/ecom-product-detail"
-                                  className="text-black"
-                                >
-                                  Fresh or Frozen (No Sugar Added) Fruits
-                                </Link>
-                              </h6>
-                              <ul>
-                                <li className="mb-2">
-                                  <i className="las la-clock scale5 mr-3" />
-                                  <span className="fs-14 text-black">
-                                    4-6 mins{" "}
-                                  </span>
-                                </li>
-                                <li>
-                                  <i
-                                    className="fa fa-star-o mr-3 scale5 text-warning"
-                                    aria-hidden="true"
-                                  />
-                                  <span className="fs-14 text-black font-w500">
-                                    568 Reviews
-                                  </span>
-                                </li>
-                              </ul>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="items">
-                          <div className="d-sm-flex p-3 border border-light rounded">
-                            <Link to="/ecom-product-detail">
-                              <img
-                                className="mr-4 food-image rounded"
-                                src={menu01}
-                                alt=""
-                                width={160}
-                              />
-                            </Link>
-                            <div>
-                              <div className="d-flex align-items-center mb-2">
-                                <img
-                                  className="rounded-circle mr-2 profile-image"
-                                  src={testimonial}
-                                  alt=""
-                                  width={30}
-                                />
-                                <span className="fs-14 text-primary">
-                                  Andrew
-                                </span>
-                              </div>
-                              <h6 className="fs-16 mb-4">
-                                <Link
-                                  to="/ecom-product-detail"
-                                  className="text-black"
-                                >
-                                  Fresh or Frozen (No Sugar Added) Fruits
-                                </Link>
-                              </h6>
-                              <ul>
-                                <li className="mb-2">
-                                  <i className="las la-clock scale5 mr-3" />
-                                  <span className="fs-14 text-black">
-                                    4-6 mins{" "}
-                                  </span>
-                                </li>
-                                <li>
-                                  <i
-                                    className="fa fa-star-o mr-3 scale5 text-warning"
-                                    aria-hidden="true"
-                                  />
-                                  <span className="fs-14 text-black font-w500">
-                                    568 Reviews
-                                  </span>
-                                </li>
-                              </ul>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="items">
-                          <div className="d-sm-flex p-3 border border-light rounded">
-                            <Link to="/ecom-product-detail">
-                              <img
-                                className="mr-4 food-image rounded"
-                                src={menu02}
-                                alt=""
-                                width={160}
-                              />
-                            </Link>
-                            <div>
-                              <div className="d-flex align-items-center mb-2">
-                                <img
-                                  className="rounded-circle mr-2 profile-image"
-                                  src={testimonial2}
-                                  alt=""
-                                  width={30}
-                                />
-                                <span className="fs-14 text-primary">
-                                  Chintya
-                                </span>
-                              </div>
-                              <h6 className="fs-16 mb-4">
-                                <Link
-                                  to="/ecom-product-detail"
-                                  className="text-black"
-                                >
-                                  Chicken Egg with fresh tomatos
-                                </Link>
-                              </h6>
-                              <ul>
-                                <li className="mb-2">
-                                  <i className="las la-clock scale5 mr-3" />
-                                  <span className="fs-14 text-black">
-                                    4-6 mins{" "}
-                                  </span>
-                                </li>
-                                <li>
-                                  <i
-                                    className="fa fa-star-o mr-3 scale5 text-warning"
-                                    aria-hidden="true"
-                                  />
-                                  <span className="fs-14 text-black font-w500">
-                                    223 Reviews
-                                  </span>
-                                </li>
-                              </ul>
-                            </div>
-                          </div>
-                        </div>
-                      </Slider>
-                    </div>
-                  </Tab.Pane>
-                  <Tab.Pane
-                    // className={`tab-pane fade ${
-                    //    activeToggle === "lunch" ? "active show" : ""
-                    // }`}
-                    id="Lunch"
-                    role="tabpanel"
-                    eventKey="lunch"
-                  >
-                    <div className="featured-menus owl-carousel">
-                      <Slider {...settings}>
-                        <div className="items">
-                          <div className="d-sm-flex p-3 border border-light rounded">
-                            <Link to="/ecom-product-detail">
-                              <img
-                                className="mr-4 food-image rounded"
-                                src={menu01}
-                                alt=""
-                                width={160}
-                              />
-                            </Link>
-                            <div>
-                              <div className="d-flex align-items-center mb-2">
-                                <img
-                                  className="rounded-circle mr-2 profile-image"
-                                  src={testimonial}
-                                  alt=""
-                                  width={30}
-                                />
-                                <span className="fs-14 text-primary">
-                                  Andrew
-                                </span>
-                              </div>
-                              <h6 className="fs-16 mb-4">
-                                <Link
-                                  to="/ecom-product-detail"
-                                  className="text-black"
-                                >
-                                  Fresh or Frozen (No Sugar Added) Fruits
-                                </Link>
-                              </h6>
-                              <ul>
-                                <li className="mb-2">
-                                  <i className="las la-clock scale5 mr-3" />
-                                  <span className="fs-14 text-black">
-                                    4-6 mins{" "}
-                                  </span>
-                                </li>
-                                <li>
-                                  <i
-                                    className="fa fa-star-o mr-3 scale5 text-warning"
-                                    aria-hidden="true"
-                                  />
-                                  <span className="fs-14 text-black font-w500">
-                                    568 Reviews
-                                  </span>
-                                </li>
-                              </ul>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="items">
-                          <div className="d-sm-flex p-3 border border-light rounded">
-                            <Link to="/ecom-product-detail">
-                              <img
-                                className="mr-4 food-image rounded"
-                                src={menu03}
-                                alt=""
-                                width={160}
-                              />
-                            </Link>
-                            <div>
-                              <div className="d-flex align-items-center mb-2">
-                                <img
-                                  className="rounded-circle mr-2 profile-image"
-                                  src={testimonial3}
-                                  alt=""
-                                  width={30}
-                                />
-                                <span className="fs-14 text-primary">
-                                  Ilham
-                                </span>
-                              </div>
-                              <h6 className="fs-16 mb-4">
-                                <Link
-                                  to="/ecom-product-detail"
-                                  className="text-black"
-                                >
-                                  Sweet Orange Fruits with Lemon
-                                </Link>
-                              </h6>
-                              <ul>
-                                <li className="mb-2">
-                                  <i className="las la-clock scale5 mr-3" />
-                                  <span className="fs-14 text-black">
-                                    4-6 mins{" "}
-                                  </span>
-                                </li>
-                                <li>
-                                  <i
-                                    className="fa fa-star-o mr-3 scale5 text-warning"
-                                    aria-hidden="true"
-                                  />
-                                  <span className="fs-14 text-black font-w500">
-                                    176 Reviews
-                                  </span>
-                                </li>
-                              </ul>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="items">
-                          <div className="d-sm-flex p-3 border border-light rounded">
-                            <Link to="/ecom-product-detail">
-                              <img
-                                className="mr-4 food-image rounded"
-                                src={menu02}
-                                alt=""
-                                width={160}
-                              />
-                            </Link>
-                            <div>
-                              <div className="d-flex align-items-center mb-2">
-                                <img
-                                  className="rounded-circle mr-2 profile-image"
-                                  src={testimonial2}
-                                  alt=""
-                                  width={30}
-                                />
-                                <span className="fs-14 text-primary">
-                                  Chintya
-                                </span>
-                              </div>
-                              <h6 className="fs-16 mb-4">
-                                <Link
-                                  to="/ecom-product-detail"
-                                  className="text-black"
-                                >
-                                  Chicken Egg with fresh tomatos
-                                </Link>
-                              </h6>
-                              <ul>
-                                <li className="mb-2">
-                                  <i className="las la-clock scale5 mr-3" />
-                                  <span className="fs-14 text-black">
-                                    4-6 mins{" "}
-                                  </span>
-                                </li>
-                                <li>
-                                  <i
-                                    className="fa fa-star-o mr-3 scale5 text-warning"
-                                    aria-hidden="true"
-                                  />
-                                  <span className="fs-14 text-black font-w500">
-                                    223 Reviews
-                                  </span>
-                                </li>
-                              </ul>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="items">
-                          <div className="d-sm-flex p-3 border border-light rounded">
-                            <Link to="/ecom-product-detail">
-                              <img
-                                className="mr-4 food-image rounded"
-                                src={menu01}
-                                alt=""
-                                width={160}
-                              />
-                            </Link>
-                            <div>
-                              <div className="d-flex align-items-center mb-2">
-                                <img
-                                  className="rounded-circle mr-2 profile-image"
-                                  src={testimonial}
-                                  alt=""
-                                  width={30}
-                                />
-                                <span className="fs-14 text-primary">
-                                  Andrew
-                                </span>
-                              </div>
-                              <h6 className="fs-16 mb-4">
-                                <Link
-                                  to="/ecom-product-detail"
-                                  className="text-black"
-                                >
-                                  Fresh or Frozen (No Sugar Added) Fruits
-                                </Link>
-                              </h6>
-                              <ul>
-                                <li className="mb-2">
-                                  <i className="las la-clock scale5 mr-3" />
-                                  <span className="fs-14 text-black">
-                                    4-6 mins{" "}
-                                  </span>
-                                </li>
-                                <li>
-                                  <i
-                                    className="fa fa-star-o mr-3 scale5 text-warning"
-                                    aria-hidden="true"
-                                  />
-                                  <span className="fs-14 text-black font-w500">
-                                    568 Reviews
-                                  </span>
-                                </li>
-                              </ul>
-                            </div>
-                          </div>
-                        </div>
-                      </Slider>
-                    </div>
-                  </Tab.Pane>
-                  <Tab.Pane
-                    // className={`tab-pane fade ${
-                    //    activeToggle === "dinner" ? "active show" : ""
-                    // }`}
-                    id="Dinner"
-                    role="tabpanel"
-                    eventKey="dinner"
-                  >
-                    <div className="featured-menus owl-carousel">
-                      <Slider {...settings}>
-                        <div className="items">
-                          <div className="d-sm-flex p-3 border border-light rounded">
-                            <Link to="/ecom-product-detail">
-                              <img
-                                className="mr-4 food-image rounded"
-                                src={menu01}
-                                alt=""
-                                width={160}
-                              />
-                            </Link>
-                            <div>
-                              <div className="d-flex align-items-center mb-2">
-                                <img
-                                  className="rounded-circle mr-2 profile-image"
-                                  src={testimonial}
-                                  alt=""
-                                  width={30}
-                                />
-                                <span className="fs-14 text-primary">
-                                  Andrew
-                                </span>
-                              </div>
-                              <h6 className="fs-16 mb-4">
-                                <Link
-                                  to="/ecom-product-detail"
-                                  className="text-black"
-                                >
-                                  Fresh or Frozen (No Sugar Added) Fruits
-                                </Link>
-                              </h6>
-                              <ul>
-                                <li className="mb-2">
-                                  <i className="las la-clock scale5 mr-3" />
-                                  <span className="fs-14 text-black">
-                                    4-6 mins{" "}
-                                  </span>
-                                </li>
-                                <li>
-                                  <i
-                                    className="fa fa-star-o mr-3 scale5 text-warning"
-                                    aria-hidden="true"
-                                  />
-                                  <span className="fs-14 text-black font-w500">
-                                    568 Reviews
-                                  </span>
-                                </li>
-                              </ul>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="items">
-                          <div className="d-sm-flex p-3 border border-light rounded">
-                            <Link to="/ecom-product-detail">
-                              <img
-                                className="mr-4 food-image rounded"
-                                src={menu02}
-                                alt=""
-                                width={160}
-                              />
-                            </Link>
-                            <div>
-                              <div className="d-flex align-items-center mb-2">
-                                <img
-                                  className="rounded-circle mr-2 profile-image"
-                                  src={testimonial2}
-                                  alt=""
-                                  width={30}
-                                />
-                                <span className="fs-14 text-primary">
-                                  Chintya
-                                </span>
-                              </div>
-                              <h6 className="fs-16 mb-4">
-                                <Link
-                                  to="/ecom-product-detail"
-                                  className="text-black"
-                                >
-                                  Chicken Egg with fresh tomatos
-                                </Link>
-                              </h6>
-                              <ul>
-                                <li className="mb-2">
-                                  <i className="las la-clock scale5 mr-3" />
-                                  <span className="fs-14 text-black">
-                                    4-6 mins{" "}
-                                  </span>
-                                </li>
-                                <li>
-                                  <i
-                                    className="fa fa-star-o mr-3 scale5 text-warning"
-                                    aria-hidden="true"
-                                  />
-                                  <span className="fs-14 text-black font-w500">
-                                    223 Reviews
-                                  </span>
-                                </li>
-                              </ul>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="items">
-                          <div className="d-sm-flex p-3 border border-light rounded">
-                            <Link to="/ecom-product-detail">
-                              <img
-                                className="mr-4 food-image rounded"
-                                src={menu03}
-                                alt=""
-                                width={160}
-                              />
-                            </Link>
-                            <div>
-                              <div className="d-flex align-items-center mb-2">
-                                <img
-                                  className="rounded-circle mr-2 profile-image"
-                                  src={testimonial3}
-                                  alt=""
-                                  width={30}
-                                />
-                                <span className="fs-14 text-primary">
-                                  Ilham
-                                </span>
-                              </div>
-                              <h6 className="fs-16 mb-4">
-                                <Link
-                                  to="/ecom-product-detail"
-                                  className="text-black"
-                                >
-                                  Sweet Orange Fruits with Lemon
-                                </Link>
-                              </h6>
-                              <ul>
-                                <li className="mb-2">
-                                  <i className="las la-clock scale5 mr-3" />
-                                  <span className="fs-14 text-black">
-                                    4-6 mins{" "}
-                                  </span>
-                                </li>
-                                <li>
-                                  <i
-                                    className="fa fa-star-o mr-3 scale5 text-warning"
-                                    aria-hidden="true"
-                                  />
-                                  <span className="fs-14 text-black font-w500">
-                                    176 Reviews
-                                  </span>
-                                </li>
-                              </ul>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="items">
-                          <div className="d-sm-flex p-3 border border-light rounded">
-                            <Link to="/ecom-product-detail">
-                              <img
-                                className="mr-4 food-image rounded"
-                                src={menu01}
-                                alt=""
-                                width={160}
-                              />
-                            </Link>
-                            <div>
-                              <div className="d-flex align-items-center mb-2">
-                                <img
-                                  className="rounded-circle mr-2 profile-image"
-                                  src={testimonial}
-                                  alt=""
-                                  width={30}
-                                />
-                                <span className="fs-14 text-primary">
-                                  Andrew
-                                </span>
-                              </div>
-                              <h6 className="fs-16 mb-4">
-                                <Link
-                                  to="/ecom-product-detail"
-                                  className="text-black"
-                                >
-                                  Fresh or Frozen (No Sugar Added) Fruits
-                                </Link>
-                              </h6>
-                              <ul>
-                                <li className="mb-2">
-                                  <i className="las la-clock scale5 mr-3" />
-                                  <span className="fs-14 text-black">
-                                    4-6 mins{" "}
-                                  </span>
-                                </li>
-                                <li>
-                                  <i
-                                    className="fa fa-star-o mr-3 scale5 text-warning"
-                                    aria-hidden="true"
-                                  />
-                                  <span className="fs-14 text-black font-w500">
-                                    568 Reviews
-                                  </span>
-                                </li>
-                              </ul>
-                            </div>
-                          </div>
-                        </div>
-                      </Slider>
-                    </div>
-                  </Tab.Pane>
-                </Tab.Content>
-              </div>
-            </Tab.Container>
           </div>
         </div>
       </div>

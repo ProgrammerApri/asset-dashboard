@@ -16,8 +16,14 @@ const CircleProgress = ({ percent, color, icon }) => {
     cir.style.strokeDashoffset = offset;
   });
 
-  var primaryColor = color;
-  var secondaryColor = `${color}40`;
+  var letters = '0123456789ABCDEF';
+  var colors = '#';
+  for (var i = 0; i < 6; i++) {
+    colors += letters[Math.floor(Math.random() * 16)];
+  }
+
+  var primaryColor = colors;
+  var secondaryColor = `${primaryColor}40`;
 
   return (
     <div className="d-inline-block mb-4 ml--12 position-relative donut-chart-sale">
@@ -33,10 +39,8 @@ const CircleProgress = ({ percent, color, icon }) => {
           ref={circle}
         ></circle>
       </svg>
-      <small className="text-primary">
-        {icon}
-      </small>
-      <span className="circle" style={{backgroundColor:color}}/>
+      <small className="text-primary">{icon}</small>
+      <span className="circle" style={{ backgroundColor: primaryColor }} />
     </div>
   );
 };

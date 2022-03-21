@@ -861,6 +861,15 @@ pre code {
   margin-left: -15px;
 }
 
+.tittle-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.hidden {
+	display: none;
+}
+
 .no-gutters {
   margin-right: 0;
   margin-left: 0;

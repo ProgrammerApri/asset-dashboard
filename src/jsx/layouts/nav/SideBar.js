@@ -54,6 +54,7 @@ class SideBar extends Component {
          ],
          lokasi = [
             "lokasi",
+            "tambah-lokasi"
          ],
          app = [
             "app-profile",
@@ -148,6 +149,9 @@ class SideBar extends Component {
                      <ul aria-expanded="false">
                         <li>
                            <Link to="/lokasi">Daftar Lokasi</Link>
+                        </li>
+                        <li>
+                           <Link to="/tambah-lokasi">Tambah Lokasi</Link>
                         </li>
                      </ul>
                   </li>

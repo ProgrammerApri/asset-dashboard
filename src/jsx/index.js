@@ -91,6 +91,7 @@ import Toastr from "./components/PluginsMenu/Toastr/Toastr";
 import JqvMap from "./components/PluginsMenu/Jqv Map/JqvMap";
 import RechartJs from "./components/charts/rechart";
 import Lokasi from "./components/Lokasi/Lokasi";
+import TambahLokasi from "./components/Lokasi/TambahLokasi";
 
 const Markup = () => {
    const routes = [
@@ -98,6 +99,7 @@ const Markup = () => {
       { url: "", component: Home },
       /// Lokasi
       {url: "lokasi", component: Lokasi},
+      {url: "tambah-lokasi", component: TambahLokasi},
       /// Bootstrap
       { url: "ui-alert", component: UiAlert },
       { url: "ui-badge", component: UiBadge },

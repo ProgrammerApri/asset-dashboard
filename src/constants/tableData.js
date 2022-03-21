@@ -330,7 +330,6 @@ const feeTable = {
 const patientTable = {
    data: [
       [
-         "",
          "#P-00001",
          "26/02/2020, 12:42 AM",
          "Paul Byrd",
@@ -338,10 +337,8 @@ const patientTable = {
          "Cold & Flu",
          "New Patient",
          "AB-001",
-         "",
       ],
       [
-         "",
          "#P-00002",
 
          "26/02/2020, 12:42 AM",
@@ -350,10 +347,8 @@ const patientTable = {
          "Cold & Flu",
          "In Treatment",
          "AB-002",
-         "",
       ],
       [
-         "",
          "#P-00003",
 
          "26/02/2020, 12:42 AM",
@@ -362,10 +357,8 @@ const patientTable = {
          "Cold & Flu",
          "Recovered",
          "AB-003",
-         "",
       ],
       [
-         "",
          "#P-00004",
          "26/02/2020, 12:42 AM",
          "Bradley Greer",
@@ -373,10 +366,8 @@ const patientTable = {
          "Cold & Flu",
          "Recovered",
          "AB-003",
-         "",
       ],
       [
-         "",
          "#P-00005",
          "26/02/2020, 12:42 AM",
          "Jenette Caldwell",
@@ -384,10 +375,8 @@ const patientTable = {
          "Cold & Flu",
          "New Patient",
          "AB-005",
-         "",
       ],
       [
-         "",
          "#P-00006",
          "26/02/2020, 12:42 AM",
          "Yuri Berry",
@@ -395,10 +384,8 @@ const patientTable = {
          "Cold & Flu",
          "New Patient",
          "AB-006",
-         "",
       ],
       [
-         "",
          "#P-00007",
          "26/02/2020, 12:42 AM",
          "Caesar Vance",
@@ -406,10 +393,8 @@ const patientTable = {
          "Cold & Flu",
          "Recovered",
          "AB-007",
-         "",
       ],
       [
-         "",
          "#P-00008",
          "26/02/2020, 12:42 AM",
          "Doris Wilder",
@@ -417,10 +402,8 @@ const patientTable = {
          "Cold & Flu",
          "New Patient",
          "AB-008",
-         "",
       ],
       [
-         "",
          "#P-00009",
          "26/02/2020, 12:42 AM",
          "Angelica Ramos",
@@ -428,10 +411,8 @@ const patientTable = {
          "Cold & Flu",
          "New Patient",
          "AB-009",
-         "",
       ],
       [
-         "",
          "#P-00010",
          "26/02/2020, 12:42 AM",
          "Gavin Joyce",
@@ -439,11 +420,9 @@ const patientTable = {
          "Cold & Flu",
          "New Patient",
          "AB-010",
-         "",
       ],
    ],
    columns: [
-      "",
       "Order ID",
       "Date Check in",
       "Name",

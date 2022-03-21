@@ -675,6 +675,7 @@ const Element = () => {
                                  type="text"
                                  placeholder="Readonly input here…"
                                  readonly
+                                 value={'tes'}
                               />
                            </div>
                            <div className="form-group row">
@@ -1365,11 +1366,10 @@ const Element = () => {
                         <form action="#">
                            <div className="input-group mb-3">
                               <SplitButton
-                                 className="input-group-prepend"
+                                 className="input-group-prepend ml-1"
                                  as={ButtonGroup}
                                  variant="primary"
                                  id="dropdown-button-drop-dwon"
-                                 className="ml-1"
                                  drop="dwon"
                                  title="Action"
                               >
@@ -1408,11 +1408,10 @@ const Element = () => {
                            <div className="input-group">
                               <input type="text" className="form-control" />
                               <SplitButton
-                                 className="input-group-prepend"
+                                 className="input-group-prepend ml-1"
                                  as={ButtonGroup}
                                  variant="primary"
                                  id="dropdown-button-drop-dwon"
-                                 className="ml-1"
                                  drop="dwon"
                                  title="Action"
                               >

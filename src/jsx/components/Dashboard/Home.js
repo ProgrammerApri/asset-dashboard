@@ -113,7 +113,7 @@ const Home = () => {
           <div className="card">
             <div className="card-body p-4">
             <CircleProgress
-                percent={75}
+                percent={60}
                 color={"#ff285c"}
                 icon={
                   <svg

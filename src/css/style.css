@@ -12709,6 +12709,12 @@ a.active {
   }
 }
 
+.progress-ring__circle {
+  transition: 3s stroke-dashoffset;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
 .hamburger {
   display: inline-block;
   left: 0px;

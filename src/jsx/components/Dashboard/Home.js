@@ -91,7 +91,7 @@ const Home = () => {
           <div className="card">
             <div className="card-body p-4">
               <CircleProgress
-                percent={30}
+                percent={37}
                 icon={
                   <svg
                     width={40}
@@ -116,7 +116,7 @@ const Home = () => {
           <div className="card">
             <div className="card-body p-4">
               <CircleProgress
-                percent={75}
+                percent={65}
                 icon={
                   <svg
                     width={40}
@@ -148,7 +148,7 @@ const Home = () => {
           <div className="card">
             <div className="card-body p-4">
               <CircleProgress
-                percent={75}
+                percent={15}
                 icon={
                   <svg
                     width={40}
@@ -212,7 +212,7 @@ const Home = () => {
           <div className="card">
             <div className="card-body p-4">
               <CircleProgress
-                percent={75}
+                percent={42}
                 icon={
                   <svg
                     width={40}

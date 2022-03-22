@@ -91,6 +91,7 @@ const profileTable = {
    data: [
       [
          pic1,
+         "00001",
          "Paul Byrd",
          "Chief Financial Officer (CFO)",
          "Male",
@@ -102,6 +103,7 @@ const profileTable = {
       ],
       [
          pic1,
+         "00002",
          "Gloria Little",
          "Systems Administrator",
          "Male",
@@ -113,6 +115,7 @@ const profileTable = {
       ],
       [
          pic1,
+         "00003",
          "Bradley Greer",
          "Software Engineer",
          "Male",
@@ -124,6 +127,7 @@ const profileTable = {
       ],
       [
          pic1,
+         "00004",
          "Dai Rios",
          "Personnel Lead",
          "Male",
@@ -135,6 +139,7 @@ const profileTable = {
       ],
       [
          pic1,
+         "00005",
          "Jenette Caldwell",
          "Development Lead",
          "Male",
@@ -146,6 +151,7 @@ const profileTable = {
       ],
       [
          pic1,
+         "00006",
          "Yuri Berry",
          "Chief Marketing Officer (CMO)",
          "Male",
@@ -157,6 +163,7 @@ const profileTable = {
       ],
       [
          pic1,
+         "00007",
          "Caesar Vance",
          "Pre-Sales Support",
          "Male",
@@ -168,6 +175,7 @@ const profileTable = {
       ],
       [
          pic1,
+         "00008",
          "Doris Wilder",
          "Sales Assistant",
          "Male",
@@ -179,6 +187,7 @@ const profileTable = {
       ],
       [
          pic1,
+         "00009",
          "Angelica Ramos",
          "Chief Executive Officer (CEO)",
          "Male",
@@ -190,6 +199,7 @@ const profileTable = {
       ],
       [
          pic1,
+         "000010",
          "Gavin Joyce",
          "Developer",
          "Male",
@@ -202,10 +212,11 @@ const profileTable = {
    ],
    columns: [
       "",
+      "Id_Employe",
       "Name",
-      "Department",
+      "Position",
       "Gender",
-      "Education",
+      "Type",
       "Mobile",
       "Email",
       "Joining Date",
@@ -527,6 +538,122 @@ const customers = {
    columns: ["Name", "Email", "Phone", "Billing Address", "Joined", ""],
 };
 
+const kolamTable = {
+   data: [
+      [
+         "#P-00001",
+         "26/02/2020, 12:42 AM",
+         "Paul Byrd",
+         "Dr. Cedric",
+         "Cold & Flu",
+         "New Patient",
+         "AB-001",
+         "",
+      ],
+      [
+         "#P-00002",
+         "26/02/2020, 12:42 AM",
+         "Gloria Little",
+         "Dr. Cedric",
+         "Cold & Flu",
+         "In Treatment",
+         "AB-002",
+         "",
+      ],
+      [
+         "#P-00003",
+         "26/02/2020, 12:42 AM",
+         "Bradley Greer",
+         "Dr. Cedric",
+         "Cold & Flu",
+         "Recovered",
+         "AB-003",
+         "",
+      ],
+      [
+         "#P-00004",
+         "26/02/2020, 12:42 AM",
+         "Bradley Greer",
+         "Dr. Cedric",
+         "Cold & Flu",
+         "Recovered",
+         "AB-003",
+         "",
+      ],
+      [
+         "#P-00005",
+         "26/02/2020, 12:42 AM",
+         "Jenette Caldwell",
+         "Dr. Cedric",
+         "Cold & Flu",
+         "New Patient",
+         "AB-005",
+         "",
+      ],
+      [
+         "#P-00006",
+         "26/02/2020, 12:42 AM",
+         "Yuri Berry",
+         "Dr. Cedric",
+         "Cold & Flu",
+         "New Patient",
+         "AB-006",
+         "",
+      ],
+      [
+         "#P-00007",
+         "26/02/2020, 12:42 AM",
+         "Caesar Vance",
+         "Dr. Cedric",
+         "Cold & Flu",
+         "Recovered",
+         "AB-007",
+         "",
+      ],
+      [
+         "#P-00008",
+         "26/02/2020, 12:42 AM",
+         "Doris Wilder",
+         "Dr. Cedric",
+         "Cold & Flu",
+         "New Patient",
+         "AB-008",
+         "",
+      ],
+      [
+         "#P-00009",
+         "26/02/2020, 12:42 AM",
+         "Angelica Ramos",
+         "Dr. Cedric",
+         "Cold & Flu",
+         "New Patient",
+         "AB-009",
+         "",
+      ],
+      [
+         "#P-00010",
+         "26/02/2020, 12:42 AM",
+         "Gavin Joyce",
+         "Dr. Cedric",
+         "Cold & Flu",
+         "New Patient",
+         "AB-010",
+         "",
+      ],
+   ],
+   columns: [
+      "ID Kolam",
+      "Anak Kolam",
+      "Density",
+      "Assgined",
+      "Disease",
+      "Status",
+      "Table no",
+      "Action",
+   ],
+};
+
+
 const data = {
    jobsTable,
    profileTable,
@@ -534,6 +661,7 @@ const data = {
    patientTable,
    productData,
    customers,
+   kolamTable,
 };
 
 export default data;

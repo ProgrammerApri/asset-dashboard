@@ -664,4 +664,99 @@ const data = {
    kolamTable,
 };
 
+const locationData = [
+   {
+      "id": "L001",
+      "lokasi": "Lampung",
+      "status": "running",
+      "tanggal_operasi": "20/03/2022",
+      "block": [
+        {
+          "id": "1",
+          "nama_block": "A",
+          "jumlah_kolam": 5
+        },
+        {
+          "id": "2",
+          "nama_block": "B",
+          "jumlah_kolam": 2
+        },
+        {
+          "id": "3",
+          "nama_block": "C",
+          "jumlah_kolam": 3
+        }
+      ]
+    },
+    {
+      "id": "L002",
+      "lokasi": "Ujung Kulon",
+      "status": "running",
+      "tanggal_operasi": "20/03/2022",
+      "block": [
+        {
+          "id": "1",
+          "nama_block": "A",
+          "jumlah_kolam": 5
+        },
+        {
+          "id": "2",
+          "nama_block": "B",
+          "jumlah_kolam": 2
+        },
+        {
+          "id": "3",
+          "nama_block": "C",
+          "jumlah_kolam": 3
+        }
+      ]
+    },
+    {
+      "id": "L003",
+      "lokasi": "Pangandaran",
+      "status": "waiting",
+      "tanggal_operasi": "20/03/2022",
+      "block": [
+        {
+          "id": "1",
+          "nama_block": "A",
+          "jumlah_kolam": 5
+        },
+        {
+          "id": "2",
+          "nama_block": "B",
+          "jumlah_kolam": 2
+        },
+        {
+          "id": "3",
+          "nama_block": "C",
+          "jumlah_kolam": 3
+        }
+      ]
+    },
+    {
+      "id": "L001",
+      "lokasi": "Sumatera Selatan",
+      "status": "stopped",
+      "tanggal_operasi": "20/03/2022",
+      "block": [
+        {
+          "id": "1",
+          "nama_block": "A",
+          "jumlah_kolam": 5
+        },
+        {
+          "id": "2",
+          "nama_block": "B",
+          "jumlah_kolam": 2
+        },
+        {
+          "id": "3",
+          "nama_block": "C",
+          "jumlah_kolam": 3
+        }
+      ]
+    }
+]
+
 export default data;

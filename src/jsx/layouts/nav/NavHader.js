@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 /// images
-import logo from "../../../images/logo.png";
-import logoText from "../../../images/logo-text.png";
+import logo from "../../../images/udang-logo.png";
+import logoText from "../../../images/udang-text.png";
 
 const NavHader = () => {
    const [toggle, setToggle] = useState(false);

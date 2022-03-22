@@ -1,7 +1,7 @@
 import React, { Component, useState, useEffect } from "react";
 import ReactApexChart from "react-apexcharts";
 
-const ApexRadialBar = ({series}) => {
+const ApexRadialBar = ({ series }) => {
   const [isShown, setIsShown] = useState(false);
   const options = {
     chart: {
@@ -50,11 +50,11 @@ const ApexRadialBar = ({series}) => {
   };
 
   useEffect(() => {
-   const timer = setTimeout(() => {
-     setIsShown(true);
-   }, 500);
-   return () => clearTimeout(timer);
- }, [500]);
+    const timer = setTimeout(() => {
+      setIsShown(true);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [500]);
 
   return isShown ? (
     <div id="chart">

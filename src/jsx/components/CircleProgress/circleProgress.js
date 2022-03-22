@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 
-const CircleProgress = ({ percent, color, icon }) => {
+const CircleProgress = ({ percent, icon }) => {
   const circle = React.createRef();
 
   useEffect(() => {
@@ -18,7 +18,7 @@ const CircleProgress = ({ percent, color, icon }) => {
 
   var letters = '0123456789ABCDEF';
   var colors = '#';
-  for (var i = 0; i < 6; i++) {
+  for (var i = 0; colors.length < 7; i++) {
     colors += letters[Math.floor(Math.random() * 16)];
   }
 

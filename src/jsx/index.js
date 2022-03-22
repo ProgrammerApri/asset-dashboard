@@ -92,6 +92,18 @@ import JqvMap from "./components/PluginsMenu/Jqv Map/JqvMap";
 import RechartJs from "./components/charts/rechart";
 import Lokasi from "./components/Lokasi/Lokasi";
 import TambahLokasi from "./components/Lokasi/TambahLokasi";
+import Karyawan from "./components/Karyawan/Karyawan";
+import InputKaryawan from "./components/Karyawan/InputKaryawan";
+
+/// Kolam
+// import Kolam from "./components/Kolam/Kolam";
+import InputKolam from "./components/Kolam/InputKolam";
+import BlockA6 from "./components/Kolam/BlockA6";
+import BlockB6 from "./components/Kolam/BlockB6";
+import BlockC6 from "./components/Kolam/BlockC6";
+import BlockA7 from "./components/Kolam/BlockA7";
+import BlockB7 from "./components/Kolam/BlockB7";
+import BlockC7 from "./components/Kolam/BlockC7";
 
 const Markup = () => {
    const routes = [
@@ -100,6 +112,21 @@ const Markup = () => {
       /// Lokasi
       {url: "lokasi", component: Lokasi},
       {url: "tambah-lokasi", component: TambahLokasi},
+      
+      /// Karyawan
+      {url: "karyawan", component: Karyawan},
+      {url: "input-karyawan", component: InputKaryawan},
+
+      /// Kolam
+      // { url: "kolam", component: Kolam },
+      { url: "block-a6", component: BlockA6 },
+      { url: "block-b6", component: BlockB6 },
+      { url: "block-c6", component: BlockC6 },
+      { url: "block-a7", component: BlockA7 },
+      { url: "block-b7", component: BlockB7 },
+      { url: "block-c7", component: BlockC7 },
+      { url: "input-kolam", component: InputKolam },
+      
       /// Bootstrap
       { url: "ui-alert", component: UiAlert },
       { url: "ui-badge", component: UiBadge },

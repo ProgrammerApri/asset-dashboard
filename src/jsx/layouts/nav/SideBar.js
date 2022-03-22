@@ -52,6 +52,10 @@ class SideBar extends Component {
       let deshBoard = [
             "",
          ],
+         karyawan = [
+            "karyawan",
+            "input-karyawan"
+         ],
          lokasi = [
             "lokasi",
             "tambah-lokasi"
@@ -135,6 +139,74 @@ class SideBar extends Component {
                   </li>
                   <li
                      className={`${
+                        karyawan.includes(path.slice(1)) ? "mm-active" : ""
+                     }`}
+                  >
+                     <Link
+                        className="has-arrow ai-icon"
+                        to="#"
+                        aria-expanded="false"
+                     >
+                        <i className="flaticon-381-user-1"></i>
+                        <span className="nav-text">Karyawan</span>
+                     </Link>
+                     <ul aria-expanded="false">
+                        <li>
+                           <Link to="/karyawan">Data Karyawan</Link>
+                        </li>
+                        <li>
+                           <Link to="/input-karyawan">Tambah Karyawan</Link>
+                        </li>
+                     </ul>
+                  </li>
+
+                  <li>
+                     <Link
+                        className="has-arrow ai-icon"
+                        to="#"
+                        aria-expanded="false"
+                     >
+                        <i className="flaticon-381-book"></i>
+                        <span className="nav-text">Kolam</span>
+                     </Link>
+                     <ul aria-expanded="false">
+                        <li>
+                           <Link
+                              className="has-arrow"
+                              to="#"
+                              aria-expanded="false"
+                           >
+                              Data Kolam
+                           </Link>
+                           <ul aria-expanded="false">
+                              <li>
+                                 <Link to="/block-a6">Block A(6)</Link>
+                              </li>
+                              <li>
+                                 <Link to="/block-b6">Block B(6)</Link>
+                              </li>
+                              <li>
+                                 <Link to="/block-c6">Block C(6)</Link>
+                              </li>
+                              <li>
+                                 <Link to="/block-a7">Block A(7)</Link>
+                              </li>
+                              <li>
+                                 <Link to="/block-b7">Block B(7)</Link>
+                              </li>
+                              <li>
+                                 <Link to="/block-c7">Block C(7)</Link>
+                              </li>
+                           </ul>
+                        </li>
+                        <li>
+                           <Link to="/input-kolam">Tambah Kolam</Link>
+                        </li>
+                     </ul>
+                  </li>
+
+                  <li
+                     className={`${
                         lokasi.includes(path.slice(1)) ? "mm-active" : ""
                      }`}
                   >
@@ -155,6 +227,7 @@ class SideBar extends Component {
                         </li>
                      </ul>
                   </li>
+
                   <li
                      className={`${
                         app.includes(path.slice(1)) ? "mm-active" : ""
@@ -235,6 +308,7 @@ class SideBar extends Component {
                         </li>
                      </ul>
                   </li>
+
                   <li
                      className={`${
                         charts.includes(path.slice(1)) ? "mm-active" : ""
@@ -266,6 +340,7 @@ class SideBar extends Component {
                         </li>
                      </ul>
                   </li>
+
                   <li
                      className={`${
                         bootstrap.includes(path.slice(1)) ? "mm-active" : ""
@@ -333,6 +408,7 @@ class SideBar extends Component {
                         </li>
                      </ul>
                   </li>
+
                   <li
                      className={`${
                         plugins.includes(path.slice(1)) ? "mm-active" : ""
@@ -367,6 +443,7 @@ class SideBar extends Component {
                         </li>
                      </ul>
                   </li>
+
                   <li
                      className={`${
                         widget.includes(path.slice(1)) ? "mm-active" : ""
@@ -381,6 +458,7 @@ class SideBar extends Component {
                         <span className="nav-text">Widget</span>
                      </Link>
                   </li>
+
                   <li
                      className={`${
                         forms.includes(path.slice(1)) ? "mm-active" : ""
@@ -414,6 +492,7 @@ class SideBar extends Component {
                         </li>
                      </ul>
                   </li>
+
                   <li
                      className={`${
                         table.includes(path.slice(1)) ? "mm-active" : ""
@@ -436,6 +515,7 @@ class SideBar extends Component {
                         </li>
                      </ul>
                   </li>
+                  
                   <li>
                      <Link
                         className="has-arrow ai-icon"

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { classNames } from "primereact/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -9,11 +10,14 @@ import { Button } from "primereact/button";
 import { Calendar } from "primereact/calendar";
 import { MultiSelect } from "primereact/multiselect";
 import { Slider } from "primereact/slider";
+import { TriStateCheckbox } from "primereact/tristatecheckbox";
+import { CustomerService } from "./CustomerService";
 import data from "../../../constants/data.js";
-import { Card, Badge, ProgressBar, Col, Row } from "react-bootstrap";
+import { Card, Badge, ProgressBar } from "react-bootstrap";
 import { Link } from "react-router-dom";
+// import './DataTableDemo.css';
 
-const DaftarLokasi = () => {
+const PaginatedTable2 = () => {
   const [customers1, setCustomers1] = useState(null);
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
@@ -58,6 +62,13 @@ const DaftarLokasi = () => {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
+    });
+  };
+
+  const formatCurrency = (value) => {
+    return value.toLocaleString("en-US", {
+      style: "currency",
+      currency: "USD",
     });
   };
 
@@ -267,11 +278,9 @@ const DaftarLokasi = () => {
 
   return (
     <>
-      <Row>
-        <Col>
-        <Card>
+      <Card>
         <Card.Header>
-          <Card.Title>Data Lokasi</Card.Title>
+          <Card.Title>Tes</Card.Title>
         </Card.Header>
         <Card.Body>
           <DataTable
@@ -357,10 +366,8 @@ const DaftarLokasi = () => {
           </DataTable>
         </Card.Body>
       </Card>
-        </Col>
-      </Row>
     </>
   );
 };
 
-export default DaftarLokasi;
+export default PaginatedTable2;

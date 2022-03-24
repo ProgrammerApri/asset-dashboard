@@ -14,7 +14,7 @@ const PaginatedTable = ({ header, body, tittle }) => {
     <>
       <Card>
         <Card.Header>
-          <Card.Title>{tittle}</Card.Title>
+          <Card.Title>Tes</Card.Title>
         </Card.Header>
         <Card.Body>
           <div id="example_wrapper" className="dataTables_wrapper">

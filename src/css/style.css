@@ -71,6 +71,35 @@
 @import url(./../vendor/aos/css/aos.min.css);
 @import url(./../vendor/perfect-scrollbar/css/perfect-scrollbar.css);
 @import url(./../vendor/metismenu/css/metisMenu.min.css);
+
+
+/* prime react style */
+.p-datatable .p-datatable-tbody > tr > td {
+  border: 0px solid #dee2e6;
+  border-bottom: 1px solid #dee2e6;
+}
+.p-datatable .p-datatable-header{
+  background: #fff;
+  border: 0px solid #fff !important; 
+  padding: 1rem 0;
+}
+
+.p-datatable .p-datatable-thead > tr > th {
+  border: 0px solid #dee2e6;
+}
+
+.p-datatable.p-datatable-gridlines .p-datatable-thead > tr > th {
+  border-width: 0px;
+}
+
+.p-datatable.p-datatable-gridlines .p-datatable-tbody > tr > td {
+  border-width: 0 0 1px 0;
+}
+
+.p-datatable.p-datatable-gridlines .p-paginator-bottom{
+  border-width: 0px;
+}
+
 .gradient_one {
   background-image: linear-gradient(
     to right,
@@ -262,7 +291,7 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
   --white: #fff;
   --gray: #6c757d;
   --gray-dark: #343a40;
-  --primary: #6cc51d;
+  --primary: #FF4D00;
   --secondary: #c046d3;
   --success: #37d1bf;
   --info: #1ea7c5;

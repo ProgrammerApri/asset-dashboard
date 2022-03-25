@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 /// React router dom
 import { Link } from "react-router-dom";
@@ -6,26 +6,40 @@ import { Link } from "react-router-dom";
 /// images
 import logo from "../../../images/udang-logo.png";
 import logoText from "../../../images/udang-text.png";
+import logoTextWhite from "../../../images/udang-text-white.png";
 
-const NavHader = () => {
-   const [toggle, setToggle] = useState(false);
-   return (
-      <div className="nav-header">
-         <Link to="/" className="brand-logo">
-            <img className="logo-abbr" src={logo} alt="" />
-            <img className="logo-compact" src={logoText} alt="" />
-            <img className="brand-title" src={logoText} alt="" />
-         </Link>
+const NavHader = ({isDark = false}) => {
+  const [toggle, setToggle] = useState(false);
 
-         <div className="nav-control" onClick={() => setToggle(!toggle)}>
-            <div className={`hamburger ${toggle ? "is-active" : ""}`}>
-               <span className="line"></span>
-               <span className="line"></span>
-               <span className="line"></span>
-            </div>
-         </div>
+  useEffect(() => {
+    console.log(isDark);
+  }, []);
+
+  return (
+    <div className="nav-header">
+      <Link to="/" className="brand-logo">
+        <img className="logo-abbr" src={logo} alt="" />
+        <img
+          className="logo-compact"
+          src={isDark ? logoTextWhite : logoText}
+          alt=""
+        />
+        <img
+          className="brand-title"
+          src={isDark ? logoTextWhite : logoText}
+          alt=""
+        />
+      </Link>
+
+      <div className="nav-control" onClick={() => setToggle(!toggle)}>
+        <div className={`hamburger ${toggle ? "is-active" : ""}`}>
+          <span className="line"></span>
+          <span className="line"></span>
+          <span className="line"></span>
+        </div>
       </div>
-   );
+    </div>
+  );
 };
 
 export default NavHader;

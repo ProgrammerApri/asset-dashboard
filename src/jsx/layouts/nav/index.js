@@ -5,23 +5,28 @@ import Header from "./Header";
 import ChatBox from "../ChatBox";
 
 const JobieNav = ({ title }) => {
-   const [toggle, setToggle] = useState("");
-   const onClick = (name) => setToggle(toggle === name ? "" : name);
-   return (
-      <Fragment>
-         <NavHader />
-         <SideBar />
-         <Header
-            onNote={() => onClick("chatbox")}
-            onNotification={() => onClick("notification")}
-            onProfile={() => onClick("profile")}
-            toggle={toggle}
-            title={title}
-            onBox={() => onClick("box")}
-         />
-         <ChatBox onClick={() => onClick("chatbox")} toggle={toggle} />
-      </Fragment>
-   );
+  const [toggle, setToggle] = useState("");
+  const [isDark, setDark] = useState(true);
+  const onClick = (name) => setToggle(toggle === name ? "" : name);
+  return (
+    <Fragment>
+      <NavHader isDark={isDark} />
+      <SideBar />
+      <Header
+        onNote={() => onClick("chatbox")}
+        onNotification={() => onClick("notification")}
+        onProfile={() => onClick("profile")}
+        toggle={toggle}
+        title={title}
+        onBox={() => onClick("box")}
+        onDark={(dark) => {
+          console.log(dark);
+          setDark(!dark);
+        }}
+      />
+      <ChatBox onClick={() => onClick("chatbox")} toggle={toggle} />
+    </Fragment>
+  );
 };
 
 export default JobieNav;

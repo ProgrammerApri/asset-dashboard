@@ -73,6 +73,7 @@
 @import url(./../vendor/metismenu/css/metisMenu.min.css);
 
 
+
 /* prime react style */
 .p-datatable .p-datatable-tbody > tr > td {
   border: 0px solid #dee2e6;
@@ -310,7 +311,27 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas,
     "Liberation Mono", "Courier New", monospace;
+  --body-bg: #F5F9F1;
+  --card-bg:#fff;
+  --text-color: #455560;
+  --selector: #33A9FE14;
+  --primary-button: #33A9FE;
+  --menu-color: var(--primary-button);
+  --menu-color-inactive: #a5a5a5;
+  --input-bg: #f3f3f3;
 }
+
+.dark {
+  --body-bg: #1C1C27;
+  --card-bg: #28293D;
+  --border-color: #2f2d35;
+  --text-color: #e4e4e4;
+  --font-input-color: #fff;
+ 
+  --menu-color-inactive: #727272;
+  --input-bg: #1C1C27;
+}
+
 
 *,
 *::before,
@@ -346,7 +367,7 @@ body {
   line-height: 1.5;
   color: #7e7e7e;
   text-align: left;
-  background-color: #f5f9f1;
+  background-color: var(--body-bg);
 }
 
 [tabindex="-1"]:focus:not(:focus-visible) {
@@ -3104,33 +3125,33 @@ fieldset:disabled a.btn {
 
 .btn-primary {
   color: #212529;
-  background-color: #6cc51d;
-  border-color: #6cc51d;
+  background-color: var(--primary-button);
+  border-color: var(--primary-button);
 }
 .btn-primary:hover {
   color: #fff;
-  background-color: #5aa418;
-  border-color: #549916;
+  background-color: #0090F8;
+  border-color: #0090F8;
 }
 .btn-primary:focus,
 .btn-primary.focus {
   color: #fff;
-  background-color: #5aa418;
-  border-color: #549916;
+  background-color: var(--primary-button);
+  border-color: var(--primary-button);
   box-shadow: 0 0 0 0.2rem rgba(97, 173, 31, 0.5);
 }
 .btn-primary.disabled,
 .btn-primary:disabled {
   color: #212529;
-  background-color: #6cc51d;
-  border-color: #6cc51d;
+  background-color: #4b8dff;
+  border-color: #4b8dff;
 }
 .btn-primary:not(:disabled):not(.disabled):active,
 .btn-primary:not(:disabled):not(.disabled).active,
 .show > .btn-primary.dropdown-toggle {
   color: #fff;
-  background-color: #549916;
-  border-color: #4e8d15;
+  background-color: #4b8dff;
+  border-color: #4b8dff;
 }
 .btn-primary:not(:disabled):not(.disabled):active:focus,
 .btn-primary:not(:disabled):not(.disabled).active:focus,
@@ -5178,7 +5199,7 @@ input[type="button"].btn-block {
   flex-direction: column;
   min-width: 0;
   word-wrap: break-word;
-  background-color: #fff;
+  background-color: #000000;
   background-clip: border-box;
   border: 1px solid rgba(0, 0, 0, 0.125);
   border-radius: 0.75rem;
@@ -6989,7 +7010,7 @@ a.close.disabled {
 }
 
 .bg-primary {
-  background-color: #6cc51d !important;
+  background-color: var(--primary-button) !important;
 }
 
 a.bg-primary:hover,
@@ -11403,7 +11424,7 @@ a.text-dark:focus {
 }
 
 .text-black-50 {
-  color: rgba(0, 0, 0, 0.5) !important;
+  color: var(--text-color) !important;
 }
 
 .text-white-50 {
@@ -11921,7 +11942,7 @@ a.active {
 }
 
 .text-black {
-  color: #000 !important;
+  color: var(--text-color) !important;
 }
 
 .dz-scroll {
@@ -12647,7 +12668,6 @@ a.active {
   position: absolute;
   left: 0;
   top: 0;
-  background-color: #fbfbfb;
   transition: all 0.2s ease;
   z-index: 5;
 }
@@ -12765,7 +12785,7 @@ a.active {
 }
 
 .hamburger .line {
-  background: #6cc51d;
+  background: var(--primary-button);
   display: block;
   height: 3px;
   border-radius: 3px;
@@ -12886,7 +12906,7 @@ a.active {
   z-index: 1;
   position: relative;
   padding: 0rem;
-  background-color: #fbfbfb;
+  background-color: var(--card-bg);
   z-index: 3;
   padding-left: 21.563rem;
   transition: all 0.2s ease;
@@ -13106,7 +13126,7 @@ svg.pulse-svg .third-circle {
 .header-left .dashboard_bar {
   font-size: 24px;
   font-weight: 600;
-  color: #000;
+  color: var(--text-color);
 }
 @media only screen and (max-width: 1400px) {
   .header-left .dashboard_bar {
@@ -13279,8 +13299,8 @@ svg.pulse-svg .third-circle {
 }
 .header-right .notification_dropdown .nav-link {
   position: relative;
-  color: #6cc51d;
-  background: #f6f6f6;
+  color: #9b9b9b;
+  background: var(--input-bg);
   border-radius: 0.875rem;
   padding: 15px;
   line-height: 1;
@@ -13319,7 +13339,7 @@ svg.pulse-svg .third-circle {
   fill: #37d1bf;
 }
 .header-right .notification_dropdown .nav-link i {
-  font-size: 24px;
+  font-size: 22px;
 }
 @media only screen and (max-width: 1400px) {
   .header-right .notification_dropdown .nav-link i {
@@ -16232,7 +16252,7 @@ html[dir="rtl"]
   top: 0;
   padding-top: 80px;
   z-index: 3;
-  background-color: #fbfbfb;
+  background-color: var(--card-bg);
   transition: all 0.2s ease;
   box-shadow: 18px 0px 35px 0px rgba(0, 0, 0, 0.02);
 }
@@ -16329,7 +16349,7 @@ html[dir="rtl"]
   fill: #6cc51d;
 }
 .deznav .metismenu > li.mm-active > a {
-  color: #6cc51d;
+  color: var(--primary-button);
 }
 .deznav .metismenu > li.mm-active > a g [fill] {
   fill: #6cc51d;
@@ -16365,7 +16385,7 @@ html[dir="rtl"]
 .deznav .metismenu ul a:focus,
 .deznav .metismenu ul a.mm-active {
   text-decoration: none;
-  color: #6cc51d;
+  color: var(--primary-button);
 }
 .deznav .metismenu a {
   position: relative;
@@ -17018,7 +17038,7 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
   > a {
   font-size: 14px;
   padding: 20px 40px;
-  color: #969ba0;
+  color: var(--menu-color-inactive);
   -webkit-transition: all 0.5s;
   -ms-transition: all 0.5s;
   transition: all 0.5s;
@@ -17040,22 +17060,22 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
   > li
   > a
   i {
-  color: #969ba0;
+  color: var(--menu-color-inactive);
 }
 [data-sidebar-style="full"][data-layout="vertical"]
   .deznav
   .metismenu
   > li.mm-active
   > a {
-  background: -moz-linear-gradient(left, white 0%, rgba(49, 206, 255, 0) 100%);
+  background: -moz-linear-gradient(left, var(--selector) 0%, rgba(49, 206, 255, 0) 100%);
   background: -webkit-linear-gradient(
     left,
-    white 0%,
+    var(--selector) 0%,
     rgba(49, 206, 255, 0) 100%
   );
-  background: linear-gradient(to right, white 0%, rgba(49, 206, 255, 0) 100%);
+  background: linear-gradient(to right, var(--selector) 0%, rgba(49, 206, 255, 0) 100%);
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#0031ceff',GradientType=1 );
-  color: #6cc51d;
+  color: var(--menu-color);
 }
 [data-sidebar-style="full"][data-layout="vertical"]
   .deznav
@@ -17063,7 +17083,7 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
   > li.mm-active
   > a
   i {
-  color: #6cc51d;
+  color: var(--menu-color);
 }
 [data-sidebar-style="full"][data-layout="vertical"]
   .deznav
@@ -17099,7 +17119,7 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
   .nav-control
   .hamburger
   .line {
-  background-color: #6cc51d !important;
+  background-color: var(--primary-button) !important;
 }
 [data-sidebar-style="full"][data-layout="vertical"] .menu-toggle .copyright,
 [data-sidebar-style="full"][data-layout="vertical"] .menu-toggle .drum-box {
@@ -17287,7 +17307,7 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
   .metismenu
   > li.mm-active
   > a {
-  background: #6cc51d;
+  background: var(--primary-button);
   border-radius: 0.875rem;
   color: #fff;
 }
@@ -17317,7 +17337,7 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
   > li:hover
   > a {
   border-radius: 0.875rem;
-  background: #6cc51d;
+  background: var(--primary-button);
   color: #fff;
 }
 [data-theme-version="dark"][data-sidebar-style="full"][data-layout="vertical"]
@@ -17605,7 +17625,7 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
     .metismenu
     > li.mm-active
     > a {
-    background: #6cc51d;
+    background: var(--primary-button);
     color: #fff;
     border-radius: 12px;
   }
@@ -25220,7 +25240,7 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
 
 [data-headerbg="color_1"] .nav-header .hamburger.is-active .line,
 [data-headerbg="color_1"] .nav-header .hamburger .line {
-  background: #6cc51d !important;
+  background: var(--primary-button) !important;
 }
 
 @media (min-width: 992px) {
@@ -26336,7 +26356,7 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
   color: #6cc51d;
 }
 [data-primary="color_3"] .hamburger .line {
-  background: #6cc51d;
+  background: var(--primary-button);
 }
 [data-primary="color_3"] svg.pulse-svg .first-circle,
 [data-primary="color_3"] svg.pulse-svg .second-circle,
@@ -26377,15 +26397,15 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
 }
 [data-primary="color_3"] .deznav .metismenu > li:hover > a,
 [data-primary="color_3"] .deznav .metismenu > li:focus > a {
-  color: #6cc51d;
+  color: var(--primary-button);
 }
 [data-primary="color_3"] .deznav .metismenu > li.mm-active > a {
-  color: #6cc51d;
+  color: var(--primary-button);
 }
 [data-primary="color_3"] .deznav .metismenu ul a:hover,
 [data-primary="color_3"] .deznav .metismenu ul a:focus,
 [data-primary="color_3"] .deznav .metismenu ul a.mm-active {
-  color: #6cc51d;
+  color: var(--primary-button);
 }
 @media (min-width: 767px) {
   [data-primary="color_3"]
@@ -39516,7 +39536,7 @@ button:focus {
 
 .card {
   margin-bottom: 1.875rem;
-  background-color: #fff;
+  background-color: var(--card-bg);
   transition: all 0.5s ease-in-out;
   position: relative;
   border: 0px solid transparent;
@@ -43277,7 +43297,7 @@ table.dataTable thead .sorting {
   height: 56px;
   padding: 10px 15px;
   font-size: 16px;
-  background: #f1f1f1;
+  background: var(--input-bg);
   border-radius: 0;
 }
 @media only screen and (max-width: 1400px) {
@@ -43839,18 +43859,23 @@ span#counter {
   width: 300px;
 }
 .search-area .form-control {
-  background: #f3f3f3;
+  background: var(--input-bg);
   border-width: 0px;
   padding-left: 20px;
   border-radius: 0.875rem 0 0 0.875rem;
   height: 45px;
 }
 .search-area .input-group-text {
-  background: #f3f3f3;
+  background: var(--input-bg);
   border-width: 0px;
-  padding-right: 25px;
+  padding-right: 18px;
   border-radius: 0 0.875rem 0.875rem 0;
   cursor: pointer;
+}
+
+.search-area .input-group-text i {
+  font-size: 22px;
+  color: #9b9b9b;
 }
 
 .distance-bx .icon {

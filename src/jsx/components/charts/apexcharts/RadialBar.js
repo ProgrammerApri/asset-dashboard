@@ -8,6 +8,10 @@ const ApexRadialBar = ({ series }) => {
       height: 300,
       type: "radialBar",
       offsetY: -10,
+      background: '#00000000'
+    },
+    theme:{
+      mode: "dark"
     },
     plotOptions: {
       radialBar: {
@@ -22,17 +26,20 @@ const ApexRadialBar = ({ series }) => {
           value: {
             offsetY: 0,
             fontSize: "34px",
-            color: "black",
+            color: "var(--text-color)",
             formatter: function (val) {
               return val + "%";
             },
           },
         },
+        track: {
+          background: 'var(--input-bg)',
+        }
       },
     },
     fill: {
       type: "gradient",
-      colors: "#6EC51E",
+      colors: "#33A9FE",
       gradient: {
         shade: "dark",
         shadeIntensity: 0.15,
@@ -44,7 +51,7 @@ const ApexRadialBar = ({ series }) => {
     },
     stroke: {
       dashArray: 4,
-      colors: "#6EC51E",
+      colors: "#33A9FE",
     },
     labels: [""],
   };

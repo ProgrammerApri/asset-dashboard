@@ -11,6 +11,7 @@ import { withResizeDetector } from "react-resize-detector";
 
 const App = ({ width }) => {
    const body = document.querySelector("body");
+   body.classList.add('dark');
 
    width >= 1300
       ? body.setAttribute("data-sidebar-style", "full")

@@ -225,7 +225,7 @@ const DaftarLokasi = () => {
 
   const activityBodyTemplate = (rowData) => {
     return (
-      <ProgressBar now={rowData.activity} variant="danger" />
+      <ProgressBar now={rowData.activity} />
     );
   };
 

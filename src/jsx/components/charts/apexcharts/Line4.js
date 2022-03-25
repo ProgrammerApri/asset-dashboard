@@ -11,6 +11,7 @@ const ProductionStat = ({series}) => {
       toolbar: {
         show: false,
       },
+      foreColor: 'var(--text-color)'
     },
     dataLabels: {
       enabled: false,

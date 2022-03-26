@@ -102,6 +102,33 @@
   color: var(--text-color);
 }
 
+.p-dropdown {
+  background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    height: 50px;
+}
+
+.p-dropdown .p-dropdown-trigger {
+  width: auto;
+}
+
+.p-inputtext:enabled:focus {
+  box-shadow: 0 0 0 0 #c7d2fe;
+  border-color: var(--primary-button);
+}
+
+.p-dropdown:not(.p-disabled).p-focus {
+  box-shadow: 0 0 0 0 #c7d2fe;
+  border-color: var(--primary-button);
+}
+
+.p-inputgroup-addon {
+  background-color: var(--input-bg);
+  border-top: 1px solid var(--border-color);
+    border-left: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
 .p-datatable.p-datatable-gridlines .p-datatable-thead > tr > th {
   border-width: 0px;
 }
@@ -39605,7 +39632,7 @@ button:focus {
   font-size: 0.875rem;
 }
 .card-header {
-  border-color: #f0f1f5;
+  border-color: var(--border-color);
   position: relative;
   background: transparent;
   padding: 1.5rem 1.875rem 1.25rem;

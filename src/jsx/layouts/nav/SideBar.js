@@ -11,6 +11,7 @@ import MetisMenu from "metismenujs";
 
 ///
 import drump from "../../../images/card/drump.png";
+import 'font-awesome/css/font-awesome.min.css';
 
 class MM extends Component {
    componentDidMount() {
@@ -55,6 +56,10 @@ class SideBar extends Component {
          karyawan = [
             "karyawan",
             "input-karyawan"
+         ],
+         kolam = [
+            "kolam",
+            "input-kolam"
          ],
          lokasi = [
             "lokasi",
@@ -159,45 +164,23 @@ class SideBar extends Component {
                         </li>
                      </ul>
                   </li>
-
-                  <li>
+                  
+                  <li
+                     className={`${
+                        kolam.includes(path.slice(1)) ? "mm-active" : ""
+                     }`}
+                  >
                      <Link
                         className="has-arrow ai-icon"
                         to="#"
                         aria-expanded="false"
                      >
-                        <i className="flaticon-381-book"></i>
+                        <i className="fa fa-book"></i>
                         <span className="nav-text">Kolam</span>
                      </Link>
                      <ul aria-expanded="false">
                         <li>
-                           <Link
-                              className="has-arrow"
-                              to="#"
-                              aria-expanded="false"
-                           >
-                              Data Kolam
-                           </Link>
-                           <ul aria-expanded="false">
-                              <li>
-                                 <Link to="/block-a6">Block A(6)</Link>
-                              </li>
-                              <li>
-                                 <Link to="/block-b6">Block B(6)</Link>
-                              </li>
-                              <li>
-                                 <Link to="/block-c6">Block C(6)</Link>
-                              </li>
-                              <li>
-                                 <Link to="/block-a7">Block A(7)</Link>
-                              </li>
-                              <li>
-                                 <Link to="/block-b7">Block B(7)</Link>
-                              </li>
-                              <li>
-                                 <Link to="/block-c7">Block C(7)</Link>
-                              </li>
-                           </ul>
+                           <Link to="/kolam">Daftar Kolam</Link>
                         </li>
                         <li>
                            <Link to="/input-kolam">Tambah Kolam</Link>

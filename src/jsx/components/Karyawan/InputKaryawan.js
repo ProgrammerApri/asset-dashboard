@@ -1,33 +1,39 @@
-import React, { useState, Fragment } from "react";
+import React, { useState, Fragment, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import Select from "react-select";
-import { DatePicker } from "@y0c/react-datepicker";
-import {
-  SplitButton,
-  ButtonGroup,
-  Dropdown,
+import { InputText } from 'primereact/inputtext';
+import { Dropdown } from 'primereact/dropdown';
+import { Calendar } from "primereact/calendar";
+import { RadioButton } from "primereact/radiobutton";
+import { SplitButton, ButtonGroup,
   Row,
   Col,
   Card,
   Button,
 } from "react-bootstrap";
 
-const options = [
-    { value: "male", label: "Male" },
-    { value: "female", label: "Female" },
- ];
- const options1 = [
-    { value: "", label: "" },
-    { value: "", label: "" },
- ];
- const options2 = [
-    { value: "", label: "" },
-    { value: "", label: "" },
- ];
-
 const InputKaryawan = () => {
-    const [selectedOption, setSelectedOption] = useState(null);
-  return (
+    const [selectJabatan, setJabatan] = useState(null);
+    const jabatan = [
+      { name: 'Manager' },
+      { name: 'HRD' },
+      { name: 'Marketing' },
+      { name: 'Accounting' }
+    ];
+
+    const gender = [
+      { name: 'Male', code: 'ML' },
+      { name: 'Female', code: 'FML' },
+    ];
+
+    const Jabatan = (e) => {
+      setJabatan(e.value);
+  }
+
+  const [date2, setDate2] = useState(null);
+  const [gender1, setGen] = useState(null);
+  
+   return (
     <Fragment>
       <Row>
         <Col lg={12}>
@@ -40,94 +46,65 @@ const InputKaryawan = () => {
                 <form onSubmit={(e) => e.preventDefault()}>
                   <div className="form-group">
                       <div className="form-row">
-                      <div className="col-sm-6">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Name"
-                        />
-                      </div>
+                      <div className="col-6 md:col-4">
+                        <div className="p-inputgroup">
+                            <span className="p-inputgroup-addon">
+                                <i className="pi pi-id-card"></i>
+                            </span>
+                            <InputText placeholder="ID Karyawan" />
+                        </div>
+                    </div>
 
-                      <div className="col-sm-6">
-                      <Select
-                            defaultValue={selectedOption}
-                            onChange={setSelectedOption}
-                            options={options2}
-                            style={{
-                                lineHeight: "100px",
-                                color: "#7e7e7e",
-                                paddingLeft: " 15px",
-                                }}
-                                placeholder="Position"
-                        />
-                      </div>
+                    <div className="col-6 md:col-4">
+                        <div className="p-inputgroup">
+                            <span className="p-inputgroup-addon">
+                                <i className="pi pi-user"></i>
+                            </span>
+                            <InputText placeholder="Full Name" />
+                        </div>
+                    </div>
+                    
                       </div>
                   </div>
 
                   <div className="form-group">
                       <div className="form-row">
-                      <div className="col-sm-6">
-                      <Select
-                            defaultValue={selectedOption}
-                            onChange={setSelectedOption}
-                            options={options}
-                            style={{
-                                lineHeight: "100px",
-                                color: "#7e7e7e",
-                                paddingLeft: " 15px",
-                                }}
-                                placeholder="Gender"
-                        />
-                      </div>
-
-                      <div className="col-sm-6">
-                      <Select
-                            defaultValue={selectedOption}
-                            onChange={setSelectedOption}
-                            options={options1}
-                            style={{
-                                lineHeight: "100px",
-                                color: "#7e7e7e",
-                                paddingLeft: " 15px",
-                                }}
-                                placeholder="Type"
-                        />
-                      </div>
-                      </div>
-                  </div>
-
-                  <div className="form-group">
-                    <div className="form-row">
-                      <div className="col-sm-6">
-                        <input
-                          type="op"
-                          className="form-control"
-                          placeholder="Mobile"
-                        />
-                      </div>
-                      <div className="col-sm-6">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Email"
-                        />
-                      </div>
+                      <div className="field col-6 md:col-6">
+                        <span className="p-float-label">
+                            <Dropdown className="col-12 md:col-6" inputId="dropdown" value={selectJabatan} options={jabatan} onChange={(e) => setJabatan(e.value)} optionLabel="name" />
+                            <label htmlFor="dropdown">Pilih Jabatan...</label>
+                        </span>
                     </div>
+
+                      <div className="field col-6">
+                        <div className="field-radiobutton"> 
+                          <RadioButton inputId="gender1" name="gender" value="Male" onChange={(e) => setGen(e.value)} checked={gender === 'Male'} />
+                          <label className="col-2" htmlFor="gender">Male</label>
+                          <RadioButton className="marginRight" inputId="gender1" name="gender" value="Male" onChange={(e) => setGen(e.value)} checked={gender === 'Female'} />
+                          <label className="col-2" htmlFor="gender">Female</label>
+                        </div>
+                    </div>
+                      </div>
                   </div>
 
                   <div className="form-group">
                     <div className="form-row">
-                      <div className="col-sm-6">
-                        <p className="mb-1">Date Joining</p>
-                         <DatePicker />
-                      </div>
-                      <div className="col-sm-6">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Action"
-                        />
-                      </div>
+                    <div className="col-6 md:col-4">
+                        <div className="p-inputgroup">
+                            <span className="p-inputgroup-addon">
+                                <i className="pi pi-phone"></i>
+                            </span>
+                            <InputText placeholder="Mobile" />
+                        </div>
+                    </div>
+                    <div className="col-6 md:col-4">
+                        <div className="p-inputgroup">
+                            <span className="p-inputgroup-addon">
+                                <i className="pi pi-id-card"></i>
+                            </span>
+                            <InputText placeholder="Email" />
+                        </div>
+                    </div>
                     </div>
                   </div>
 

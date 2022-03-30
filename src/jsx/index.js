@@ -1,4 +1,5 @@
 import React from "react";
+// import Login from "./components/Login";
 
 /// React router dom
 import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
@@ -13,7 +14,7 @@ import Footer from "./layouts/Footer";
 
 /// Pages
 import Registration from "./pages/Registration";
-import Login from "./pages/Login";
+// import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import LockScreen from "./pages/LockScreen";
 import Error400 from "./pages/Error400";
@@ -24,8 +25,12 @@ import Error503 from "./pages/Error503";
 /// Widget
 import Widget from "./pages/Widget";
 
+
 /// Deshboard
 import Home from "./components/Dashboard/Home";
+
+/// Klasifikasi
+import KlasifikasiAkun from "./components/Master/KlasifikasiAkun";
 
 /// Bo
 import UiAlert from "./components/bootstrap/Alert";
@@ -92,24 +97,31 @@ import JqvMap from "./components/PluginsMenu/Jqv Map/JqvMap";
 import RechartJs from "./components/charts/rechart";
 import Lokasi from "./components/Lokasi/Lokasi";
 import TambahLokasi from "./components/Lokasi/TambahLokasi";
-import Karyawan from "./components/Karyawan/Karyawan";
-import InputKaryawan from "./components/Karyawan/InputKaryawan";
+
+/// Master
+import Master from "./components/Master/PusatBiaya";
+// import InputKaryawan from "./components/Master/InputKaryawan";
 
 /// Kolam
 import Kolam from "./components/Kolam/Kolam";
 import InputKolam from "./components/Kolam/InputKolam";
 
+
 const Markup = () => {
    const routes = [
       /// Deshborad
       { url: "", component: Home },
+
+       /// Klasifikasi
+       { url: "klasifikasi", component: KlasifikasiAkun },
+
       /// Lokasi
       {url: "lokasi", component: Lokasi},
       {url: "tambah-lokasi", component: TambahLokasi},
       
-      /// Karyawan
-      {url: "karyawan", component: Karyawan},
-      {url: "input-karyawan", component: InputKaryawan},
+      /// Master
+      // {url: "master", component: Master},
+      // {url: "input-karyawan", component: InputKaryawan},
 
       /// Kolam
       { url: "kolam", component: Kolam },
@@ -184,7 +196,7 @@ const Markup = () => {
 
       { url: "page-register", component: Registration },
       { url: "page-lock-screen", component: LockScreen },
-      { url: "page-login", component: Login },
+      // { url: "page-login", component: Login },
       { url: "page-forgot-password", component: ForgotPassword },
       { url: "page-error-400", component: Error400 },
       { url: "page-error-403", component: Error403 },

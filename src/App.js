@@ -2,6 +2,7 @@ import React, { Fragment } from "react";
 
 /// Components
 import Markup from "./jsx";
+import Login from "./jsx/Login";
 
 /// Style
 import "./vendor/bootstrap-select/dist/css/bootstrap-select.min.css";
@@ -21,7 +22,7 @@ const App = ({ width }) => {
 
    return (
       <Fragment>
-         <Markup />
+         <Markup/>
       </Fragment>
    );
 };

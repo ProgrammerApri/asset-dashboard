@@ -1,26 +1,30 @@
 import React, { useState, useEffect } from "react";
-import { FilterMatchMode, FilterOperator } from "primereact/api";
+
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { InputText } from "primereact/inputtext";
-import { Button } from "primereact/button";
+
 import data from "../../../constants/data";
 import { Row, Col, Card } from "react-bootstrap";
+import { Button } from 'primereact/button';
 import { Link } from "react-router-dom";
-import { Margin } from "@syncfusion/ej2-react-charts";
+import { Dialog } from 'primereact/dialog';
+import { InputText } from 'primereact/inputtext';
 
 const KlasifikasiAkun = () => {
    const [klasifikasi, setKlasifikasi] = useState(null);
-   const [filter, setFilter] = useState(null);
-   const [load, setLoad] = useState(false);
-   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
+  //  const [ setData ] = useState();
+  //  const [dataDialog, setDataDialog] = useState(false);
+   const [displayData, setDisplayData] = useState(false);
+   const [position, setPosition] = useState('center');
+
+   const dialogFuncMap = {
+    'displayData': setDisplayData,
+}
    
 
    useEffect(() => {
     console.log(data.data);
-    setKlasifikasi(getKlasifikasi(data.data));
-    initFilters1();
-  }, []);
+    setKlasifikasi(getKlasifikasi(data.data)); }, []);
 
   const getKlasifikasi = (data) => {
     return [...(data || [])].map((d) => {
@@ -29,106 +33,58 @@ const KlasifikasiAkun = () => {
     });
   };
 
-   const renderHeader1 = () => {
-    return (
-      <div className="flex justify-content-between">
-        <Button
-          type="button"
-          icon="pi pi-filter-slash"
-          label="Clear"
-          className="p-button-outlined"
-          onClick={clearFilter1}
-        />
-        <span className="p-input-icon-left">
-          <i className="pi pi-search" />
-          <InputText
-            value={globalFilterValue1}
-            onChange={onGlobalFilterChange1}
-            placeholder="Keyword Search"
-          />
-        </span>
-      </div>
-    );
-  };
-
-  const clearFilter1 = () => {
-    initFilters1();
-  };
-
-  const initFilters1 = () => {
-    setFilter({
-      global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      name: {
-        operator: FilterOperator.AND,
-        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
-      },
-      "unit": {
-        operator: FilterOperator.AND,
-        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
-      },
-      representative: { value: null, matchMode: FilterMatchMode.IN },
-      date: {
-        operator: FilterOperator.AND,
-        constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }],
-      },
-      balance: {
-        operator: FilterOperator.AND,
-        constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
-      },
-      status: {
-        operator: FilterOperator.OR,
-        constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
-      },
-      activity: { value: null, matchMode: FilterMatchMode.BETWEEN },
-      verified: { value: null, matchMode: FilterMatchMode.EQUALS },
-    });
-    setGlobalFilterValue1("");
-  };
-
-  const onGlobalFilterChange1 = (e) => {
-    const value = e.target.value;
-    let _filters1 = { ...filter };
-    _filters1["global"].value = value;
-
-    setFilter(_filters1);
-    setGlobalFilterValue1(value);
-  };
-
-
-   const namaBodyTemplate = (rowData) => {
-    return (
-      <React.Fragment>
-        <span className="image-text">{rowData.nama}</span>
-      </React.Fragment>
-    );
-  };
-
   const actionBodyTemplate = () => {
     return (
+      // <React.Fragment>
       <div className="d-flex">
-        <Link to="#" className="btn btn-primary shadow btn-xs sharp mr-1">
+         <Link onClick={() => onClick('displayData')} className="btn btn-primary shadow btn-xs sharp ml-2">
           <i className="fa fa-pencil"></i>
         </Link>
-      </div>
-    );
+        </div>
+      // </React.Fragment>
+  );
   };
 
-  const header1 = renderHeader1();
-    return (
+//   const editData = (klasifikasi) => {
+//     setKlasifikasi({...klasifikasi});
+//     setDataDialog(true);
+// }
+
+const onClick = (kode, klasifikasi) => {
+  dialogFuncMap[`${kode}`](true);
+
+  if (position) {
+      setPosition(position);
+  }
+}
+
+const onHide = (kode) => {
+  dialogFuncMap[`${kode}`](false);
+}
+
+const renderFooter = (kode) => {
+  return (
+      <div>
+          <Button label="No" icon="pi pi-times" onClick={() => onHide(kode)} className="p-button-text btn-primary" />
+          <Button label="Yes" icon="pi pi-check" onClick={() => onHide(kode)} autoFocus />
+      </div>
+  );
+}
+ return (
         <>
-          <Row>
+        <Row>
             <Col>
             <Card>
             <Card.Header>
               <Card.Title>Klasifikasi Akun</Card.Title>
             </Card.Header>
             <Card.Body>
-              <DataTable
+              <DataTable responsive
                 value={klasifikasi}
                 paginator
-                className="p-datatable-customers"
+                className="display w-100 datatable-wrapper"
                 showGridlines
-                rows={10}
+                rows={10} 
                 dataKey="kode"
                 globalFilterFields={[
                   "kode",
@@ -138,23 +94,19 @@ const KlasifikasiAkun = () => {
                 <Column
                   field="kode"
                   header="Kode"
-                  filter
-                  filterPlaceholder="Search by id"
-                  style={{ minWidth: "12rem" }}
+                  style={{ minWidth: "6rem" }}
                 />
                 <Column
                   header="Nama Klasifikasi Akun"
-                  filterField="nama"
+                  field="nama"
                   style={{ minWidth: "12rem" }}
-                  body={namaBodyTemplate}
-                  filter
-                  filterPlaceholder="Search by Nama"
+
                 />
-                <Column
+                 <Column
                 header="Action"
                 dataType="boolean"
                 bodyClassName="text-center"
-                style={{ minWidth: "4rem" }}
+                style={{ minWidth: "2rem" }}
                 body={actionBodyTemplate}
               />
               </DataTable>
@@ -162,8 +114,25 @@ const KlasifikasiAkun = () => {
           </Card>
             </Col>
           </Row>
+          <Dialog header="Edit Klasifikasi Akun" visible={displayData} style={{ width: '40vw' }} footer={renderFooter('displayData')} onHide={() => onHide('displayData')}>
+          <div className="col-12 mb-2">
+              <label className="text-label">Kode Klasifikasi</label>
+              <div className="p-inputgroup">
+                   <InputText disabled/>
+              </div>
+            </div>
+
+            <div className="col-12 mb-2">
+              <label className="text-label">Nama Klasifikasi</label>
+              <div className="p-inputgroup">
+                   <InputText/>
+              </div>
+            </div>
+      </Dialog>
         </>
       );
+
+  
 };
 
 export default KlasifikasiAkun;

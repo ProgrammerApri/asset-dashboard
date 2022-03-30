@@ -10,7 +10,7 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import MetisMenu from "metismenujs";
 
 ///
-import drump from "../../../images/card/drump.png";
+
 import 'font-awesome/css/font-awesome.min.css';
 
 class MM extends Component {
@@ -54,14 +54,6 @@ class SideBar extends Component {
             "",
          ],
 
-         kolam = [
-            "kolam",
-            "input-kolam"
-         ],
-         lokasi = [
-            "lokasi",
-            "tambah-lokasi"
-         ],
          app = [
             "app-profile",
             "app-calender",
@@ -135,7 +127,7 @@ class SideBar extends Component {
                         to=""
                         aria-expanded="false"
                      >
-                        <i className="flaticon-381-networking"></i>
+                        <i className="flaticon-381-home"></i>
                         <span className="nav-text">Dashboard</span>
                      </Link>
                   </li>
@@ -420,54 +412,6 @@ class SideBar extends Component {
                         </li>
                         <li>
                            <Link to="/in">In</Link>
-                        </li>
-                     </ul>
-                  </li>
-
-
-                  
-                  <li
-                     className={`${
-                        kolam.includes(path.slice(1)) ? "mm-active" : ""
-                     }`}
-                  >
-                     <Link
-                        className="has-arrow ai-icon"
-                        to="#"
-                        aria-expanded="false"
-                     >
-                        <i className="fa fa-book"></i>
-                        <span className="nav-text">Kolam</span>
-                     </Link>
-                     <ul aria-expanded="false">
-                        <li>
-                           <Link to="/kolam">Daftar Kolam</Link>
-                        </li>
-                        <li>
-                           <Link to="/input-kolam">Tambah Kolam</Link>
-                        </li>
-                     </ul>
-                  </li>
-
-                  <li
-                     className={`${
-                        lokasi.includes(path.slice(1)) ? "mm-active" : ""
-                     }`}
-                  >
-                     <Link
-                        className="has-arrow ai-icon"
-                        to="#"
-                        aria-expanded="false"
-                     >
-                        <i className="flaticon-381-location"></i>
-                        <span className="nav-text">Lokasi</span>
-                     </Link>
-                     <ul aria-expanded="false">
-                        <li>
-                           <Link to="/lokasi">Daftar Lokasi</Link>
-                        </li>
-                        <li>
-                           <Link to="/tambah-lokasi">Tambah Lokasi</Link>
                         </li>
                      </ul>
                   </li>
@@ -808,25 +752,6 @@ class SideBar extends Component {
                      </ul>
                   </li>
                </MM>
-               <div className="drum-box mt-5">
-                  <img src={drump} alt="" />
-                  <p className="fs-18 font-w500 mb-4">
-                     Start Plan Your Workout
-                  </p>
-                  <Link className to={"./personal-record"}>
-                     Check schedule
-                     <svg
-                        className="ml-3"
-                        width={6}
-                        height={12}
-                        viewBox="0 0 6 12"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                     >
-                        <path d="M0 12L6 6L0 0" fill="#BCD7FF" />
-                     </svg>
-                  </Link>
-               </div>
 
                <div className="copyright">
                   <p>

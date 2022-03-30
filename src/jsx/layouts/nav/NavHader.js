@@ -4,9 +4,9 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 /// images
-import logo from "../../../images/udang-logo.png";
-import logoText from "../../../images/udang-text.png";
-import logoTextWhite from "../../../images/udang-text-white.png";
+import logo from "../../../images/logo-large.png";
+// import logoText from "../../../images/udang-text.png";
+// import logoTextWhite from "../../../images/udang-text-white.png";
 
 const NavHader = ({isDark = false}) => {
   const [toggle, setToggle] = useState(false);
@@ -19,7 +19,7 @@ const NavHader = ({isDark = false}) => {
     <div className="nav-header">
       <Link to="/" className="brand-logo">
         <img className="logo-abbr" src={logo} alt="" />
-        <img
+        {/* <img
           className="logo-compact"
           src={isDark ? logoTextWhite : logoText}
           alt=""
@@ -28,7 +28,7 @@ const NavHader = ({isDark = false}) => {
           className="brand-title"
           src={isDark ? logoTextWhite : logoText}
           alt=""
-        />
+        /> */}
       </Link>
 
       <div className="nav-control" onClick={() => setToggle(!toggle)}>

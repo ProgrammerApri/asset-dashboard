@@ -130,16 +130,10 @@ const KlasifikasiAkun = () => {
                 showGridlines
                 rows={10}
                 dataKey="kode"
-                filters={filter}
-                filterDisplay="menu"
-                loading={load}
-                responsiveLayout="scroll"
                 globalFilterFields={[
                   "kode",
                   "nama",
                 ]}
-                header={header1}
-                emptyMessage="Kode no found."
               >
                 <Column
                   field="kode"

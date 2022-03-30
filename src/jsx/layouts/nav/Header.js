@@ -18,7 +18,7 @@ const Header = ({
 }) => {
   var path = window.location.pathname.split("/");
   var name = path[path.length - 1].split("-");
-  const [isDark, setDark] = useState(true);
+  const [isDark, setDark] = useState(false);
   var filterName = name.length >= 3 ? name.filter((n, i) => i > 0) : name;
   var finalName = filterName.includes("app")
     ? filterName.filter((f) => f !== "app")

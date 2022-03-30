@@ -1,6 +1,6 @@
 import React, { Fragment } from "react";
 
-/// Components
+// Components
 import Markup from "./jsx";
 import Login from "./jsx/Login";
 
@@ -8,23 +8,14 @@ import Login from "./jsx/Login";
 import "./vendor/bootstrap-select/dist/css/bootstrap-select.min.css";
 import "./css/style.css";
 
-import { withResizeDetector } from "react-resize-detector";
 
-const App = ({ width }) => {
-   const body = document.querySelector("body");
-   body.classList.add('dark');
-
-   width >= 1300
-      ? body.setAttribute("data-sidebar-style", "full")
-      : width <= 1299 && width >= 767
-      ? body.setAttribute("data-sidebar-style", "mini")
-      : body.setAttribute("data-sidebar-style", "overlay");
-
-   return (
-      <Fragment>
-         <Markup/>
-      </Fragment>
-   );
+const App = () => {
+  const token = localStorage.getItem("token");
+  return (
+    <Fragment>
+       {token ? (<Markup/>) : (<Login/>)}
+    </Fragment>
+  );
 };
 
-export default withResizeDetector(App);
+export default App;

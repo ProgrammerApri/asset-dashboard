@@ -1,98 +1,42 @@
 import React, { useState } from "react";
-import { endpoints, request } from "./Utils";
+import { request, endpoints } from "src/utils";
 import { useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { SET_USER } from "../../../redux/actions";
+// import { SET_USER } from "../../../redux/actions";
 import axios from "axios";
 
 const Login = () => {
-   const [loginData, setLoginData] = useState({});
-   const handleBlur = (e) => {
-      // const newLoginData = { ...loginData };
-   };
-   const handleChange = (e) => {
-       this.useState({ name: e.target.value });
-   }
+  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const history = useHistory();
 
-   const handleSubmit = (e) => {
-       e.preventDefault();
-
-       const user = {
-           name: this.state.name
-       };
-   };
-
-   axios.post()
-   
-  
-//   const history = useHistory();
-//   const dispatch = useDispatch();
-//   const [password, setPassword] = useState("");
-//   const [username, setUsername] = useState("");
-//   const [isSubmitted, setIsSubmitted] = useState(false);
-//   const [isLoading, setIsLoading] = useState(false);
-
-//    const handleSubmit = async () => {
-//       setIsSubmitted(true);
-//       if (username && password) {
-//         setIsLoading(true);
-//         const config = {
-//           ...endpoints.login,
-//           data: { username, password },
-//         };
-//         let response = null;
-//         try {
-//           response = await request(null, config);
-//           if (response.status) {
-//             const { token, myprofile } = response;
-//             localStorage.setItem("token", token);
-//             localStorage.setItem("profile", JSON.stringify(myprofile));
-//             if (myprofile.type !== 4) {
-//               dispatch({
-//                 type: SET_USER,
-//                 payload: {
-//                   token,
-//                   myprofile,
-//                 },
-//               });
-//               setIsLoading(false);
-//               setIsSubmitted(false);
-//               history.push("/Dashboard");
-//             } else {
-//               const user = await request(null, {
-//                 ...endpoints.getUsers,
-//                 endpoint: endpoints.getUsers.endpoint + `/${myprofile.id}`,
-//               });
-//               const userData = {
-//                 ...myprofile,
-//                 data: user.data,
-//               };
-//               localStorage.setItem("token", token);
-//               localStorage.setItem("myprofile", JSON.stringify(userData));
-//               dispatch({
-//                 type: SET_USER,
-//                 payload: {
-//                   token,
-//                   myprofile: userData,
-//                 },
-//               });
-//               setIsLoading(false);
-//               setIsSubmitted(false);
-//               history.push("/Dashboard");
-//             }
-//           }
-//         } catch (error) {
-//           setIsLoading(false);
-//           if (error.status === 409 || error.status === 401) {
-//             alert(error.error.response.data.messages);
-//           } else {
-//             alert("Gangguan Server");
-//           }
-//         }
-//       } else {
-//         setIsSubmitted(true);
-//       }
-//     };
+   const handleSubmit = async () => {
+      if (username && password) {
+        const config = {
+          ...endpoints.login,
+          data: { username, password },
+        };
+        console.log(config.data);
+        let response = null;
+        try {
+          response = await request(null, config);
+          console.log(response);
+          if (response.status) {
+            const { data } = response;
+            console.log(data.token);
+            localStorage.setItem("token", data.token);
+            // history.push("/dashboard");
+            window.location.reload();
+          }
+        } catch (error) {
+          if (error.status === 403) {
+            alert("Password yang anda inputkan salah");
+          } else {
+            alert("Gangguan Server");
+          }
+        }
+      }
+    };
 
    return (
       <div className="authincation">
@@ -107,10 +51,10 @@ const Login = () => {
                                  Sign in your account
                               </h4>
                               <form
-                                 action=""
-                                 onSubmit={(e) =>
-                                    e.preventDefault(handleSubmit)
-                                 }
+                              action=""
+                              onSubmit={(e) =>
+                                 e.preventDefault()
+                              }
                               >
                                  <div className="form-group">
                                     <label className="mb-1">
@@ -120,7 +64,8 @@ const Login = () => {
                                        type="text"
                                        className="form-control"
                                        name="username"
-                                       onChange={handleBlur}
+                                       value={username}
+                                       onChange={(e) => setUsername(e.target.value)}
                                     />
                                  </div>
                                  <div className="form-group">
@@ -130,9 +75,9 @@ const Login = () => {
                                     <input
                                        type="password"
                                        className="form-control"
-                                       defaultValue="Password"
                                        name="password"
-                                       onChange={handleBlur}
+                                       value={password}
+                                       onChange={(e) => setPassword(e.target.value)}
                                     />
                                  </div>
                                  <div className="form-row d-flex justify-content-between mt-4 mb-2">
@@ -147,37 +92,21 @@ const Login = () => {
                                              className="custom-control-label"
                                              htmlFor="basic_checkbox_1"
                                           >
-                                             Remember my preference
+                                             Remember me
                                           </label>
                                        </div>
                                     </div>
-                                    {/* <div className="form-group">
-                                       <Link to="/page-forgot-password">
-                                          Forgot Password?
-                                       </Link>
-                                    </div> */}
                                  </div>
                                  <div className="text-center">
                                     <button
                                        type="submit"
                                        className="btn btn-primary btn-block"
-                                       onClick={() => handleSubmit}
+                                       onClick={() => handleSubmit()}
                                     >
                                        Sign Me In
                                     </button>
                                  </div>
                               </form>
-                              {/* <div className="new-account mt-3">
-                                 <p>
-                                    Don't have an account?{" "}
-                                    <Link
-                                       className="text-primary"
-                                       to="/page-register"
-                                    >
-                                       Sign up
-                                    </Link>
-                                 </p>
-                              </div> */}
                            </div>
                         </div>
                      </div>

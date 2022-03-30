@@ -6,7 +6,7 @@ import ChatBox from "../ChatBox";
 
 const JobieNav = ({ title }) => {
   const [toggle, setToggle] = useState("");
-  const [isDark, setDark] = useState(true);
+  const [isDark, setDark] = useState(false);
   const onClick = (name) => setToggle(toggle === name ? "" : name);
   return (
     <Fragment>

@@ -1,6 +1,6 @@
 const endpoints = {
     login: {
-        endpoints: "/v1/api/login",
+        endpoint: "/v1/api/login",
         method: "POST",
         data: {},
     },

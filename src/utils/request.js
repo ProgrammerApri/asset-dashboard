@@ -78,13 +78,11 @@ export default function request(param, config, header = {} ) {
               err
             );
           }
-          if (err?.response?.status === 403) {
-            if (err?.response?.data?.code === "other_user_login") {
-              alert(err.response.data.message);
+          if (err?.response?.status === 401) {
+            alert("Sesi anda sudah habis, silahkan login ulang");
               localStorage.removeItem("token");
               window.location.reload();
               return;
-            }
           }
 
   

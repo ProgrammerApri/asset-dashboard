@@ -368,7 +368,7 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
   --menu-color: var(--primary-button);
   --menu-color-inactive: #a5a5a5;
   --input-bg: #f3f3f3;
-  --border-color: #c2c2c2;
+  --border-color: #f0f1f5;
   --progress-color: #e9ecef;
 }
 
@@ -378,7 +378,7 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
   --border-color: #2f2d35;
   --text-color: #e4e4e4;
   --font-input-color: #fff;
-  --border-color: #636363;
+  --border-color: #414141;
   --menu-color-inactive: #727272;
   --input-bg: #1c1c27;
   --progress-color: #e9ecef50;
@@ -39599,7 +39599,7 @@ button:focus {
   position: relative;
   border: 0px solid transparent;
   border-radius: 0.875rem;
-  box-shadow: 0px 12px 23px 0px rgba(192, 70, 211, 0.04);
+  box-shadow: 0px 12px 23px 0px rgb(59 40 62 / 15%);
   height: calc(100% - 30px);
 }
 @media only screen and (max-width: 575px) {

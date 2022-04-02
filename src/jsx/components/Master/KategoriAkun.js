@@ -26,11 +26,17 @@ const data = {
   },
 };
 
+const kodesaldo = [
+  { name: 'Debit', code: 'D' },
+  { name: 'Kredit', code: 'K' },
+];
+
 const KategoriAkun = () => {
   const [klasifikasi, setKlasifikasi] = useState(null);
   const [kategori, setKategori] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
+  const [create, setCreate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
   const [position, setPosition] = useState("center");
   const [currentItem, setCurrentItem] = useState(null);
@@ -96,12 +102,14 @@ const KategoriAkun = () => {
     }
   };
 
-  const editKlasifikasi = async () => {
+  const editKategori = async () => {
     const config = {
-      ...endpoints.editKlasi,
-      endpoint: endpoints.editKlasi.endpoint + currentItem.id,
+      ...endpoints.editKateg,
+      endpoint: endpoints.editKateg.endpoint + currentItem.kategory.id,
       data: {
-        name: currentItem.klasiname,
+        name: currentItem.kategory.name,
+        kode_klasi : currentItem.klasifikasi.id,
+        kode_saldo : currentItem.kategory.kode_saldo,
       },
     };
     console.log(config.data);
@@ -113,7 +121,47 @@ const KategoriAkun = () => {
         setTimeout(() => {
           setUpdate(false);
           dialogFuncMap["displayData"](false);
-          getKlasifikasi();
+          getKategori();
+          toast.current.show({
+            severity: "info",
+            summary: "Berhasil",
+            detail: "Data berhasil diperbarui",
+            life: 3000,
+          });
+        }, 1500);
+      }
+    } catch (error) {
+      setTimeout(() => {
+        setUpdate(false);
+        toast.current.show({
+          severity: "error",
+          summary: "Gagal",
+          detail: "Gagal memperbarui data",
+          life: 3000,
+        });
+      }, 1000);
+    }
+  };
+
+  const addKategori = async () => {
+    const config = {
+      ...endpoints.addKateg,
+      data: {
+        name: currentItem.kategory.name,
+        kode_klasi : currentItem.klasifikasi.id,
+        kode_saldo : currentItem.kategory.kode_saldo,
+      },
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setTimeout(() => {
+          setUpdate(false);
+          dialogFuncMap["displayData"](false);
+          getKategori();
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -167,8 +215,14 @@ const KategoriAkun = () => {
   };
 
   const onSubmit = () => {
+    if (isEdit) {
     setUpdate(true);
-    editKlasifikasi();
+    editKategori();
+    }
+    else {
+      setUpdate(true);
+      addKategori();
+    }
   };
 
   const renderFooter = (kode) => {
@@ -322,11 +376,12 @@ const KategoriAkun = () => {
                   kategory: { ...currentItem.kategory, name: e.target.value },
                 })
               }
+              placeholder="Masukan Nama Kategori"
             />
           </div>
         </div>
         <div className="col-12 mb-2">
-          <label className="text-label">Nama Kategori</label>
+          <label className="text-label">Nama Klasifikasi</label>
           <div className="p-inputgroup">
             <Dropdown
               value={currentItem !== null ? currentItem.klasifikasi : null}
@@ -342,6 +397,25 @@ const KategoriAkun = () => {
               filter
               filterBy="klasiname"
               placeholder="Pilih Klasifikasi"
+            />
+          </div>
+        </div>
+
+        <div className="col-12 mb-2">
+          <label className="text-label">Kode Saldo Normal</label>
+          <div className="p-inputgroup">
+            <Dropdown
+              value={currentItem !== null && currentItem.kategory.kode_saldo !== "" ? currentItem.kategory.kode_saldo === "D" ?  { name: 'Debit', code: 'D' } : { name: 'Kredit', code: 'K' }: null}
+              options={kodesaldo}
+              onChange={(e) => {
+                console.log(e.value);
+                setCurrentItem({
+                  ...currentItem,
+                  kategory: {...currentItem.kategory, kode_saldo: e.value.code},
+                });
+              }}
+              optionLabel="name"
+              placeholder="Pilih Kode Saldo"
             />
           </div>
         </div>

@@ -22,6 +22,18 @@ const endpoints = {
         method: "GET",
         data: {},
     },
+
+    editKateg: {
+        endpoint: "/v1/api/kategory/",
+        method: "PUT",
+        data: {},
+    },
+
+    addKateg: {
+        endpoint: "/v1/api/kategory",
+        method: "POST",
+        data: {},
+    },
 };
 
 export default endpoints;

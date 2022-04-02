@@ -1,18 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
 
 import { request, endpoints } from "src/utils";
+import data from "../bootstrap/alertData";
 
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-
-// import data from "../../../constants/data";
+import { Alert } from "react-bootstrap";
 import { Row, Col, Card } from "react-bootstrap";
 import { Button } from "primereact/button";
 import { Link } from "react-router-dom";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { Skeleton } from "primereact/skeleton";
-import { Toast } from 'primereact/toast';
+import { Toast } from "primereact/toast";
 
 const KlasifikasiAkun = () => {
   const [klasifikasi, setKlasifikasi] = useState(null);
@@ -49,11 +49,11 @@ const KlasifikasiAkun = () => {
       }
     } catch (error) {}
     if (isUpdate) {
-      setLoading(false)
+      setLoading(false);
     } else {
       setTimeout(() => {
-      setLoading(false);
-    }, 1500);
+        setLoading(false);
+      }, 1500);
     }
   };
 
@@ -75,13 +75,23 @@ const KlasifikasiAkun = () => {
           setUpdate(false);
           dialogFuncMap["displayData"](false);
           getKlasifikasi(true);
-          toast.current.show({severity:'success', summary: 'Berhasil', detail:'Data berhasil diperbarui', life: 3000});
+          toast.current.show({
+            severity: "info",
+            summary: "Berhasil",
+            detail: "Data berhasil diperbarui",
+            life: 3000,
+          });
         }, 1500);
       }
     } catch (error) {
       setTimeout(() => {
         setUpdate(false);
-        toast.current.show({severity:'error', summary: 'Gagal', detail:'Gagal memperbarui data', life: 3000});
+        toast.current.show({
+          severity: "error",
+          summary: "Gagal",
+          detail: "Gagal memperbarui data",
+          life: 3000,
+        });
       }, 1000);
     }
   };
@@ -139,7 +149,7 @@ const KlasifikasiAkun = () => {
   };
   return (
     <>
-    <Toast ref={toast} />
+      <Toast ref={toast} />
       <Row>
         <Col>
           <Card>
@@ -154,29 +164,30 @@ const KlasifikasiAkun = () => {
                 showGridlines
                 rows={10}
                 dataKey="id"
+                rowHover
               >
                 <Column
                   field="id"
-                  header="#"
+                  header="Kode"
                   style={{
                     width: "10rem",
                     fontWeight: "bold",
                     color: "#727272",
                   }}
-                  body={loading && <Skeleton/>}
+                  body={loading && <Skeleton />}
                 />
                 <Column
                   header="Nama Klasifikasi Akun"
                   field="klasiname"
                   style={{ minWidth: "25rem" }}
-                  body={loading && <Skeleton/>}
+                  body={loading && <Skeleton />}
                 />
                 <Column
                   header="Action"
                   dataType="boolean"
                   bodyClassName="text-center"
                   style={{ minWidth: "2rem" }}
-                  body={(e) => loading ? <Skeleton/> : actionBodyTemplate(e)}
+                  body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
                 />
               </DataTable>
             </Card.Body>

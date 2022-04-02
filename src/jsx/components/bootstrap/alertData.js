@@ -202,6 +202,7 @@ const data = {
    mainData,
    socialMediaData,
    leftBigIconData,
+   emojis,
 };
 
 export default data;

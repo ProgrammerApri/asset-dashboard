@@ -111,6 +111,7 @@ import Kolam from "./components/Kolam/Kolam";
 import InputKolam from "./components/Kolam/InputKolam";
 import Login from "./Login";
 import { withResizeDetector } from "react-resize-detector";
+import KategoriAkun from "./components/Master/KategoriAkun";
 
 const Markup = ({width}) => {
   const routes = [
@@ -122,12 +123,13 @@ const Markup = ({width}) => {
 
     /// Klasifikasi
     { url: "klasifikasi", component: KlasifikasiAkun },
+    { url: "kategori", component: KategoriAkun },
 
     /// Lokasi
     { url: "lokasi", component: Lokasi },
     { url: "tambah-lokasi", component: TambahLokasi },
 
-    /// Master
+    // Master
     // {url: "master", component: Master},
     // {url: "input-karyawan", component: InputKaryawan},
 
@@ -241,8 +243,6 @@ const Markup = ({width}) => {
             </Switch>
           </div>
         </div>
-
-        <Footer />
       </div>
     </Router>
   );

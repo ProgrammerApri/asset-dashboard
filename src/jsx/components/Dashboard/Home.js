@@ -83,10 +83,6 @@ const Home = () => {
   };
   return (
     <>
-      <div className="tittle-row">
-        {/* <h4 className="text-black fs-18 mb-3">Inventory</h4>
-        <Button variant="primary btn-xxs mb-3">Lihat Semua</Button> */}
-      </div>
       <div className="row">
         <div className="col-xl col-md-6 col-sm-6">
           <div className="card">
@@ -127,10 +123,6 @@ const Home = () => {
 
       </div>
 
-
-      <div className="tittle-row">
-        <h4 className="text-black fs-18 mb-3">Account</h4>
-      </div>
       <div className="row">
         <div className="col-xl-9 col-xxl-8">
           <div className="card">

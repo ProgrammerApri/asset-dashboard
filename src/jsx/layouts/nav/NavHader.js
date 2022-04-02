@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 
 /// images
 import logo from "../../../images/logo-large.png";
+import logoSmall from "../../../images/logo.png";
 // import logoText from "../../../images/udang-text.png";
 // import logoTextWhite from "../../../images/udang-text-white.png";
 
@@ -18,7 +19,7 @@ const NavHader = ({isDark = false}) => {
   return (
     <div className="nav-header">
       <Link to="/" className="brand-logo">
-        <img className="logo-abbr" src={logo} alt="" />
+        <img className="logo-abbr" src={toggle ? logoSmall : logo} alt="" />
         {/* <img
           className="logo-compact"
           src={isDark ? logoTextWhite : logoText}

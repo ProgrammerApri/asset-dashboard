@@ -77,20 +77,6 @@ const Header = ({
               </div>
             </div>
             <ul className="navbar-nav header-right">
-              <li className="nav-item">
-                <div className="input-group search-area d-lg-inline-flex d-none mr-5">
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Search here"
-                  />
-                  <div className="input-group-append">
-                    <span className="input-group-text">
-                      <i class="bx bx-search"></i>
-                    </span>
-                  </div>
-                </div>
-              </li>
               <li className="nav-item dropdown notification_dropdown">
                 <Link
                   className="nav-link  ai-icon"

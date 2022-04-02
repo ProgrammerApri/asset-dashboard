@@ -16,6 +16,12 @@ const endpoints = {
         method: "PUT",
         data: {},
     },
+
+    kategori: {
+        endpoint: "/v1/api/kategory",
+        method: "GET",
+        data: {},
+    },
 };
 
 export default endpoints;

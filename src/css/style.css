@@ -77,6 +77,10 @@
   border: 0px solid #dee2e6;
   border-bottom: 1px solid var(--border-color);
   color: var(--text-color);
+  padding: 0.7rem 1rem;
+}
+.p-datatable.p-datatable-hoverable-rows .p-datatable-tbody > tr:not(.p-highlight):not(.p-datatable-emptymessage):hover {
+  background: #e9ecef63;
 }
 .p-datatable .p-datatable-tbody > tr {
   background: #00000000;
@@ -85,6 +89,11 @@
   color: var(--primary-button);
   border: 1px solid;
 }
+
+.p-button {
+  border-radius: 10px;
+}
+
 .p-datatable .p-datatable-header {
   background: #00000000;
   border: 0px solid #00000000 !important;
@@ -106,6 +115,7 @@
   background: var(--input-bg);
     border: 1px solid var(--border-color);
     height: 50px;
+    padding-right: 15px;
 }
 
 .p-dropdown .p-dropdown-trigger {
@@ -148,6 +158,30 @@
 
 .p-datatable.p-datatable-gridlines .p-paginator-bottom {
   border-width: 0px;
+}
+
+.p-dialog .p-dialog-content {
+  padding: 1.5rem 1.5rem 4rem 1.5rem;
+}
+
+.p-dialog .p-dialog-header {
+  border-top-right-radius: 0.875rem;
+  border-top-left-radius: 0.875rem;
+  padding-top: 2rem;
+}
+
+.p-dialog .p-dialog-footer {
+  border-bottom-right-radius: 0.875rem;
+  border-bottom-left-radius: 0.875rem;
+  padding: 0 1.5rem 2rem 1.5rem;
+}
+
+.p-dialog {
+  border-radius: 0.875rem;
+}
+
+.p-dialog .p-dialog-header .p-dialog-title {
+  margin-left: 15px;
 }
 
 .gradient_one {
@@ -360,7 +394,7 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas,
     "Liberation Mono", "Courier New", monospace;
-  --body-bg: #f5f9f1;
+  --body-bg: #f8f9ff;
   --card-bg: #fff;
   --text-color: #455560;
   --selector: #33a9fe14;
@@ -12722,7 +12756,7 @@ a.active {
   z-index: 5;
 }
 .nav-header .logo-abbr {
-  max-width: 54px;
+  max-width: 75px;
 }
 @media only screen and (max-width: 575px) {
   .nav-header .logo-abbr {
@@ -12910,6 +12944,7 @@ a.active {
   .nav-header
   .logo-abbr {
   display: block;
+  max-width: 50px;
 }
 
 [data-sidebar-style="full"][data-layout="horizontal"] .logo-compact {
@@ -12956,10 +12991,10 @@ a.active {
   z-index: 1;
   position: relative;
   padding: 0rem;
-  background-color: var(--card-bg);
   z-index: 3;
   padding-left: 21.563rem;
   transition: all 0.2s ease;
+  background-color: var(--body-bg);
 }
 @media only screen and (max-width: 1400px) {
   .header {
@@ -12968,7 +13003,7 @@ a.active {
 }
 .header .header-content {
   height: 100%;
-  padding-left: 5.3125rem;
+  padding-left: 3.5rem;
   padding-right: 2.4rem;
   align-items: center;
   display: flex;
@@ -13137,7 +13172,7 @@ svg.pulse-svg .third-circle {
   width: 100%;
 }
 [data-header-position="fixed"] .content-body {
-  padding-top: 4.5rem;
+  padding-top: 4rem;
 }
 @media only screen and (max-width: 1199px) {
   [data-header-position="fixed"] .content-body {
@@ -13350,7 +13385,8 @@ svg.pulse-svg .third-circle {
 .header-right .notification_dropdown .nav-link {
   position: relative;
   color: #9b9b9b;
-  background: var(--input-bg);
+  background: var(--card-bg);
+  box-shadow: 0px 12px 23px 0px rgb(59 40 62 / 8%);
   border-radius: 0.875rem;
   padding: 12px;
   line-height: 1;
@@ -13500,6 +13536,7 @@ svg.pulse-svg .third-circle {
   width: 45px;
   height: 45px;
   border-radius: 0.875rem;
+  box-shadow: 0px 12px 23px 0px rgb(59 40 62 / 8%);
 }
 @media only screen and (max-width: 1400px) {
   .header-right .header-profile img {
@@ -16300,11 +16337,12 @@ html[dir="rtl"]
   height: 100%;
   position: absolute;
   top: 0;
-  padding-top: 80px;
-  z-index: 3;
+  padding-top: 100px;
+  padding-bottom: 140px;
+  z-index: 4;
   background-color: var(--card-bg);
   transition: all 0.2s ease;
-  box-shadow: 18px 0px 35px 0px rgba(0, 0, 0, 0.02);
+  box-shadow: 18px 0px 35px 0px rgba(0, 0, 0, 0.05);
 }
 @media only screen and (max-width: 1199px) {
   .deznav {
@@ -17184,7 +17222,7 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
   display: none;
 }
 [data-sidebar-style="full"][data-layout="vertical"] .menu-toggle .header {
-  padding-left: 5rem;
+  padding-left: 6rem;
   width: 100%;
 }
 [direction="rtl"][data-sidebar-style="full"][data-layout="vertical"]
@@ -38668,7 +38706,7 @@ button:focus {
 }
 
 .btn {
-  padding: 0.938rem 1.5rem;
+  padding: 0.5rem 1rem;
   border-radius: 0.875rem;
   font-weight: 500;
   font-size: 1rem;
@@ -39186,7 +39224,7 @@ button:focus {
   margin: -0.8rem 0 -0.8rem 1rem;
   padding: 0.4375rem 0 0.4375rem 1rem;
   margin: -1rem -0.25rem -1rem 1rem;
-  padding: 1rem 0 1rem 1.25rem;
+  padding: 1rem 0 1rem 0.5rem;
 }
 @media only screen and (max-width: 1199px) {
   .btn-icon-right {
@@ -39599,7 +39637,7 @@ button:focus {
   position: relative;
   border: 0px solid transparent;
   border-radius: 0.875rem;
-  box-shadow: 0px 12px 23px 0px rgb(59 40 62 / 15%);
+  box-shadow: 0px 12px 23px 0px rgb(59 40 62 / 8%);
   height: calc(100% - 30px);
 }
 @media only screen and (max-width: 575px) {
@@ -43439,8 +43477,11 @@ table.dataTable thead .sorting {
 .deznav .copyright {
   font-size: 14px;
   padding: 0 45px;
-  margin-top: 100px;
-  margin-bottom: 15px;
+  padding-top: 60px;
+  padding-bottom: 20px;
+  position: fixed;
+  bottom: 0;
+  background: var(--card-bg);
 }
 .deznav .copyright p {
   margin-bottom: 10px;

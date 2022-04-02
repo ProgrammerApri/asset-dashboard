@@ -27,8 +27,8 @@ const data = {
 };
 
 const kodesaldo = [
-  { name: 'Debit', code: 'D' },
-  { name: 'Kredit', code: 'K' },
+  { name: "Debit", code: "D" },
+  { name: "Kredit", code: "K" },
 ];
 
 const KategoriAkun = () => {
@@ -108,8 +108,8 @@ const KategoriAkun = () => {
       endpoint: endpoints.editKateg.endpoint + currentItem.kategory.id,
       data: {
         name: currentItem.kategory.name,
-        kode_klasi : currentItem.klasifikasi.id,
-        kode_saldo : currentItem.kategory.kode_saldo,
+        kode_klasi: currentItem.klasifikasi.id,
+        kode_saldo: currentItem.kategory.kode_saldo,
       },
     };
     console.log(config.data);
@@ -121,14 +121,14 @@ const KategoriAkun = () => {
         setTimeout(() => {
           setUpdate(false);
           dialogFuncMap["displayData"](false);
-          getKategori();
+          getKategori(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
             detail: "Data berhasil diperbarui",
             life: 3000,
           });
-        }, 1500);
+        }, 500);
       }
     } catch (error) {
       setTimeout(() => {
@@ -139,7 +139,7 @@ const KategoriAkun = () => {
           detail: "Gagal memperbarui data",
           life: 3000,
         });
-      }, 1000);
+      }, 500);
     }
   };
 
@@ -148,8 +148,8 @@ const KategoriAkun = () => {
       ...endpoints.addKateg,
       data: {
         name: currentItem.kategory.name,
-        kode_klasi : currentItem.klasifikasi.id,
-        kode_saldo : currentItem.kategory.kode_saldo,
+        kode_klasi: currentItem.klasifikasi.id,
+        kode_saldo: currentItem.kategory.kode_saldo,
       },
     };
     console.log(config.data);
@@ -161,14 +161,14 @@ const KategoriAkun = () => {
         setTimeout(() => {
           setUpdate(false);
           dialogFuncMap["displayData"](false);
-          getKategori();
+          getKategori(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
             detail: "Data berhasil diperbarui",
             life: 3000,
           });
-        }, 1500);
+        }, 500);
       }
     } catch (error) {
       setTimeout(() => {
@@ -179,7 +179,7 @@ const KategoriAkun = () => {
           detail: "Gagal memperbarui data",
           life: 3000,
         });
-      }, 1000);
+      }, 500);
     }
   };
 
@@ -216,10 +216,9 @@ const KategoriAkun = () => {
 
   const onSubmit = () => {
     if (isEdit) {
-    setUpdate(true);
-    editKategori();
-    }
-    else {
+      setUpdate(true);
+      editKategori();
+    } else {
       setUpdate(true);
       addKategori();
     }
@@ -405,13 +404,22 @@ const KategoriAkun = () => {
           <label className="text-label">Kode Saldo Normal</label>
           <div className="p-inputgroup">
             <Dropdown
-              value={currentItem !== null && currentItem.kategory.kode_saldo !== "" ? currentItem.kategory.kode_saldo === "D" ?  { name: 'Debit', code: 'D' } : { name: 'Kredit', code: 'K' }: null}
+              value={
+                currentItem !== null && currentItem.kategory.kode_saldo !== ""
+                  ? currentItem.kategory.kode_saldo === "D"
+                    ? { name: "Debit", code: "D" }
+                    : { name: "Kredit", code: "K" }
+                  : null
+              }
               options={kodesaldo}
               onChange={(e) => {
                 console.log(e.value);
                 setCurrentItem({
                   ...currentItem,
-                  kategory: {...currentItem.kategory, kode_saldo: e.value.code},
+                  kategory: {
+                    ...currentItem.kategory,
+                    kode_saldo: e.value.code,
+                  },
                 });
               }}
               optionLabel="name"

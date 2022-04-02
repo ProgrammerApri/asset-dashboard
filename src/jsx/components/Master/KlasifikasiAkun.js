@@ -81,7 +81,7 @@ const KlasifikasiAkun = () => {
             detail: "Data berhasil diperbarui",
             life: 3000,
           });
-        }, 1500);
+        }, 500);
       }
     } catch (error) {
       setTimeout(() => {
@@ -92,7 +92,7 @@ const KlasifikasiAkun = () => {
           detail: "Gagal memperbarui data",
           life: 3000,
         });
-      }, 1000);
+      }, 500);
     }
   };
 

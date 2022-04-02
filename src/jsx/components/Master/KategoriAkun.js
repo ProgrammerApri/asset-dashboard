@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { request, endpoints } from "src/utils";
-import data from "../bootstrap/alertData";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -14,6 +13,19 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 
+const data = {
+  kategory: {
+    id: 1,
+    name: "",
+    kode_klasi: 0,
+    kode_saldo: "",
+  },
+  klasifikasi: {
+    id: 0,
+    klasiname: "",
+  },
+};
+
 const KategoriAkun = () => {
   const [klasifikasi, setKlasifikasi] = useState(null);
   const [kategori, setKategori] = useState(null);
@@ -21,18 +33,7 @@ const KategoriAkun = () => {
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
   const [position, setPosition] = useState("center");
-  const [currentItem, setCurrentItem] = useState({
-    kategory: {
-      id: 1,
-      name: "",
-      kode_klasi: 0,
-      kode_saldo: "",
-    },
-    klasifikasi: {
-      id: 0,
-      klasiname: "",
-    },
-  });
+  const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
@@ -49,7 +50,7 @@ const KategoriAkun = () => {
 
   const getKlasifikasi = async () => {
     console.log("-------------------");
-    console.log(currentItem);
+    // console.log(currentItem);
     setLoading(true);
     const config = {
       ...endpoints.klasifikasi,
@@ -219,19 +220,8 @@ const KategoriAkun = () => {
           variant="primary"
           onClick={() => {
             setEdit(false);
-            setCurrentItem({
-              kategory: {
-                id: 0,
-                name: "",
-                kode_klasi: 0,
-                kode_saldo: "",
-              },
-              klasifikasi: {
-                id: 0,
-                klasiname: "",
-              },
-            });
-            
+            setCurrentItem(data);
+
             onClick("displayData", data);
           }}
         >
@@ -325,7 +315,7 @@ const KategoriAkun = () => {
           <label className="text-label">Nama Kategori</label>
           <div className="p-inputgroup">
             <InputText
-              // value={`${currentItem.kategory.id}`}
+              value={currentItem !== null ? `${currentItem.kategory.name}` : ""}
               onChange={(e) =>
                 setCurrentItem({
                   ...currentItem,
@@ -339,12 +329,17 @@ const KategoriAkun = () => {
           <label className="text-label">Nama Kategori</label>
           <div className="p-inputgroup">
             <Dropdown
-              value={currentItem && isEdit ? currentItem.klasifikasi : null}
+              value={currentItem !== null ? currentItem.klasifikasi : null}
               options={klasifikasi}
-              //   onChange={onCountryChange}
+              onChange={(e) => {
+                console.log(e.value);
+                setCurrentItem({
+                  ...currentItem,
+                  klasifikasi: e.value,
+                });
+              }}
               optionLabel="klasiname"
               filter
-              showClear
               filterBy="klasiname"
               placeholder="Pilih Klasifikasi"
             />

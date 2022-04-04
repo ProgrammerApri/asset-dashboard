@@ -239,6 +239,9 @@ class SideBar extends Component {
                 <li>
                   <Link to="/kategori">Kategori Akun</Link>
                 </li>
+                <li>
+                  <Link to="/akun">Akun</Link>
+                </li>
               </ul>
             </li>
 

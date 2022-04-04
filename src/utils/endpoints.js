@@ -34,6 +34,18 @@ const endpoints = {
         method: "POST",
         data: {},
     },
+
+    editAkun: {
+        endpoint: "/v1/api/akun/",
+        method: "PUT",
+        data: {},
+    },
+
+    addAkun: {
+        endpoint: "/v1/api/akun",
+        method: "POST",
+        data: {},
+    },
 };
 
 export default endpoints;

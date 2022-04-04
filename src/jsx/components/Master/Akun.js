@@ -69,7 +69,7 @@ const Akun = () => {
   };
 
   useEffect(() => {
-    getKategori();
+    // getKategori();
     initFilters1();
   }, []);
 

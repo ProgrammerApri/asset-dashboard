@@ -35,17 +35,36 @@ const endpoints = {
         data: {},
     },
 
-    editAkun: {
-        endpoint: "/v1/api/akun/",
+    account: {
+        endpoint: "/v1/api/account",
+        method: "GET",
+        data: {},
+    },
+
+    editAccount: {
+        endpoint: "/v1/api/account/",
         method: "PUT",
         data: {},
     },
 
-    addAkun: {
-        endpoint: "/v1/api/akun",
+    addAccount: {
+        endpoint: "/v1/api/account",
         method: "POST",
         data: {},
     },
+
+    getAccKodeUm: {
+        endpoint: "/v1/api/account/u",
+        method: "GET",
+        data: {},
+    },
+
+    accountUmum: {
+        endpoint: "/v1/api/account/umum",
+        method: "GET",
+        data: {},
+    },
+
 };
 
 export default endpoints;

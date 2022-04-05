@@ -12,24 +12,22 @@ import { InputText } from "primereact/inputtext";
 import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
-import { SelectButton } from 'primereact/selectbutton';
-import { Checkbox } from 'primereact/checkbox';
-
+import { SelectButton } from "primereact/selectbutton";
+import { Checkbox } from "primereact/checkbox";
 
 const data = {
-  akun: {
-    id: 1,
-    name_akun: "",
-    kategori: "",
-    kode_akun: 0,
-    akun_umum: 0,
-    jenis_akun: "",
-    saldo: "",
-    saldo_awal: "",
+  account: {
+    acc_code: "",
+    acc_name: "Iuran",
+    kode_umum: 0,
+    kode_kategori: 0,
+    du: "U",
+    kode_saldo: "",
+    terhubung: "",
+    saldo_awal: 0,
   },
-
   kategory: {
-    id: 1,
+    id: 0,
     name: "",
     kode_klasi: 0,
     kode_saldo: "",
@@ -46,12 +44,12 @@ const saldoNormal = [
 ];
 
 const jenisAkun = [
-    { name: "Detail", code: "D" },
-    { name: "Umum", code: "U" },
-  ];
+  { name: "Detail", code: "D" },
+  { name: "Umum", code: "U" },
+];
 
 const Akun = () => {
-  const [klasifikasi, setKlasifikasi] = useState(null);
+  const [account, setAkccount] = useState(null);
   const [kategori, setKategori] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
@@ -69,33 +67,11 @@ const Akun = () => {
   };
 
   useEffect(() => {
-    // getKategori();
+    getKategori();
     initFilters1();
   }, []);
 
-  const getKlasifikasi = async () => {
-    console.log("-------------------");
-    // console.log(currentItem);
-    setLoading(true);
-    const config = {
-      ...endpoints.klasifikasi,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setKlasifikasi(data);
-      }
-    } catch (error) {}
-    getKategori();
-  };
-
-  const getKategori= async () => {
+  const getKategori = async () => {
     console.log("-------------------");
     // console.log(currentItem);
     setLoading(true);
@@ -114,18 +90,12 @@ const Akun = () => {
         setKategori(data);
       }
     } catch (error) {}
-    getKategori();
   };
 
-  const editKategori = async () => {
+  const getAccountUmum = async (data) => {
     const config = {
-      ...endpoints.editKateg,
-      endpoint: endpoints.editKateg.endpoint + currentItem.kategory.id,
-      data: {
-        name: currentItem.kategory.name,
-        kode_klasi: currentItem.klasifikasi.id,
-        kode_saldo: currentItem.kategory.kode_saldo,
-      },
+      ...endpoints.accountUmum,
+      endpoint: endpoints.accountUmum.endpoint + data.account.id,
     };
     console.log(config.data);
     let response = null;
@@ -133,38 +103,95 @@ const Akun = () => {
       response = await request(null, config);
       console.log(response);
       if (response.status) {
-        setTimeout(() => {
-          setUpdate(false);
-          dialogFuncMap["displayData"](false);
-          getKategori(true);
-          toast.current.show({
-            severity: "info",
-            summary: "Berhasil",
-            detail: "Data berhasil diperbarui",
-            life: 3000,
-          });
-        }, 500);
-      }
-    } catch (error) {
-      setTimeout(() => {
-        setUpdate(false);
-        toast.current.show({
-          severity: "error",
-          summary: "Gagal",
-          detail: "Gagal memperbarui data",
-          life: 3000,
+        const data = response;
+        setCurrentItem({
+          ...currentItem,
+          account: { ...currentItem.account, acc_code: data }
         });
-      }, 500);
-    }
+      }
+    } catch (error) {}
   };
 
-  const addAkun = async () => {
+  const getAccKodeUm = async (data) => {
     const config = {
-      ...endpoints.addAkun,
+      ...endpoints.getAccKodeUm,
+      endpoint: endpoints.getAccKodeUm.endpoint + data.kategory.id,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const res = response.data;
+        setCurrentItem({
+          ...currentItem,
+          account: { ...currentItem.account, acc_code: res },
+          kategory: data.kategory,
+          klasifikasi: data.klasifikasi,
+        });
+      }
+    } catch (error) {}
+  };
+
+  // const editAccount = async () => {
+  //   const config = {
+  //     ...endpoints.editAccount,
+  //     endpoint: endpoints.editAccount.endpoint + currentItem.account.id,
+  //     data: {
+  //       acc_name: currentItem.account.acc_name,
+  //       kode_kategori: currentItem.kategory.id,
+  //       acc_code: currentItem.account.acc_code,
+  //       kode_umum: currentItem.account.kode_umum,
+  //       du: currentItem.account.du,
+  //       kode_saldo: currentItem.account.kode_saldo,
+  //       terhubung: currentItem.account.terhubung,
+  //       saldo_awal: currentItem.account.saldo_awal,
+  //     },
+  //   };
+  //   console.log(config.data);
+  //   let response = null;
+  //   try {
+  //     response = await request(null, config);
+  //     console.log(response);
+  //     if (response.status) {
+  //       setTimeout(() => {
+  //         setUpdate(false);
+  //         dialogFuncMap["displayData"](false);
+  //         getKategori(true);
+  //         toast.current.show({
+  //           severity: "info",
+  //           summary: "Berhasil",
+  //           detail: "Data berhasil diperbarui",
+  //           life: 3000,
+  //         });
+  //       }, 500);
+  //     }
+  //   } catch (error) {
+  //     setTimeout(() => {
+  //       setUpdate(false);
+  //       toast.current.show({
+  //         severity: "error",
+  //         summary: "Gagal",
+  //         detail: "Gagal memperbarui data",
+  //         life: 3000,
+  //       });
+  //     }, 500);
+  //   }
+  // };
+
+  const addAccount = async () => {
+    const config = {
+      ...endpoints.addAccount,
       data: {
-        name: currentItem.akun.name,
-        kode_klasi: currentItem.klasifikasi.id,
-        kode_saldo: currentItem.kategory.kode_saldo,
+        acc_name: currentItem.account.acc_name,
+        kode_kategori: currentItem.kategory.id,
+        acc_code: currentItem.account.acc_code,
+        kode_umum: currentItem.account.kode_umum,
+        du: currentItem.account.du,
+        kode_saldo: currentItem.account.kode_saldo,
+        terhubung: currentItem.account.terhubung,
+        saldo_awal: currentItem.account.saldo_awal,
       },
     };
     console.log(config.data);
@@ -230,13 +257,8 @@ const Akun = () => {
   };
 
   const onSubmit = () => {
-    if (isEdit) {
-      setUpdate(true);
-      editKategori();
-    } else {
-      setUpdate(true);
-      addAkun();
-    }
+    setUpdate(true);
+    addAccount();
   };
 
   const renderFooter = (kode) => {
@@ -314,24 +336,27 @@ const Akun = () => {
             <Card.Body>
               <DataTable
                 responsive="scroll"
-                value={kategori}
-                className="display w-100 datatable-wrapper"
+                value={account}
+                className="display w-150 datatable-wrapper"
                 showGridlines
                 rows={10}
-                dataKey="kategory.id"
+                dataKey=""
                 rowHover
                 header={renderHeader}
                 filters={filters1}
                 globalFilterFields={[
+                  "akun.name",
                   "kategory.name",
-                  "klasifikasi.klasiname",
-                  "kategory.kode_saldo",
+                  "akun.kode_akun",
+                  "kategory.id",
+                  "akun.jenis_akun",
+                  "akun.saldo_normal",
                 ]}
-                emptyMessage="Tidak ada data kategori"
+                emptyMessage="Tidak ada data"
               >
                 <Column
-                  field={(e) => e.kategory.id}
-                  header="Kode"
+                  field={(e) => e.account.id}
+                  header="ID"
                   style={{
                     width: "10rem",
                     fontWeight: "bold",
@@ -340,20 +365,32 @@ const Akun = () => {
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Nama Kategori Akun"
-                  field={(e) => e.kategory.name}
+                  header="Nama Akun"
+                  field={(e) => e.account.acc_name}
                   style={{ minWidth: "10rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Klasifikasi Akun"
-                  field={(e) => e.klasifikasi.klasiname}
+                  header="Kategori"
+                  field={(e) => e.account.kode_kategori}
                   style={{ minWidth: "10rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Kode Saldo Normal"
-                  field={(e) => e.kategory.kode_saldo}
+                  header="Kode Akun"
+                  field={(e) => e.account.acc_code}
+                  style={{ minWidth: "10rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Kode Akun Umum"
+                  field={(e) => e.account.kode_umum}
+                  style={{ minWidth: "10rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Jenis Akun"
+                  field={(e) => e.account.du}
                   style={{ minWidth: "10rem" }}
                   body={loading && <Skeleton />}
                 />
@@ -381,89 +418,61 @@ const Akun = () => {
         }}
       >
         <div className="col-12 mb-2">
-          <label className="text-label">Nama Akun</label>
+          <label className="text-label">Kode Akun</label>
           <div className="p-inputgroup">
             <InputText
-              value={currentItem !== null ? `${currentItem.akun.name}` : ""}
+              value={
+                currentItem !== null ? `${currentItem.account.acc_code}` : ""
+              }
               onChange={(e) =>
                 setCurrentItem({
                   ...currentItem,
-                  akun: { ...currentItem.akun, name: e.target.value },
+                  account: { ...currentItem.account, acc_code: e.target.value },
                 })
               }
-              placeholder="Masukan Nama Akun"
-            />
-          </div>
-        </div>
-        
-        <div className="col-12 mb-2">
-          <label className="text-label">Kategori</label>
-          <div className="p-inputgroup">
-            <Dropdown
-              value={currentItem !== null ? currentItem.kategory : null}
-              options={kategori}
-              onChange={(e) => {
-                console.log(e.value);
-                setCurrentItem({
-                  ...currentItem,
-                  kategory: e.value,
-                });
-              }}
-              optionLabel="name"
-              filter
-              filterBy="name"
-              placeholder="Pilih Kategori"
-            />
-          </div>
-        </div>
-
-        <div className="col-12 mb-2">
-          <label className="text-label">Kode Akun</label>
-          <div className="p-inputgroup">
-            <Dropdown
-              value={
-                currentItem !== null && currentItem.kategory.id !== ""
-                  ? currentItem.kategory.id : null
-              }
-              options={kategori}
-              onChange={(e) => {
-                console.log(e.value);
-                setCurrentItem({
-                  ...currentItem,
-                  kategory: {
-                    ...currentItem.kategory,
-                    id: e.value,
-                  },
-                });
-              }}
-              optionLabel="id"
-              placeholder="Pilih Kode Akun"
+              placeholder="Masukan Kode Akun"
               disabled
             />
           </div>
         </div>
 
         <div className="col-12 mb-2">
-          <label className="text-label">Akun Umum</label>
+          <label className="text-label">Nama Akun</label>
+          <div className="p-inputgroup">
+            <InputText
+              // value={currentItem !== null ? `${currentItem.account.acc_name}` : ""}
+              // onChange={(e) =>
+              //   setCurrentItem({
+              //     ...currentItem,
+              //     account: { ...currentItem.account, acc_name: e.target.value },
+              //   })
+              // }
+              placeholder="Masukan Nama Akun"
+            />
+          </div>
+        </div>
+
+        <div className="col-12 mb-2">
+          <label className="text-label">Kategori</label>
           <div className="p-inputgroup">
             <Dropdown
               value={
-                currentItem !== null && currentItem.kategory.kode_saldo !== ""
-                  ? currentItem.kategory.kode_saldo : null
+                currentItem !== null
+                  ? {
+                      kategory: currentItem.kategory,
+                      klasifikasi: currentItem.klasifikasi,
+                    }
+                  : null
               }
-            //   options={}
+              options={kategori}
               onChange={(e) => {
                 console.log(e.value);
-                setCurrentItem({
-                  ...currentItem,
-                  kategory: {
-                    ...currentItem.kategory,
-                    kode_saldo: e.value.code,
-                  },
-                });
+                getAccKodeUm(e.value);
               }}
-              optionLabel="name"
-              placeholder="Pilih Akun Umum"
+              optionLabel="kategory.name"
+              filter
+              filterBy="kategory.name"
+              placeholder="Pilih Kategori"
             />
           </div>
         </div>
@@ -473,8 +482,8 @@ const Akun = () => {
           <div className="p-inputgroup">
             <SelectButton
               value={
-                currentItem !== null && currentItem.akun.jenis_akun !== ""
-                  ? currentItem.akun.jenis_akun === "D"
+                currentItem !== null && currentItem.account.du !== ""
+                  ? currentItem.account.du === "D"
                     ? { name: "Detail", code: "D" }
                     : { name: "Umum", code: "U" }
                   : null
@@ -484,9 +493,9 @@ const Akun = () => {
                 console.log(e.value);
                 setCurrentItem({
                   ...currentItem,
-                  akun: {
-                    ...currentItem.akun,
-                    jenis_akun: e.value.code,
+                  account: {
+                    ...currentItem.account,
+                    du: e.value.code,
                   },
                 });
               }}
@@ -495,14 +504,41 @@ const Akun = () => {
           </div>
         </div>
 
+        {currentItem !== null && currentItem.account.du !== "" ? (
+          currentItem.account.du === "D" ? (
+            <>
+              <div className="col-12 mb-2">
+                <label className="text-label">Akun Umum</label>
+                <div className="p-inputgroup">
+                <Dropdown
+                  value={currentItem !== null ? currentItem.account : null}
+                  options={account}
+                  onChange={(e) => {
+                    console.log(e.value);
+                    getAccountUmum(e.value);
+                    // setCurrentItem({
+                    //   ...currentItem,
+                    //   account: e.value,
+                    // });
+                  }}
+                  optionLabel="account.acc_code"
+                  filter
+                  filterBy="account.acc_code"
+                  placeholder="Pilih Kode Umum"
+            />
+                </div>
+              </div>
+            </>
+          ) : null
+        ) : null}
 
         <div className="col-12 mb-2">
           <label className="text-label">Saldo Normal</label>
           <div className="p-inputgroup">
             <SelectButton
               value={
-                currentItem !== null && currentItem.akun.saldo !== ""
-                  ? currentItem.akun.saldo === "D"
+                currentItem !== null && currentItem.kategory.kode_saldo !== ""
+                  ? currentItem.kategory.kode_saldo === "D"
                     ? { name: "Debit", code: "D" }
                     : { name: "Kredit", code: "K" }
                   : null
@@ -512,9 +548,9 @@ const Akun = () => {
                 console.log(e.value);
                 setCurrentItem({
                   ...currentItem,
-                  akun: {
-                    ...currentItem.akun,
-                    saldo: e.value.code,
+                  account: {
+                    ...currentItem.account,
+                    kode_saldo: e.value.code,
                   },
                 });
               }}
@@ -524,45 +560,30 @@ const Akun = () => {
         </div>
 
         <div className="col-12 mb-2">
-          <label className="text-label">Akun Terhubung</label>
-          <Checkbox className="ml-8 mb-2" inputId="binary" checked={akunTerhub} onChange={e => setAkunTerhub(e.checked)} />
-            <label className="ml-3" htmlFor="binary">{akunTerhub ? 'True' : 'False'}</label>
-
-            {/* <Checkbox
-              value={
-                currentItem !== null && currentItem.kategory.kode_saldo !== ""
-                  ? currentItem.kategory.kode_saldo === "D"
-                    ? { name: "Detail", code: "D" }
-                    : { name: "Umum", code: "U" }
-                  : null
-              }
-              options={jenisAkun}
-              onChange={(e) => {
-                // console.log(e.value);
-                // setCurrentItem({
-                //   ...currentItem,
-                //   kategory: {
-                //     ...currentItem.kategory,
-                //     kode_saldo: e.value.code,
-                //   },
-                // });
-              }}
-              optionLabel="name"
-            /> */}
+          <Checkbox
+            className="mb-2"
+            inputId="binary"
+            checked={akunTerhub}
+            onChange={(e) => setAkunTerhub(e.checked)}
+          />
+          <label className="ml-3" htmlFor="binary">
+            {"Akun Terhubung"}
+          </label>
         </div>
 
         <div className="col-12 mb-2">
           <label className="text-label">Saldo Awal</label>
           <div className="p-inputgroup">
             <InputText
-            //   value={currentItem !== null ? `${currentItem.kategory.name}` : ""}
-            //   onChange={(e) =>
-            //     setCurrentItem({
-            //       ...currentItem,
-            //       kategory: { ...currentItem.kategory, name: e.target.value },
-            //     })
-            //   }
+              //   value={currentItem !== null ? `${currentItem.kategory.name}` : ""}
+              //   onChange={(e) =>
+              //     setCurrentItem({
+              //       ...currentItem,
+              //       kategory: { ...currentItem.kategory, name: e.target.value },
+              //     })
+              //   }
               placeholder="Masukan Saldo Awal"
+              disabled
             />
           </div>
         </div>

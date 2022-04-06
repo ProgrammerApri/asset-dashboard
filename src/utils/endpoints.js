@@ -71,6 +71,12 @@ const endpoints = {
         data: {},
     },
 
+    delAccount: {
+        endpoint: "/v1/api/account/",
+        method: "DELETE",
+        data: {},
+    }
+
 };
 
 export default endpoints;

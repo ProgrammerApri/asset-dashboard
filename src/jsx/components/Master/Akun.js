@@ -334,6 +334,55 @@ const Akun = () => {
     }
   };
 
+  const delAccount = async (id) => {
+    const config = {
+      ...endpoints.delAccount,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setTimeout(() => {
+          setUpdate(false);
+          dialogFuncMap["displayDel"](false);
+          getKategori(true);
+          toast.current.show({
+            severity: "info",
+            summary: "Berhasil",
+            detail: "Data berhasil diperbarui",
+            life: 3000,
+          });
+        }, 500);
+      }
+    } catch (error) {
+      console.log(error);
+      if (error.status === 400) {
+        setTimeout(() => {
+          setUpdate(false);
+          toast.current.show({
+            severity: "error",
+            summary: "Gagal",
+            detail: `Kode Akun ${currentItem.account.acc_code} Sudah Digunakan`,
+            life: 3000,
+          });
+        }, 500);
+      } else {
+        setTimeout(() => {
+          setUpdate(false);
+          toast.current.show({
+            severity: "error",
+            summary: "Gagal",
+            detail: "Gagal memperbarui data",
+            life: 3000,
+          });
+        }, 500);
+      }
+    }
+  };
+
+
   const actionBodyTemplate = (data) => {
     return (
       // <React.Fragment>
@@ -352,7 +401,7 @@ const Akun = () => {
         <Link
           onClick={() => {
             setEdit(true);
-            onClick("displayDel", data);
+            delAccount();
           }}
           className="btn btn-danger shadow btn-xs sharp ml-2"
         >
@@ -617,7 +666,7 @@ const Akun = () => {
                       <Skeleton />
                     ) : (
                       <div>
-                        {e.account.sld_type === "D" ? (
+                        {e.account.dou_type === "D" ? (
                           <Badge variant="success light">
                             <i className="bx bxs-circle text-success mr-1"></i>{" "}
                             Detail
@@ -911,7 +960,7 @@ const Akun = () => {
         header={"Delete Data"}
         visible={displayDel}
         style={{ width: "450px" }}
-        footer={renderFooter("displayDel")}
+        footer={renderFooterDel("displayDel")}
         onHide={() => {
           setEdit(false);
           onHide("displayDel");
@@ -923,7 +972,7 @@ const Akun = () => {
             style={{ fontSize: "2rem" }}
           />
           {account && (
-            <span>Are you sure you want to delete the selected products?</span>
+            <span>Are you sure you want to delete the selected data?</span>
           )}
         </div>
       </Dialog>

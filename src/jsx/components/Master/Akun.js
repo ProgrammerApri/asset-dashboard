@@ -528,8 +528,12 @@ const Akun = () => {
               >
                 <Column
                   header="Kode Akun"
+                  style={{
+                    width: "10rem",
+                    fontWeight: "bold",
+                    minWidth: "8rem"
+                  }}
                   field={(e) => e.account.acc_code}
-                  style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column

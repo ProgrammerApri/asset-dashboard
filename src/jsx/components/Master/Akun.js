@@ -68,7 +68,6 @@ const Akun = () => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
 
-
   useEffect(() => {
     getKategori();
     initFilters1();
@@ -246,7 +245,7 @@ const Akun = () => {
       if (response.status) {
         setTimeout(() => {
           setUpdate(false);
-          setDisplayData(false)
+          setDisplayData(false);
           getKategori(true);
           toast.current.show({
             severity: "info",
@@ -291,7 +290,7 @@ const Akun = () => {
       if (response.status) {
         setTimeout(() => {
           setUpdate(false);
-          setDisplayData(false)
+          setDisplayData(false);
           getKategori(true);
           toast.current.show({
             severity: "info",
@@ -338,7 +337,7 @@ const Akun = () => {
       response = await request(null, config);
       console.log(response);
       if (response.status) {
-          setTimeout(() => {
+        setTimeout(() => {
           setUpdate(false);
           setDisplayDel(false);
           getKategori(true);
@@ -364,7 +363,6 @@ const Akun = () => {
       }, 500);
     }
   };
-
 
   const actionBodyTemplate = (data) => {
     return (
@@ -397,14 +395,13 @@ const Akun = () => {
   };
 
   const onClick = (kode, kategori) => {
-    setDisplayData(true)
+    setDisplayData(true);
     setCurrentItem(kategori);
 
     if (position) {
       setPosition(position);
     }
   };
-
 
   const onSubmit = () => {
     if (isEdit) {
@@ -444,14 +441,17 @@ const Akun = () => {
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Ok"
-          icon="pi pi-check"
+          label="Hapus"
+          icon="pi pi-trash"
           onClick={() => {
-            if (currentItem.account.dou_type === "D" && currentItem.account.sld_awal === 0) {
+            if (
+              currentItem.account.dou_type === "D" &&
+              currentItem.account.sld_awal === 0
+            ) {
               delAccount(currentItem.account.id);
               setUpdate(true);
-
-            }else {
+            } else {
+              setUpdate(true);
               setTimeout(() => {
                 setUpdate(false);
                 setDisplayDel(false);
@@ -751,7 +751,7 @@ const Akun = () => {
         footer={renderFooter("displayData")}
         onHide={() => {
           setEdit(false);
-          setDisplayData(false)
+          setDisplayData(false);
         }}
       >
         <div className="col-12 mb-2">
@@ -954,7 +954,7 @@ const Akun = () => {
       </Dialog>
 
       <Dialog
-        header={"Delete Data"}
+        header={"Hapus Data"}
         visible={displayDel}
         style={{ width: "30vw" }}
         footer={renderFooterDel("displayDel")}
@@ -962,14 +962,12 @@ const Akun = () => {
           setDisplayDel(false);
         }}
       >
-        <div className="confirmation-content">
+        <div className="ml-3 mr-3 mb-1">
           <i
-            className="pi pi-exclamation-triangle mr-3"
+            className="pi pi-exclamation-triangle mr-3 align-middle"
             style={{ fontSize: "2rem" }}
           />
-          {account && (
-            <span>Apakah anda yakin ingin menghapus data?</span>
-          )}
+          <span>Apakah anda yakin ingin menghapus data ?</span>
         </div>
       </Dialog>
     </>

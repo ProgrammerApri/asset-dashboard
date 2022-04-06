@@ -122,6 +122,10 @@
   width: auto;
 }
 
+.p-paginator .p-dropdown .p-dropdown-label {
+  padding-right: 0.75rem;
+}
+
 .p-inputtext:enabled:focus {
   box-shadow: 0 0 0 0 #c7d2fe;
   border-color: var(--primary-button);
@@ -149,6 +153,7 @@
 
 .p-paginator {
   background: #00000000;
+  padding: 0.5rem 0rem;
 }
 
 .p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
@@ -38509,7 +38514,7 @@ html:not([dir="rtl"]) .noUi-horizontal .noUi-handle {
 }
 
 .light.badge-success {
-  background-color: #d5f5f120;
+  background-color: #37d1bf20;
   color: #37d1bf;
 }
 [data-theme-version="dark"] .light.badge-success {
@@ -38517,7 +38522,7 @@ html:not([dir="rtl"]) .noUi-horizontal .noUi-handle {
 }
 
 .light.badge-info {
-  background-color: #d9f4f920;
+  background-color: #1ea7c520;
   color: #1ea7c5;
 }
 [data-theme-version="dark"] .light.badge-info {
@@ -38525,7 +38530,7 @@ html:not([dir="rtl"]) .noUi-horizontal .noUi-handle {
 }
 
 .light.badge-primary {
-  background-color: #ddf7c720;
+  background-color: #6cc51d20;
   color: #6cc51d;
 }
 [data-theme-version="dark"] .light.badge-primary {
@@ -38533,7 +38538,7 @@ html:not([dir="rtl"]) .noUi-horizontal .noUi-handle {
 }
 
 .light.badge-secondary {
-  background-color: #f8ebfa20;
+  background-color: #c046d320;
   color: #c046d3;
 }
 [data-theme-version="dark"] .light.badge-secondary {
@@ -38542,7 +38547,7 @@ html:not([dir="rtl"]) .noUi-horizontal .noUi-handle {
 }
 
 .light.badge-warning {
-  background-color: #fff9f420;
+  background-color: #ff943220;
   color: #ff9432;
 }
 [data-theme-version="dark"] .light.badge-warning {
@@ -38550,7 +38555,7 @@ html:not([dir="rtl"]) .noUi-horizontal .noUi-handle {
 }
 
 .light.badge-danger {
-  background-color: #ffeaef20;
+  background-color: #ff285c20;
   color: #ff285c;
 }
 [data-theme-version="dark"] .light.badge-danger {

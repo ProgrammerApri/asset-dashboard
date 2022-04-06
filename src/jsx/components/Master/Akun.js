@@ -15,6 +15,7 @@ import { Dropdown } from "primereact/dropdown";
 import { SelectButton } from "primereact/selectbutton";
 import { Checkbox } from "primereact/checkbox";
 import { InputNumber } from "primereact/inputnumber";
+import { Badge } from "react-bootstrap";
 
 const data = {
   account: {
@@ -63,11 +64,12 @@ const Akun = () => {
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
   const [isEdit, setEdit] = useState(false);
   const [akunTerhub, setAkunTerhub] = useState(false);
+  const [first2, setFirst2] = useState(0);
+  const [rows2, setRows2] = useState(10);
 
   const dialogFuncMap = {
     displayData: setDisplayData,
   };
-
 
   useEffect(() => {
     getKategori();
@@ -104,7 +106,7 @@ const Akun = () => {
         setKategori(data);
       }
     } catch (error) {}
-      getAccount();
+    getAccount();
   };
 
   const getAccountUmum = async () => {
@@ -441,6 +443,53 @@ const Akun = () => {
     return <span>{props.placeholder}</span>;
   };
 
+  const template2 = {
+    layout: "RowsPerPageDropdown CurrentPageReport PrevPageLink NextPageLink",
+    RowsPerPageDropdown: (options) => {
+      const dropdownOptions = [
+        { label: 10, value: 10 },
+        { label: 20, value: 20 },
+        { label: 50, value: 50 },
+        { label: "Semua", value: options.totalRecords },
+      ];
+
+      return (
+        <React.Fragment>
+          <span
+            className="mx-1"
+            style={{ color: "var(--text-color)", userSelect: "none" }}
+          >
+            Data per halaman:{" "}
+          </span>
+          <Dropdown
+            value={options.value}
+            options={dropdownOptions}
+            onChange={options.onChange}
+          />
+        </React.Fragment>
+      );
+    },
+    CurrentPageReport: (options) => {
+      return (
+        <span
+          style={{
+            color: "var(--text-color)",
+            userSelect: "none",
+            width: "120px",
+            textAlign: "center",
+          }}
+        >
+          {options.first} - {options.last} dari {options.totalRecords}
+        </span>
+      );
+    },
+  };
+
+  const onCustomPage2 = (event) => {
+    setFirst2(event.first);
+    setRows2(event.rows);
+  };
+
   return (
     <>
       <Toast ref={toast} />
@@ -456,7 +505,6 @@ const Akun = () => {
                 value={account}
                 className="display w-150 datatable-wrapper"
                 showGridlines
-                rows={10}
                 dataKey=""
                 rowHover
                 header={renderHeader}
@@ -472,10 +520,12 @@ const Akun = () => {
                 ]}
                 emptyMessage="Tidak ada data"
                 paginator
-                paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown ml-50"
-                currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
-                >
-                
+                paginatorTemplate={template2}
+                first={first2}
+                rows={rows2}
+                onPage={onCustomPage2}
+                paginatorClassName="justify-content-end mt-3"
+              >
                 <Column
                   header="Kode Akun"
                   field={(e) => e.account.acc_code}
@@ -498,27 +548,87 @@ const Akun = () => {
                   header="Akun Umum"
                   // field={(e) => e.account.umm_code}
                   style={{ minWidth: "8rem" }}
-                  body={(e) => (loading ? <Skeleton /> : <div>{e.account.umm_code ? e.account.umm_code : "-"}</div>)}
+                  body={(e) =>
+                    loading ? (
+                      <Skeleton />
+                    ) : (
+                      <div>{e.account.umm_code ? e.account.umm_code : "-"}</div>
+                    )
+                  }
                 />
                 <Column
                   header="Jenis Akun"
                   field={(e) => e.account.dou_type}
                   style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
+                  body={(e) =>
+                    loading ? (
+                      <Skeleton />
+                    ) : (
+                      <div>
+                        {e.account.sld_type === "D" ? (
+                          <Badge variant="success light">
+                            <i className='bx bxs-circle text-success mr-1'></i>
+                            {" "}Detail
+                          </Badge>
+                        ) : (
+                          <Badge variant="info light">
+                            <i className='bx bxs-circle text-info mr-1'></i>
+                            {" "}Umum
+                          </Badge>
+                        )}
+                      </div>
+                    )
+                  }
                 />
-                 <Column
+                <Column
                   header="Saldo Normal"
                   field={(e) => e.account.sld_type}
                   style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
+                  body={(e) =>
+                    loading ? (
+                      <Skeleton />
+                    ) : (
+                      <div>
+                        {e.account.sld_type === "D" ? (
+                          <Badge variant="secondary light">
+                            <i className='bx bxs-plus-circle text-secondary mr-1'></i>
+                            {" "}Debit
+                          </Badge>
+                        ) : (
+                          <Badge variant="warning light">
+                            <i className='bx bxs-minus-circle text-warning mr-1'></i>
+                            {" "}Kredit
+                          </Badge>
+                        )}
+                      </div>
+                    )
+                  }
                 />
-                  <Column
+                <Column
                   header="Terhubung"
                   field={(e) => e.account.connect}
                   style={{ minWidth: "8rem" }}
-                  body={(e) => (loading ? <Skeleton /> : <div>{e.account.connect ? "Ya" : "Tidak"}</div>)}
+                  body={(e) =>
+                    loading ? (
+                      <Skeleton />
+                    ) : (
+                      <div>
+                        {e.account.connect ? (
+                          <Badge variant="primary light">
+                            <i className='bx bx-check text-primary mr-1'></i>
+                            {" "}Terhubung
+                          </Badge>
+                        ) : (
+                          <Badge variant="danger light">
+                            <i className='bx bx-x text-danger mr-1'></i>
+                            {" "}Tidak
+                          </Badge>
+                        )}
+                      </div>
+                    )
+                  }
                 />
-                  <Column
+                <Column
                   header="Saldo Awal"
                   field={(e) => e.account.sld_awal}
                   style={{ minWidth: "8rem" }}
@@ -570,7 +680,9 @@ const Akun = () => {
           <label className="text-label">Nama Akun</label>
           <div className="p-inputgroup">
             <InputText
-              value={currentItem !== null ? `${currentItem.account.acc_name}` : ""}
+              value={
+                currentItem !== null ? `${currentItem.account.acc_name}` : ""
+              }
               onChange={(e) =>
                 setCurrentItem({
                   ...currentItem,

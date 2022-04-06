@@ -72,9 +72,7 @@ const Akun = () => {
     displayData: setDisplayData,
   };
 
-  const dialogDelete = {
-    displayDel: setDisplayDel,
-  };
+
 
   useEffect(() => {
     getKategori();
@@ -253,7 +251,7 @@ const Akun = () => {
       if (response.status) {
         setTimeout(() => {
           setUpdate(false);
-          dialogFuncMap["displayData"](false);
+          setDisplayData(false)
           getKategori(true);
           toast.current.show({
             severity: "info",
@@ -298,7 +296,7 @@ const Akun = () => {
       if (response.status) {
         setTimeout(() => {
           setUpdate(false);
-          dialogFuncMap["displayData"](false);
+          setDisplayData(false)
           getKategori(true);
           toast.current.show({
             severity: "info",
@@ -337,6 +335,7 @@ const Akun = () => {
   const delAccount = async (id) => {
     const config = {
       ...endpoints.delAccount,
+      endpoint: endpoints.delAccount.endpoint + id,
     };
     console.log(config.data);
     let response = null;
@@ -346,7 +345,7 @@ const Akun = () => {
       if (response.status) {
         setTimeout(() => {
           setUpdate(false);
-          dialogFuncMap["displayDel"](false);
+          setDisplayDel(false);
           getKategori(true);
           toast.current.show({
             severity: "info",
@@ -358,27 +357,16 @@ const Akun = () => {
       }
     } catch (error) {
       console.log(error);
-      if (error.status === 400) {
-        setTimeout(() => {
-          setUpdate(false);
-          toast.current.show({
-            severity: "error",
-            summary: "Gagal",
-            detail: `Kode Akun ${currentItem.account.acc_code} Sudah Digunakan`,
-            life: 3000,
-          });
-        }, 500);
-      } else {
-        setTimeout(() => {
-          setUpdate(false);
-          toast.current.show({
-            severity: "error",
-            summary: "Gagal",
-            detail: "Gagal memperbarui data",
-            life: 3000,
-          });
-        }, 500);
-      }
+      setTimeout(() => {
+        setUpdate(false);
+        setDisplayDel(false);
+        toast.current.show({
+          severity: "error",
+          summary: "Gagal",
+          detail: `Tidak Dapat Menghapus Akun`,
+          life: 3000,
+        });
+      }, 500);
     }
   };
 
@@ -401,7 +389,8 @@ const Akun = () => {
         <Link
           onClick={() => {
             setEdit(true);
-            delAccount();
+            setDisplayDel(true);
+            setCurrentItem(data);
           }}
           className="btn btn-danger shadow btn-xs sharp ml-2"
         >
@@ -413,7 +402,7 @@ const Akun = () => {
   };
 
   const onClick = (kode, kategori) => {
-    dialogFuncMap[`${kode}`](true);
+    setDisplayData(true)
     setCurrentItem(kategori);
 
     if (position) {
@@ -421,9 +410,6 @@ const Akun = () => {
     }
   };
 
-  const onHide = (kode) => {
-    dialogFuncMap[`${kode}`](false);
-  };
 
   const onSubmit = () => {
     if (isEdit) {
@@ -440,7 +426,7 @@ const Akun = () => {
       <div>
         <PButton
           label="Batal"
-          onClick={() => onHide(kode)}
+          onClick={() => setDisplayData(false)}
           className="p-button-text btn-primary"
         />
         <PButton
@@ -459,13 +445,30 @@ const Akun = () => {
       <div>
         <PButton
           label="Batal"
-          onClick={() => onHide(kode)}
+          onClick={() => setDisplayDel(false)}
           className="p-button-text btn-primary"
         />
         <PButton
           label="Ok"
           icon="pi pi-check"
-          onClick={() => onSubmit()}
+          onClick={() => {
+            if (currentItem.account.dou_type === "D" && currentItem.account.sld_awal === 0) {
+              delAccount(currentItem.account.id);
+              setUpdate(true);
+
+            }else {
+              setTimeout(() => {
+                setUpdate(false);
+                setDisplayDel(false);
+                toast.current.show({
+                  severity: "error",
+                  summary: "Gagal",
+                  detail: `Tidak Dapat Menghapus Akun Umum`,
+                  life: 3000,
+                });
+              }, 500);
+            }
+          }}
           autoFocus
           loading={update}
         />
@@ -504,8 +507,7 @@ const Akun = () => {
           onClick={() => {
             setEdit(false);
             setCurrentItem(data);
-
-            onClick("displayData", data);
+            setDisplayData(true);
           }}
         >
           Tambah{" "}
@@ -754,7 +756,7 @@ const Akun = () => {
         footer={renderFooter("displayData")}
         onHide={() => {
           setEdit(false);
-          onHide("displayData");
+          setDisplayData(false)
         }}
       >
         <div className="col-12 mb-2">
@@ -959,11 +961,10 @@ const Akun = () => {
       <Dialog
         header={"Delete Data"}
         visible={displayDel}
-        style={{ width: "450px" }}
+        style={{ width: "30vw" }}
         footer={renderFooterDel("displayDel")}
         onHide={() => {
-          setEdit(false);
-          onHide("displayDel");
+          setDisplayDel(false);
         }}
       >
         <div className="confirmation-content">
@@ -972,7 +973,7 @@ const Akun = () => {
             style={{ fontSize: "2rem" }}
           />
           {account && (
-            <span>Are you sure you want to delete the selected data?</span>
+            <span>Apakah anda yakin ingin menghapus data?</span>
           )}
         </div>
       </Dialog>

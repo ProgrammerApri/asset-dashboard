@@ -44,6 +44,8 @@ const KategoriAkun = () => {
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
   const [isEdit, setEdit] = useState(false);
+  const [first2, setFirst2] = useState(0);
+  const [rows2, setRows2] = useState(20);
 
   const dialogFuncMap = {
     displayData: setDisplayData,
@@ -287,6 +289,52 @@ const KategoriAkun = () => {
     );
   };
 
+  const template2 = {
+    layout: "RowsPerPageDropdown CurrentPageReport PrevPageLink NextPageLink",
+    RowsPerPageDropdown: (options) => {
+      const dropdownOptions = [
+        { label: 20, value: 20 },
+        { label: 50, value: 50 },
+        { label: "Semua", value: options.totalRecords },
+      ];
+
+      return (
+        <React.Fragment>
+          <span
+            className="mx-1"
+            style={{ color: "var(--text-color)", userSelect: "none" }}
+          >
+            Data per halaman:{" "}
+          </span>
+          <Dropdown
+            value={options.value}
+            options={dropdownOptions}
+            onChange={options.onChange}
+          />
+        </React.Fragment>
+      );
+    },
+    CurrentPageReport: (options) => {
+      return (
+        <span
+          style={{
+            color: "var(--text-color)",
+            userSelect: "none",
+            width: "120px",
+            textAlign: "center",
+          }}
+        >
+          {options.first} - {options.last} dari {options.totalRecords}
+        </span>
+      );
+    },
+  };
+
+  const onCustomPage2 = (event) => {
+    setFirst2(event.first);
+    setRows2(event.rows);
+  };
+
   return (
     <>
       <Toast ref={toast} />
@@ -302,7 +350,6 @@ const KategoriAkun = () => {
                 value={kategori}
                 className="display w-100 datatable-wrapper"
                 showGridlines
-                rows={10}
                 dataKey="kategory.id"
                 rowHover
                 header={renderHeader}
@@ -313,6 +360,12 @@ const KategoriAkun = () => {
                   "kategory.kode_saldo",
                 ]}
                 emptyMessage="Tidak ada data kategori"
+                paginator
+                paginatorTemplate={template2}
+                first={first2}
+                rows={rows2}
+                onPage={onCustomPage2}
+                paginatorClassName="justify-content-end mt-3"
               >
                 <Column
                   field={(e) => e.kategory.id}

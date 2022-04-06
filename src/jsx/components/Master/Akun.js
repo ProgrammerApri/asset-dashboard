@@ -57,6 +57,7 @@ const Akun = () => {
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
+  const [displayDel, setDisplayDel] = useState(false);
   const [position, setPosition] = useState("center");
   const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
@@ -65,10 +66,14 @@ const Akun = () => {
   const [isEdit, setEdit] = useState(false);
   const [akunTerhub, setAkunTerhub] = useState(false);
   const [first2, setFirst2] = useState(0);
-  const [rows2, setRows2] = useState(10);
+  const [rows2, setRows2] = useState(20);
 
   const dialogFuncMap = {
     displayData: setDisplayData,
+  };
+
+  const dialogDelete = {
+    displayDel: setDisplayDel,
   };
 
   useEffect(() => {
@@ -143,6 +148,7 @@ const Akun = () => {
             ...currentItem.account,
             acc_code: res,
             kat_code: data.kategory.id,
+            sld_type: data.kategory.kode_saldo,
           },
           kategory: data.kategory,
           klasifikasi: data.klasifikasi,
@@ -303,15 +309,28 @@ const Akun = () => {
         }, 500);
       }
     } catch (error) {
-      setTimeout(() => {
-        setUpdate(false);
-        toast.current.show({
-          severity: "error",
-          summary: "Gagal",
-          detail: "Gagal memperbarui data",
-          life: 3000,
-        });
-      }, 500);
+      console.log(error);
+      if (error.status === 400) {
+        setTimeout(() => {
+          setUpdate(false);
+          toast.current.show({
+            severity: "error",
+            summary: "Gagal",
+            detail: `Kode Akun ${currentItem.account.acc_code} Sudah Digunakan`,
+            life: 3000,
+          });
+        }, 500);
+      } else {
+        setTimeout(() => {
+          setUpdate(false);
+          toast.current.show({
+            severity: "error",
+            summary: "Gagal",
+            detail: "Gagal memperbarui data",
+            life: 3000,
+          });
+        }, 500);
+      }
     }
   };
 
@@ -323,10 +342,21 @@ const Akun = () => {
           onClick={() => {
             setEdit(true);
             onClick("displayData", data);
+            getAccountUmum();
           }}
           className="btn btn-primary shadow btn-xs sharp ml-2"
         >
           <i className="fa fa-pencil"></i>
+        </Link>
+
+        <Link
+          onClick={() => {
+            setEdit(true);
+            onClick("displayDel", data);
+          }}
+          className="btn btn-danger shadow btn-xs sharp ml-2"
+        >
+          <i className="fa fa-trash"></i>
         </Link>
       </div>
       // </React.Fragment>
@@ -366,6 +396,25 @@ const Akun = () => {
         />
         <PButton
           label="Simpan"
+          icon="pi pi-check"
+          onClick={() => onSubmit()}
+          autoFocus
+          loading={update}
+        />
+      </div>
+    );
+  };
+
+  const renderFooterDel = (kode) => {
+    return (
+      <div>
+        <PButton
+          label="Batal"
+          onClick={() => onHide(kode)}
+          className="p-button-text btn-primary"
+        />
+        <PButton
+          label="Ok"
           icon="pi pi-check"
           onClick={() => onSubmit()}
           autoFocus
@@ -447,7 +496,6 @@ const Akun = () => {
     layout: "RowsPerPageDropdown CurrentPageReport PrevPageLink NextPageLink",
     RowsPerPageDropdown: (options) => {
       const dropdownOptions = [
-        { label: 10, value: 10 },
         { label: 20, value: 20 },
         { label: 50, value: 50 },
         { label: "Semua", value: options.totalRecords },
@@ -531,7 +579,7 @@ const Akun = () => {
                   style={{
                     width: "10rem",
                     fontWeight: "bold",
-                    minWidth: "8rem"
+                    minWidth: "8rem",
                   }}
                   field={(e) => e.account.acc_code}
                   body={loading && <Skeleton />}
@@ -571,13 +619,13 @@ const Akun = () => {
                       <div>
                         {e.account.sld_type === "D" ? (
                           <Badge variant="success light">
-                            <i className='bx bxs-circle text-success mr-1'></i>
-                            {" "}Detail
+                            <i className="bx bxs-circle text-success mr-1"></i>{" "}
+                            Detail
                           </Badge>
                         ) : (
                           <Badge variant="info light">
-                            <i className='bx bxs-circle text-info mr-1'></i>
-                            {" "}Umum
+                            <i className="bx bxs-circle text-info mr-1"></i>{" "}
+                            Umum
                           </Badge>
                         )}
                       </div>
@@ -595,13 +643,13 @@ const Akun = () => {
                       <div>
                         {e.account.sld_type === "D" ? (
                           <Badge variant="secondary light">
-                            <i className='bx bxs-plus-circle text-secondary mr-1'></i>
-                            {" "}Debit
+                            <i className="bx bxs-plus-circle text-secondary mr-1"></i>{" "}
+                            Debit
                           </Badge>
                         ) : (
                           <Badge variant="warning light">
-                            <i className='bx bxs-minus-circle text-warning mr-1'></i>
-                            {" "}Kredit
+                            <i className="bx bxs-minus-circle text-warning mr-1"></i>{" "}
+                            Kredit
                           </Badge>
                         )}
                       </div>
@@ -609,9 +657,9 @@ const Akun = () => {
                   }
                 />
                 <Column
-                  header="Terhubung"
+                  header="Terhubung Sub Akun"
                   field={(e) => e.account.connect}
-                  style={{ minWidth: "8rem" }}
+                  style={{ maxWidth: "8rem" }}
                   body={(e) =>
                     loading ? (
                       <Skeleton />
@@ -619,13 +667,12 @@ const Akun = () => {
                       <div>
                         {e.account.connect ? (
                           <Badge variant="primary light">
-                            <i className='bx bx-check text-primary mr-1'></i>
-                            {" "}Terhubung
+                            <i className="bx bx-check text-primary mr-1"></i>{" "}
+                            Terhubung
                           </Badge>
                         ) : (
                           <Badge variant="danger light">
-                            <i className='bx bx-x text-danger mr-1'></i>
-                            {" "}Tidak
+                            <i className="bx bx-x text-danger mr-1"></i> Tidak
                           </Badge>
                         )}
                       </div>
@@ -793,8 +840,8 @@ const Akun = () => {
           <div className="p-inputgroup">
             <SelectButton
               value={
-                currentItem !== null && currentItem.kategory.kode_saldo !== ""
-                  ? currentItem.kategory.kode_saldo === "D"
+                currentItem !== null && currentItem.account.sld_type !== ""
+                  ? currentItem.account.sld_type === "D"
                     ? { name: "Debit", code: "D" }
                     : { name: "Kredit", code: "K" }
                   : null
@@ -806,7 +853,7 @@ const Akun = () => {
                   ...currentItem,
                   account: {
                     ...currentItem.account,
-                    kode_saldo: e.value.code,
+                    sld_type: e.value.code,
                   },
                 });
               }}
@@ -858,6 +905,27 @@ const Akun = () => {
             </>
           ) : null
         ) : null}
+      </Dialog>
+
+      <Dialog
+        header={"Delete Data"}
+        visible={displayDel}
+        style={{ width: "450px" }}
+        footer={renderFooter("displayDel")}
+        onHide={() => {
+          setEdit(false);
+          onHide("displayDel");
+        }}
+      >
+        <div className="confirmation-content">
+          <i
+            className="pi pi-exclamation-triangle mr-3"
+            style={{ fontSize: "2rem" }}
+          />
+          {account && (
+            <span>Are you sure you want to delete the selected products?</span>
+          )}
+        </div>
       </Dialog>
     </>
   );

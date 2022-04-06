@@ -14,17 +14,18 @@ import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { SelectButton } from "primereact/selectbutton";
 import { Checkbox } from "primereact/checkbox";
+import { InputNumber } from "primereact/inputnumber";
 
 const data = {
   account: {
     acc_code: "",
-    acc_name: "Iuran",
-    kode_umum: 0,
-    kode_kategori: 0,
-    du: "U",
-    kode_saldo: "",
-    terhubung: "",
-    saldo_awal: 0,
+    acc_name: "",
+    umm_code: null,
+    kat_code: 0,
+    dou_type: "U",
+    sld_type: "",
+    connect: false,
+    sld_awal: 0,
   },
   kategory: {
     id: 0,
@@ -49,8 +50,9 @@ const jenisAkun = [
 ];
 
 const Akun = () => {
-  const [account, setAkccount] = useState(null);
+  const [account, setAccount] = useState(null);
   const [kategori, setKategori] = useState(null);
+  const [umum, setUmum] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
@@ -66,10 +68,22 @@ const Akun = () => {
     displayData: setDisplayData,
   };
 
+
   useEffect(() => {
     getKategori();
     initFilters1();
   }, []);
+
+  const valueUmum = (value) => {
+    let selected = null;
+    umum.forEach((element) => {
+      if (element.account.acc_code === value) {
+        selected = element;
+      }
+    });
+    console.log(selected);
+    return selected;
+  };
 
   const getKategori = async () => {
     console.log("-------------------");
@@ -90,12 +104,12 @@ const Akun = () => {
         setKategori(data);
       }
     } catch (error) {}
+      getAccount();
   };
 
-  const getAccountUmum = async (data) => {
+  const getAccountUmum = async () => {
     const config = {
       ...endpoints.accountUmum,
-      endpoint: endpoints.accountUmum.endpoint + data.account.id,
     };
     console.log(config.data);
     let response = null;
@@ -103,11 +117,8 @@ const Akun = () => {
       response = await request(null, config);
       console.log(response);
       if (response.status) {
-        const data = response;
-        setCurrentItem({
-          ...currentItem,
-          account: { ...currentItem.account, acc_code: data }
-        });
+        const { data } = response;
+        setUmum(data);
       }
     } catch (error) {}
   };
@@ -126,7 +137,11 @@ const Akun = () => {
         const res = response.data;
         setCurrentItem({
           ...currentItem,
-          account: { ...currentItem.account, acc_code: res },
+          account: {
+            ...currentItem.account,
+            acc_code: res,
+            kat_code: data.kategory.id,
+          },
           kategory: data.kategory,
           klasifikasi: data.klasifikasi,
         });
@@ -134,51 +149,124 @@ const Akun = () => {
     } catch (error) {}
   };
 
-  // const editAccount = async () => {
-  //   const config = {
-  //     ...endpoints.editAccount,
-  //     endpoint: endpoints.editAccount.endpoint + currentItem.account.id,
-  //     data: {
-  //       acc_name: currentItem.account.acc_name,
-  //       kode_kategori: currentItem.kategory.id,
-  //       acc_code: currentItem.account.acc_code,
-  //       kode_umum: currentItem.account.kode_umum,
-  //       du: currentItem.account.du,
-  //       kode_saldo: currentItem.account.kode_saldo,
-  //       terhubung: currentItem.account.terhubung,
-  //       saldo_awal: currentItem.account.saldo_awal,
-  //     },
-  //   };
-  //   console.log(config.data);
-  //   let response = null;
-  //   try {
-  //     response = await request(null, config);
-  //     console.log(response);
-  //     if (response.status) {
-  //       setTimeout(() => {
-  //         setUpdate(false);
-  //         dialogFuncMap["displayData"](false);
-  //         getKategori(true);
-  //         toast.current.show({
-  //           severity: "info",
-  //           summary: "Berhasil",
-  //           detail: "Data berhasil diperbarui",
-  //           life: 3000,
-  //         });
-  //       }, 500);
-  //     }
-  //   } catch (error) {
-  //     setTimeout(() => {
-  //       setUpdate(false);
-  //       toast.current.show({
-  //         severity: "error",
-  //         summary: "Gagal",
-  //         detail: "Gagal memperbarui data",
-  //         life: 3000,
-  //       });
-  //     }, 500);
-  //   }
-  // };
+  const getAccKodeDet = async (data) => {
+    const config = {
+      ...endpoints.getAccKodeDet,
+      endpoint: endpoints.getAccKodeDet.endpoint + data.account.acc_code,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const res = response.data;
+        setCurrentItem({
+          ...currentItem,
+          account: {
+            ...currentItem.account,
+            acc_code: res,
+            umm_code: data.account.acc_code,
+          },
+        });
+      }
+    } catch (error) {}
+  };
+
+  const getKodeUmum = async (id) => {
+    const config = {
+      ...endpoints.getAccKodeUm,
+      endpoint: endpoints.getAccKodeUm.endpoint + id,
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const res = response.data;
+        setCurrentItem({
+          ...currentItem,
+          account: {
+            ...currentItem.account,
+            acc_code: res,
+            umm_code: null,
+          },
+        });
+      }
+    } catch (error) {}
+  };
+
+  const getAccount = async (isUpdate = false) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.account,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setAccount(data);
+      }
+    } catch (error) {}
+    if (isUpdate) {
+      setLoading(false);
+    } else {
+      setTimeout(() => {
+        setLoading(false);
+      }, 1500);
+    }
+  };
+
+  const editAccount = async () => {
+    const config = {
+      ...endpoints.editAccount,
+      endpoint: endpoints.editAccount.endpoint + currentItem.account.id,
+      data: {
+        acc_name: currentItem.account.acc_name,
+        kode_kategori: currentItem.kategory.id,
+        kode_acc: currentItem.account.acc_code,
+        kode_umum: currentItem.account.umm_code,
+        du: currentItem.account.dou_type,
+        kode_saldo: currentItem.kategory.kode_saldo,
+        terhubung: currentItem.account.connect,
+        saldo_awal: currentItem.account.sld_awal,
+      },
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setTimeout(() => {
+          setUpdate(false);
+          dialogFuncMap["displayData"](false);
+          getKategori(true);
+          toast.current.show({
+            severity: "info",
+            summary: "Berhasil",
+            detail: "Data berhasil diperbarui",
+            life: 3000,
+          });
+        }, 500);
+      }
+    } catch (error) {
+      setTimeout(() => {
+        setUpdate(false);
+        toast.current.show({
+          severity: "error",
+          summary: "Gagal",
+          detail: "Gagal memperbarui data",
+          life: 3000,
+        });
+      }, 500);
+    }
+  };
 
   const addAccount = async () => {
     const config = {
@@ -186,12 +274,12 @@ const Akun = () => {
       data: {
         acc_name: currentItem.account.acc_name,
         kode_kategori: currentItem.kategory.id,
-        acc_code: currentItem.account.acc_code,
-        kode_umum: currentItem.account.kode_umum,
-        du: currentItem.account.du,
-        kode_saldo: currentItem.account.kode_saldo,
-        terhubung: currentItem.account.terhubung,
-        saldo_awal: currentItem.account.saldo_awal,
+        kode_acc: currentItem.account.acc_code,
+        kode_umum: currentItem.account.umm_code,
+        du: currentItem.account.dou_type,
+        kode_saldo: currentItem.kategory.kode_saldo,
+        terhubung: currentItem.account.connect,
+        saldo_awal: currentItem.account.sld_awal,
       },
     };
     console.log(config.data);
@@ -257,8 +345,13 @@ const Akun = () => {
   };
 
   const onSubmit = () => {
-    setUpdate(true);
-    addAccount();
+    if (isEdit) {
+      setUpdate(true);
+      editAccount();
+    } else {
+      setUpdate(true);
+      addAccount();
+    }
   };
 
   const renderFooter = (kode) => {
@@ -324,6 +417,30 @@ const Akun = () => {
     );
   };
 
+  const umumTemplate = (option) => {
+    return (
+      <div>
+        {option !== null
+          ? `${option.account.acc_name} (${option.account.acc_code})`
+          : ""}
+      </div>
+    );
+  };
+
+  const selectedou_typemumTemplate = (option, props) => {
+    if (option) {
+      return (
+        <div>
+          {option !== null
+            ? `${option.account.acc_name} (${option.account.acc_code})`
+            : ""}
+        </div>
+      );
+    }
+
+    return <span>{props.placeholder}</span>;
+  };
+
   return (
     <>
       <Toast ref={toast} />
@@ -335,7 +452,7 @@ const Akun = () => {
             </Card.Header>
             <Card.Body>
               <DataTable
-                responsive="scroll"
+                responsiveLayout="scroll"
                 value={account}
                 className="display w-150 datatable-wrapper"
                 showGridlines
@@ -345,53 +462,66 @@ const Akun = () => {
                 header={renderHeader}
                 filters={filters1}
                 globalFilterFields={[
-                  "akun.name",
+                  "account.acc_name",
                   "kategory.name",
-                  "akun.kode_akun",
-                  "kategory.id",
-                  "akun.jenis_akun",
-                  "akun.saldo_normal",
+                  "account.acc_code",
+                  "account.umm_code",
+                  "account.dou_type",
+                  "account.sld_type",
+                  "account.sld_awal",
                 ]}
                 emptyMessage="Tidak ada data"
-              >
+                paginator
+                paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown ml-50"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+                >
+                
                 <Column
-                  field={(e) => e.account.id}
-                  header="ID"
-                  style={{
-                    width: "10rem",
-                    fontWeight: "bold",
-                    color: "#727272",
-                  }}
+                  header="Kode Akun"
+                  field={(e) => e.account.acc_code}
+                  style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Nama Akun"
                   field={(e) => e.account.acc_name}
-                  style={{ minWidth: "10rem" }}
+                  style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Kategori"
-                  field={(e) => e.account.kode_kategori}
-                  style={{ minWidth: "10rem" }}
+                  field={(e) => e.kategory.name}
+                  style={{ minWidth: "6rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Kode Akun"
-                  field={(e) => e.account.acc_code}
-                  style={{ minWidth: "10rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Kode Akun Umum"
-                  field={(e) => e.account.kode_umum}
-                  style={{ minWidth: "10rem" }}
-                  body={loading && <Skeleton />}
+                  header="Akun Umum"
+                  // field={(e) => e.account.umm_code}
+                  style={{ minWidth: "8rem" }}
+                  body={(e) => (loading ? <Skeleton /> : <div>{e.account.umm_code ? e.account.umm_code : "-"}</div>)}
                 />
                 <Column
                   header="Jenis Akun"
-                  field={(e) => e.account.du}
-                  style={{ minWidth: "10rem" }}
+                  field={(e) => e.account.dou_type}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                 <Column
+                  header="Saldo Normal"
+                  field={(e) => e.account.sld_type}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                  <Column
+                  header="Terhubung"
+                  field={(e) => e.account.connect}
+                  style={{ minWidth: "8rem" }}
+                  body={(e) => (loading ? <Skeleton /> : <div>{e.account.connect ? "Ya" : "Tidak"}</div>)}
+                />
+                  <Column
+                  header="Saldo Awal"
+                  field={(e) => e.account.sld_awal}
+                  style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
@@ -440,13 +570,13 @@ const Akun = () => {
           <label className="text-label">Nama Akun</label>
           <div className="p-inputgroup">
             <InputText
-              // value={currentItem !== null ? `${currentItem.account.acc_name}` : ""}
-              // onChange={(e) =>
-              //   setCurrentItem({
-              //     ...currentItem,
-              //     account: { ...currentItem.account, acc_name: e.target.value },
-              //   })
-              // }
+              value={currentItem !== null ? `${currentItem.account.acc_name}` : ""}
+              onChange={(e) =>
+                setCurrentItem({
+                  ...currentItem,
+                  account: { ...currentItem.account, acc_name: e.target.value },
+                })
+              }
               placeholder="Masukan Nama Akun"
             />
           </div>
@@ -482,8 +612,8 @@ const Akun = () => {
           <div className="p-inputgroup">
             <SelectButton
               value={
-                currentItem !== null && currentItem.account.du !== ""
-                  ? currentItem.account.du === "D"
+                currentItem !== null && currentItem.account.dou_type !== ""
+                  ? currentItem.account.dou_type === "D"
                     ? { name: "Detail", code: "D" }
                     : { name: "Umum", code: "U" }
                   : null
@@ -491,11 +621,14 @@ const Akun = () => {
               options={jenisAkun}
               onChange={(e) => {
                 console.log(e.value);
+                if (e.value.code === "D") {
+                  getAccountUmum();
+                }
                 setCurrentItem({
                   ...currentItem,
                   account: {
                     ...currentItem.account,
-                    du: e.value.code,
+                    dou_type: e.value.code,
                   },
                 });
               }}
@@ -504,28 +637,35 @@ const Akun = () => {
           </div>
         </div>
 
-        {currentItem !== null && currentItem.account.du !== "" ? (
-          currentItem.account.du === "D" ? (
+        {currentItem !== null && currentItem.account.dou_type !== "" ? (
+          currentItem.account.dou_type === "D" &&
+          currentItem.account.kat_code !== 0 ? (
             <>
               <div className="col-12 mb-2">
                 <label className="text-label">Akun Umum</label>
                 <div className="p-inputgroup">
-                <Dropdown
-                  value={currentItem !== null ? currentItem.account : null}
-                  options={account}
-                  onChange={(e) => {
-                    console.log(e.value);
-                    getAccountUmum(e.value);
-                    // setCurrentItem({
-                    //   ...currentItem,
-                    //   account: e.value,
-                    // });
-                  }}
-                  optionLabel="account.acc_code"
-                  filter
-                  filterBy="account.acc_code"
-                  placeholder="Pilih Kode Umum"
-            />
+                  <Dropdown
+                    value={
+                      umum !== null && currentItem.account.umm_code !== null
+                        ? valueUmum(currentItem.account.umm_code)
+                        : null
+                    }
+                    options={umum}
+                    onChange={(e) => {
+                      if (e.value) {
+                        getAccKodeDet(e.value);
+                      } else {
+                        getKodeUmum(currentItem.account.kat_code);
+                      }
+                    }}
+                    optionLabel="account.acc_name"
+                    valueTemplate={selectedou_typemumTemplate}
+                    itemTemplate={umumTemplate}
+                    filter
+                    filterBy="account.acc_name"
+                    placeholder="Pilih Kode Umum"
+                    showClear
+                  />
                 </div>
               </div>
             </>
@@ -559,34 +699,49 @@ const Akun = () => {
           </div>
         </div>
 
-        <div className="col-12 mb-2">
-          <Checkbox
-            className="mb-2"
-            inputId="binary"
-            checked={akunTerhub}
-            onChange={(e) => setAkunTerhub(e.checked)}
-          />
-          <label className="ml-3" htmlFor="binary">
-            {"Akun Terhubung"}
-          </label>
-        </div>
+        {currentItem !== null && currentItem.account.dou_type !== "" ? (
+          currentItem.account.dou_type === "D" &&
+          currentItem.account.kat_code !== 0 ? (
+            <>
+              <div className="col-12 mb-2">
+                <Checkbox
+                  className="mb-2"
+                  inputId="binary"
+                  checked={currentItem ? currentItem.account.connect : false}
+                  onChange={(e) =>
+                    setCurrentItem({
+                      ...currentItem,
+                      account: { ...currentItem.account, connect: e.checked },
+                    })
+                  }
+                />
+                <label className="ml-3" htmlFor="binary">
+                  {"Akun Terhubung"}
+                </label>
+              </div>
 
-        <div className="col-12 mb-2">
-          <label className="text-label">Saldo Awal</label>
-          <div className="p-inputgroup">
-            <InputText
-              //   value={currentItem !== null ? `${currentItem.kategory.name}` : ""}
-              //   onChange={(e) =>
-              //     setCurrentItem({
-              //       ...currentItem,
-              //       kategory: { ...currentItem.kategory, name: e.target.value },
-              //     })
-              //   }
-              placeholder="Masukan Saldo Awal"
-              disabled
-            />
-          </div>
-        </div>
+              <div className="col-12 mb-2">
+                <label className="text-label">Saldo Awal</label>
+                <div className="p-inputgroup">
+                  <InputNumber
+                    value={
+                      currentItem !== null ? currentItem.account.sld_awal : ""
+                    }
+                    onChange={(e) => {
+                      console.log(e);
+                      setCurrentItem({
+                        ...currentItem,
+                        account: { ...currentItem.account, sld_awal: e.value },
+                      });
+                    }}
+                    placeholder="Masukan Saldo Awal"
+                    disabled={currentItem ? currentItem.account.connect : false}
+                  />
+                </div>
+              </div>
+            </>
+          ) : null
+        ) : null}
       </Dialog>
     </>
   );

@@ -54,7 +54,13 @@ const endpoints = {
     },
 
     getAccKodeUm: {
-        endpoint: "/v1/api/account/u",
+        endpoint: "/v1/api/account/u/",
+        method: "GET",
+        data: {},
+    },
+
+    getAccKodeDet: {
+        endpoint: "/v1/api/account/d/",
         method: "GET",
         data: {},
     },

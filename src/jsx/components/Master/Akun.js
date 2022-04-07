@@ -825,7 +825,7 @@ const Akun = () => {
               filter
               filterBy="kategory.name"
               placeholder="Pilih Kategori"
-              // disabled={currentItem !== null}
+              disabled={isEdit ? currentItem.kategory !== null : false}
             />
           </div>
         </div>

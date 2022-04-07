@@ -107,6 +107,7 @@
 .p-inputtext {
   background: var(--input-bg);
   border: 1px solid var(--border-color);
+  border-radius: 10px;
 }
 
 .p-datatable .p-datatable-thead > tr > th {
@@ -11746,9 +11747,9 @@ a.active {
 .content-body .container-md,
 .content-body .container-lg,
 .content-body .container-xl {
-  padding-top: 40px;
-  padding-right: 40px;
-  padding-left: 40px;
+  padding-top: 20px;
+  padding-right: 30px;
+  padding-left: 30px;
 }
 @media only screen and (max-width: 1600px) {
   .content-body .container-fluid,
@@ -12756,7 +12757,7 @@ a.active {
 
 .nav-header {
   height: 4.5rem;
-  width: 20rem;
+  width: 17rem;
   display: inline-block;
   text-align: left;
   position: absolute;
@@ -12790,8 +12791,8 @@ a.active {
   font-size: 1.125rem;
   color: #fff;
   text-decoration: none;
-  padding-left: 40px;
-  padding-right: 40px;
+  padding-left: 30px;
+  padding-right: 30px;
   font-weight: 700;
 }
 @media only screen and (max-width: 1400px) {
@@ -13013,8 +13014,8 @@ a.active {
 }
 .header .header-content {
   height: 100%;
-  padding-left: 3.5rem;
-  padding-right: 2.4rem;
+  padding-left: 0.5rem;
+  padding-right: 30px;
   align-items: center;
   display: flex;
 }
@@ -13219,7 +13220,7 @@ svg.pulse-svg .third-circle {
   align-items: center;
 }
 .header-left .dashboard_bar {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 600;
   color: var(--text-color);
 }
@@ -13398,7 +13399,7 @@ svg.pulse-svg .third-circle {
   background: var(--card-bg);
   box-shadow: 0px 12px 23px 0px rgb(59 40 62 / 8%);
   border-radius: 0.875rem;
-  padding: 12px;
+  padding: 10px;
   line-height: 1;
 }
 @media only screen and (max-width: 1400px) {
@@ -13543,8 +13544,8 @@ svg.pulse-svg .third-circle {
   color: #6cc51d;
 }
 .header-right .header-profile img {
-  width: 45px;
-  height: 45px;
+  width: 42px;
+  height: 42px;
   border-radius: 0.875rem;
   box-shadow: 0px 12px 23px 0px rgb(59 40 62 / 8%);
 }
@@ -16101,7 +16102,7 @@ html[dir="rtl"]
 }
 
 .content-body {
-  margin-left: 20.2rem;
+  margin-left: 17rem;
   z-index: 0;
   transition: all 0.2s ease;
 }
@@ -16342,7 +16343,7 @@ html[dir="rtl"]
   }
 }
 .deznav {
-  width: 20rem;
+  width: 17rem;
   padding-bottom: 0;
   height: 100%;
   position: absolute;
@@ -16466,7 +16467,7 @@ html[dir="rtl"]
   padding-bottom: 0.5rem;
   position: relative;
   font-size: 14px;
-  padding-left: 5.625rem;
+  padding-left: 4.5rem;
 }
 @media only screen and (max-width: 1400px) {
   .deznav .metismenu ul a {
@@ -17135,7 +17136,7 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
   > li
   > a {
   font-size: 14px;
-  padding: 20px 40px;
+  padding: 20px 30px;
   color: var(--menu-color-inactive);
   -webkit-transition: all 0.5s;
   -ms-transition: all 0.5s;
@@ -17232,7 +17233,7 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
   display: none;
 }
 [data-sidebar-style="full"][data-layout="vertical"] .menu-toggle .header {
-  padding-left: 6rem;
+  padding-left: 9.5rem;
   width: 100%;
 }
 [direction="rtl"][data-sidebar-style="full"][data-layout="vertical"]
@@ -17915,10 +17916,6 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
   }
   [data-layout="horizontal"] .nav-header .nav-control {
     display: none;
-  }
-  [data-layout="horizontal"] .nav-header .brand-logo {
-    /*  padding-left: 0;
-       justify-content: center; */
   }
   [data-layout="horizontal"] .header {
     width: 100%;
@@ -38717,9 +38714,9 @@ button:focus {
 
 .btn {
   padding: 0.5rem 1rem;
-  border-radius: 0.875rem;
+  border-radius: 10px;
   font-weight: 500;
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 .btn:hover,
 .btn:focus,

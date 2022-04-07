@@ -99,16 +99,11 @@ import MainSweetAlert from "./components/PluginsMenu/Sweet Alert/SweetAlert";
 import Toastr from "./components/PluginsMenu/Toastr/Toastr";
 import JqvMap from "./components/PluginsMenu/Jqv Map/JqvMap";
 import RechartJs from "./components/charts/rechart";
-import Lokasi from "./components/Lokasi/Lokasi";
-import TambahLokasi from "./components/Lokasi/TambahLokasi";
 
 /// Master
 import Master from "./components/Master/PusatBiaya";
 // import InputKaryawan from "./components/Master/InputKaryawan";
 
-/// Kolam
-import Kolam from "./components/Kolam/Kolam";
-import InputKolam from "./components/Kolam/InputKolam";
 import Login from "./Login";
 import { withResizeDetector } from "react-resize-detector";
 import KategoriAkun from "./components/Master/KategoriAkun";
@@ -128,16 +123,16 @@ const Markup = ({width}) => {
     { url: "akun", component: Akun },
 
     /// Lokasi
-    { url: "lokasi", component: Lokasi },
-    { url: "tambah-lokasi", component: TambahLokasi },
+    // { url: "lokasi", component: Lokasi },
+    // { url: "tambah-lokasi", component: TambahLokasi },
 
     // Master
     // {url: "master", component: Master},
     // {url: "input-karyawan", component: InputKaryawan},
 
     /// Kolam
-    { url: "kolam", component: Kolam },
-    { url: "input-kolam", component: InputKolam },
+    // { url: "kolam", component: Kolam },
+    // { url: "input-kolam", component: InputKolam },
 
     /// Bootstrap
     { url: "ui-alert", component: UiAlert },

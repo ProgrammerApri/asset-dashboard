@@ -604,9 +604,9 @@ const Akun = () => {
       <Row>
         <Col>
           <Card>
-            <Card.Header>
+            {/* <Card.Header>
               <Card.Title>Akun</Card.Title>
-            </Card.Header>
+            </Card.Header> */}
             <Card.Body>
               <DataTable
                 responsiveLayout="scroll"
@@ -638,7 +638,6 @@ const Akun = () => {
                   header="Kode Akun"
                   style={{
                     width: "10rem",
-                    fontWeight: "bold",
                     minWidth: "8rem",
                   }}
                   field={(e) => e.account.acc_code}

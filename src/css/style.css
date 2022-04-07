@@ -73,6 +73,10 @@
 @import url(./../vendor/metismenu/css/metisMenu.min.css);
 
 /* prime react style */
+.p-component{
+  font-size: 0.9rem;
+}
+
 .p-datatable .p-datatable-tbody > tr > td {
   border: 0px solid #dee2e6;
   border-bottom: 1px solid var(--border-color);
@@ -97,7 +101,7 @@
 .p-datatable .p-datatable-header {
   background: #00000000;
   border: 0px solid #00000000 !important;
-  padding: 1rem 0;
+  padding: 0 0 1rem 0;
 }
 
 .p-inputtext {
@@ -108,6 +112,7 @@
 .p-datatable .p-datatable-thead > tr > th {
   border: 0px solid #dee2e6;
   background: var(--input-bg);
+  font-weight: 500;
   color: var(--text-color);
 }
 
@@ -451,7 +456,7 @@ section {
 
 body {
   margin: 0;
-  font-family: "Roboto", sans-serif;
+  font-family: "Open Sans", sans-serif;
   font-size: 0.875rem;
   font-weight: 400;
   line-height: 1.5;
@@ -33602,11 +33607,11 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
   background-color: rgba(110, 110, 110, 0.1);
 }
 
-[data-typography="opensans"] {
+/* [data-typography="opensans"] {
   font-family: "Open Sans", sans-serif;
-}
+} */
 
-[data-typography="poppins"] {
+/* [data-typography="poppins"] {
   font-family: "poppins", sans-serif;
 }
 
@@ -33616,7 +33621,7 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
 
 [data-typography="helvetica"] {
   font-family: "HelveticaNeue";
-}
+} */
 
 /*$primary  : #7356f1 !default;*/
 [data-theme-version="transparent"] {

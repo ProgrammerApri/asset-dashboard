@@ -16,33 +16,35 @@ const Header = ({
   onBox,
   onDark,
 }) => {
-  var path = window.location.pathname.split("/");
-  var name = path[path.length - 1].split("-");
+  const origin = window.location.origin;
+  const patern = origin+"/#/"
+  var path = window.location.href;
+  var name = path.replace(patern, "");
   const [isDark, setDark] = useState(false);
-  var filterName = name.length >= 3 ? name.filter((n, i) => i > 0) : name;
-  var finalName = filterName.includes("app")
-    ? filterName.filter((f) => f !== "app")
-    : filterName.includes("ui")
-    ? filterName.filter((f) => f !== "ui")
-    : filterName.includes("uc")
-    ? filterName.filter((f) => f !== "uc")
-    : filterName.includes("basic")
-    ? filterName.filter((f) => f !== "basic")
-    : filterName.includes("form")
-    ? filterName.filter((f) => f !== "form")
-    : filterName.includes("table")
-    ? filterName.filter((f) => f !== "table")
-    : filterName.includes("page")
-    ? filterName.filter((f) => f !== "page")
-    : filterName.includes("email")
-    ? filterName.filter((f) => f !== "email")
-    : filterName.includes("ecom")
-    ? filterName.filter((f) => f !== "ecom")
-    : filterName.includes("chart")
-    ? filterName.filter((f) => f !== "chart")
-    : filterName.includes("editor")
-    ? filterName.filter((f) => f !== "editor")
-    : filterName;
+  // var filterName = name.length >= 3 ? name.filter((n, i) => i > 0) : name;
+  // var finalName = filterName.includes("app")
+  //   ? filterName.filter((f) => f !== "app")
+  //   : filterName.includes("ui")
+  //   ? filterName.filter((f) => f !== "ui")
+  //   : filterName.includes("uc")
+  //   ? filterName.filter((f) => f !== "uc")
+  //   : filterName.includes("basic")
+  //   ? filterName.filter((f) => f !== "basic")
+  //   : filterName.includes("form")
+  //   ? filterName.filter((f) => f !== "form")
+  //   : filterName.includes("table")
+  //   ? filterName.filter((f) => f !== "table")
+  //   : filterName.includes("page")
+  //   ? filterName.filter((f) => f !== "page")
+  //   : filterName.includes("email")
+  //   ? filterName.filter((f) => f !== "email")
+  //   : filterName.includes("ecom")
+  //   ? filterName.filter((f) => f !== "ecom")
+  //   : filterName.includes("chart")
+  //   ? filterName.filter((f) => f !== "chart")
+  //   : filterName.includes("editor")
+  //   ? filterName.filter((f) => f !== "editor")
+  //   : filterName;
   const body = document.querySelector("body");
 
   const switchTheme = () => {
@@ -58,7 +60,7 @@ const Header = ({
   };
 
   useEffect(() => {
-    console.log(isDark);
+    console.log(path);
   }, []);
 
   return (
@@ -71,9 +73,9 @@ const Header = ({
                 className="dashboard_bar"
                 style={{ textTransform: "capitalize" }}
               >
-                {finalName.join(" ").length === 0
+                {name.length === 0
                   ? "Dashboard"
-                  : finalName.join(" ")}
+                  : name}
               </div>
             </div>
             <ul className="navbar-nav header-right">

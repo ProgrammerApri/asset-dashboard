@@ -68,6 +68,8 @@ const Akun = () => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
 
+  const dummy = Array.from({ length: 15 });
+
   useEffect(() => {
     getKategori();
     initFilters1();
@@ -218,7 +220,7 @@ const Akun = () => {
     } else {
       setTimeout(() => {
         setLoading(false);
-      }, 1500);
+      }, 500);
     }
   };
 
@@ -291,7 +293,7 @@ const Akun = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayData(false);
-          getKategori(true);
+          getAccount(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -340,7 +342,7 @@ const Akun = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayDel(false);
-          getKategori(true);
+          getAccount(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -610,7 +612,7 @@ const Akun = () => {
             <Card.Body>
               <DataTable
                 responsiveLayout="scroll"
-                value={account}
+                value={loading ? dummy : account}
                 className="display w-150 datatable-wrapper"
                 showGridlines
                 dataKey=""

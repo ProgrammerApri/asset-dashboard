@@ -7,6 +7,7 @@ import {
   Switch,
   Route,
   Redirect,
+  HashRouter,
 } from "react-router-dom";
 
 /// Css
@@ -222,7 +223,8 @@ const Markup = ({width}) => {
     : body.setAttribute("data-sidebar-style", "overlay");
 
   return (
-    <Router>
+    <HashRouter basename="/">
+      <Router>
       <div id="main-wrapper" className="show">
         <Nav />
 
@@ -242,6 +244,7 @@ const Markup = ({width}) => {
         </div>
       </div>
     </Router>
+    </HashRouter>
   );
 };
 

@@ -153,9 +153,9 @@ const KlasifikasiAkun = () => {
       <Row>
         <Col>
           <Card>
-            <Card.Header>
+            {/* <Card.Header>
               <Card.Title>Klasifikasi Akun</Card.Title>
-            </Card.Header>
+            </Card.Header> */}
             <Card.Body>
               <DataTable
                 responsive
@@ -171,8 +171,6 @@ const KlasifikasiAkun = () => {
                   header="Kode"
                   style={{
                     width: "10rem",
-                    fontWeight: "bold",
-                    color: "#727272",
                   }}
                   body={loading && <Skeleton />}
                 />

@@ -341,9 +341,9 @@ const KategoriAkun = () => {
       <Row>
         <Col>
           <Card>
-            <Card.Header>
+            {/* <Card.Header>
               <Card.Title>Kategori Akun</Card.Title>
-            </Card.Header>
+            </Card.Header> */}
             <Card.Body>
               <DataTable
                 responsive="scroll"
@@ -372,8 +372,6 @@ const KategoriAkun = () => {
                   header="Kode"
                   style={{
                     width: "10rem",
-                    fontWeight: "bold",
-                    color: "#727272",
                   }}
                   body={loading && <Skeleton />}
                 />

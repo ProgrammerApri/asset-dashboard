@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 
 /// Link
-import { Link } from "react-router-dom";
+import { HashRouter, Link } from "react-router-dom";
 
 /// Scroll
 import PerfectScrollbar from "react-perfect-scrollbar";
@@ -47,11 +47,13 @@ class SideBar extends Component {
   }
   render() {
     /// Path
-    const path = window.location.pathname;
+    const path = window.location.href;
+    const origin = window.location.origin;
+    const patern = origin+"/#/"
 
     /// Active menu
     let deshBoard = [""],
-      master = ["klasifikasi", "kategori"],
+      master = ["klasifikasi", "kategori", "akun"],
       app = [
         "app-profile",
         "app-calender",
@@ -112,12 +114,13 @@ class SideBar extends Component {
       table = ["table-bootstrap-basic", "table-datatable-basic"];
 
     return (
-      <div className="deznav">
+      <HashRouter basename="/">
+        <div className="deznav">
         <PerfectScrollbar className="deznav-scroll">
           <MM className="metismenu" id="menu">
             <li
               className={`${
-                deshBoard.includes(path.slice(1)) ? "mm-active" : ""
+                deshBoard.includes(path.replace(patern, "")) ? "mm-active" : ""
               }`}
             >
               <Link className="ai-icon" to="" aria-expanded="false">
@@ -128,7 +131,7 @@ class SideBar extends Component {
 
             <li
               className={`${
-                master.includes(path.slice(1)) ? "mm-active" : ""
+                master.includes(path.replace(patern, "")) ? "mm-active" : ""
               }`}
             >
               <Link className="has-arrow ai-icon" to="#" aria-expanded="false">
@@ -370,7 +373,7 @@ class SideBar extends Component {
               </ul>
             </li>
 
-            <li className={`${app.includes(path.slice(1)) ? "mm-active" : ""}`}>
+            {/* <li className={`${app.includes(path.replace(patern, "")) ? "mm-active" : ""}`}>
               <Link className="has-arrow ai-icon" to="#" aria-expanded="false">
                 <i className="flaticon-381-television"></i>
                 <span className="nav-text">Apps</span>
@@ -430,7 +433,7 @@ class SideBar extends Component {
             </li>
 
             <li
-              className={`${charts.includes(path.slice(1)) ? "mm-active" : ""}`}
+              className={`${charts.includes(path.replace(patern, "")) ? "mm-active" : ""}`}
             >
               <Link className="has-arrow ai-icon" to="#" aria-expanded="false">
                 <i className="flaticon-381-controls-3"></i>
@@ -457,7 +460,7 @@ class SideBar extends Component {
 
             <li
               className={`${
-                bootstrap.includes(path.slice(1)) ? "mm-active" : ""
+                bootstrap.includes(path.replace(patern, "")) ? "mm-active" : ""
               }`}
             >
               <Link className="has-arrow ai-icon" to="#" aria-expanded="false">
@@ -521,7 +524,7 @@ class SideBar extends Component {
 
             <li
               className={`${
-                plugins.includes(path.slice(1)) ? "mm-active" : ""
+                plugins.includes(path.replace(patern, "")) ? "mm-active" : ""
               }`}
             >
               <Link className="has-arrow ai-icon" to="#" aria-expanded="false">
@@ -551,7 +554,7 @@ class SideBar extends Component {
             </li>
 
             <li
-              className={`${widget.includes(path.slice(1)) ? "mm-active" : ""}`}
+              className={`${widget.includes(path.replace(patern, "")) ? "mm-active" : ""}`}
             >
               <Link to="widget-basic" className="ai-icon" aria-expanded="false">
                 <i className="flaticon-381-settings-2"></i>
@@ -560,7 +563,7 @@ class SideBar extends Component {
             </li>
 
             <li
-              className={`${forms.includes(path.slice(1)) ? "mm-active" : ""}`}
+              className={`${forms.includes(path.replace(patern, "")) ? "mm-active" : ""}`}
             >
               <Link className="has-arrow ai-icon" to="#" aria-expanded="false">
                 <i className="flaticon-381-notepad"></i>
@@ -586,7 +589,7 @@ class SideBar extends Component {
             </li>
 
             <li
-              className={`${table.includes(path.slice(1)) ? "mm-active" : ""}`}
+              className={`${table.includes(path.replace(patern, "")) ? "mm-active" : ""}`}
             >
               <Link className="has-arrow ai-icon" to="#" aria-expanded="false">
                 <i className="flaticon-381-network"></i>
@@ -640,7 +643,7 @@ class SideBar extends Component {
                   <Link to="/page-lock-screen">Lock Screen</Link>
                 </li>
               </ul>
-            </li>
+            </li> */}
           </MM>
 
           <div className="copyright">
@@ -650,6 +653,7 @@ class SideBar extends Component {
           </div>
         </PerfectScrollbar>
       </div>
+      </HashRouter>
     );
   }
 }

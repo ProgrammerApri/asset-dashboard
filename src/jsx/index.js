@@ -223,14 +223,14 @@ const Markup = ({width}) => {
     : body.setAttribute("data-sidebar-style", "overlay");
 
   return (
-    <HashRouter basename="/">
       <Router>
       <div id="main-wrapper" className="show">
         <Nav />
 
         <div className="content-body">
           <div className="container-fluid">
-            <Switch>
+           <HashRouter basename="/" >
+           <Switch>
               {routes.map((data, i) => (
                 <Route
                   key={i}
@@ -240,11 +240,11 @@ const Markup = ({width}) => {
                 />
               ))}
             </Switch>
+           </HashRouter>
           </div>
         </div>
       </div>
     </Router>
-    </HashRouter>
   );
 };
 

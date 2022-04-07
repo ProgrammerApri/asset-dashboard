@@ -450,6 +450,20 @@ const Akun = () => {
             ) {
               delAccount(currentItem.account.id);
               setUpdate(true);
+
+            } else if(currentItem.account.sld_awal !== 0) {
+              setUpdate(true);
+              setTimeout(() => {
+                setUpdate(false);
+                setDisplayDel(false);
+                toast.current.show({
+                  severity: "error",
+                  summary: "Gagal",
+                  detail: `Tidak Dapat Menghapus Akun, Saldo Terisi`,
+                  life: 3000,
+                });
+              }, 500);
+
             } else {
               setUpdate(true);
               setTimeout(() => {
@@ -811,6 +825,7 @@ const Akun = () => {
               filter
               filterBy="kategory.name"
               placeholder="Pilih Kategori"
+              // disabled={currentItem !== null}
             />
           </div>
         </div>
@@ -858,6 +873,7 @@ const Akun = () => {
                         ? valueUmum(currentItem.account.umm_code)
                         : null
                     }
+                    
                     options={umum}
                     onChange={(e) => {
                       if (e.value) {
@@ -873,6 +889,7 @@ const Akun = () => {
                     filterBy="account.acc_name"
                     placeholder="Pilih Kode Umum"
                     showClear
+                    disabled={isEdit ? currentItem.account.umm_code !== null : false}
                   />
                 </div>
               </div>

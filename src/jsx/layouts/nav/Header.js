@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 
-import { Link } from "react-router-dom";
+import { HashRouter, Link } from "react-router-dom";
 /// Scroll
 import PerfectScrollbar from "react-perfect-scrollbar";
 
 /// Image
 import profile from "../../../images/profile/17.jpg";
 import avatar from "../../../images/avatar/1.jpg";
+import { Button } from "react-bootstrap";
 
 const Header = ({
   onNote,
@@ -53,16 +54,15 @@ const Header = ({
             </div>
             <ul className="navbar-nav header-right">
               <li className="nav-item dropdown notification_dropdown">
-                <Link
-                  className="nav-link  ai-icon"
-                  to="#"
+                <Button
+                  className="nav-link ai-icon"
                   role="button"
                   data-toggle="dropdown"
                   onClick={() => onNotification()}
                 >
                   <i class="bx bx-bell"></i>
                   <span className="badge light text-white bg-primary">12</span>
-                </Link>
+                </Button>
                 <div
                   className={`dropdown-menu dropdown-menu-right ${
                     toggle === "notification" ? "show" : ""
@@ -161,9 +161,8 @@ const Header = ({
                 </div>
               </li>
               <li className="nav-item dropdown notification_dropdown">
-                <Link
-                  className="nav-link  ai-icon"
-                  to="#"
+                <Button
+                  className="nav-link ai-icon"
                   role="button"
                   data-toggle="dropdown"
                   onClick={() => switchTheme()}
@@ -173,7 +172,7 @@ const Header = ({
                   ) : (
                     <i class="bx bx-moon"></i>
                   )}
-                </Link>
+                </Button>
               </li>
               <li className="nav-item dropdown header-profile">
                 <Link

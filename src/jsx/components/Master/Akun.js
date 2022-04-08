@@ -513,6 +513,19 @@ const Akun = () => {
             placeholder="Cari disini"
           />
         </span>
+        <Row className="mr-1">
+        <Button
+        className="mr-3"
+          variant="primary"
+          onClick={() => {
+            exportExcel();
+          }}
+        >
+          Export{" "}
+          <span className="btn-icon-right">
+            <i class="bx bx-plus"></i>
+          </span>
+        </Button>
         <Button
           variant="primary"
           onClick={() => {
@@ -526,6 +539,7 @@ const Akun = () => {
             <i class="bx bx-plus"></i>
           </span>
         </Button>
+        </Row>
       </div>
     );
   };
@@ -598,6 +612,49 @@ const Akun = () => {
   const onCustomPage2 = (event) => {
     setFirst2(event.first);
     setRows2(event.rows);
+  };
+
+  const exportExcel = () => {
+    let data = [];
+    account.forEach(el => {
+      data.push({
+        KODE_ACC: el.account.acc_code,
+        ACC_NAME: el.account.acc_name,
+        KODE_UMM : el.account.umm_code != null ? el.account.umm_code : "-",
+        KAT_ACC : el.kategory.name,
+        D_OR_U : el.account.dou_type,
+        SLD_TYPE: el.account.sld_type,
+        TERHUBUNG: el.account.connect,
+        SLD_AWAL: el.account.sld_awal,
+      });
+    });
+    import("xlsx").then((xlsx) => {
+      const worksheet = xlsx.utils.json_to_sheet(data);
+      const workbook = { Sheets: { data: worksheet }, SheetNames: ["data"] };
+      const excelBuffer = xlsx.write(workbook, {
+        bookType: "xlsx",
+        type: "array"
+      });
+      saveAsExcelFile(excelBuffer, "account");
+    });
+  };
+
+  const saveAsExcelFile = (buffer, fileName) => {
+    import("file-saver").then((module) => {
+      if (module && module.default) {
+        let EXCEL_TYPE =
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+        let EXCEL_EXTENSION = ".xlsx";
+        const data = new Blob([buffer], {
+          type: EXCEL_TYPE
+        });
+
+        module.default.saveAs(
+          data,
+          fileName + "_export_" + new Date().getTime() + EXCEL_EXTENSION
+        );
+      }
+    });
   };
 
   return (

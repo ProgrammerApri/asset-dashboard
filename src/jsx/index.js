@@ -101,14 +101,12 @@ import Toastr from "./components/PluginsMenu/Toastr/Toastr";
 import JqvMap from "./components/PluginsMenu/Jqv Map/JqvMap";
 import RechartJs from "./components/charts/rechart";
 
-/// Master
-import Master from "./components/Master/PusatBiaya";
-// import InputKaryawan from "./components/Master/InputKaryawan";
-
 import Login from "./Login";
 import { withResizeDetector } from "react-resize-detector";
 import KategoriAkun from "./components/Master/KategoriAkun";
 import Akun from "./components/Master/Akun";
+import PusatBiaya from "./components/Master/PusatBiaya";
+import Project from "./components/Master/Project";
 
 const Markup = ({width}) => {
   const routes = [
@@ -122,18 +120,8 @@ const Markup = ({width}) => {
     { url: "klasifikasi", component: KlasifikasiAkun },
     { url: "kategori", component: KategoriAkun },
     { url: "akun", component: Akun },
-
-    /// Lokasi
-    // { url: "lokasi", component: Lokasi },
-    // { url: "tambah-lokasi", component: TambahLokasi },
-
-    // Master
-    // {url: "master", component: Master},
-    // {url: "input-karyawan", component: InputKaryawan},
-
-    /// Kolam
-    // { url: "kolam", component: Kolam },
-    // { url: "input-kolam", component: InputKolam },
+    { url: "pusat-biaya", component: PusatBiaya },
+    { url: "project", component: Project },
 
     /// Bootstrap
     { url: "ui-alert", component: UiAlert },

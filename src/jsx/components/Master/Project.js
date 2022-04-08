@@ -14,15 +14,16 @@ import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 
 const data = {
-  pusatBiaya: {
+  project: {
     kode: "",
     name: "",
     keterangan: null,
   },
 };
 
-const PusatBiaya = () => {
-  const [pusatBiaya, setPusatBiaya] = useState(null);
+
+const Project = () => {
+  const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
@@ -37,14 +38,15 @@ const PusatBiaya = () => {
   const [rows2, setRows2] = useState(20);
 
   useEffect(() => {
-    getPusatBiaya();
+    getProject();
     initFilters1();
   }, []);
 
-  const getPusatBiaya = async (isUpdate = false) => {
+
+  const getProject = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.pusatBiaya,
+      ...endpoints.project,
       data: {},
     };
     console.log(config.data);
@@ -55,7 +57,7 @@ const PusatBiaya = () => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        setPusatBiaya(data);
+        setProject(data);
       }
     } catch (error) {}
     if (isUpdate) {
@@ -67,14 +69,14 @@ const PusatBiaya = () => {
     }
   };
 
-  const editPusatBiaya = async () => {
+  const editProject = async () => {
     const config = {
-      ...endpoints.editPusatBiaya,
-      endpoint: endpoints.editPusatBiaya.endpoint + currentItem.pusatBiaya.id,
+      ...endpoints.editProject,
+      endpoint: endpoints.editProject.endpoint + currentItem.project.id,
       data: {
-        kode: currentItem.pusatBiaya.kode,
-        name: currentItem.pusatBiaya.name,
-        keterangan: currentItem.pusatBiaya.keterangan,
+        kode: currentItem.project.kode,
+        name: currentItem.project.name,
+        keterangan: currentItem.project.keterangan,
       },
     };
     console.log(config.data);
@@ -85,7 +87,7 @@ const PusatBiaya = () => {
       if (response.status) {
         setTimeout(() => {
           setUpdate(false);
-          setDisplayData(false);
+          setDisplayData(false);;
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -107,13 +109,13 @@ const PusatBiaya = () => {
     }
   };
 
-  const addPusatBiaya = async () => {
+  const addProject = async () => {
     const config = {
-      ...endpoints.addPusatBiaya,
+      ...endpoints.addProject,
       data: {
-        kode: currentItem.pusatBiaya.kode,
-        name: currentItem.pusatBiaya.name,
-        keterangan: currentItem.pusatBiaya.keterangan,
+        kode: currentItem.project.kode,
+        name: currentItem.project.name,
+        keterangan: currentItem.project.keterangan,
       },
     };
     console.log(config.data);
@@ -141,7 +143,7 @@ const PusatBiaya = () => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${currentItem.pusatBiaya.kode} Sudah Digunakan`,
+            detail: `Kode Project ${currentItem.project.kode} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -159,10 +161,10 @@ const PusatBiaya = () => {
     }
   };
 
-  const delPusatBiaya = async (id) => {
+  const delProject = async (id) => {
     const config = {
-      ...endpoints.delPusatBiaya,
-      endpoint: endpoints.delPusatBiaya.endpoint + id,
+      ...endpoints.delProject,
+      endpoint: endpoints.delProject.endpoint + id,
     };
     console.log(config.data);
     let response = null;
@@ -189,7 +191,7 @@ const PusatBiaya = () => {
         toast.current.show({
           severity: "error",
           summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Data`,
+          detail: `Tidak Dapat Menghapus Project`,
           life: 3000,
         });
       }, 500);
@@ -237,10 +239,10 @@ const PusatBiaya = () => {
   const onSubmit = () => {
     if (isEdit) {
       setUpdate(true);
-      editPusatBiaya();
+      editProject();
     } else {
       setUpdate(true);
-      addPusatBiaya();
+      addProject();
     }
   };
 
@@ -263,7 +265,7 @@ const PusatBiaya = () => {
     );
   };
 
-  const renderFooterDel = (kode) => {
+  const renderFooterDel = () => {
     return (
       <div>
         <PButton
@@ -279,9 +281,10 @@ const PusatBiaya = () => {
               currentItem.account.dou_type === "D" &&
               currentItem.account.sld_awal === 0
             ) {
-              delPusatBiaya(currentItem.account.id);
+              delProject(currentItem.account.id);
               setUpdate(true);
-            } else if (currentItem.account.sld_awal !== 0) {
+
+            } else if(currentItem.account.sld_awal !== 0) {
               setUpdate(true);
               setTimeout(() => {
                 setUpdate(false);
@@ -293,6 +296,7 @@ const PusatBiaya = () => {
                   life: 3000,
                 });
               }, 500);
+
             } else {
               setUpdate(true);
               setTimeout(() => {
@@ -357,6 +361,7 @@ const PusatBiaya = () => {
     );
   };
 
+
   const template2 = {
     layout: "RowsPerPageDropdown CurrentPageReport PrevPageLink NextPageLink",
     RowsPerPageDropdown: (options) => {
@@ -412,7 +417,7 @@ const PusatBiaya = () => {
             <Card.Body>
               <DataTable
                 responsiveLayout="scroll"
-                value={pusatBiaya}
+                value={project}
                 className="display w-150 datatable-wrapper"
                 showGridlines
                 dataKey=""
@@ -420,9 +425,9 @@ const PusatBiaya = () => {
                 header={renderHeader}
                 filters={filters1}
                 globalFilterFields={[
-                  "pusatBiaya.kode",
-                  "pusatBiaya.name",
-                  "pusatBiaya.keterangan",
+                  "project.kode",
+                  "project.name",
+                  "project.keterangan",
                 ]}
                 emptyMessage="Tidak ada data"
                 paginator
@@ -437,18 +442,18 @@ const PusatBiaya = () => {
                   style={{
                     minWidth: "8rem",
                   }}
-                  field={(e) => e.pusatBiaya.kode}
+                //   field={(e) => e.account.acc_code}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Nama"
-                  field={(e) => e.pusatBiaya.name}
+                //   field={(e) => e.account.acc_name}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Keterangan"
-                  field={(e) => e.pusatBiaya.keterangan}
+                //   field={(e) => e.kategory.name}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
@@ -466,7 +471,7 @@ const PusatBiaya = () => {
       </Row>
 
       <Dialog
-        header={isEdit ? "Edit Pusat Biaya" : "Tambah Pusat Biaya"}
+        header={isEdit ? "Edit Project" : "Tambah Project"}
         visible={displayData}
         style={{ width: "40vw" }}
         footer={renderFooter("displayData")}
@@ -479,13 +484,13 @@ const PusatBiaya = () => {
           <label className="text-label">Kode</label>
           <div className="p-inputgroup">
             <InputText
-              //   value={
-              //     currentItem !== null ? `${currentItem.pusatBiaya.kode}` : ""
-              //   }
+            //   value={
+            //     currentItem !== null ? `${currentItem}` : ""
+            //   }
               onChange={(e) =>
                 setCurrentItem({
                   ...currentItem,
-                  account: { ...currentItem.pusatBiaya, kode: e.target.value },
+                //   account: { ...currentItem : e.target.value },
                 })
               }
               placeholder="Masukan Kode"
@@ -497,13 +502,13 @@ const PusatBiaya = () => {
           <label className="text-label">Nama</label>
           <div className="p-inputgroup">
             <InputText
-              //   value={
-              //     currentItem !== null ? `${currentItem.pusatBiaya.name}` : ""
-              //   }
+            //   value={
+            //     currentItem !== null ? `${currentItem.}` : ""
+            //   }
               onChange={(e) =>
                 setCurrentItem({
                   ...currentItem,
-                  account: { ...currentItem.pusatBiaya, name: e.target.value },
+                //   account: { ...currentItem.: e.target.value },
                 })
               }
               placeholder="Masukan Nama Akun"
@@ -515,16 +520,13 @@ const PusatBiaya = () => {
           <label className="text-label">Keterangan</label>
           <div className="p-inputgroup">
             <InputText
-              //   value={
-              //     currentItem !== null ? `${currentItem.pusatBiaya.keterangan}` : ""
-              //   }
+            //   value={
+            //     currentItem !== null ? `${currentItem.}` : ""
+            //   }
               onChange={(e) =>
                 setCurrentItem({
                   ...currentItem,
-                  account: {
-                    ...currentItem.pusatBiaya,
-                    keterangan: e.target.value,
-                  },
+                //   account: { ...currentItem.: e.target.value },
                 })
               }
               placeholder="Masukan Keterangan"
@@ -554,4 +556,4 @@ const PusatBiaya = () => {
   );
 };
 
-export default PusatBiaya;
+export default Project;

@@ -148,7 +148,7 @@ class SideBar extends Component {
                       <Link to="/pusat-biaya">Pusat Biaya</Link>
                     </li>
                     <li>
-                      <Link to="/produk">Produk</Link>
+                      <Link to="/project">Project</Link>
                     </li>
                     <li>
                       <Link to="/perkiraan">Perkiraan</Link>

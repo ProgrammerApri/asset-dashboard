@@ -75,8 +75,55 @@ const endpoints = {
         endpoint: "/v1/api/account/",
         method: "DELETE",
         data: {},
-    }
+    },
 
+    pusatBiaya: {
+        endpoint: "",
+        method: "GET",
+        data: {},
+    },
+
+    addPusatBiaya: {
+        endpoint: "",
+        method: "POST",
+        data: {},
+    },
+
+    editPusatBiaya: {
+        endpoint: "",
+        method: "PUT",
+        data: {},
+    },
+
+    delPusatBiaya: {
+        endpoint: "",
+        method: "DELETE",
+        data: {},
+    },
+
+    project: {
+        endpoint: "",
+        method: "GET",
+        data: {},
+    },
+
+    addProject: {
+        endpoint: "",
+        method: "POST",
+        data: {},
+    },
+
+    editProject: {
+        endpoint: "",
+        method: "PUT",
+        data: {},
+    },
+
+    delProject: {
+        endpoint: "",
+        method: "DELETE",
+        data: {},
+    },
 };
 
 export default endpoints;

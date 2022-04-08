@@ -47,6 +47,8 @@ const KategoriAkun = () => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
 
+  const dummy = Array.from({ length: 10 });
+
   const dialogFuncMap = {
     displayData: setDisplayData,
   };
@@ -100,7 +102,7 @@ const KategoriAkun = () => {
     } else {
       setTimeout(() => {
         setLoading(false);
-      }, 1500);
+      }, 500);
     }
   };
 
@@ -347,7 +349,7 @@ const KategoriAkun = () => {
             <Card.Body>
               <DataTable
                 responsive="scroll"
-                value={kategori}
+                value={loading ? dummy : kategori}
                 className="display w-100 datatable-wrapper"
                 showGridlines
                 dataKey="kategory.id"

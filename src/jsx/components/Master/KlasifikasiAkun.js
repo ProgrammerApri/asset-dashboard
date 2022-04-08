@@ -23,6 +23,8 @@ const KlasifikasiAkun = () => {
   const [currentItem, setCurrentItem] = useState({ id: "", klasiname: "" });
   const toast = useRef(null);
 
+  const dummy = Array.from({ length: 10 });
+
   const dialogFuncMap = {
     displayData: setDisplayData,
   };
@@ -53,7 +55,7 @@ const KlasifikasiAkun = () => {
     } else {
       setTimeout(() => {
         setLoading(false);
-      }, 1500);
+      }, 500);
     }
   };
 
@@ -159,7 +161,7 @@ const KlasifikasiAkun = () => {
             <Card.Body>
               <DataTable
                 responsive
-                value={klasifikasi}
+                value={loading ? dummy : klasifikasi}
                 className="display w-100 datatable-wrapper"
                 showGridlines
                 rows={10}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 /// React router dom
-import { Link } from "react-router-dom";
+import { HashRouter, Link } from "react-router-dom";
 
 /// images
 import logo from "../../../images/logo-large.png";
@@ -18,7 +18,8 @@ const NavHader = ({isDark = false}) => {
 
   return (
     <div className="nav-header">
-      <Link to="/" className="brand-logo">
+      <HashRouter>
+      <Link to="" className="brand-logo">
         <img className="logo-abbr" src={toggle ? logoSmall : logo} alt="" />
         {/* <img
           className="logo-compact"
@@ -31,6 +32,7 @@ const NavHader = ({isDark = false}) => {
           alt=""
         /> */}
       </Link>
+      </HashRouter>
 
       <div className="nav-control" onClick={() => setToggle(!toggle)}>
         <div className={`hamburger ${toggle ? "is-active" : ""}`}>

@@ -20,39 +20,12 @@ const Header = ({
   const patern = origin+"/#/"
   var path = window.location.href;
   var name = path.replace(patern, "");
+  var finalName = name.length > 0 && name.includes("-") ? name.replace("-", " ") : name;
   const [isDark, setDark] = useState(false);
-  // var filterName = name.length >= 3 ? name.filter((n, i) => i > 0) : name;
-  // var finalName = filterName.includes("app")
-  //   ? filterName.filter((f) => f !== "app")
-  //   : filterName.includes("ui")
-  //   ? filterName.filter((f) => f !== "ui")
-  //   : filterName.includes("uc")
-  //   ? filterName.filter((f) => f !== "uc")
-  //   : filterName.includes("basic")
-  //   ? filterName.filter((f) => f !== "basic")
-  //   : filterName.includes("form")
-  //   ? filterName.filter((f) => f !== "form")
-  //   : filterName.includes("table")
-  //   ? filterName.filter((f) => f !== "table")
-  //   : filterName.includes("page")
-  //   ? filterName.filter((f) => f !== "page")
-  //   : filterName.includes("email")
-  //   ? filterName.filter((f) => f !== "email")
-  //   : filterName.includes("ecom")
-  //   ? filterName.filter((f) => f !== "ecom")
-  //   : filterName.includes("chart")
-  //   ? filterName.filter((f) => f !== "chart")
-  //   : filterName.includes("editor")
-  //   ? filterName.filter((f) => f !== "editor")
-  //   : filterName;
+
   const body = document.querySelector("body");
 
   const switchTheme = () => {
-    // if (isDark) {
-    //    body.classList.toggle("dark");
-    // } else {
-    //    body.classList.add("dark");
-    // }
     body.classList.toggle("dark");
     setDark(!isDark);
     console.log(isDark);
@@ -75,7 +48,7 @@ const Header = ({
               >
                 {name.length === 0
                   ? "Dashboard"
-                  : name}
+                  : finalName}
               </div>
             </div>
             <ul className="navbar-nav header-right">

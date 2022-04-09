@@ -1,115 +1,110 @@
 import React, { useState } from "react";
 import { request, endpoints } from "src/utils";
+import { Checkbox } from "primereact/checkbox";
+import { Password } from "primereact/password";
+import { InputText } from "primereact/inputtext";
+import { Button, Image, Row } from "react-bootstrap";
+import logo from "../images/logo-large.png";
 
 const Login = () => {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
+  const [remember, setRemember] = useState(false);
 
-   const handleSubmit = async () => {
-      if (username && password) {
-        const config = {
-          ...endpoints.login,
-          data: { username, password },
-        };
-        console.log(config.data);
-        let response = null;
-        try {
-          response = await request(null, config);
-          console.log(response);
-          if (response.status) {
-            const { data } = response;
-            console.log(data.token);
-            localStorage.setItem("token", data.token);
-            window.location.reload();
-          }
-        } catch (error) {
-          if (error.status === 403) {
-            alert("Password yang anda inputkan salah");
-          } else {
-            alert("Gangguan Server");
-          }
+  const handleSubmit = async () => {
+    if (username && password) {
+      const config = {
+        ...endpoints.login,
+        data: { username, password, remember },
+      };
+      console.log(config.data);
+      let response = null;
+      try {
+        response = await request(null, config);
+        console.log(response);
+        if (response.status) {
+          const { data } = response;
+          console.log(data.token);
+          localStorage.setItem("token", data.token);
+          window.location.reload();
+        }
+      } catch (error) {
+        if (error.status === 403) {
+          alert("Password yang anda inputkan salah");
+        } else {
+          alert("Gangguan Server");
         }
       }
-    };
+    }
+  };
 
-   return (
-      <div className="authincation">
-         <div className="container p-0">
-            <div className="row justify-content-center align-items-center authincation-page-area">
-               <div className="col-lg-6 col-md-9">
-                  <div className="authincation-content">
-                     <div className="row no-gutters">
-                        <div className="col-xl-12">
-                           <div className="auth-form">
-                              <h4 className="text-center mb-4">
-                                 Sign in your account
-                              </h4>
-                              <form
-                              action=""
-                              onSubmit={(e) =>
-                                 e.preventDefault()
-                              }
-                              >
-                                 <div className="form-group">
-                                    <label className="mb-1">
-                                       <strong>Username</strong>
-                                    </label>
-                                    <input
-                                       type="text"
-                                       className="form-control"
-                                       name="username"
-                                       value={username}
-                                       onChange={(e) => setUsername(e.target.value)}
-                                    />
-                                 </div>
-                                 <div className="form-group">
-                                    <label className="mb-1">
-                                       <strong>Password</strong>
-                                    </label>
-                                    <input
-                                       type="password"
-                                       className="form-control"
-                                       name="password"
-                                       value={password}
-                                       onChange={(e) => setPassword(e.target.value)}
-                                    />
-                                 </div>
-                                 <div className="form-row d-flex justify-content-between mt-4 mb-2">
-                                    <div className="form-group">
-                                       <div className="custom-control custom-checkbox ml-1">
-                                          <input
-                                             type="checkbox"
-                                             className="custom-control-input"
-                                             id="basic_checkbox_1"
-                                          />
-                                          <label
-                                             className="custom-control-label"
-                                             htmlFor="basic_checkbox_1"
-                                          >
-                                             Remember me
-                                          </label>
-                                       </div>
-                                    </div>
-                                 </div>
-                                 <div className="text-center">
-                                    <button
-                                       type="submit"
-                                       className="btn btn-primary btn-block"
-                                       onClick={() => handleSubmit()}
-                                    >
-                                       Sign Me In
-                                    </button>
-                                 </div>
-                              </form>
-                           </div>
-                        </div>
-                     </div>
-                  </div>
-               </div>
+  return (
+    <>
+      <Row>
+        <div className="login-left col-lg-4 col-md-6 vh-100">
+          <div className="login-header col-12 ml-3 mt-4">
+            <img className="login-logo" src={logo} alt="" />
+          </div>
+          <div className="d-flex align-items-center mt-5">
+            <div className="mr-3 ml-3 mt-5" style={{ width: "40rem" }}>
+              <div className="col-12 mt-6">
+                <h2 className="fw-bold">Sign In</h2>
+              </div>
+              <div className="col-12 mb-2 mt-6">
+                <span className="p-float-label w-100">
+                  <InputText
+                  className="w-100"
+                    id="username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                  />
+                  <label htmlFor="username">Username</label>
+                </span>
+              </div>
+              <div className="col-12 mb-2 mt-3">
+              <span className="p-float-label w-100">
+                  <Password
+                  className="w-100"
+                    id="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    toggleMask
+                    feedback={false}
+                  />
+                  <label htmlFor="password">Password</label>
+                </span>
+              </div>
+              <div className="col-12 mb-2">
+                <Checkbox
+                  className="mb-2"
+                  inputId="binary"
+                  checked={remember}
+                  onChange={(e) => setRemember(e.checked)}
+                />
+                <label className="ml-3" htmlFor="binary">
+                  {"Ingat Saya"}
+                </label>
+              </div>
+              <div className="col-12 mb-2 mt-5">
+                <div className="text-center">
+                  <Button
+                    type="submit"
+                    className="btn btn-primary btn-block"
+                    onClick={() => handleSubmit()}
+                    style={{ height: "56px" }}
+                  >
+                    Sign In
+                  </Button>
+                </div>
+              </div>
             </div>
-         </div>
-      </div>
-   );
+          </div>
+        </div>
+
+        <div className="w-100 vh-100 login-right col-lg-8 col-md-6"></div>
+      </Row>
+    </>
+  );
 };
 
 export default Login;

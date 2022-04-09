@@ -68,8 +68,6 @@ const Akun = () => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
 
-  const dummy = Array.from({ length: 15 });
-
   useEffect(() => {
     getKategori();
     initFilters1();
@@ -220,7 +218,7 @@ const Akun = () => {
     } else {
       setTimeout(() => {
         setLoading(false);
-      }, 500);
+      }, 1500);
     }
   };
 
@@ -293,7 +291,7 @@ const Akun = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayData(false);
-          getAccount(true);
+          getKategori(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -342,7 +340,7 @@ const Akun = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayDel(false);
-          getAccount(true);
+          getKategori(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -612,7 +610,7 @@ const Akun = () => {
             <Card.Body>
               <DataTable
                 responsiveLayout="scroll"
-                value={loading ? dummy : account}
+                value={account}
                 className="display w-150 datatable-wrapper"
                 showGridlines
                 dataKey=""
@@ -827,7 +825,7 @@ const Akun = () => {
               filter
               filterBy="kategory.name"
               placeholder="Pilih Kategori"
-              disabled={isEdit ? currentItem.kategory !== null : false}
+              // disabled={isEdit ? currentItem.kategory !== null : false}
             />
           </div>
         </div>
@@ -891,7 +889,7 @@ const Akun = () => {
                     filterBy="account.acc_name"
                     placeholder="Pilih Kode Umum"
                     showClear
-                    disabled={isEdit ? currentItem.account.umm_code !== null : false}
+                    // disabled={isEdit ? currentItem.account.umm_code !== null : false}
                   />
                 </div>
               </div>

@@ -4,7 +4,7 @@ import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "react-bootstrap";
-import { Row, Col, Card } from "react-bootstrap";
+import { Row, Col, Card, Badge } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { Dialog } from "primereact/dialog";
@@ -12,6 +12,7 @@ import { InputText } from "primereact/inputtext";
 import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
+import { SelectButton } from "primereact/selectbutton";
 
 const data = {
   kategory: {
@@ -343,9 +344,6 @@ const KategoriAkun = () => {
       <Row>
         <Col>
           <Card>
-            {/* <Card.Header>
-              <Card.Title>Kategori Akun</Card.Title>
-            </Card.Header> */}
             <Card.Body>
               <DataTable
                 responsive="scroll"
@@ -393,7 +391,25 @@ const KategoriAkun = () => {
                   header="Kode Saldo Normal"
                   field={(e) => e.kategory.kode_saldo}
                   style={{ minWidth: "10rem" }}
-                  body={loading && <Skeleton />}
+                  body={(e) =>
+                    loading ? (
+                      <Skeleton />
+                    ) : (
+                      <div>
+                        {e.kategory.kode_saldo === "D" ? (
+                          <Badge variant="secondary light">
+                            <i className="bx bxs-plus-circle text-secondary mr-1"></i>{" "}
+                            Debit
+                          </Badge>
+                        ) : (
+                          <Badge variant="warning light">
+                            <i className="bx bxs-minus-circle text-warning mr-1"></i>{" "}
+                            Kredit
+                          </Badge>
+                        )}
+                      </div>
+                    )
+                  }
                 />
                 <Column
                   header="Action"
@@ -456,7 +472,7 @@ const KategoriAkun = () => {
         <div className="col-12 mb-2">
           <label className="text-label">Kode Saldo Normal</label>
           <div className="p-inputgroup">
-            <Dropdown
+            <SelectButton
               value={
                 currentItem !== null && currentItem.kategory.kode_saldo !== ""
                   ? currentItem.kategory.kode_saldo === "D"

@@ -78,25 +78,25 @@ const endpoints = {
     },
 
     pusatBiaya: {
-        endpoint: "",
+        endpoint: "/v1/api/cost-center",
         method: "GET",
         data: {},
     },
 
     addPusatBiaya: {
-        endpoint: "",
+        endpoint: "/v1/api/cost-center",
         method: "POST",
         data: {},
     },
 
     editPusatBiaya: {
-        endpoint: "",
+        endpoint: "/v1/api/cost-center/",
         method: "PUT",
         data: {},
     },
 
     delPusatBiaya: {
-        endpoint: "",
+        endpoint: "/v1/api/cost-center/",
         method: "DELETE",
         data: {},
     },

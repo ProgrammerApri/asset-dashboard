@@ -73,7 +73,7 @@
 @import url(./../vendor/metismenu/css/metisMenu.min.css);
 
 /* prime react style */
-.p-component{
+.p-component {
   font-size: 0.9rem;
 }
 
@@ -83,7 +83,9 @@
   color: var(--text-color);
   padding: 0.7rem 1rem;
 }
-.p-datatable.p-datatable-hoverable-rows .p-datatable-tbody > tr:not(.p-highlight):not(.p-datatable-emptymessage):hover {
+.p-datatable.p-datatable-hoverable-rows
+  .p-datatable-tbody
+  > tr:not(.p-highlight):not(.p-datatable-emptymessage):hover {
   background: #e9ecef63;
 }
 .p-datatable .p-datatable-tbody > tr {
@@ -119,9 +121,9 @@
 
 .p-dropdown {
   background: var(--input-bg);
-    border: 1px solid var(--border-color);
-    height: 50px;
-    padding-right: 15px;
+  border: 1px solid var(--border-color);
+  height: 50px;
+  padding-right: 15px;
 }
 
 .p-dropdown .p-dropdown-trigger {
@@ -145,8 +147,8 @@
 .p-inputgroup-addon {
   background-color: var(--input-bg);
   border-top: 1px solid var(--border-color);
-    border-left: 1px solid var(--border-color);
-    border-bottom: 1px solid var(--border-color);
+  border-left: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .p-datatable.p-datatable-gridlines .p-datatable-thead > tr > th {
@@ -193,6 +195,10 @@
 
 .p-dialog .p-dialog-header .p-dialog-title {
   margin-left: 15px;
+}
+
+.p-input-icon-right > .p-inputtext {
+  width: 100% !important;
 }
 
 .gradient_one {
@@ -47218,3 +47224,30 @@ html[dir="rtl"]
 }
 
 /*# sourceMappingURL=style.css.map */
+
+.bg-image-vertical {
+  position: relative;
+  overflow: hidden;
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: auto 100%;
+}
+
+.login-logo {
+  max-width: 75px;
+}
+
+@media (min-width: 1025px) {
+  .h-custom-2 {
+    height: 50rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .login-right {
+    display: none;
+  }
+}
+.login-right {
+  background-color: var(--primary-button);
+}

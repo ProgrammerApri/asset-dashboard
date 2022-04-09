@@ -67,6 +67,8 @@ const Akun = () => {
   // const [akunTerhub, setAkunTerhub] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+  const [ firstId, setFirstId] = useState("");
+  const [ firstKat, setFirstKat] = useState(0);
 
   useEffect(() => {
     getKategori();
@@ -173,7 +175,7 @@ const Akun = () => {
     } catch (error) {}
   };
 
-  const getKodeUmum = async (id) => {
+  const getKodeUmum = async (id, data) => {
     const config = {
       ...endpoints.getAccKodeUm,
       endpoint: endpoints.getAccKodeUm.endpoint + id,
@@ -184,14 +186,26 @@ const Akun = () => {
       console.log(response);
       if (response.status) {
         const res = response.data;
-        setCurrentItem({
-          ...currentItem,
-          account: {
-            ...currentItem.account,
-            acc_code: res,
-            umm_code: null,
-          },
-        });
+        if(data){
+          setCurrentItem({
+            ...currentItem,
+            account: {
+              ...currentItem.account,
+              acc_code: res,
+              umm_code: null,
+              dou_type: data
+            },
+          });
+        } else {
+          setCurrentItem({
+            ...currentItem,
+            account: {
+              ...currentItem.account,
+              acc_code: res,
+              umm_code: null,
+            },
+          });
+        }
       }
     } catch (error) {}
   };
@@ -397,7 +411,9 @@ const Akun = () => {
   const onClick = (kode, kategori) => {
     setDisplayData(true);
     setCurrentItem(kategori);
-
+    setFirstId(kategori.account.acc_code)
+    setFirstKat(kategori.account.kat_code)
+    
     if (position) {
       setPosition(position);
     }
@@ -450,8 +466,7 @@ const Akun = () => {
             ) {
               delAccount(currentItem.account.id);
               setUpdate(true);
-
-            } else if(currentItem.account.sld_awal !== 0) {
+            } else if (currentItem.account.sld_awal !== 0) {
               setUpdate(true);
               setTimeout(() => {
                 setUpdate(false);
@@ -463,7 +478,6 @@ const Akun = () => {
                   life: 3000,
                 });
               }, 500);
-
             } else {
               setUpdate(true);
               setTimeout(() => {
@@ -512,31 +526,31 @@ const Akun = () => {
           />
         </span>
         <Row className="mr-1">
-        <Button
-        className="mr-3"
-          variant="primary"
-          onClick={() => {
-            exportExcel();
-          }}
-        >
-          Export{" "}
-          <span className="btn-icon-right">
-            <i class="bx bx-plus"></i>
-          </span>
-        </Button>
-        <Button
-          variant="primary"
-          onClick={() => {
-            setEdit(false);
-            setCurrentItem(data);
-            setDisplayData(true);
-          }}
-        >
-          Tambah{" "}
-          <span className="btn-icon-right">
-            <i class="bx bx-plus"></i>
-          </span>
-        </Button>
+          <Button
+            className="mr-3"
+            variant="primary"
+            onClick={() => {
+              exportExcel();
+            }}
+          >
+            Export{" "}
+            <span className="btn-icon-right">
+              <i class="bx bx-plus"></i>
+            </span>
+          </Button>
+          <Button
+            variant="primary"
+            onClick={() => {
+              setEdit(false);
+              setCurrentItem(data);
+              setDisplayData(true);
+            }}
+          >
+            Tambah{" "}
+            <span className="btn-icon-right">
+              <i class="bx bx-plus"></i>
+            </span>
+          </Button>
         </Row>
       </div>
     );
@@ -614,13 +628,13 @@ const Akun = () => {
 
   const exportExcel = () => {
     let data = [];
-    account.forEach(el => {
+    account.forEach((el) => {
       data.push({
         KODE_ACC: el.account.acc_code,
         ACC_NAME: el.account.acc_name,
-        KODE_UMM : el.account.umm_code != null ? el.account.umm_code : "-",
-        KAT_ACC : el.kategory.name,
-        D_OR_U : el.account.dou_type,
+        KODE_UMM: el.account.umm_code != null ? el.account.umm_code : "-",
+        KAT_ACC: el.kategory.name,
+        D_OR_U: el.account.dou_type,
         SLD_TYPE: el.account.sld_type,
         TERHUBUNG: el.account.connect,
         SLD_AWAL: el.account.sld_awal,
@@ -631,7 +645,7 @@ const Akun = () => {
       const workbook = { Sheets: { data: worksheet }, SheetNames: ["data"] };
       const excelBuffer = xlsx.write(workbook, {
         bookType: "xlsx",
-        type: "array"
+        type: "array",
       });
       saveAsExcelFile(excelBuffer, "account");
     });
@@ -644,7 +658,7 @@ const Akun = () => {
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
         let EXCEL_EXTENSION = ".xlsx";
         const data = new Blob([buffer], {
-          type: EXCEL_TYPE
+          type: EXCEL_TYPE,
         });
 
         module.default.saveAs(
@@ -876,7 +890,21 @@ const Akun = () => {
               options={kategori}
               onChange={(e) => {
                 console.log(e.value);
-                getAccKodeUm(e.value);
+                if(isEdit && e.value.kategory.id === firstKat && currentItem.account.dou_type ==="U") {
+                  setCurrentItem({
+                    ...currentItem,
+                    account: {
+                      ...currentItem.account,
+                      acc_code: firstId,
+                      kat_code: e.value.kategory.id,
+                    },
+                    kategory: e.value.kategory,
+                    klasifikasi: e.value.klasifikasi,
+                  });
+                } else {
+                  getAccKodeUm(e.value);
+                }
+                
               }}
               optionLabel="kategory.name"
               filter
@@ -903,14 +931,31 @@ const Akun = () => {
                 console.log(e.value);
                 if (e.value.code === "D") {
                   getAccountUmum();
+                  setCurrentItem({
+                    ...currentItem,
+                    account: {
+                      ...currentItem.account,
+                      dou_type: e.value.code,
+                    },
+                  });
+                } else if (e.value.code === "U") {
+                  if(isEdit && currentItem.account.kat_code === firstKat) {
+                    setCurrentItem({
+                      ...currentItem,
+                      account: {
+                        ...currentItem.account,
+                        acc_code: firstId,
+                        dou_type:e.value.code,
+                        umm_code: null,
+                      },
+                    });
+                  } else {
+                    getKodeUmum(currentItem.account.kat_code, e.value.code);
+                  }
+                  
+                  // getAccountUmum();
                 }
-                setCurrentItem({
-                  ...currentItem,
-                  account: {
-                    ...currentItem.account,
-                    dou_type: e.value.code,
-                  },
-                });
+                
               }}
               optionLabel="name"
             />
@@ -930,7 +975,6 @@ const Akun = () => {
                         ? valueUmum(currentItem.account.umm_code)
                         : null
                     }
-                    
                     options={umum}
                     onChange={(e) => {
                       if (e.value) {

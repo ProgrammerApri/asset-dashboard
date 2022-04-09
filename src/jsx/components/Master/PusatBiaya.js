@@ -12,7 +12,7 @@ import { InputText } from "primereact/inputtext";
 import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
-import { id } from "chartjs-plugin-streaming";
+import { InputTextarea } from "primereact/inputtextarea";
 
 const data = {
     
@@ -270,24 +270,14 @@ const PusatBiaya = () => {
         <PButton
           label="Batal"
           onClick={() => setDisplayDel(false)}
-          className="p-button-text btn-primary"
+          className="p-button-text btn-s btn-primary"
         />
         <PButton
           label="Hapus"
+          className="p-button btn-s btn-primary"
           icon="pi pi-trash"
           onClick={() => {
             delPusatBiaya();
-            // setUpdate(true);
-            // setTimeout(() => {
-            //   setUpdate(false);
-            //   setDisplayDel(false);
-            //   toast.current.show({
-            //     severity: "error",
-            //     summary: "Gagal",
-            //     detail: `Tidak Dapat Menghapus Akun Umum`,
-            //     life: 3000,
-            //   });
-            // }, 500);
           }}
           autoFocus
           loading={update}
@@ -491,7 +481,7 @@ const PusatBiaya = () => {
         <div className="col-12">
           <label className="text-label">Keterangan</label>
           <div className="p-inputgroup">
-            <InputText
+            <InputTextarea
                 value={
                   currentItem !== null ? `${currentItem.keterangan}` : ""
                 }
@@ -512,10 +502,10 @@ const PusatBiaya = () => {
           setDisplayDel(false);
         }}
       >
-        <div className="ml-3 mr-3">
+        <div className="ml-2 mr-3">
           <i
-            className="pi pi-exclamation-triangle mr-3 align-middle"
-            style={{ fontSize: "2rem" }}
+            className="pi pi-exclamation-triangle mr-2 align-middle"
+            style={{ fontSize: "1rem" }}
           />
           <span>Apakah anda yakin ingin menghapus data ?</span>
         </div>

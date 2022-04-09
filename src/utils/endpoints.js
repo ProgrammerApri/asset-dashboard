@@ -102,25 +102,25 @@ const endpoints = {
     },
 
     project: {
-        endpoint: "",
+        endpoint: "/v1/api/project",
         method: "GET",
         data: {},
     },
 
     addProject: {
-        endpoint: "",
+        endpoint: "/v1/api/project",
         method: "POST",
         data: {},
     },
 
     editProject: {
-        endpoint: "",
+        endpoint: "/v1/api/project/",
         method: "PUT",
         data: {},
     },
 
     delProject: {
-        endpoint: "",
+        endpoint: "/v1/api/project/",
         method: "DELETE",
         data: {},
     },

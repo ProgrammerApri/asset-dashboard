@@ -12,13 +12,12 @@ import { InputText } from "primereact/inputtext";
 import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
+import { InputTextarea } from "primereact/inputtextarea";
 
 const data = {
-  project: {
     kode: "",
     name: "",
-    keterangan: null,
-  },
+    keterangan: "",
 };
 
 
@@ -72,11 +71,11 @@ const Project = () => {
   const editProject = async () => {
     const config = {
       ...endpoints.editProject,
-      endpoint: endpoints.editProject.endpoint + currentItem.project.id,
+      endpoint: endpoints.editProject.endpoint + currentItem.id,
       data: {
-        kode: currentItem.project.kode,
-        name: currentItem.project.name,
-        keterangan: currentItem.project.keterangan,
+        // kode: currentItem.kode,
+        name: currentItem.name,
+        keterangan: currentItem.keterangan,
       },
     };
     console.log(config.data);
@@ -87,7 +86,8 @@ const Project = () => {
       if (response.status) {
         setTimeout(() => {
           setUpdate(false);
-          setDisplayData(false);;
+          setDisplayData(false);
+          getProject(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -113,9 +113,9 @@ const Project = () => {
     const config = {
       ...endpoints.addProject,
       data: {
-        kode: currentItem.project.kode,
-        name: currentItem.project.name,
-        keterangan: currentItem.project.keterangan,
+        // kode: currentItem.kode,
+        name: currentItem.name,
+        keterangan: currentItem.keterangan,
       },
     };
     console.log(config.data);
@@ -127,6 +127,7 @@ const Project = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayData(false);
+          getProject(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -143,7 +144,7 @@ const Project = () => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode Project ${currentItem.project.kode} Sudah Digunakan`,
+            detail: `Kode Project ${currentItem.kode} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -164,7 +165,7 @@ const Project = () => {
   const delProject = async (id) => {
     const config = {
       ...endpoints.delProject,
-      endpoint: endpoints.delProject.endpoint + id,
+      endpoint: endpoints.delProject.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -175,6 +176,7 @@ const Project = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayDel(false);
+          getProject(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -206,8 +208,9 @@ const Project = () => {
           onClick={() => {
             setEdit(true);
             onClick("displayData", data);
+            setCurrentItem(data);
           }}
-          className="btn btn-primary shadow btn-xs sharp ml-2"
+          className="btn btn-primary shadow btn-xs sharp ml-1"
         >
           <i className="fa fa-pencil"></i>
         </Link>
@@ -218,7 +221,7 @@ const Project = () => {
             setDisplayDel(true);
             setCurrentItem(data);
           }}
-          className="btn btn-danger shadow btn-xs sharp ml-2"
+          className="btn btn-danger shadow btn-xs sharp ml-1"
         >
           <i className="fa fa-trash"></i>
         </Link>
@@ -277,39 +280,7 @@ const Project = () => {
           label="Hapus"
           icon="pi pi-trash"
           onClick={() => {
-            if (
-              currentItem.account.dou_type === "D" &&
-              currentItem.account.sld_awal === 0
-            ) {
-              delProject(currentItem.account.id);
-              setUpdate(true);
-
-            } else if(currentItem.account.sld_awal !== 0) {
-              setUpdate(true);
-              setTimeout(() => {
-                setUpdate(false);
-                setDisplayDel(false);
-                toast.current.show({
-                  severity: "error",
-                  summary: "Gagal",
-                  detail: `Tidak Dapat Menghapus Akun, Saldo Terisi`,
-                  life: 3000,
-                });
-              }, 500);
-
-            } else {
-              setUpdate(true);
-              setTimeout(() => {
-                setUpdate(false);
-                setDisplayDel(false);
-                toast.current.show({
-                  severity: "error",
-                  summary: "Gagal",
-                  detail: `Tidak Dapat Menghapus Akun Umum`,
-                  life: 3000,
-                });
-              }, 500);
-            }
+            delProject();
           }}
           autoFocus
           loading={update}
@@ -420,12 +391,12 @@ const Project = () => {
                 value={project}
                 className="display w-150 datatable-wrapper"
                 showGridlines
-                dataKey=""
+                dataKey="id"
                 rowHover
                 header={renderHeader}
                 filters={filters1}
                 globalFilterFields={[
-                  "project.kode",
+                  "project.id",
                   "project.name",
                   "project.keterangan",
                 ]}
@@ -442,18 +413,18 @@ const Project = () => {
                   style={{
                     minWidth: "8rem",
                   }}
-                //   field={(e) => e.account.acc_code}
+                  field={(e) => e.id}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Nama"
-                //   field={(e) => e.account.acc_name}
+                  field={(e) => e.name}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Keterangan"
-                //   field={(e) => e.kategory.name}
+                  field={(e) => e.keterangan}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
@@ -480,36 +451,31 @@ const Project = () => {
           setDisplayData(false);
         }}
       >
-        <div className="col-12">
+        {/* <div className="col-12">
           <label className="text-label">Kode</label>
           <div className="p-inputgroup">
             <InputText
-            //   value={
-            //     currentItem !== null ? `${currentItem}` : ""
-            //   }
+              value={
+                currentItem !== null ? `${currentItem.kode}` : ""
+              }
               onChange={(e) =>
-                setCurrentItem({
-                  ...currentItem,
-                //   account: { ...currentItem : e.target.value },
-                })
+                setCurrentItem({...currentItem, kode: e.target.value})
               }
               placeholder="Masukan Kode"
+              disabled
             />
           </div>
-        </div>
+        </div> */}
 
         <div className="col-12">
           <label className="text-label">Nama</label>
           <div className="p-inputgroup">
             <InputText
-            //   value={
-            //     currentItem !== null ? `${currentItem.}` : ""
-            //   }
+              value={
+                currentItem !== null ? `${currentItem.name}` : ""
+              }
               onChange={(e) =>
-                setCurrentItem({
-                  ...currentItem,
-                //   account: { ...currentItem.: e.target.value },
-                })
+                setCurrentItem({...currentItem, name: e.target.value})
               }
               placeholder="Masukan Nama Akun"
             />
@@ -519,15 +485,12 @@ const Project = () => {
         <div className="col-12">
           <label className="text-label">Keterangan</label>
           <div className="p-inputgroup">
-            <InputText
-            //   value={
-            //     currentItem !== null ? `${currentItem.}` : ""
-            //   }
+            <InputTextarea
+              value={
+                currentItem !== null ? `${currentItem.keterangan}` : ""
+              }
               onChange={(e) =>
-                setCurrentItem({
-                  ...currentItem,
-                //   account: { ...currentItem.: e.target.value },
-                })
+                setCurrentItem({...currentItem, keterangan: e.target.value})
               }
               placeholder="Masukan Keterangan"
             />

@@ -4801,6 +4801,7 @@ input[type="button"].btn-block {
 .nav-link {
   display: block;
   padding: 0.5rem 1rem;
+  border: 0;
 }
 .nav-link:hover,
 .nav-link:focus {
@@ -13397,11 +13398,12 @@ svg.pulse-svg .third-circle {
   position: relative;
   color: #9b9b9b;
   background: var(--card-bg);
-  box-shadow: 0px 12px 23px 0px rgb(59 40 62 / 8%);
+  box-shadow: 0px 12px 23px 0px rgb(59 40 62 / 8%) !important;
   border-radius: 0.875rem;
   padding: 10px;
   line-height: 1;
 }
+
 @media only screen and (max-width: 1400px) {
   .header-right .notification_dropdown .nav-link {
     padding: 10px;

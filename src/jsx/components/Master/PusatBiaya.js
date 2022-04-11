@@ -144,7 +144,7 @@ const PusatBiaya = () => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${currentItem.kode} Sudah Digunakan`,
+            detail: `Kode ${currentItem.ccost_code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);

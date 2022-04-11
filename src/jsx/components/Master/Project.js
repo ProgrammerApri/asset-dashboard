@@ -13,6 +13,7 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
+import { classNames } from "primereact/utils";
 
 const data = {
     id: 1,

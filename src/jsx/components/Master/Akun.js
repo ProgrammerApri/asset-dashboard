@@ -64,7 +64,6 @@ const Akun = () => {
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
   const [isEdit, setEdit] = useState(false);
-  // const [akunTerhub, setAkunTerhub] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const [ firstId, setFirstId] = useState("");

@@ -17,8 +17,9 @@ import { InputTextarea } from "primereact/inputtextarea";
 const data = {
     
     id: 1,
-    name: "",
-    keterangan: "",
+    ccost_code: "",
+    ccost_name: "",
+    ccost_ket: "",
 };
 
 const PusatBiaya = () => {
@@ -72,8 +73,9 @@ const PusatBiaya = () => {
       ...endpoints.editPusatBiaya,
       endpoint: endpoints.editPusatBiaya.endpoint + currentItem.id,
       data: {
-        name: currentItem.name,
-        keterangan: currentItem.keterangan,
+        ccost_code: currentItem.ccost_code,
+        ccost_name: currentItem.ccost_name,
+        ccost_ket: currentItem.ccost_ket,
       },
     };
     console.log(config.data);
@@ -111,8 +113,9 @@ const PusatBiaya = () => {
     const config = {
       ...endpoints.addPusatBiaya,
       data: {
-        name: currentItem.name,
-        keterangan: currentItem.keterangan,
+        ccost_code: currentItem.ccost_code,
+        ccost_name: currentItem.ccost_name,
+        ccost_ket: currentItem.ccost_ket,
       },
     };
     console.log(config.data);
@@ -392,8 +395,9 @@ const PusatBiaya = () => {
                 header={renderHeader}
                 filters={filters1}
                 globalFilterFields={[
-                  "pusatBiaya.name",
-                  "pusatBiaya.keterangan",
+                  "pusatBiaya.ccost_code",
+                  "pusatBiaya.ccost_name",
+                  "pusatBiaya.ccost_ket",
                 ]}
                 emptyMessage="Tidak ada data"
                 paginator
@@ -408,18 +412,18 @@ const PusatBiaya = () => {
                   style={{
                     minWidth: "8rem",
                   }}
-                  field={(e) => e.id}
+                  field={(e) => e.ccost_code}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Nama"
-                  field={(e) => e.name}
+                  field={(e) => e.ccost_name}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Keterangan"
-                  field={(e) => e.keterangan}
+                  field={(e) => e.ccost_ket}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
@@ -446,32 +450,29 @@ const PusatBiaya = () => {
           setDisplayData(false);
         }}
       >
-        {/* <div className="col-12">
+        <div className="col-12">
           <label className="text-label">Kode</label>
           <div className="p-inputgroup">
             <InputText
                 value={
-                  currentItem !== null ? `${currentItem.pusatBiaya.id}` : ""
+                  currentItem !== null ? `${currentItem.ccost_code}` : ""
                 }
               onChange={(e) =>
-                setCurrentItem({
-                  ...currentItem,
-                  pusatBiaya: { ...currentItem.pusatBiaya, id: e.target.value },
-                })
+                setCurrentItem({...currentItem, ccost_code: e.target.value})
               }
               placeholder="Masukan Kode"
             />
           </div>
-        </div> */}
+        </div>
 
         <div className="col-12">
           <label className="text-label">Nama</label>
           <div className="p-inputgroup">
             <InputText
                 value={
-                  currentItem !== null ? `${currentItem.name}` : ""
+                  currentItem !== null ? `${currentItem.ccost_name}` : ""
                 }
-              onChange={(e) => setCurrentItem({...currentItem, name: e.target.value})
+              onChange={(e) => setCurrentItem({...currentItem, ccost_name: e.target.value})
               }
               placeholder="Masukan Nama Akun"
             />
@@ -483,9 +484,9 @@ const PusatBiaya = () => {
           <div className="p-inputgroup">
             <InputTextarea
                 value={
-                  currentItem !== null ? `${currentItem.keterangan}` : ""
+                  currentItem !== null ? `${currentItem.ccost_ket}` : ""
                 }
-              onChange={(e) => setCurrentItem({...currentItem, keterangan: e.target.value})
+              onChange={(e) => setCurrentItem({...currentItem, ccost_ket: e.target.value})
               }
               placeholder="Masukan Keterangan"
             />

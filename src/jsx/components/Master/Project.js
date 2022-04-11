@@ -15,9 +15,10 @@ import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 
 const data = {
-    kode: "",
-    name: "",
-    keterangan: "",
+    id: 1,
+    proj_code: "",
+    proj_name: "",
+    proj_ket: "",
 };
 
 
@@ -73,9 +74,9 @@ const Project = () => {
       ...endpoints.editProject,
       endpoint: endpoints.editProject.endpoint + currentItem.id,
       data: {
-        // kode: currentItem.kode,
-        name: currentItem.name,
-        keterangan: currentItem.keterangan,
+        proj_code: currentItem.proj_code,
+        proj_name: currentItem.proj_name,
+        proj_ket: currentItem.proj_ket,
       },
     };
     console.log(config.data);
@@ -113,9 +114,9 @@ const Project = () => {
     const config = {
       ...endpoints.addProject,
       data: {
-        // kode: currentItem.kode,
-        name: currentItem.name,
-        keterangan: currentItem.keterangan,
+        proj_code: currentItem.proj_code,
+        proj_name: currentItem.proj_name,
+        proj_ket: currentItem.proj_ket,
       },
     };
     console.log(config.data);
@@ -144,7 +145,7 @@ const Project = () => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode Project ${currentItem.kode} Sudah Digunakan`,
+            detail: `Kode Project ${currentItem.proj_code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -396,9 +397,9 @@ const Project = () => {
                 header={renderHeader}
                 filters={filters1}
                 globalFilterFields={[
-                  "project.id",
-                  "project.name",
-                  "project.keterangan",
+                  "project.proj_code",
+                  "project.proj_name",
+                  "project.proj_ket",
                 ]}
                 emptyMessage="Tidak ada data"
                 paginator
@@ -413,18 +414,18 @@ const Project = () => {
                   style={{
                     minWidth: "8rem",
                   }}
-                  field={(e) => e.id}
+                  field={(e) => e.proj_code}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Nama"
-                  field={(e) => e.name}
+                  field={(e) => e.proj_name}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Keterangan"
-                  field={(e) => e.keterangan}
+                  field={(e) => e.proj_ket}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
@@ -451,31 +452,31 @@ const Project = () => {
           setDisplayData(false);
         }}
       >
-        {/* <div className="col-12">
+        <div className="col-12">
           <label className="text-label">Kode</label>
           <div className="p-inputgroup">
             <InputText
               value={
-                currentItem !== null ? `${currentItem.kode}` : ""
+                currentItem !== null ? `${currentItem.proj_code}` : ""
               }
               onChange={(e) =>
-                setCurrentItem({...currentItem, kode: e.target.value})
+                setCurrentItem({...currentItem, proj_code: e.target.value})
               }
               placeholder="Masukan Kode"
-              disabled
+            
             />
           </div>
-        </div> */}
+        </div>
 
         <div className="col-12">
           <label className="text-label">Nama</label>
           <div className="p-inputgroup">
             <InputText
               value={
-                currentItem !== null ? `${currentItem.name}` : ""
+                currentItem !== null ? `${currentItem.proj_name}` : ""
               }
               onChange={(e) =>
-                setCurrentItem({...currentItem, name: e.target.value})
+                setCurrentItem({...currentItem, proj_name: e.target.value})
               }
               placeholder="Masukan Nama Akun"
             />
@@ -487,10 +488,10 @@ const Project = () => {
           <div className="p-inputgroup">
             <InputTextarea
               value={
-                currentItem !== null ? `${currentItem.keterangan}` : ""
+                currentItem !== null ? `${currentItem.proj_ket}` : ""
               }
               onChange={(e) =>
-                setCurrentItem({...currentItem, keterangan: e.target.value})
+                setCurrentItem({...currentItem, proj_ket: e.target.value})
               }
               placeholder="Masukan Keterangan"
             />

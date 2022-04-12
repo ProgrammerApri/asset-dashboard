@@ -65,10 +65,11 @@ const Akun = () => {
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
   const [isEdit, setEdit] = useState(false);
-  // const [akunTerhub, setAkunTerhub] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const dummy = Array.from({ length: 20 });
+  const [ firstId, setFirstId] = useState("");
+  const [ firstKat, setFirstKat] = useState(0);
 
   useEffect(() => {
     getKategori();
@@ -175,7 +176,7 @@ const Akun = () => {
     } catch (error) {}
   };
 
-  const getKodeUmum = async (id) => {
+  const getKodeUmum = async (id, data) => {
     const config = {
       ...endpoints.getAccKodeUm,
       endpoint: endpoints.getAccKodeUm.endpoint + id,
@@ -186,14 +187,26 @@ const Akun = () => {
       console.log(response);
       if (response.status) {
         const res = response.data;
-        setCurrentItem({
-          ...currentItem,
-          account: {
-            ...currentItem.account,
-            acc_code: res,
-            umm_code: null,
-          },
-        });
+        if(data){
+          setCurrentItem({
+            ...currentItem,
+            account: {
+              ...currentItem.account,
+              acc_code: res,
+              umm_code: null,
+              dou_type: data
+            },
+          });
+        } else {
+          setCurrentItem({
+            ...currentItem,
+            account: {
+              ...currentItem.account,
+              acc_code: res,
+              umm_code: null,
+            },
+          });
+        }
       }
     } catch (error) {}
   };
@@ -399,7 +412,9 @@ const Akun = () => {
   const onClick = (kode, kategori) => {
     setDisplayData(true);
     setCurrentItem(kategori);
-
+    setFirstId(kategori.account.acc_code)
+    setFirstKat(kategori.account.kat_code)
+    
     if (position) {
       setPosition(position);
     }
@@ -879,7 +894,21 @@ const Akun = () => {
               options={kategori}
               onChange={(e) => {
                 console.log(e.value);
-                getAccKodeUm(e.value);
+                if(isEdit && e.value.kategory.id === firstKat && currentItem.account.dou_type ==="U") {
+                  setCurrentItem({
+                    ...currentItem,
+                    account: {
+                      ...currentItem.account,
+                      acc_code: firstId,
+                      kat_code: e.value.kategory.id,
+                    },
+                    kategory: e.value.kategory,
+                    klasifikasi: e.value.klasifikasi,
+                  });
+                } else {
+                  getAccKodeUm(e.value);
+                }
+                
               }}
               optionLabel="kategory.name"
               filter
@@ -906,14 +935,31 @@ const Akun = () => {
                 console.log(e.value);
                 if (e.value.code === "D") {
                   getAccountUmum();
+                  setCurrentItem({
+                    ...currentItem,
+                    account: {
+                      ...currentItem.account,
+                      dou_type: e.value.code,
+                    },
+                  });
+                } else if (e.value.code === "U") {
+                  if(isEdit && currentItem.account.kat_code === firstKat) {
+                    setCurrentItem({
+                      ...currentItem,
+                      account: {
+                        ...currentItem.account,
+                        acc_code: firstId,
+                        dou_type:e.value.code,
+                        umm_code: null,
+                      },
+                    });
+                  } else {
+                    getKodeUmum(currentItem.account.kat_code, e.value.code);
+                  }
+                  
+                  // getAccountUmum();
                 }
-                setCurrentItem({
-                  ...currentItem,
-                  account: {
-                    ...currentItem.account,
-                    dou_type: e.value.code,
-                  },
-                });
+                
               }}
               optionLabel="name"
             />

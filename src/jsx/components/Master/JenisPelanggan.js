@@ -15,7 +15,7 @@ import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 
 const data = {
-    id: 1,
+    id: 0,
     jpel_code: "",
     jpel_name: "",
     jpel_ket: "",
@@ -74,9 +74,9 @@ const JenisPelanggan = () => {
       ...endpoints.editJenisPel,
       endpoint: endpoints.editJenisPel.endpoint + currentItem.id,
       data: {
-        jpel_code: currentItem.jpel_code,
-        jpel_name: currentItem.jpel_name,
-        jpel_ket: currentItem.jpel_ket,
+        code: currentItem.jpel_code,
+        name: currentItem.jpel_name,
+        ket: currentItem.jpel_ket,
       },
     };
     console.log(config.data);
@@ -443,7 +443,7 @@ const JenisPelanggan = () => {
       </Row>
 
       <Dialog
-        header={isEdit ? "Edit Project" : "Tambah Project"}
+        header={isEdit ? "Edit Jenis Pelanggan" : "Tambah Jenis Pelanggan"}
         visible={displayData}
         style={{ width: "40vw" }}
         footer={renderFooter("displayData")}

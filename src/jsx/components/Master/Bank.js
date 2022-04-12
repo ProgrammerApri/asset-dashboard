@@ -57,7 +57,7 @@ const Bank = () => {
   const [rows2, setRows2] = useState(20);
 
   useEffect(() => {
-    getBank();
+    // getBank();
     getAccount();
     initFilters1();
   }, []);
@@ -80,7 +80,7 @@ const Bank = () => {
         let filt = [];
         data.forEach((element) => {
           if (element.account.kat_code === 2 && element.account.connect) {
-            filt.push(element);
+            filt.push(element.account);
           }
         });
         console.log(data);
@@ -119,10 +119,10 @@ const Bank = () => {
   const editBank = async () => {
     const config = {
       ...endpoints.editBank,
-      endpoint: endpoints.editBank.endpoint + currentItem.id,
+      endpoint: endpoints.editBank.endpoint + currentItem.bank.id,
       data: {
         BANK_CODE: currentItem.bank.BANK_CODE,
-        acc_id: currentItem.account.id,
+        ACC_ID: currentItem.account.id,
         BANK_NAME: currentItem.bank.BANK_NAME,
         BANK_DESC: currentItem.bank.BANK_DESC,
       },
@@ -215,7 +215,7 @@ const Bank = () => {
   const delBank = async (id) => {
     const config = {
       ...endpoints.delBank,
-      endpoint: endpoints.delBank.endpoint + currentItem.id,
+      endpoint: endpoints.delBank.endpoint + currentItem.bank.id,
     };
     console.log(config.data);
     let response = null;
@@ -566,14 +566,14 @@ const Bank = () => {
           <div className="p-inputgroup">
             <Dropdown
               value={currentItem !== null ? currentItem.account : null}
-              options={account && account.account}
+              options={account && account}
               onChange={(e) => {
                 console.log(e.value);
                 setCurrentItem({
                   ...currentItem,
                   account: e.value,
                 });
-                console.log(currentItem.account);
+                // console.log(currentItem.account);
               }}
               optionLabel="acc_name"
               filter

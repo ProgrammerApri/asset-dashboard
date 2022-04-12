@@ -107,6 +107,12 @@ import KategoriAkun from "./components/Master/KategoriAkun";
 import Akun from "./components/Master/Akun";
 import PusatBiaya from "./components/Master/PusatBiaya";
 import Project from "./components/Master/Project";
+import Bank from "./components/Master/Bank";
+import JenisPelanggan from "./components/Master/JenisPelanggan";
+import JenisPemasok from "./components/Master/JenisPemasok";
+import Salesman from "./components/Master/Salesman";
+import AreaPenjualan from "./components/Master/AreaPenjualan";
+import SubArea from "./components/Master/SubArea";
 
 const Markup = ({width}) => {
   const routes = [
@@ -122,6 +128,12 @@ const Markup = ({width}) => {
     { url: "akun", component: Akun },
     { url: "pusat-biaya", component: PusatBiaya },
     { url: "project", component: Project },
+    { url: "bank", component: Bank },
+    { url: "jenis-pelanggan", component: JenisPelanggan },
+    { url: "jenis-pemasok", component: JenisPemasok },
+    { url: "salesman", component: Salesman },
+    { url: "area-penjualan", component: AreaPenjualan },
+    { url: "sub-area", component: SubArea },
 
     /// Bootstrap
     { url: "ui-alert", component: UiAlert },

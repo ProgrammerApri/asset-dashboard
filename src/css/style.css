@@ -201,6 +201,15 @@
   width: 100% !important;
 }
 
+span .btn {
+  height: 100%;
+}
+
+.center-header .p-column-header-content {
+  justify-content: center;
+  font-weight: bold;
+}
+
 .gradient_one {
   background-image: linear-gradient(
     to right,

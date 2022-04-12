@@ -107,6 +107,7 @@ import KategoriAkun from "./components/Master/KategoriAkun";
 import Akun from "./components/Master/Akun";
 import PusatBiaya from "./components/Master/PusatBiaya";
 import Project from "./components/Master/Project";
+import Neraca from "./components/Report/Neraca";
 
 const Markup = ({width}) => {
   const routes = [
@@ -122,6 +123,9 @@ const Markup = ({width}) => {
     { url: "akun", component: Akun },
     { url: "pusat-biaya", component: PusatBiaya },
     { url: "project", component: Project },
+
+    // Report
+    { url: "neraca", component: Neraca },
 
     /// Bootstrap
     { url: "ui-alert", component: UiAlert },

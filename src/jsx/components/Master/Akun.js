@@ -17,6 +17,7 @@ import { Checkbox } from "primereact/checkbox";
 import { InputNumber } from "primereact/inputnumber";
 import { Badge } from "react-bootstrap";
 
+
 const data = {
   account: {
     acc_code: "",
@@ -67,6 +68,7 @@ const Akun = () => {
   // const [akunTerhub, setAkunTerhub] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+  const dummy = Array.from({ length: 20 });
 
   useEffect(() => {
     getKategori();
@@ -218,7 +220,7 @@ const Akun = () => {
     } else {
       setTimeout(() => {
         setLoading(false);
-      }, 1500);
+      }, 500);
     }
   };
 
@@ -450,8 +452,7 @@ const Akun = () => {
             ) {
               delAccount(currentItem.account.id);
               setUpdate(true);
-
-            } else if(currentItem.account.sld_awal !== 0) {
+            } else if (currentItem.account.sld_awal !== 0) {
               setUpdate(true);
               setTimeout(() => {
                 setUpdate(false);
@@ -463,7 +464,6 @@ const Akun = () => {
                   life: 3000,
                 });
               }, 500);
-
             } else {
               setUpdate(true);
               setTimeout(() => {
@@ -512,31 +512,31 @@ const Akun = () => {
           />
         </span>
         <Row className="mr-1">
-        <Button
-        className="mr-3"
-          variant="primary"
-          onClick={() => {
-            exportExcel();
-          }}
-        >
-          Export{" "}
-          <span className="btn-icon-right">
-            <i class="bx bx-plus"></i>
-          </span>
-        </Button>
-        <Button
-          variant="primary"
-          onClick={() => {
-            setEdit(false);
-            setCurrentItem(data);
-            setDisplayData(true);
-          }}
-        >
-          Tambah{" "}
-          <span className="btn-icon-right">
-            <i class="bx bx-plus"></i>
-          </span>
-        </Button>
+          <Button
+            className="mr-3"
+            variant="primary"
+            onClick={() => {
+              exportExcel();
+            }}
+          >
+            Export{" "}
+            <span className="btn-icon-right">
+              <i class="bx bx-plus"></i>
+            </span>
+          </Button>
+          <Button
+            variant="primary"
+            onClick={() => {
+              setEdit(false);
+              setCurrentItem(data);
+              setDisplayData(true);
+            }}
+          >
+            Tambah{" "}
+            <span className="btn-icon-right">
+              <i class="bx bx-plus"></i>
+            </span>
+          </Button>
         </Row>
       </div>
     );
@@ -614,24 +614,26 @@ const Akun = () => {
 
   const exportExcel = () => {
     let data = [];
-    account.forEach(el => {
+    account.forEach((el) => {
       data.push({
         KODE_ACC: el.account.acc_code,
         ACC_NAME: el.account.acc_name,
-        KODE_UMM : el.account.umm_code != null ? el.account.umm_code : "-",
-        KAT_ACC : el.kategory.name,
-        D_OR_U : el.account.dou_type,
+        KODE_UMM: el.account.umm_code != null ? el.account.umm_code : "-",
+        KAT_ACC: el.kategory.name,
+        D_OR_U: el.account.dou_type,
         SLD_TYPE: el.account.sld_type,
         TERHUBUNG: el.account.connect,
         SLD_AWAL: el.account.sld_awal,
       });
     });
+
+
     import("xlsx").then((xlsx) => {
       const worksheet = xlsx.utils.json_to_sheet(data);
       const workbook = { Sheets: { data: worksheet }, SheetNames: ["data"] };
       const excelBuffer = xlsx.write(workbook, {
         bookType: "xlsx",
-        type: "array"
+        type: "array",
       });
       saveAsExcelFile(excelBuffer, "account");
     });
@@ -644,7 +646,7 @@ const Akun = () => {
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
         let EXCEL_EXTENSION = ".xlsx";
         const data = new Blob([buffer], {
-          type: EXCEL_TYPE
+          type: EXCEL_TYPE,
         });
 
         module.default.saveAs(
@@ -654,6 +656,7 @@ const Akun = () => {
       }
     });
   };
+
 
   return (
     <>
@@ -667,7 +670,7 @@ const Akun = () => {
             <Card.Body>
               <DataTable
                 responsiveLayout="scroll"
-                value={account}
+                value={loading ? dummy : account}
                 className="display w-150 datatable-wrapper"
                 showGridlines
                 dataKey=""
@@ -930,7 +933,6 @@ const Akun = () => {
                         ? valueUmum(currentItem.account.umm_code)
                         : null
                     }
-                    
                     options={umum}
                     onChange={(e) => {
                       if (e.value) {

@@ -17,6 +17,7 @@ import { Checkbox } from "primereact/checkbox";
 import { InputNumber } from "primereact/inputnumber";
 import { Badge } from "react-bootstrap";
 
+
 const data = {
   account: {
     acc_code: "",
@@ -66,6 +67,7 @@ const Akun = () => {
   const [isEdit, setEdit] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+  const dummy = Array.from({ length: 20 });
   const [ firstId, setFirstId] = useState("");
   const [ firstKat, setFirstKat] = useState(0);
 
@@ -231,7 +233,7 @@ const Akun = () => {
     } else {
       setTimeout(() => {
         setLoading(false);
-      }, 1500);
+      }, 500);
     }
   };
 
@@ -639,6 +641,8 @@ const Akun = () => {
         SLD_AWAL: el.account.sld_awal,
       });
     });
+
+
     import("xlsx").then((xlsx) => {
       const worksheet = xlsx.utils.json_to_sheet(data);
       const workbook = { Sheets: { data: worksheet }, SheetNames: ["data"] };
@@ -668,6 +672,7 @@ const Akun = () => {
     });
   };
 
+
   return (
     <>
       <Toast ref={toast} />
@@ -680,7 +685,7 @@ const Akun = () => {
             <Card.Body>
               <DataTable
                 responsiveLayout="scroll"
-                value={account}
+                value={loading ? dummy : account}
                 className="display w-150 datatable-wrapper"
                 showGridlines
                 dataKey=""

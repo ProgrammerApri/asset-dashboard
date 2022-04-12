@@ -52,66 +52,9 @@ class SideBar extends Component {
     const patern = origin+"/#/"
 
     /// Active menu
-    let deshBoard = [""],
-      master = ["klasifikasi", "kategori", "akun"],
-      app = [
-        "app-profile",
-        "app-calender",
-        "email-compose",
-        "email-inbox",
-        "email-read",
-        "ecom-product-grid",
-        "ecom-product-list",
-        "ecom-product-list",
-        "ecom-product-order",
-        "ecom-checkout",
-        "ecom-invoice",
-        "ecom-customers",
-      ],
-      charts = [
-        "chart-flot",
-        "chart-morris",
-        "chart-chartjs",
-        "chart-chartist",
-        "chart-sparkline",
-        "chart-peity",
-      ],
-      bootstrap = [
-        "ui-accordion",
-        "ui-badge",
-        "ui-alert",
-        "ui-button",
-        "ui-modal",
-        "ui-button-group",
-        "ui-list-group",
-        "ui-media-object",
-        "ui-card",
-        "ui-carousel",
-        "ui-dropdown",
-        "ui-popover",
-        "ui-progressbar",
-        "ui-tab",
-        "ui-typography",
-        "ui-pagination",
-        "ui-grid",
-      ],
-      plugins = [
-        "uc-select2",
-        "uc-nestable",
-        "uc-sweetalert",
-        "uc-toastr",
-        "uc-jqvmap",
-        "uc-noui-slider",
-      ],
-      widget = ["widget"],
-      forms = [
-        "form-element",
-        "form-wizard",
-        "form-editor-summernote",
-        "form-pickers",
-        "form-validation-jquery",
-      ],
-      table = ["table-bootstrap-basic", "table-datatable-basic"];
+    let deshBoard = [""];
+    let master = ["klasifikasi", "kategori", "akun"];
+    let report = ["neraca"]
 
     return (
       <HashRouter basename="/">
@@ -124,7 +67,7 @@ class SideBar extends Component {
               }`}
             >
               <Link className="ai-icon" to="" aria-expanded="false">
-                <i className="flaticon-381-home"></i>
+              <i class='bx bxs-dashboard' ></i>
                 <span className="nav-text">Dashboard</span>
               </Link>
             </li>
@@ -135,7 +78,7 @@ class SideBar extends Component {
               }`}
             >
               <Link className="has-arrow ai-icon" to="#" aria-expanded="false">
-                <i className="fa fa-book"></i>
+              <i class='bx bxs-data' ></i>
                 <span className="nav-text">Master</span>
               </Link>
               <ul aria-expanded="false">
@@ -250,7 +193,7 @@ class SideBar extends Component {
 
             <li>
               <Link className="has-arrow ai-icon" to="#" aria-expanded="false">
-                <i className="fa fa-money"></i>
+              <i class='bx bxs-shopping-bags' ></i>
                 <span className="nav-text">Pembelian</span>
               </Link>
               <ul aria-expanded="false">
@@ -281,7 +224,7 @@ class SideBar extends Component {
 
             <li>
               <Link className="has-arrow ai-icon" to="#" aria-expanded="false">
-                <i className="fa fa-money"></i>
+              <i class='bx bx-money' ></i>
                 <span className="nav-text">Penjualan</span>
               </Link>
               <ul aria-expanded="false">
@@ -296,7 +239,7 @@ class SideBar extends Component {
 
             <li>
               <Link className="has-arrow ai-icon" to="#" aria-expanded="false">
-                <i className="fa fa-list"></i>
+              <i class='bx bxs-box' ></i>
                 <span className="nav-text">Barang</span>
               </Link>
               <ul aria-expanded="false">
@@ -336,7 +279,7 @@ class SideBar extends Component {
 
             <li>
               <Link className="has-arrow ai-icon" to="#" aria-expanded="false">
-                <i className="fa fa-book"></i>
+              <i class='bx bxs-layer' ></i>
                 <span className="nav-text">General Ledger</span>
               </Link>
               <ul aria-expanded="false">
@@ -360,7 +303,7 @@ class SideBar extends Component {
 
             <li>
               <Link className="has-arrow ai-icon" to="#" aria-expanded="false">
-                <i className="fa fa-bank"></i>
+              <i class='bx bxs-bank' ></i>
                 <span className="nav-text">Kas & Bank</span>
               </Link>
               <ul aria-expanded="false">
@@ -372,278 +315,21 @@ class SideBar extends Component {
                 </li>
               </ul>
             </li>
-
-            {/* <li className={`${app.includes(path.replace(patern, "")) ? "mm-active" : ""}`}>
-              <Link className="has-arrow ai-icon" to="#" aria-expanded="false">
-                <i className="flaticon-381-television"></i>
-                <span className="nav-text">Apps</span>
-              </Link>
-              <ul aria-expanded="false">
-                <li>
-                  <Link to="/app-profile">Profile</Link>
-                </li>
-                <li>
-                  <Link className="has-arrow" to="#" aria-expanded="false">
-                    Email
-                  </Link>
-                  <ul aria-expanded="false">
-                    <li>
-                      <Link to="/email-compose">Compose</Link>
-                    </li>
-                    <li>
-                      <Link to="/email-inbox">Inbox</Link>
-                    </li>
-                    <li>
-                      <Link to="/email-read">Read</Link>
-                    </li>
-                  </ul>
-                </li>
-                <li>
-                  <Link to="/app-calender">Calendar</Link>
-                </li>
-                <li>
-                  <Link className="has-arrow" to="#" aria-expanded="false">
-                    Shop
-                  </Link>
-                  <ul aria-expanded="false">
-                    <li>
-                      <Link to="/ecom-product-grid">Product Grid</Link>
-                    </li>
-                    <li>
-                      <Link to="/ecom-product-list">Product List</Link>
-                    </li>
-                    <li>
-                      <Link to="/ecom-product-detail">Product Details</Link>
-                    </li>
-                    <li>
-                      <Link to="/ecom-product-order">Order</Link>
-                    </li>
-                    <li>
-                      <Link to="/ecom-checkout">Checkout</Link>
-                    </li>
-                    <li>
-                      <Link to="/ecom-invoice">Invoice</Link>
-                    </li>
-                    <li>
-                      <Link to="/ecom-customers">Customers</Link>
-                    </li>
-                  </ul>
-                </li>
-              </ul>
-            </li>
-
-            <li
-              className={`${charts.includes(path.replace(patern, "")) ? "mm-active" : ""}`}
-            >
-              <Link className="has-arrow ai-icon" to="#" aria-expanded="false">
-                <i className="flaticon-381-controls-3"></i>
-                <span className="nav-text">Charts</span>
-              </Link>
-              <ul aria-expanded="false">
-                <li>
-                  <Link to="/chart-rechart">RechartJs</Link>
-                </li>
-                <li>
-                  <Link to="/chart-chartjs">Chartjs</Link>
-                </li>
-                <li>
-                  <Link to="/chart-chartist">Chartist</Link>
-                </li>
-                <li>
-                  <Link to="/chart-sparkline">Sparkline</Link>
-                </li>
-                <li>
-                  <Link to="/chart-apexchart">Apexchart</Link>
-                </li>
-              </ul>
-            </li>
-
             <li
               className={`${
-                bootstrap.includes(path.replace(patern, "")) ? "mm-active" : ""
+                report.includes(path.replace(patern, "")) ? "mm-active" : ""
               }`}
             >
               <Link className="has-arrow ai-icon" to="#" aria-expanded="false">
-                <i className="flaticon-381-internet"></i>
-                <span className="nav-text">Bootstrap</span>
+                <i class='bx bxs-report'></i>
+                <span className="nav-text">Laporan</span>
               </Link>
               <ul aria-expanded="false">
                 <li>
-                  <Link to="/ui-accordion">Accordion</Link>
-                </li>
-                <li>
-                  <Link to="/ui-alert">Alert</Link>
-                </li>
-                <li>
-                  <Link to="/ui-badge">Badge</Link>
-                </li>
-                <li>
-                  <Link to="/ui-button">Button</Link>
-                </li>
-                <li>
-                  <Link to="/ui-modal">Modal</Link>
-                </li>
-                <li>
-                  <Link to="/ui-button-group">Button Group</Link>
-                </li>
-                <li>
-                  <Link to="/ui-list-group">List Group</Link>
-                </li>
-                <li>
-                  <Link to="/ui-media-object">Media Object</Link>
-                </li>
-                <li>
-                  <Link to="/ui-card">Cards</Link>
-                </li>
-                <li>
-                  <Link to="/ui-carousel">Carousel</Link>
-                </li>
-                <li>
-                  <Link to="/ui-dropdown">Dropdown</Link>
-                </li>
-                <li>
-                  <Link to="/ui-popover">Popover</Link>
-                </li>
-                <li>
-                  <Link to="/ui-progressbar">Progressbar</Link>
-                </li>
-                <li>
-                  <Link to="/ui-tab">Tab</Link>
-                </li>
-                <li>
-                  <Link to="/ui-typography">Typography</Link>
-                </li>
-                <li>
-                  <Link to="/ui-pagination">Pagination</Link>
-                </li>
-                <li>
-                  <Link to="/ui-grid">Grid</Link>
+                  <Link to="/neraca">Neraca</Link>
                 </li>
               </ul>
             </li>
-
-            <li
-              className={`${
-                plugins.includes(path.replace(patern, "")) ? "mm-active" : ""
-              }`}
-            >
-              <Link className="has-arrow ai-icon" to="#" aria-expanded="false">
-                <i className="flaticon-381-heart"></i>
-                <span className="nav-text">Plugins</span>
-              </Link>
-              <ul aria-expanded="false">
-                <li>
-                  <Link to="/uc-select2">Select 2</Link>
-                </li>
-                <li>
-                  <Link to="/uc-nestable">Nestedable</Link>
-                </li>
-                <li>
-                  <Link to="/uc-noui-slider">Noui Slider</Link>
-                </li>
-                <li>
-                  <Link to="/uc-sweetalert">Sweet Alert</Link>
-                </li>
-                <li>
-                  <Link to="/uc-toastr">Toastr</Link>
-                </li>
-                <li>
-                  <Link to="/map-jqvmap">Jqv Map</Link>
-                </li>
-              </ul>
-            </li>
-
-            <li
-              className={`${widget.includes(path.replace(patern, "")) ? "mm-active" : ""}`}
-            >
-              <Link to="widget-basic" className="ai-icon" aria-expanded="false">
-                <i className="flaticon-381-settings-2"></i>
-                <span className="nav-text">Widget</span>
-              </Link>
-            </li>
-
-            <li
-              className={`${forms.includes(path.replace(patern, "")) ? "mm-active" : ""}`}
-            >
-              <Link className="has-arrow ai-icon" to="#" aria-expanded="false">
-                <i className="flaticon-381-notepad"></i>
-                <span className="nav-text forms">Forms</span>
-              </Link>
-              <ul aria-expanded="false">
-                <li>
-                  <Link to="/form-element">Form Elements</Link>
-                </li>
-                <li>
-                  <Link to="/form-wizard">Wizard</Link>
-                </li>
-                <li>
-                  <Link to="/form-editor-summernote">Summernote</Link>
-                </li>
-                <li>
-                  <Link to="form-pickers">Pickers</Link>
-                </li>
-                <li>
-                  <Link to="form-validation-jquery">Jquery Validate</Link>
-                </li>
-              </ul>
-            </li>
-
-            <li
-              className={`${table.includes(path.replace(patern, "")) ? "mm-active" : ""}`}
-            >
-              <Link className="has-arrow ai-icon" to="#" aria-expanded="false">
-                <i className="flaticon-381-network"></i>
-                <span className="nav-text">Table</span>
-              </Link>
-              <ul aria-expanded="false">
-                <li>
-                  <Link to="table-bootstrap-basic">Bootstrap</Link>
-                </li>
-                <li>
-                  <Link to="table-datatable-basic">Datatable</Link>
-                </li>
-              </ul>
-            </li>
-
-            <li>
-              <Link className="has-arrow ai-icon" to="#" aria-expanded="false">
-                <i className="flaticon-381-layer-1"></i>
-                <span className="nav-text">Pages</span>
-              </Link>
-              <ul aria-expanded="false">
-                <li>
-                  <Link to="/page-register">Register</Link>
-                </li>
-                <li>
-                  <Link to="/page-login">Login</Link>
-                </li>
-                <li>
-                  <Link className="has-arrow" to="#" aria-expanded="false">
-                    Error
-                  </Link>
-                  <ul aria-expanded="false">
-                    <li>
-                      <Link to="/page-error-400">Error 400</Link>
-                    </li>
-                    <li>
-                      <Link to="/page-error-403">Error 403</Link>
-                    </li>
-                    <li>
-                      <Link to="/page-error-404">Error 404</Link>
-                    </li>
-                    <li>
-                      <Link to="/page-error-500">Error 500</Link>
-                    </li>
-                    <li>
-                      <Link to="/page-error-503">Error 503</Link>
-                    </li>
-                  </ul>
-                </li>
-                <li>
-                  <Link to="/page-lock-screen">Lock Screen</Link>
-                </li>
-              </ul>
-            </li> */}
           </MM>
 
           <div className="copyright">

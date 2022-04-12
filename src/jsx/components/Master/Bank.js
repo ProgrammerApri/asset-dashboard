@@ -16,14 +16,28 @@ import { InputTextarea } from "primereact/inputtextarea";
 
 const data = {
   bank: {
+    id: 1,
     BANK_CODE: "",
     BANK_NAME: "",
     BANK_DESC: "",
+    acc_id: 0,
+    user_entry: 0,
+    user_edit: null,
+    entry_date: "",
+    edit_date: ""
   },
+  
   account: {
+    id: 0,
     acc_code: "",
     acc_name: "",
-  },
+    umm_code: null,
+    kat_code: 0,
+    dou_type: "",
+    sld_type: "",
+    connect: true,
+    sld_awal: 0
+  }
 };
 
 const Bank = () => {
@@ -43,7 +57,7 @@ const Bank = () => {
   const [rows2, setRows2] = useState(20);
 
   useEffect(() => {
-    // getBank();
+    getBank();
     getAccount();
     initFilters1();
   }, []);
@@ -108,7 +122,7 @@ const Bank = () => {
       endpoint: endpoints.editBank.endpoint + currentItem.id,
       data: {
         BANK_CODE: currentItem.bank.BANK_CODE,
-        BANK_ACC: currentItem.account.acc_code,
+        acc_id: currentItem.account.id,
         BANK_NAME: currentItem.bank.BANK_NAME,
         BANK_DESC: currentItem.bank.BANK_DESC,
       },
@@ -149,7 +163,7 @@ const Bank = () => {
       ...endpoints.addBank,
       data: {
         BANK_CODE: currentItem.bank.BANK_CODE,
-        BANK_ACC: currentItem.account.acc_code,
+        ACC_ID: currentItem.account.id,
         BANK_NAME: currentItem.bank.BANK_NAME,
         BANK_DESC: currentItem.bank.BANK_DESC,
       },
@@ -552,17 +566,18 @@ const Bank = () => {
           <div className="p-inputgroup">
             <Dropdown
               value={currentItem !== null ? currentItem.account : null}
-              options={account}
+              options={account && account.account}
               onChange={(e) => {
                 console.log(e.value);
                 setCurrentItem({
                   ...currentItem,
                   account: e.value,
                 });
+                console.log(currentItem.account);
               }}
-              optionLabel="account.acc_name"
+              optionLabel="acc_name"
               filter
-              filterBy="account.acc_name"
+              filterBy="acc_name"
               placeholder="Pilih Akun GL"
             />
           </div>

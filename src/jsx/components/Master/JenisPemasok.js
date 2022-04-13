@@ -443,7 +443,7 @@ const JenisPemasok = () => {
       </Row>
 
       <Dialog
-        header={isEdit ? "Edit Project" : "Tambah Project"}
+        header={isEdit ? "Edit Jenis Pemasok" : "Tambah Jenis Pemasok"}
         visible={displayData}
         style={{ width: "40vw" }}
         footer={renderFooter("displayData")}

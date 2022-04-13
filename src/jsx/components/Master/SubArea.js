@@ -18,17 +18,15 @@ const data = {
   subArea: {
     id: 1,
     sub_code: "",
+    sub_area_code: "",
     sub_name: "",
     sub_ket: "",
-    sub_area_code: "",
   },
-
   areaPen: {
     id: 0,
     area_pen_code: "",
     area_pen_name: ""
-  }
-   
+  },   
 };
 
 
@@ -47,6 +45,8 @@ const SubArea = () => {
   const [isEdit, setEdit] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+
+  const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
     getSubArea();
@@ -78,7 +78,6 @@ const SubArea = () => {
   };
 
 
-
   const getSubArea = async (isUpdate = false) => {
     setLoading(true);
     const config = {
@@ -108,10 +107,10 @@ const SubArea = () => {
   const editSubArea = async () => {
     const config = {
       ...endpoints.editSubArea,
-      endpoint: endpoints.editSubArea.endpoint + currentItem.id,
+      endpoint: endpoints.editSubArea.endpoint + currentItem.subArea.id,
       data: {
         sub_code: currentItem.subArea.sub_code,
-        sub_area_code: currentItem.areaPen.sub_area_code,
+        sub_area_code: currentItem.areaPen.id,
         sub_name: currentItem.subArea.sub_name,
         sub_ket: currentItem.subArea.sub_ket,
       },
@@ -152,7 +151,7 @@ const SubArea = () => {
       ...endpoints.addSubArea,
       data: {
         sub_code: currentItem.subArea.sub_code,
-        sub_area_code: currentItem.areaPen.sub_area_code,
+        sub_area_code: currentItem.areaPen.id,
         sub_name: currentItem.subArea.sub_name,
         sub_ket: currentItem.subArea.sub_ket,
       },
@@ -427,7 +426,7 @@ const SubArea = () => {
             <Card.Body>
               <DataTable
                 responsiveLayout="scroll"
-                value={subArea}
+                value={loading ? dummy : subArea}
                 className="display w-150 datatable-wrapper"
                 showGridlines
                 dataKey="id"
@@ -501,11 +500,12 @@ const SubArea = () => {
           <label className="text-label">Kode</label>
           <div className="p-inputgroup">
             <InputText
-              value={
-                currentItem !== null ? `${currentItem.subArea.sub_code}` : ""
-              }
+              value={currentItem !== null ? `${currentItem.subArea.sub_code}` : ""}
               onChange={(e) =>
-                setCurrentItem({...currentItem.subArea, sub_code: e.target.value})
+                setCurrentItem({
+                  ...currentItem,
+                  subArea: { ...currentItem.subArea, sub_code: e.target.value },
+                })
               }
               placeholder="Masukan Kode"
             
@@ -517,11 +517,12 @@ const SubArea = () => {
           <label className="text-label">Nama Sub Area</label>
           <div className="p-inputgroup">
             <InputText
-              value={
-                currentItem !== null ? `${currentItem.subArea.sub_name}` : ""
-              }
+              value={currentItem !== null ? `${currentItem.subArea.sub_name}` : ""}
               onChange={(e) =>
-                setCurrentItem({...currentItem.subArea, sub_name: e.target.value})
+                setCurrentItem({
+                  ...currentItem,
+                  subArea: { ...currentItem.subArea, sub_name: e.target.value },
+                })
               }
               placeholder="Masukan Nama Sub Area"
             />
@@ -553,11 +554,12 @@ const SubArea = () => {
           <label className="text-label">Keterangan</label>
           <div className="p-inputgroup">
             <InputTextarea
-              value={
-                currentItem !== null ? `${currentItem.proj_ket}` : ""
-              }
+              value={currentItem !== null ? `${currentItem.subArea.sub_ket}` : ""}
               onChange={(e) =>
-                setCurrentItem({...currentItem, proj_ket: e.target.value})
+                setCurrentItem({
+                  ...currentItem,
+                  subArea: { ...currentItem.subArea, sub_ket: e.target.value },
+                })
               }
               placeholder="Masukan Keterangan"
             />

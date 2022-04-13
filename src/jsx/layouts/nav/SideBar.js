@@ -330,6 +330,30 @@ class SideBar extends Component {
                 </li>
               </ul>
             </li>
+            <li
+              className={`${
+                report.includes(path.replace(patern, "")) ? "mm-active" : ""
+              }`}
+            >
+              <Link className="has-arrow ai-icon" to="#" aria-expanded="false">
+              <i class='bx bxs-buildings'></i>
+                <span className="nav-text">Setup</span>
+              </Link>
+              <ul aria-expanded="false">
+                <li>
+                  <Link to="/perusahaan">Perusahaan</Link>
+                </li>
+                <li>
+                  <Link to="/penjualan">Penjualan</Link>
+                </li>
+                <li>
+                  <Link to="/pembelian">Pembelian</Link>
+                </li>
+                <li>
+                  <Link to="/pengguna">Pengguna</Link>
+                </li>
+              </ul>
+            </li>
           </MM>
 
           <div className="copyright">

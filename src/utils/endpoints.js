@@ -236,7 +236,7 @@ const endpoints = {
   },
 
   /// Area Penjualan
-  areaPenjualan: {
+  areaPen: {
     endpoint: "/v1/api/area-penjualan",
     method: "GET",
     data: {},

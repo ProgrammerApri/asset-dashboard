@@ -16,9 +16,9 @@ import { InputTextarea } from "primereact/inputtextarea";
 
 const data = {
     id: 1,
-    proj_code: "",
-    proj_name: "",
-    proj_ket: "",
+    area_pen_code: "",
+    area_pen_name: "",
+    area_pen_ket: "",
 };
 
 
@@ -46,7 +46,7 @@ const AreaPenjualan = () => {
   const getAreaPen = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.jenisPel,
+      ...endpoints.areaPen,
       data: {},
     };
     console.log(config.data);
@@ -71,12 +71,12 @@ const AreaPenjualan = () => {
 
   const editAreaPen = async () => {
     const config = {
-      ...endpoints.editProject,
-      endpoint: endpoints.editProject.endpoint + currentItem.id,
+      ...endpoints.editAreaPen,
+      endpoint: endpoints.editAreaPen.endpoint + currentItem.id,
       data: {
-        proj_code: currentItem.proj_code,
-        proj_name: currentItem.proj_name,
-        proj_ket: currentItem.proj_ket,
+        area_pen_code: currentItem.area_pen_code,
+        area_pen_name: currentItem.area_pen_name,
+        area_pen_ket: currentItem.area_pen_ket,
       },
     };
     console.log(config.data);
@@ -112,11 +112,11 @@ const AreaPenjualan = () => {
 
   const addAreaPen = async () => {
     const config = {
-      ...endpoints.addProject,
+      ...endpoints.addAreaPen,
       data: {
-        proj_code: currentItem.proj_code,
-        proj_name: currentItem.proj_name,
-        proj_ket: currentItem.proj_ket,
+        area_pen_code: currentItem.area_pen_code,
+        area_pen_name: currentItem.area_pen_name,
+        area_pen_ket: currentItem.area_pen_ket,
       },
     };
     console.log(config.data);
@@ -145,7 +145,7 @@ const AreaPenjualan = () => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode Project ${currentItem.proj_code} Sudah Digunakan`,
+            detail: `Kode Area ${currentItem.area_pen_code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -165,8 +165,8 @@ const AreaPenjualan = () => {
 
   const delAreaPen = async (id) => {
     const config = {
-      ...endpoints.delProject,
-      endpoint: endpoints.delProject.endpoint + currentItem.id,
+      ...endpoints.delAreaPen,
+      endpoint: endpoints.delAreaPen.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -397,9 +397,9 @@ const AreaPenjualan = () => {
                 header={renderHeader}
                 filters={filters1}
                 globalFilterFields={[
-                  "project.proj_code",
-                  "project.proj_name",
-                  "project.proj_ket",
+                  "areaPen.area_pen_code",
+                  "areaPen.area_pen_name",
+                  "areaPen.area_pen_ket",
                 ]}
                 emptyMessage="Tidak ada data"
                 paginator
@@ -414,12 +414,12 @@ const AreaPenjualan = () => {
                   style={{
                     minWidth: "8rem",
                   }}
-                  field={(e) => e.proj_code}
+                  field={(e) => e.area_pen_code}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Nama"
-                  field={(e) => e.proj_name}
+                  field={(e) => e.area_pen_name}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
@@ -443,7 +443,7 @@ const AreaPenjualan = () => {
       </Row>
 
       <Dialog
-        header={isEdit ? "Edit Project" : "Tambah Project"}
+        header={isEdit ? "Edit Area Penjualan" : "Tambah Area Penjualan"}
         visible={displayData}
         style={{ width: "40vw" }}
         footer={renderFooter("displayData")}
@@ -457,10 +457,10 @@ const AreaPenjualan = () => {
           <div className="p-inputgroup">
             <InputText
               value={
-                currentItem !== null ? `${currentItem.proj_code}` : ""
+                currentItem !== null ? `${currentItem.area_pen_code}` : ""
               }
               onChange={(e) =>
-                setCurrentItem({...currentItem, proj_code: e.target.value})
+                setCurrentItem({...currentItem, area_pen_code: e.target.value})
               }
               placeholder="Masukan Kode"
             
@@ -473,10 +473,10 @@ const AreaPenjualan = () => {
           <div className="p-inputgroup">
             <InputText
               value={
-                currentItem !== null ? `${currentItem.proj_name}` : ""
+                currentItem !== null ? `${currentItem.area_pen_name}` : ""
               }
               onChange={(e) =>
-                setCurrentItem({...currentItem, proj_name: e.target.value})
+                setCurrentItem({...currentItem, area_pen_name: e.target.value})
               }
               placeholder="Masukan Nama Akun"
             />
@@ -488,10 +488,10 @@ const AreaPenjualan = () => {
           <div className="p-inputgroup">
             <InputTextarea
               value={
-                currentItem !== null ? `${currentItem.proj_ket}` : ""
+                currentItem !== null ? `${currentItem.area_pen_ket}` : ""
               }
               onChange={(e) =>
-                setCurrentItem({...currentItem, proj_ket: e.target.value})
+                setCurrentItem({...currentItem, area_pen_ket: e.target.value})
               }
               placeholder="Masukan Keterangan"
             />

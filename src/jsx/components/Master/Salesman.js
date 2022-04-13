@@ -16,9 +16,9 @@ import { InputTextarea } from "primereact/inputtextarea";
 
 const data = {
     id: 1,
-    proj_code: "",
-    proj_name: "",
-    proj_ket: "",
+    sales_code: "",
+    sales_name: "",
+    sales_ket: "",
 };
 
 
@@ -46,7 +46,7 @@ const Salesman = () => {
   const getSalesman = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.jenisPel,
+      ...endpoints.salesman,
       data: {},
     };
     console.log(config.data);
@@ -71,12 +71,12 @@ const Salesman = () => {
 
   const editSalesman = async () => {
     const config = {
-      ...endpoints.editProject,
-      endpoint: endpoints.editProject.endpoint + currentItem.id,
+      ...endpoints.editSalesman,
+      endpoint: endpoints.editSalesman.endpoint + currentItem.id,
       data: {
-        proj_code: currentItem.proj_code,
-        proj_name: currentItem.proj_name,
-        proj_ket: currentItem.proj_ket,
+        sales_code: currentItem.sales_code,
+        sales_name: currentItem.sales_name,
+        sales_ket: currentItem.sales_ket,
       },
     };
     console.log(config.data);
@@ -112,11 +112,11 @@ const Salesman = () => {
 
   const addSalesman = async () => {
     const config = {
-      ...endpoints.addProject,
+      ...endpoints.addSalesman,
       data: {
-        proj_code: currentItem.proj_code,
-        proj_name: currentItem.proj_name,
-        proj_ket: currentItem.proj_ket,
+        sales_code: currentItem.sales_code,
+        sales_name: currentItem.sales_name,
+        sales_ket: currentItem.sales_ket,
       },
     };
     console.log(config.data);
@@ -145,7 +145,7 @@ const Salesman = () => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode Project ${currentItem.proj_code} Sudah Digunakan`,
+            detail: `Kode ${currentItem.sales_code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -165,8 +165,8 @@ const Salesman = () => {
 
   const delSalesman = async (id) => {
     const config = {
-      ...endpoints.delProject,
-      endpoint: endpoints.delProject.endpoint + currentItem.id,
+      ...endpoints.delSalesman,
+      endpoint: endpoints.delSalesman.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -397,9 +397,9 @@ const Salesman = () => {
                 header={renderHeader}
                 filters={filters1}
                 globalFilterFields={[
-                  "project.proj_code",
-                  "project.proj_name",
-                  "project.proj_ket",
+                  "salesman.sales_code",
+                  "salesman.sales_name",
+                  "salesman.sales_ket",
                 ]}
                 emptyMessage="Tidak ada data"
                 paginator
@@ -414,18 +414,18 @@ const Salesman = () => {
                   style={{
                     minWidth: "8rem",
                   }}
-                  field={(e) => e.proj_code}
+                  field={(e) => e.sales_code}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Nama"
-                  field={(e) => e.proj_name}
+                  field={(e) => e.sales_name}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Keterangan"
-                  field={(e) => e.proj_ket}
+                  field={(e) => e.sales_ket}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
@@ -443,7 +443,7 @@ const Salesman = () => {
       </Row>
 
       <Dialog
-        header={isEdit ? "Edit Project" : "Tambah Project"}
+        header={isEdit ? "Edit Salesman" : "Tambah Salesman"}
         visible={displayData}
         style={{ width: "40vw" }}
         footer={renderFooter("displayData")}
@@ -457,10 +457,10 @@ const Salesman = () => {
           <div className="p-inputgroup">
             <InputText
               value={
-                currentItem !== null ? `${currentItem.proj_code}` : ""
+                currentItem !== null ? `${currentItem.sales_code}` : ""
               }
               onChange={(e) =>
-                setCurrentItem({...currentItem, proj_code: e.target.value})
+                setCurrentItem({...currentItem, sales_code: e.target.value})
               }
               placeholder="Masukan Kode"
             
@@ -473,10 +473,10 @@ const Salesman = () => {
           <div className="p-inputgroup">
             <InputText
               value={
-                currentItem !== null ? `${currentItem.proj_name}` : ""
+                currentItem !== null ? `${currentItem.sales_name}` : ""
               }
               onChange={(e) =>
-                setCurrentItem({...currentItem, proj_name: e.target.value})
+                setCurrentItem({...currentItem, sales_name: e.target.value})
               }
               placeholder="Masukan Nama Akun"
             />
@@ -488,10 +488,10 @@ const Salesman = () => {
           <div className="p-inputgroup">
             <InputTextarea
               value={
-                currentItem !== null ? `${currentItem.proj_ket}` : ""
+                currentItem !== null ? `${currentItem.sales_ket}` : ""
               }
               onChange={(e) =>
-                setCurrentItem({...currentItem, proj_ket: e.target.value})
+                setCurrentItem({...currentItem, sales_ket: e.target.value})
               }
               placeholder="Masukan Keterangan"
             />

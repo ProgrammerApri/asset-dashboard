@@ -74,9 +74,9 @@ const JenisPelanggan = () => {
       ...endpoints.editJenisPel,
       endpoint: endpoints.editJenisPel.endpoint + currentItem.id,
       data: {
-        code: currentItem.jpel_code,
-        name: currentItem.jpel_name,
-        ket: currentItem.jpel_ket,
+        jpel_code: currentItem.jpel_code,
+        jpel_name: currentItem.jpel_name,
+        jpel_ket: currentItem.jpel_ket,
       },
     };
     console.log(config.data);

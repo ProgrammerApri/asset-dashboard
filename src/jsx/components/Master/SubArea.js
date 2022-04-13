@@ -15,15 +15,26 @@ import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 
 const data = {
+  subArea: {
     id: 1,
-    proj_code: "",
-    proj_name: "",
-    proj_ket: "",
+    sub_code: "",
+    sub_name: "",
+    sub_ket: "",
+    sub_area_code: "",
+  },
+
+  areaPen: {
+    id: 0,
+    area_pen_code: "",
+    area_pen_name: ""
+  }
+   
 };
 
 
 const SubArea = () => {
   const [subArea, setSubArea] = useState(null);
+  const [areaPen, setAreaPen] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
@@ -39,14 +50,39 @@ const SubArea = () => {
 
   useEffect(() => {
     getSubArea();
+    getAreaPen();
     initFilters1();
   }, []);
+
+
+  const getAreaPen = async () => {
+    console.log("-------------------");
+    // console.log(currentItem);
+    setLoading(true);
+    const config = {
+      ...endpoints.areaPen,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setAreaPen(data);
+      }
+    } catch (error) {}
+    getSubArea();
+  };
+
 
 
   const getSubArea = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.jenisPel,
+      ...endpoints.subArea,
       data: {},
     };
     console.log(config.data);
@@ -71,12 +107,13 @@ const SubArea = () => {
 
   const editSubArea = async () => {
     const config = {
-      ...endpoints.editProject,
-      endpoint: endpoints.editProject.endpoint + currentItem.id,
+      ...endpoints.editSubArea,
+      endpoint: endpoints.editSubArea.endpoint + currentItem.id,
       data: {
-        proj_code: currentItem.proj_code,
-        proj_name: currentItem.proj_name,
-        proj_ket: currentItem.proj_ket,
+        sub_code: currentItem.subArea.sub_code,
+        sub_area_code: currentItem.areaPen.sub_area_code,
+        sub_name: currentItem.subArea.sub_name,
+        sub_ket: currentItem.subArea.sub_ket,
       },
     };
     console.log(config.data);
@@ -112,11 +149,12 @@ const SubArea = () => {
 
   const addSubArea = async () => {
     const config = {
-      ...endpoints.addProject,
+      ...endpoints.addSubArea,
       data: {
-        proj_code: currentItem.proj_code,
-        proj_name: currentItem.proj_name,
-        proj_ket: currentItem.proj_ket,
+        sub_code: currentItem.subArea.sub_code,
+        sub_area_code: currentItem.areaPen.sub_area_code,
+        sub_name: currentItem.subArea.sub_name,
+        sub_ket: currentItem.subArea.sub_ket,
       },
     };
     console.log(config.data);
@@ -145,7 +183,7 @@ const SubArea = () => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode Project ${currentItem.proj_code} Sudah Digunakan`,
+            detail: `Kode ${currentItem.subArea.sub_code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -165,8 +203,8 @@ const SubArea = () => {
 
   const delSubArea = async (id) => {
     const config = {
-      ...endpoints.delProject,
-      endpoint: endpoints.delProject.endpoint + currentItem.id,
+      ...endpoints.delSubArea,
+      endpoint: endpoints.delSubArea.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -397,9 +435,10 @@ const SubArea = () => {
                 header={renderHeader}
                 filters={filters1}
                 globalFilterFields={[
-                  "subArea.proj_code",
-                  "project.proj_name",
-                  "project.proj_ket",
+                  "subArea.sub_code",
+                  "areaPen.sub_area_code",
+                  "subArea.sub_name",
+                  "subArea.sub_ket",
                 ]}
                 emptyMessage="Tidak ada data"
                 paginator
@@ -414,24 +453,24 @@ const SubArea = () => {
                   style={{
                     minWidth: "8rem",
                   }}
-                  field={(e) => e.proj_code}
+                  field={(e) => e.subArea.sub_code}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Nama Sub Area"
-                  field={(e) => e.proj_name}
+                  field={(e) => e.subArea.sub_name}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Nama Area"
-                  field={(e) => e.proj_ket}
+                  field={(e) => e.areaPen.area_pen_name}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                  <Column
                   header="Keterangan"
-                  field={(e) => e.proj_ket}
+                  field={(e) => e.subArea.sub_ket}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
@@ -449,7 +488,7 @@ const SubArea = () => {
       </Row>
 
       <Dialog
-        header={isEdit ? "Edit Project" : "Tambah Project"}
+        header={isEdit ? "Edit Sub Area" : "Tambah Sub Area"}
         visible={displayData}
         style={{ width: "40vw" }}
         footer={renderFooter("displayData")}
@@ -463,10 +502,10 @@ const SubArea = () => {
           <div className="p-inputgroup">
             <InputText
               value={
-                currentItem !== null ? `${currentItem.proj_code}` : ""
+                currentItem !== null ? `${currentItem.subArea.sub_code}` : ""
               }
               onChange={(e) =>
-                setCurrentItem({...currentItem, proj_code: e.target.value})
+                setCurrentItem({...currentItem.subArea, sub_code: e.target.value})
               }
               placeholder="Masukan Kode"
             
@@ -479,12 +518,12 @@ const SubArea = () => {
           <div className="p-inputgroup">
             <InputText
               value={
-                currentItem !== null ? `${currentItem.proj_name}` : ""
+                currentItem !== null ? `${currentItem.subArea.sub_name}` : ""
               }
               onChange={(e) =>
-                setCurrentItem({...currentItem, proj_name: e.target.value})
+                setCurrentItem({...currentItem.subArea, sub_name: e.target.value})
               }
-              placeholder="Masukan Nama Akun"
+              placeholder="Masukan Nama Sub Area"
             />
           </div>
         </div>
@@ -492,14 +531,20 @@ const SubArea = () => {
         <div className="col-12">
           <label className="text-label">Nama Area</label>
           <div className="p-inputgroup">
-            <InputText
-              value={
-                currentItem !== null ? `${currentItem.proj_name}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({...currentItem, proj_name: e.target.value})
-              }
-              placeholder="Masukan Nama Akun"
+          <Dropdown
+              value={currentItem !== null ? currentItem.areaPen : null}
+              options={areaPen}
+              onChange={(e) => {
+                console.log(e.value);
+                setCurrentItem({
+                  ...currentItem,
+                  areaPen: e.value,
+                });
+              }}
+              optionLabel="area_pen_name"
+              filter
+              filterBy="area_pen_name"
+              placeholder="Pilih Area"
             />
           </div>
         </div>

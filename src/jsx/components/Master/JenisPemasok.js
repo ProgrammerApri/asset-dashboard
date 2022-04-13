@@ -74,9 +74,9 @@ const JenisPemasok = () => {
       ...endpoints.editJenisPem,
       endpoint: endpoints.editJenisPem.endpoint + currentItem.id,
       data: {
-        jpem_code: currentItem.proj_code,
-        jpem_name: currentItem.proj_name,
-        jpem_ket: currentItem.proj_ket,
+        jpem_code: currentItem.jpem_code,
+        jpem_name: currentItem.jpem_name,
+        jpem_ket: currentItem.jpem_ket,
       },
     };
     console.log(config.data);
@@ -112,11 +112,11 @@ const JenisPemasok = () => {
 
   const addJenisPemasok = async () => {
     const config = {
-      ...endpoints.addProject,
+      ...endpoints.addJenisPem,
       data: {
-        proj_code: currentItem.proj_code,
-        proj_name: currentItem.proj_name,
-        proj_ket: currentItem.proj_ket,
+        jpem_code: currentItem.jpem_code,
+        jpem_name: currentItem.jpem_name,
+        jpem_ket: currentItem.jpem_ket,
       },
     };
     console.log(config.data);
@@ -145,7 +145,7 @@ const JenisPemasok = () => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode Project ${currentItem.proj_code} Sudah Digunakan`,
+            detail: `Kode ${currentItem.jpem_code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -165,8 +165,8 @@ const JenisPemasok = () => {
 
   const delJenisPemasok = async (id) => {
     const config = {
-      ...endpoints.delProject,
-      endpoint: endpoints.delProject.endpoint + currentItem.id,
+      ...endpoints.delJenisPem,
+      endpoint: endpoints.delJenisPem.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -397,9 +397,9 @@ const JenisPemasok = () => {
                 header={renderHeader}
                 filters={filters1}
                 globalFilterFields={[
-                  "project.proj_code",
-                  "project.proj_name",
-                  "project.proj_ket",
+                  "jenisPemasok.jpem_code",
+                  "jenisPemasok.jpem_name",
+                  "jenisPemasok.jpem_ket",
                 ]}
                 emptyMessage="Tidak ada data"
                 paginator
@@ -414,18 +414,18 @@ const JenisPemasok = () => {
                   style={{
                     minWidth: "8rem",
                   }}
-                  field={(e) => e.proj_code}
+                  field={(e) => e.jpem_code}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Nama"
-                  field={(e) => e.proj_name}
+                  field={(e) => e.jpem_name}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Keterangan"
-                  field={(e) => e.proj_ket}
+                  field={(e) => e.jpem_ket}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
@@ -457,10 +457,10 @@ const JenisPemasok = () => {
           <div className="p-inputgroup">
             <InputText
               value={
-                currentItem !== null ? `${currentItem.proj_code}` : ""
+                currentItem !== null ? `${currentItem.jpem_code}` : ""
               }
               onChange={(e) =>
-                setCurrentItem({...currentItem, proj_code: e.target.value})
+                setCurrentItem({...currentItem, jpem_code: e.target.value})
               }
               placeholder="Masukan Kode"
             
@@ -473,10 +473,10 @@ const JenisPemasok = () => {
           <div className="p-inputgroup">
             <InputText
               value={
-                currentItem !== null ? `${currentItem.proj_name}` : ""
+                currentItem !== null ? `${currentItem.jpem_name}` : ""
               }
               onChange={(e) =>
-                setCurrentItem({...currentItem, proj_name: e.target.value})
+                setCurrentItem({...currentItem, jpem_name: e.target.value})
               }
               placeholder="Masukan Nama Akun"
             />
@@ -488,10 +488,10 @@ const JenisPemasok = () => {
           <div className="p-inputgroup">
             <InputTextarea
               value={
-                currentItem !== null ? `${currentItem.proj_ket}` : ""
+                currentItem !== null ? `${currentItem.jpem_ket}` : ""
               }
               onChange={(e) =>
-                setCurrentItem({...currentItem, proj_ket: e.target.value})
+                setCurrentItem({...currentItem, jpem_ket: e.target.value})
               }
               placeholder="Masukan Keterangan"
             />

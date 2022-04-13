@@ -37,6 +37,8 @@ const JenisPelanggan = () => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
 
+  const dummy = Array.from({ length: 10 });
+
   useEffect(() => {
     getJenisPel();
     initFilters1();
@@ -389,7 +391,7 @@ const JenisPelanggan = () => {
             <Card.Body>
               <DataTable
                 responsiveLayout="scroll"
-                value={jenisPel}
+                value={loading ? dummy : jenisPel}
                 className="display w-150 datatable-wrapper"
                 showGridlines
                 dataKey="id"

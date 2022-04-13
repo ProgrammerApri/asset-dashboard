@@ -114,6 +114,7 @@ import Salesman from "./components/Master/Salesman";
 import AreaPenjualan from "./components/Master/AreaPenjualan";
 import SubArea from "./components/Master/SubArea";
 import Neraca from "./components/Report/Neraca";
+import Currency from "./components/Master/Currency";
 
 const Markup = ({width}) => {
   const routes = [
@@ -135,6 +136,7 @@ const Markup = ({width}) => {
     { url: "salesman", component: Salesman },
     { url: "area-penjualan", component: AreaPenjualan },
     { url: "sub-area", component: SubArea },
+    { url: "currency", component: Currency },
 
     // Report
     { url: "neraca", component: Neraca },

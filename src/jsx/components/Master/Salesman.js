@@ -37,6 +37,8 @@ const Salesman = () => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
 
+  const dummy = Array.from({ length: 10 });
+
   useEffect(() => {
     getSalesman();
     initFilters1();
@@ -389,7 +391,7 @@ const Salesman = () => {
             <Card.Body>
               <DataTable
                 responsiveLayout="scroll"
-                value={salesman}
+                value={loading ? dummy : salesman}
                 className="display w-150 datatable-wrapper"
                 showGridlines
                 dataKey="id"

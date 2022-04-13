@@ -425,7 +425,7 @@ const AreaPenjualan = () => {
                 />
                 <Column
                   header="Keterangan"
-                  field={(e) => e.proj_ket}
+                  field={(e) => e.area_pen_ket}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />

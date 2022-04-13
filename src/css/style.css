@@ -159,6 +159,10 @@
   border-width: 0 0 1px 0;
 }
 
+.p-datatable.p-datatable-gridlines .p-datatable-tbody > tr > td .neraca-total {
+  border-width: 0 1px 1px 0;
+}
+
 .p-paginator {
   background: #00000000;
   padding: 0.5rem 0rem;

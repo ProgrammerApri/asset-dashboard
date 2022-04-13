@@ -19,6 +19,33 @@ import ReactToPrint from "react-to-print";
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
+const category = {
+  aktiva: [
+    {
+      name: "Aktiva Lancar",
+      id: [1, 2, 3, 4, 5]
+    },
+    {
+      name: "Aktiva Tetap",
+      id: [6]
+    },
+    {
+      name: "Aktiva Lainnya",
+      id: [8]
+    },
+  ],
+  pasiva: [
+    {
+      name: "Hutang",
+      id: [9, 10, 11, 12, 18]
+    },
+    {
+      name: "Modal",
+      id: [13, 15, 16, 17]
+    },
+  ]
+}
+
 const Neraca = () => {
   const [account, setAccount] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -86,42 +113,61 @@ const Neraca = () => {
     let aktiva = [];
     let pasiva = [];
     let datum = [];
-    account.forEach((el) => {
-      if (el.account.dou_type === "U") {
-        datum.push({
-          id: el.account.id,
-          acc_code: el.account.acc_code,
-          acc_name: el.account.acc_name,
-          kategori: el.account.kat_code,
-          detail: [],
-        });
-      }
+    // account.forEach((el) => {
+    //   if (el.account.dou_type === "U") {
+    //     datum.push({
+    //       id: el.account.id,
+    //       acc_code: el.account.acc_code,
+    //       acc_name: el.account.acc_name,
+    //       kategori: el.account.kat_code,
+    //       detail: [],
+    //     });
+    //   }
+    // });
+
+    category.aktiva.forEach((el) => {
+      datum.push({
+        type : "aktiva",
+        kat_id : el.id,
+        name : el.name,
+        sub : []
+      })
+    });
+
+    category.pasiva.forEach((el) => {
+      datum.push({
+        type : "pasiva",
+        kat_id : el.id,
+        name : el.name,
+        sub : []
+      })
     });
 
     datum.forEach((el) => {
-      account.forEach((ek) => {
-        if (
-          ek.account.dou_type === "D" &&
-          ek.account.umm_code === el.acc_code
-        ) {
-          el.detail.push({
-            acc_code: ek.account.acc_code,
-            acc_name: ek.account.acc_name,
-            saldo: ek.account.sld_awal,
-          });
-        }
+      el.kat_id.forEach((e) => {
+        account.forEach((ek) => {
+          if (
+            ek.account.dou_type === "U" &&
+            ek.kategory.id === e
+          ) {
+            el.sub.push({
+              acc_code: ek.account.acc_code,
+              acc_name: ek.account.acc_name,
+              saldo: ek.account.sld_awal,
+            });
+          }
+        });
       });
     });
 
     let totalAktiva = 0;
     let totalPasiva = 0;
     datum.forEach((el) => {
-      let kate = el.kategori;
-      if (kate >= 1 && kate <= 8) {
-        if (el.detail.length > 0) {
-          aktiva.push([{ ...umum, value: el.acc_name }, { value: "" }]);
+      if (el.type === "aktiva") {
+        if (el.sub.length > 0) {
+          aktiva.push([{ ...umum, value: el.name }, { value: "" }]);
           let total = 0;
-          el.detail.forEach((sub) => {
+          el.sub.forEach((sub) => {
             aktiva.push([
               { ...detail, value: `           ${sub.acc_name}` },
               { ...saldo, value: sub.saldo },
@@ -129,16 +175,16 @@ const Neraca = () => {
             total += sub.saldo;
           });
           aktiva.push([
-            { ...umum, value: `Total ${el.acc_name}` },
+            { ...umum, value: `Total ${el.name}` },
             { ...lastSaldo, value: total },
           ]);
           totalAktiva += total;
         }
       } else {
-        if (el.detail.length > 0) {
-          pasiva.push([{ ...umum, value: el.acc_name }, { value: "" }]);
+        if (el.sub.length > 0) {
+          pasiva.push([{ ...umum, value: el.name }, { value: "" }]);
           let total = 0;
-          el.detail.forEach((sub) => {
+          el.sub.forEach((sub) => {
             pasiva.push([
               { ...detail, value: `           ${sub.acc_name}` },
               { ...saldo, value: sub.saldo },
@@ -146,7 +192,7 @@ const Neraca = () => {
             total += sub.saldo;
           });
           pasiva.push([
-            { ...umum, value: `Total ${el.acc_name}` },
+            { ...umum, value: `Total ${el.name}` },
             { ...lastSaldo, value: total },
           ]);
           totalPasiva += total;
@@ -315,7 +361,7 @@ const Neraca = () => {
                 <Column
                   header=" "
                   field={(e) => e[1].value}
-                  className="text-center"
+                  className="text-center border-right"
                   body={(e) =>
                     loading ? (
                       <Skeleton />
@@ -338,6 +384,7 @@ const Neraca = () => {
                       <Skeleton />
                     ) : (
                       <Row>
+                        <div className={"mr-4"}></div>
                         <div className={e[2].type == "D" && "mr-4"}></div>
                         <div className={e[2].type == "U" && "font-weight-bold"}>
                           {e[2].value}
@@ -356,7 +403,7 @@ const Neraca = () => {
                     ) : (
                       <div
                         className={e[3].last && "font-weight-bold"}
-                      >{`${e[3].value}`}</div>
+                      >{e[3].value}</div>
                     )
                   }
                 />
@@ -382,7 +429,7 @@ const Neraca = () => {
                     : null
                 }
                 className="display w-150 datatable-wrapper"
-                showGridlines
+                // showGridlines
                 dataKey="id"
                 rowHover
                 emptyMessage="Tidak ada data"
@@ -410,7 +457,7 @@ const Neraca = () => {
                 <Column
                   header=" "
                   field={(e) => e[1].value}
-                  className="text-center"
+                  className="text-center border-right"
                   body={(e) =>
                     loading ? (
                       <Skeleton />
@@ -433,6 +480,7 @@ const Neraca = () => {
                       <Skeleton />
                     ) : (
                       <Row>
+                        <div className={"mr-4"}></div>
                         <div className={e[2].type == "D" && "mr-4"}></div>
                         <div className={e[2].type == "U" && "font-weight-bold"}>
                           {e[2].value}
@@ -451,7 +499,7 @@ const Neraca = () => {
                     ) : (
                       <div
                         className={e[3].last && "font-weight-bold"}
-                      >{`${e[3].value}`}</div>
+                      >{e[3].value}</div>
                     )
                   }
                 />

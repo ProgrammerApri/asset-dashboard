@@ -116,6 +116,7 @@ import SubArea from "./components/Master/SubArea";
 import Neraca from "./components/Report/Neraca";
 import Currency from "./components/Master/Currency";
 import Lokasi from "./components/Master/Lokasi";
+import RulesPay from "./components/Master/RulesPayment";
 
 const Markup = ({width}) => {
   const routes = [
@@ -139,7 +140,7 @@ const Markup = ({width}) => {
     { url: "sub-area", component: SubArea },
     { url: "currency", component: Currency },
     { url: "lokasi", component: Lokasi },
-    // { url: "syarat-pembayaran", component: RulesPaymenent },
+    { url: "syarat-pembayaran", component: RulesPay },
 
     // Report
     { url: "neraca", component: Neraca },

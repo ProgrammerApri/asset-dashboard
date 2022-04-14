@@ -12,17 +12,15 @@ import { InputText } from "primereact/inputtext";
 import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
-import { InputTextarea } from "primereact/inputtextarea";
-import { classNames } from "primereact/utils";
 import { InputNumber } from "primereact/inputnumber";
 import { Calendar } from 'primereact/calendar';
 
 const data = {
     id: 1,
-    curren_code: "", 
-    curren_name: "", 
-    curren_date: "",
-    curren_rate: 0,
+    code: "", 
+    name: "", 
+    date: "",
+    rate: 0,
 };
 
 
@@ -40,6 +38,7 @@ const Currency = () => {
   const [isEdit, setEdit] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+  // const [rate, setRate] = useState(0);
 
   const dummy = Array.from({ length: 10 });
 
@@ -80,10 +79,10 @@ const Currency = () => {
       ...endpoints.editCurrency,
       endpoint: endpoints.editCurrency.endpoint + currentItem.id,
       data: {
-        curren_code: currentItem.curren_code,
-        curren_name: currentItem.curren_name,
-        curren_date: currentItem.curren_date,
-        curren_rate: currentItem.curren_rate,
+        code: currentItem.code,
+        name: currentItem.name,
+        date: currentItem.date,
+        rate: currentItem.rate,
       },
     };
     console.log(config.data);
@@ -121,10 +120,10 @@ const Currency = () => {
     const config = {
       ...endpoints.addCurrency,
       data: {
-        curren_code: currentItem.curren_code,
-        curren_name: currentItem.curren_name,
-        curren_date: currentItem.curren_date,
-        curren_rate: currentItem.curren_rate,
+        code: currentItem.code,
+        name: currentItem.name,
+        date: currentItem.date,
+        rate: currentItem.rate,
       },
     };
     console.log(config.data);
@@ -153,7 +152,7 @@ const Currency = () => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${currentItem.curren_code} Sudah Digunakan`,
+            detail: `Kode ${currentItem.code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -405,10 +404,10 @@ const Currency = () => {
                 header={renderHeader}
                 filters={filters1}
                 globalFilterFields={[
-                  "currency.curren_code",
-                  "currency.curren_name",
-                  "currency.curren_date",
-                  "currency.curren_rate",
+                  "currency.code",
+                  "currency.name",
+                  "currency.date",
+                  "currency.rate",
                 ]}
                 emptyMessage="Tidak ada data"
                 paginator
@@ -423,24 +422,24 @@ const Currency = () => {
                   style={{
                     minWidth: "8rem",
                   }}
-                  field={(e) => e.curren_code}
+                  field={(e) => e.code}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Nama Currency"
-                  field={(e) => e.curren_name}
+                  field={(e) => e.name}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Taggal"
-                  field={(e) => e.curren_date}
+                  field={(e) => e.date}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Rate Currency"
-                  field={(e) => e.curren_rate}
+                  field={(e) => e.rate}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
@@ -472,10 +471,10 @@ const Currency = () => {
           <div className="p-inputgroup">
             <InputText
               value={
-                currentItem !== null ? `${currentItem.curren_code}` : ""
+                currentItem !== null ? `${currentItem.code}` : ""
               }
               onChange={(e) =>
-                setCurrentItem({...currentItem, curren_code: e.target.value})
+                setCurrentItem({...currentItem, code: e.target.value})
               }
               placeholder="Masukan Kode"
             
@@ -488,10 +487,10 @@ const Currency = () => {
           <div className="p-inputgroup">
             <InputText
               value={
-                currentItem !== null ? `${currentItem.curren_name}` : ""
+                currentItem !== null ? `${currentItem.name}` : ""
               }
               onChange={(e) =>
-                setCurrentItem({...currentItem, curren_name: e.target.value})
+                setCurrentItem({...currentItem, name: e.target.value})
               }
               placeholder="Masukan Nama"
             />
@@ -503,12 +502,13 @@ const Currency = () => {
           <div className="p-inputgroup">
             <Calendar
               value={
-                currentItem !== null ? `${currentItem.curren_date}` : ""
+                currentItem !== null ? `${currentItem.date}` : ""
               }
               onChange={(e) =>
-                setCurrentItem({...currentItem, curren_date: e.target.value})
+                setCurrentItem({...currentItem, date: e.target.value})
               }
               placeholder="Masukan Tanggal"
+              // dateFormat="dd-mm-yy"
               showIcon
             />
           </div>
@@ -517,15 +517,14 @@ const Currency = () => {
         <div className="col-12">
           <label className="text-label">Rate Currency</label>
           <div className="p-inputgroup">
-            <InputNumber
+          <InputNumber
               value={
-                currentItem !== null ? `${currentItem.curren_rate}` : ""
+                currentItem !== null ? `${currentItem.rate}` : ""
               }
               onChange={(e) =>
-                setCurrentItem({...currentItem, curren_rate: e.target.value})
+                setCurrentItem({...currentItem, rate: e.value})
               }
               placeholder="Masukan Rate"
-              showButtons
             />
           </div>
         </div>

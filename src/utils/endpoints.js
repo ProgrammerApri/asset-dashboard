@@ -334,6 +334,31 @@ const endpoints = {
     method: "DELETE",
     data: {},
   },
+
+  /// Rules Payment
+  rules_pay: {
+    endpoint: "/v1/api/rules-payment",
+    method: "GET",
+    data: {},
+  },
+
+  addRulesPay: {
+    endpoint: "/v1/api/rules-payment",
+    method: "POST",
+    data: {},
+  },
+
+  editRulesPay: {
+    endpoint: "/v1/api/rules-payment/",
+    method: "PUT",
+    data: {},
+  },
+
+  delRulesPay: {
+    endpoint: "/v1/api/rules-payment/",
+    method: "DELETE",
+    data: {},
+  },
 };
 
 export default endpoints;

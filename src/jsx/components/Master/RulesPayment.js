@@ -13,36 +13,19 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
+import { classNames } from "primereact/utils";
+import { InputNumber } from "primereact/inputnumber";
 
 const data = {
-  bank: {
     id: 1,
-    BANK_CODE: "",
-    BANK_NAME: "",
-    BANK_DESC: "",
-    acc_id: 0,
-    user_entry: 0,
-    user_edit: null,
-    entry_date: "",
-    edit_date: ""
-  },
-  
-  account: {
-    id: 0,
-    acc_code: "",
-    acc_name: "",
-    umm_code: null,
-    kat_code: 0,
-    dou_type: "",
-    sld_type: "",
-    connect: true,
-    sld_awal: 0
-  }
+    name: "",
+    day: 0,
+    ket: "",
 };
 
-const Bank = () => {
-  const [bank, setBank] = useState(null);
-  const [account, setAccount] = useState(null);
+
+const RulesPay = () => {
+  const [rules_pay, setRulesPay] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
@@ -59,43 +42,15 @@ const Bank = () => {
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    // getBank();
-    getAccount();
+    getRulesPay();
     initFilters1();
   }, []);
 
-  const getAccount = async () => {
-    console.log("-------------------");
-    // console.log(currentItem);
-    setLoading(true);
-    const config = {
-      ...endpoints.account,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        let filt = [];
-        data.forEach((element) => {
-          if (element.account.kat_code === 2 && element.account.connect) {
-            filt.push(element.account);
-          }
-        });
-        console.log(data);
-        setAccount(filt);
-      }
-    } catch (error) {}
-    getBank();
-  };
 
-  const getBank = async (isUpdate = false) => {
+  const getRulesPay = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.bank,
+      ...endpoints.rules_pay,
       data: {},
     };
     console.log(config.data);
@@ -106,7 +61,7 @@ const Bank = () => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        setBank(data);
+        setRulesPay(data);
       }
     } catch (error) {}
     if (isUpdate) {
@@ -118,15 +73,14 @@ const Bank = () => {
     }
   };
 
-  const editBank = async () => {
+  const editRulesPay = async () => {
     const config = {
-      ...endpoints.editBank,
-      endpoint: endpoints.editBank.endpoint + currentItem.bank.id,
+      ...endpoints.editRulesPay,
+      endpoint: endpoints.editRulesPay.endpoint + currentItem.id,
       data: {
-        BANK_CODE: currentItem.bank.BANK_CODE,
-        ACC_ID: currentItem.account.id,
-        BANK_NAME: currentItem.bank.BANK_NAME,
-        BANK_DESC: currentItem.bank.BANK_DESC,
+        name: currentItem.name,
+        day: currentItem.day,
+        ket: currentItem.ket,
       },
     };
     console.log(config.data);
@@ -138,7 +92,7 @@ const Bank = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayData(false);
-          getBank(true);
+          getRulesPay(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -160,14 +114,13 @@ const Bank = () => {
     }
   };
 
-  const addBank = async () => {
+  const addRulesPay = async () => {
     const config = {
-      ...endpoints.addBank,
+      ...endpoints.addRulesPay,
       data: {
-        BANK_CODE: currentItem.bank.BANK_CODE,
-        ACC_ID: currentItem.account.id,
-        BANK_NAME: currentItem.bank.BANK_NAME,
-        BANK_DESC: currentItem.bank.BANK_DESC,
+        name: currentItem.name,
+        day: currentItem.day,
+        ket: currentItem.ket,
       },
     };
     console.log(config.data);
@@ -179,7 +132,7 @@ const Bank = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayData(false);
-          getBank(true);
+          getRulesPay(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -196,7 +149,7 @@ const Bank = () => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${currentItem.bank.BANK_CODE} Sudah Digunakan`,
+            // detail: `Kode ${currentItem.code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -214,10 +167,10 @@ const Bank = () => {
     }
   };
 
-  const delBank = async (id) => {
+  const delRulesPay = async (id) => {
     const config = {
-      ...endpoints.delBank,
-      endpoint: endpoints.delBank.endpoint + currentItem.bank.id,
+      ...endpoints.delRulesPay,
+      endpoint: endpoints.delRulesPay.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -228,7 +181,7 @@ const Bank = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayDel(false);
-          getBank(true);
+          getRulesPay(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -262,7 +215,7 @@ const Bank = () => {
             onClick("displayData", data);
             setCurrentItem(data);
           }}
-          className="btn btn-primary shadow btn-xs sharp ml-2"
+          className="btn btn-primary shadow btn-xs sharp ml-1"
         >
           <i className="fa fa-pencil"></i>
         </Link>
@@ -273,7 +226,7 @@ const Bank = () => {
             setDisplayDel(true);
             setCurrentItem(data);
           }}
-          className="btn btn-danger shadow btn-xs sharp ml-2"
+          className="btn btn-danger shadow btn-xs sharp ml-1"
         >
           <i className="fa fa-trash"></i>
         </Link>
@@ -284,6 +237,7 @@ const Bank = () => {
 
   const onClick = () => {
     setDisplayData(true);
+    setCurrentItem();
 
     if (position) {
       setPosition(position);
@@ -293,10 +247,10 @@ const Bank = () => {
   const onSubmit = () => {
     if (isEdit) {
       setUpdate(true);
-      editBank();
+      editRulesPay();
     } else {
       setUpdate(true);
-      addBank();
+      addRulesPay();
     }
   };
 
@@ -319,20 +273,19 @@ const Bank = () => {
     );
   };
 
-  const renderFooterDel = (kode) => {
+  const renderFooterDel = () => {
     return (
       <div>
         <PButton
           label="Batal"
           onClick={() => setDisplayDel(false)}
-          className="p-button-text btn-s btn-primary"
+          className="p-button-text btn-primary"
         />
         <PButton
           label="Hapus"
-          className="p-button btn-s btn-primary"
           icon="pi pi-trash"
           onClick={() => {
-            delBank();
+            delRulesPay();
           }}
           autoFocus
           loading={update}
@@ -383,6 +336,7 @@ const Bank = () => {
       </div>
     );
   };
+
 
   const template2 = {
     layout: "RowsPerPageDropdown CurrentPageReport PrevPageLink NextPageLink",
@@ -439,7 +393,7 @@ const Bank = () => {
             <Card.Body>
               <DataTable
                 responsiveLayout="scroll"
-                value={loading ? dummy : bank}
+                value={loading ? dummy : rules_pay}
                 className="display w-150 datatable-wrapper"
                 showGridlines
                 dataKey="id"
@@ -447,10 +401,9 @@ const Bank = () => {
                 header={renderHeader}
                 filters={filters1}
                 globalFilterFields={[
-                  "bank.BANK_CODE",
-                  "account.acc_name",
-                  "bank.BANK_NAME",
-                  "bank.BANK_DESC",
+                  "rules_pay.name",
+                  "rules_pay.day",
+                  "rules_pay.ket",
                 ]}
                 emptyMessage="Tidak ada data"
                 paginator
@@ -461,28 +414,20 @@ const Bank = () => {
                 paginatorClassName="justify-content-end mt-3"
               >
                 <Column
-                  header="Kode Bank"
-                  style={{
-                    minWidth: "8rem",
-                  }}
-                  field={(e) => e.bank.BANK_CODE}
+                  header="Nama"
+                  field={(e) => e.name}
+                  style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Nama"
-                  field={(e) => e.bank.BANK_NAME}
+                  header="Jumlah Hari"
+                  field={(e) => e.day}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Keterangan"
-                  field={(e) => e.bank.BANK_DESC}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="GL"
-                  field={(e) => e.account.acc_name}
+                  field={(e) => e.ket}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
@@ -500,7 +445,7 @@ const Bank = () => {
       </Row>
 
       <Dialog
-        header={isEdit ? "Edit Bank" : "Tambah Bank"}
+        header={isEdit ? "Edit Syarat Pembayaran" : "Tambah Syarat Pembayaran"}
         visible={displayData}
         style={{ width: "40vw" }}
         footer={renderFooter("displayData")}
@@ -509,38 +454,33 @@ const Bank = () => {
           setDisplayData(false);
         }}
       >
-        <div className="col-12">
-          <label className="text-label">Kode Bank</label>
-          <div className="p-inputgroup">
-            <InputText
-              value={
-                currentItem !== null ? `${currentItem.bank.BANK_CODE}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({
-                  ...currentItem,
-                  bank: { ...currentItem.bank, BANK_CODE: e.target.value },
-                })
-              }
-              placeholder="Masukan Kode Bank"
-            />
-          </div>
-        </div>
 
         <div className="col-12">
           <label className="text-label">Nama</label>
           <div className="p-inputgroup">
             <InputText
               value={
-                currentItem !== null ? `${currentItem.bank.BANK_NAME}` : ""
+                currentItem !== null ? `${currentItem.name}` : ""
               }
               onChange={(e) =>
-                setCurrentItem({
-                  ...currentItem,
-                  bank: { ...currentItem.bank, BANK_NAME: e.target.value },
-                })
+                setCurrentItem({...currentItem, name: e.target.value})
               }
-              placeholder="Masukan Nama Akun"
+              placeholder="Masukan Nama"
+            />
+          </div>
+        </div>
+
+        <div className="col-12">
+          <label className="text-label">Jumlah Hari</label>
+          <div className="p-inputgroup">
+            <InputNumber
+              value={
+                currentItem !== null ? `${currentItem.day}` : ""
+              }
+              onChange={(e) =>
+                setCurrentItem({...currentItem, day: e.value})
+              }
+              placeholder="Masukan Jumlah Hari"
             />
           </div>
         </div>
@@ -550,37 +490,12 @@ const Bank = () => {
           <div className="p-inputgroup">
             <InputTextarea
               value={
-                currentItem !== null ? `${currentItem.bank.BANK_DESC}` : ""
+                currentItem !== null ? `${currentItem.ket}` : ""
               }
               onChange={(e) =>
-                setCurrentItem({
-                  ...currentItem,
-                  bank: { ...currentItem.bank, BANK_DESC: e.target.value },
-                })
+                setCurrentItem({...currentItem, ket: e.target.value})
               }
               placeholder="Masukan Keterangan"
-            />
-          </div>
-        </div>
-
-        <div className="col-12">
-          <label className="text-label">GL</label>
-          <div className="p-inputgroup">
-            <Dropdown
-              value={currentItem !== null ? currentItem.account : null}
-              options={account && account}
-              onChange={(e) => {
-                console.log(e.value);
-                setCurrentItem({
-                  ...currentItem,
-                  account: e.value,
-                });
-                // console.log(currentItem.account);
-              }}
-              optionLabel="acc_name"
-              filter
-              filterBy="acc_name"
-              placeholder="Pilih Akun GL"
             />
           </div>
         </div>
@@ -595,10 +510,10 @@ const Bank = () => {
           setDisplayDel(false);
         }}
       >
-        <div className="ml-2 mr-3">
+        <div className="ml-3 mr-3">
           <i
-            className="pi pi-exclamation-triangle mr-2 align-middle"
-            style={{ fontSize: "1rem" }}
+            className="pi pi-exclamation-triangle mr-3 align-middle"
+            style={{ fontSize: "2rem" }}
           />
           <span>Apakah anda yakin ingin menghapus data ?</span>
         </div>
@@ -607,4 +522,4 @@ const Bank = () => {
   );
 };
 
-export default Bank;
+export default RulesPay;

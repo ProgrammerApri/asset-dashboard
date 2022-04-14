@@ -284,6 +284,81 @@ const endpoints = {
     method: "DELETE",
     data: {},
   },
+
+/// Currency
+  currency: {
+    endpoint: "/v1/api/currency",
+    method: "GET",
+    data: {},
+  },
+
+  addCurrency: {
+    endpoint: "/v1/api/currency",
+    method: "POST",
+    data: {},
+  },
+
+  editCurrency: {
+    endpoint: "/v1/api/currency/",
+    method: "PUT",
+    data: {},
+  },
+
+  delCurrency: {
+    endpoint: "/v1/api/currency/",
+    method: "DELETE",
+    data: {},
+  },
+
+  /// Lokasi
+  lokasi: {
+    endpoint: "/v1/api/lokasi",
+    method: "GET",
+    data: {},
+  },
+
+  addLokasi: {
+    endpoint: "/v1/api/lokasi",
+    method: "POST",
+    data: {},
+  },
+
+  editLokasi: {
+    endpoint: "/v1/api/lokasi/",
+    method: "PUT",
+    data: {},
+  },
+
+  delLokasi: {
+    endpoint: "/v1/api/lokasi/",
+    method: "DELETE",
+    data: {},
+  },
+
+  /// Rules Payment
+  rules_pay: {
+    endpoint: "/v1/api/rules-payment",
+    method: "GET",
+    data: {},
+  },
+
+  addRulesPay: {
+    endpoint: "/v1/api/rules-payment",
+    method: "POST",
+    data: {},
+  },
+
+  editRulesPay: {
+    endpoint: "/v1/api/rules-payment/",
+    method: "PUT",
+    data: {},
+  },
+
+  delRulesPay: {
+    endpoint: "/v1/api/rules-payment/",
+    method: "DELETE",
+    data: {},
+  },
 };
 
 export default endpoints;

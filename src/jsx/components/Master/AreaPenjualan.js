@@ -37,6 +37,8 @@ const AreaPenjualan = () => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
 
+  const dummy = Array.from({ length: 10 });
+
   useEffect(() => {
     getAreaPen();
     initFilters1();
@@ -389,7 +391,7 @@ const AreaPenjualan = () => {
             <Card.Body>
               <DataTable
                 responsiveLayout="scroll"
-                value={areaPen}
+                value={loading ? dummy : areaPen}
                 className="display w-150 datatable-wrapper"
                 showGridlines
                 dataKey="id"

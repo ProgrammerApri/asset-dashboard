@@ -7,6 +7,7 @@ import { Button as PButton } from "primereact/button";
 import { FileUpload } from "primereact/fileupload";
 import { Tag } from "primereact/tag";
 import { InputTextarea } from "primereact/inputtextarea";
+import { Checkbox } from "primereact/checkbox";
 
 const Perusahaan = () => {
   const [displayDialog, setDisplayDialog] = useState(false);
@@ -238,28 +239,71 @@ const Perusahaan = () => {
         <div className="col-12 mb-2">
           <label className="text-label">Nama Perusahaan</label>
           <div className="p-inputgroup">
-            <InputText value={""} disabled />
+            <InputText value={""} placeholder="PT. ABC" />
           </div>
         </div>
 
-        <div className="col-12">
+        <div className="col-12 mb-2">
           <label className="text-label">Alamat Perusahaan</label>
           <div className="p-inputgroup">
             <InputTextarea
               value=""
               onChange={(e) => {}}
-              placeholder="Alamat Perusahaan"
+              placeholder="Jl. Alamat Perusahaan ...."
             />
           </div>
         </div>
+
+        <div className="col-12 mb-2">
+                <Checkbox
+                  className="mb-2"
+                  inputId="binary"
+                  checked={false}
+                  onChange={(e) =>
+                   {}
+                  }
+                />
+                <label className="ml-3" htmlFor="binary">
+                  {"Alamat pengiriman sama dengan alamat perusahaan"}
+                </label>
+              </div>
+
         <div className="col-12">
           <label className="text-label">Alamat Pengiriman</label>
           <div className="p-inputgroup">
             <InputTextarea
               value=""
               onChange={(e) => {}}
-              placeholder="Alamat Pengiriman"
+              placeholder="Jl. Alamat Pengiriman ...."
             />
+          </div>
+        </div>
+
+        <div className="col-12 mb-2">
+          <label className="text-label">No. Telp</label>
+          <div className="p-inputgroup">
+            <InputText value={""} placeholder="08399xxxxxx" />
+          </div>
+        </div>
+
+        <div className="col-12 mb-2">
+          <label className="text-label">Email</label>
+          <div className="p-inputgroup">
+            <InputText value={""} placeholder="mail@company.com" />
+          </div>
+        </div>
+
+        <div className="col-12 mb-2">
+          <label className="text-label">NPWP Perusahaan</label>
+          <div className="p-inputgroup">
+            <InputText value={""} placeholder="0000xxxxxxxxxxx" />
+          </div>
+        </div>
+        
+        <div className="col-12 mb-2">
+          <label className="text-label">No. Telp</label>
+          <div className="p-inputgroup">
+            <InputText value={""} placeholder="08399xxxxxx" />
           </div>
         </div>
       </Dialog>

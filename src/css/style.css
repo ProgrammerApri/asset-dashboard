@@ -139,6 +139,10 @@
   border-color: var(--primary-button);
 }
 
+.p-inputgroup > .p-component, .p-inputgroup > .p-inputwrapper > .p-inputtext, .p-inputgroup > .p-float-label > .p-component {
+  border-radius: 10px;
+}
+
 .p-dropdown:not(.p-disabled).p-focus {
   box-shadow: 0 0 0 0 #c7d2fe;
   border-color: var(--primary-button);
@@ -47263,4 +47267,8 @@ html[dir="rtl"]
 }
 .login-right {
   background-color: var(--primary-button);
+}
+
+.cp-logo {
+  max-width: 70px;
 }

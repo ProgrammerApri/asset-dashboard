@@ -114,6 +114,7 @@ import Salesman from "./components/Master/Salesman";
 import AreaPenjualan from "./components/Master/AreaPenjualan";
 import SubArea from "./components/Master/SubArea";
 import Neraca from "./components/Report/Neraca";
+import Perusahaan from "./components/Setup/Perusahaan";
 
 const Markup = ({width}) => {
   const routes = [
@@ -138,6 +139,9 @@ const Markup = ({width}) => {
 
     // Report
     { url: "neraca", component: Neraca },
+
+    // Setup
+    { url: "perusahaan", component: Perusahaan },
 
     /// Bootstrap
     { url: "ui-alert", component: UiAlert },

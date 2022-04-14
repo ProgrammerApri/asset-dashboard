@@ -55,6 +55,7 @@ class SideBar extends Component {
     let deshBoard = [""];
     let master = ["klasifikasi", "kategori", "akun"];
     let report = ["neraca"]
+    let setup = ["perusahaan"]
 
     return (
       <HashRouter basename="/">
@@ -332,7 +333,7 @@ class SideBar extends Component {
             </li>
             <li
               className={`${
-                report.includes(path.replace(patern, "")) ? "mm-active" : ""
+                setup.includes(path.replace(patern, "")) ? "mm-active" : ""
               }`}
             >
               <Link className="has-arrow ai-icon" to="#" aria-expanded="false">

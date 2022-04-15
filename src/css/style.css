@@ -139,8 +139,12 @@
   border-color: var(--primary-button);
 }
 
+textarea.p-inputtext {
+  height: 120px !important;
+}
+
 .p-inputgroup > .p-component, .p-inputgroup > .p-inputwrapper > .p-inputtext, .p-inputgroup > .p-float-label > .p-component {
-  border-radius: 10px;
+  border-radius: 6px;
 }
 
 .p-dropdown:not(.p-disabled).p-focus {

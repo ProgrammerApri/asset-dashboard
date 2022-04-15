@@ -2,7 +2,7 @@ import axios from "axios";
 import { ApiConfig, shouldLogApi } from "src/data/config";
 
 
-export default function request(param, config, header = {} ) {
+export default function request(param, config, isUpload = false ,header = {} ) {
     const { endpoint, method, data } = config;
 
     const url = `${ApiConfig.baseUrl}${endpoint}`;
@@ -14,11 +14,20 @@ export default function request(param, config, header = {} ) {
   
     let token = localStorage.getItem("token");
   
-    const headers = {
-      ...header,
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    };
+    let headers = {}
+    if (isUpload) {
+      headers = {
+        ...header,
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      };
+    } else {
+      headers = {
+        ...header,
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      };
+    }
   
     const axiosConfig = {
       method,
@@ -26,11 +35,18 @@ export default function request(param, config, header = {} ) {
       headers,
       timeout: ApiConfig.timeout * 1000,
     };
+
+    var bodyFormData = new FormData();
   
-    if (method.toUpperCase() === "GET") {
-      axiosConfig.params = params;
+    if (isUpload) {
+      bodyFormData.append('image', data.image);
+      axiosConfig.data = bodyFormData;
     } else {
-      axiosConfig.data = params;
+      if (method.toUpperCase() === "GET") {
+        axiosConfig.params = params;
+      } else {
+        axiosConfig.data = params;
+      }
     }
   
     if (shouldLogApi) {

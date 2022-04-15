@@ -359,6 +359,24 @@ const endpoints = {
     method: "DELETE",
     data: {},
   },
+
+  uploadImage: {
+    endpoint: "/v1/api/upload",
+    method: "POST",
+    data: {},
+  },
+
+  addCompany: {
+    endpoint: "/v1/api/company",
+    method: "POST",
+    data: {},
+  },
+
+  getCompany: {
+    endpoint: "/v1/api/company",
+    method: "GET",
+    data: {},
+  },
 };
 
 export default endpoints;

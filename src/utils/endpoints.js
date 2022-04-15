@@ -356,28 +356,21 @@ const endpoints = {
     data: {},
   },
 
-  /// Group Stock
-  grouptock: {
-    endpoint: "/v1/api/",
-    method: "GET",
-    data: {},
-  },
-
-  addGroupStock: {
-    endpoint: "/v1/api/",
+  uploadImage: {
+    endpoint: "/v1/api/upload",
     method: "POST",
     data: {},
   },
 
-  editGroupStock: {
-    endpoint: "/v1/api//",
-    method: "PUT",
+  addCompany: {
+    endpoint: "/v1/api/company",
+    method: "POST",
     data: {},
   },
 
-  delGroupStock: {
-    endpoint: "/v1/api//",
-    method: "DELETE",
+  getCompany: {
+    endpoint: "/v1/api/company",
+    method: "GET",
     data: {},
   },
 };

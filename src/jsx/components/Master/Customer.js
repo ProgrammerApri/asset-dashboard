@@ -13,6 +13,7 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
+import { InputNumber} from "primereact/inputnumber";
 import { classNames } from "primereact/utils";
 
 const data = {
@@ -492,7 +493,7 @@ const Customer = () => {
       </Row>
 
       <Dialog
-        header={isEdit ? "Edit Pelanggan" : "Tambah Pelanggan"}
+        header={isEdit ? "Edit Data Pelanggan" : "Tambah Data Pelanggan"}
         visible={displayData}
         style={{ width: "40vw" }}
         footer={renderFooter("displayData")}
@@ -500,95 +501,321 @@ const Customer = () => {
           setEdit(false);
           setDisplayData(false);
         }}
+        responsiveLayout
       >
-        <div className="col-12">
-          <label className="text-label">Kode Customer</label>
-          <div className="p-inputgroup">
-            <InputText
-              value={currentItem !== null ? `${currentItem.code}` : ""}
-              onChange={(e) =>
-                setCurrentItem({ ...currentItem, code: e.target.value })
-              }
-              placeholder="Masukan Kode Customer"
-            />
+        {/* <div className="from-group"> */}
+          <div className="form-row">
+            <div className="col-6">
+              <label className="text-label">Kode Pelanggan</label>
+              <div className="p-inputgroup">
+                <InputText
+                  value={currentItem !== null ? `${currentItem.code}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, code: e.target.value })
+                  }
+                  placeholder="Masukan Kode Pelanggan"
+                />
+              </div>
+            </div>
+
+            <div className="col-6">
+              <label className="text-label">Nama Pelanggan</label>
+              <div className="p-inputgroup">
+                <InputText
+                  value={currentItem !== null ? `${currentItem.name}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, name: e.target.value })
+                  }
+                  placeholder="Masukan Nama Pelanggan"
+                />
+              </div>
+            </div>
+          </div>
+        {/* </div> */}
+
+        {/* <div className="form-group"> */}
+          <div className="form-row">
+            <div className="col-6">
+              <label className="text-label">Jenis</label>
+              <div className="p-inputgroup">
+                <Dropdown
+                  value={currentItem !== null ? `${currentItem.name}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, name: e.target.value })
+                  }
+                  placeholder="Pilih Jenis"
+                />
+              </div>
+            </div>
+
+            <div className="col-6">
+              <label className="text-label">Sub Area Penjualan</label>
+              <div className="p-inputgroup">
+                <Dropdown
+                  value={currentItem !== null ? `${currentItem.name}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, name: e.target.value })
+                  }
+                  placeholder="Pilih Sub Area Penjualan"
+                />
+              </div>
+            </div>
+          </div>
+        {/* </div> */}
+
+        <div className="form-group">
+          <div className="form-row">
+            <div className="col-6">
+              <label className="text-label">Kolektor</label>
+              <div className="p-inputgroup">
+                <Dropdown
+                  value={currentItem !== null ? `${currentItem.name}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, name: e.target.value })
+                  }
+                  placeholder="Pilih Kolektor"
+                />
+              </div>
+            </div>
+
+            <div className="col-6">
+              <label className="text-label">NPWP</label>
+              <div className="p-inputgroup">
+                <InputText
+                  value={currentItem !== null ? `${currentItem.name}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, name: e.target.value })
+                  }
+                  placeholder="Masukan NPWP"
+                />
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="col-12">
-          <label className="text-label">Nama Customer</label>
-          <div className="p-inputgroup">
-            <InputText
-              value={currentItem !== null ? `${currentItem.name}` : ""}
-              onChange={(e) =>
-                setCurrentItem({ ...currentItem, name: e.target.value })
-              }
-              placeholder="Masukan Nama Customer"
-            />
+        <h4><b>Alamat Customer</b></h4>
+
+        {/* <div className="form-group"> */}
+          <div className="form-row">
+            <div className="col-6">
+              <label className="text-label">Alamat</label>
+              <div className="p-inputgroup">
+                <InputTextarea
+                  value={currentItem !== null ? `${currentItem.desc}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, desc: e.target.value })
+                  }
+                  placeholder="Masukan Alamat"
+                />
+              </div>
+            </div>
+
+            <div className="col-6">
+              <label className="text-label">Kota</label>
+              <div className="p-inputgroup">
+                <Dropdown
+                  value={currentItem !== null ? `${currentItem.desc}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, desc: e.target.value })
+                  }
+                  placeholder="Pilih Kota"
+                />
+              </div>
+            </div>
+          </div>
+        {/* </div> */}
+
+        <div className="form-group">
+          <div className="form-row">
+            <div className="col-12">
+              <label className="text-label">Kode Pos</label>
+              <div className="p-inputgroup">
+                <InputText
+                  value={currentItem !== null ? `${currentItem.desc}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, desc: e.target.value })
+                  }
+                  placeholder="Masukan Kode Pos"
+                />
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="col-12">
-          <label className="text-label">Jenis Pelanggan</label>
-          <div className="p-inputgroup">
-            <Dropdown
-              value={currentItem !== null ? `${currentItem.name}` : ""}
-              onChange={(e) =>
-                setCurrentItem({ ...currentItem, name: e.target.value })
-              }
-              placeholder="Masukan Nama Customer"
-            />
+        <h4><b>Contact Person</b></h4>
+
+        {/* <div className="form-group"> */}
+          <div className="form-row">
+            <div className="col-6">
+              <label className="text-label">Telp 1</label>
+              <div className="p-inputgroup">
+                <InputText
+                  value={currentItem !== null ? `${currentItem.desc}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, desc: e.target.value })
+                  }
+                  placeholder="Masukan No. Telepon"
+                />
+              </div>
+            </div>
+
+            <div className="col-6">
+              <label className="text-label">Telp 2</label>
+              <div className="p-inputgroup">
+                <InputText
+                  value={currentItem !== null ? `${currentItem.desc}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, desc: e.target.value })
+                  }
+                  placeholder="Masukan No. Telepon"
+                />
+              </div>
+            </div>
+          </div>
+        {/* </div> */}
+
+        {/* <div className="form-group"> */}
+          <div className="form-row">
+            <div className="col-6">
+              <label className="text-label">Fax</label>
+              <div className="p-inputgroup">
+                <InputText
+                  value={currentItem !== null ? `${currentItem.desc}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, desc: e.target.value })
+                  }
+                  placeholder="Masukan Fax"
+                />
+              </div>
+            </div>
+
+            <div className="col-6">
+              <label className="text-label">Email</label>
+              <div className="p-inputgroup">
+                <InputText
+                  value={currentItem !== null ? `${currentItem.desc}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, desc: e.target.value })
+                  }
+                  placeholder="Masukan Email"
+                />
+              </div>
+            </div>
+          </div>
+        {/* </div> */}
+
+        <div className="form-group">
+          <div className="form-row">
+            <div className="col-12">
+              <label className="text-label">Contact Person</label>
+              <div className="p-inputgroup">
+                <InputText
+                  value={currentItem !== null ? `${currentItem.desc}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, desc: e.target.value })
+                  }
+                  placeholder="Masukan Contact Person"
+                />
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="col-12">
-          <label className="text-label">Nama Customer</label>
-          <div className="p-inputgroup">
-            <InputText
-              value={currentItem !== null ? `${currentItem.name}` : ""}
-              onChange={(e) =>
-                setCurrentItem({ ...currentItem, name: e.target.value })
-              }
-              placeholder="Masukan Nama Customer"
-            />
+        <h4><b>Penjualan</b></h4>
+
+        {/* <div className="form-group"> */}
+          <div className="form-row">
+            <div className="col-6 md: col-3">
+              <label className="text-label">Currency</label>
+              <div className="p-inputgroup">
+                <Dropdown
+                  value={currentItem !== null ? `${currentItem.desc}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, desc: e.target.value })
+                  }
+                  placeholder="Pilih Currency"
+                />
+              </div>
+            </div>
+
+            <div className="col-6 md: col-3">
+              <label className="text-label">Pajak</label>
+              <div className="p-inputgroup">
+                <Dropdown
+                  value={currentItem !== null ? `${currentItem.desc}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, desc: e.target.value })
+                  }
+                  placeholder="Pilih Jenis Pajak"
+                />
+              </div>
+            </div>
+          </div>
+        {/* </div> */}
+
+        <div className="form-group">
+          <div className="form-row">
+            <div className="col-12 md: col-3">
+              <label className="text-label">Keterangan</label>
+              <div className="p-inputgroup">
+                <InputTextarea
+                  value={currentItem !== null ? `${currentItem.desc}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, desc: e.target.value })
+                  }
+                  placeholder="Masukan Keterangan"
+                />
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="col-12">
-          <label className="text-label">Nama Customer</label>
-          <div className="p-inputgroup">
-            <InputText
-              value={currentItem !== null ? `${currentItem.name}` : ""}
-              onChange={(e) =>
-                setCurrentItem({ ...currentItem, name: e.target.value })
-              }
-              placeholder="Masukan Nama Customer"
-            />
-          </div>
-        </div>
+        <h4><b>Distribusi GL</b></h4>
 
-        <div className="col-12">
-          <label className="text-label">Nama Customer</label>
-          <div className="p-inputgroup">
-            <InputText
-              value={currentItem !== null ? `${currentItem.name}` : ""}
-              onChange={(e) =>
-                setCurrentItem({ ...currentItem, name: e.target.value })
-              }
-              placeholder="Masukan Nama Customer"
-            />
-          </div>
-        </div>
+        {/* <div className="form-group"> */}
+          <div className="form-row">
+            <div className="col-6 md: col-3">
+              <label className="text-label">Hutang</label>
+              <div className="p-inputgroup">
+                <Dropdown
+                  value={currentItem !== null ? `${currentItem.desc}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, desc: e.target.value })
+                  }
+                  placeholder="Pilih Jenis Hutang"
+                />
+              </div>
+            </div>
 
-        <div className="col-12">
-          <label className="text-label">Keterangan</label>
-          <div className="p-inputgroup">
-            <InputTextarea
-              value={currentItem !== null ? `${currentItem.desc}` : ""}
-              onChange={(e) =>
-                setCurrentItem({ ...currentItem, desc: e.target.value })
-              }
-              placeholder="Masukan Keterangan"
-            />
+            <div className="col-6 md: col-3">
+              <label className="text-label">Uang Muka Pembelian</label>
+              <div className="p-inputgroup">
+                <Dropdown
+                  value={currentItem !== null ? `${currentItem.desc}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, desc: e.target.value })
+                  }
+                  placeholder="Pilih Uang Muka Pembelian"
+                />
+              </div>
+            </div>
+          </div>
+        {/* </div> */}
+
+        <div className="form-group">
+          <div className="form-row">
+            <div className="col-12 md: col-3">
+              <label className="text-label">Limit Credit</label>
+              <div className="p-inputgroup">
+                <InputText
+                  value={currentItem !== null ? `${currentItem.desc}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, desc: e.target.value })
+                  }
+                  placeholder="Masukan Limit Credit"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </Dialog>

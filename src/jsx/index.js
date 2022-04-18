@@ -123,6 +123,8 @@ import NonStock from "./components/Master/NonStock";
 import Customer from "./components/Master/Customer";
 import SubCustomer from "./components/Master/SubCustomer";
 import SetupKhusus from "./components/Master/SetupKhusus";
+import Pemasok from "./components/Master/Pemasok";
+import Mitra from "./components/Master/Mitra";
 
 const Markup = ({width}) => {
   const routes = [
@@ -152,6 +154,8 @@ const Markup = ({width}) => {
     { url: "pelanggan", component: Customer },
     { url: "sub-pelanggan", component: SubCustomer },
     { url: "setup-perkiraan", component: SetupKhusus },
+    { url: "pemasok", component: Pemasok },
+    { url: "mitra", component: Mitra },
 
     // Report
     { url: "neraca", component: Neraca },

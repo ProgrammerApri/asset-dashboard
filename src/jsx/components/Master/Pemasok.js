@@ -13,6 +13,8 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
+import { classNames } from "primereact/utils";
+import { InputNumber } from "primereact/inputnumber";
 
 const data = {
   id: 1,
@@ -22,8 +24,8 @@ const data = {
   desc: "",
 };
 
-const SubCustomer = () => {
-  const [subCustomer, setSubCustomer] = useState(null);
+const Pemasok = () => {
+  const [pemasok, setPemasok] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
@@ -40,14 +42,14 @@ const SubCustomer = () => {
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getSubCustomer();
+    getPemasok();
     initFilters1();
   }, []);
 
-  const getSubCustomer = async (isUpdate = false) => {
+  const getPemasok = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.subCostumer,
+      ...endpoints.noStock,
       data: {},
     };
     console.log(config.data);
@@ -58,7 +60,7 @@ const SubCustomer = () => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        setSubCustomer(data);
+        setPemasok(data);
       }
     } catch (error) {}
     if (isUpdate) {
@@ -70,10 +72,10 @@ const SubCustomer = () => {
     }
   };
 
-  const editSubCustomer = async () => {
+  const editPemasok = async () => {
     const config = {
-      ...endpoints.editSubCustomer,
-      endpoint: endpoints.editSubCustomer.endpoint + currentItem.id,
+      ...endpoints.editPemasok,
+      endpoint: endpoints.editPemasok.endpoint + currentItem.id,
       data: {
         code: currentItem.code,
         name: currentItem.name,
@@ -89,7 +91,7 @@ const SubCustomer = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayData(false);
-          getSubCustomer(true);
+          getPemasok(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -111,9 +113,9 @@ const SubCustomer = () => {
     }
   };
 
-  const addSubCustomer = async () => {
+  const addPemasok = async () => {
     const config = {
-      ...endpoints.addSubCustomer,
+      ...endpoints.addPemasok,
       data: {
         code: currentItem.code,
         name: currentItem.name,
@@ -129,7 +131,7 @@ const SubCustomer = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayData(false);
-          getSubCustomer(true);
+          getPemasok(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -164,10 +166,10 @@ const SubCustomer = () => {
     }
   };
 
-  const delSubCustomer = async (id) => {
+  const delPemasok = async (id) => {
     const config = {
-      ...endpoints.delSubCustomer,
-      endpoint: endpoints.delSubCustomer.endpoint + currentItem.id,
+      ...endpoints.delPemasok,
+      endpoint: endpoints.delPemasok.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -178,7 +180,7 @@ const SubCustomer = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayDel(false);
-          getSubCustomer(true);
+          getPemasok(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -244,10 +246,10 @@ const SubCustomer = () => {
   const onSubmit = () => {
     if (isEdit) {
       setUpdate(true);
-      editSubCustomer();
+      editPemasok();
     } else {
       setUpdate(true);
-      addSubCustomer();
+      addPemasok();
     }
   };
 
@@ -282,7 +284,7 @@ const SubCustomer = () => {
           label="Hapus"
           icon="pi pi-trash"
           onClick={() => {
-            delSubCustomer();
+            delPemasok();
           }}
           autoFocus
           loading={update}
@@ -389,7 +391,7 @@ const SubCustomer = () => {
             <Card.Body>
               <DataTable
                 responsiveLayout="scroll"
-                value={loading ? dummy : subCustomer}
+                value={loading ? dummy : pemasok}
                 className="display w-150 datatable-wrapper"
                 showGridlines
                 dataKey="id"
@@ -424,43 +426,37 @@ const SubCustomer = () => {
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="NPWP"
-                  field={(e) => e.name}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Alamat 1"
-                  field={(e) => e.name}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Alamat 2"
-                  field={(e) => e.name}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Kota"
+                  header="Jenis"
                   field={(e) => e.name}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Kode Pos"
+                  field={(e) => e.name}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Telp"
+                  field={(e) => e.name}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Distribusi GL Hutang"
+                  field={(e) => e.name}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Distribusi GL Uang Muka Pembelian"
                   field={(e) => e.desc}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Telpon 1"
-                  field={(e) => e.desc}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Telpon 2"
+                  header="Keterangan"
                   field={(e) => e.desc}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
@@ -479,7 +475,7 @@ const SubCustomer = () => {
       </Row>
 
       <Dialog
-        header={isEdit ? "Edit Sub Pelanggan" : "Tambah Sub Pelanggan"}
+        header={isEdit ? "Edit Pemasok" : "Tambah Pemasok"}
         visible={displayData}
         style={{ width: "40vw" }}
         footer={renderFooter("displayData")}
@@ -487,71 +483,53 @@ const SubCustomer = () => {
           setEdit(false);
           setDisplayData(false);
         }}
-        responsiveLayout
       >
         {/* <div className="from-group"> */}
-        <div className="form-row">
-          <div className="col-6">
-            <label className="text-label">Kode Sub Pelanggan</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={currentItem !== null ? `${currentItem.code}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, code: e.target.value })
-                }
-                placeholder="Masukan Kode Sub Pelanggan"
-              />
+          <div className="form-row">
+            <div className="col-6 md: col-3">
+              <label className="text-label">Kode Pemasok</label>
+              <div className="p-inputgroup">
+                <InputText
+                  value={currentItem !== null ? `${currentItem.code}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, code: e.target.value })
+                  }
+                  placeholder="Masukan Kode Pemasok"
+                />
+              </div>
             </div>
-          </div>
 
-          <div className="col-6">
-            <label className="text-label">Nama Sub Pelanggan</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={currentItem !== null ? `${currentItem.name}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, name: e.target.value })
-                }
-                placeholder="Masukan Nama Pelanggan"
-              />
+            <div className="col-6 md: col-3">
+              <label className="text-label">Nama Pemasok</label>
+              <div className="p-inputgroup">
+                <InputText
+                  value={currentItem !== null ? `${currentItem.name}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, name: e.target.value })
+                  }
+                  placeholder="Masukan Nama Pemasok"
+                />
+              </div>
             </div>
           </div>
-        </div>
         {/* </div> */}
 
         {/* <div className="form-group"> */}
-        <div className="form-row">
-          <div className="col-6">
-            <label className="text-label">Kode Master Pelanggan</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={currentItem !== null ? `${currentItem.name}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, name: e.target.value })
-                }
-                placeholder="Pilih Kode Master"
-              />
-            </div>
-          </div>
-
-          <div className="col-6">
-            <label className="text-label">PPN</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={currentItem !== null ? `${currentItem.name}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, name: e.target.value })
-                }
-                placeholder="Pilih Jenis PPN"
-              />
-            </div>
-          </div>
-        </div>
-        {/* </div> */}
-
-        <div className="form-group">
           <div className="form-row">
-            <div className="col-12">
+            <div className="col-6 md: col-3">
+              <label className="text-label">Jenis Pemasok</label>
+              <div className="p-inputgroup">
+                <Dropdown
+                  value={currentItem !== null ? `${currentItem.name}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, name: e.target.value })
+                  }
+                  placeholder="Pilih Jenis Pemasok"
+                />
+              </div>
+            </div>
+
+            <div className="col-6 md: col-3">
               <label className="text-label">NPWP</label>
               <div className="p-inputgroup">
                 <InputText
@@ -564,45 +542,41 @@ const SubCustomer = () => {
               </div>
             </div>
           </div>
-        </div>
-
-        <h4>
-          <b>Alamat Sub Pelanggan</b>
-        </h4>
-
-        {/* <div className="form-group"> */}
-        <div className="form-row">
-          <div className="col-6">
-            <label className="text-label">Alamat 1</label>
-            <div className="p-inputgroup">
-              <InputTextarea
-                value={currentItem !== null ? `${currentItem.desc}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, desc: e.target.value })
-                }
-                placeholder="Masukan Alamat"
-              />
-            </div>
-          </div>
-
-          <div className="col-6">
-            <label className="text-label">Alamat 2</label>
-            <div className="p-inputgroup">
-              <InputTextarea
-                value={currentItem !== null ? `${currentItem.desc}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, desc: e.target.value })
-                }
-                placeholder="Masukan Alamat"
-              />
-            </div>
-          </div>
-        </div>
         {/* </div> */}
 
-        <div className="form-group">
+        {/* <div className="form-group"> */}
           <div className="form-row">
-            <div className="col-6">
+            <div className="col-6 md:col-3">
+              <label className="text-label">Alamat</label>
+              <div className="p-inputgroup">
+                <InputTextarea
+                  value={currentItem !== null ? `${currentItem.name}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, name: e.target.value })
+                  }
+                  placeholder="Masukan Alamat"
+                />
+              </div>
+            </div>
+
+            <div className="col-6 md:col-3">
+              <label className="text-label">PPN</label>
+              <div className="p-inputgroup">
+                <Dropdown
+                  value={currentItem !== null ? `${currentItem.name}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, name: e.target.value })
+                  }
+                  placeholder="Pilih Jenis PPN"
+                />
+              </div>
+            </div>
+          </div>
+        {/* </div> */}
+
+        {/* <div className="form-group"> */}
+          <div className="form-row">
+            <div className="col-6 md: col-3">
               <label className="text-label">Kota</label>
               <div className="p-inputgroup">
                 <Dropdown
@@ -615,7 +589,7 @@ const SubCustomer = () => {
               </div>
             </div>
 
-            <div className="col-6">
+            <div className="col-6 md: col-3">
               <label className="text-label">Kode Pos</label>
               <div className="p-inputgroup">
                 <InputText
@@ -628,75 +602,149 @@ const SubCustomer = () => {
               </div>
             </div>
           </div>
-        </div>
-
-        <h4>
-          <b>Contact Person</b>
-        </h4>
-
-        <div className="form-group">
-        <div className="form-row">
-          <div className="col-6">
-            <label className="text-label">Telp 1</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={currentItem !== null ? `${currentItem.desc}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, desc: e.target.value })
-                }
-                placeholder="Masukan No. Telepon"
-              />
-            </div>
-          </div>
-
-          <div className="col-6">
-            <label className="text-label">Telp 2</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={currentItem !== null ? `${currentItem.desc}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, desc: e.target.value })
-                }
-                placeholder="Masukan No. Telepon"
-              />
-            </div>
-          </div>
-        </div>
-        </div> 
-
-        <h4>
-          <b>Hub Tujuan</b>
-        </h4>
+        {/* </div> */}
 
         {/* <div className="form-group"> */}
-        <div className="form-row">
-          <div className="col-6 md: col-3">
-            <label className="text-label">Kode Sales</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={currentItem !== null ? `${currentItem.desc}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, desc: e.target.value })
-                }
-                placeholder="Pilih Kode Sales"
-              />
+          <div className="form-row">
+            <div className="col-6 md: col-3">
+              <label className="text-label">Telp 1</label>
+              <div className="p-inputgroup">
+                <InputText
+                  value={currentItem !== null ? `${currentItem.desc}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, desc: e.target.value })
+                  }
+                  placeholder="Masukan No. Telepon"
+                />
+              </div>
+            </div>
+
+            <div className="col-6 md: col-3">
+              <label className="text-label">Telp 2</label>
+              <div className="p-inputgroup">
+                <InputText
+                  value={currentItem !== null ? `${currentItem.desc}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, desc: e.target.value })
+                  }
+                  placeholder="Masukan No. Telepon"
+                />
+              </div>
             </div>
           </div>
+        {/* </div> */}
 
-          <div className="col-6 md: col-3">
-            <label className="text-label">Tujuan</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={currentItem !== null ? `${currentItem.desc}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, desc: e.target.value })
-                }
-                placeholder="Pilih Tujuan"
-              />
+        <div className="form-group">
+          <div className="form-row">
+            <div className="col-12 md: col-3">
+              <label className="text-label">Fax</label>
+              <div className="p-inputgroup">
+                <InputText
+                  value={currentItem !== null ? `${currentItem.desc}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, desc: e.target.value })
+                  }
+                  placeholder="Masukan Fax"
+                />
+              </div>
             </div>
           </div>
         </div>
+
+        <h4><b>Informasi Kontak</b></h4>
+
+        {/* <div className="form-group"> */}
+          <div className="form-row">
+            <div className="col-6 md: col-3">
+              <label className="text-label">Contact Person</label>
+              <div className="p-inputgroup">
+                <InputText
+                  value={currentItem !== null ? `${currentItem.desc}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, desc: e.target.value })
+                  }
+                  placeholder="Masukan Contact Person"
+                />
+              </div>
+            </div>
+
+            <div className="col-6 md: col-3">
+              <label className="text-label">Kode Currency</label>
+              <div className="p-inputgroup">
+                <Dropdown
+                  value={currentItem !== null ? `${currentItem.desc}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, desc: e.target.value })
+                  }
+                  placeholder="Pilih Jenis Currency"
+                />
+              </div>
+            </div>
+          </div>
         {/* </div> */}
+
+        <div className="form-group">
+          <div className="form-row">
+            <div className="col-6 md: col-3">
+              <label className="text-label">Keterangan</label>
+              <div className="p-inputgroup">
+                <InputTextarea
+                  value={currentItem !== null ? `${currentItem.desc}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, desc: e.target.value })
+                  }
+                  placeholder="Masukan Keterangan"
+                />
+              </div>
+            </div>
+
+            <div className="col-6 md: col-3">
+              <label className="text-label">Limit Kredit</label>
+              <div className="p-inputgroup">
+                <InputNumber
+                  value={currentItem !== null ? `${currentItem.desc}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, desc: e.value })
+                  }
+                  placeholder="Masukan Nominal"
+                  showButtons
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h4><b>Distribusi GL</b></h4>
+
+        <div className="form-group">
+          <div className="form-row">
+            <div className="col-6 md: col-3">
+              <label className="text-label">Hutang</label>
+              <div className="p-inputgroup">
+                <Dropdown
+                  value={currentItem !== null ? `${currentItem.desc}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, desc: e.target.value })
+                  }
+                  placeholder="Pilih Jenis Hutang"
+                />
+              </div>
+            </div>
+
+            <div className="col-6 md: col-3">
+              <label className="text-label">Uang Muka Pembelian</label>
+              <div className="p-inputgroup">
+                <Dropdown
+                  value={currentItem !== null ? `${currentItem.desc}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, desc: e.target.value })
+                  }
+                  placeholder="Pilih Uang Muka Pembelian"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       </Dialog>
 
       <Dialog
@@ -720,4 +768,4 @@ const SubCustomer = () => {
   );
 };
 
-export default SubCustomer;
+export default Pemasok;

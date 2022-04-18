@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Card, Row, Col, Button, Badge } from "react-bootstrap";
+import { Card, Row, Col, Button, Badge, Accordion } from "react-bootstrap";
 import logo from "../../../images/udang-logo.png";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
@@ -10,6 +10,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { Checkbox } from "primereact/checkbox";
 import { endpoints, request } from "src/utils";
 import { Skeleton } from "primereact/skeleton";
+import { InputSwitch } from "primereact/inputswitch";
 
 const data = {
   id: 0,
@@ -36,6 +37,11 @@ const Perusahaan = () => {
   const [onSubmit, setSubmit] = useState(false);
   const [available, setAvailable] = useState(false);
   const [isLoading, setLoading] = useState(true);
+  const [accor, setAccor] = useState({
+    main: true,
+    other: false,
+    approval: false,
+  });
 
   const renderDetail = (label, value) => {
     return (
@@ -169,12 +175,14 @@ const Perusahaan = () => {
     iconOnly: true,
     className: "custom-choose-btn p-button-rounded p-button-outlined",
   };
+
   const uploadOptions = {
     icon: "pi pi-fw pi-cloud-upload",
     iconOnly: true,
     className:
       "custom-upload-btn p-button-success p-button-rounded p-button-outlined",
   };
+
   const cancelOptions = {
     icon: "pi pi-fw pi-times",
     iconOnly: true,
@@ -215,7 +223,10 @@ const Perusahaan = () => {
     }
   };
 
-  const getCompany = async () => {
+  const getCompany = async (needLoading = true) => {
+    if (!needLoading) {
+      setLoading(false);
+    }
     const config = endpoints.getCompany;
     let response = null;
     try {
@@ -230,12 +241,14 @@ const Perusahaan = () => {
           Object.keys(response.data).length === 0 &&
           response.data.constructor === Object
         ) {
-          setAvailable(false);
+          setAvailable(true);
+          setCurrentData(data);
         } else {
           setSameValue(response.data.cp_addr == response.data.cp_ship_addr);
-          setCurrentData(response.data);
           setAvailable(true);
+          setCurrentData(response.data);
         }
+
         setLoading(false);
       }
     } catch (error) {
@@ -270,119 +283,306 @@ const Perusahaan = () => {
     <>
       {isLoading ? (
         <Row>
-          <Col>
-            <Card>
-              <Card.Body>
-                <Skeleton
-                  width="7em"
-                  height="7em"
-                  className="col-12 mb-3"
-                ></Skeleton>
-                {renderLoadingData()}
-                {renderLoadingData()}
-                {renderLoadingData()}
-                {renderLoadingData()}
-                {renderLoadingData()}
-                {renderLoadingData()}
-                {renderLoadingData()}
-                {renderLoadingData()}
-                {renderLoadingData()}
-                {renderLoadingData()}
-                {renderLoadingData()}
-                {renderLoadingData()}
-              </Card.Body>
-            </Card>
+          <Col className="col-lg-6 col-sm-12 col-xs-12">
+            <Accordion className="accordion " defaultActiveKey="0">
+              <div className="accordion__item" key={0}>
+                <Accordion.Toggle
+                  as={Card.Text}
+                  eventKey={`0`}
+                  className={`accordion__header ${
+                    accor.main ? "collapsed" : ""
+                  }`}
+                  onClick={() => {
+                    setAccor({
+                      ...accor,
+                      main: !accor.main,
+                    });
+                  }}
+                >
+                  <span className="accordion__header--icon"></span>
+                  <span className="accordion__header--text">
+                    Informasi Perusahaan
+                  </span>
+                  <span className="accordion__header--indicator indicator_bordered"></span>
+                </Accordion.Toggle>
+                <Accordion.Collapse eventKey={"0"}>
+                  <div className="accordion__body--text">
+                    <Skeleton
+                      width="7em"
+                      height="7em"
+                      className="col-12 mb-3"
+                    ></Skeleton>
+                    {renderLoadingData()}
+                    {renderLoadingData()}
+                    {renderLoadingData()}
+                    {renderLoadingData()}
+                    {renderLoadingData()}
+                  </div>
+                </Accordion.Collapse>
+              </div>
+            </Accordion>
+
+            <Accordion className="accordion " defaultActiveKey="1">
+              <div className="accordion__item" key={0}>
+                <Accordion.Toggle
+                  as={Card.Text}
+                  eventKey={`0`}
+                  className={`accordion__header ${
+                    accor.main ? "collapsed" : ""
+                  }`}
+                  onClick={() => {
+                    setAccor({
+                      ...accor,
+                      main: !accor.main,
+                    });
+                  }}
+                >
+                  <span className="accordion__header--icon"></span>
+                  <span className="accordion__header--text">Approval</span>
+                  <span className="accordion__header--indicator indicator_bordered"></span>
+                </Accordion.Toggle>
+                <Accordion.Collapse eventKey={"0"}>
+                  <div className="accordion__body--text">
+                    {renderLoadingData()}
+                    {renderLoadingData()}
+                    {renderLoadingData()}
+                  </div>
+                </Accordion.Collapse>
+              </div>
+            </Accordion>
+          </Col>
+
+          <Col className="col-lg-6 col-sm-12 col-xs-12">
+            <Accordion className="accordion " defaultActiveKey="1">
+              <div className="accordion__item" key={0}>
+                <Accordion.Toggle
+                  as={Card.Text}
+                  eventKey={`0`}
+                  className={`accordion__header ${
+                    accor.main ? "collapsed" : ""
+                  }`}
+                  onClick={() => {
+                    setAccor({
+                      ...accor,
+                      main: !accor.main,
+                    });
+                  }}
+                >
+                  <span className="accordion__header--icon"></span>
+                  <span className="accordion__header--text">
+                    Informasi Lain
+                  </span>
+                  <span className="accordion__header--indicator indicator_bordered"></span>
+                </Accordion.Toggle>
+                <Accordion.Collapse eventKey={"0"}>
+                  <div className="accordion__body--text">
+                    {renderLoadingData()}
+                    {renderLoadingData()}
+                    {renderLoadingData()}
+                    {renderLoadingData()}
+                    {renderLoadingData()}
+                    {renderLoadingData()}
+                    {renderLoadingData()}
+                  </div>
+                </Accordion.Collapse>
+              </div>
+            </Accordion>
           </Col>
         </Row>
       ) : (
         <Row>
-          <Col>
-            <Card>
-              <Card.Header>
-                <div className="flex justify-content-between w-100">
-                  <div style={{ height: "3rem" }}></div>
-                  <Button
-                    variant="primary"
-                    onClick={() => {
-                      setDisplayDialog(true);
-                      if (!available) {
-                        setCurrentData(data);
-                      }
-                    }}
-                  >
-                    {available ? "Edit" : "Tambah"}
-                    <span className="btn-icon-right">
-                      <i class="bx bxs-pencil"></i>
-                    </span>
-                  </Button>
-                </div>
-              </Card.Header>
-              {available ? (
-                <Card.Body>
-                  <div className="col-12 mb-3">
-                    <img className="cp-logo" src={currentData.cp_logo} alt="" />
+          <Col className="col-lg-6 col-sm-12 col-xs-12">
+            <Accordion className="accordion " defaultActiveKey="0">
+              <div className="accordion__item" key={0}>
+                <Accordion.Toggle
+                  as={Card.Text}
+                  eventKey={`0`}
+                  className={`accordion__header ${
+                    accor.main ? "collapsed" : ""
+                  }`}
+                  onClick={() => {
+                    setAccor({
+                      ...accor,
+                      main: !accor.main,
+                    });
+                  }}
+                >
+                  <span className="accordion__header--icon"></span>
+                  <span className="accordion__header--text">
+                    Informasi Perusahaan
+                  </span>
+                  <span className="accordion__header--indicator indicator_bordered"></span>
+                </Accordion.Toggle>
+                <Accordion.Collapse eventKey={"0"}>
+                  <div className="accordion__body--text">
+                    {currentData.cp_logo !== "" ? (
+                      <div className="col-12 mb-3">
+                        <img
+                          className="cp-logo"
+                          src={currentData.cp_logo}
+                          alt=""
+                        />
+                      </div>
+                    ) : (
+                      <></>
+                    )}
+                    {renderDetail(
+                      "Nama Perusahaan",
+                      currentData.cp_name !== "" ? currentData.cp_name : "-"
+                    )}
+                    {renderDetail(
+                      "Alamat Perusahaan",
+                      currentData.cp_addr !== "" ? currentData.cp_addr : "-"
+                    )}
+                    {renderDetail(
+                      "Alamat Pengiriman",
+                      currentData.cp_ship_addr !== ""
+                        ? currentData.cp_ship_addr
+                        : "-"
+                    )}
+                    {renderDetail(
+                      "Telp",
+                      currentData.cp_telp != "" ? currentData.cp_telp : "-"
+                    )}
+                    <div className="mt-3 mb-1 flex justify-content-between">
+                      <div></div>
+                      <PButton
+                        label="Ubah"
+                        icon="pi pi-pencil"
+                        iconPos="right"
+                        onClick={() => {
+                          setDisplayDialog(true)
+                        }}
+                      />
+                    </div>
                   </div>
-                  {renderDetail("Nama Perusahaan", currentData.cp_name)}
-                  {renderDetail("Alamat Perusahaan", currentData.cp_addr)}
-                  {renderDetail("Alamat Pengiriman", currentData.cp_ship_addr)}
-                  {renderDetail("Telp", currentData.cp_telp)}
-                  {renderDetail("Email", currentData.cp_email)}
-                  {renderDetail("Website", currentData.cp_webs)}
-                  {renderDetail("NPWP Perusahaan", currentData.cp_npwp)}
-                  {renderDetail("Kontak Person", currentData.cp_coper)}
-                  {currentData.multi_currency ? (
-                    <div className="col-12 mb-3">
-                      <span>
-                        <strong className="mr-2">Multi Currency</strong>
-                        <i
-                          style={{ color: "#00ff00", fontSize: "20px" }}
-                          class="bx bxs-check-circle"
-                        ></i>
-                      </span>
+                </Accordion.Collapse>
+              </div>
+            </Accordion>
+
+            <Accordion className="acordion" defaultActiveKey="1">
+              <div className="accordion__item" key={1}>
+                <Accordion.Toggle
+                  as={Card.Text}
+                  eventKey={`0`}
+                  className={`accordion__header ${
+                    accor.approval ? "collapsed" : ""
+                  }`}
+                  onClick={() => {
+                    setAccor({
+                      ...accor,
+                      approval: !accor.other,
+                    });
+                  }}
+                >
+                  <span className="accordion__header--icon"></span>
+                  <span className="accordion__header--text">Approval</span>
+                  <span className="accordion__header--indicator indicator_bordered"></span>
+                </Accordion.Toggle>
+                <Accordion.Collapse eventKey={"0"}>
+                  <div className="accordion__body--text">
+                    <div className="d-flex col-12 align-items-center">
+                      <InputSwitch
+                        className="mr-3"
+                        inputId="email"
+                        checked={currentData.multi_currency}
+                        onChange={(e) =>
+                          setCurrentData({
+                            ...currentData,
+                            multi_currency: e.value,
+                          })
+                        }
+                      />
+                      <label className="mr-3 mt-1" htmlFor="email">
+                        {"Multi Currency"}
+                      </label>
                     </div>
-                  ) : (
-                    <></>
-                  )}
-                  {currentData.appr_po ? (
-                    <div className="col-12 mb-3">
-                      <span>
-                        <strong className="mr-2">Approval PO</strong>
-                        <i
-                          style={{ color: "#00ff00", fontSize: "20px" }}
-                          class="bx bxs-check-circle"
-                        ></i>
-                      </span>
+
+                    <div className="d-flex col-12 align-items-center">
+                      <InputSwitch
+                        className="mr-3"
+                        inputId="email"
+                        checked={currentData.appr_po}
+                        onChange={(e) =>
+                          setCurrentData({ ...currentData, appr_po: e.value })
+                        }
+                      />
+                      <label className="mr-3 mt-1" htmlFor="email">
+                        {"Approval PO"}
+                      </label>
                     </div>
-                  ) : (
-                    <></>
-                  )}
-                  {currentData.appr_payment ? (
-                    <div className="col-12 mb-3">
-                      <span>
-                        <strong className="mr-2">Approval Pembayaran</strong>
-                        <i
-                          style={{ color: "#00ff00", fontSize: "20px" }}
-                          class="bx bxs-check-circle"
-                        ></i>
-                      </span>
+
+                    <div className="d-flex col-12 align-items-center">
+                      <InputSwitch
+                        className="mr-3"
+                        inputId="email"
+                        checked={currentData.appr_payment}
+                        onChange={(e) =>
+                          setCurrentData({
+                            ...currentData,
+                            appr_payment: e.value,
+                          })
+                        }
+                      />
+                      <label className="mr-3 mt-1" htmlFor="email">
+                        {"Approval Pembayaran"}
+                      </label>
                     </div>
-                  ) : (
-                    <></>
-                  )}
-                </Card.Body>
-              ) : (
-                <Card.Body>
-                  <div className="col-12 mb-5 mt-5 text-center">
-                    Data Perusahaan Masih Kosong
                   </div>
-                </Card.Body>
-              )}
-            </Card>
+                </Accordion.Collapse>
+              </div>
+            </Accordion>
+          </Col>
+
+          <Col className="col-lg-6 col-sm-12 col-xs-12">
+            <Accordion className="accordion" defaultActiveKey="1">
+              <div className="accordion__item" key={2}>
+                <Accordion.Toggle
+                  as={Card.Text}
+                  eventKey={`0`}
+                  className={`accordion__header ${
+                    accor.other ? "collapsed" : ""
+                  }`}
+                  onClick={() => {
+                    setAccor({
+                      ...accor,
+                      other: !accor.other,
+                    });
+                  }}
+                >
+                  <span className="accordion__header--icon"></span>
+                  <span className="accordion__header--text">
+                    Informasi Lain
+                  </span>
+                  <span className="accordion__header--indicator indicator_bordered"></span>
+                </Accordion.Toggle>
+                <Accordion.Collapse eventKey={"0"}>
+                  <div className="accordion__body--text">
+                    {renderDetail(
+                      "Email",
+                      currentData.cp_email !== "" ? currentData.cp_email : "-"
+                    )}
+                    {renderDetail(
+                      "Website",
+                      currentData.cp_webs !== "" ? currentData.cp_webs : "-"
+                    )}
+                    {renderDetail(
+                      "NPWP Perusahaan",
+                      currentData.cp_npwp !== "" ? currentData.cp_npwp : "-"
+                    )}
+                    {renderDetail(
+                      "Kontak Person",
+                      currentData.cp_coper !== "" ? currentData.cp_coper : "-"
+                    )}
+                  </div>
+                </Accordion.Collapse>
+              </div>
+            </Accordion>
           </Col>
         </Row>
       )}
       <Dialog
-        header={available ? "Edit Data Perusahaan" : "Tambah Data Perusahaan"}
+        header={"Edit Informasi Perusahaan"}
         visible={displayDialog}
         style={{ width: "40vw" }}
         footer={renderFooter()}
@@ -501,7 +701,7 @@ const Perusahaan = () => {
           </div>
         </div>
 
-        <div className="col-12 mb-2">
+        {/* <div className="col-12 mb-2">
           <label className="text-label">Email</label>
           <div className="p-inputgroup">
             <InputText
@@ -614,7 +814,7 @@ const Perusahaan = () => {
           <label className="ml-3" htmlFor="binary">
             {"Approval Pembayaran"}
           </label>
-        </div>
+        </div> */}
       </Dialog>
     </>
   );

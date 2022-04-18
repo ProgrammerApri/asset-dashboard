@@ -12,20 +12,20 @@ import { InputText } from "primereact/inputtext";
 import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
-import { InputNumber } from "primereact/inputnumber";
-import { Calendar } from 'primereact/calendar';
+import { InputTextarea } from "primereact/inputtextarea";
+import { classNames } from "primereact/utils";
 
 const data = {
     id: 1,
-    code: "", 
-    name: "", 
-    date: "",
-    rate: 0,
+    code: "",
+    name: "",
+    address: "",
+    desc: "",
 };
 
 
-const Currency = () => {
-  const [currency, setCurrency] = useState(null);
+const SetupKhusus = () => {
+  const [setupKhusus, setSetupKhusus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
@@ -38,20 +38,19 @@ const Currency = () => {
   const [isEdit, setEdit] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
-  // const [rate, setRate] = useState(0);
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getCurrency();
+    getSetupKhusus();
     initFilters1();
   }, []);
 
 
-  const getCurrency = async (isUpdate = false) => {
+  const getSetupKhusus = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.currency,
+      ...endpoints.noStock,
       data: {},
     };
     console.log(config.data);
@@ -62,7 +61,7 @@ const Currency = () => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        setCurrency(data);
+        setSetupKhusus(data);
       }
     } catch (error) {}
     if (isUpdate) {
@@ -74,15 +73,14 @@ const Currency = () => {
     }
   };
 
-  const editCurrency = async () => {
+  const editSetupKhusus = async () => {
     const config = {
-      ...endpoints.editCurrency,
-      endpoint: endpoints.editCurrency.endpoint + currentItem.id,
+      ...endpoints.editSetupKhusus,
+      endpoint: endpoints.editSetupKhusus.endpoint + currentItem.id,
       data: {
         code: currentItem.code,
         name: currentItem.name,
-        date: currentItem.date,
-        rate: currentItem.rate,
+        desc: currentItem.desc,
       },
     };
     console.log(config.data);
@@ -94,7 +92,7 @@ const Currency = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayData(false);
-          getCurrency(true);
+          getSetupKhusus(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -116,14 +114,13 @@ const Currency = () => {
     }
   };
 
-  const addCurrency = async () => {
+  const addSetupKhusus = async () => {
     const config = {
-      ...endpoints.addCurrency,
+      ...endpoints.addNonStock,
       data: {
         code: currentItem.code,
         name: currentItem.name,
-        date: currentItem.date,
-        rate: currentItem.rate,
+        desc: currentItem.desc,
       },
     };
     console.log(config.data);
@@ -135,7 +132,7 @@ const Currency = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayData(false);
-          getCurrency(true);
+          getSetupKhusus(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -170,10 +167,10 @@ const Currency = () => {
     }
   };
 
-  const delCurrency = async (id) => {
+  const delNonStock = async (id) => {
     const config = {
-      ...endpoints.delCurrency,
-      endpoint: endpoints.delCurrency.endpoint + currentItem.id,
+      ...endpoints.delNonStock,
+      endpoint: endpoints.delNonStock.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -184,7 +181,7 @@ const Currency = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayDel(false);
-          getCurrency(true);
+          getSetupKhusus(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -250,10 +247,10 @@ const Currency = () => {
   const onSubmit = () => {
     if (isEdit) {
       setUpdate(true);
-      editCurrency();
+      editSetupKhusus();
     } else {
       setUpdate(true);
-      addCurrency();
+      addSetupKhusus();
     }
   };
 
@@ -288,7 +285,7 @@ const Currency = () => {
           label="Hapus"
           icon="pi pi-trash"
           onClick={() => {
-            delCurrency();
+            delNonStock();
           }}
           autoFocus
           loading={update}
@@ -396,7 +393,7 @@ const Currency = () => {
             <Card.Body>
               <DataTable
                 responsiveLayout="scroll"
-                value={loading ? dummy : currency}
+                value={loading ? dummy : setupKhusus}
                 className="display w-150 datatable-wrapper"
                 showGridlines
                 dataKey="id"
@@ -404,10 +401,9 @@ const Currency = () => {
                 header={renderHeader}
                 filters={filters1}
                 globalFilterFields={[
-                  "currency.code",
-                  "currency.name",
-                  "currency.date",
-                  "currency.rate",
+                  "groupStock.code",
+                  "groupStock.name",
+                  "groupStock.desc",
                 ]}
                 emptyMessage="Tidak ada data"
                 paginator
@@ -418,7 +414,7 @@ const Currency = () => {
                 paginatorClassName="justify-content-end mt-3"
               >
                 <Column
-                  header="Kode Currency"
+                  header="Kode Setup"
                   style={{
                     minWidth: "8rem",
                   }}
@@ -426,20 +422,20 @@ const Currency = () => {
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Nama Currency"
+                  header="Nama"
                   field={(e) => e.name}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
-                <Column
-                  header="Taggal"
-                  field={(e) => e.date}
+                 <Column
+                  header="Kode Account"
+                  field={(e) => e.name}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
-                <Column
-                  header="Rate Currency"
-                  field={(e) => e.rate}
+                 <Column
+                  header="Nama Account"
+                  field={(e) => e.name}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
@@ -457,7 +453,7 @@ const Currency = () => {
       </Row>
 
       <Dialog
-        header={isEdit ? "Edit Currency" : "Tambah Currency"}
+        header={isEdit ? "Edit Setup Khusus" : "Tambah Setup Khusus"}
         visible={displayData}
         style={{ width: "40vw" }}
         footer={renderFooter("displayData")}
@@ -467,23 +463,22 @@ const Currency = () => {
         }}
       >
         <div className="col-12">
-          <label className="text-label">Kode Currency</label>
+          <label className="text-label">Kode Setup</label>
           <div className="p-inputgroup">
-            <InputText
+            <Dropdown
               value={
                 currentItem !== null ? `${currentItem.code}` : ""
               }
               onChange={(e) =>
                 setCurrentItem({...currentItem, code: e.target.value})
               }
-              placeholder="Masukan Kode"
-            
+              placeholder="Masukan Kode Setup"
             />
           </div>
         </div>
 
         <div className="col-12">
-          <label className="text-label">Nama Currency</label>
+          <label className="text-label">Account</label>
           <div className="p-inputgroup">
             <InputText
               value={
@@ -492,43 +487,11 @@ const Currency = () => {
               onChange={(e) =>
                 setCurrentItem({...currentItem, name: e.target.value})
               }
-              placeholder="Masukan Nama"
+              placeholder="Masukan Nama Group"
             />
           </div>
         </div>
 
-        <div className="col-12">
-          <label className="text-label" htmlFor="tanggal">Tanggal</label>
-          <div className="p-inputgroup">
-            <Calendar
-            inputId="tanggal"
-              value={
-                currentItem !== null ? `${currentItem.date}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({...currentItem, date: e.target.value})
-              }
-              placeholder="Masukan Tanggal"
-              // dateFormat="dd-mm-yy"
-              showIcon
-            />
-          </div>
-        </div>
-
-        <div className="col-12">
-          <label className="text-label">Rate Currency</label>
-          <div className="p-inputgroup">
-          <InputNumber
-              value={
-                currentItem !== null ? `${currentItem.rate}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({...currentItem, rate: e.value})
-              }
-              placeholder="Masukan Rate"
-            />
-          </div>
-        </div>
       </Dialog>
 
       <Dialog
@@ -552,4 +515,4 @@ const Currency = () => {
   );
 };
 
-export default Currency;
+export default SetupKhusus;

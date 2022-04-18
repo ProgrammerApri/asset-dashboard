@@ -1,12 +1,10 @@
 const endpoints = {
-
   /// Login
   login: {
     endpoint: "/v1/api/login",
     method: "POST",
     data: {},
   },
-
 
   /// Klasifikasi
   klasifikasi: {
@@ -20,7 +18,6 @@ const endpoints = {
     method: "PUT",
     data: {},
   },
-
 
   /// Kategori
   kategori: {
@@ -41,8 +38,7 @@ const endpoints = {
     data: {},
   },
 
-
-/// Account
+  /// Account
   account: {
     endpoint: "/v1/api/account",
     method: "GET",
@@ -285,7 +281,7 @@ const endpoints = {
     data: {},
   },
 
-/// Currency
+  /// Currency
   currency: {
     endpoint: "/v1/api/currency",
     method: "GET",

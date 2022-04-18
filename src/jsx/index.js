@@ -119,6 +119,11 @@ import Currency from "./components/Master/Currency";
 import Lokasi from "./components/Master/Lokasi";
 import RulesPay from "./components/Master/RulesPayment";
 import Setup from "./components/Setup";
+import GroupStock from "./components/Master/GroupStock";
+import NonStock from "./components/Master/NonStock";
+import Customer from "./components/Master/Customer";
+import SubCustomer from "./components/Master/SubCustomer";
+import SetupKhusus from "./components/Master/SetupKhusus";
 
 const Markup = ({width}) => {
   const routes = [
@@ -143,6 +148,11 @@ const Markup = ({width}) => {
     { url: "currency", component: Currency },
     { url: "lokasi", component: Lokasi },
     { url: "syarat-pembayaran", component: RulesPay },
+    { url: "divisi", component: GroupStock },
+    { url: "non-stok", component: NonStock },
+    { url: "pelanggan", component: Customer },
+    { url: "sub-pelanggan", component: SubCustomer },
+    { url: "setup-perkiraan", component: SetupKhusus },
 
     // Report
     { url: "neraca", component: Neraca },

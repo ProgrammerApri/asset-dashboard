@@ -118,6 +118,7 @@ import Perusahaan from "./components/Setup/Perusahaan";
 import Currency from "./components/Master/Currency";
 import Lokasi from "./components/Master/Lokasi";
 import RulesPay from "./components/Master/RulesPayment";
+import Setup from "./components/Setup";
 
 const Markup = ({width}) => {
   const routes = [
@@ -147,7 +148,7 @@ const Markup = ({width}) => {
     { url: "neraca", component: Neraca },
 
     // Setup
-    { url: "perusahaan", component: Perusahaan },
+    { url: "setup", component: Setup },
 
     /// Bootstrap
     { url: "ui-alert", component: UiAlert },

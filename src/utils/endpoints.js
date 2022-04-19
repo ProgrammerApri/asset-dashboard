@@ -368,6 +368,12 @@ const endpoints = {
     data: {},
   },
 
+  updateCompany: {
+    endpoint: "/v1/api/company/",
+    method: "PUT",
+    data: {},
+  },
+
   getCompany: {
     endpoint: "/v1/api/company",
     method: "GET",

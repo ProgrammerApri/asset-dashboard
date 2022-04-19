@@ -69,6 +69,7 @@ class SideBar extends Component {
       "area-penjualan",
       "sub-area",
       "lokasi",
+      "mitra",
     ];
     let report = ["neraca"];
 
@@ -211,6 +212,9 @@ class SideBar extends Component {
                   </li>
                   <li>
                     <Link to="/akun">Akun</Link>
+                  </li>
+                  <li>
+                    <Link to="/mitra">Mitra</Link>
                   </li>
                 </ul>
               </li>

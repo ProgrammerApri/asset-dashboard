@@ -121,11 +121,9 @@ import RulesPay from "./components/Master/RulesPayment";
 import Setup from "./components/Setup";
 import GroupStock from "./components/Master/GroupStock";
 import NonStock from "./components/Master/NonStock";
-import Customer from "./components/Master/Customer";
 import SubCustomer from "./components/Master/SubCustomer";
 import SetupKhusus from "./components/Master/SetupKhusus";
-import Pemasok from "./components/Master/Pemasok";
-import Mitra from "./components/Master/Mitra";
+import Mitra from "./components/Mitra/Mitra";
 
 const Markup = ({width}) => {
   const routes = [
@@ -152,10 +150,10 @@ const Markup = ({width}) => {
     { url: "syarat-pembayaran", component: RulesPay },
     { url: "divisi", component: GroupStock },
     { url: "non-stok", component: NonStock },
-    { url: "pelanggan", component: Customer },
+    // { url: "pelanggan", component: Customer },
     { url: "sub-pelanggan", component: SubCustomer },
     { url: "setup-perkiraan", component: SetupKhusus },
-    { url: "pemasok", component: Pemasok },
+    // { url: "pemasok", component: Pemasok },
     { url: "mitra", component: Mitra },
 
     // Report

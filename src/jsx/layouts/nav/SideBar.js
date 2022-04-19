@@ -53,7 +53,7 @@ class SideBar extends Component {
 
     /// Active menu
     let deshBoard = [""];
-    let setup = ["setup"]
+    let setup = ["setup"];
     let master = [
       "klasifikasi",
       "kategori",
@@ -69,9 +69,9 @@ class SideBar extends Component {
       "area-penjualan",
       "sub-area",
       "lokasi",
-      "mitra",
     ];
     let report = ["neraca"];
+    let mitra = ["mitra"];
 
     return (
       <HashRouter basename="/">
@@ -141,9 +141,7 @@ class SideBar extends Component {
                       <li>
                         <Link to="/jenis-pemasok">Jenis Pemasok</Link>
                       </li>
-                      <li>
-                        <Link to="/pemasok">Pemasok</Link>
-                      </li>
+                      <li>{/* <Link to="/pemasok">Pemasok</Link> */}</li>
                       <li>
                         <Link to="/syarat-pembayaran">Syarat Pembayaran</Link>
                       </li>
@@ -155,9 +153,7 @@ class SideBar extends Component {
                       Penjualan
                     </Link>
                     <ul aria-expanded="false">
-                      <li>
-                        <Link to="/pelanggan">Pelanggan</Link>
-                      </li>
+                      <li>{/* <Link to="/pelanggan">Pelanggan</Link> */}</li>
                       <li>
                         <Link to="/area-penjualan">Area Penjualan</Link>
                       </li>
@@ -213,10 +209,18 @@ class SideBar extends Component {
                   <li>
                     <Link to="/akun">Akun</Link>
                   </li>
-                  <li>
-                    <Link to="/mitra">Mitra</Link>
-                  </li>
                 </ul>
+              </li>
+
+              <li
+                className={`${
+                  setup.includes(path.replace(patern, "")) ? "mm-active" : ""
+                }`}
+              >
+                <Link className="ai-icon" to="/mitra" aria-expanded="false">
+                  <i class="bx bxs-group"></i>
+                  <span className="nav-text">Mitra</span>
+                </Link>
               </li>
 
               <li>
@@ -345,47 +349,54 @@ class SideBar extends Component {
                 </ul>
               </li>
 
-            <li>
-              <Link className="has-arrow ai-icon" to="#" aria-expanded="false">
-              <i class='bx bxs-bank' ></i>
-                <span className="nav-text">Kas & Bank</span>
-              </Link>
-              <ul aria-expanded="false">
-                <li>
-                  <Link to="/out">Out</Link>
-                </li>
-                <li>
-                  <Link to="/in">In</Link>
-                </li>
-              </ul>
-            </li>
-            <li
-              className={`${
-                report.includes(path.replace(patern, "")) ? "mm-active" : ""
-              }`}
-            >
-              <Link className="has-arrow ai-icon" to="#" aria-expanded="false">
-                <i class='bx bxs-report'></i>
-                <span className="nav-text">Laporan</span>
-              </Link>
-              <ul aria-expanded="false">
-                <li>
-                  <Link to="/neraca">Neraca</Link>
-                </li>
-              </ul>
-            </li>
-            <li
-              className={`${
-                setup.includes(path.replace(patern, "")) ? "mm-active" : ""
-              }`}
-            >
-              <Link className="ai-icon" to="/setup" aria-expanded="false">
-              <i class='bx bxs-buildings'></i>
-                <span className="nav-text">Setup</span>
-              </Link>
-              
-            </li>
-          </MM>
+              <li>
+                <Link
+                  className="has-arrow ai-icon"
+                  to="#"
+                  aria-expanded="false"
+                >
+                  <i class="bx bxs-bank"></i>
+                  <span className="nav-text">Kas & Bank</span>
+                </Link>
+                <ul aria-expanded="false">
+                  <li>
+                    <Link to="/out">Out</Link>
+                  </li>
+                  <li>
+                    <Link to="/in">In</Link>
+                  </li>
+                </ul>
+              </li>
+              <li
+                className={`${
+                  report.includes(path.replace(patern, "")) ? "mm-active" : ""
+                }`}
+              >
+                <Link
+                  className="has-arrow ai-icon"
+                  to="#"
+                  aria-expanded="false"
+                >
+                  <i class="bx bxs-report"></i>
+                  <span className="nav-text">Laporan</span>
+                </Link>
+                <ul aria-expanded="false">
+                  <li>
+                    <Link to="/neraca">Neraca</Link>
+                  </li>
+                </ul>
+              </li>
+              <li
+                className={`${
+                  setup.includes(path.replace(patern, "")) ? "mm-active" : ""
+                }`}
+              >
+                <Link className="ai-icon" to="/setup" aria-expanded="false">
+                  <i class="bx bxs-buildings"></i>
+                  <span className="nav-text">Setup</span>
+                </Link>
+              </li>
+            </MM>
 
             <div className="copyright">
               <p>

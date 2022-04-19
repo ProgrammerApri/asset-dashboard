@@ -11,6 +11,8 @@ import { Checkbox } from "primereact/checkbox";
 import { endpoints, request } from "src/utils";
 import { Skeleton } from "primereact/skeleton";
 import { InputSwitch } from "primereact/inputswitch";
+import { Toast } from "primereact/toast";
+import { Tooltip } from "primereact/tooltip";
 
 const data = {
   id: 0,
@@ -29,9 +31,12 @@ const data = {
 };
 
 const Perusahaan = () => {
+  const toast = useRef(null);
   const [displayDialog, setDisplayDialog] = useState(false);
+  const [displayDialog2, setDisplayDialog2] = useState(false);
   const picker = useRef(null);
   const [file, setFile] = useState(null);
+  const [fileUrl, setFileUrl] = useState(null);
   const [currentData, setCurrentData] = useState(null);
   const [sameValue, setSameValue] = useState(false);
   const [onSubmit, setSubmit] = useState(false);
@@ -77,7 +82,28 @@ const Perusahaan = () => {
           label="Simpan"
           icon="pi pi-check"
           onClick={() => {
-            uploadImage();
+            submitUpdate(true);
+          }}
+          autoFocus
+          loading={onSubmit}
+        />
+      </div>
+    );
+  };
+
+  const renderFooter2 = () => {
+    return (
+      <div>
+        <PButton
+          label="Batal"
+          onClick={() => onHide()}
+          className="p-button-text btn-primary"
+        />
+        <PButton
+          label="Simpan"
+          icon="pi pi-check"
+          onClick={() => {
+            submitUpdate();
           }}
           autoFocus
           loading={onSubmit}
@@ -88,144 +114,43 @@ const Perusahaan = () => {
 
   const onHide = () => {
     setDisplayDialog(false);
+    setDisplayDialog2(false);
+    setFile(null)
+    getCompany(false);
   };
 
-  const emptyTemplate = () => {
-    return (
-      <div className="flex align-items-center flex-column">
-        <i
-          className="pi pi-image mt-3 p-5"
-          style={{
-            fontSize: "3em",
-            borderRadius: "50%",
-            backgroundColor: "var(--surface-b)",
-            color: "var(--surface-d)",
-          }}
-        ></i>
-        <span
-          style={{ fontSize: "1.2em", color: "var(--text-color-secondary)" }}
-          className="my-5"
-        >
-          Pilih logo perusahaan
-        </span>
-      </div>
-    );
-  };
-
-  const itemTemplate = (file, props) => {
-    console.log(file);
-    return (
-      <div className="flex align-items-center flex-wrap">
-        <div className="flex align-items-center" style={{ width: "40%" }}>
-          <img
-            alt={file.name}
-            role="presentation"
-            src={file.objectURL}
-            width={100}
-          />
-          <span
-            className="flex flex-column text-left ml-3"
-            style={{
-              width: "100px",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {file.name}
-            <small>{new Date().toLocaleDateString()}</small>
-          </span>
-        </div>
-        <Tag
-          value={props.formatSize}
-          severity="warning"
-          className="px-3 py-2"
-        />
-        <PButton
-          type="button"
-          icon="pi pi-times"
-          className="p-button-outlined p-button-rounded p-button-danger ml-auto"
-          onClick={() => onTemplateRemove(file, props.onRemove)}
-        />
-      </div>
-    );
-  };
-
-  const headerTemplate = (options) => {
-    const { className, chooseButton, uploadButton, cancelButton } = options;
-
-    return (
-      <div
-        className={className}
-        style={{
-          backgroundColor: "transparent",
-          display: "flex",
-          alignItems: "center",
-        }}
-      >
-        {chooseButton}
-        {/* {uploadButton} */}
-        {cancelButton}
-      </div>
-    );
-  };
-
-  const chooseOptions = {
-    icon: "pi pi-fw pi-images",
-    iconOnly: true,
-    className: "custom-choose-btn p-button-rounded p-button-outlined",
-  };
-
-  const uploadOptions = {
-    icon: "pi pi-fw pi-cloud-upload",
-    iconOnly: true,
-    className:
-      "custom-upload-btn p-button-success p-button-rounded p-button-outlined",
-  };
-
-  const cancelOptions = {
-    icon: "pi pi-fw pi-times",
-    iconOnly: true,
-    className:
-      "custom-cancel-btn p-button-danger p-button-rounded p-button-outlined",
-  };
-
-  const onTemplateRemove = (file, callback) => {
-    callback();
-    setFile(null);
-  };
-
-  const onTemplateSelect = (e) => {
-    console.log(e.files);
-    setFile(e.files[0]);
-  };
-
-  const uploadImage = async () => {
+  const uploadImage = async (isUpdate = false) => {
     setSubmit(true);
-    const config = {
-      ...endpoints.uploadImage,
-      data: {
-        image: file,
-      },
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config, {
-        "Content-Type": "multipart/form-data",
-      });
-      console.log(response);
-      if (response.status) {
-        postCompany(response.data);
+    if (file) {
+      const config = {
+        ...endpoints.uploadImage,
+        data: {
+          image: file,
+        },
+      };
+      console.log(config.data);
+      let response = null;
+      try {
+        response = await request(null, config, {
+          "Content-Type": "multipart/form-data",
+        });
+        console.log(response);
+        if (response.status) {
+          postCompany(response.data, isUpdate);
+        }
+      } catch (error) {
+        setSubmit(false);
       }
-    } catch (error) {
-      setSubmit(false);
+    } else {
+      postCompany("", isUpdate);
     }
   };
 
   const getCompany = async (needLoading = true) => {
     if (!needLoading) {
       setLoading(false);
+    } else {
+      setLoading(true);
     }
     const config = endpoints.getCompany;
     let response = null;
@@ -257,21 +182,69 @@ const Perusahaan = () => {
     }
   };
 
-  const postCompany = async (logo) => {
-    const config = {
-      ...endpoints.addCompany,
-      data: { ...currentData, cp_logo: logo },
-    };
+  const postCompany = async (logo, isUpdate = false, data) => {
+    let config = {};
+    if (isUpdate) {
+      if (data) {
+        config = {
+          ...endpoints.updateCompany,
+          endpoint: endpoints.updateCompany.endpoint + currentData.id,
+          data: data,
+        };
+      } else {
+        config = {
+          ...endpoints.updateCompany,
+          endpoint: endpoints.updateCompany.endpoint + currentData.id,
+          data: {
+            ...currentData,
+            cp_logo: logo !== "" ? logo : currentData.cp_logo,
+          },
+        };
+      }
+    } else {
+      config = {
+        ...endpoints.addCompany,
+        data: { ...currentData, cp_logo: logo },
+      };
+    }
     let response = null;
     try {
       response = await request(null, config);
       console.log(response);
       if (response.status) {
         setSubmit(false);
-        setDisplayDialog(false);
+        onHide();
+        toast.current.show({
+          severity: "info",
+          summary: "Berhasil",
+          detail: "Data berhasil diperbarui",
+          life: 3000,
+        });
       }
     } catch (error) {
       setSubmit(false);
+      toast.current.show({
+        severity: "error",
+        summary: "Gagal",
+        detail: "Gagal memperbarui data",
+        life: 3000,
+      });
+    }
+  };
+
+  const submitUpdate = async (upload = false, data) => {
+    if (currentData.id === 0) {
+      if (upload) {
+        uploadImage();
+      } else {
+        postCompany("");
+      }
+    } else {
+      if (upload) {
+        uploadImage(true);
+      } else {
+        postCompany("", true, data);
+      }
     }
   };
 
@@ -281,6 +254,7 @@ const Perusahaan = () => {
 
   return (
     <>
+      <Toast ref={toast} />
       {isLoading ? (
         <Row>
           <Col className="col-lg-6 col-sm-12 col-xs-12">
@@ -451,7 +425,7 @@ const Perusahaan = () => {
                         icon="pi pi-pencil"
                         iconPos="right"
                         onClick={() => {
-                          setDisplayDialog(true)
+                          setDisplayDialog(true);
                         }}
                       />
                     </div>
@@ -486,12 +460,16 @@ const Perusahaan = () => {
                         className="mr-3"
                         inputId="email"
                         checked={currentData.multi_currency}
-                        onChange={(e) =>
+                        onChange={(e) => {
                           setCurrentData({
                             ...currentData,
                             multi_currency: e.value,
-                          })
-                        }
+                          });
+                          submitUpdate(false, {
+                            ...currentData,
+                            multi_currency: e.value,
+                          });
+                        }}
                       />
                       <label className="mr-3 mt-1" htmlFor="email">
                         {"Multi Currency"}
@@ -503,9 +481,13 @@ const Perusahaan = () => {
                         className="mr-3"
                         inputId="email"
                         checked={currentData.appr_po}
-                        onChange={(e) =>
-                          setCurrentData({ ...currentData, appr_po: e.value })
-                        }
+                        onChange={(e) => {
+                          setCurrentData({ ...currentData, appr_po: e.value });
+                          submitUpdate(false, {
+                            ...currentData,
+                            appr_po: e.value,
+                          });
+                        }}
                       />
                       <label className="mr-3 mt-1" htmlFor="email">
                         {"Approval PO"}
@@ -517,12 +499,16 @@ const Perusahaan = () => {
                         className="mr-3"
                         inputId="email"
                         checked={currentData.appr_payment}
-                        onChange={(e) =>
+                        onChange={(e) => {
                           setCurrentData({
                             ...currentData,
                             appr_payment: e.value,
-                          })
-                        }
+                          });
+                          submitUpdate(false, {
+                            ...currentData,
+                            appr_payment: e.value,
+                          });
+                        }}
                       />
                       <label className="mr-3 mt-1" htmlFor="email">
                         {"Approval Pembayaran"}
@@ -574,6 +560,17 @@ const Perusahaan = () => {
                       "Kontak Person",
                       currentData.cp_coper !== "" ? currentData.cp_coper : "-"
                     )}
+                    <div className="mt-3 mb-1 flex justify-content-between">
+                      <div></div>
+                      <PButton
+                        label="Ubah"
+                        icon="pi pi-pencil"
+                        iconPos="right"
+                        onClick={() => {
+                          setDisplayDialog2(true);
+                        }}
+                      />
+                    </div>
                   </div>
                 </Accordion.Collapse>
               </div>
@@ -589,19 +586,63 @@ const Perusahaan = () => {
         onHide={() => onHide()}
       >
         <div className="col-12 mb-2">
-          <FileUpload
+          <Tooltip target=".upload" mouseTrack mouseTrackLeft={10} />
+          <input
+            type="file"
+            id="file"
             ref={picker}
-            name="logo"
             accept="image/*"
-            onSelect={onTemplateSelect}
-            headerTemplate={headerTemplate}
-            itemTemplate={itemTemplate}
-            emptyTemplate={emptyTemplate}
-            chooseOptions={chooseOptions}
-            uploadOptions={uploadOptions}
-            cancelOptions={cancelOptions}
-            onClear={(e) => setFile(null)}
+            style={{ display: "none" }}
+            onChange={(e) => {
+              console.log(e);
+              setFile(e.target.files[0]);
+            }}
           />
+          <div className="flex align-items-center flex-column">
+            <Card
+              className="upload mb-3"
+              data-pr-tooltip="Klik untuk memilih foto"
+              style={{ cursor: "pointer", height: "200px", width: "200px" }}
+              onClick={() => {
+                picker.current.click();
+              }}
+            >
+              <Card.Body className="flex align-items-center justify-content-center">
+                {file ? (
+                  <img
+                    style={{ maxWidth: "150px" }}
+                    src={URL.createObjectURL(file)}
+                    alt=""
+                  />
+                ) : currentData && currentData.cp_logo !== "" ? (
+                  <img
+                    style={{ maxWidth: "150px" }}
+                    src={currentData.cp_logo}
+                    alt=""
+                  />
+                ) : (
+                  <i
+                    className="pi pi-image p-3"
+                    style={{
+                      fontSize: "3em",
+                      borderRadius: "50%",
+                      backgroundColor: "var(--surface-b)",
+                      color: "var(--surface-d)",
+                    }}
+                  ></i>
+                )}
+              </Card.Body>
+            </Card>
+            <span
+              style={{
+                fontSize: "0.9rem",
+                color: "var(--text-color-secondary)",
+              }}
+              className="mb-5"
+            >
+              Logo Perusahaan
+            </span>
+          </div>
         </div>
 
         <div className="col-12 mb-2">
@@ -700,8 +741,16 @@ const Perusahaan = () => {
             />
           </div>
         </div>
+      </Dialog>
 
-        {/* <div className="col-12 mb-2">
+      <Dialog
+        header={"Edit Informasi Lain"}
+        visible={displayDialog2}
+        style={{ width: "40vw" }}
+        footer={renderFooter2()}
+        onHide={() => onHide()}
+      >
+        <div className="col-12 mb-2">
           <label className="text-label">Email</label>
           <div className="p-inputgroup">
             <InputText
@@ -764,57 +813,6 @@ const Perusahaan = () => {
             />
           </div>
         </div>
-
-        <div className="col-12 mb-2">
-          <Checkbox
-            className="mb-2"
-            inputId="binary"
-            checked={currentData ? currentData.multi_currency : false}
-            onChange={(e) => {
-              setCurrentData({
-                ...currentData,
-                multi_currency: e.checked,
-              });
-            }}
-          />
-          <label className="ml-3" htmlFor="binary">
-            {"Multi Currency"}
-          </label>
-        </div>
-
-        <div className="col-12 mb-2">
-          <Checkbox
-            className="mb-2"
-            inputId="binary"
-            checked={currentData ? currentData.appr_po : false}
-            onChange={(e) => {
-              setCurrentData({
-                ...currentData,
-                appr_po: e.checked,
-              });
-            }}
-          />
-          <label className="ml-3" htmlFor="binary">
-            {"Approval PO"}
-          </label>
-        </div>
-
-        <div className="col-12 mb-2">
-          <Checkbox
-            className="mb-2"
-            inputId="binary"
-            checked={currentData ? currentData.appr_payment : false}
-            onChange={(e) => {
-              setCurrentData({
-                ...currentData,
-                appr_payment: e.checked,
-              });
-            }}
-          />
-          <label className="ml-3" htmlFor="binary">
-            {"Approval Pembayaran"}
-          </label>
-        </div> */}
       </Dialog>
     </>
   );

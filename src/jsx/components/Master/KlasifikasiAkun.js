@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 
 import { request, endpoints } from "src/utils";
-import data from "../bootstrap/alertData";
 
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";

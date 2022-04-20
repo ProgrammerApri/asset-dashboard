@@ -14,16 +14,42 @@ import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { InputNumber } from "primereact/inputnumber";
-import { TabPanel, TabView } from "primereact/tabview";
-import { Padding } from "@syncfusion/ej2-react-charts";
+import { Divider } from "@material-ui/core";
 
 const data = {
-  id: 1,
-  sup_code: "",
-  sup_name: "",
-  sup_address: "",
-  sup_telp: "",
-  sup_saldo: "",
+  supplier: {
+    id: 1,
+    sup_code: "",
+    sup_name: "",
+    sup_jpem: "",
+    sup_ppn: "",
+    sup_npwp: "",
+    sup_address: "",
+    sup_kota: "",
+    sup_kpos: "",
+    sup_telp1: "",
+    sup_telp2: "",
+    sup_fax: "",
+    sup_cp: "",
+    sup_curren: "",
+    sup_ket: "",
+    sup_hutang: "",
+    sup_uang_muka: "",
+    sup_limit: "",
+  },
+
+  currency: {
+    id: 1,
+    code: "",
+    name: "",
+  },
+
+  jenisPemasok: {
+    id: 1,
+    jpem_code: "",
+    jpem_name: "",
+    jpem_ket: "",
+  },
 };
 
 const Supplier = () => {
@@ -79,11 +105,23 @@ const Supplier = () => {
       ...endpoints.editSupplier,
       endpoint: endpoints.editSupplier.endpoint + currentItem.id,
       data: {
-        sup_code: currentItem.sup_code,
-        sup_name: currentItem.sup_name,
-        sup_address: currentItem.sup_address,
-        sup_telp: currentItem.sup_telp,
-        sup_saldo: currentItem.sup_saldo,
+        sup_code: currentItem.supplier.sup_code,
+        sup_name: currentItem.supplier.sup_name,
+        sup_jpem: currentItem.jenisPemasok.id,
+        sup_ppn: currentItem.supplier.sup_ppn,
+        sup_npwp: currentItem.supplier.sup_npwp,
+        sup_address: currentItem.supplier.sup_address,
+        sup_kota: currentItem.supplier.sup_kota,
+        sup_kpos: currentItem.supplier.sup_kpos,
+        sup_telp1: currentItem.supplier.sup_telp1,
+        sup_telp2: currentItem.supplier.sup_telp2,
+        sup_fax: currentItem.supplier.sup_fax,
+        sup_cp: currentItem.supplier.sup_cp,
+        sup_curren: currentItem.currency.id,
+        sup_ket: currentItem.supplier.sup_ket,
+        sup_hutang: currentItem,
+        sup_uang_muka: currentItem,
+        sup_limit: currentItem.supplier.sup_limit,
       },
     };
     console.log(config.data);
@@ -121,11 +159,23 @@ const Supplier = () => {
     const config = {
       ...endpoints.addSupplier,
       data: {
-        sup_code: currentItem.sup_code,
-        sup_name: currentItem.sup_name,
-        sup_address: currentItem.sup_address,
-        sup_telp: currentItem.sup_telp,
-        sup_saldo: currentItem.sup_saldo,
+        sup_code: currentItem.supplier.sup_code,
+        sup_name: currentItem.supplier.sup_name,
+        sup_jpem: currentItem.jenisPemasok.id,
+        sup_ppn: currentItem.supplier.sup_ppn,
+        sup_npwp: currentItem.supplier.sup_npwp,
+        sup_address: currentItem.supplier.sup_address,
+        sup_kota: currentItem.supplier.sup_kota,
+        sup_kpos: currentItem.supplier.sup_kpos,
+        sup_telp1: currentItem.supplier.sup_telp1,
+        sup_telp2: currentItem.supplier.sup_telp2,
+        sup_fax: currentItem.supplier.sup_fax,
+        sup_cp: currentItem.supplier.sup_cp,
+        sup_curren: currentItem.currency.id,
+        sup_ket: currentItem.supplier.sup_ket,
+        sup_hutang: currentItem,
+        sup_uang_muka: currentItem,
+        sup_limit: currentItem.supplier.sup_limit,
       },
     };
     console.log(config.data);
@@ -447,8 +497,8 @@ const Supplier = () => {
                   "supplier.sup_code",
                   "supplier.sup_name",
                   "supplier.sup_address",
-                  "supplier.sup_telp",
-                  "supplier.sup_saldo",
+                  "supplier.sup_telp1",
+                  "supplier.sup_limit",
                 ]}
                 emptyMessage="Tidak ada data"
                 paginator
@@ -463,30 +513,30 @@ const Supplier = () => {
                   style={{
                     minWidth: "8rem",
                   }}
-                  field={(e) => e.sup_code}
+                  field={(e) => e.supplier.sup_code}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Nama Pemasok"
-                  field={(e) => e.sup_name}
+                  field={(e) => e.supplier.sup_name}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Alamat"
-                  field={(e) => e.sup_address}
+                  field={(e) => e.supplier.sup_address}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Telp"
-                  field={(e) => e.sup_telp}
+                  field={(e) => e.supplier.sup_telp1}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Saldo"
-                  field={(e) => e.sup_saldo}
+                  header="Limit Kredit"
+                  field={(e) => e.supplier.sup_limit}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
@@ -506,149 +556,410 @@ const Supplier = () => {
       <Dialog
         header={isEdit ? "Edit Data Pemasok" : "Tambah Data Pemasok"}
         visible={displayData}
-        style={{ width: "40vw" }}
+        style={{ width: "50vw" }}
         footer={renderFooter("displayData")}
         onHide={() => {
           setEdit(false);
           setDisplayData(false);
         }}
       >
-        <TabView>
-          <TabPanel header="Informasi Pemasok">
-            <div className="form-row">
-              <div className="col-6 mt-0">
-                <label className="text-label">Kode Pemasok</label>
-                <div className="p-inputgroup">
-                  <InputText
-                    value={
-                      currentItem !== null ? `${currentItem.sup_code}` : ""
-                    }
-                    onChange={(e) =>
-                      setCurrentItem({
-                        ...currentItem,
-                        sup_code: e.target.value,
-                      })
-                    }
-                    placeholder="Masukan Kode Pemasok"
-                  />
-                </div>
-              </div>
-
-              <div className="col-6">
-                <label className="text-label">Nama Pemasok</label>
-                <div className="p-inputgroup">
-                  <InputText
-                    value={
-                      currentItem !== null ? `${currentItem.sup_name}` : ""
-                    }
-                    onChange={(e) =>
-                      setCurrentItem({
-                        ...currentItem,
-                        sup_name: e.target.value,
-                      })
-                    }
-                    placeholder="Masukan Nama Pemasok"
-                  />
-                </div>
-              </div>
+        <div className="form-row">
+          <div className="col-6 mt-0">
+            <label className="text-label">Kode Pemasok</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={
+                  currentItem !== null ? `${currentItem.supplier.sup_code}` : ""
+                }
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    supplier: {
+                      ...currentItem.supplier,
+                      sup_code: e.target.value,
+                    },
+                  })
+                }
+                placeholder="Masukan Kode Pemasok"
+              />
             </div>
+          </div>
 
-            <div className="form-row">
-              <div className="col-6 mt-0">
-                <label className="text-label">Email</label>
-                <div className="p-inputgroup">
-                  <InputText
-                    value={
-                      currentItem !== null ? `${currentItem.sup_code}` : ""
-                    }
-                    onChange={(e) =>
-                      setCurrentItem({
-                        ...currentItem,
-                        sup_code: e.target.value,
-                      })
-                    }
-                    placeholder="Masukan Alamat Email"
-                  />
-                </div>
-              </div>
-
-              <div className="col-6">
-                <label className="text-label">Telepon</label>
-                <div className="p-inputgroup">
-                  <InputText
-                    value={
-                      currentItem !== null ? `${currentItem.sup_name}` : ""
-                    }
-                    onChange={(e) =>
-                      setCurrentItem({
-                        ...currentItem,
-                        sup_name: e.target.value,
-                      })
-                    }
-                    placeholder="Masukan No. Telepon"
-                  />
-                </div>
-              </div>
+          <div className="col-6">
+            <label className="text-label">Nama Pemasok</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={
+                  currentItem !== null ? `${currentItem.supplier.sup_name}` : ""
+                }
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    supplier: {
+                      ...currentItem.supplier,
+                      sup_name: e.target.value,
+                    },
+                  })
+                }
+                placeholder="Masukan Nama Pemasok"
+              />
             </div>
-          </TabPanel>
+          </div>
+        </div>
 
-          <TabPanel header="Alamat Pemasok">
-            <div className="form-row">
-              <div className="col-12">
-                <label className="text-label">Alamat</label>
-                <div className="p-inputgroup">
-                  <InputTextarea
-                    value={
-                      currentItem !== null ? `${currentItem.sup_address}` : ""
-                    }
-                    onChange={(e) =>
-                      setCurrentItem({
-                        ...currentItem,
-                        sup_address: e.target.value,
-                      })
-                    }
-                    placeholder="Masukan Alamat"
-                  />
-                </div>
-              </div>
+        <div className="form-row">
+          <div className="col-6 mt-0">
+            <label className="text-label">JenisPemasok</label>
+            <div className="p-inputgroup">
+              <Dropdown
+                value={
+                  currentItem !== null
+                    ? `${currentItem.jenisPemasok.jpem_name}`
+                    : ""
+                }
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    jenisPemasok: {
+                      ...currentItem.jenisPemasok,
+                      jpem_name: e.target.value,
+                    },
+                  })
+                }
+                placeholder="Pilih Jenis Pemasok"
+              />
             </div>
-          </TabPanel>
+          </div>
 
-          <TabPanel header="Informasi Saldo">
-            <div className="form-row">
-              <div className="col-6">
-                <label className="text-label">Telp</label>
-                <div className="p-inputgroup">
-                  <InputNumber
-                    value={
-                      currentItem !== null ? `${currentItem.sup_telp}` : ""
-                    }
-                    onChange={(e) =>
-                      setCurrentItem({ ...currentItem, sup_telp: e.value })
-                    }
-                    placeholder="Masukan No. Telepon"
-                  />
-                </div>
-              </div>
-
-              <div className="col-6">
-                <label className="text-label">Saldo</label>
-                <div className="p-inputgroup">
-                  <InputNumber
-                    value={
-                      currentItem !== null ? `${currentItem.sup_saldo}` : ""
-                    }
-                    onChange={(e) =>
-                      setCurrentItem({ ...currentItem, sup_saldo: e.value })
-                    }
-                    placeholder="Masukan Saldo"
-                    showButtons
-                  />
-                </div>
-              </div>
+          <div className="col-6">
+            <label className="text-label">PPN</label>
+            <div className="p-inputgroup">
+              <Dropdown
+                value={currentItem !== null ? `${currentItem.sup_ppn}` : ""}
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    supplier: {
+                      ...currentItem.supplier,
+                      sup_ppn: e.target.value,
+                    },
+                  })
+                }
+                placeholder="Pilih Jenis PPN"
+              />
             </div>
-          </TabPanel>
-        </TabView>
+          </div>
+        </div>
+
+        <div className="form-row">
+          <div className="col-12">
+            <label className="text-label">NPWP</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={
+                  currentItem !== null ? `${currentItem.supplier.sup_npwp}` : ""
+                }
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    supplier: {
+                      ...currentItem.supplier,
+                      sup_npwp: e.target.value,
+                    },
+                  })
+                }
+                placeholder="Masukan NPWP"
+              />
+            </div>
+          </div>
+        </div>
+
+        <h4 className="mt-5">
+          <b>Informasi Alamat</b>
+        </h4>
+
+        <Divider className="mb-3"></Divider>
+
+        <div className="form-row">
+          <div className="col-12">
+            <label className="text-label">Alamat</label>
+            <div className="p-inputgroup">
+              <InputTextarea
+                value={
+                  currentItem !== null
+                    ? `${currentItem.supplier.sup_address}`
+                    : ""
+                }
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    supplier: {
+                      ...currentItem.supplier,
+                      sup_address: e.target.value,
+                    },
+                  })
+                }
+                placeholder="Masukan Alamat"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="form-row">
+          <div className="col-6 mt-0">
+            <label className="text-label">Kota</label>
+            <div className="p-inputgroup">
+              <Dropdown
+                value={currentItem !== null ? `${currentItem.sup_kota}` : ""}
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    supplier: {
+                      ...currentItem.supplier,
+                      sup_kota: e.target.value,
+                    },
+                  })
+                }
+                placeholder="Pilih Kota"
+              />
+            </div>
+          </div>
+
+          <div className="col-6">
+            <label className="text-label">Kode Pos</label>
+            <div className="p-inputgroup">
+              <InputNumber
+                value={
+                  currentItem !== null ? `${currentItem.supplier.sup_kpos}` : ""
+                }
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    supplier: {
+                      ...currentItem.supplier,
+                      sup_kpos: e.value,
+                    },
+                  })
+                }
+                placeholder="Masukan Kode Pos"
+              />
+            </div>
+          </div>
+        </div>
+
+        <h4 className="mt-5">
+          <b>Informasi Kontak</b>
+        </h4>
+        <Divider className="mb-3"></Divider>
+
+        <div className="form-row">
+          <div className="col-6 mt-0">
+            <label className="text-label">Telp 1</label>
+            <div className="p-inputgroup">
+              <InputNumber
+                value={
+                  currentItem !== null
+                    ? `${currentItem.supplier.sup_telp1}`
+                    : ""
+                }
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    supplier: {
+                      ...currentItem.supplier,
+                      sup_telp1: e.value,
+                    },
+                  })
+                }
+                placeholder="Masukan No. Telepon"
+              />
+            </div>
+          </div>
+
+          <div className="col-6">
+            <label className="text-label">Telp 2</label>
+            <div className="p-inputgroup">
+              <InputNumber
+                value={
+                  currentItem !== null
+                    ? `${currentItem.supplier.sup_telp2}`
+                    : ""
+                }
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    supplier: {
+                      ...currentItem.supplier,
+                      sup_telp2: e.value,
+                    },
+                  })
+                }
+                placeholder="Masukan No. Telepon"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="form-row">
+          <div className="col-6 mt-0">
+            <label className="text-label">Fax</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={
+                  currentItem !== null ? `${currentItem.supplier.sup_fax}` : ""
+                }
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    supplier: {
+                      ...currentItem.supplier,
+                      sup_fax: e.target.value,
+                    },
+                  })
+                }
+                placeholder="Masukan Fax"
+              />
+            </div>
+          </div>
+
+          <div className="col-6">
+            <label className="text-label">Contact Person</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={
+                  currentItem !== null ? `${currentItem.supplier.sup_cp}` : ""
+                }
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    supplier: {
+                      ...currentItem.supplier,
+                      sup_cp: e.target.value,
+                    },
+                  })
+                }
+                placeholder="Masukan Contact Person"
+              />
+            </div>
+          </div>
+        </div>
+
+        <h4 className="mt-5">
+          <b>Informasi Currency</b>
+        </h4>
+        <Divider className="mb-3"></Divider>
+
+        <div className="form-row">
+          <div className="col-6">
+            <label className="text-label">Kode Currency</label>
+            <div className="p-inputgroup">
+              <Dropdown
+                value={
+                  currentItem !== null ? `${currentItem.currency.name}` : ""
+                }
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    currency: { ...currentItem.currency, name: e.target.value },
+                  })
+                }
+                placeholder="Pilih Jenis Currency"
+              />
+            </div>
+          </div>
+
+          <div className="col-6">
+            <label className="text-label">Limit Kredit</label>
+            <div className="p-inputgroup">
+              <InputNumber
+                value={
+                  currentItem !== null
+                    ? `${currentItem.supplier.sup_limit}`
+                    : ""
+                }
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    supplier: {
+                      ...currentItem.supplier,
+                      sup_limit: e.value,
+                    },
+                  })
+                }
+                placeholder="Masukan Limit Kredit"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="form-row">
+          <div className="col-12">
+            <label className="text-label">Keterangan</label>
+            <div className="p-inputgroup">
+              <InputTextarea
+                value={
+                  currentItem !== null ? `${currentItem.supplier.sup_ket}` : ""
+                }
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    supplier: {
+                      ...currentItem.supplier,
+                      sup_ket: e.target.value,
+                    },
+                  })
+                }
+                placeholder="Masukan Keterangan"
+              />
+            </div>
+          </div>
+        </div>
+
+        <h4 className="mt-5">
+          <b>Distribusi GL/AR</b>
+        </h4>
+        <Divider className="mb-3"></Divider>
+
+        <div className="form-row">
+          <div className="col-6">
+            <label className="text-label">Hutang</label>
+            <div className="p-inputgroup">
+              <Dropdown
+                value={currentItem !== null ? `${currentItem.sup_telp}` : ""}
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    supplier: {
+                      ...currentItem.supplier,
+                      sup_np: e.target.value,
+                    },
+                  })
+                }
+                placeholder="Pilih Hutang"
+              />
+            </div>
+          </div>
+
+          <div className="col-6">
+            <label className="text-label">Uang Muka Pembelian</label>
+            <div className="p-inputgroup">
+              <Dropdown
+                value={currentItem !== null ? `${currentItem.sup_saldo}` : ""}
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    supplier: {
+                      ...currentItem.supplier,
+                      sup_np: e.target.value,
+                    },
+                  })
+                }
+                placeholder="Pilih Jenis Uang Muka Pembelian"
+                showButtons
+              />
+            </div>
+          </div>
+        </div>
       </Dialog>
 
       <Dialog

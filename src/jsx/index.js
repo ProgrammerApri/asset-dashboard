@@ -74,17 +74,17 @@ const Markup = ({width}) => {
     { url: "syarat-pembayaran", component: RulesPay },
     { url: "divisi", component: GroupStock },
     { url: "non-stok", component: NonStock },
-    // { url: "pelanggan", component: Customer },
     { url: "sub-pelanggan", component: SubCustomer },
     { url: "setup-perkiraan", component: SetupKhusus },
-    // { url: "pemasok", component: Pemasok },
-    { url: "mitra", component: Mitra },
 
     // Report
     { url: "neraca", component: Neraca },
 
     // Setup
     { url: "setup", component: Setup },
+
+    // Mitra
+    { url: "mitra", component: Mitra },
   ];
 
 

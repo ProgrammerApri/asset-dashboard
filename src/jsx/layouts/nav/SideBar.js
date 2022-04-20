@@ -214,7 +214,7 @@ class SideBar extends Component {
 
               <li
                 className={`${
-                  setup.includes(path.replace(patern, "")) ? "mm-active" : ""
+                  mitra.includes(path.replace(patern, "")) ? "mm-active" : ""
                 }`}
               >
                 <Link className="ai-icon" to="/mitra" aria-expanded="false">

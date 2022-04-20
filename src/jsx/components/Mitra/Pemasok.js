@@ -481,7 +481,7 @@ const Supplier = () => {
           </Card>
         </div>
 
-        <Col className="col-md-12">
+        <Col className="col-xl-12 col-xxl-12 pt-0">
           <Card>
             <Card.Body>
               <DataTable

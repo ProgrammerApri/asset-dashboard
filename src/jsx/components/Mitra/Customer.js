@@ -429,7 +429,7 @@ const Customer = () => {
           </Card>
         </div>
 
-        <Col>
+        <Col className="pt-0">
           <Card>
             <Card.Body>
               <DataTable

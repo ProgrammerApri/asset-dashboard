@@ -1,23 +1,133 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Card, Row, Col, Accordion } from "react-bootstrap";
 import { InputSwitch } from "primereact/inputswitch";
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Button as PButton } from "primereact/button";
+import { endpoints, request } from "src/utils";
+import { Toast } from "primereact/toast";
+
+const data = {
+  id: 0,
+  cp_name: "",
+  cp_addr: "",
+  cp_ship_addr: "",
+  cp_telp: "",
+  cp_webs: "",
+  cp_email: "",
+  cp_npwp: "",
+  cp_coper: "",
+  cp_logo: "",
+  multi_currency: false,
+  appr_po: false,
+  appr_payment: false,
+  over_stock: false,
+  discount: false,
+  tiered: false,
+  rp: false,
+  over_po: false,
+};
 
 const Penjualan = () => {
+  const toast = useRef(null);
   const [template, setTemplate] = useState(true);
+  const [currentData, setCurrentData] = useState(null);
   const [accor, setAccor] = useState({
     main: true,
     template: true,
     setting: false,
   });
-  const [setting, setSetting] = useState({
-    over_stock: false,
-    discount: false,
-    tiered: false,
-  });
+
+  useEffect(() => {
+    getCompany();
+  }, []);
+
+  const getCompany = async (needLoading = true) => {
+    const config = endpoints.getCompany;
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        console.log(
+          Object.keys(response.data).length === 0 &&
+            response.data.constructor === Object
+        );
+        if (
+          Object.keys(response.data).length === 0 &&
+          response.data.constructor === Object
+        ) {
+          setCurrentData(data);
+        } else {
+          setCurrentData(response.data);
+        }
+      }
+    } catch (error) {}
+  };
+
+  const postCompany = async (logo, isUpdate = false, data) => {
+    let config = {};
+    if (isUpdate) {
+      if (data) {
+        config = {
+          ...endpoints.updateCompany,
+          endpoint: endpoints.updateCompany.endpoint + currentData.id,
+          data: data,
+        };
+      } else {
+        config = {
+          ...endpoints.updateCompany,
+          endpoint: endpoints.updateCompany.endpoint + currentData.id,
+          data: {
+            ...currentData,
+            cp_logo: logo !== "" ? logo : currentData.cp_logo,
+          },
+        };
+      }
+    } else {
+      if (data) {
+        config = {
+          ...endpoints.addCompany,
+          data: data,
+        };
+      } else {
+        config = {
+          ...endpoints.addCompany,
+          data: { ...currentData, cp_logo: logo },
+        };
+      }
+    }
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        getCompany(false);
+        toast.current.show({
+          severity: "info",
+          summary: "Berhasil",
+          detail: "Data berhasil diperbarui",
+          life: 3000,
+        });
+      }
+    } catch (error) {
+      toast.current.show({
+        severity: "error",
+        summary: "Gagal",
+        detail: "Gagal memperbarui data",
+        life: 3000,
+      });
+    }
+  };
+
+  const submitUpdate = (data) => {
+    if (currentData.id === 0) {
+      postCompany("", data);
+    } else {
+      postCompany("", true, data);
+    }
+  };
 
   const renderTemplate = () => {
     return (
@@ -140,10 +250,11 @@ const Penjualan = () => {
                 <InputSwitch
                   className="mr-3"
                   inputId="email"
-                  checked={setting.over_stock}
-                  onChange={(e) =>
-                    setSetting({ ...setting, over_stock: e.value })
-                  }
+                  checked={currentData && currentData.over_stock}
+                  onChange={(e) => {
+                    setCurrentData({ ...currentData, over_stock: e.value });
+                    submitUpdate({ ...currentData, over_stock: e.value });
+                  }}
                 />
                 <label className="mr-3 mt-1" htmlFor="email">
                   {"Barang boleh melebihi stok sisa"}
@@ -154,10 +265,11 @@ const Penjualan = () => {
                 <InputSwitch
                   className="mr-3"
                   inputId="email"
-                  checked={setting.discount}
-                  onChange={(e) =>
-                    setSetting({ ...setting, discount: e.value })
-                  }
+                  checked={currentData && currentData.discount}
+                  onChange={(e) => {
+                    setCurrentData({ ...currentData, discount: e.value });
+                    submitUpdate({ ...currentData, discount: e.value });
+                  }}
                 />
                 <label className="mr-3 mt-1" htmlFor="email">
                   {"Diskon"}
@@ -168,8 +280,11 @@ const Penjualan = () => {
                 <InputSwitch
                   className="mr-3"
                   inputId="email"
-                  checked={setting.tiered}
-                  onChange={(e) => setSetting({ ...setting, tiered: e.value })}
+                  checked={currentData && currentData.tiered}
+                  onChange={(e) => {
+                    setCurrentData({ ...currentData, tiered: e.value });
+                    submitUpdate({ ...currentData, tiered: e.value });
+                  }}
                 />
                 <label className="mt-1" htmlFor="email">
                   {"Diskon Bertingkat"}
@@ -184,6 +299,7 @@ const Penjualan = () => {
 
   return (
     <>
+      <Toast ref={toast} />
       <Row>
         <Col className="col-lg-6 col-sm-12 col-xs-12">
           <Accordion className="accordion " defaultActiveKey="0">
@@ -216,10 +332,10 @@ const Penjualan = () => {
                       onChange={(e) => {
                         setTemplate(e.value);
                         setAccor({
-                            ...accor,
-                            template: e.value,
-                            setting : !e.value
-                          });
+                          ...accor,
+                          template: e.value,
+                          setting: !e.value,
+                        });
                       }}
                     />
                   </div>

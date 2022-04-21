@@ -28,6 +28,11 @@ const data = {
   multi_currency: false,
   appr_po: false,
   appr_payment: false,
+  over_stock: false,
+  discount: false,
+  tiered: false,
+  rp: false,
+  over_po: false,
 };
 
 const Perusahaan = () => {

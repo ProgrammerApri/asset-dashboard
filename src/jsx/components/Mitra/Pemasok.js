@@ -50,10 +50,22 @@ const data = {
     jpem_name: "",
     jpem_ket: "",
   },
+
+  city: {
+    city_id: 1,
+    province_id: 0,
+    province: "",
+    type: "",
+    city_name: "",
+    postal_code: 0,
+  },
 };
 
 const Supplier = () => {
   const [supplier, setSupplier] = useState(null);
+  const [jenisPemasok, setJpem] = useState(null);
+  const [currency, setCurrency] = useState(null);
+  const [city, setCity] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
@@ -71,6 +83,9 @@ const Supplier = () => {
 
   useEffect(() => {
     getSupplier();
+    getJpem();
+    getCurrency();
+    getCity();
     initFilters1();
   }, []);
 
@@ -100,10 +115,88 @@ const Supplier = () => {
     }
   };
 
+  const getJpem = async (isUpdate = false) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.jenisPemasok,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setJpem(data);
+      }
+    } catch (error) {}
+    if (isUpdate) {
+      setLoading(false);
+    } else {
+      setTimeout(() => {
+        setLoading(false);
+      }, 1500);
+    }
+  };
+
+  const getCurrency = async (isUpdate = false) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.currency,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setCurrency(data);
+      }
+    } catch (error) {}
+    if (isUpdate) {
+      setLoading(false);
+    } else {
+      setTimeout(() => {
+        setLoading(false);
+      }, 1500);
+    }
+  };
+
+  const getCity = async (isUpdate = false) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.city,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setCity(data);
+      }
+    } catch (error) {}
+    if (isUpdate) {
+      setLoading(false);
+    } else {
+      setTimeout(() => {
+        setLoading(false);
+      }, 1500);
+    }
+  };
+
   const editSupplier = async () => {
     const config = {
       ...endpoints.editSupplier,
-      endpoint: endpoints.editSupplier.endpoint + currentItem.id,
+      endpoint: endpoints.editSupplier.endpoint + currentItem.supplier.id,
       data: {
         sup_code: currentItem.supplier.sup_code,
         sup_name: currentItem.supplier.sup_name,
@@ -204,7 +297,7 @@ const Supplier = () => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${currentItem.sup_code} Sudah Digunakan`,
+            detail: `Kode ${currentItem.supplier.sup_code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -609,23 +702,21 @@ const Supplier = () => {
 
         <div className="form-row">
           <div className="col-6 mt-0">
-            <label className="text-label">JenisPemasok</label>
+            <label className="text-label">Jenis Pemasok</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={
-                  currentItem !== null
-                    ? `${currentItem.jenisPemasok.jpem_name}`
-                    : ""
-                }
-                onChange={(e) =>
+                value={currentItem !== null ? currentItem.jenisPemasok : null}
+                options={jenisPemasok}
+                onChange={(e) => {
+                  console.log(e.value);
                   setCurrentItem({
                     ...currentItem,
-                    jenisPemasok: {
-                      ...currentItem.jenisPemasok,
-                      jpem_name: e.target.value,
-                    },
-                  })
-                }
+                    jenisPemasok: e.value,
+                  });
+                }}
+                optionLabel="jpem_name"
+                filter
+                filterBy="jpem_name"
                 placeholder="Pilih Jenis Pemasok"
               />
             </div>
@@ -710,16 +801,18 @@ const Supplier = () => {
             <label className="text-label">Kota</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={currentItem !== null ? `${currentItem.sup_kota}` : ""}
-                onChange={(e) =>
+                value={currentItem !== null ? currentItem.city : null}
+                options={city}
+                onChange={(e) => {
+                  console.log(e.value);
                   setCurrentItem({
                     ...currentItem,
-                    supplier: {
-                      ...currentItem.supplier,
-                      sup_kota: e.target.value,
-                    },
-                  })
-                }
+                    city: e.value,
+                  });
+                }}
+                optionLabel="city_name"
+                filter
+                filterBy="city_name"
                 placeholder="Pilih Kota"
               />
             </div>
@@ -854,16 +947,19 @@ const Supplier = () => {
             <label className="text-label">Kode Currency</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={
-                  currentItem !== null ? `${currentItem.currency.name}` : ""
-                }
-                onChange={(e) =>
+                value={currentItem !== null ? currentItem.currency : null}
+                options={currency}
+                onChange={(e) => {
+                  console.log(e.value);
                   setCurrentItem({
                     ...currentItem,
-                    currency: { ...currentItem.currency, name: e.target.value },
-                  })
-                }
-                placeholder="Pilih Jenis Currency"
+                    currency: e.value,
+                  });
+                }}
+                optionLabel="code"
+                filter
+                filterBy="code"
+                placeholder="Pilih Sub Area"
               />
             </div>
           </div>
@@ -925,13 +1021,17 @@ const Supplier = () => {
             <label className="text-label">Hutang</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={currentItem !== null ? `${currentItem.sup_telp}` : ""}
+                value={
+                  currentItem !== null
+                    ? `${currentItem.supplier.sup_hutang}`
+                    : ""
+                }
                 onChange={(e) =>
                   setCurrentItem({
                     ...currentItem,
                     supplier: {
                       ...currentItem.supplier,
-                      sup_np: e.target.value,
+                      sup_hutang: e.target.value,
                     },
                   })
                 }
@@ -944,7 +1044,11 @@ const Supplier = () => {
             <label className="text-label">Uang Muka Pembelian</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={currentItem !== null ? `${currentItem.sup_saldo}` : ""}
+                value={
+                  currentItem !== null
+                    ? `${currentItem.supplier.sup_uang_muka}`
+                    : ""
+                }
                 onChange={(e) =>
                   setCurrentItem({
                     ...currentItem,

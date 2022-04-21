@@ -18,7 +18,6 @@ import "./chart.css";
 import Nav from "./layouts/nav";
 import Footer from "./layouts/Footer";
 
-
 /// Deshboard
 import Home from "./components/Dashboard/Home";
 
@@ -48,8 +47,9 @@ import NonStock from "./components/Master/NonStock";
 import SubCustomer from "./components/Master/SubCustomer";
 import SetupKhusus from "./components/Master/SetupKhusus";
 import Mitra from "./components/Mitra/Mitra";
+import TransaksiPembelian from "./components/TransaksiPembelian/TransaksiPembelian";
 
-const Markup = ({width}) => {
+const Markup = ({ width }) => {
   const routes = [
     /// Deshborad
     { url: "", component: Home },
@@ -85,8 +85,10 @@ const Markup = ({width}) => {
 
     // Mitra
     { url: "mitra", component: Mitra },
-  ];
 
+    // Transaksi Pembelian
+    { url: "transaksi", component: TransaksiPembelian },
+  ];
 
   const body = document.querySelector("body");
 
@@ -97,24 +99,24 @@ const Markup = ({width}) => {
     : body.setAttribute("data-sidebar-style", "overlay");
 
   return (
-      <Router>
+    <Router>
       <div id="main-wrapper" className="show">
         <Nav />
 
         <div className="content-body">
           <div className="container-fluid">
-           <HashRouter basename="/" >
-           <Switch>
-              {routes.map((data, i) => (
-                <Route
-                  key={i}
-                  exact
-                  path={`/${data.url}`}
-                  component={data.component}
-                />
-              ))}
-            </Switch>
-           </HashRouter>
+            <HashRouter basename="/">
+              <Switch>
+                {routes.map((data, i) => (
+                  <Route
+                    key={i}
+                    exact
+                    path={`/${data.url}`}
+                    component={data.component}
+                  />
+                ))}
+              </Switch>
+            </HashRouter>
           </div>
         </div>
       </div>

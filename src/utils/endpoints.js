@@ -380,7 +380,30 @@ const endpoints = {
     data: {},
   },
 
-  /// Customer
+  getSetup: {
+    endpoint: "/v1/api/setup/account",
+    method: "GET",
+    data: {},
+  },
+
+  addSetup: {
+    endpoint: "/v1/api/setup/account",
+    method: "POST",
+    data: {},
+  },
+
+  editSetup: {
+    endpoint: "/v1/api/setup/account/",
+    method: "PUT",
+    data: {},
+  },
+
+  editCustomer: {
+    endpoint: "/v1/api/customer/",
+    method: "PUT",
+    data: {},
+  },
+
   customer: {
     endpoint: "/v1/api/customer",
     method: "GET",
@@ -390,12 +413,6 @@ const endpoints = {
   addCustomer: {
     endpoint: "/v1/api/customer",
     method: "POST",
-    data: {},
-  },
-
-  editCustomer: {
-    endpoint: "/v1/api/customer/",
-    method: "PUT",
     data: {},
   },
 

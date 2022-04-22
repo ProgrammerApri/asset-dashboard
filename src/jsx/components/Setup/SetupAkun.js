@@ -1,15 +1,47 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Card, Row, Col, Accordion } from "react-bootstrap";
-import { InputSwitch } from "primereact/inputswitch";
-import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
-import { InputTextarea } from "primereact/inputtextarea";
-import { Button as PButton } from "primereact/button";
 import { endpoints, request } from "src/utils";
+import { Skeleton } from "primereact/skeleton";
+import { Toast } from "primereact/toast";
+
+const set = {
+  id: null,
+  cp_id: null,
+  ar: null,
+  ap: null,
+  pnl: null,
+  pnl_year: null,
+  rtn_income: null,
+  sls_rev: null,
+  sls_disc: null,
+  sls_retur: null,
+  sls_shipping: null,
+  sls_prepaid: null,
+  sls_unbill: null,
+  sls_unbill_recv: null,
+  sls_tax: null,
+  pur_cogs: null,
+  pur_discount: null,
+  pur_shipping: null,
+  pur_retur: null,
+  pur_advance: null,
+  pur_unbill: null,
+  pur_tax: null,
+  sto: null,
+  sto_broken: null,
+  sto_general: null,
+  sto_production: null,
+  sto_hpp_diff: null,
+  fixed_assets: null,
+};
 
 const SetupAkun = () => {
-  const [template, setTemplate] = useState(true);
+  const toast = useRef(null);
   const [account, setAccount] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [setup, setSetup] = useState(null);
+  const [available, setAvailable] = useState(false);
   const [accor, setAccor] = useState({
     penjualan: true,
     pembelian: true,
@@ -24,6 +56,7 @@ const SetupAkun = () => {
   }, []);
 
   const getAccount = async () => {
+    setLoading(true);
     const config = {
       ...endpoints.account,
       data: {},
@@ -35,34 +68,260 @@ const SetupAkun = () => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-
-        setAccount(data);
+        let acc = [];
+        data.forEach((el) => {
+          acc.push(el.account);
+        });
+        setAccount(acc);
       }
     } catch (error) {}
+
+    getCompany();
+  };
+
+  const getCompany = async () => {
+    const config = endpoints.getCompany;
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        if (
+          Object.keys(response.data).length === 0 &&
+          response.data.constructor === Object
+        ) {
+          setAvailable(false);
+        } else {
+          setAvailable(true);
+        }
+      }
+    } catch (error) {
+      setAvailable(false);
+    }
+
+    getSetup();
+  };
+
+  const getSetup = async (needLoading = true) => {
+    setLoading(needLoading);
+    const config = {
+      ...endpoints.getSetup,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+
+        setSetup(data);
+      } else {
+        setSetup(set);
+      }
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+    }
+  };
+
+  const postCompany = async (data) => {
+    let config = {
+      ...endpoints.addCompany,
+      data: {
+        id: 0,
+        cp_name: "",
+        cp_addr: "",
+        cp_ship_addr: "",
+        cp_telp: "",
+        cp_webs: "",
+        cp_email: "",
+        cp_npwp: "",
+        cp_coper: "",
+        cp_logo: "",
+        multi_currency: false,
+        appr_po: false,
+        appr_payment: false,
+        over_stock: false,
+        discount: false,
+        tiered: false,
+        rp: false,
+        over_po: false,
+      },
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        addSetup(data);
+      }
+    } catch (error) {}
+  };
+
+  const addSetup = async (data) => {
+    let config = {
+      ...endpoints.addSetup,
+      data: {
+        ar: data?.ar?.id ?? null,
+        ap: data?.ap?.id ?? null,
+        pnl: data?.pnl?.id ?? null,
+        pnl_year: data?.pnl_year?.id ?? null,
+        rtn_income: data?.rtn_income?.id ?? null,
+        sls_rev: data?.sls_rev?.id ?? null,
+        sls_disc: data?.sls_disc?.id ?? null,
+        sls_retur: data?.sls_retur?.id ?? null,
+        sls_shipping: data?.sls_shipping?.id ?? null,
+        sls_prepaid: data?.sls_prepaid?.id ?? null,
+        sls_unbill: data?.sls_unbill?.id ?? null,
+        sls_unbill_recv: data?.sls_unbill_recv?.id ?? null,
+        sls_tax: data?.sls_tax?.id ?? null,
+        pur_cogs: data?.pur_cogs?.id ?? null,
+        pur_discount: data?.pur_discount?.id ?? null,
+        pur_shipping: data?.pur_shipping?.id ?? null,
+        pur_retur: data?.pur_retur?.id ?? null,
+        pur_advance: data?.pur_advance?.id ?? null,
+        pur_unbill: data?.pur_unbill?.id ?? null,
+        pur_tax: data?.pur_tax?.id ?? null,
+        sto: data?.sto?.id ?? null,
+        sto_broken: data?.sto_broken?.id ?? null,
+        sto_general: data?.sto?.sto_general ?? null,
+        sto_production: data?.sto?.sto_production ?? null,
+        sto_hpp_diff: data?.sto_hpp_diff?.id ?? null,
+        fixed_assets: data?.fixed_assets?.id ?? null,
+      },
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        toast.current.show({
+          severity: "info",
+          summary: "Berhasil",
+          detail: "Data berhasil diperbarui",
+          life: 3000,
+        });
+      }
+    } catch (error) {
+      toast.current.show({
+        severity: "error",
+        summary: "Gagal",
+        detail: "Gagal memperbarui data",
+        life: 3000,
+      });
+    }
+
+    getSetup(false);
+  };
+
+  const editSetup = async (data) => {
+    let config = {
+      ...endpoints.editSetup,
+      endpoint: endpoints.editSetup.endpoint + data.id,
+      data: {
+        ar: data?.ar?.id ?? null,
+        ap: data?.ap?.id ?? null,
+        pnl: data?.pnl?.id ?? null,
+        pnl_year: data?.pnl_year?.id ?? null,
+        rtn_income: data?.rtn_income?.id ?? null,
+        sls_rev: data?.sls_rev?.id ?? null,
+        sls_disc: data?.sls_disc?.id ?? null,
+        sls_retur: data?.sls_retur?.id ?? null,
+        sls_shipping: data?.sls_shipping?.id ?? null,
+        sls_prepaid: data?.sls_prepaid?.id ?? null,
+        sls_unbill: data?.sls_unbill?.id ?? null,
+        sls_unbill_recv: data?.sls_unbill_recv?.id ?? null,
+        sls_tax: data?.sls_tax?.id ?? null,
+        pur_cogs: data?.pur_cogs?.id ?? null,
+        pur_discount: data?.pur_discount?.id ?? null,
+        pur_shipping: data?.pur_shipping?.id ?? null,
+        pur_retur: data?.pur_retur?.id ?? null,
+        pur_advance: data?.pur_advance?.id ?? null,
+        pur_unbill: data?.pur_unbill?.id ?? null,
+        pur_tax: data?.pur_tax?.id ?? null,
+        sto: data?.sto?.id ?? null,
+        sto_broken: data?.sto_broken?.id ?? null,
+        sto_general: data?.sto?.sto_general ?? null,
+        sto_production: data?.sto?.sto_production ?? null,
+        sto_hpp_diff: data?.sto_hpp_diff?.id ?? null,
+        fixed_assets: data?.fixed_assets?.id ?? null,
+      },
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        toast.current.show({
+          severity: "info",
+          summary: "Berhasil",
+          detail: "Data berhasil diperbarui",
+          life: 3000,
+        });
+      }
+    } catch (error) {
+      toast.current.show({
+        severity: "error",
+        summary: "Gagal",
+        detail: "Gagal memperbarui data",
+        life: 3000,
+      });
+    }
+
+    getSetup(false);
+  };
+
+  const submitUpdate = (data) => {
+    if (available) {
+      if (data.id) {
+        editSetup(data);
+      } else {
+        addSetup(data);
+      }
+    } else {
+      postCompany(data);
+    }
   };
 
   const renderAccountDropdown = (label, value, onChange, expanded = false) => {
     return (
       <div className={`${expanded ? "col-12" : "col-6"} mb-2`}>
-        <label className="text-label">{label}</label>
-        <div className="p-inputgroup">
-          <Dropdown
-            value={value}
-            options={account && account}
-            onChange={onChange}
-            optionLabel="acc_name"
-            filter
-            filterBy="account.acc_name"
-            placeholder="Pilih Akun"
-            itemTemplate={(option) => (
-              <div>
-                {option !== null
-                  ? `(${option.account.acc_code}) - ${option.account.acc_name}`
-                  : ""}
-              </div>
-            )}
-          />
-        </div>
+        {loading ? (
+          <>
+            <Skeleton width="200px" />
+            <Skeleton className="mt-3" height="45px" />
+          </>
+        ) : (
+          <>
+            <label className="text-label">{label}</label>
+            <div className="p-inputgroup">
+              <Dropdown
+                value={value}
+                options={account && account}
+                onChange={onChange}
+                optionLabel={(option) => (
+                  <div>
+                    {option !== null
+                      ? `(${option.acc_code}) - ${option.acc_name}`
+                      : ""}
+                  </div>
+                )}
+                filter
+                filterBy="acc_name"
+                placeholder="Pilih Akun"
+                itemTemplate={(option) => (
+                  <div>
+                    {option !== null
+                      ? `(${option.acc_code}) - ${option.acc_name}`
+                      : ""}
+                  </div>
+                )}
+              />
+            </div>
+          </>
+        )}
       </div>
     );
   };
@@ -90,9 +349,10 @@ const SetupAkun = () => {
               <Row className="mr-0 ml-0">
                 {renderAccountDropdown(
                   "Aset Tetap",
-                  null,
+                  setup && setup.fixed_assets,
                   (e) => {
-                    console.log(e.value);
+                    setSetup({ ...setup, fixed_assets: e.value });
+                    submitUpdate({ ...setup, fixed_assets: e.value });
                   },
                   true
                 )}
@@ -127,37 +387,77 @@ const SetupAkun = () => {
           <Accordion.Collapse eventKey={"0"}>
             <div className="accordion__body--text">
               <Row className="mr-0 ml-0">
-                {renderAccountDropdown("Pendapatan Penjualan", null, (e) => {
-                  console.log(e.value);
-                })}
+                {renderAccountDropdown(
+                  "Pendapatan Penjualan",
+                  setup && setup.sls_rev,
+                  (e) => {
+                    setSetup({ ...setup, sls_rev: e.value });
+                    submitUpdate({ ...setup, sls_rev: e.value });
+                  }
+                )}
 
-                {renderAccountDropdown("Pembayaran Dimuka", null, (e) => {
-                  console.log(e.value);
-                })}
+                {renderAccountDropdown(
+                  "Pembayaran Dimuka",
+                  setup && setup.sls_prepaid,
+                  (e) => {
+                    setSetup({ ...setup, sls_prepaid: e.value });
+                    submitUpdate({ ...setup, sls_prepaid: e.value });
+                  }
+                )}
 
-                {renderAccountDropdown("Diskon Penjualan", null, (e) => {
-                  console.log(e.value);
-                })}
+                {renderAccountDropdown(
+                  "Diskon Penjualan",
+                  setup && setup.sls_disc,
+                  (e) => {
+                    setSetup({ ...setup, sls_disc: e.value });
+                    submitUpdate({ ...setup, sls_disc: e.value });
+                  }
+                )}
 
-                {renderAccountDropdown("Penjualan Belum Ditagih", null, (e) => {
-                  console.log(e.value);
-                })}
+                {renderAccountDropdown(
+                  "Penjualan Belum Ditagih",
+                  setup && setup.sls_unbill,
+                  (e) => {
+                    setSetup({ ...setup, sls_unbill: e.value });
+                    submitUpdate({ ...setup, sls_unbill: e.value });
+                  }
+                )}
 
-                {renderAccountDropdown("Retur Penjualan", null, (e) => {
-                  console.log(e.value);
-                })}
+                {renderAccountDropdown(
+                  "Retur Penjualan",
+                  setup && setup.sls_retur,
+                  (e) => {
+                    setSetup({ ...setup, sls_retur: e.value });
+                    submitUpdate({ ...setup, sls_retur: e.value });
+                  }
+                )}
 
-                {renderAccountDropdown("Piutang Belum Ditagih", null, (e) => {
-                  console.log(e.value);
-                })}
+                {renderAccountDropdown(
+                  "Piutang Belum Ditagih",
+                  setup && setup.sls_unbill_recv,
+                  (e) => {
+                    setSetup({ ...setup, sls_unbill_recv: e.value });
+                    submitUpdate({ ...setup, sls_unbill_recv: e.value });
+                  }
+                )}
 
-                {renderAccountDropdown("Pengiriman Penjualan", null, (e) => {
-                  console.log(e.value);
-                })}
+                {renderAccountDropdown(
+                  "Pengiriman Penjualan",
+                  setup && setup.sls_shipping,
+                  (e) => {
+                    setSetup({ ...setup, sls_shipping: e.value });
+                    submitUpdate({ ...setup, sls_shipping: e.value });
+                  }
+                )}
 
-                {renderAccountDropdown("Hutang Pajak Penjualan", null, (e) => {
-                  console.log(e.value);
-                })}
+                {renderAccountDropdown(
+                  "Hutang Pajak Penjualan",
+                  setup && setup.sls_tax,
+                  (e) => {
+                    setSetup({ ...setup, sls_tax: e.value });
+                    submitUpdate({ ...setup, sls_tax: e.value });
+                  }
+                )}
               </Row>
             </div>
           </Accordion.Collapse>
@@ -189,125 +489,50 @@ const SetupAkun = () => {
           <Accordion.Collapse eventKey={"0"}>
             <div className="accordion__body--text">
               <Row className="mr-0 ml-0">
-                <div className="col-6 mb-2">
-                  <label className="text-label">Pembelian (COGS)</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={null}
-                      options={account && account}
-                      onChange={(e) => {
-                        console.log(e.value);
-                      }}
-                      optionLabel="acc_name"
-                      filter
-                      filterBy="acc_name"
-                      placeholder="Pilih Akun"
-                      itemTemplate={(option) => (
-                        <div>
-                          {option !== null
-                            ? `(${option.account.acc_code}) - ${option.account.acc_name}`
-                            : ""}
-                        </div>
-                      )}
-                    />
-                  </div>
-                </div>
+                {renderAccountDropdown(
+                  "Pembelian (COGS)",
+                  setup && setup.pur_cogs,
+                  (e) => {
+                    setSetup({ ...setup, pur_cogs: e.value });
+                    submitUpdate({ ...setup, pur_cogs: e.value });
+                  }
+                )}
 
-                <div className="col-6 mb-2">
-                  <label className="text-label">Hutang Belum Ditagih</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={null}
-                      options={account && account}
-                      onChange={(e) => {
-                        console.log(e.value);
-                      }}
-                      optionLabel="acc_name"
-                      filter
-                      filterBy="acc_name"
-                      placeholder="Pilih Akun"
-                      itemTemplate={(option) => (
-                        <div>
-                          {option !== null
-                            ? `(${option.account.acc_code}) - ${option.account.acc_name}`
-                            : ""}
-                        </div>
-                      )}
-                    />
-                  </div>
-                </div>
+                {renderAccountDropdown(
+                  "Pembelian Belum Ditagih",
+                  setup && setup.pur_unbill,
+                  (e) => {
+                    setSetup({ ...setup, pur_unbill: e.value });
+                    submitUpdate({ ...setup, pur_unbill: e.value });
+                  }
+                )}
 
-                <div className="col-6 mb-2">
-                  <label className="text-label">Pengiriman Pembelian</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={null}
-                      options={account && account}
-                      onChange={(e) => {
-                        console.log(e.value);
-                      }}
-                      optionLabel="acc_name"
-                      filter
-                      filterBy="acc_name"
-                      placeholder="Pilih Akun"
-                      itemTemplate={(option) => (
-                        <div>
-                          {option !== null
-                            ? `(${option.account.acc_code}) - ${option.account.acc_name}`
-                            : ""}
-                        </div>
-                      )}
-                    />
-                  </div>
-                </div>
+                {renderAccountDropdown(
+                  "Pengiriman Pembelian",
+                  setup && setup.pur_shipping,
+                  (e) => {
+                    setSetup({ ...setup, pur_shipping: e.value });
+                    submitUpdate({ ...setup, pur_shipping: e.value });
+                  }
+                )}
 
-                <div className="col-6 mb-2">
-                  <label className="text-label">Pajak Pembelian</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={null}
-                      options={account && account}
-                      onChange={(e) => {
-                        console.log(e.value);
-                      }}
-                      optionLabel="acc_name"
-                      filter
-                      filterBy="acc_name"
-                      placeholder="Pilih Akun"
-                      itemTemplate={(option) => (
-                        <div>
-                          {option !== null
-                            ? `(${option.account.acc_code}) - ${option.account.acc_name}`
-                            : ""}
-                        </div>
-                      )}
-                    />
-                  </div>
-                </div>
+                {renderAccountDropdown(
+                  "Pajak Pembelian",
+                  setup && setup.pur_tax,
+                  (e) => {
+                    setSetup({ ...setup, pur_tax: e.value });
+                    submitUpdate({ ...setup, pur_tax: e.value });
+                  }
+                )}
 
-                <div className="col-6 mb-2">
-                  <label className="text-label">Uang Muka Pembelian</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={null}
-                      options={account && account}
-                      onChange={(e) => {
-                        console.log(e.value);
-                      }}
-                      optionLabel="acc_name"
-                      filter
-                      filterBy="acc_name"
-                      placeholder="Pilih Akun"
-                      itemTemplate={(option) => (
-                        <div>
-                          {option !== null
-                            ? `(${option.account.acc_code}) - ${option.account.acc_name}`
-                            : ""}
-                        </div>
-                      )}
-                    />
-                  </div>
-                </div>
+                {renderAccountDropdown(
+                  "Uang Muka Pembelian",
+                  setup && setup.pur_advance,
+                  (e) => {
+                    setSetup({ ...setup, pur_advance: e.value });
+                    submitUpdate({ ...setup, pur_advance: e.value });
+                  }
+                )}
               </Row>
             </div>
           </Accordion.Collapse>
@@ -337,13 +562,23 @@ const SetupAkun = () => {
           <Accordion.Collapse eventKey={"0"}>
             <div className="accordion__body--text">
               <Row className="mr-0 ml-0">
-                {renderAccountDropdown("Piutang Usaha", null, (e) => {
-                  console.log(e.value);
-                })}
+                {renderAccountDropdown(
+                  "Piutang Usaha",
+                  setup && setup.ar,
+                  (e) => {
+                    setSetup({ ...setup, ar: e.value });
+                    submitUpdate({ ...setup, ar: e.value });
+                  }
+                )}
 
-                {renderAccountDropdown("Hutang Usaha", null, (e) => {
-                  console.log(e.value);
-                })}
+                {renderAccountDropdown(
+                  "Hutang Usaha",
+                  setup && setup.ap,
+                  (e) => {
+                    setSetup({ ...setup, ap: e.value });
+                    submitUpdate({ ...setup, ap: e.value });
+                  }
+                )}
               </Row>
             </div>
           </Accordion.Collapse>
@@ -375,21 +610,50 @@ const SetupAkun = () => {
           <Accordion.Collapse eventKey={"0"}>
             <div className="accordion__body--text">
               <Row className="mr-0 ml-0">
-                {renderAccountDropdown("Persediaan", null, (e) => {
-                  console.log(e.value);
-                })}
+                {renderAccountDropdown(
+                  "Persediaan",
+                  setup && setup.sto,
+                  (e) => {
+                    setSetup({ ...setup, sto: e.value });
+                    submitUpdate({ ...setup, sto: e.value });
+                  }
+                )}
 
-                {renderAccountDropdown("Persediaan Rusak", null, (e) => {
-                  console.log(e.value);
-                })}
+                {renderAccountDropdown(
+                  "Persediaan Rusak",
+                  setup && setup.sto_broken,
+                  (e) => {
+                    setSetup({ ...setup, sto_broken: e.value });
+                    submitUpdate({ ...setup, sto_broken: e.value });
+                  }
+                )}
 
-                {renderAccountDropdown("Persediaan Umum", null, (e) => {
-                  console.log(e.value);
-                })}
+                {renderAccountDropdown(
+                  "Persediaan Umum",
+                  setup && setup.sto_general,
+                  (e) => {
+                    setSetup({ ...setup, sto_general: e.value });
+                    submitUpdate({ ...setup, sto_general: e.value });
+                  }
+                )}
 
-                {renderAccountDropdown("Persediaan Produksi", null, (e) => {
-                  console.log(e.value);
-                })}
+                {renderAccountDropdown(
+                  "Persediaan Produksi",
+                  setup && setup.sto_production,
+                  (e) => {
+                    setSetup({ ...setup, sto_production: e.value });
+                    submitUpdate({ ...setup, sto_production: e.value });
+                  }
+                )}
+
+                {renderAccountDropdown(
+                  "Persediaan Selisih HPP",
+                  setup && setup.sto_hpp_diff,
+                  (e) => {
+                    setSetup({ ...setup, sto_hpp_diff: e.value });
+                    submitUpdate({ ...setup, sto_hpp_diff: e.value });
+                  }
+                )}
               </Row>
             </div>
           </Accordion.Collapse>
@@ -419,21 +683,32 @@ const SetupAkun = () => {
           <Accordion.Collapse eventKey={"0"}>
             <div className="accordion__body--text">
               <Row className="mr-0 ml-0">
-                {renderAccountDropdown("Laba Rugi Berjalan", null, (e) => {
-                  console.log(e.value);
-                })}
-
                 {renderAccountDropdown(
-                  "Laba Rugi Tahun Berjalan",
-                  null,
+                  "Laba Rugi Berjalan",
+                  setup && setup.pnl,
                   (e) => {
-                    console.log(e.value);
+                    setSetup({ ...setup, pnl: e.value });
+                    submitUpdate({ ...setup, pnl: e.value });
                   }
                 )}
 
-                {renderAccountDropdown("Laba Rugi Ditahan", null, (e) => {
-                  console.log(e.value);
-                })}
+                {renderAccountDropdown(
+                  "Laba Rugi Tahun Berjalan",
+                  setup && setup.pnl_year,
+                  (e) => {
+                    setSetup({ ...setup, pnl_year: e.value });
+                    submitUpdate({ ...setup, pnl_year: e.value });
+                  }
+                )}
+
+                {renderAccountDropdown(
+                  "Laba Rugi Ditahan",
+                  setup && setup.rtn_income,
+                  (e) => {
+                    setSetup({ ...setup, rtn_income: e.value });
+                    submitUpdate({ ...setup, rtn_income: e.value });
+                  }
+                )}
               </Row>
             </div>
           </Accordion.Collapse>
@@ -444,13 +719,14 @@ const SetupAkun = () => {
 
   return (
     <>
+    <Toast ref={toast} />
       <Row>
         <Col className="col-lg-6 col-sm-12 col-xs-12">
           {renderArAp()} {renderPenjualan()} {renderPersediaan()}
         </Col>
 
         <Col className="col-lg-6 col-sm-12 col-xs-12">
-            {renderLabaRugi()}
+          {renderLabaRugi()}
           {renderPembelian()}
           {renderOthers()}
         </Col>

@@ -72,6 +72,7 @@ class SideBar extends Component {
     ];
     let report = ["neraca"];
     let mitra = ["mitra"];
+    let transaksi = ["transaksi"];
 
     return (
       <HashRouter basename="/">
@@ -220,6 +221,17 @@ class SideBar extends Component {
                 <Link className="ai-icon" to="/mitra" aria-expanded="false">
                   <i class="bx bxs-group"></i>
                   <span className="nav-text">Mitra</span>
+                </Link>
+              </li>
+
+              <li
+                className={`${
+                  transaksi.includes(path.replace(patern, "")) ? "mm-active" : ""
+                }`}
+              >
+                <Link className="ai-icon" to="/transaksi" aria-expanded="false">
+                  <i class="bx bxs-group"></i>
+                  <span className="nav-text">Transaksi Pembelian</span>
                 </Link>
               </li>
 

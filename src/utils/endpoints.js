@@ -397,6 +397,62 @@ const endpoints = {
     method: "PUT",
     data: {},
   },
+
+  editCustomer: {
+    endpoint: "/v1/api/customer/",
+    method: "PUT",
+    data: {},
+  },
+
+  customer: {
+    endpoint: "/v1/api/customer",
+    method: "GET",
+    data: {},
+  },
+
+  addCustomer: {
+    endpoint: "/v1/api/customer",
+    method: "POST",
+    data: {},
+  },
+
+  delCustomer: {
+    endpoint: "/v1/api/customer/",
+    method: "DELETE",
+    data: {},
+  },
+
+  /// Supplier
+  supplier: {
+    endpoint: "/v1/api/supplier",
+    method: "GET",
+    data: {},
+  },
+
+  addSupplier: {
+    endpoint: "/v1/api/supplier",
+    method: "POST",
+    data: {},
+  },
+
+  editSupplier: {
+    endpoint: "/v1/api/supplier/",
+    method: "PUT",
+    data: {},
+  },
+
+  delSupplier: {
+    endpoint: "/v1/api/supplier/",
+    method: "DELETE",
+    data: {},
+  },
+
+  /// City
+  city: {
+    endpoint: "/v1/api/city",
+    method: "GET",
+    data: {},
+  },
 };
 
 export default endpoints;

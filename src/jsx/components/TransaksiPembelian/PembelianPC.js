@@ -61,23 +61,10 @@ const data = {
     code: "",
     name: "",
   },
-
-  city: {
-    city_id: 1,
-    province_id: 0,
-    province: "",
-    type: "",
-    city_name: "",
-    postal_code: 0,
-  },
 };
 
-const Customer = () => {
-  const [customer, setCustomer] = useState(null);
-  const [city, setCity] = useState(null);
-  const [jenisPel, setJenisPel] = useState(null);
-  const [subArea, setSubArea] = useState(null);
-  const [currency, setCurrency] = useState(null);
+const PembelianPC = () => {
+  const [pc, setPC] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
@@ -94,18 +81,14 @@ const Customer = () => {
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getCustomer();
-    getCity();
-    getJpel();
-    getSubArea();
-    getCurrency();
+    getPC();
     initFilters1();
   }, []);
 
-  const getCustomer = async (isUpdate = false) => {
+  const getPC = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.customer,
+      ...endpoints.noStock,
       data: {},
     };
     console.log(config.data);
@@ -116,111 +99,7 @@ const Customer = () => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        setCustomer(data);
-      }
-    } catch (error) {}
-    if (isUpdate) {
-      setLoading(false);
-    } else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1500);
-    }
-  };
-
-  const getCity = async (isUpdate = false) => {
-    setLoading(true);
-    const config = {
-      ...endpoints.city,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setCity(data);
-      }
-    } catch (error) {}
-    if (isUpdate) {
-      setLoading(false);
-    } else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1500);
-    }
-  };
-
-  const getJpel = async (isUpdate = false) => {
-    setLoading(true);
-    const config = {
-      ...endpoints.jenisPel,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setJenisPel(data);
-      }
-    } catch (error) {}
-    if (isUpdate) {
-      setLoading(false);
-    } else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1500);
-    }
-  };
-
-  const getSubArea = async (isUpdate = false) => {
-    setLoading(true);
-    const config = {
-      ...endpoints.subArea,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setSubArea(data);
-      }
-    } catch (error) {}
-    if (isUpdate) {
-      setLoading(false);
-    } else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1500);
-    }
-  };
-
-  const getCurrency = async (isUpdate = false) => {
-    setLoading(true);
-    const config = {
-      ...endpoints.currency,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setCurrency(data);
+        setPC(data);
       }
     } catch (error) {}
     if (isUpdate) {
@@ -235,13 +114,13 @@ const Customer = () => {
   const editCustomer = async () => {
     const config = {
       ...endpoints.editCustomer,
-      endpoint: endpoints.editCustomer.endpoint + currentItem.customer.id,
+      endpoint: endpoints.editCustomer.endpoint + currentItem.id,
       data: {
         cus_code: currentItem.customer.cus_code,
         cus_name: currentItem.customer.cus_name,
         cus_jpel: currentItem.jenisPel.id,
         cus_sub_area: currentItem.subArea.id,
-        cus_kolektor: customer.kolektor.id,
+        cus_kolektor: currentItem.kolektor.id,
         cus_npwp: currentItem.customer.cus_npwp,
         cus_address: currentItem.customer.cus_address,
         cus_kota: currentItem.customer.cus_kota,
@@ -268,7 +147,7 @@ const Customer = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayData(false);
-          getCustomer(true);
+          getPC(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -298,7 +177,7 @@ const Customer = () => {
         cus_name: currentItem.customer.cus_name,
         cus_jpel: currentItem.jenisPel.id,
         cus_sub_area: currentItem.subArea.id,
-        cus_kolektor: customer.kolektor.id,
+        cus_kolektor: currentItem.kolektor.id,
         cus_npwp: currentItem.customer.cus_npwp,
         cus_address: currentItem.customer.cus_address,
         cus_kota: currentItem.customer.cus_kota,
@@ -325,7 +204,7 @@ const Customer = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayData(false);
-          getCustomer(true);
+          getPC(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -374,7 +253,7 @@ const Customer = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayDel(false);
-          getCustomer(true);
+          getPC(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -624,7 +503,7 @@ const Customer = () => {
             <Card.Body>
               <DataTable
                 responsiveLayout="scroll"
-                value={loading ? dummy : customer}
+                value={loading ? dummy : pc}
                 className="display w-150 datatable-wrapper"
                 showGridlines
                 dataKey="id"
@@ -706,16 +585,11 @@ const Customer = () => {
             <label className="text-label">Kode Pelanggan</label>
             <div className="p-inputgroup">
               <InputText
-                value={
-                  currentItem !== null ? `${currentItem.customer.cus_code}` : ""
-                }
+                value={currentItem !== null ? `${currentItem.customer.cus_code}` : ""}
                 onChange={(e) =>
                   setCurrentItem({
                     ...currentItem,
-                    customer: {
-                      ...currentItem.customer,
-                      cus_code: e.target.value,
-                    },
+                    customer: { ...currentItem.customer, cus_code: e.target.value },
                   })
                 }
                 placeholder="Masukan Kode Pelanggan"
@@ -727,16 +601,11 @@ const Customer = () => {
             <label className="text-label">Nama Pelanggan</label>
             <div className="p-inputgroup">
               <InputText
-                value={
-                  currentItem !== null ? `${currentItem.customer.cus_name}` : ""
-                }
+                value={currentItem !== null ? `${currentItem.customer.cus_name}` : ""}
                 onChange={(e) =>
                   setCurrentItem({
                     ...currentItem,
-                    customer: {
-                      ...currentItem.customer,
-                      cus_name: e.target.value,
-                    },
+                    customer: { ...currentItem.customer, cus_name: e.target.value },
                   })
                 }
                 placeholder="Masukan Nama Pelanggan"
@@ -750,18 +619,13 @@ const Customer = () => {
             <label className="text-label">Jenis Pelanggan</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={currentItem !== null ? currentItem.jenisPel : null}
-                options={jenisPel}
-                onChange={(e) => {
-                  console.log(e.value);
+                value={currentItem !== null ? `${currentItem.jenisPel.jpel_name}` : ""}
+                onChange={(e) =>
                   setCurrentItem({
                     ...currentItem,
-                    jenisPel: e.value,
-                  });
-                }}
-                optionLabel="jpel_name"
-                filter
-                filterBy="jpel_name"
+                    jenisPel: { ...currentItem.jenisPel, jpel_name: e.target.value },
+                  })
+                }
                 placeholder="Pilih Jenis Pelanggan"
               />
             </div>
@@ -771,19 +635,14 @@ const Customer = () => {
             <label className="text-label">Sub Area Penjualan</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={currentItem !== null ? currentItem.subArea : null}
-                options={subArea}
-                onChange={(e) => {
-                  console.log(e.value);
+                value={currentItem !== null ? `${currentItem.subArea.sub_name}` : ""}
+                onChange={(e) =>
                   setCurrentItem({
                     ...currentItem,
-                    subArea: e.value,
-                  });
-                }}
-                optionLabel="subArea.sub_name"
-                filter
-                filterBy="subArea.sub_name"
-                placeholder="Pilih Sub Area"
+                    jenisPel: { ...currentItem.jenisPel, sub_name: e.target.value },
+                  })
+                }
+                placeholder="Pilih Sub Area Penjualan"
               />
             </div>
           </div>
@@ -807,16 +666,11 @@ const Customer = () => {
             <label className="text-label">NPWP</label>
             <div className="p-inputgroup">
               <InputText
-                value={
-                  currentItem !== null ? `${currentItem.customer.cus_npwp}` : ""
-                }
+                value={currentItem !== null ? `${currentItem.customer.cus_npwp}` : ""}
                 onChange={(e) =>
                   setCurrentItem({
                     ...currentItem,
-                    customer: {
-                      ...currentItem.customer,
-                      cus_npwp: e.target.value,
-                    },
+                    customer: { ...currentItem.customer, cus_npwp: e.target.value },
                   })
                 }
                 placeholder="Masukan NPWP"
@@ -835,18 +689,11 @@ const Customer = () => {
             <label className="text-label">Alamat</label>
             <div className="p-inputgroup">
               <InputTextarea
-                value={
-                  currentItem !== null
-                    ? `${currentItem.customer.cus_address}`
-                    : ""
-                }
+                value={currentItem !== null ? `${currentItem.customer.cus_address}` : ""}
                 onChange={(e) =>
                   setCurrentItem({
                     ...currentItem,
-                    customer: {
-                      ...currentItem.customer,
-                      cus_code: e.target.value,
-                    },
+                    customer: { ...currentItem.customer, cus_code: e.target.value },
                   })
                 }
                 placeholder="Masukan Alamat"
@@ -860,18 +707,13 @@ const Customer = () => {
             <label className="text-label">Kota</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={currentItem !== null ? currentItem.city : null}
-                options={city}
-                onChange={(e) => {
-                  console.log(e.value);
+                value={currentItem !== null ? `${currentItem.customer.cus_kota}` : ""}
+                onChange={(e) =>
                   setCurrentItem({
                     ...currentItem,
-                    city: e.value,
-                  });
-                }}
-                optionLabel="city_name"
-                filter
-                filterBy="city_name"
+                    customer: { ...currentItem.customer, cus_kota: e.target.value },
+                  })
+                }
                 placeholder="Pilih Kota"
               />
             </div>
@@ -881,9 +723,7 @@ const Customer = () => {
             <label className="text-label">Kode Pos</label>
             <div className="p-inputgroup">
               <InputNumber
-                value={
-                  currentItem !== null ? `${currentItem.customer.cus_kpos}` : ""
-                }
+                value={currentItem !== null ? `${currentItem.customer.cus_kpos}` : ""}
                 onChange={(e) =>
                   setCurrentItem({
                     ...currentItem,
@@ -906,11 +746,7 @@ const Customer = () => {
             <label className="text-label">Telp 1</label>
             <div className="p-inputgroup">
               <InputNumber
-                value={
-                  currentItem !== null
-                    ? `${currentItem.customer.cus_telp1}`
-                    : ""
-                }
+                value={currentItem !== null ? `${currentItem.customer.cus_telp1}` : ""}
                 onChange={(e) =>
                   setCurrentItem({
                     ...currentItem,
@@ -926,11 +762,7 @@ const Customer = () => {
             <label className="text-label">Telp 2</label>
             <div className="p-inputgroup">
               <InputNumber
-                value={
-                  currentItem !== null
-                    ? `${currentItem.customer.cus_telp2}`
-                    : ""
-                }
+                value={currentItem !== null ? `${currentItem.customer.cus_telp2}` : ""}
                 onChange={(e) =>
                   setCurrentItem({
                     ...currentItem,
@@ -948,18 +780,11 @@ const Customer = () => {
             <label className="text-label">Email</label>
             <div className="p-inputgroup">
               <InputText
-                value={
-                  currentItem !== null
-                    ? `${currentItem.customer.cus_email}`
-                    : ""
-                }
+                value={currentItem !== null ? `${currentItem.customer.cus_email}` : ""}
                 onChange={(e) =>
                   setCurrentItem({
                     ...currentItem,
-                    customer: {
-                      ...currentItem.customer,
-                      cus_email: e.target.value,
-                    },
+                    customer: { ...currentItem.customer, cus_email: e.target.value },
                   })
                 }
                 placeholder="Cth. ar@gmail.com"
@@ -971,16 +796,11 @@ const Customer = () => {
             <label className="text-label">Fax</label>
             <div className="p-inputgroup">
               <InputText
-                value={
-                  currentItem !== null ? `${currentItem.customer.cus_fax}` : ""
-                }
+                value={currentItem !== null ? `${currentItem.customer.cus_fax}` : ""}
                 onChange={(e) =>
                   setCurrentItem({
                     ...currentItem,
-                    customer: {
-                      ...currentItem.customer,
-                      cus_fax: e.target.value,
-                    },
+                    customer: { ...currentItem.customer, cus_fax: e.target.value },
                   })
                 }
                 placeholder="Masukan Fax"
@@ -994,16 +814,11 @@ const Customer = () => {
             <label className="text-label">Contact Person</label>
             <div className="p-inputgroup">
               <InputText
-                value={
-                  currentItem !== null ? `${currentItem.customer.cus_cp}` : ""
-                }
+                value={currentItem !== null ? `${currentItem.customer.cus_cp}` : ""}
                 onChange={(e) =>
                   setCurrentItem({
                     ...currentItem,
-                    customer: {
-                      ...currentItem.customer,
-                      cus_cp: e.target.value,
-                    },
+                    customer: { ...currentItem.customer, cus_cp: e.target.value },
                   })
                 }
                 placeholder="Masukan Contact Person"
@@ -1022,18 +837,13 @@ const Customer = () => {
             <label className="text-label">Currency</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={currentItem !== null ? currentItem.currency : null}
-                options={currency}
-                onChange={(e) => {
-                  console.log(e.value);
+                value={currentItem !== null ? `${currentItem.currency.name}` : ""}
+                onChange={(e) =>
                   setCurrentItem({
                     ...currentItem,
-                    currency: e.value,
-                  });
-                }}
-                optionLabel="code"
-                filter
-                filterBy="name"
+                    currency: { ...currentItem.currency, name: e.target.value },
+                  })
+                }
                 placeholder="Pilih Jenis Currency"
               />
             </div>
@@ -1043,16 +853,11 @@ const Customer = () => {
             <label className="text-label">Pajak</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={
-                  currentItem !== null ? `${currentItem.customer.cus_pjk}` : ""
-                }
+                value={currentItem !== null ? `${currentItem.customer.cus_pjk}` : ""}
                 onChange={(e) =>
                   setCurrentItem({
                     ...currentItem,
-                    customer: {
-                      ...currentItem.customer,
-                      cus_pjk: e.target.value,
-                    },
+                    customer: { ...currentItem.customer, cus_pjk: e.target.value },
                   })
                 }
                 placeholder="Pilih Pajak"
@@ -1066,16 +871,11 @@ const Customer = () => {
             <label className="text-label">Keterangan</label>
             <div className="p-inputgroup">
               <InputTextarea
-                value={
-                  currentItem !== null ? `${currentItem.customer.cus_ket}` : ""
-                }
+                value={currentItem !== null ? `${currentItem.customer.cus_ket}` : ""}
                 onChange={(e) =>
                   setCurrentItem({
                     ...currentItem,
-                    customer: {
-                      ...currentItem.customer,
-                      cus_ket: e.target.value,
-                    },
+                    customer: { ...currentItem.customer, cus_ket: e.target.value },
                   })
                 }
                 placeholder="Masukan Keterangan"
@@ -1124,11 +924,7 @@ const Customer = () => {
             <label className="text-label">Limit Kredit</label>
             <div className="p-inputgroup">
               <InputNumber
-                value={
-                  currentItem !== null
-                    ? `${currentItem.customer.cus_limit}`
-                    : ""
-                }
+                value={currentItem !== null ? `${currentItem.customer.cus_limit}` : ""}
                 onChange={(e) =>
                   setCurrentItem({
                     ...currentItem,
@@ -1163,4 +959,4 @@ const Customer = () => {
   );
 };
 
-export default Customer;
+export default PembelianPC;

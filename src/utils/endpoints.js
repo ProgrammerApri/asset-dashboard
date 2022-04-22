@@ -379,6 +379,24 @@ const endpoints = {
     method: "GET",
     data: {},
   },
+
+  getSetup: {
+    endpoint: "/v1/api/setup/account",
+    method: "GET",
+    data: {},
+  },
+
+  addSetup: {
+    endpoint: "/v1/api/setup/account",
+    method: "POST",
+    data: {},
+  },
+
+  editSetup: {
+    endpoint: "/v1/api/setup/account/",
+    method: "PUT",
+    data: {},
+  },
 };
 
 export default endpoints;

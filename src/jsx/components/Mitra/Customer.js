@@ -794,10 +794,18 @@ const Customer = () => {
             <label className="text-label">Kolektor</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={currentItem !== null ? `${currentItem.cus_code}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, cus_code: e.target.value })
-                }
+                value={currentItem !== null ? currentItem : null}
+                options={subArea}
+                onChange={(e) => {
+                  console.log(e.value);
+                  setCurrentItem({
+                    ...currentItem,
+                    subArea: e.value,
+                  });
+                }}
+                optionLabel="subArea.sub_name"
+                filter
+                filterBy="subArea.sub_name"
                 placeholder="Pilih Kolektor"
               />
             </div>
@@ -1043,19 +1051,19 @@ const Customer = () => {
             <label className="text-label">Pajak</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={
-                  currentItem !== null ? `${currentItem.customer.cus_pjk}` : ""
-                }
-                onChange={(e) =>
+                value={currentItem !== null ? currentItem : null}
+                options={subArea}
+                onChange={(e) => {
+                  console.log(e.value);
                   setCurrentItem({
                     ...currentItem,
-                    customer: {
-                      ...currentItem.customer,
-                      cus_pjk: e.target.value,
-                    },
-                  })
-                }
-                placeholder="Pilih Pajak"
+                    subArea: e.value,
+                  });
+                }}
+                optionLabel=""
+                filter
+                filterBy=""
+                placeholder="Pilih Jenis Pajak"
               />
             </div>
           </div>
@@ -1094,11 +1102,19 @@ const Customer = () => {
             <label className="text-label">Kode Distribusi GL/AR</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={currentItem !== null ? `${currentItem.cus_telp}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, cus_telp: e.value })
-                }
-                placeholder="Pilih Kode Distribusi"
+                value={currentItem !== null ? currentItem : null}
+                options={subArea}
+                onChange={(e) => {
+                  console.log(e.value);
+                  setCurrentItem({
+                    ...currentItem,
+                    subArea: e.value,
+                  });
+                }}
+                optionLabel=""
+                filter
+                filterBy=""
+                placeholder="Pilih Kode Distribusi GL"
               />
             </div>
           </div>
@@ -1109,10 +1125,18 @@ const Customer = () => {
             </label>
             <div className="p-inputgroup">
               <Dropdown
-                value={currentItem !== null ? `${currentItem.cus_saldo}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, cus_saldo: e.value })
-                }
+                value={currentItem !== null ? currentItem : null}
+                options={subArea}
+                onChange={(e) => {
+                  console.log(e.value);
+                  setCurrentItem({
+                    ...currentItem,
+                    subArea: e.value,
+                  });
+                }}
+                optionLabel=""
+                filter
+                filterBy=""
                 placeholder="Pilih Kode Distribusi Uang Muka"
               />
             </div>

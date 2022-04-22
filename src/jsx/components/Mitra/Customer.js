@@ -70,6 +70,13 @@ const data = {
     city_name: "",
     postal_code: 0,
   },
+
+  account: {
+    id: 1,
+    acc_code: "",
+    acc_name: "",
+  },
+
 };
 
 const Customer = () => {
@@ -77,6 +84,7 @@ const Customer = () => {
   const [city, setCity] = useState(null);
   const [jenisPel, setJenisPel] = useState(null);
   const [subArea, setSubArea] = useState(null);
+  const [setup, setSetup] = useState(null);
   const [currency, setCurrency] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
@@ -99,6 +107,7 @@ const Customer = () => {
     getJpel();
     getSubArea();
     getCurrency();
+    getAR();
     initFilters1();
   }, []);
 
@@ -169,6 +178,32 @@ const Customer = () => {
         const { data } = response;
         console.log(data);
         setJenisPel(data);
+      }
+    } catch (error) {}
+    if (isUpdate) {
+      setLoading(false);
+    } else {
+      setTimeout(() => {
+        setLoading(false);
+      }, 1500);
+    }
+  };
+
+  const getAR = async (isUpdate = false) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.getSetup,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setSetup(data);
       }
     } catch (error) {}
     if (isUpdate) {
@@ -1099,22 +1134,15 @@ const Customer = () => {
 
         <div className="form-row">
           <div className="col-6">
-            <label className="text-label">Kode Distribusi GL/AR</label>
+            <label className="text-label">Kode Distribusi AR</label>
             <div className="p-inputgroup">
-              <Dropdown
-                value={currentItem !== null ? currentItem : null}
-                options={subArea}
-                onChange={(e) => {
-                  console.log(e.value);
-                  setCurrentItem({
-                    ...currentItem,
-                    subArea: e.value,
-                  });
-                }}
-                optionLabel=""
-                filter
-                filterBy=""
-                placeholder="Pilih Kode Distribusi GL"
+            <InputText
+                value={
+                    setup !== null
+                      ? `(${setup.ar.acc_code}) - ${setup.ar.acc_name}`
+                      : ""
+                }
+               disabled
               />
             </div>
           </div>

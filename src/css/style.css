@@ -473,6 +473,7 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
   --input-bg: #f3f3f3;
   --border-color: #f0f1f5;
   --progress-color: #e9ecef;
+  --shadow: 18px 0px 35px 0px rgba(0, 0, 0, 0.05);
 }
 
 .dark {
@@ -11806,7 +11807,7 @@ a.active {
 .content-body .container-md,
 .content-body .container-lg,
 .content-body .container-xl {
-  padding-top: 20px;
+  padding-top: 10px;
   padding-right: 30px;
   padding-left: 30px;
 }
@@ -13057,12 +13058,12 @@ a.active {
 }
 
 .header {
-  height: 4.5rem;
+  height: 5.5rem;
   z-index: 1;
   position: relative;
   padding: 0rem;
   z-index: 3;
-  padding-left: 21.563rem;
+  padding-left: 17rem;
   transition: all 0.2s ease;
   background-color: var(--body-bg);
 }
@@ -13073,7 +13074,7 @@ a.active {
 }
 .header .header-content {
   height: 100%;
-  padding-left: 0.5rem;
+  padding-left: 2rem;
   padding-right: 30px;
   align-items: center;
   display: flex;
@@ -13242,7 +13243,7 @@ svg.pulse-svg .third-circle {
   width: 100%;
 }
 [data-header-position="fixed"] .content-body {
-  padding-top: 4rem;
+  padding-top: 5.5rem;
 }
 @media only screen and (max-width: 1199px) {
   [data-header-position="fixed"] .content-body {
@@ -47309,4 +47310,133 @@ html[dir="rtl"]
 
 .cp-logo {
   max-width: 70px;
+}
+
+.sidebar {
+  background-color: var(--card-bg);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 17rem;
+  height: 100vh;
+  box-shadow: var(--shadow);
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 10000;
+  white-space: nowrap;
+  transition: 0.25s;
+}
+
+.sidebar-header {
+  padding: 1.5rem 0 15px 40px;
+  display: flex;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  width: 17rem;
+  background: #ffffff;
+  z-index: 10;
+}
+
+
+.sidebar-header span {
+  margin-left: 10px;
+  font-weight: 900;
+  color: #7A80AB;
+}
+
+.sidebar-logo { 
+  background: #EBF0FE;
+  border-radius: 1rem;
+  padding: 5px;
+}
+
+.sidebar-logo .logo{
+  max-width: 35px;
+}
+
+.sidebar-menu {
+  width: 17rem;
+}
+
+.sidebar-menu .menu-tittle {
+  padding: 30px 24px 10px 40px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  font-size: 0.8rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  transition: color 0.2s ease-in-out;
+  color: #B6B9CD;
+}
+
+.menu-sub {
+  margin-right: 1.5rem;
+  margin-left: 1.5rem;
+}
+
+.sidebar-menu .menu-sub > li > a {
+  padding: 10px 10px 10px 15px;
+  width: 100%;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-transform: capitalize;
+  transition: color 0.2s ease-in-out;
+  color: #7A80AB;
+  cursor: pointer;
+  margin: 0px 0px 6px 0px;
+  border-radius: 0.7rem;
+}
+
+.sidebar-menu .menu-sub > li > a.active{
+  background: #EBF0FE;
+  color: #5877E0;
+  font-weight: 510;
+  transition: color 0.2s ease-in-out;
+}
+
+.sidebar-menu .menu-sub > li > a.active:hover{
+  background: #EBF0FE;
+  color: #5877E0;
+  font-weight: 510;
+  transition: color 0.2s ease-in-out;
+}
+
+.sidebar-menu .menu-sub > li > a:hover{
+  background: var(--body-bg);
+  color: #5877E0;
+  transition: color 0.2s ease-in-out;
+}
+
+.sidebar-menu .menu-sub > li > a > span {
+  margin-left: 10px;
+}
+
+.sidebar-menu .menu-sub > li > a > i {
+  font-size: 1.2rem;
+}
+
+.sidebar .sidebar-footer {
+  font-size: 14px;
+  padding: 1.5rem;
+  position: fixed;
+  bottom: 0;
+  color: #7A80AB;
+  width: 17rem;
+  background: #ffffff;
+}
+
+.sidebar-footer p strong {
+  display: block;
+}
+
+.sidebar .scroll {
+  position: relative;
+  height: 100%;
+  padding-top: 5.5rem;
+  padding-bottom: 10rem;
 }

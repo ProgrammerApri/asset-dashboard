@@ -2,6 +2,7 @@ import React, { Fragment, useState } from "react";
 import SideBar from "./SideBar";
 import NavHader from "./NavHader";
 import Header from "./Header";
+import SideMenu from "./Sidebar2";
 
 const JobieNav = ({ title }) => {
   const [toggle, setToggle] = useState("");
@@ -9,8 +10,9 @@ const JobieNav = ({ title }) => {
   const onClick = (name) => setToggle(toggle === name ? "" : name);
   return (
     <Fragment>
-      <NavHader isDark={isDark} />
-      <SideBar />
+      {/* <NavHader isDark={isDark} /> */}
+      {/* <SideBar /> */}
+      <SideMenu/>
       <Header
         onNote={() => onClick("chatbox")}
         onNotification={() => onClick("notification")}

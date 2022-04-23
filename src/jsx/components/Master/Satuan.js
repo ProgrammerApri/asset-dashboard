@@ -4,7 +4,7 @@ import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "react-bootstrap";
-import { Row, Col, Card, Badge } from "react-bootstrap";
+import { Row, Col, Card } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { Dialog } from "primereact/dialog";
@@ -13,15 +13,19 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
+import { classNames } from "primereact/utils";
 import { InputNumber } from "primereact/inputnumber";
-import { Divider } from "@material-ui/core";
 
 const data = {
-
+    id: 1,
+    proj_code: "",
+    proj_name: "",
+    proj_ket: "",
 };
 
-const Faktur = () => {
-  const [faktur, setFaktur] = useState(null);
+
+const Satuan = () => {
+  const [satuan, setSatuan] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
@@ -38,14 +42,15 @@ const Faktur = () => {
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getFaktur();
+    getSatuan();
     initFilters1();
   }, []);
 
-  const getFaktur = async (isUpdate = false) => {
+
+  const getSatuan = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.faktur,
+      ...endpoints.satuan,
       data: {},
     };
     console.log(config.data);
@@ -56,7 +61,7 @@ const Faktur = () => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        setFaktur(data);
+        setSatuan(data);
       }
     } catch (error) {}
     if (isUpdate) {
@@ -68,13 +73,14 @@ const Faktur = () => {
     }
   };
 
-  const editFaktur = async () => {
+  const editSatuan = async () => {
     const config = {
-      ...endpoints.editFaktur,
-      endpoint: endpoints.editFaktur.endpoint + currentItem.id,
+      ...endpoints.editSatuan,
+      endpoint: endpoints.editSatuan.endpoint + currentItem.id,
       data: {
-        cus_code: currentItem.customer.cus_code,
-       
+        proj_code: currentItem.proj_code,
+        proj_name: currentItem.proj_name,
+        proj_ket: currentItem.proj_ket,
       },
     };
     console.log(config.data);
@@ -86,7 +92,7 @@ const Faktur = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayData(false);
-          getFaktur(true);
+          getSatuan(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -108,12 +114,13 @@ const Faktur = () => {
     }
   };
 
-  const addFaktur = async () => {
+  const addSatuan = async () => {
     const config = {
-      ...endpoints.addFaktur,
+      ...endpoints.addSatuan,
       data: {
-        cus_code: currentItem.customer.cus_code,
-    
+        proj_code: currentItem.proj_code,
+        proj_name: currentItem.proj_name,
+        proj_ket: currentItem.proj_ket,
       },
     };
     console.log(config.data);
@@ -125,7 +132,7 @@ const Faktur = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayData(false);
-          getFaktur(true);
+          getSatuan(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -142,7 +149,7 @@ const Faktur = () => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${currentItem.customer.cus_code} Sudah Digunakan`,
+            detail: `Kode Project ${currentItem.proj_code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -160,10 +167,10 @@ const Faktur = () => {
     }
   };
 
-  const delFaktur = async (id) => {
+  const delSatuan = async (id) => {
     const config = {
-      ...endpoints.delFaktur,
-      endpoint: endpoints.delFaktur.endpoint + currentItem.id,
+      ...endpoints.delSatuan,
+      endpoint: endpoints.delSatuan.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -174,11 +181,11 @@ const Faktur = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayDel(false);
-          getFaktur(true);
+          getSatuan(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
-            detail: "Data Berhasil Dihapus",
+            detail: "Data Berhasil Diperbarui",
             life: 3000,
           });
         }, 500);
@@ -191,7 +198,7 @@ const Faktur = () => {
         toast.current.show({
           severity: "error",
           summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Data`,
+          detail: `Tidak Dapat Menghapus Project`,
           life: 3000,
         });
       }, 500);
@@ -240,10 +247,10 @@ const Faktur = () => {
   const onSubmit = () => {
     if (isEdit) {
       setUpdate(true);
-      editFaktur();
+      editSatuan();
     } else {
       setUpdate(true);
-      addFaktur();
+      addSatuan();
     }
   };
 
@@ -278,7 +285,7 @@ const Faktur = () => {
           label="Hapus"
           icon="pi pi-trash"
           onClick={() => {
-            delFaktur();
+            delSatuan();
           }}
           autoFocus
           loading={update}
@@ -330,6 +337,7 @@ const Faktur = () => {
     );
   };
 
+
   const template2 = {
     layout: "RowsPerPageDropdown CurrentPageReport PrevPageLink NextPageLink",
     RowsPerPageDropdown: (options) => {
@@ -380,19 +388,23 @@ const Faktur = () => {
     <>
       <Toast ref={toast} />
       <Row>
-        <Col className="pt-0">
+        <Col>
           <Card>
             <Card.Body>
               <DataTable
                 responsiveLayout="scroll"
-                value={loading ? dummy : faktur}
+                value={loading ? dummy : satuan}
                 className="display w-150 datatable-wrapper"
                 showGridlines
                 dataKey="id"
                 rowHover
                 header={renderHeader}
                 filters={filters1}
-                globalFilterFields={["customer.cus_code"]}
+                globalFilterFields={[
+                  "project.proj_code",
+                  "project.proj_name",
+                  "project.proj_ket",
+                ]}
                 emptyMessage="Tidak ada data"
                 paginator
                 paginatorTemplate={template2}
@@ -402,65 +414,29 @@ const Faktur = () => {
                 paginatorClassName="justify-content-end mt-3"
               >
                 <Column
-                  header="Tanggal"
+                  header="Kode Satuan"
                   style={{
                     minWidth: "8rem",
                   }}
-                  field={(e) => e.customer.cus_code}
+                  field={(e) => e.proj_code}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Nomor Pembelian"
-                  field={(e) => e.customer.cus_name}
+                  header="Nama Satuan"
+                  field={(e) => e.proj_name}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Nomor Pesanan"
-                  field={(e) => e.customer.cus_address}
+                  header="Konversi"
+                  field={(e) => e.proj_ket}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Nama Supplier"
-                  field={(e) => e.customer.cus_name}
+                  header="Keterangan"
+                  field={(e) => e.proj_ket}
                   style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="J/T"
-                  field={(e) => e.customer.cus_name}
-                  style={{ minWidth: "4rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Pembayaran"
-                  field={(e) => e.account.dou_type}
-                  style={{ minWidth: "8rem" }}
-                  body={(e) =>
-                    loading ? (
-                      <Skeleton />
-                    ) : (
-                      <div>
-                        {e.account.dou_type === "P" ? (
-                          <Badge variant="success light">
-                            <i className="bx bxs-circle text-success mr-1"></i>{" "}
-                            Paid
-                          </Badge>
-                        ) : (
-                          <Badge variant="info light">
-                            <i className="bx bxs-circle text-info mr-1"></i>{" "}
-                            Unpaid
-                          </Badge>
-                        )}
-                      </div>
-                    )
-                  }
-                />
-                <Column
-                  header="Status"
-                  field={(e) => e.cus_telp}
-                  style={{ minWidth: "6rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
@@ -477,16 +453,75 @@ const Faktur = () => {
       </Row>
 
       <Dialog
-        header={isEdit ? "Edit Data Faktur" : "Tambah Data Faktur"}
+        header={isEdit ? "Edit Satuan" : "Tambah Satuan"}
         visible={displayData}
-        style={{ width: "50vw" }}
+        style={{ width: "40vw" }}
         footer={renderFooter("displayData")}
         onHide={() => {
           setEdit(false);
           setDisplayData(false);
         }}
       >
-       
+        <div className="col-12">
+          <label className="text-label">Kode Satuan</label>
+          <div className="p-inputgroup">
+            <InputNumber
+              value={
+                currentItem !== null ? `${currentItem.proj_code}` : ""
+              }
+              onChange={(e) =>
+                setCurrentItem({...currentItem, proj_code: e.target.value})
+              }
+              placeholder="Masukan Kode Satuan"
+            
+            />
+          </div>
+        </div>
+
+        <div className="col-12">
+          <label className="text-label">Nama Satuan</label>
+          <div className="p-inputgroup">
+            <InputText
+              value={
+                currentItem !== null ? `${currentItem.proj_name}` : ""
+              }
+              onChange={(e) =>
+                setCurrentItem({...currentItem, proj_name: e.target.value})
+              }
+              placeholder="Masukan Nama Satuan"
+            />
+          </div>
+        </div>
+
+        <div className="col-12">
+          <label className="text-label">Konversi</label>
+          <div className="p-inputgroup">
+            <InputNumber
+              value={
+                currentItem !== null ? `${currentItem.proj_ket}` : ""
+              }
+              onChange={(e) =>
+                setCurrentItem({...currentItem, proj_ket: e.target.value})
+              }
+              placeholder="Masukan Keterangan"
+            />
+          </div>
+        </div>
+
+        <div className="col-12">
+          <label className="text-label">Keterangan</label>
+          <div className="p-inputgroup">
+            <InputTextarea
+              value={
+                currentItem !== null ? `${currentItem.proj_ket}` : ""
+              }
+              onChange={(e) =>
+                setCurrentItem({...currentItem, proj_ket: e.target.value})
+              }
+              placeholder="Masukan Keterangan"
+            />
+          </div>
+        </div>
       </Dialog>
 
       <Dialog
@@ -510,4 +545,4 @@ const Faktur = () => {
   );
 };
 
-export default Faktur;
+export default Satuan;

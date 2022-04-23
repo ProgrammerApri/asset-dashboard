@@ -637,7 +637,7 @@ const Supplier = () => {
                   header="Action"
                   dataType="boolean"
                   bodyClassName="text-center"
-                  style={{ minWidth: "2rem" }}
+                  style={{ minWidth: "3rem" }}
                   body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
                 />
               </DataTable>
@@ -726,16 +726,18 @@ const Supplier = () => {
             <label className="text-label">PPN</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={currentItem !== null ? `${currentItem.sup_ppn}` : ""}
-                onChange={(e) =>
+                value={currentItem !== null ? currentItem.jenisPemasok : null}
+                options={jenisPemasok}
+                onChange={(e) => {
+                  console.log(e.value);
                   setCurrentItem({
                     ...currentItem,
-                    supplier: {
-                      ...currentItem.supplier,
-                      sup_ppn: e.target.value,
-                    },
-                  })
-                }
+                    jenisPemasok: e.value,
+                  });
+                }}
+                optionLabel="jpem_name"
+                filter
+                filterBy="jpem_name"
                 placeholder="Pilih Jenis PPN"
               />
             </div>
@@ -959,7 +961,7 @@ const Supplier = () => {
                 optionLabel="code"
                 filter
                 filterBy="code"
-                placeholder="Pilih Sub Area"
+                placeholder="Pilih Jenis Currency"
               />
             </div>
           </div>
@@ -1021,21 +1023,19 @@ const Supplier = () => {
             <label className="text-label">Hutang</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={
-                  currentItem !== null
-                    ? `${currentItem.supplier.sup_hutang}`
-                    : ""
-                }
-                onChange={(e) =>
+                value={currentItem !== null ? currentItem : null}
+                // options={}
+                onChange={(e) => {
+                  console.log(e.value);
                   setCurrentItem({
                     ...currentItem,
-                    supplier: {
-                      ...currentItem.supplier,
-                      sup_hutang: e.target.value,
-                    },
-                  })
-                }
-                placeholder="Pilih Hutang"
+                    subArea: e.value,
+                  });
+                }}
+                optionLabel="subArea.sub_name"
+                filter
+                filterBy="subArea.sub_name"
+                placeholder="Pilih Kode Distribusi GL"
               />
             </div>
           </div>
@@ -1044,22 +1044,19 @@ const Supplier = () => {
             <label className="text-label">Uang Muka Pembelian</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={
-                  currentItem !== null
-                    ? `${currentItem.supplier.sup_uang_muka}`
-                    : ""
-                }
-                onChange={(e) =>
+                value={currentItem !== null ? currentItem : null}
+                // options={}
+                onChange={(e) => {
+                  console.log(e.value);
                   setCurrentItem({
                     ...currentItem,
-                    supplier: {
-                      ...currentItem.supplier,
-                      sup_np: e.target.value,
-                    },
-                  })
-                }
-                placeholder="Pilih Jenis Uang Muka Pembelian"
-                showButtons
+                    subArea: e.value,
+                  });
+                }}
+                optionLabel="subArea.sub_name"
+                filter
+                filterBy="subArea.sub_name"
+                placeholder="Pilih Jenis Uang Muka"
               />
             </div>
           </div>

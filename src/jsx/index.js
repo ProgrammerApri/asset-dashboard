@@ -48,6 +48,7 @@ import SubCustomer from "./components/Master/SubCustomer";
 import SetupKhusus from "./components/Master/SetupKhusus";
 import Mitra from "./components/Mitra/Mitra";
 import TransaksiPembelian from "./components/TransaksiPembelian/TransaksiPembelian";
+import Satuan from "./components/Master/Satuan";
 
 const Markup = ({ width }) => {
   const routes = [
@@ -76,6 +77,7 @@ const Markup = ({ width }) => {
     { url: "non-stok", component: NonStock },
     { url: "sub-pelanggan", component: SubCustomer },
     { url: "setup-perkiraan", component: SetupKhusus },
+    { url: "satuan", component: Satuan },
 
     // Report
     { url: "neraca", component: Neraca },

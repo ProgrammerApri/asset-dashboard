@@ -453,6 +453,7 @@ const endpoints = {
     method: "GET",
     data: {},
   },
+
 };
 
 export default endpoints;

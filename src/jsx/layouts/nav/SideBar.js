@@ -69,6 +69,7 @@ class SideBar extends Component {
       "area-penjualan",
       "sub-area",
       "lokasi",
+      "satuan",
     ];
     let report = ["neraca"];
     let mitra = ["mitra"];
@@ -230,7 +231,7 @@ class SideBar extends Component {
                 }`}
               >
                 <Link className="ai-icon" to="/transaksi" aria-expanded="false">
-                  <i class="bx bxs-group"></i>
+                  <i class="bx bxs-badge-dollar"></i>
                   <span className="nav-text">Transaksi Pembelian</span>
                 </Link>
               </li>

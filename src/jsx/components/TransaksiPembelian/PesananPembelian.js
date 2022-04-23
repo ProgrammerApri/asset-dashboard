@@ -4,7 +4,7 @@ import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "react-bootstrap";
-import { Row, Col, Card } from "react-bootstrap";
+import { Row, Col, Card, Badge } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { Dialog } from "primereact/dialog";
@@ -16,52 +16,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { InputNumber } from "primereact/inputnumber";
 import { Divider } from "@material-ui/core";
 
-const data = {
-  customer: {
-    id: 1,
-    cus_code: "",
-    cus_name: "",
-    cus_jpel: "",
-    cus_sub_area: "",
-    cus_kolektor: "",
-    cus_npwp: "",
-    cus_address: "",
-    cus_kota: "",
-    cus_kpos: "",
-    cus_telp1: "",
-    cus_telp2: "",
-    cus_email: "",
-    cus_fax: "",
-    cus_cp: "",
-    cus_curren: "",
-    cus_pjk: "",
-    cus_ket: "",
-    cus_gl: "",
-    cus_uang_muka: "",
-    cus_limit: "",
-  },
-
-  jenisPel: {
-    id: 0,
-    jpel_code: "",
-    jpel_name: "",
-    jpel_ket: "",
-  },
-
-  subArea: {
-    id: 1,
-    sub_code: "",
-    sub_area_code: "",
-    sub_name: "",
-    sub_ket: "",
-  },
-
-  currency: {
-    id: 1,
-    code: "",
-    name: "",
-  },
-};
+const data = {};
 
 const PesananPO = () => {
   const [po, setPO] = useState(null);
@@ -111,31 +66,12 @@ const PesananPO = () => {
     }
   };
 
-  const editCustomer = async () => {
+  const editPO = async () => {
     const config = {
-      ...endpoints.editCustomer,
-      endpoint: endpoints.editCustomer.endpoint + currentItem.id,
+      ...endpoints.editPO,
+      endpoint: endpoints.editPO.endpoint + currentItem.id,
       data: {
         cus_code: currentItem.customer.cus_code,
-        cus_name: currentItem.customer.cus_name,
-        cus_jpel: currentItem.jenisPel.id,
-        cus_sub_area: currentItem.subArea.id,
-        cus_kolektor: currentItem.kolektor.id,
-        cus_npwp: currentItem.customer.cus_npwp,
-        cus_address: currentItem.customer.cus_address,
-        cus_kota: currentItem.customer.cus_kota,
-        cus_kpos: currentItem.customer.cus_kpos,
-        cus_telp1: currentItem.customer.cus_telp1,
-        cus_telp2: currentItem.customer.cus_telp2,
-        cus_email: currentItem.customer.cus_email,
-        cus_fax: currentItem.customer.cus_fax,
-        cus_cp: currentItem.customer.cus_cp,
-        cus_curren: currentItem.currency.id,
-        cus_pjk: currentItem.customer.cus_pjk,
-        cus_ket: currentItem.customer.cus_ket,
-        cus_gl: currentItem,
-        cus_uang_muka: currentItem,
-        cus_limit: currentItem.customer.cus_limit,
       },
     };
     console.log(config.data);
@@ -169,30 +105,11 @@ const PesananPO = () => {
     }
   };
 
-  const addCustomer = async () => {
+  const addPO = async () => {
     const config = {
-      ...endpoints.addCustomer,
+      ...endpoints.addPO,
       data: {
         cus_code: currentItem.customer.cus_code,
-        cus_name: currentItem.customer.cus_name,
-        cus_jpel: currentItem.jenisPel.id,
-        cus_sub_area: currentItem.subArea.id,
-        cus_kolektor: currentItem.kolektor.id,
-        cus_npwp: currentItem.customer.cus_npwp,
-        cus_address: currentItem.customer.cus_address,
-        cus_kota: currentItem.customer.cus_kota,
-        cus_kpos: currentItem.customer.cus_kpos,
-        cus_telp1: currentItem.customer.cus_telp1,
-        cus_telp2: currentItem.customer.cus_telp2,
-        cus_email: currentItem.customer.cus_email,
-        cus_fax: currentItem.customer.cus_fax,
-        cus_cp: currentItem.customer.cus_cp,
-        cus_curren: currentItem.currency.id,
-        cus_pjk: currentItem.customer.cus_pjk,
-        cus_ket: currentItem.customer.cus_ket,
-        cus_gl: currentItem,
-        cus_uang_muka: currentItem,
-        cus_limit: currentItem.customer.cus_limit,
       },
     };
     console.log(config.data);
@@ -239,10 +156,10 @@ const PesananPO = () => {
     }
   };
 
-  const delCustomer = async (id) => {
+  const delPO = async (id) => {
     const config = {
-      ...endpoints.delCustomer,
-      endpoint: endpoints.delCustomer.endpoint + currentItem.id,
+      ...endpoints.delPO,
+      endpoint: endpoints.delPO.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -319,10 +236,10 @@ const PesananPO = () => {
   const onSubmit = () => {
     if (isEdit) {
       setUpdate(true);
-      editCustomer();
+      editPO();
     } else {
       setUpdate(true);
-      addCustomer();
+      addPO();
     }
   };
 
@@ -357,7 +274,7 @@ const PesananPO = () => {
           label="Hapus"
           icon="pi pi-trash"
           onClick={() => {
-            delCustomer();
+            delPO();
           }}
           autoFocus
           loading={update}
@@ -459,45 +376,6 @@ const PesananPO = () => {
     <>
       <Toast ref={toast} />
       <Row>
-        <div className="col-md-4 col-sm-4">
-          <Card>
-            <Card.Body className="p-4">
-              <span className="fs-13 text-black font-w600 mb-0">
-                Piutang Jatuh Tempo Lebih Dari <b>90 Hari</b>
-              </span>
-              <h4 className="fs-140 text-black font-w600 mt-3">
-                <b>Rp. </b>
-              </h4>
-            </Card.Body>
-          </Card>
-        </div>
-
-        <div className="col-md-4 col-sm-4">
-          <Card>
-            <Card.Body className="p-4">
-              <span className="fs-13 text-black font-w600 mb-0">
-                Piutang Jatuh Tempo <b>Belum Jatuh Tempo</b>
-              </span>
-              <h4 className="fs-140 text-black font-w600 mt-3">
-                <b>Rp. </b>
-              </h4>
-            </Card.Body>
-          </Card>
-        </div>
-
-        <div className="col-md-4 col-sm-4">
-          <Card>
-            <Card.Body className="p-4">
-              <span className="fs-13 text-black font-w600 mb-0">
-                <b>Total Piutang</b>
-              </span>
-              <h4 className="fs-140 text-black font-w600 mt-3">
-                <b>Rp. </b>
-              </h4>
-            </Card.Body>
-          </Card>
-        </div>
-
         <Col className="pt-0">
           <Card>
             <Card.Body>
@@ -510,13 +388,7 @@ const PesananPO = () => {
                 rowHover
                 header={renderHeader}
                 filters={filters1}
-                globalFilterFields={[
-                  "customer.cus_code",
-                  "customer.cus_name",
-                  "customer.cus_address",
-                  "customer.cus_telp1",
-                  "customer.cus_limit",
-                ]}
+                globalFilterFields={["customer.cus_code", "customer.cus_limit"]}
                 emptyMessage="Tidak ada data"
                 paginator
                 paginatorTemplate={template2}
@@ -526,35 +398,29 @@ const PesananPO = () => {
                 paginatorClassName="justify-content-end mt-3"
               >
                 <Column
-                  header="Kode Pelanggan"
+                  header="Tanggal"
                   style={{
-                    minWidth: "8rem",
+                    minWidth: "10rem",
                   }}
                   field={(e) => e.customer.cus_code}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Nama Pelanggan"
+                  header="Nomor Pesanan"
                   field={(e) => e.customer.cus_name}
-                  style={{ minWidth: "8rem" }}
+                  style={{ minWidth: "10rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Alamat"
+                  header="Nomor Pesanan"
                   field={(e) => e.customer.cus_address}
-                  style={{ minWidth: "8rem" }}
+                  style={{ minWidth: "10rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Telp"
+                  header="Status"
                   field={(e) => e.cus_telp}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Limit Kredit"
-                  field={(e) => e.customer.cus_limit}
-                  style={{ minWidth: "8rem" }}
+                  style={{ minWidth: "10rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
@@ -571,7 +437,7 @@ const PesananPO = () => {
       </Row>
 
       <Dialog
-        header={isEdit ? "Edit Data Pelanggan" : "Tambah Data Pelanggan"}
+        header={isEdit ? "Edit Pesanan Pembelian (PO)" : "Tambah Pesanan Pembelian (PO)"}
         visible={displayData}
         style={{ width: "50vw" }}
         footer={renderFooter("displayData")}
@@ -580,362 +446,7 @@ const PesananPO = () => {
           setDisplayData(false);
         }}
       >
-        <div className="form-row">
-          <div className="col-6">
-            <label className="text-label">Kode Pelanggan</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={currentItem !== null ? `${currentItem.customer.cus_code}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    customer: { ...currentItem.customer, cus_code: e.target.value },
-                  })
-                }
-                placeholder="Masukan Kode Pelanggan"
-              />
-            </div>
-          </div>
-
-          <div className="col-6">
-            <label className="text-label">Nama Pelanggan</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={currentItem !== null ? `${currentItem.customer.cus_name}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    customer: { ...currentItem.customer, cus_name: e.target.value },
-                  })
-                }
-                placeholder="Masukan Nama Pelanggan"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="form-row">
-          <div className="col-6">
-            <label className="text-label">Jenis Pelanggan</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={currentItem !== null ? `${currentItem.jenisPel.jpel_name}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    jenisPel: { ...currentItem.jenisPel, jpel_name: e.target.value },
-                  })
-                }
-                placeholder="Pilih Jenis Pelanggan"
-              />
-            </div>
-          </div>
-
-          <div className="col-6">
-            <label className="text-label">Sub Area Penjualan</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={currentItem !== null ? `${currentItem.subArea.sub_name}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    jenisPel: { ...currentItem.jenisPel, sub_name: e.target.value },
-                  })
-                }
-                placeholder="Pilih Sub Area Penjualan"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="form-row">
-          <div className="col-6">
-            <label className="text-label">Kolektor</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={currentItem !== null ? `${currentItem.cus_code}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, cus_code: e.target.value })
-                }
-                placeholder="Pilih Kolektor"
-              />
-            </div>
-          </div>
-
-          <div className="col-6">
-            <label className="text-label">NPWP</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={currentItem !== null ? `${currentItem.customer.cus_npwp}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    customer: { ...currentItem.customer, cus_npwp: e.target.value },
-                  })
-                }
-                placeholder="Masukan NPWP"
-              />
-            </div>
-          </div>
-        </div>
-
-        <h4 className="mt-5">
-          <b>Informasi Alamat</b>
-        </h4>
-        <Divider className="mb-3"></Divider>
-
-        <div className="form-row">
-          <div className="col-12">
-            <label className="text-label">Alamat</label>
-            <div className="p-inputgroup">
-              <InputTextarea
-                value={currentItem !== null ? `${currentItem.customer.cus_address}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    customer: { ...currentItem.customer, cus_code: e.target.value },
-                  })
-                }
-                placeholder="Masukan Alamat"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="form-row">
-          <div className="col-6">
-            <label className="text-label">Kota</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={currentItem !== null ? `${currentItem.customer.cus_kota}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    customer: { ...currentItem.customer, cus_kota: e.target.value },
-                  })
-                }
-                placeholder="Pilih Kota"
-              />
-            </div>
-          </div>
-
-          <div className="col-6">
-            <label className="text-label">Kode Pos</label>
-            <div className="p-inputgroup">
-              <InputNumber
-                value={currentItem !== null ? `${currentItem.customer.cus_kpos}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    customer: { ...currentItem.customer, cus_kpos: e.value },
-                  })
-                }
-                placeholder="Masukan Kode Pos"
-              />
-            </div>
-          </div>
-        </div>
-
-        <h4 className="mt-5">
-          <b>Informasi Kontak</b>
-        </h4>
-        <Divider className="mb-3"></Divider>
-
-        <div className="form-row">
-          <div className="col-6">
-            <label className="text-label">Telp 1</label>
-            <div className="p-inputgroup">
-              <InputNumber
-                value={currentItem !== null ? `${currentItem.customer.cus_telp1}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    customer: { ...currentItem.customer, cus_telp1: e.value },
-                  })
-                }
-                placeholder="Masukan No. Telepon"
-              />
-            </div>
-          </div>
-
-          <div className="col-6">
-            <label className="text-label">Telp 2</label>
-            <div className="p-inputgroup">
-              <InputNumber
-                value={currentItem !== null ? `${currentItem.customer.cus_telp2}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    customer: { ...currentItem.customer, cus_telp2: e.value },
-                  })
-                }
-                placeholder="Masukan No. Telepon"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="form-row">
-          <div className="col-6">
-            <label className="text-label">Email</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={currentItem !== null ? `${currentItem.customer.cus_email}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    customer: { ...currentItem.customer, cus_email: e.target.value },
-                  })
-                }
-                placeholder="Cth. ar@gmail.com"
-              />
-            </div>
-          </div>
-
-          <div className="col-6">
-            <label className="text-label">Fax</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={currentItem !== null ? `${currentItem.customer.cus_fax}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    customer: { ...currentItem.customer, cus_fax: e.target.value },
-                  })
-                }
-                placeholder="Masukan Fax"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="form-row">
-          <div className="col-12">
-            <label className="text-label">Contact Person</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={currentItem !== null ? `${currentItem.customer.cus_cp}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    customer: { ...currentItem.customer, cus_cp: e.target.value },
-                  })
-                }
-                placeholder="Masukan Contact Person"
-              />
-            </div>
-          </div>
-        </div>
-
-        <h4 className="mt-5">
-          <b>Informasi Currency</b>
-        </h4>
-        <Divider className="mb-3"></Divider>
-
-        <div className="form-row">
-          <div className="col-6">
-            <label className="text-label">Currency</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={currentItem !== null ? `${currentItem.currency.name}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    currency: { ...currentItem.currency, name: e.target.value },
-                  })
-                }
-                placeholder="Pilih Jenis Currency"
-              />
-            </div>
-          </div>
-
-          <div className="col-6">
-            <label className="text-label">Pajak</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={currentItem !== null ? `${currentItem.customer.cus_pjk}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    customer: { ...currentItem.customer, cus_pjk: e.target.value },
-                  })
-                }
-                placeholder="Pilih Pajak"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="form-row">
-          <div className="col-12">
-            <label className="text-label">Keterangan</label>
-            <div className="p-inputgroup">
-              <InputTextarea
-                value={currentItem !== null ? `${currentItem.customer.cus_ket}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    customer: { ...currentItem.customer, cus_ket: e.target.value },
-                  })
-                }
-                placeholder="Masukan Keterangan"
-              />
-            </div>
-          </div>
-        </div>
-
-        <h4 className="mt-5">
-          <b>Distribusi GL/AR</b>
-        </h4>
-        <Divider className="mb-3"></Divider>
-
-        <div className="form-row">
-          <div className="col-6">
-            <label className="text-label">Kode Distribusi GL/AR</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={currentItem !== null ? `${currentItem.cus_telp}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, cus_telp: e.value })
-                }
-                placeholder="Pilih Kode Distribusi"
-              />
-            </div>
-          </div>
-
-          <div className="col-6">
-            <label className="text-label">
-              Kode Distribusi Uang Muka Penjualan
-            </label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={currentItem !== null ? `${currentItem.cus_saldo}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, cus_saldo: e.value })
-                }
-                placeholder="Pilih Kode Distribusi Uang Muka"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="form-row">
-          <div className="col-12">
-            <label className="text-label">Limit Kredit</label>
-            <div className="p-inputgroup">
-              <InputNumber
-                value={currentItem !== null ? `${currentItem.customer.cus_limit}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    customer: { ...currentItem.customer, cus_limit: e.value },
-                  })
-                }
-                placeholder="Masukan Limit Kredit"
-              />
-            </div>
-          </div>
-        </div>
+        
       </Dialog>
 
       <Dialog

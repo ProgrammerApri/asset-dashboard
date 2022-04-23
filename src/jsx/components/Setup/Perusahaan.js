@@ -394,7 +394,7 @@ const Perusahaan = () => {
                 </Accordion.Toggle>
                 <Accordion.Collapse eventKey={"0"}>
                   <div className="accordion__body--text">
-                    {currentData.cp_logo !== "" ? (
+                    {currentData && currentData.cp_logo !== "" ? (
                       <div className="col-12 mb-3">
                         <img
                           className="cp-logo"
@@ -407,21 +407,21 @@ const Perusahaan = () => {
                     )}
                     {renderDetail(
                       "Nama Perusahaan",
-                      currentData.cp_name !== "" ? currentData.cp_name : "-"
+                      currentData && currentData.cp_name !== "" ? currentData.cp_name : "-"
                     )}
                     {renderDetail(
                       "Alamat Perusahaan",
-                      currentData.cp_addr !== "" ? currentData.cp_addr : "-"
+                      currentData && currentData.cp_addr !== "" ? currentData.cp_addr : "-"
                     )}
                     {renderDetail(
                       "Alamat Pengiriman",
-                      currentData.cp_ship_addr !== ""
+                      currentData && currentData.cp_ship_addr !== ""
                         ? currentData.cp_ship_addr
                         : "-"
                     )}
                     {renderDetail(
                       "Telp",
-                      currentData.cp_telp != "" ? currentData.cp_telp : "-"
+                      currentData && currentData.cp_telp != "" ? currentData.cp_telp : "-"
                     )}
                     <div className="mt-3 mb-1 flex justify-content-between">
                       <div></div>
@@ -464,7 +464,7 @@ const Perusahaan = () => {
                       <InputSwitch
                         className="mr-3"
                         inputId="email"
-                        checked={currentData.multi_currency}
+                        checked={currentData && currentData.multi_currency}
                         onChange={(e) => {
                           setCurrentData({
                             ...currentData,
@@ -485,7 +485,7 @@ const Perusahaan = () => {
                       <InputSwitch
                         className="mr-3"
                         inputId="email"
-                        checked={currentData.appr_po}
+                        checked={currentData && currentData.appr_po}
                         onChange={(e) => {
                           setCurrentData({ ...currentData, appr_po: e.value });
                           submitUpdate(false, {
@@ -503,7 +503,7 @@ const Perusahaan = () => {
                       <InputSwitch
                         className="mr-3"
                         inputId="email"
-                        checked={currentData.appr_payment}
+                        checked={currentData && currentData.appr_payment}
                         onChange={(e) => {
                           setCurrentData({
                             ...currentData,
@@ -551,19 +551,19 @@ const Perusahaan = () => {
                   <div className="accordion__body--text">
                     {renderDetail(
                       "Email",
-                      currentData.cp_email !== "" ? currentData.cp_email : "-"
+                      currentData && currentData.cp_email !== "" ? currentData.cp_email : "-"
                     )}
                     {renderDetail(
                       "Website",
-                      currentData.cp_webs !== "" ? currentData.cp_webs : "-"
+                      currentData && currentData.cp_webs !== "" ? currentData.cp_webs : "-"
                     )}
                     {renderDetail(
                       "NPWP Perusahaan",
-                      currentData.cp_npwp !== "" ? currentData.cp_npwp : "-"
+                      currentData && currentData.cp_npwp !== "" ? currentData.cp_npwp : "-"
                     )}
                     {renderDetail(
                       "Kontak Person",
-                      currentData.cp_coper !== "" ? currentData.cp_coper : "-"
+                      currentData && currentData.cp_coper !== "" ? currentData.cp_coper : "-"
                     )}
                     <div className="mt-3 mb-1 flex justify-content-between">
                       <div></div>

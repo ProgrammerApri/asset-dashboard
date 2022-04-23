@@ -21,64 +21,64 @@ const SideMenu = () => {
       {
         tittle: "Mitra",
         to: "mitra",
-        icon: "bx-stats",
+        icon: "bx-shape-circle",
       },
       {
         tittle: "Group Produk",
         to: "group-produk",
-        icon: "bx-network-chart",
+        icon: "bx-cabinet",
       },
       {
         tittle: "Produk",
         to: "produk",
-        icon: "bx-category-alt",
+        icon: "bx-archive",
       },
       {
         tittle: "Gudang",
         to: "gudang",
-        icon: "bx-category-alt",
+        icon: "bx-building",
       },
       {
         tittle: "Aset",
         to: "aset",
-        icon: "bx-category-alt",
+        icon: "bx-car",
       },
     ],
     master_lainnya: [
       {
         tittle: "Satuan",
         to: "satuan",
-        icon: "bx-category-alt",
+        icon: "bx-barcode",
       },
       {
         tittle: "Departemen",
         to: "departemen",
-        icon: "bx-stats",
+        icon: "bx-globe-alt",
       },
       {
         tittle: "Project",
         to: "project",
-        icon: "bx-network-chart",
+        icon: "bx-poll",
       },
       {
         tittle: "Currency",
         to: "currency",
-        icon: "bx-category-alt",
+        icon: "bx-dollar-circle",
       },
       {
         tittle: "bank",
         to: "bank",
-        icon: "bx-category-alt",
+        icon: "bx-money-withdraw",
       },
       {
         tittle: "jenis pelanggan",
         to: "jenis-pelanggan",
-        icon: "bx-category-alt",
+        icon: "bx-street-view",
       },
       {
         tittle: "jenis pemasok",
         to: "jenis-pemasok",
-        icon: "bx-category-alt",
+        icon: "bx-user-voice",
       },
     ],
     lainnya: [
@@ -114,7 +114,7 @@ const SideMenu = () => {
       console.log(key);
       out.push(
         <div className="sidebar-menu">
-          <div className="menu-tittle">
+          <div className={key === "dashboard" ? "menu-tittle first": "menu-tittle"}>
             {key.includes("_") ? key.replace("_", " ") : key}
           </div>
           <div className="menu-sub">
@@ -132,10 +132,12 @@ const SideMenu = () => {
       <HashRouter basename="/">
         <div className="sidebar">
           <div className="sidebar-header">
+            <Link to={""}>
             <div className="sidebar-logo">
               <img className="logo" src={logoSmall} alt="" />
             </div>
             <span>itungin.id</span>
+            </Link>
           </div>
           <PerfectScrollbar className="scroll">
             {renderSidebar()}

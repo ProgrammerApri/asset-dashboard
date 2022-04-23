@@ -47327,7 +47327,7 @@ html[dir="rtl"]
   transition: 0.25s;
 }
 
-.sidebar-header {
+.sidebar-header a{
   padding: 1.5rem 0 15px 40px;
   display: flex;
   align-items: center;
@@ -47339,7 +47339,7 @@ html[dir="rtl"]
 }
 
 
-.sidebar-header span {
+.sidebar-header a span {
   margin-left: 10px;
   font-weight: 900;
   color: #7A80AB;
@@ -47351,7 +47351,7 @@ html[dir="rtl"]
   padding: 5px;
 }
 
-.sidebar-logo .logo{
+a .sidebar-logo .logo{
   max-width: 35px;
 }
 
@@ -47370,6 +47370,7 @@ html[dir="rtl"]
   transition: color 0.2s ease-in-out;
   color: #B6B9CD;
 }
+
 
 .menu-sub {
   margin-right: 1.5rem;

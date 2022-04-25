@@ -15,41 +15,42 @@ import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { InputNumber } from "primereact/inputnumber";
 import { Divider } from "@material-ui/core";
+import { TabPanel, TabView } from "primereact/tabview";
 
 const data = {
   customer: {
-    id: 1,
-    cus_code: "",
-    cus_name: "",
-    cus_jpel: "",
-    cus_sub_area: "",
-    cus_kolektor: "",
-    cus_npwp: "",
-    cus_address: "",
-    cus_kota: "",
-    cus_kpos: "",
-    cus_telp1: "",
-    cus_telp2: "",
-    cus_email: "",
-    cus_fax: "",
-    cus_cp: "",
-    cus_curren: "",
-    cus_pjk: "",
-    cus_ket: "",
-    cus_gl: "",
-    cus_uang_muka: "",
-    cus_limit: "",
+    id: null,
+    cus_code: null,
+    cus_name: null,
+    cus_jpel: null,
+    cus_sub_area: null,
+    cus_kolektor: null,
+    cus_npwp: null,
+    cus_address: null,
+    cus_kota: null,
+    cus_kpos: null,
+    cus_telp1: null,
+    cus_telp2: null,
+    cus_email: null,
+    cus_fax: null,
+    cus_cp: null,
+    cus_curren: null,
+    cus_pjk: null,
+    cus_ket: null,
+    cus_gl: null,
+    cus_uang_muka: null,
+    cus_limit: null,
   },
 
-  jenisPel: {
-    id: 0,
+  jpel: {
+    id: null,
     jpel_code: "",
     jpel_name: "",
     jpel_ket: "",
   },
 
   subArea: {
-    id: 1,
+    id: null,
     sub_code: "",
     sub_area_code: "",
     sub_name: "",
@@ -57,32 +58,22 @@ const data = {
   },
 
   currency: {
-    id: 1,
+    id: null,
     code: "",
     name: "",
   },
-
-  city: {
-    city_id: 1,
-    province_id: 0,
-    province: "",
-    type: "",
-    city_name: "",
-    postal_code: 0,
-  },
-
-  account: {
-    id: 1,
-    acc_code: "",
-    acc_name: "",
-  },
-
 };
+
+const pajak = [
+  { name: "Include", code: "I" },
+  { name: "Exclude", code: "E" },
+  { name: "Non PPN", code: "N" },
+];
 
 const Customer = () => {
   const [customer, setCustomer] = useState(null);
   const [city, setCity] = useState(null);
-  const [jenisPel, setJenisPel] = useState(null);
+  const [jpel, setJpel] = useState(null);
   const [subArea, setSubArea] = useState(null);
   const [setup, setSetup] = useState(null);
   const [currency, setCurrency] = useState(null);
@@ -137,11 +128,9 @@ const Customer = () => {
     }
   };
 
-  const getCity = async (isUpdate = false) => {
-    setLoading(true);
+  const getCity = async () => {
     const config = {
       ...endpoints.city,
-      data: {},
     };
     console.log(config.data);
     let response = null;
@@ -150,17 +139,17 @@ const Customer = () => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        console.log(data);
         setCity(data);
+        // let selected = null;
+        // city.forEach((element) => {
+        //   if (element.city.city_id === value) {
+        //     selected = element;
+        //   }
+        // });
+        // console.log(selected);
+        // return selected;
       }
     } catch (error) {}
-    if (isUpdate) {
-      setLoading(false);
-    } else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1500);
-    }
   };
 
   const getJpel = async (isUpdate = false) => {
@@ -177,7 +166,7 @@ const Customer = () => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        setJenisPel(data);
+        setJpel(data);
       }
     } catch (error) {}
     if (isUpdate) {
@@ -229,7 +218,11 @@ const Customer = () => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        setSubArea(data);
+        let sub = []
+        data.forEach(element => {
+          sub.push(element.subArea)
+        });
+        setSubArea(sub);
       }
     } catch (error) {}
     if (isUpdate) {
@@ -274,12 +267,11 @@ const Customer = () => {
       data: {
         cus_code: currentItem.customer.cus_code,
         cus_name: currentItem.customer.cus_name,
-        cus_jpel: currentItem.jenisPel.id,
+        cus_jpel: currentItem.jpel.id,
         cus_sub_area: currentItem.subArea.id,
-        cus_kolektor: customer.kolektor.id,
         cus_npwp: currentItem.customer.cus_npwp,
         cus_address: currentItem.customer.cus_address,
-        cus_kota: currentItem.customer.cus_kota,
+        cus_kota: currentItem.city.city_id,
         cus_kpos: currentItem.customer.cus_kpos,
         cus_telp1: currentItem.customer.cus_telp1,
         cus_telp2: currentItem.customer.cus_telp2,
@@ -289,8 +281,8 @@ const Customer = () => {
         cus_curren: currentItem.currency.id,
         cus_pjk: currentItem.customer.cus_pjk,
         cus_ket: currentItem.customer.cus_ket,
-        cus_gl: currentItem,
-        cus_uang_muka: currentItem,
+        cus_gl: setup.ar.id,
+        cus_uang_muka: setup.pur_advance.id,
         cus_limit: currentItem.customer.cus_limit,
       },
     };
@@ -331,12 +323,11 @@ const Customer = () => {
       data: {
         cus_code: currentItem.customer.cus_code,
         cus_name: currentItem.customer.cus_name,
-        cus_jpel: currentItem.jenisPel.id,
+        cus_jpel: currentItem.jpel.id,
         cus_sub_area: currentItem.subArea.id,
-        cus_kolektor: customer.kolektor.id,
         cus_npwp: currentItem.customer.cus_npwp,
         cus_address: currentItem.customer.cus_address,
-        cus_kota: currentItem.customer.cus_kota,
+        cus_kota: currentItem.city.city_id,
         cus_kpos: currentItem.customer.cus_kpos,
         cus_telp1: currentItem.customer.cus_telp1,
         cus_telp2: currentItem.customer.cus_telp2,
@@ -346,8 +337,8 @@ const Customer = () => {
         cus_curren: currentItem.currency.id,
         cus_pjk: currentItem.customer.cus_pjk,
         cus_ket: currentItem.customer.cus_ket,
-        cus_gl: currentItem,
-        cus_uang_muka: currentItem,
+        cus_gl: setup.ar.id,
+        cus_uang_muka: setup.pur_advance.id,
         cus_limit: currentItem.customer.cus_limit,
       },
     };
@@ -398,7 +389,7 @@ const Customer = () => {
   const delCustomer = async (id) => {
     const config = {
       ...endpoints.delCustomer,
-      endpoint: endpoints.delCustomer.endpoint + currentItem.id,
+      endpoint: endpoints.delCustomer.endpoint + currentItem.customer.id,
     };
     console.log(config.data);
     let response = null;
@@ -439,6 +430,7 @@ const Customer = () => {
       <div className="d-flex">
         <Link
           onClick={() => {
+            console.log(data);
             setEdit(true);
             onClick("displayData", data);
             setCurrentItem(data);
@@ -611,6 +603,27 @@ const Customer = () => {
     setRows2(event.rows);
   };
 
+  const getPpn = (value) => {
+    let ppn = {}
+    pajak.forEach(element => {
+      if (value === element.code) {
+        ppn = element
+      }
+    });
+    return ppn
+  }
+
+  const kota = (value) => {
+    let selected = {};
+    city.forEach((element) => {
+      if (element.city_id === `${value}`) {
+        selected = element;
+      }
+    });
+    console.log(currentItem);
+    return selected;
+  };
+
   return (
     <>
       <Toast ref={toast} />
@@ -703,7 +716,7 @@ const Customer = () => {
                 />
                 <Column
                   header="Telp"
-                  field={(e) => e.cus_telp}
+                  field={(e) => e.customer.cus_telp1}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
@@ -736,462 +749,442 @@ const Customer = () => {
           setDisplayData(false);
         }}
       >
-        <div className="form-row">
-          <div className="col-6">
-            <label className="text-label">Kode Pelanggan</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={
-                  currentItem !== null ? `${currentItem.customer.cus_code}` : ""
-                }
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    customer: {
-                      ...currentItem.customer,
-                      cus_code: e.target.value,
-                    },
-                  })
-                }
-                placeholder="Masukan Kode Pelanggan"
-              />
+        <TabView>
+          <TabPanel header="Informasi Pelanggan">
+            <div className="row mr-0 ml-0">
+              <div className="col-6">
+                <label className="text-label">Kode Pelanggan</label>
+                <div className="p-inputgroup">
+                  <InputText
+                    value={
+                        `${currentItem?.customer?.cus_code ?? ""}`  
+                    }
+                    onChange={(e) =>
+                      setCurrentItem({
+                        ...currentItem,
+                        customer: {
+                          ...currentItem.customer,
+                          cus_code: e.target.value,
+                        },
+                      })
+                    }
+                    placeholder="Masukan Kode Pelanggan"
+                  />
+                </div>
+              </div>
+
+              <div className="col-6">
+                <label className="text-label">Nama Pelanggan</label>
+                <div className="p-inputgroup">
+                  <InputText
+                    value={
+                      `${currentItem?.customer?.cus_name ?? ""}`  
+                  }
+                    onChange={(e) =>
+                      setCurrentItem({
+                        ...currentItem,
+                        customer: {
+                          ...currentItem.customer,
+                          cus_name: e.target.value,
+                        },
+                      })
+                    }
+                    placeholder="Masukan Nama Pelanggan"
+                  />
+                </div>
+              </div>
             </div>
-          </div>
 
-          <div className="col-6">
-            <label className="text-label">Nama Pelanggan</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={
-                  currentItem !== null ? `${currentItem.customer.cus_name}` : ""
-                }
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    customer: {
-                      ...currentItem.customer,
-                      cus_name: e.target.value,
-                    },
-                  })
-                }
-                placeholder="Masukan Nama Pelanggan"
-              />
+            <div className="row mr-0 ml-0">
+              <div className="col-6">
+                <label className="text-label">Jenis Pelanggan</label>
+                <div className="p-inputgroup">
+                  <Dropdown
+                    value={currentItem !== null ? currentItem.jpel : null}
+                    options={jpel}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        jpel: e.value,
+                      });
+                    }}
+                    optionLabel="jpel_name"
+                    filter
+                    filterBy="jpel_name"
+                    placeholder="Pilih Jenis Pelanggan"
+                  />
+                </div>
+              </div>
+
+              <div className="col-6">
+                <label className="text-label">Sub Area Penjualan</label>
+                <div className="p-inputgroup">
+                  <Dropdown
+                    value={currentItem !== null ? currentItem.subArea : null}
+                    options={subArea}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        subArea: e.value,
+                      });
+                    }}
+                    optionLabel="sub_name"
+                    filter
+                    filterBy="sub_name"
+                    placeholder="Pilih Sub Area"
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <div className="form-row">
-          <div className="col-6">
-            <label className="text-label">Jenis Pelanggan</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={currentItem !== null ? currentItem.jenisPel : null}
-                options={jenisPel}
-                onChange={(e) => {
-                  console.log(e.value);
-                  setCurrentItem({
-                    ...currentItem,
-                    jenisPel: e.value,
-                  });
-                }}
-                optionLabel="jpel_name"
-                filter
-                filterBy="jpel_name"
-                placeholder="Pilih Jenis Pelanggan"
-              />
+            <div className="row mr-0 ml-0">
+              <div className="col-12">
+                <label className="text-label">NPWP</label>
+                <div className="p-inputgroup">
+                  <InputText
+                    value={
+                      `${currentItem?.customer?.cus_npwp ?? ""}`  
+                  }
+                    onChange={(e) =>
+                      setCurrentItem({
+                        ...currentItem,
+                        customer: {
+                          ...currentItem.customer,
+                          cus_npwp: e.target.value,
+                        },
+                      })
+                    }
+                    placeholder="Masukan NPWP"
+                  />
+                </div>
+              </div>
             </div>
-          </div>
 
-          <div className="col-6">
-            <label className="text-label">Sub Area Penjualan</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={currentItem !== null ? currentItem.subArea : null}
-                options={subArea}
-                onChange={(e) => {
-                  console.log(e.value);
-                  setCurrentItem({
-                    ...currentItem,
-                    subArea: e.value,
-                  });
-                }}
-                optionLabel="subArea.sub_name"
-                filter
-                filterBy="subArea.sub_name"
-                placeholder="Pilih Sub Area"
-              />
+            <h4 className="mt-4">
+              <b>Informasi Alamat</b>
+            </h4>
+            <Divider className="mb-3"></Divider>
+
+            <div className="row mr-0 ml-0">
+              <div className="col-12">
+                <label className="text-label">Alamat</label>
+                <div className="p-inputgroup">
+                  <InputTextarea
+                    value={
+                      `${currentItem?.customer?.cus_address ?? ""}`  
+                  }
+                    onChange={(e) =>
+                      setCurrentItem({
+                        ...currentItem,
+                        customer: {
+                          ...currentItem.customer,
+                          cus_address: e.target.value,
+                        },
+                      })
+                    }
+                    placeholder="Masukan Alamat"
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <div className="form-row">
-          <div className="col-6">
-            <label className="text-label">Kolektor</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={currentItem !== null ? currentItem : null}
-                options={subArea}
-                onChange={(e) => {
-                  console.log(e.value);
-                  setCurrentItem({
-                    ...currentItem,
-                    subArea: e.value,
-                  });
-                }}
-                optionLabel="subArea.sub_name"
-                filter
-                filterBy="subArea.sub_name"
-                placeholder="Pilih Kolektor"
-              />
+            <div className="row mr-0 ml-0">
+              <div className="col-6">
+                <label className="text-label">Kota</label>
+                <div className="p-inputgroup">
+                  <Dropdown
+                    value={currentItem !== null && currentItem.customer.cus_kota !== null
+                      ? kota(currentItem.customer.cus_kota)
+                      : null}
+                    options={city}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        customer: {
+                          ...currentItem.customer,
+                          cus_kota: e.value.city_id,
+                        },
+                      });
+                    }}
+                    optionLabel="city_name"
+                    filter
+                    filterBy="city_name"
+                    placeholder="Pilih Kota"
+                  />
+                </div>
+              </div>
+
+              <div className="col-6">
+                <label className="text-label">Kode Pos</label>
+                <div className="p-inputgroup">
+                  <InputNumber
+                    value={
+                      `${currentItem?.customer?.cus_kpos ?? ""}`  
+                  }
+                    onChange={(e) =>
+                      setCurrentItem({
+                        ...currentItem,
+                        customer: {
+                          ...currentItem.customer,
+                          cus_kpos: e.value,
+                        },
+                      })
+                    }
+                    placeholder="Masukan Kode Pos"
+                  />
+                </div>
+              </div>
             </div>
-          </div>
+          </TabPanel>
 
-          <div className="col-6">
-            <label className="text-label">NPWP</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={
-                  currentItem !== null ? `${currentItem.customer.cus_npwp}` : ""
-                }
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    customer: {
-                      ...currentItem.customer,
-                      cus_npwp: e.target.value,
-                    },
-                  })
-                }
-                placeholder="Masukan NPWP"
-              />
+          <TabPanel header="Informasi Kontak">
+            <div className="row mr-0 ml-0">
+              <div className="col-6">
+                <label className="text-label">Telp 1</label>
+                <div className="p-inputgroup">
+                  <InputNumber
+                    value={
+                      `${currentItem?.customer?.cus_telp1 ?? ""}`  
+                  }
+                    onChange={(e) =>
+                      setCurrentItem({
+                        ...currentItem,
+                        customer: {
+                          ...currentItem.customer,
+                          cus_telp1: e.value,
+                        },
+                      })
+                    }
+                    placeholder="Masukan No. Telepon"
+                  />
+                </div>
+              </div>
+
+              <div className="col-6">
+                <label className="text-label">Telp 2</label>
+                <div className="p-inputgroup">
+                  <InputNumber
+                    value={
+                      `${currentItem?.customer?.cus_telp2 ?? ""}`  
+                  }
+                    onChange={(e) =>
+                      setCurrentItem({
+                        ...currentItem,
+                        customer: {
+                          ...currentItem.customer,
+                          cus_telp2: e.value,
+                        },
+                      })
+                    }
+                    placeholder="Masukan No. Telepon"
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <h4 className="mt-5">
-          <b>Informasi Alamat</b>
-        </h4>
-        <Divider className="mb-3"></Divider>
+            <div className="row mr-0 ml-0">
+              <div className="col-6">
+                <label className="text-label">Email</label>
+                <div className="p-inputgroup">
+                  <InputText
+                    value={
+                      `${currentItem?.customer?.cus_email ?? ""}`  
+                  }
+                    onChange={(e) =>
+                      setCurrentItem({
+                        ...currentItem,
+                        customer: {
+                          ...currentItem.customer,
+                          cus_email: e.target.value,
+                        },
+                      })
+                    }
+                    placeholder="Cth. ar@gmail.com"
+                  />
+                </div>
+              </div>
 
-        <div className="form-row">
-          <div className="col-12">
-            <label className="text-label">Alamat</label>
-            <div className="p-inputgroup">
-              <InputTextarea
-                value={
-                  currentItem !== null
-                    ? `${currentItem.customer.cus_address}`
-                    : ""
-                }
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    customer: {
-                      ...currentItem.customer,
-                      cus_code: e.target.value,
-                    },
-                  })
-                }
-                placeholder="Masukan Alamat"
-              />
+              <div className="col-6">
+                <label className="text-label">Fax</label>
+                <div className="p-inputgroup">
+                  <InputText
+                    value={
+                      `${currentItem?.customer?.cus_fax?? ""}`  
+                  }
+                    onChange={(e) =>
+                      setCurrentItem({
+                        ...currentItem,
+                        customer: {
+                          ...currentItem.customer,
+                          cus_fax: e.target.value,
+                        },
+                      })
+                    }
+                    placeholder="Masukan Fax"
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <div className="form-row">
-          <div className="col-6">
-            <label className="text-label">Kota</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={currentItem !== null ? currentItem.city : null}
-                options={city}
-                onChange={(e) => {
-                  console.log(e.value);
-                  setCurrentItem({
-                    ...currentItem,
-                    city: e.value,
-                  });
-                }}
-                optionLabel="city_name"
-                filter
-                filterBy="city_name"
-                placeholder="Pilih Kota"
-              />
+            <div className="row mr-0 ml-0">
+              <div className="col-12">
+                <label className="text-label">Contact Person</label>
+                <div className="p-inputgroup">
+                  <InputText
+                    value={
+                      `${currentItem?.customer?.cus_cp ?? ""}`  
+                  }
+                    onChange={(e) =>
+                      setCurrentItem({
+                        ...currentItem,
+                        customer: {
+                          ...currentItem.customer,
+                          cus_cp: e.target.value,
+                        },
+                      })
+                    }
+                    placeholder="Masukan Contact Person"
+                  />
+                </div>
+              </div>
             </div>
-          </div>
+          </TabPanel>
 
-          <div className="col-6">
-            <label className="text-label">Kode Pos</label>
-            <div className="p-inputgroup">
-              <InputNumber
-                value={
-                  currentItem !== null ? `${currentItem.customer.cus_kpos}` : ""
-                }
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    customer: { ...currentItem.customer, cus_kpos: e.value },
-                  })
-                }
-                placeholder="Masukan Kode Pos"
-              />
+          <TabPanel header="Currency & Distribusi AR">
+            <div className="row mr-0 ml-0">
+              <div className="col-6">
+                <label className="text-label">Currency</label>
+                <div className="p-inputgroup">
+                  <Dropdown
+                    value={currentItem !== null ? currentItem.currency : null}
+                    options={currency}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        currency: e.value,
+                      });
+                    }}
+                    optionLabel="code"
+                    filter
+                    filterBy="name"
+                    placeholder="Pilih Jenis Currency"
+                  />
+                </div>
+              </div>
+
+              <div className="col-6">
+                <label className="text-label">Pajak</label>
+                <div className="p-inputgroup">
+                <Dropdown
+                    value={currentItem !== null ? getPpn(currentItem.customer.cus_pjk): null}
+                    options={pajak}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        customer: {
+                          ...currentItem.customer,
+                          cus_pjk: e.value.code,
+                        },
+                      });
+                    }}
+                    optionLabel="name"
+                    filter
+                    filterBy="name"
+                    placeholder="Pilih Jenis Pajak"
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <h4 className="mt-5">
-          <b>Informasi Kontak</b>
-        </h4>
-        <Divider className="mb-3"></Divider>
-
-        <div className="form-row">
-          <div className="col-6">
-            <label className="text-label">Telp 1</label>
-            <div className="p-inputgroup">
-              <InputNumber
-                value={
-                  currentItem !== null
-                    ? `${currentItem.customer.cus_telp1}`
-                    : ""
-                }
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    customer: { ...currentItem.customer, cus_telp1: e.value },
-                  })
-                }
-                placeholder="Masukan No. Telepon"
-              />
+            <div className="row mr-0 ml-0">
+              <div className="col-12">
+                <label className="text-label">Keterangan</label>
+                <div className="p-inputgroup">
+                  <InputTextarea
+                    value={
+                      `${currentItem?.customer?.cus_ket ?? ""}`  
+                  }
+                    onChange={(e) =>
+                      setCurrentItem({
+                        ...currentItem,
+                        customer: {
+                          ...currentItem.customer,
+                          cus_ket: e.target.value,
+                        },
+                      })
+                    }
+                    placeholder="Masukan Keterangan"
+                  />
+                </div>
+              </div>
             </div>
-          </div>
 
-          <div className="col-6">
-            <label className="text-label">Telp 2</label>
-            <div className="p-inputgroup">
-              <InputNumber
-                value={
-                  currentItem !== null
-                    ? `${currentItem.customer.cus_telp2}`
-                    : ""
-                }
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    customer: { ...currentItem.customer, cus_telp2: e.value },
-                  })
-                }
-                placeholder="Masukan No. Telepon"
-              />
+            <h4 className="mt-4 ml-0 mr-0">
+              <b>Distribusi GL/AR</b>
+            </h4>
+            <Divider className="mb-3 ml-0 mr-0"></Divider>
+
+            <div className="row mr-0 ml-0">
+              <div className="col-6">
+                <label className="text-label">Kode Distribusi AR</label>
+                <div className="p-inputgroup">
+                  <InputText
+                    value={
+                      setup !== null
+                        ? `(${setup.ar.acc_code}) - ${setup.ar.acc_name}`
+                        : ""
+                    }
+                    disabled
+                  />
+                </div>
+              </div>
+
+              <div className="col-6">
+                <label className="text-label">
+                  Kode Distribusi Uang Muka Penjualan
+                </label>
+                <div className="p-inputgroup">
+                  <InputText
+                    value={
+                      setup !== null
+                        ? `(${setup.pur_advance.acc_code}) - ${setup.pur_advance.acc_name}`
+                        : ""
+                    }
+                    disabled
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <div className="form-row">
-          <div className="col-6">
-            <label className="text-label">Email</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={
-                  currentItem !== null
-                    ? `${currentItem.customer.cus_email}`
-                    : ""
-                }
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    customer: {
-                      ...currentItem.customer,
-                      cus_email: e.target.value,
-                    },
-                  })
-                }
-                placeholder="Cth. ar@gmail.com"
-              />
+            <div className="row mr-0 ml-0">
+              <div className="col-12">
+                <label className="text-label">Limit Kredit</label>
+                <div className="p-inputgroup">
+                <InputNumber
+                    value={
+                      `${currentItem?.customer?.cus_limit ?? ""}`  
+                  }
+                    onChange={(e) =>
+                      setCurrentItem({
+                        ...currentItem,
+                        customer: {
+                          ...currentItem.customer,
+                          cus_limit: e.value,
+                        },
+                      })
+                    }
+                    placeholder="Masukan No. Telepon"
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-
-          <div className="col-6">
-            <label className="text-label">Fax</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={
-                  currentItem !== null ? `${currentItem.customer.cus_fax}` : ""
-                }
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    customer: {
-                      ...currentItem.customer,
-                      cus_fax: e.target.value,
-                    },
-                  })
-                }
-                placeholder="Masukan Fax"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="form-row">
-          <div className="col-12">
-            <label className="text-label">Contact Person</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={
-                  currentItem !== null ? `${currentItem.customer.cus_cp}` : ""
-                }
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    customer: {
-                      ...currentItem.customer,
-                      cus_cp: e.target.value,
-                    },
-                  })
-                }
-                placeholder="Masukan Contact Person"
-              />
-            </div>
-          </div>
-        </div>
-
-        <h4 className="mt-5">
-          <b>Informasi Currency</b>
-        </h4>
-        <Divider className="mb-3"></Divider>
-
-        <div className="form-row">
-          <div className="col-6">
-            <label className="text-label">Currency</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={currentItem !== null ? currentItem.currency : null}
-                options={currency}
-                onChange={(e) => {
-                  console.log(e.value);
-                  setCurrentItem({
-                    ...currentItem,
-                    currency: e.value,
-                  });
-                }}
-                optionLabel="code"
-                filter
-                filterBy="name"
-                placeholder="Pilih Jenis Currency"
-              />
-            </div>
-          </div>
-
-          <div className="col-6">
-            <label className="text-label">Pajak</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={currentItem !== null ? currentItem : null}
-                options={subArea}
-                onChange={(e) => {
-                  console.log(e.value);
-                  setCurrentItem({
-                    ...currentItem,
-                    subArea: e.value,
-                  });
-                }}
-                optionLabel=""
-                filter
-                filterBy=""
-                placeholder="Pilih Jenis Pajak"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="form-row">
-          <div className="col-12">
-            <label className="text-label">Keterangan</label>
-            <div className="p-inputgroup">
-              <InputTextarea
-                value={
-                  currentItem !== null ? `${currentItem.customer.cus_ket}` : ""
-                }
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    customer: {
-                      ...currentItem.customer,
-                      cus_ket: e.target.value,
-                    },
-                  })
-                }
-                placeholder="Masukan Keterangan"
-              />
-            </div>
-          </div>
-        </div>
-
-        <h4 className="mt-5">
-          <b>Distribusi GL/AR</b>
-        </h4>
-        <Divider className="mb-3"></Divider>
-
-        <div className="form-row">
-          <div className="col-6">
-            <label className="text-label">Kode Distribusi AR</label>
-            <div className="p-inputgroup">
-            <InputText
-                value={
-                    setup !== null
-                      ? `(${setup.ar.acc_code}) - ${setup.ar.acc_name}`
-                      : ""
-                }
-               disabled
-              />
-            </div>
-          </div>
-
-          <div className="col-6">
-            <label className="text-label">
-              Kode Distribusi Uang Muka Penjualan
-            </label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={currentItem !== null ? currentItem : null}
-                options={subArea}
-                onChange={(e) => {
-                  console.log(e.value);
-                  setCurrentItem({
-                    ...currentItem,
-                    subArea: e.value,
-                  });
-                }}
-                optionLabel=""
-                filter
-                filterBy=""
-                placeholder="Pilih Kode Distribusi Uang Muka"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="form-row">
-          <div className="col-12">
-            <label className="text-label">Limit Kredit</label>
-            <div className="p-inputgroup">
-              <InputNumber
-                value={
-                  currentItem !== null
-                    ? `${currentItem.customer.cus_limit}`
-                    : ""
-                }
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    customer: { ...currentItem.customer, cus_limit: e.value },
-                  })
-                }
-                placeholder="Masukan Limit Kredit"
-              />
-            </div>
-          </div>
-        </div>
+          </TabPanel>
+        </TabView>
       </Dialog>
 
       <Dialog

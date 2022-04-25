@@ -244,6 +244,20 @@ textarea.p-inputtext {
   border-width: 0 0 1px 0;
 }
 
+.p-badge {
+  background: #a5a6bc;
+  color: #ffffff;
+  font-size: 0.75rem !important;
+  font-weight: 700;
+  min-width: 1.2rem;
+  height: 1.2rem;
+  line-height: 1.2rem;
+}
+
+.p-badge.active {
+  background: #6366F1;
+}
+
 span .btn {
   height: 100%;
 }

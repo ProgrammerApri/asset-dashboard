@@ -16,6 +16,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { InputNumber } from "primereact/inputnumber";
 import { Divider } from "@material-ui/core";
 import { TabPanel, TabView } from "primereact/tabview";
+import { Badge } from "primereact/badge";
 
 const data = {
   customer: {
@@ -88,6 +89,7 @@ const Customer = () => {
   const [isEdit, setEdit] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+  const [active, setActive] = useState(0);
 
   const dummy = Array.from({ length: 10 });
 
@@ -209,9 +211,9 @@ const Customer = () => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        let sub = []
-        data.forEach(element => {
-          sub.push(element.subArea)
+        let sub = [];
+        data.forEach((element) => {
+          sub.push(element.subArea);
         });
         setSubArea(sub);
       }
@@ -466,11 +468,49 @@ const Customer = () => {
   };
 
   const renderFooter = () => {
+    if (active !== 2) {
+      return (
+        <div className="mt-3">
+          {active > 0 ? (
+            <PButton
+              label="Sebelumnya"
+              onClick={() => {
+                if (active > 0) {
+                  setActive(active - 1);
+                }
+              }}
+              className="p-button-text btn-primary"
+            />
+          ) : (
+            <PButton
+              label="Batal"
+              onClick={() => setDisplayData(false)}
+              className="p-button-text btn-primary"
+            />
+          )}
+          <PButton
+            label="Selanjutnya"
+            onClick={() => {
+              if (active < 2) {
+                setActive(active + 1);
+              }
+            }}
+            autoFocus
+            loading={update}
+          />
+        </div>
+      );
+    }
+
     return (
       <div className="mt-3">
         <PButton
-          label="Batal"
-          onClick={() => setDisplayData(false)}
+          label="Sebelumnya"
+          onClick={() => {
+            if (active > 0) {
+              setActive(active - 1);
+            }
+          }}
           className="p-button-text btn-primary"
         />
         <PButton
@@ -595,14 +635,14 @@ const Customer = () => {
   };
 
   const getPpn = (value) => {
-    let ppn = {}
-    pajak.forEach(element => {
+    let ppn = {};
+    pajak.forEach((element) => {
       if (value === element.code) {
-        ppn = element
+        ppn = element;
       }
     });
-    return ppn
-  }
+    return ppn;
+  };
 
   const kota = (value) => {
     let selected = {};
@@ -613,6 +653,19 @@ const Customer = () => {
     });
     console.log(currentItem);
     return selected;
+  };
+
+  const renderTabHeader = (options) => {
+    return (
+      <button
+        type="button"
+        onClick={options.onClick}
+        className={options.className}
+      >
+        {options.titleElement}
+        <Badge value={`${options.index+1}`} className={`${active === options.index ? "active" : ""} ml-2`}></Badge>
+      </button>
+    );
   };
 
   return (
@@ -734,22 +787,23 @@ const Customer = () => {
         header={isEdit ? "Edit Data Pelanggan" : "Tambah Data Pelanggan"}
         visible={displayData}
         style={{ width: "50vw" }}
-        footer={renderFooter("displayData")}
+        footer={renderFooter()}
         onHide={() => {
           setEdit(false);
           setDisplayData(false);
         }}
       >
-        <TabView>
-          <TabPanel header="Informasi Pelanggan">
+        <TabView activeIndex={active} onTabChange={(e) => setActive(e.index)}>
+          <TabPanel
+            header="Informasi Pelanggan"
+            headerTemplate={renderTabHeader}
+          >
             <div className="row mr-0 ml-0">
               <div className="col-6">
                 <label className="text-label">Kode Pelanggan</label>
                 <div className="p-inputgroup">
                   <InputText
-                    value={
-                        `${currentItem?.customer?.cus_code ?? ""}`  
-                    }
+                    value={`${currentItem?.customer?.cus_code ?? ""}`}
                     onChange={(e) =>
                       setCurrentItem({
                         ...currentItem,
@@ -768,9 +822,7 @@ const Customer = () => {
                 <label className="text-label">Nama Pelanggan</label>
                 <div className="p-inputgroup">
                   <InputText
-                    value={
-                      `${currentItem?.customer?.cus_name ?? ""}`  
-                  }
+                    value={`${currentItem?.customer?.cus_name ?? ""}`}
                     onChange={(e) =>
                       setCurrentItem({
                         ...currentItem,
@@ -835,9 +887,7 @@ const Customer = () => {
                 <label className="text-label">NPWP</label>
                 <div className="p-inputgroup">
                   <InputText
-                    value={
-                      `${currentItem?.customer?.cus_npwp ?? ""}`  
-                  }
+                    value={`${currentItem?.customer?.cus_npwp ?? ""}`}
                     onChange={(e) =>
                       setCurrentItem({
                         ...currentItem,
@@ -863,9 +913,7 @@ const Customer = () => {
                 <label className="text-label">Alamat</label>
                 <div className="p-inputgroup">
                   <InputText
-                    value={
-                      `${currentItem?.customer?.cus_address ?? ""}`  
-                  }
+                    value={`${currentItem?.customer?.cus_address ?? ""}`}
                     onChange={(e) =>
                       setCurrentItem({
                         ...currentItem,
@@ -886,9 +934,12 @@ const Customer = () => {
                 <label className="text-label">Kota</label>
                 <div className="p-inputgroup">
                   <Dropdown
-                    value={currentItem !== null && currentItem.customer.cus_kota !== null
-                      ? kota(currentItem.customer.cus_kota)
-                      : null}
+                    value={
+                      currentItem !== null &&
+                      currentItem.customer.cus_kota !== null
+                        ? kota(currentItem.customer.cus_kota)
+                        : null
+                    }
                     options={city}
                     onChange={(e) => {
                       console.log(e.value);
@@ -912,9 +963,7 @@ const Customer = () => {
                 <label className="text-label">Kode Pos</label>
                 <div className="p-inputgroup">
                   <InputNumber
-                    value={
-                      `${currentItem?.customer?.cus_kpos ?? ""}`  
-                  }
+                    value={`${currentItem?.customer?.cus_kpos ?? ""}`}
                     onChange={(e) =>
                       setCurrentItem({
                         ...currentItem,
@@ -933,15 +982,13 @@ const Customer = () => {
             </div>
           </TabPanel>
 
-          <TabPanel header="Informasi Kontak">
+          <TabPanel header="Informasi Kontak" headerTemplate={renderTabHeader}>
             <div className="row mr-0 ml-0">
               <div className="col-6">
                 <label className="text-label">No. Telepon 1</label>
                 <div className="p-inputgroup">
                   <InputNumber
-                    value={
-                      `${currentItem?.customer?.cus_telp1 ?? ""}`  
-                  }
+                    value={`${currentItem?.customer?.cus_telp1 ?? ""}`}
                     onChange={(e) =>
                       setCurrentItem({
                         ...currentItem,
@@ -962,9 +1009,7 @@ const Customer = () => {
                 <label className="text-label">No. Telepon 2</label>
                 <div className="p-inputgroup">
                   <InputNumber
-                    value={
-                      `${currentItem?.customer?.cus_telp2 ?? ""}`  
-                  }
+                    value={`${currentItem?.customer?.cus_telp2 ?? ""}`}
                     onChange={(e) =>
                       setCurrentItem({
                         ...currentItem,
@@ -987,9 +1032,7 @@ const Customer = () => {
                 <label className="text-label">Email</label>
                 <div className="p-inputgroup">
                   <InputText
-                    value={
-                      `${currentItem?.customer?.cus_email ?? ""}`  
-                  }
+                    value={`${currentItem?.customer?.cus_email ?? ""}`}
                     onChange={(e) =>
                       setCurrentItem({
                         ...currentItem,
@@ -1008,9 +1051,7 @@ const Customer = () => {
                 <label className="text-label">Fax</label>
                 <div className="p-inputgroup">
                   <InputText
-                    value={
-                      `${currentItem?.customer?.cus_fax?? ""}`  
-                  }
+                    value={`${currentItem?.customer?.cus_fax ?? ""}`}
                     onChange={(e) =>
                       setCurrentItem({
                         ...currentItem,
@@ -1031,9 +1072,7 @@ const Customer = () => {
                 <label className="text-label">Contact Person</label>
                 <div className="p-inputgroup">
                   <InputText
-                    value={
-                      `${currentItem?.customer?.cus_cp ?? ""}`  
-                  }
+                    value={`${currentItem?.customer?.cus_cp ?? ""}`}
                     onChange={(e) =>
                       setCurrentItem({
                         ...currentItem,
@@ -1050,7 +1089,7 @@ const Customer = () => {
             </div>
           </TabPanel>
 
-          <TabPanel header="Currency & Distribusi AR">
+          <TabPanel header="Currency & Distribusi AR" headerTemplate={renderTabHeader}>
             <div className="row mr-0 ml-0">
               <div className="col-6">
                 <label className="text-label">Currency</label>
@@ -1076,10 +1115,13 @@ const Customer = () => {
               <div className="col-6">
                 <label className="text-label">Pajak</label>
                 <div className="p-inputgroup">
-                <Dropdown
-                    value={currentItem !== null && currentItem.customer.cus_pjk !== null
-                      ? getPpn(currentItem.customer.cus_pjk)
-                      : null}
+                  <Dropdown
+                    value={
+                      currentItem !== null &&
+                      currentItem.customer.cus_pjk !== null
+                        ? getPpn(currentItem.customer.cus_pjk)
+                        : null
+                    }
                     options={pajak}
                     onChange={(e) => {
                       console.log(e.value);
@@ -1105,9 +1147,7 @@ const Customer = () => {
                 <label className="text-label">Keterangan</label>
                 <div className="p-inputgroup">
                   <InputTextarea
-                    value={
-                      `${currentItem?.customer?.cus_ket ?? ""}`  
-                  }
+                    value={`${currentItem?.customer?.cus_ket ?? ""}`}
                     onChange={(e) =>
                       setCurrentItem({
                         ...currentItem,
@@ -1164,10 +1204,8 @@ const Customer = () => {
               <div className="col-12">
                 <label className="text-label">Limit Kredit</label>
                 <div className="p-inputgroup">
-                <InputNumber
-                    value={
-                      `${currentItem?.customer?.cus_limit ?? ""}`  
-                  }
+                  <InputNumber
+                    value={`${currentItem?.customer?.cus_limit ?? ""}`}
                     onChange={(e) =>
                       setCurrentItem({
                         ...currentItem,

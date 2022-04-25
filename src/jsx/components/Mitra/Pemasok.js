@@ -16,6 +16,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { InputNumber } from "primereact/inputnumber";
 import { Divider } from "@material-ui/core";
 import { TabPanel, TabView } from "primereact/tabview";
+import { Badge } from "primereact/badge";
 
 const data = {
   supplier: {
@@ -86,6 +87,7 @@ const Supplier = () => {
   const [isEdit, setEdit] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+  const [active, setActive] = useState(0);
 
   const dummy = Array.from({ length: 10 });
 
@@ -438,11 +440,49 @@ const Supplier = () => {
   };
 
   const renderFooter = () => {
+    if (active !== 2) {
+      return (
+        <div className="mt-3">
+          {active > 0 ? (
+            <PButton
+              label="Sebelumnya"
+              onClick={() => {
+                if (active > 0) {
+                  setActive(active - 1);
+                }
+              }}
+              className="p-button-text btn-primary"
+            />
+          ) : (
+            <PButton
+              label="Batal"
+              onClick={() => setDisplayData(false)}
+              className="p-button-text btn-primary"
+            />
+          )}
+          <PButton
+            label="Selanjutnya"
+            onClick={() => {
+              if (active < 2) {
+                setActive(active + 1);
+              }
+            }}
+            autoFocus
+            loading={update}
+          />
+        </div>
+      );
+    }
+
     return (
-      <div className="mt-3" position="right">
+      <div className="mt-3">
         <PButton
-          label="Batal"
-          onClick={() => setDisplayData(false)}
+          label="Sebelumnya"
+          onClick={() => {
+            if (active > 0) {
+              setActive(active - 1);
+            }
+          }}
           className="p-button-text btn-primary"
         />
         <PButton
@@ -587,6 +627,19 @@ const Supplier = () => {
     return selected;
   };
 
+  const renderTabHeader = (options) => {
+    return (
+      <button
+        type="button"
+        onClick={options.onClick}
+        className={options.className}
+      >
+        {options.titleElement}
+        <Badge value={`${options.index+1}`} className={`${active === options.index ? "active" : ""} ml-2`}></Badge>
+      </button>
+    );
+  };
+
   return (
     <>
       <Toast ref={toast} />
@@ -712,8 +765,11 @@ const Supplier = () => {
           setDisplayData(false);
         }}
       >
-        <TabView>
-          <TabPanel header="Informasi Supplier">
+        <TabView
+        activeIndex={active}
+        onTabChange={(e) => setActive(e.index)}
+        >
+          <TabPanel header="Informasi Supplier" headerTemplate={renderTabHeader}>
             <div className="row ml-0 mt-0">
               <div className="col-6 mt-0">
                 <label className="text-label">Kode Pemasok</label>
@@ -926,7 +982,7 @@ const Supplier = () => {
             </div>
           </TabPanel>
 
-          <TabPanel header="Informasi Kontak">
+          <TabPanel header="Informasi Kontak" headerTemplate={renderTabHeader}>
             <div className="row ml-0 mt-0">
               <div className="col-6 mt-0">
                 <label className="text-label">No. Telepon 1</label>
@@ -1030,6 +1086,7 @@ const Supplier = () => {
 
           <TabPanel
             header="Currency & Distribusi AP"
+            headerTemplate={renderTabHeader}
           >
             <div className="row ml-0 mt-0">
               <div className="col-6">

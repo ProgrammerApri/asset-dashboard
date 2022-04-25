@@ -26,7 +26,7 @@ const data = {
     sup_ppn: "",
     sup_npwp: "",
     sup_address: "",
-    sup_kota: 0,
+    sup_kota: null,
     sup_kpos: 0,
     sup_telp1: 0,
     sup_telp2: 0,
@@ -239,7 +239,7 @@ const Supplier = () => {
         sup_ppn: currentItem.supplier.sup_ppn,
         sup_npwp: currentItem.supplier.sup_npwp,
         sup_address: currentItem.supplier.sup_address,
-        sup_kota: currentItem.city.city_id,
+        sup_kota: currentItem.supplier.sup_kota,
         sup_kpos: currentItem.supplier.sup_kpos,
         sup_telp1: currentItem.supplier.sup_telp1,
         sup_telp2: currentItem.supplier.sup_telp2,
@@ -293,7 +293,7 @@ const Supplier = () => {
         sup_ppn: currentItem.supplier.sup_ppn,
         sup_npwp: currentItem.supplier.sup_npwp,
         sup_address: currentItem.supplier.sup_address,
-        sup_kota: currentItem.city.city_id,
+        sup_kota: currentItem.supplier.sup_kota,
         sup_kpos: currentItem.supplier.sup_kpos,
         sup_telp1: currentItem.supplier.sup_telp1,
         sup_telp2: currentItem.supplier.sup_telp2,
@@ -439,7 +439,7 @@ const Supplier = () => {
 
   const renderFooter = () => {
     return (
-      <div>
+      <div className="mt-3" position="right">
         <PButton
           label="Batal"
           onClick={() => setDisplayData(false)}
@@ -583,7 +583,7 @@ const Supplier = () => {
         selected = element;
       }
     });
-    console.log(currentItem);
+    console.log(selected);
     return selected;
   };
 
@@ -842,13 +842,13 @@ const Supplier = () => {
               <b>Informasi Alamat</b>
             </h4>
 
-            <Divider className="mb-3"></Divider>
+            <Divider className="mb-2"></Divider>
 
             <div className="row ml-0 mt-0">
               <div className="col-12">
                 <label className="text-label">Alamat</label>
                 <div className="p-inputgroup">
-                  <InputTextarea
+                  <InputText
                     value={
                       currentItem !== null
                         ? `${currentItem.supplier.sup_address}`
@@ -917,8 +917,9 @@ const Supplier = () => {
                         },
                       })
                     }
-                    mode="decimal"
                     placeholder="Masukan Kode Pos"
+                    mode="decimal"
+                    useGrouping={false}
                   />
                 </div>
               </div>
@@ -928,7 +929,7 @@ const Supplier = () => {
           <TabPanel header="Informasi Kontak">
             <div className="row ml-0 mt-0">
               <div className="col-6 mt-0">
-                <label className="text-label">Telp 1</label>
+                <label className="text-label">No. Telepon 1</label>
                 <div className="p-inputgroup">
                   <InputNumber
                     value={
@@ -946,12 +947,14 @@ const Supplier = () => {
                       })
                     }
                     placeholder="Masukan No. Telepon"
+                    mode="decimal"
+                    useGrouping={false}
                   />
                 </div>
               </div>
 
               <div className="col-6">
-                <label className="text-label">Telp 2</label>
+                <label className="text-label">No. Telepon 2</label>
                 <div className="p-inputgroup">
                   <InputNumber
                     value={
@@ -969,6 +972,8 @@ const Supplier = () => {
                       })
                     }
                     placeholder="Masukan No. Telepon"
+                    mode="decimal"
+                    useGrouping={false}
                   />
                 </div>
               </div>
@@ -1025,7 +1030,6 @@ const Supplier = () => {
 
           <TabPanel
             header="Currency & Distribusi AP"
-            footer={renderFooter("displayData")}
           >
             <div className="row ml-0 mt-0">
               <div className="col-6">

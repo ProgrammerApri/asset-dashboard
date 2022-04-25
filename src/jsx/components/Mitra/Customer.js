@@ -24,7 +24,6 @@ const data = {
     cus_name: null,
     cus_jpel: null,
     cus_sub_area: null,
-    cus_kolektor: null,
     cus_npwp: null,
     cus_address: null,
     cus_kota: null,
@@ -140,14 +139,6 @@ const Customer = () => {
       if (response.status) {
         const { data } = response;
         setCity(data);
-        // let selected = null;
-        // city.forEach((element) => {
-        //   if (element.city.city_id === value) {
-        //     selected = element;
-        //   }
-        // });
-        // console.log(selected);
-        // return selected;
       }
     } catch (error) {}
   };
@@ -271,7 +262,7 @@ const Customer = () => {
         cus_sub_area: currentItem.subArea.id,
         cus_npwp: currentItem.customer.cus_npwp,
         cus_address: currentItem.customer.cus_address,
-        cus_kota: currentItem.city.city_id,
+        cus_kota: currentItem.customer.cus_kota,
         cus_kpos: currentItem.customer.cus_kpos,
         cus_telp1: currentItem.customer.cus_telp1,
         cus_telp2: currentItem.customer.cus_telp2,
@@ -327,7 +318,7 @@ const Customer = () => {
         cus_sub_area: currentItem.subArea.id,
         cus_npwp: currentItem.customer.cus_npwp,
         cus_address: currentItem.customer.cus_address,
-        cus_kota: currentItem.city.city_id,
+        cus_kota: currentItem.customer.cus_kota,
         cus_kpos: currentItem.customer.cus_kpos,
         cus_telp1: currentItem.customer.cus_telp1,
         cus_telp2: currentItem.customer.cus_telp2,
@@ -476,7 +467,7 @@ const Customer = () => {
 
   const renderFooter = () => {
     return (
-      <div>
+      <div className="mt-3">
         <PButton
           label="Batal"
           onClick={() => setDisplayData(false)}
@@ -865,13 +856,13 @@ const Customer = () => {
             <h4 className="mt-4">
               <b>Informasi Alamat</b>
             </h4>
-            <Divider className="mb-3"></Divider>
+            <Divider className="mb-2"></Divider>
 
             <div className="row mr-0 ml-0">
               <div className="col-12">
                 <label className="text-label">Alamat</label>
                 <div className="p-inputgroup">
-                  <InputTextarea
+                  <InputText
                     value={
                       `${currentItem?.customer?.cus_address ?? ""}`  
                   }
@@ -934,6 +925,8 @@ const Customer = () => {
                       })
                     }
                     placeholder="Masukan Kode Pos"
+                    mode="decimal"
+                    useGrouping={false}
                   />
                 </div>
               </div>
@@ -943,7 +936,7 @@ const Customer = () => {
           <TabPanel header="Informasi Kontak">
             <div className="row mr-0 ml-0">
               <div className="col-6">
-                <label className="text-label">Telp 1</label>
+                <label className="text-label">No. Telepon 1</label>
                 <div className="p-inputgroup">
                   <InputNumber
                     value={
@@ -959,12 +952,14 @@ const Customer = () => {
                       })
                     }
                     placeholder="Masukan No. Telepon"
+                    mode="decimal"
+                    useGrouping={false}
                   />
                 </div>
               </div>
 
               <div className="col-6">
-                <label className="text-label">Telp 2</label>
+                <label className="text-label">No. Telepon 2</label>
                 <div className="p-inputgroup">
                   <InputNumber
                     value={
@@ -980,6 +975,8 @@ const Customer = () => {
                       })
                     }
                     placeholder="Masukan No. Telepon"
+                    mode="decimal"
+                    useGrouping={false}
                   />
                 </div>
               </div>
@@ -1080,7 +1077,9 @@ const Customer = () => {
                 <label className="text-label">Pajak</label>
                 <div className="p-inputgroup">
                 <Dropdown
-                    value={currentItem !== null ? getPpn(currentItem.customer.cus_pjk): null}
+                    value={currentItem !== null && currentItem.customer.cus_pjk !== null
+                      ? getPpn(currentItem.customer.cus_pjk)
+                      : null}
                     options={pajak}
                     onChange={(e) => {
                       console.log(e.value);
@@ -1127,7 +1126,7 @@ const Customer = () => {
             <h4 className="mt-4 ml-0 mr-0">
               <b>Distribusi GL/AR</b>
             </h4>
-            <Divider className="mb-3 ml-0 mr-0"></Divider>
+            <Divider className="mb-2 ml-0 mr-0"></Divider>
 
             <div className="row mr-0 ml-0">
               <div className="col-6">
@@ -1178,7 +1177,7 @@ const Customer = () => {
                         },
                       })
                     }
-                    placeholder="Masukan No. Telepon"
+                    placeholder="Masukan Limit Kredit"
                   />
                 </div>
               </div>

@@ -49,6 +49,10 @@ const SideMenu = () => {
         tittle: "Satuan",
         to: "satuan",
         icon: "bx-barcode",
+      },{
+        tittle: "Divisi",
+        to: "divisi",
+        icon: "bx-scatter-chart",
       },
       {
         tittle: "Departemen",
@@ -80,8 +84,28 @@ const SideMenu = () => {
         to: "jenis-pemasok",
         icon: "bx-user-voice",
       },
+      {
+        tittle: "Transaksi Penjualan",
+        to: "transaksi",
+        icon: "bx-map-pin",
+      },
     ],
     lainnya: [
+      {
+        tittle: "Klasifikasi",
+        to: "klasifikasi",
+        icon: "bx-list-minus",
+      },
+      {
+        tittle: "Kategori",
+        to: "kategori",
+        icon: "bx-task",
+      },
+      {
+        tittle: "Area Penjualan",
+        to: "area-penjualan",
+        icon: "bx-map-pin",
+      },
       {
         tittle: "setup",
         to: "setup",

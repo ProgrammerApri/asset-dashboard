@@ -454,6 +454,32 @@ const endpoints = {
     data: {},
   },
 
+
+  /// Divisi
+  divisi: {
+    endpoint: "/v1/api/divisi",
+    method: "GET",
+    data: {},
+  },
+
+  addDivisi: {
+    endpoint: "/v1/api/divisi",
+    method: "POST",
+    data: {},
+  },
+
+  editDivisi: {
+    endpoint: "/v1/api/divisi/",
+    method: "PUT",
+    data: {},
+  },
+
+  delDivisi: {
+    endpoint: "/v1/api/divisi/",
+    method: "DELETE",
+    data: {},
+  },
+
 };
 
 export default endpoints;

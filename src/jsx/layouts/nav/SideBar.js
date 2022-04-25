@@ -70,6 +70,7 @@ class SideBar extends Component {
       "sub-area",
       "lokasi",
       "satuan",
+      "divisi",
     ];
     let report = ["neraca"];
     let mitra = ["mitra"];

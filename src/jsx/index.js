@@ -42,13 +42,15 @@ import Currency from "./components/Master/Currency";
 import Lokasi from "./components/Master/Lokasi";
 import RulesPay from "./components/Master/RulesPayment";
 import Setup from "./components/Setup";
-import GroupStock from "./components/Master/GroupStock";
+import Divisi from "./components/Master/Divisi";
 import NonStock from "./components/Master/NonStock";
 import SubCustomer from "./components/Master/SubCustomer";
 import SetupKhusus from "./components/Master/SetupKhusus";
 import Mitra from "./components/Mitra/Mitra";
 import TransaksiPembelian from "./components/TransaksiPembelian/TransaksiPembelian";
 import Satuan from "./components/Master/Satuan";
+import Produk from "./components/Master/Produk";
+import GroupProduk from "./components/Master/GroupProduk";
 
 const Markup = ({ width }) => {
   const routes = [
@@ -73,11 +75,14 @@ const Markup = ({ width }) => {
     { url: "currency", component: Currency },
     { url: "lokasi", component: Lokasi },
     { url: "syarat-pembayaran", component: RulesPay },
-    { url: "divisi", component: GroupStock },
+    { url: "divisi", component: Divisi },
     { url: "non-stok", component: NonStock },
     { url: "sub-pelanggan", component: SubCustomer },
     { url: "setup-perkiraan", component: SetupKhusus },
     { url: "satuan", component: Satuan },
+    { url: "produk", component: Produk },
+    { url: "group-produk", component: GroupProduk },
+
 
     // Report
     { url: "neraca", component: Neraca },

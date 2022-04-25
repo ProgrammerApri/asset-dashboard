@@ -12,17 +12,14 @@ import { InputText } from "primereact/inputtext";
 import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
-import { InputTextarea } from "primereact/inputtextarea";
-import { TabView, TabPanel } from "primereact/tabview";
-import { InputNumber } from "primereact/inputnumber";
 import { Badge } from "primereact/badge";
-import { InputSwitch } from "primereact/inputswitch";
+import { Divider } from "@material-ui/core";
+import { TabPanel, TabView } from "primereact/tabview";
 
-const data = {
-};
+const data = {};
 
-const Satuan = () => {
-  const [satuan, setSatuan] = useState(null);
+const GroupProduk = () => {
+  const [groupProduk, setGroup] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
@@ -40,14 +37,14 @@ const Satuan = () => {
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getSatuan();
+    getGroupProduk();
     initFilters1();
   }, []);
 
-  const getSatuan = async (isUpdate = false) => {
+  const getGroupProduk = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.satuan,
+      ...endpoints.produk,
       data: {},
     };
     console.log(config.data);
@@ -58,7 +55,7 @@ const Satuan = () => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        setSatuan(data);
+        setGroup(data);
       }
     } catch (error) {}
     if (isUpdate) {
@@ -70,15 +67,11 @@ const Satuan = () => {
     }
   };
 
-  const editSatuan = async () => {
+  const editGroupProduk = async () => {
     const config = {
-      ...endpoints.editSatuan,
-      endpoint: endpoints.editSatuan.endpoint + currentItem.id,
-      data: {
-        proj_code: currentItem.proj_code,
-        proj_name: currentItem.proj_name,
-        proj_ket: currentItem.proj_ket,
-      },
+      ...endpoints.editGroupProduk,
+      endpoint: endpoints.editGroupProduk.endpoint + currentItem.id,
+      data: {},
     };
     console.log(config.data);
     let response = null;
@@ -89,7 +82,7 @@ const Satuan = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayData(false);
-          getSatuan(true);
+          getGroupProduk(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -111,14 +104,10 @@ const Satuan = () => {
     }
   };
 
-  const addSatuan = async () => {
+  const addGroupProduk = async () => {
     const config = {
-      ...endpoints.addSatuan,
-      data: {
-        proj_code: currentItem.proj_code,
-        proj_name: currentItem.proj_name,
-        proj_ket: currentItem.proj_ket,
-      },
+      ...endpoints.addGroupProduk,
+      data: {},
     };
     console.log(config.data);
     let response = null;
@@ -129,7 +118,7 @@ const Satuan = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayData(false);
-          getSatuan(true);
+          getGroupProduk(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -146,7 +135,7 @@ const Satuan = () => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode Project ${currentItem.proj_code} Sudah Digunakan`,
+            detail: `Kode ${currentItem.customer.cus_code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -164,10 +153,10 @@ const Satuan = () => {
     }
   };
 
-  const delSatuan = async (id) => {
+  const delGroupProduk = async (id) => {
     const config = {
-      ...endpoints.delSatuan,
-      endpoint: endpoints.delSatuan.endpoint + currentItem.id,
+      ...endpoints.delGroupProduk,
+      endpoint: endpoints.delGroupProduk.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -178,11 +167,11 @@ const Satuan = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayDel(false);
-          getSatuan(true);
+          getGroupProduk(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            detail: "Data Berhasil Dihapus",
             life: 3000,
           });
         }, 500);
@@ -195,7 +184,7 @@ const Satuan = () => {
         toast.current.show({
           severity: "error",
           summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Project`,
+          detail: `Tidak Dapat Menghapus Data`,
           life: 3000,
         });
       }, 500);
@@ -208,6 +197,7 @@ const Satuan = () => {
       <div className="d-flex">
         <Link
           onClick={() => {
+            console.log(data);
             setEdit(true);
             onClick("displayData", data);
             setCurrentItem(data);
@@ -244,10 +234,10 @@ const Satuan = () => {
   const onSubmit = () => {
     if (isEdit) {
       setUpdate(true);
-      editSatuan();
+      editGroupProduk();
     } else {
       setUpdate(true);
-      addSatuan();
+      addGroupProduk();
     }
   };
 
@@ -320,7 +310,7 @@ const Satuan = () => {
           label="Hapus"
           icon="pi pi-trash"
           onClick={() => {
-            delSatuan();
+            delGroupProduk();
           }}
           autoFocus
           loading={update}
@@ -438,12 +428,12 @@ const Satuan = () => {
     <>
       <Toast ref={toast} />
       <Row>
-        <Col>
+        <Col className="pt-0">
           <Card>
             <Card.Body>
               <DataTable
                 responsiveLayout="scroll"
-                value={loading ? dummy : satuan}
+                value={loading ? dummy : groupProduk}
                 className="display w-150 datatable-wrapper"
                 showGridlines
                 dataKey="id"
@@ -451,10 +441,9 @@ const Satuan = () => {
                 header={renderHeader}
                 filters={filters1}
                 globalFilterFields={[
-                  "satuan.code",
-                  "satuan.name",
-                  "satuan.status",
-                  "satuan.ket",
+                  "groupProduk.code",
+                  "groupProduk.name",
+                  "groupProduk.divisi",
                 ]}
                 emptyMessage="Tidak ada data"
                 paginator
@@ -465,7 +454,7 @@ const Satuan = () => {
                 paginatorClassName="justify-content-end mt-3"
               >
                 <Column
-                  header="Kode Satuan"
+                  header="Kode Kelompok"
                   style={{
                     minWidth: "8rem",
                   }}
@@ -473,20 +462,16 @@ const Satuan = () => {
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Nama Satuan"
+                  header="Nama Kelompok"
+                  style={{
+                    minWidth: "8rem",
+                  }}
                   field={(e) => e.name}
-                  style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Status Satuan"
-                  field={(e) => e.status}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Keterangan"
-                  field={(e) => e.ket}
+                  header="Divisi"
+                  field={(e) => e.divisi}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
@@ -504,9 +489,9 @@ const Satuan = () => {
       </Row>
 
       <Dialog
-        header={isEdit ? "Edit Satuan" : "Tambah Satuan"}
+        header={isEdit ? "Edit Data Group Produk" : "Tambah Data Group Produk"}
         visible={displayData}
-        style={{ width: "40vw" }}
+        style={{ width: "50vw" }}
         footer={renderFooter()}
         onHide={() => {
           setEdit(false);
@@ -514,155 +499,256 @@ const Satuan = () => {
         }}
       >
         <TabView activeIndex={active} onTabChange={(e) => setActive(e.index)}>
-          <TabPanel header="Data Satuan" headerTemplate={renderTabHeader}>
+          <TabPanel header="Informasi Produk" headerTemplate={renderTabHeader}>
             <div className="row mr-0 ml-0">
               <div className="col-6">
-                <label className="text-label">Kode Satuan</label>
+                <label className="text-label">Kode Kelompok</label>
                 <div className="p-inputgroup">
                   <InputText
-                    value={currentItem !== null ? `${currentItem.code}` : ""}
+                    value={`${currentItem?.groupProduk?.code ?? ""}`}
                     onChange={(e) =>
-                      setCurrentItem({ ...currentItem, code: e.target.value })
+                      setCurrentItem({
+                        ...currentItem,
+                        groupProduk: {
+                          ...currentItem.groupProduk,
+                          code: e.target.value,
+                        },
+                      })
                     }
-                    placeholder="Masukan Kode Satuan"
+                    placeholder="Masukan Kode Kelompok"
                   />
                 </div>
               </div>
 
               <div className="col-6">
-                <label className="text-label">Nama Satuan</label>
+                <label className="text-label">Nama Kelompok</label>
                 <div className="p-inputgroup">
                   <InputText
-                    value={currentItem !== null ? `${currentItem.name}` : ""}
+                    value={`${currentItem?.groupProduk?.name ?? ""}`}
                     onChange={(e) =>
-                      setCurrentItem({ ...currentItem, name: e.target.value })
+                      setCurrentItem({
+                        ...currentItem,
+                        groupProduk: {
+                          ...currentItem.groupProduk,
+                          name: e.target.value,
+                        },
+                      })
                     }
-                    placeholder="Masukan Nama Satuan"
+                    placeholder="Masukan Nama Kelompok"
                   />
                 </div>
               </div>
             </div>
-
-            <div className="col-12">
-              <label className="text-label">Keterangan</label>
-              <div className="p-inputgroup">
-                <InputTextarea
-                  value={currentItem !== null ? `${currentItem.ket}` : ""}
-                  onChange={(e) =>
-                    setCurrentItem({ ...currentItem, ket: e.target.value })
-                  }
-                  placeholder="Masukan Keterangan"
-                />
-              </div>
-            </div>
-
             <div className="row mr-0 ml-0">
-              <div className="col-6 mb-0">
-                <InputSwitch
-                  className="mt-1"
-                  inputId="satuan"
-                  checked={currentItem ? currentItem: false}
-                  onChange={(e) =>
-                    setCurrentItem(e.value)
-                  }
-                />
-                <label className="ml-3" htmlFor="satuan">
-                  {"Aktif"}
-                </label>
-              </div>
-
-              <div className="col-6 mb-0">
-                <InputSwitch
-                  className="mt-1"
-                  checked={currentItem ? currentItem : false}
-                  onChange={(e) =>
-                    setCurrentItem(e.value)
-                  }
-                />
-                <label className="ml-3">{"Satuan Dasar"}</label>
+              <div className="col-12">
+                <label className="text-label">Divisi</label>
+                <div className="p-inputgroup">
+                  <Dropdown
+                    value={currentItem !== null ? currentItem.divisi : null}
+                    // options={divisi}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        divisi: e.value,
+                      });
+                    }}
+                    optionLabel="name"
+                    filter
+                    filterBy="name"
+                    placeholder="Pilih Divisi"
+                  />
+                </div>
               </div>
             </div>
           </TabPanel>
 
-          <TabPanel header="Konversi Satuan" headerTemplate={renderTabHeader}>
-            <Card>
-              <Card.Body>
-                <div className="row">
-                  <div className="col-3">
-                    <label className="text-label">
-                      <b>Satuan Ukur</b>
-                    </label>
-                    <div className="p-inputgroup">
-                      <span className="mt-3">1 Box Isi 10</span>
-                    </div>
-                  </div>
-
-                  <div className="col-4">
-                    <label className="text-label">
-                      <b>Nilai</b>
-                    </label>
-                    <div className="p-inputgroup">
-                      <InputNumber
-                        value={
-                          currentItem !== null ? `${currentItem.nilai}` : ""
-                        }
-                        onChange={(e) =>
-                          setCurrentItem({
-                            ...currentItem,
-                            nilai: e.value,
-                          })
-                        }
-                        placeholder="Masukan Nilai"
-                        showButtons
-                      />
-                    </div>
-                  </div>
-
-                  <div className="col-4">
-                    <label className="text-label">
-                      <b>Satuan Dasar</b>
-                    </label>
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={
-                          currentItem !== null ? `${currentItem.sat_dasar}` : ""
-                        }
-                        onChange={(e) =>
-                          setCurrentItem({
-                            ...currentItem,
-                            sat_dasar: e.target.value,
-                          })
-                        }
-                        placeholder="Masukan Satuan Dasar"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="d-flex">
-                    <label className="text-label">
-                      <b>#</b>
-                    </label>
-                    <div className="mt-5">
-                      <Link
-                        onClick={() => {}}
-                        className="btn btn-danger shadow btn-xs sharp ml-1"
-                      >
-                        <i className="fa fa-trash"></i>
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-5">
-                  <PButton
-                    style={{ width: "32vw" }}
-                    label="Tambah Konversi"
-                    icon="pi pi-plus"
-                    // onClick={() => onSubmit()}
+          <TabPanel
+            header="Distribusi GL Kontrol Stock"
+            headerTemplate={renderTabHeader}
+          >
+            <div className="row mr-0 ml-0">
+              <div className="col-6">
+                <label className="text-label">Akun Persediaan</label>
+                <div className="p-inputgroup">
+                  <Dropdown
+                    value={currentItem !== null ? currentItem.setup : null}
+                    // options={divisi}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        setup: e.value,
+                      });
+                    }}
+                    optionLabel="name"
+                    filter
+                    filterBy="name"
+                    placeholder="Pilih Akun Persediaan"
                   />
                 </div>
-              </Card.Body>
-            </Card>
+              </div>
+
+              <div className="col-6">
+                <label className="text-label">Akun Pengiriman Barang</label>
+                <div className="p-inputgroup">
+                  <Dropdown
+                    value={currentItem !== null ? currentItem.setup : null}
+                    // options={divisi}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        setup: e.value,
+                      });
+                    }}
+                    optionLabel="name"
+                    filter
+                    filterBy="name"
+                    placeholder="Pilih Akun Pengiriman"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="row mr-0 ml-0">
+              <div className="col-12">
+                <label className="text-label">Akun Penerimaan Barang</label>
+                <div className="p-inputgroup">
+                  <Dropdown
+                    value={currentItem !== null ? currentItem.setup : null}
+                    // options={divisi}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        setup: e.value,
+                      });
+                    }}
+                    optionLabel="name"
+                    filter
+                    filterBy="name"
+                    placeholder="Pilih Akun Penerimaan"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <h4 className="mt-4">
+              <b>Akun Penjualan</b>
+            </h4>
+            <Divider className="mb-2"></Divider>
+
+            <div className="row mr-0 ml-0">
+              <div className="col-6">
+                <label className="text-label">Harga Pokok Penjualan</label>
+                <div className="p-inputgroup">
+                  <Dropdown
+                    value={currentItem !== null ? currentItem.setup : null}
+                    // options={divisi}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        setup: e.value,
+                      });
+                    }}
+                    optionLabel="name"
+                    filter
+                    filterBy="name"
+                    placeholder="Pilih Akun HPP"
+                  />
+                </div>
+              </div>
+
+              <div className="col-6">
+                <label className="text-label">Penjualan</label>
+                <div className="p-inputgroup">
+                  <Dropdown
+                    value={currentItem !== null ? currentItem.setup : null}
+                    // options={divisi}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        setup: e.value,
+                      });
+                    }}
+                    optionLabel="name"
+                    filter
+                    filterBy="name"
+                    placeholder="Pilih Akun Penjualan"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="row mr-0 ml-0 mt-2">
+              <div className="col-6">
+                <label className="text-label">Potongan Penjualan</label>
+                <div className="p-inputgroup">
+                  <Dropdown
+                    value={currentItem !== null ? currentItem.setup : null}
+                    // options={divisi}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        setup: e.value,
+                      });
+                    }}
+                    optionLabel="name"
+                    filter
+                    filterBy="name"
+                    placeholder="Pilih Akun Potongan Penjualan"
+                  />
+                </div>
+              </div>
+
+              <div className="col-6">
+                <label className="text-label">Pengembalian Penjualan</label>
+                <div className="p-inputgroup">
+                  <Dropdown
+                    value={currentItem !== null ? currentItem.setup : null}
+                    // options={divisi}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        setup: e.value,
+                      });
+                    }}
+                    optionLabel="name"
+                    filter
+                    filterBy="name"
+                    placeholder="Pilih Akun Pengembalian"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="row mr-0 ml-0">
+              <div className="col-12">
+                <label className="text-label">Selisih Harga Pokok</label>
+                <div className="p-inputgroup">
+                  <Dropdown
+                    value={currentItem !== null ? currentItem.setup : null}
+                    // options={divisi}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        setup: e.value,
+                      });
+                    }}
+                    optionLabel="name"
+                    filter
+                    filterBy="name"
+                    placeholder="Pilih Akun Selisih"
+                  />
+                </div>
+              </div>
+            </div>
           </TabPanel>
         </TabView>
       </Dialog>
@@ -688,4 +774,4 @@ const Satuan = () => {
   );
 };
 
-export default Satuan;
+export default GroupProduk;

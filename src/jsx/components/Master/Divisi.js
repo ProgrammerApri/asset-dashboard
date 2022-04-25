@@ -18,13 +18,12 @@ const data = {
     id: 1,
     code: "",
     name: "",
-    address: "",
     desc: "",
 };
 
 
-const GroupStock = () => {
-  const [groupStock, setGroupStock] = useState(null);
+const Divisi = () => {
+  const [divisi, setDivisi] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
@@ -41,15 +40,15 @@ const GroupStock = () => {
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getGroupStock();
+    getDivisi();
     initFilters1();
   }, []);
 
 
-  const getGroupStock = async (isUpdate = false) => {
+  const getDivisi = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.groupStock,
+      ...endpoints.divisi,
       data: {},
     };
     console.log(config.data);
@@ -60,7 +59,7 @@ const GroupStock = () => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        setGroupStock(data);
+        setDivisi(data);
       }
     } catch (error) {}
     if (isUpdate) {
@@ -72,10 +71,10 @@ const GroupStock = () => {
     }
   };
 
-  const editGroupStock = async () => {
+  const editDivisi = async () => {
     const config = {
-      ...endpoints.editGroupStock,
-      endpoint: endpoints.editGroupStock.endpoint + currentItem.id,
+      ...endpoints.editDivisi,
+      endpoint: endpoints.editDivisi.endpoint + currentItem.id,
       data: {
         code: currentItem.code,
         name: currentItem.name,
@@ -91,7 +90,7 @@ const GroupStock = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayData(false);
-          getGroupStock(true);
+          getDivisi(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -113,9 +112,9 @@ const GroupStock = () => {
     }
   };
 
-  const addGroupStock = async () => {
+  const addDivisi = async () => {
     const config = {
-      ...endpoints.addGroupStock,
+      ...endpoints.addDivisi,
       data: {
         code: currentItem.code,
         name: currentItem.name,
@@ -131,7 +130,7 @@ const GroupStock = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayData(false);
-          getGroupStock(true);
+          getDivisi(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -166,10 +165,10 @@ const GroupStock = () => {
     }
   };
 
-  const delGroupStock = async (id) => {
+  const delDivisi = async (id) => {
     const config = {
-      ...endpoints.delGroupStock,
-      endpoint: endpoints.delGroupStock.endpoint + currentItem.id,
+      ...endpoints.delDivisi,
+      endpoint: endpoints.delDivisi.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -180,7 +179,7 @@ const GroupStock = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayDel(false);
-          getGroupStock(true);
+          getDivisi(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -197,7 +196,7 @@ const GroupStock = () => {
         toast.current.show({
           severity: "error",
           summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Project`,
+          detail: `Tidak Dapat Menghapus Data`,
           life: 3000,
         });
       }, 500);
@@ -246,10 +245,10 @@ const GroupStock = () => {
   const onSubmit = () => {
     if (isEdit) {
       setUpdate(true);
-      editGroupStock();
+      editDivisi();
     } else {
       setUpdate(true);
-      addGroupStock();
+      addDivisi();
     }
   };
 
@@ -284,7 +283,7 @@ const GroupStock = () => {
           label="Hapus"
           icon="pi pi-trash"
           onClick={() => {
-            delGroupStock();
+            delDivisi();
           }}
           autoFocus
           loading={update}
@@ -392,7 +391,7 @@ const GroupStock = () => {
             <Card.Body>
               <DataTable
                 responsiveLayout="scroll"
-                value={loading ? dummy : groupStock}
+                value={loading ? dummy : divisi}
                 className="display w-150 datatable-wrapper"
                 showGridlines
                 dataKey="id"
@@ -400,9 +399,9 @@ const GroupStock = () => {
                 header={renderHeader}
                 filters={filters1}
                 globalFilterFields={[
-                  "groupStock.code",
-                  "groupStock.name",
-                  "groupStock.desc",
+                  "divisi.code",
+                  "divisi.name",
+                  "divisi.desc",
                 ]}
                 emptyMessage="Tidak ada data"
                 paginator
@@ -446,7 +445,7 @@ const GroupStock = () => {
       </Row>
 
       <Dialog
-        header={isEdit ? "Edit Group Stock" : "Tambah Group Stock"}
+        header={isEdit ? "Edit Divisi" : "Tambah Divisi"}
         visible={displayData}
         style={{ width: "40vw" }}
         footer={renderFooter("displayData")}
@@ -523,4 +522,4 @@ const GroupStock = () => {
   );
 };
 
-export default GroupStock;
+export default Divisi;

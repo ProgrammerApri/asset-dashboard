@@ -15,11 +15,92 @@ import { Dropdown } from "primereact/dropdown";
 import { Badge } from "primereact/badge";
 import { InputNumber } from "primereact/inputnumber";
 import { TabPanel, TabView } from "primereact/tabview";
+import { Tooltip } from "primereact/tooltip";
 
-const data = {};
+const data = {
+  product: {
+    id: null,
+    code: null,
+    name: null,
+    group: null,
+    type: null,
+    codeb: null,
+    unit: null,
+    suplier: null,
+    b_price: null,
+    s_price: null,
+    barcode: null,
+    max_stock: null,
+    min_stock: null,
+    re_stock: null,
+    lt_stock: null,
+    max_order: null,
+    image: null,
+  },
+
+  suplier: {
+    id: null,
+    sup_code: null,
+    sup_name: null,
+    sup_jpem: null,
+    sup_ppn: null,
+    sup_npwp: null,
+    sup_address: null,
+    sup_kota: null,
+    sup_kpos: null,
+    sup_telp1: null,
+    sup_telp2: null,
+    sup_fax: null,
+    sup_cp: null,
+    sup_curren: null,
+    sup_ket: null,
+    sup_hutang: null,
+    sup_uang_muka: null,
+    sup_limit: null,
+  },
+
+  unit: {
+    id: null,
+    code: null,
+    name: null,
+    type: null,
+    desc: null,
+    active: true,
+    qty: null,
+    unit: null,
+  },
+
+  group: {
+    id: null,
+    code: null,
+    name: null,
+    div_code: null,
+    acc_sto: null,
+    acc_send: null,
+    acc_terima: null,
+    hrg_pokok: null,
+    acc_penj: null,
+    potongan: null,
+    pengembalian: null,
+    selisih: null,
+  },
+};
+
+const type = [
+  { name: "Stock", id: 1 },
+  { name: "Non Stock", id: 2 },
+];
+
+const metode = [
+  { name: "First In First Out (FIFO)", id: 1 },
+  { name: "Avarage", id: 2 },
+];
 
 const Produk = () => {
-  const [produk, setProduk] = useState(null);
+  const [product, setProduk] = useState(null);
+  const [group, setGroup] = useState(null);
+  const [unit, setUnit] = useState(null);
+  const [supplier, setSupplier] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
@@ -33,18 +114,25 @@ const Produk = () => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const [active, setActive] = useState(0);
+  const picker = useRef(null);
+  const [file, setFile] = useState(null);
+  const [currentData, setCurrentData] = useState(null);
+  const [onUpload, setSubmit] = useState(false);
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
     getProduk();
+    getGroup();
+    getUnit();
+    getSupplier();
     initFilters1();
   }, []);
 
   const getProduk = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.produk,
+      ...endpoints.product,
       data: {},
     };
     console.log(config.data);
@@ -67,11 +155,86 @@ const Produk = () => {
     }
   };
 
+  const getGroup = async (isUpdate = false) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.groupPro,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setGroup(data);
+      }
+    } catch (error) {}
+  };
+
+  const getUnit = async (isUpdate = false) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.unit,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setUnit(data);
+      }
+    } catch (error) {}
+  };
+
+  const getSupplier = async (isUpdate = false) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.supplier,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setSupplier(data);
+      }
+    } catch (error) {}
+  };
+
   const editProduk = async () => {
     const config = {
-      ...endpoints.editProduk,
-      endpoint: endpoints.editProduk.endpoint + currentItem.id,
-      data: {},
+      ...endpoints.editProduct,
+      endpoint: endpoints.editProduct.endpoint + currentItem.product.id,
+      data: {
+        code: currentItem.code,
+        name: currentItem.name,
+        group: currentItem.groupPro.id,
+        type: currentItem.type,
+        codeb: currentItem.codeb,
+        unit: currentItem.unit.id,
+        suplier: currentItem.supplier.id,
+        b_price: currentItem.b_price,
+        s_price: currentItem.s_price,
+        barcode: currentItem.barcode,
+        metode: currentItem.metode,
+        max_stock: currentItem.max_stock,
+        min_stock: currentItem.min_stock,
+        re_stock: currentItem.re_stock,
+        lt_stock: currentItem.lt_stock,
+        max_order: currentItem.max_order,
+        image: currentItem.image,
+      },
     };
     console.log(config.data);
     let response = null;
@@ -106,8 +269,26 @@ const Produk = () => {
 
   const addProduk = async () => {
     const config = {
-      ...endpoints.addProduk,
-      data: {},
+      ...endpoints.addProduct,
+      data: {
+        code: currentItem.code,
+        name: currentItem.name,
+        group: currentItem.groupPro.id,
+        type: currentItem.type,
+        codeb: currentItem.codeb,
+        unit: currentItem.unit.id,
+        suplier: currentItem.supplier.id,
+        b_price: currentItem.b_price,
+        s_price: currentItem.s_price,
+        barcode: currentItem.barcode,
+        metode: currentItem.metode,
+        max_stock: currentItem.max_stock,
+        min_stock: currentItem.min_stock,
+        re_stock: currentItem.re_stock,
+        lt_stock: currentItem.lt_stock,
+        max_order: currentItem.max_order,
+        image: currentItem.image,
+      },
     };
     console.log(config.data);
     let response = null;
@@ -135,7 +316,7 @@ const Produk = () => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${currentItem.customer.cus_code} Sudah Digunakan`,
+            detail: `Kode ${currentItem.product.code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -155,8 +336,8 @@ const Produk = () => {
 
   const delProduk = async (id) => {
     const config = {
-      ...endpoints.delProduk,
-      endpoint: endpoints.delProduk.endpoint + currentItem.id,
+      ...endpoints.delProduct,
+      endpoint: endpoints.delProduct.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -188,6 +369,51 @@ const Produk = () => {
           life: 3000,
         });
       }, 500);
+    }
+  };
+
+  const uploadImage = async (isUpdate = false) => {
+    setSubmit(true);
+    if (file) {
+      const config = {
+        ...endpoints.uploadImage,
+        data: {
+          image: file,
+        },
+      };
+      console.log(config.data);
+      let response = null;
+      try {
+        response = await request(null, config, {
+          "Content-Type": "multipart/form-data",
+        });
+        console.log(response);
+        if (response.status) {
+          addProduk(response.data, isUpdate);
+          editProduk(response.data, isUpdate);
+        }
+      } catch (error) {
+        setSubmit(false);
+      }
+    } else {
+      addProduk("", isUpdate);
+      editProduk("", isUpdate);
+    }
+  };
+
+  const submitUpdate = async (upload = false, data) => {
+    if (currentItem.product.id === 0) {
+      if (upload) {
+        uploadImage();
+      } else {
+        addProduk("");
+      }
+    } else {
+      if (upload) {
+        uploadImage(true);
+      } else {
+        addProduk("", true, data);
+      }
     }
   };
 
@@ -235,9 +461,11 @@ const Produk = () => {
     if (isEdit) {
       setUpdate(true);
       editProduk();
+      // submitUpdate(true);
     } else {
       setUpdate(true);
       addProduk();
+      // submitUpdate(true);
     }
   };
 
@@ -424,6 +652,26 @@ const Produk = () => {
     );
   };
 
+  const getType = (nilai) => {
+    let typ = {};
+    type.forEach((element) => {
+      if (nilai === element.id) {
+        typ = element;
+      }
+    });
+    return typ;
+  };
+
+  const getMetodeHPP = (value) => {  
+    let met = {};
+    metode.forEach((element) => {
+      if (value === element.id) {
+        met = element;
+      }
+    });
+    return met;
+  };
+
   return (
     <>
       <Toast ref={toast} />
@@ -468,7 +716,7 @@ const Produk = () => {
             <Card.Body>
               <DataTable
                 responsiveLayout="scroll"
-                value={loading ? dummy : produk}
+                value={loading ? dummy : product}
                 className="display w-150 datatable-wrapper"
                 showGridlines
                 dataKey="id"
@@ -476,12 +724,12 @@ const Produk = () => {
                 header={renderHeader}
                 filters={filters1}
                 globalFilterFields={[
-                  "produk.code",
-                  "produk.barcode",
-                  "produk.name",
-                  "produk.group_barang",
-                  "produk.departemen",
-                  "produk.stock",
+                  "product.code",
+                  "product.barcode",
+                  "product.name",
+                  "group.group",
+                  "product.type",
+                  "product.stock",
                 ]}
                 emptyMessage="Tidak ada data"
                 paginator
@@ -496,7 +744,7 @@ const Produk = () => {
                   style={{
                     minWidth: "8rem",
                   }}
-                  field={(e) => e.code}
+                  field={(e) => e?.code ?? ""}
                   body={loading && <Skeleton />}
                 />
                 <Column
@@ -504,7 +752,7 @@ const Produk = () => {
                   style={{
                     minWidth: "8rem",
                   }}
-                  field={(e) => e.barcode}
+                  field={(e) => e?.barcode ?? ""}
                   body={loading && <Skeleton />}
                 />
                 <Column
@@ -515,19 +763,19 @@ const Produk = () => {
                 />
                 <Column
                   header="Group Barang"
-                  field={(e) => e.group_barang}
+                  field={(e) => e?.group?.name ??""}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Departemen Barang"
-                  field={(e) => e.departemen}
+                  field={(e) => e?.type ?? ""}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Informasi Stock"
-                  field={(e) => e.stock}
+                  field={(e) => e?.max_stock ?? "" }
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
@@ -561,15 +809,9 @@ const Produk = () => {
                 <label className="text-label">Kode Barang</label>
                 <div className="p-inputgroup">
                   <InputText
-                    value={`${currentItem?.produk?.code ?? ""}`}
+                    value={`${currentItem?.code ?? ""}`}
                     onChange={(e) =>
-                      setCurrentItem({
-                        ...currentItem,
-                        produk: {
-                          ...currentItem.produk,
-                          code: e.target.value,
-                        },
-                      })
+                      setCurrentItem({...currentItem, code: e.target.value})
                     }
                     placeholder="Masukan Kode Produk"
                   />
@@ -580,15 +822,9 @@ const Produk = () => {
                 <label className="text-label">Nama Barang</label>
                 <div className="p-inputgroup">
                   <InputText
-                    value={`${currentItem?.produk?.name ?? ""}`}
+                    value={`${currentItem?.name ?? ""}`}
                     onChange={(e) =>
-                      setCurrentItem({
-                        ...currentItem,
-                        produk: {
-                          ...currentItem.produk,
-                          name: e.target.value,
-                        },
-                      })
+                      setCurrentItem({...currentItem, name: e.target.value})
                     }
                     placeholder="Masukan Nama Barang"
                   />
@@ -601,18 +837,18 @@ const Produk = () => {
                 <label className="text-label">Kode Group</label>
                 <div className="p-inputgroup">
                   <Dropdown
-                    value={currentItem !== null ? currentItem.jpel : null}
-                    // options={divisi}
+                    value={currentItem !== null ? currentItem.groupPro : null}
+                    options={group}
                     onChange={(e) => {
                       console.log(e.value);
                       setCurrentItem({
                         ...currentItem,
-                        jpel: e.value,
+                        groupPro: e.target.value,
                       });
                     }}
-                    optionLabel="name"
+                    optionLabel="groupPro.name"
                     filter
-                    filterBy="name"
+                    filterBy="groupPro.name"
                     placeholder="Pilih Group Barang"
                   />
                 </div>
@@ -622,15 +858,15 @@ const Produk = () => {
                 <label className="text-label">Type Barang</label>
                 <div className="p-inputgroup">
                   <Dropdown
-                    value={currentItem !== null ? currentItem.subArea : null}
-                    // options={subArea}
-                    onChange={(e) => {
-                      console.log(e.value);
-                      setCurrentItem({
-                        ...currentItem,
-                        subArea: e.value,
-                      });
-                    }}
+                    value={
+                      currentItem !== null && currentItem.type !== null
+                        ? getType(currentItem.type)
+                        : null
+                    }
+                    options={type}
+                    onChange={(e) =>
+                      setCurrentItem({...currentItem, type: e.target.value})
+                    }
                     optionLabel="name"
                     filter
                     filterBy="name"
@@ -645,15 +881,9 @@ const Produk = () => {
                 <label className="text-label">Kode Sebelumnya</label>
                 <div className="p-inputgroup">
                   <InputText
-                    value={`${currentItem?.produk?.kd_sebelumnya ?? ""}`}
+                    value={`${currentItem?.codeb ?? ""}`}
                     onChange={(e) =>
-                      setCurrentItem({
-                        ...currentItem,
-                        customer: {
-                          ...currentItem.produk,
-                          kd_sebelumnya: e.target.value,
-                        },
-                      })
+                      setCurrentItem({...currentItem, codeb: e.target.value})
                     }
                     placeholder="Masukan Kode Sebelumnya"
                   />
@@ -666,18 +896,18 @@ const Produk = () => {
                 <label className="text-label">Satuan</label>
                 <div className="p-inputgroup">
                   <Dropdown
-                    value={currentItem !== null ? currentItem.satuan : null}
-                    // options={divisi}
+                    value={currentItem !== null ? currentItem.unit : null}
+                    options={unit}
                     onChange={(e) => {
                       console.log(e.value);
                       setCurrentItem({
                         ...currentItem,
-                        satuan: e.value,
+                        unit: e.target.value,
                       });
                     }}
-                    optionLabel="name"
+                    optionLabel="unit.name"
                     filter
-                    filterBy="name"
+                    filterBy="unit.name"
                     placeholder="Pilih Satuan Barang"
                   />
                 </div>
@@ -687,18 +917,18 @@ const Produk = () => {
                 <label className="text-label">Pemasok</label>
                 <div className="p-inputgroup">
                   <Dropdown
-                    value={currentItem !== null ? currentItem.pemasok : null}
-                    // options={subArea}
+                    value={currentItem !== null ? currentItem.supplier : null}
+                    options={supplier}
                     onChange={(e) => {
                       console.log(e.value);
                       setCurrentItem({
                         ...currentItem,
-                        pemasok: e.value,
+                        supplier: e.target.value,
                       });
                     }}
-                    optionLabel="name"
+                    optionLabel="supplier.sup_name"
                     filter
-                    filterBy="name"
+                    filterBy="supplier.sup_name"
                     placeholder="Pilih Pemasok"
                   />
                 </div>
@@ -710,15 +940,9 @@ const Produk = () => {
                 <label className="text-label">Harga Beli</label>
                 <div className="p-inputgroup">
                   <InputNumber
-                    value={`${currentItem?.produk?.hrg_beli ?? ""}`}
+                    value={`${currentItem?.b_price ?? ""}`}
                     onChange={(e) =>
-                      setCurrentItem({
-                        ...currentItem,
-                        produk: {
-                          ...currentItem.produk,
-                          hrg_beli: e.value,
-                        },
-                      })
+                      setCurrentItem({...currentItem, b_price: e.value})
                     }
                     placeholder="Masukan Harga Beli"
                   />
@@ -729,15 +953,9 @@ const Produk = () => {
                 <label className="text-label">Harga Jual</label>
                 <div className="p-inputgroup">
                   <InputNumber
-                    value={`${currentItem?.produk?.hrg_jual ?? ""}`}
+                    value={`${currentItem?.s_price ?? ""}`}
                     onChange={(e) =>
-                      setCurrentItem({
-                        ...currentItem,
-                        produk: {
-                          ...currentItem.produk,
-                          hrg_jual: e.value,
-                        },
-                      })
+                      setCurrentItem({...currentItem, s_price: e.value})
                     }
                     placeholder="Masukan Harga Jual"
                   />
@@ -751,21 +969,43 @@ const Produk = () => {
             headerTemplate={renderTabHeader}
           >
             <div className="row mr-0 ml-0">
-              <div className="col-12">
+              <div className="col-6">
                 <label className="text-label">Kode Barcode</label>
                 <div className="p-inputgroup">
                   <InputText
-                    value={`${currentItem?.produk?.barcode ?? ""}`}
+                    value={`${currentItem?.barcode ?? ""}`}
                     onChange={(e) =>
-                      setCurrentItem({
-                        ...currentItem,
-                        produk: {
-                          ...currentItem.produk,
-                          barcode: e.target.value,
-                        },
-                      })
+                      setCurrentItem({...currentItem, barcode: e.target.value})
                     }
                     placeholder="Masukan Kode Barcode"
+                  />
+                </div>
+              </div>
+
+              <div className="col-6">
+                <label className="text-label">Metode HPP</label>
+                <div className="p-inputgroup">
+                  <Dropdown
+                    value={
+                      currentItem !== null && currentItem.metode !== null
+                        ? getMetodeHPP(currentItem.metode)
+                        : null
+                    }
+                    options={metode}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        product: {
+                          ...currentItem.product,
+                          metode: e.value.id,
+                        },
+                      });
+                    }}
+                    optionLabel="name"
+                    filter
+                    filterBy="name"
+                    placeholder="Pilih Metode HPP"
                   />
                 </div>
               </div>
@@ -776,15 +1016,9 @@ const Produk = () => {
                 <label className="text-label">Maksimum Stock</label>
                 <div className="p-inputgroup">
                   <InputNumber
-                    value={`${currentItem?.produk?.max_stock ?? ""}`}
+                    value={`${currentItem?.max_stock ?? ""}`}
                     onChange={(e) =>
-                      setCurrentItem({
-                        ...currentItem,
-                        produk: {
-                          ...currentItem.produk,
-                          max_stock: e.value,
-                        },
-                      })
+                      setCurrentItem({...currentItem, max_stock: e.value})
                     }
                     placeholder="Masukan Maksimum Stock"
                     showButtons
@@ -796,15 +1030,9 @@ const Produk = () => {
                 <label className="text-label">Minimum Stock</label>
                 <div className="p-inputgroup">
                   <InputNumber
-                    value={`${currentItem?.produk?.min_stock ?? ""}`}
+                    value={`${currentItem?.min_stock ?? ""}`}
                     onChange={(e) =>
-                      setCurrentItem({
-                        ...currentItem,
-                        produk: {
-                          ...currentItem.produk,
-                          min_stock: e.value,
-                        },
-                      })
+                      setCurrentItem({...currentItem, min_stock: e.value})
                     }
                     placeholder="Masukan Minimum Stock"
                     showButtons
@@ -818,15 +1046,9 @@ const Produk = () => {
                 <label className="text-label">Reorder Stock</label>
                 <div className="p-inputgroup">
                   <InputNumber
-                    value={`${currentItem?.produk?.reorder ?? ""}`}
+                    value={`${currentItem?.re_stock ?? ""}`}
                     onChange={(e) =>
-                      setCurrentItem({
-                        ...currentItem,
-                        produk: {
-                          ...currentItem.produk,
-                          reorder: e.value,
-                        },
-                      })
+                      setCurrentItem({...currentItem, re_stock: e.value})
                     }
                     placeholder="Masukan Reorder Stock"
                     showButtons
@@ -838,15 +1060,9 @@ const Produk = () => {
                 <label className="text-label">Lead Timeout Stock</label>
                 <div className="p-inputgroup">
                   <InputText
-                    value={`${currentItem?.produk?.lead_timeout ?? ""}`}
+                    value={`${currentItem?.lt_stock ?? ""}`}
                     onChange={(e) =>
-                      setCurrentItem({
-                        ...currentItem,
-                        produk: {
-                          ...currentItem.produk,
-                          lead_timeout: e.value,
-                        },
-                      })
+                      setCurrentItem({...currentItem, lt_stock: e.target.value})
                     }
                     placeholder="Masukan Lead Timeout Stock"
                   />
@@ -859,12 +1075,12 @@ const Produk = () => {
                 <label className="text-label">Maksimal Order</label>
                 <div className="p-inputgroup">
                   <InputNumber
-                    value={`${currentItem?.produk?.max_order ?? ""}`}
+                    value={`${currentItem?.max_order ?? ""}`}
                     onChange={(e) =>
                       setCurrentItem({
                         ...currentItem,
-                        produk: {
-                          ...currentItem.produk,
+                        product: {
+                          ...currentItem.product,
                           max_order: e.value,
                         },
                       })
@@ -879,28 +1095,42 @@ const Produk = () => {
             <div className="row mr-0 ml-0">
               <div className="col-12">
                 <label className="text-label">Gambar</label>
+                <Tooltip target=".upload" mouseTrack mouseTrackLeft={10} />
+                <input
+                  type="file"
+                  id="file"
+                  ref={picker}
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  onChange={(e) => {
+                    console.log(e);
+                    setFile(e.target.files[0]);
+                  }}
+                />
                 <div className="flex align-items-center flex-column">
                   <Card
                     className="upload mb-3"
-                    data-pr-tooltip="Klik Untuk Memilih Foto"
+                    data-pr-tooltip="Klik untuk memilih foto"
                     style={{
                       cursor: "pointer",
                       height: "200px",
                       width: "200px",
                     }}
-                    onClick={() => {}}
+                    onClick={() => {
+                      picker.current.click();
+                    }}
                   >
                     <Card.Body className="flex align-items-center justify-content-center">
-                      {data ? (
+                      {file ? (
                         <img
                           style={{ maxWidth: "150px" }}
-                          // src={URL.createObjectURL()}
+                          src={URL.createObjectURL(file)}
                           alt=""
                         />
-                      ) : currentItem && currentItem.gambar !== "" ? (
+                      ) : currentItem && currentItem.image !== "" ? (
                         <img
                           style={{ maxWidth: "150px" }}
-                          src={currentItem.gambar}
+                          src={currentItem.image}
                           alt=""
                         />
                       ) : (

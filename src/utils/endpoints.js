@@ -503,6 +503,31 @@ const endpoints = {
     method: "DELETE",
     data: {},
   },
+
+  /// Produk
+  product: {
+    endpoint: "/v1/api/product",
+    method: "GET",
+    data: {},
+  },
+
+  addProduct: {
+    endpoint: "/v1/api/product",
+    method: "POST",
+    data: {},
+  },
+
+  editProduct: {
+    endpoint: "/v1/api/product/",
+    method: "PUT",
+    data: {},
+  },
+
+  delProduct: {
+    endpoint: "/v1/api/product/",
+    method: "DELETE",
+    data: {},
+  },
 };
 
 export default endpoints;

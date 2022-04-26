@@ -454,7 +454,6 @@ const endpoints = {
     data: {},
   },
 
-
   /// Divisi
   divisi: {
     endpoint: "/v1/api/divisi",
@@ -480,6 +479,30 @@ const endpoints = {
     data: {},
   },
 
+  /// Group Produk
+  groupPro: {
+    endpoint: "/v1/api/group-product",
+    method: "GET",
+    data: {},
+  },
+
+  addGroupPro: {
+    endpoint: "/v1/api/group-product",
+    method: "POST",
+    data: {},
+  },
+
+  editGroupPro: {
+    endpoint: "/v1/api/group-product/",
+    method: "PUT",
+    data: {},
+  },
+
+  delGroupPro: {
+    endpoint: "/v1/api/group-product/",
+    method: "DELETE",
+    data: {},
+  },
 };
 
 export default endpoints;

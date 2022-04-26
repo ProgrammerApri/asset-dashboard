@@ -16,10 +16,34 @@ import { Badge } from "primereact/badge";
 import { Divider } from "@material-ui/core";
 import { TabPanel, TabView } from "primereact/tabview";
 
-const data = {};
+const data = {
+  groupPro: {
+    id: null,
+    code: null,
+    name: null,
+    div_code: null,
+    acc_sto: null,
+    acc_send: null,
+    acc_terima: null,
+    hrg_pokok: null,
+    acc_penj: null,
+    potongan: null,
+    pengembalian: null,
+    selisih: null,
+  },
+
+  divisi: {
+    id: null,
+    code: null,
+    name: null,
+    desc: null,
+  },
+};
 
 const GroupProduk = () => {
-  const [groupProduk, setGroup] = useState(null);
+  const [groupPro, setGroup] = useState(null);
+  const [divisi, setDivisi] = useState(null);
+  const [setup, setSetup] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
@@ -38,13 +62,15 @@ const GroupProduk = () => {
 
   useEffect(() => {
     getGroupProduk();
+    getDivisi();
+    getSetup();
     initFilters1();
   }, []);
 
   const getGroupProduk = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.produk,
+      ...endpoints.groupPro,
       data: {},
     };
     console.log(config.data);
@@ -67,11 +93,55 @@ const GroupProduk = () => {
     }
   };
 
+  const getDivisi = async () => {
+    const config = {
+      ...endpoints.divisi,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setDivisi(data);
+      }
+    } catch (error) {}
+  };
+
+  const getSetup = async (isUpdate = false) => {
+    const config = {
+      ...endpoints.getSetup,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setSetup(data);
+      }
+    } catch (error) {}
+  };
+
   const editGroupProduk = async () => {
     const config = {
-      ...endpoints.editGroupProduk,
-      endpoint: endpoints.editGroupProduk.endpoint + currentItem.id,
-      data: {},
+      ...endpoints.editGroupPro,
+      endpoint: endpoints.editGroupPro.endpoint + currentItem.groupPro.id,
+      data: {
+        code: currentItem.groupPro.code,
+        name: currentItem.groupPro.name,
+        div_code: currentItem.divisi.id,
+        acc_sto: setup.sto.id,
+        acc_send: setup.sls_shipping.id,
+        acc_terima: setup.sls_shipping.id,
+        hrg_pokok: setup.sls_shipping.id,
+        acc_penj: setup.sls_shipping.id,
+        potongan: setup.sls_shipping.id,
+        pengembalian: setup.sls_shipping.id,
+        selisih: setup.sls_shipping.id,
+      },
     };
     console.log(config.data);
     let response = null;
@@ -106,8 +176,20 @@ const GroupProduk = () => {
 
   const addGroupProduk = async () => {
     const config = {
-      ...endpoints.addGroupProduk,
-      data: {},
+      ...endpoints.addGroupPro,
+      data: {
+        code: currentItem.groupPro.code,
+        name: currentItem.groupPro.name,
+        div_code: currentItem.divisi.id,
+        acc_sto: setup.sto.id,
+        acc_send: setup.sls_shipping.id,
+        acc_terima: setup.sls_shipping.id,
+        hrg_pokok: setup.sls_shipping.id,
+        acc_penj: setup.sls_shipping.id,
+        potongan: setup.sls_shipping.id,
+        pengembalian: setup.sls_shipping.id,
+        selisih: setup.sls_shipping.id,
+      },
     };
     console.log(config.data);
     let response = null;
@@ -135,7 +217,7 @@ const GroupProduk = () => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${currentItem.customer.cus_code} Sudah Digunakan`,
+            detail: `Kode ${currentItem.groupPro.code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -155,8 +237,8 @@ const GroupProduk = () => {
 
   const delGroupProduk = async (id) => {
     const config = {
-      ...endpoints.delGroupProduk,
-      endpoint: endpoints.delGroupProduk.endpoint + currentItem.id,
+      ...endpoints.delGroupPro,
+      endpoint: endpoints.delGroupPro.endpoint + currentItem.groupPro.id,
     };
     console.log(config.data);
     let response = null;
@@ -433,7 +515,7 @@ const GroupProduk = () => {
             <Card.Body>
               <DataTable
                 responsiveLayout="scroll"
-                value={loading ? dummy : groupProduk}
+                value={loading ? dummy : groupPro}
                 className="display w-150 datatable-wrapper"
                 showGridlines
                 dataKey="id"
@@ -443,7 +525,7 @@ const GroupProduk = () => {
                 globalFilterFields={[
                   "groupProduk.code",
                   "groupProduk.name",
-                  "groupProduk.divisi",
+                  "groupProduk.div_code",
                 ]}
                 emptyMessage="Tidak ada data"
                 paginator
@@ -458,7 +540,7 @@ const GroupProduk = () => {
                   style={{
                     minWidth: "8rem",
                   }}
-                  field={(e) => e.code}
+                  field={(e) => e.groupPro.code}
                   body={loading && <Skeleton />}
                 />
                 <Column
@@ -466,12 +548,12 @@ const GroupProduk = () => {
                   style={{
                     minWidth: "8rem",
                   }}
-                  field={(e) => e.name}
+                  field={(e) => e.groupPro.name}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Divisi"
-                  field={(e) => e.divisi}
+                  field={(e) => e.divisi.name}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
@@ -505,12 +587,12 @@ const GroupProduk = () => {
                 <label className="text-label">Kode Kelompok</label>
                 <div className="p-inputgroup">
                   <InputText
-                    value={`${currentItem?.groupProduk?.code ?? ""}`}
+                    value={`${currentItem?.groupPro?.code ?? ""}`}
                     onChange={(e) =>
                       setCurrentItem({
                         ...currentItem,
-                        groupProduk: {
-                          ...currentItem.groupProduk,
+                        groupPro: {
+                          ...currentItem.groupPro,
                           code: e.target.value,
                         },
                       })
@@ -524,12 +606,12 @@ const GroupProduk = () => {
                 <label className="text-label">Nama Kelompok</label>
                 <div className="p-inputgroup">
                   <InputText
-                    value={`${currentItem?.groupProduk?.name ?? ""}`}
+                    value={`${currentItem?.groupPro?.name ?? ""}`}
                     onChange={(e) =>
                       setCurrentItem({
                         ...currentItem,
-                        groupProduk: {
-                          ...currentItem.groupProduk,
+                        groupPro: {
+                          ...currentItem.groupPro,
                           name: e.target.value,
                         },
                       })
@@ -545,12 +627,12 @@ const GroupProduk = () => {
                 <div className="p-inputgroup">
                   <Dropdown
                     value={currentItem !== null ? currentItem.divisi : null}
-                    // options={divisi}
+                    options={divisi}
                     onChange={(e) => {
                       console.log(e.value);
                       setCurrentItem({
                         ...currentItem,
-                        divisi: e.value,
+                        divisi: e.target.value,
                       });
                     }}
                     optionLabel="name"
@@ -571,20 +653,13 @@ const GroupProduk = () => {
               <div className="col-6">
                 <label className="text-label">Akun Persediaan</label>
                 <div className="p-inputgroup">
-                  <Dropdown
-                    value={currentItem !== null ? currentItem.setup : null}
-                    // options={divisi}
-                    onChange={(e) => {
-                      console.log(e.value);
-                      setCurrentItem({
-                        ...currentItem,
-                        setup: e.value,
-                      });
-                    }}
-                    optionLabel="name"
-                    filter
-                    filterBy="name"
-                    placeholder="Pilih Akun Persediaan"
+                  <InputText
+                    value={
+                      setup !== null
+                        ? `(${setup.sto.acc_code}) - ${setup.sto.acc_name}`
+                        : ""
+                    }
+                    disabled
                   />
                 </div>
               </div>
@@ -592,20 +667,13 @@ const GroupProduk = () => {
               <div className="col-6">
                 <label className="text-label">Akun Pengiriman Barang</label>
                 <div className="p-inputgroup">
-                  <Dropdown
-                    value={currentItem !== null ? currentItem.setup : null}
-                    // options={divisi}
-                    onChange={(e) => {
-                      console.log(e.value);
-                      setCurrentItem({
-                        ...currentItem,
-                        setup: e.value,
-                      });
-                    }}
-                    optionLabel="name"
-                    filter
-                    filterBy="name"
-                    placeholder="Pilih Akun Pengiriman"
+                  <InputText
+                    value={
+                      setup !== null
+                        ? `(${setup.sls_shipping.acc_code}) - ${setup.sls_shipping.acc_name}`
+                        : ""
+                    }
+                    disabled
                   />
                 </div>
               </div>
@@ -615,20 +683,13 @@ const GroupProduk = () => {
               <div className="col-12">
                 <label className="text-label">Akun Penerimaan Barang</label>
                 <div className="p-inputgroup">
-                  <Dropdown
-                    value={currentItem !== null ? currentItem.setup : null}
-                    // options={divisi}
-                    onChange={(e) => {
-                      console.log(e.value);
-                      setCurrentItem({
-                        ...currentItem,
-                        setup: e.value,
-                      });
-                    }}
-                    optionLabel="name"
-                    filter
-                    filterBy="name"
-                    placeholder="Pilih Akun Penerimaan"
+                  <InputText
+                    value={
+                      setup !== null
+                        ? `(${setup.sls_shipping.acc_code}) - ${setup.sls_shipping.acc_name}`
+                        : ""
+                    }
+                    disabled
                   />
                 </div>
               </div>
@@ -643,20 +704,13 @@ const GroupProduk = () => {
               <div className="col-6">
                 <label className="text-label">Harga Pokok Penjualan</label>
                 <div className="p-inputgroup">
-                  <Dropdown
-                    value={currentItem !== null ? currentItem.setup : null}
-                    // options={divisi}
-                    onChange={(e) => {
-                      console.log(e.value);
-                      setCurrentItem({
-                        ...currentItem,
-                        setup: e.value,
-                      });
-                    }}
-                    optionLabel="name"
-                    filter
-                    filterBy="name"
-                    placeholder="Pilih Akun HPP"
+                  <InputText
+                    value={
+                      setup !== null
+                        ? `(${setup.sls_shipping.acc_code}) - ${setup.sls_shipping.acc_name}`
+                        : ""
+                    }
+                    disabled
                   />
                 </div>
               </div>
@@ -664,20 +718,13 @@ const GroupProduk = () => {
               <div className="col-6">
                 <label className="text-label">Penjualan</label>
                 <div className="p-inputgroup">
-                  <Dropdown
-                    value={currentItem !== null ? currentItem.setup : null}
-                    // options={divisi}
-                    onChange={(e) => {
-                      console.log(e.value);
-                      setCurrentItem({
-                        ...currentItem,
-                        setup: e.value,
-                      });
-                    }}
-                    optionLabel="name"
-                    filter
-                    filterBy="name"
-                    placeholder="Pilih Akun Penjualan"
+                  <InputText
+                    value={
+                      setup !== null
+                        ? `(${setup.sls_shipping.acc_code}) - ${setup.sls_shipping.acc_name}`
+                        : ""
+                    }
+                    disabled
                   />
                 </div>
               </div>
@@ -687,20 +734,13 @@ const GroupProduk = () => {
               <div className="col-6">
                 <label className="text-label">Potongan Penjualan</label>
                 <div className="p-inputgroup">
-                  <Dropdown
-                    value={currentItem !== null ? currentItem.setup : null}
-                    // options={divisi}
-                    onChange={(e) => {
-                      console.log(e.value);
-                      setCurrentItem({
-                        ...currentItem,
-                        setup: e.value,
-                      });
-                    }}
-                    optionLabel="name"
-                    filter
-                    filterBy="name"
-                    placeholder="Pilih Akun Potongan Penjualan"
+                  <InputText
+                    value={
+                      setup !== null
+                        ? `(${setup.sls_shipping.acc_code}) - ${setup.sls_shipping.acc_name}`
+                        : ""
+                    }
+                    disabled
                   />
                 </div>
               </div>
@@ -708,20 +748,13 @@ const GroupProduk = () => {
               <div className="col-6">
                 <label className="text-label">Pengembalian Penjualan</label>
                 <div className="p-inputgroup">
-                  <Dropdown
-                    value={currentItem !== null ? currentItem.setup : null}
-                    // options={divisi}
-                    onChange={(e) => {
-                      console.log(e.value);
-                      setCurrentItem({
-                        ...currentItem,
-                        setup: e.value,
-                      });
-                    }}
-                    optionLabel="name"
-                    filter
-                    filterBy="name"
-                    placeholder="Pilih Akun Pengembalian"
+                  <InputText
+                    value={
+                      setup !== null
+                        ? `(${setup.sls_shipping.acc_code}) - ${setup.sls_shipping.acc_name}`
+                        : ""
+                    }
+                    disabled
                   />
                 </div>
               </div>
@@ -731,20 +764,13 @@ const GroupProduk = () => {
               <div className="col-12">
                 <label className="text-label">Selisih Harga Pokok</label>
                 <div className="p-inputgroup">
-                  <Dropdown
-                    value={currentItem !== null ? currentItem.setup : null}
-                    // options={divisi}
-                    onChange={(e) => {
-                      console.log(e.value);
-                      setCurrentItem({
-                        ...currentItem,
-                        setup: e.value,
-                      });
-                    }}
-                    optionLabel="name"
-                    filter
-                    filterBy="name"
-                    placeholder="Pilih Akun Selisih"
+                  <InputText
+                    value={
+                      setup !== null
+                        ? `(${setup.sls_shipping.acc_code}) - ${setup.sls_shipping.acc_name}`
+                        : ""
+                    }
+                    disabled
                   />
                 </div>
               </div>

@@ -21,8 +21,15 @@ import { InputSwitch } from "primereact/inputswitch";
 const data = {
 };
 
+
+
+const addKonversi = [
+  
+];
+
 const Satuan = () => {
   const [satuan, setSatuan] = useState(null);
+  const [konversi, setAddKonv] = useState(false);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
@@ -433,6 +440,10 @@ const Satuan = () => {
       </button>
     );
   };
+
+  const addKonversi = () => {
+
+  }
 
   return (
     <>

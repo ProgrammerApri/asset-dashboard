@@ -509,15 +509,33 @@ const endpoints = {
     method: "GET",
     data: {},
   },
+  /// Produk
+  product: {
+    endpoint: "/v1/api/product",
+    method: "GET",
+    data: {},
+  },
 
   addSatuan: {
     endpoint: "/v1/api/unit",
     method: "POST",
     data: {},
   },
+  
+  addProduct: {
+    endpoint: "/v1/api/product",
+    method: "POST",
+    data: {},
+  },
 
   updateSatuan: {
     endpoint: "/v1/api/unit/",
+    method: "PUT",
+    data: {},
+  },
+  
+  editProduct: {
+    endpoint: "/v1/api/product/",
     method: "PUT",
     data: {},
   },
@@ -531,6 +549,12 @@ const endpoints = {
   convertSatuan: {
     endpoint: "/v1/api/unit-konversi",
     method: "POST",
+    data: {},
+  },
+  
+  delProduct: {
+    endpoint: "/v1/api/product/",
+    method: "DELETE",
     data: {},
   },
 };

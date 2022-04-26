@@ -48,9 +48,9 @@ import SubCustomer from "./components/Master/SubCustomer";
 import SetupKhusus from "./components/Master/SetupKhusus";
 import Mitra from "./components/Mitra/Mitra";
 import TransaksiPembelian from "./components/TransaksiPembelian/TransaksiPembelian";
-import Satuan from "./components/Master/Satuan";
 import Produk from "./components/Master/Produk";
 import GroupProduk from "./components/Master/GroupProduk";
+import Satuan from "./components/Satuan";
 
 const Markup = ({ width }) => {
   const routes = [

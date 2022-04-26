@@ -15,21 +15,26 @@ import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { TabView, TabPanel } from "primereact/tabview";
 import { InputNumber } from "primereact/inputnumber";
-import { Badge } from "primereact/badge";
 import { InputSwitch } from "primereact/inputswitch";
+import { Divider } from "@material-ui/core";
+import { Badge } from "react-bootstrap";
 
 const data = {
+  id: 0,
+  code: null,
+  name: null,
+  type: "d",
+  desc: null,
+  active: true,
+  qty: 1,
+  u_from: null,
+  u_to: null,
 };
 
+const addKonversi = [];
 
-
-const addKonversi = [
-  
-];
-
-const Satuan = () => {
+const DataSatuan = () => {
   const [satuan, setSatuan] = useState(null);
-  const [konversi, setAddKonv] = useState(false);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
@@ -43,6 +48,7 @@ const Satuan = () => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const [active, setActive] = useState(0);
+  const [konversi, setKonversi] = useState([{ qty: 0, unit: null }]);
 
   const dummy = Array.from({ length: 10 });
 
@@ -54,7 +60,7 @@ const Satuan = () => {
   const getSatuan = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.satuan,
+      ...endpoints.getSatuan,
       data: {},
     };
     console.log(config.data);
@@ -73,19 +79,15 @@ const Satuan = () => {
     } else {
       setTimeout(() => {
         setLoading(false);
-      }, 1500);
+      }, 500);
     }
   };
 
   const editSatuan = async () => {
     const config = {
-      ...endpoints.editSatuan,
-      endpoint: endpoints.editSatuan.endpoint + currentItem.id,
-      data: {
-        proj_code: currentItem.proj_code,
-        proj_name: currentItem.proj_name,
-        proj_ket: currentItem.proj_ket,
-      },
+      ...endpoints.updateSatuan,
+      endpoint: endpoints.updateSatuan.endpoint + currentItem.id,
+      data: currentItem,
     };
     console.log(config.data);
     let response = null;
@@ -121,11 +123,7 @@ const Satuan = () => {
   const addSatuan = async () => {
     const config = {
       ...endpoints.addSatuan,
-      data: {
-        proj_code: currentItem.proj_code,
-        proj_name: currentItem.proj_name,
-        proj_ket: currentItem.proj_ket,
-      },
+      data: currentItem,
     };
     console.log(config.data);
     let response = null;
@@ -140,7 +138,7 @@ const Satuan = () => {
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            detail: "Data Berhasil Ditambahkan",
             life: 3000,
           });
         }, 500);
@@ -173,8 +171,8 @@ const Satuan = () => {
 
   const delSatuan = async (id) => {
     const config = {
-      ...endpoints.delSatuan,
-      endpoint: endpoints.delSatuan.endpoint + currentItem.id,
+      ...endpoints.deleteSatuan,
+      endpoint: endpoints.deleteSatuan.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -217,6 +215,11 @@ const Satuan = () => {
           onClick={() => {
             setEdit(true);
             onClick("displayData", data);
+            data = {
+              ...data,
+              u_from: data.u_from && data.u_from.id,
+              u_to: data.u_to && data.u_to.id,
+            };
             setCurrentItem(data);
           }}
           className="btn btn-primary shadow btn-xs sharp ml-1"
@@ -259,48 +262,12 @@ const Satuan = () => {
   };
 
   const renderFooter = () => {
-    if (active !== 1) {
-      return (
-        <div className="mt-3">
-          {active > 0 ? (
-            <PButton
-              label="Sebelumnya"
-              onClick={() => {
-                if (active > 0) {
-                  setActive(active - 1);
-                }
-              }}
-              className="p-button-text btn-primary"
-            />
-          ) : (
-            <PButton
-              label="Batal"
-              onClick={() => setDisplayData(false)}
-              className="p-button-text btn-primary"
-            />
-          )}
-          <PButton
-            label="Selanjutnya"
-            onClick={() => {
-              if (active < 2) {
-                setActive(active + 1);
-              }
-            }}
-            autoFocus
-            loading={update}
-          />
-        </div>
-      );
-    }
-
     return (
       <div className="mt-3">
         <PButton
-          label="Sebelumnya"
+          label="Batal"
           onClick={() => {
-            if (active > 0) {
-              setActive(active - 1);
-            }
+            setDisplayData(false);
           }}
           className="p-button-text btn-primary"
         />
@@ -368,6 +335,7 @@ const Satuan = () => {
             setEdit(false);
             setCurrentItem(data);
             setDisplayData(true);
+            setActive(0);
           }}
         >
           Tambah{" "}
@@ -425,25 +393,16 @@ const Satuan = () => {
     setRows2(event.rows);
   };
 
-  const renderTabHeader = (options) => {
-    return (
-      <button
-        type="button"
-        onClick={options.onClick}
-        className={options.className}
-      >
-        {options.titleElement}
-        <Badge
-          value={`${options.index + 1}`}
-          className={`${active === options.index ? "active" : ""} ml-2`}
-        ></Badge>
-      </button>
-    );
+  const checkUnit = (value) => {
+    let selected = {};
+    satuan.forEach((el) => {
+      if (value === el.id) {
+        selected = el;
+      }
+    });
+
+    return selected;
   };
-
-  const addKonversi = () => {
-
-  }
 
   return (
     <>
@@ -491,13 +450,24 @@ const Satuan = () => {
                 />
                 <Column
                   header="Status Satuan"
-                  field={(e) => e.status}
                   style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
+                  body={(e) =>
+                    loading ? (
+                      <Skeleton />
+                    ) : e.type == "d" ? (
+                      <Badge variant="warning light">
+                        {" "}Dasar
+                      </Badge>
+                    ) : (
+                      <Badge variant="info light">
+                        {" "}Konversi
+                      </Badge>
+                    )
+                  }
                 />
                 <Column
                   header="Keterangan"
-                  field={(e) => e.ket}
+                  field={(e) => e?.desc ?? "-"}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
@@ -524,158 +494,141 @@ const Satuan = () => {
           setDisplayData(false);
         }}
       >
-        <TabView activeIndex={active} onTabChange={(e) => setActive(e.index)}>
-          <TabPanel header="Data Satuan" headerTemplate={renderTabHeader}>
-            <div className="row mr-0 ml-0">
-              <div className="col-6">
-                <label className="text-label">Kode Satuan</label>
+        <div className="row mr-0 ml-0">
+          <div className="col-6">
+            <label className="text-label">Kode Satuan</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={currentItem !== null ? currentItem.code : ""}
+                onChange={(e) =>
+                  setCurrentItem({ ...currentItem, code: e.target.value })
+                }
+                placeholder="Masukan Kode Satuan"
+              />
+            </div>
+          </div>
+
+          <div className="col-6">
+            <label className="text-label">Nama Satuan</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={currentItem !== null ? currentItem.name : ""}
+                onChange={(e) => {
+                  setCurrentItem({ ...currentItem, name: e.target.value });
+                }}
+                placeholder="Masukan Nama Satuan"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="col-12">
+          <label className="text-label">Keterangan</label>
+          <div className="p-inputgroup">
+            <InputTextarea
+              value={currentItem !== null ? currentItem.desc : ""}
+              onChange={(e) => {
+                setCurrentItem({ ...currentItem, desc: e.target.value });
+              }}
+              placeholder="Masukan Keterangan"
+            />
+          </div>
+        </div>
+
+        <div className="d-flex col-12 align-items-center">
+          <InputSwitch
+            className="mr-3"
+            inputId="email"
+            checked={currentItem && currentItem.active}
+            onChange={(e) => {
+              setCurrentItem({ ...currentItem, active: e.value });
+            }}
+          />
+          <label className="mr-3 mt-1" htmlFor="email">
+            {"Aktif"}
+          </label>
+        </div>
+        <div className="d-flex col-12 align-items-center">
+          <InputSwitch
+            className="mr-3"
+            inputId="email"
+            checked={currentItem && currentItem.type == "d"}
+            onChange={(e) => {
+              setCurrentItem({
+                ...currentItem,
+                type: e.value ? "d" : "k",
+              });
+            }}
+          />
+          <label className="mr-3 mt-1" htmlFor="email">
+            {"Satuan Dasar"}
+          </label>
+        </div>
+
+        {currentItem && currentItem.type == "k" && (
+          <>
+            <h4 className="mt-4 ml-3 mr-3">
+              <b>Konversi Satuan</b>
+            </h4>
+            <Divider className="mb-2 ml-3 mr-3"></Divider>
+
+            <div className="row ml-0 mr-0">
+              <div className="col-3">
+                <label className="text-label">Nilai/Kuantiti</label>
                 <div className="p-inputgroup">
-                  <InputText
-                    value={currentItem !== null ? `${currentItem.code}` : ""}
-                    onChange={(e) =>
-                      setCurrentItem({ ...currentItem, code: e.target.value })
-                    }
-                    placeholder="Masukan Kode Satuan"
+                  <InputNumber
+                    value={currentItem && currentItem.qty}
+                    onChange={(e) => {
+                      setCurrentItem({ ...currentItem, qty: e.value });
+                    }}
+                    placeholder="Masukan Nilai"
+                    showButtons
                   />
                 </div>
               </div>
 
-              <div className="col-6">
-                <label className="text-label">Nama Satuan</label>
-                <div className="p-inputgroup">
-                  <InputText
-                    value={currentItem !== null ? `${currentItem.name}` : ""}
-                    onChange={(e) =>
-                      setCurrentItem({ ...currentItem, name: e.target.value })
-                    }
-                    placeholder="Masukan Nama Satuan"
+              <div className="col-4">
+                <label className="text-label"> </label>
+                <div className="p-inputgroup mt-2">
+                  <Dropdown
+                    value={currentItem && checkUnit(currentItem.u_to)}
+                    options={satuan}
+                    onChange={(e) => {
+                      setCurrentItem({ ...currentItem, u_to: e.value.id });
+                    }}
+                    placeholder="Pilih Satuan"
+                    optionLabel="name"
+                    filter
+                    filterBy="name"
+                  />
+                </div>
+              </div>
+              <div
+                className="col-1 mt-4"
+                style={{ fontSize: "1rem", paddingTop: "1.5rem" }}
+              >
+                {" "}
+                /
+              </div>
+              <div className="col-4">
+                <label className="text-label"> </label>
+                <div className="p-inputgroup mt-2">
+                  <Dropdown
+                    value={currentItem && checkUnit(currentItem.u_from)}
+                    options={satuan}
+                    onChange={(e) => {
+                      setCurrentItem({ ...currentItem, u_from: e.value.id });
+                    }}
+                    placeholder="Pilih Satuan"
+                    optionLabel="name"
+                    filter
+                    filterBy="name"
                   />
                 </div>
               </div>
             </div>
-
-            <div className="col-12">
-              <label className="text-label">Keterangan</label>
-              <div className="p-inputgroup">
-                <InputTextarea
-                  value={currentItem !== null ? `${currentItem.ket}` : ""}
-                  onChange={(e) =>
-                    setCurrentItem({ ...currentItem, ket: e.target.value })
-                  }
-                  placeholder="Masukan Keterangan"
-                />
-              </div>
-            </div>
-
-            <div className="row mr-0 ml-0">
-              <div className="col-6 mb-0">
-                <InputSwitch
-                  className="mt-1"
-                  inputId="satuan"
-                  checked={currentItem ? currentItem: false}
-                  onChange={(e) =>
-                    setCurrentItem(e.value)
-                  }
-                />
-                <label className="ml-3" htmlFor="satuan">
-                  {"Aktif"}
-                </label>
-              </div>
-
-              <div className="col-6 mb-0">
-                <InputSwitch
-                  className="mt-1"
-                  checked={currentItem ? currentItem : false}
-                  onChange={(e) =>
-                    setCurrentItem(e.value)
-                  }
-                />
-                <label className="ml-3">{"Satuan Dasar"}</label>
-              </div>
-            </div>
-          </TabPanel>
-
-          <TabPanel header="Konversi Satuan" headerTemplate={renderTabHeader}>
-            <Card>
-              <Card.Body>
-                <div className="row">
-                  <div className="col-3">
-                    <label className="text-label">
-                      <b>Satuan Ukur</b>
-                    </label>
-                    <div className="p-inputgroup">
-                      <span className="mt-3">1 Box Isi 10</span>
-                    </div>
-                  </div>
-
-                  <div className="col-4">
-                    <label className="text-label">
-                      <b>Nilai</b>
-                    </label>
-                    <div className="p-inputgroup">
-                      <InputNumber
-                        value={
-                          currentItem !== null ? `${currentItem.nilai}` : ""
-                        }
-                        onChange={(e) =>
-                          setCurrentItem({
-                            ...currentItem,
-                            nilai: e.value,
-                          })
-                        }
-                        placeholder="Masukan Nilai"
-                        showButtons
-                      />
-                    </div>
-                  </div>
-
-                  <div className="col-4">
-                    <label className="text-label">
-                      <b>Satuan Dasar</b>
-                    </label>
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={
-                          currentItem !== null ? `${currentItem.sat_dasar}` : ""
-                        }
-                        onChange={(e) =>
-                          setCurrentItem({
-                            ...currentItem,
-                            sat_dasar: e.target.value,
-                          })
-                        }
-                        placeholder="Masukan Satuan Dasar"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="d-flex">
-                    <label className="text-label">
-                      <b>#</b>
-                    </label>
-                    <div className="mt-5">
-                      <Link
-                        onClick={() => {}}
-                        className="btn btn-danger shadow btn-xs sharp ml-1"
-                      >
-                        <i className="fa fa-trash"></i>
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-5">
-                  <PButton
-                    style={{ width: "32vw" }}
-                    label="Tambah Konversi"
-                    icon="pi pi-plus"
-                    // onClick={() => onSubmit()}
-                  />
-                </div>
-              </Card.Body>
-            </Card>
-          </TabPanel>
-        </TabView>
+          </>
+        )}
       </Dialog>
 
       <Dialog
@@ -699,4 +652,4 @@ const Satuan = () => {
   );
 };
 
-export default Satuan;
+export default DataSatuan;

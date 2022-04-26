@@ -503,6 +503,36 @@ const endpoints = {
     method: "DELETE",
     data: {},
   },
+
+  getSatuan: {
+    endpoint: "/v1/api/unit",
+    method: "GET",
+    data: {},
+  },
+
+  addSatuan: {
+    endpoint: "/v1/api/unit",
+    method: "POST",
+    data: {},
+  },
+
+  updateSatuan: {
+    endpoint: "/v1/api/unit/",
+    method: "PUT",
+    data: {},
+  },
+
+  deleteSatuan: {
+    endpoint: "/v1/api/unit/",
+    method: "DELETE",
+    data: {},
+  },
+
+  convertSatuan: {
+    endpoint: "/v1/api/unit-konversi",
+    method: "POST",
+    data: {},
+  },
 };
 
 export default endpoints;

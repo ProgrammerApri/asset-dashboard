@@ -258,6 +258,27 @@ textarea.p-inputtext {
   background: #6366F1;
 }
 
+.p-inputnumber-buttons-stacked .p-button.p-inputnumber-button-up {
+  border-top-left-radius: 0;
+  border-top-right-radius: 6px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  padding: 0;
+}
+
+.p-inputnumber-buttons-stacked .p-button.p-inputnumber-button-down {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 6px;
+  padding: 0;
+}
+
+.p-inputnumber-input {
+  border-bottom-right-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+}
+
 span .btn {
   height: 100%;
 }

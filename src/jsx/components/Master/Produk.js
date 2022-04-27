@@ -18,72 +18,24 @@ import { TabPanel, TabView } from "primereact/tabview";
 import { Tooltip } from "primereact/tooltip";
 
 const data = {
-  product: {
-    id: null,
-    code: null,
-    name: null,
-    group: null,
-    type: null,
-    codeb: null,
-    unit: null,
-    suplier: null,
-    b_price: null,
-    s_price: null,
-    barcode: null,
-    max_stock: null,
-    min_stock: null,
-    re_stock: null,
-    lt_stock: null,
-    max_order: null,
-    image: null,
-  },
-
-  suplier: {
-    id: null,
-    sup_code: null,
-    sup_name: null,
-    sup_jpem: null,
-    sup_ppn: null,
-    sup_npwp: null,
-    sup_address: null,
-    sup_kota: null,
-    sup_kpos: null,
-    sup_telp1: null,
-    sup_telp2: null,
-    sup_fax: null,
-    sup_cp: null,
-    sup_curren: null,
-    sup_ket: null,
-    sup_hutang: null,
-    sup_uang_muka: null,
-    sup_limit: null,
-  },
-
-  unit: {
-    id: null,
-    code: null,
-    name: null,
-    type: null,
-    desc: null,
-    active: true,
-    qty: null,
-    unit: null,
-  },
-
-  group: {
-    id: null,
-    code: null,
-    name: null,
-    div_code: null,
-    acc_sto: null,
-    acc_send: null,
-    acc_terima: null,
-    hrg_pokok: null,
-    acc_penj: null,
-    potongan: null,
-    pengembalian: null,
-    selisih: null,
-  },
+  id: null,
+  code: null,
+  name: null,
+  group: null,
+  type: null,
+  codeb: null,
+  unit: null,
+  suplier: null,
+  b_price: null,
+  s_price: null,
+  barcode: null,
+  metode: null,
+  max_stock: null,
+  min_stock: null,
+  re_stock: null,
+  lt_stock: null,
+  max_order: null,
+  image: null,
 };
 
 const type = [
@@ -100,7 +52,7 @@ const Produk = () => {
   const [product, setProduk] = useState(null);
   const [group, setGroup] = useState(null);
   const [unit, setUnit] = useState(null);
-  const [supplier, setSupplier] = useState(null);
+  const [suplier, setSupplier] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
@@ -116,7 +68,7 @@ const Produk = () => {
   const [active, setActive] = useState(0);
   const picker = useRef(null);
   const [file, setFile] = useState(null);
-  const [currentData, setCurrentData] = useState(null);
+  // const [currentData, setCurrentData] = useState(null);
   const [onUpload, setSubmit] = useState(false);
 
   const dummy = Array.from({ length: 10 });
@@ -168,8 +120,11 @@ const Produk = () => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        console.log(data);
-        setGroup(data);
+        let grp = [];
+        data.forEach((element) => {
+          grp.push(element.groupPro);
+        });
+        setGroup(grp);
       }
     } catch (error) {}
   };
@@ -177,7 +132,7 @@ const Produk = () => {
   const getUnit = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.unit,
+      ...endpoints.getSatuan,
       data: {},
     };
     console.log(config.data);
@@ -207,33 +162,25 @@ const Produk = () => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        setSupplier(data);
+        let sup = [];
+        data.forEach((element) => {
+          sup.push(element.supplier);
+        });
+        setSupplier(sup);
       }
     } catch (error) {}
   };
 
-  const editProduk = async () => {
+  const editProduk = async (image) => {
     const config = {
       ...endpoints.editProduct,
-      endpoint: endpoints.editProduct.endpoint + currentItem.product.id,
+      endpoint: endpoints.editProduct.endpoint + currentItem.id,
       data: {
-        code: currentItem.code,
-        name: currentItem.name,
-        group: currentItem.groupPro.id,
-        type: currentItem.type,
-        codeb: currentItem.codeb,
-        unit: currentItem.unit.id,
-        suplier: currentItem.supplier.id,
-        b_price: currentItem.b_price,
-        s_price: currentItem.s_price,
-        barcode: currentItem.barcode,
-        metode: currentItem.metode,
-        max_stock: currentItem.max_stock,
-        min_stock: currentItem.min_stock,
-        re_stock: currentItem.re_stock,
-        lt_stock: currentItem.lt_stock,
-        max_order: currentItem.max_order,
-        image: currentItem.image,
+        ...currentItem,
+        group: currentItem?.group?.id ?? null,
+        suplier: currentItem?.suplier?.id ?? null,
+        unit: currentItem?.unit?.id ?? null,
+        image: image,
       },
     };
     console.log(config.data);
@@ -246,6 +193,7 @@ const Produk = () => {
           setUpdate(false);
           setDisplayData(false);
           getProduk(true);
+          setActive(0);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -267,27 +215,15 @@ const Produk = () => {
     }
   };
 
-  const addProduk = async () => {
+  const addProduk = async (image) => {
     const config = {
       ...endpoints.addProduct,
       data: {
-        code: currentItem.code,
-        name: currentItem.name,
-        group: currentItem.groupPro.id,
-        type: currentItem.type,
-        codeb: currentItem.codeb,
-        unit: currentItem.unit.id,
-        suplier: currentItem.supplier.id,
-        b_price: currentItem.b_price,
-        s_price: currentItem.s_price,
-        barcode: currentItem.barcode,
-        metode: currentItem.metode,
-        max_stock: currentItem.max_stock,
-        min_stock: currentItem.min_stock,
-        re_stock: currentItem.re_stock,
-        lt_stock: currentItem.lt_stock,
-        max_order: currentItem.max_order,
-        image: currentItem.image,
+        ...currentItem,
+        group: currentItem?.group?.id ?? null,
+        suplier: currentItem?.suplier?.id ?? null,
+        unit: currentItem?.unit?.id ?? null,
+        image: image,
       },
     };
     console.log(config.data);
@@ -300,6 +236,7 @@ const Produk = () => {
           setUpdate(false);
           setDisplayData(false);
           getProduk(true);
+          setActive(0);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -316,7 +253,7 @@ const Produk = () => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${currentItem.product.code} Sudah Digunakan`,
+            detail: `Kode ${currentItem.code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -333,6 +270,70 @@ const Produk = () => {
       }
     }
   };
+
+  // const postProduct = async (image, isUpdate = false, data) => {
+  //   let config = {};
+  //   if (isUpdate) {
+  //     if (data) {
+  //       config = {
+  //         ...endpoints.editProduct,
+  //         endpoint: endpoints.editProduct.endpoint + currentItem.id,
+  //         data: {
+  //           ...currentItem,
+  //           group: currentItem?.group?.id ?? null,
+  //           suplier: currentItem?.suplier?.id ?? null,
+  //           unit: currentItem?.unit?.id ?? null,
+  //         },
+  //       };
+  //     } else {
+  //       config = {
+  //         ...endpoints.editProduct,
+  //         endpoint: endpoints.editProduct.endpoint + currentItem.id,
+  //         data: {
+  //           ...currentItem,
+  //           image: image !== "" ? image : currentItem.image,
+  //         },
+  //       };
+  //     }
+  //   } else {
+  //     config = {
+  //       ...endpoints.addProduct,
+  //       data: {
+  //         ...currentItem,
+  //         group: currentItem?.group?.id ?? null,
+  //         suplier: currentItem?.suplier?.id ?? null,
+  //         unit: currentItem?.unit?.id ?? null,
+  //         image: image,
+  //       },
+  //     };
+  //   }
+  //   let response = null;
+  //   try {
+  //     response = await request(null, config);
+  //     console.log(response);
+  //     if (response.status) {
+  //       setTimeout(() => {
+  //         setUpdate(false);
+  //         setDisplayData(false);
+  //         getProduk(true);
+  //         toast.current.show({
+  //           severity: "info",
+  //           summary: "Berhasil",
+  //           detail: "Data Berhasil Diperbarui",
+  //           life: 3000,
+  //         });
+  //       }, 500);
+  //     }
+  //   } catch (error) {
+  //     setSubmit(false);
+  //     toast.current.show({
+  //       severity: "error",
+  //       summary: "Gagal",
+  //       detail: "Gagal memperbarui data",
+  //       life: 3000,
+  //     });
+  //   }
+  // };
 
   const delProduk = async (id) => {
     const config = {
@@ -372,8 +373,7 @@ const Produk = () => {
     }
   };
 
-  const uploadImage = async (isUpdate = false) => {
-    setSubmit(true);
+  const uploadImage = async () => {
     if (file) {
       const config = {
         ...endpoints.uploadImage,
@@ -389,30 +389,25 @@ const Produk = () => {
         });
         console.log(response);
         if (response.status) {
-          addProduk(response.data, isUpdate);
-          editProduk(response.data, isUpdate);
+          if (isEdit) {
+            editProduk(response.data);
+          } else {
+            addProduk(response.data);
+          }
         }
       } catch (error) {
-        setSubmit(false);
+        if (isEdit) {
+          editProduk("");
+        } else {
+          addProduk("");
+        }
       }
+      setFile(null);
     } else {
-      addProduk("", isUpdate);
-      editProduk("", isUpdate);
-    }
-  };
-
-  const submitUpdate = async (upload = false, data) => {
-    if (currentItem.product.id === 0) {
-      if (upload) {
-        uploadImage();
+      if (isEdit) {
+        editProduk("");
       } else {
         addProduk("");
-      }
-    } else {
-      if (upload) {
-        uploadImage(true);
-      } else {
-        addProduk("", true, data);
       }
     }
   };
@@ -458,15 +453,8 @@ const Produk = () => {
   };
 
   const onSubmit = () => {
-    if (isEdit) {
-      setUpdate(true);
-      editProduk();
-      // submitUpdate(true);
-    } else {
-      setUpdate(true);
-      addProduk();
-      // submitUpdate(true);
-    }
+    setUpdate(true);
+    uploadImage();
   };
 
   const renderFooter = () => {
@@ -486,7 +474,11 @@ const Produk = () => {
           ) : (
             <PButton
               label="Batal"
-              onClick={() => setDisplayData(false)}
+              onClick={() => {
+                setDisplayData(false);
+                setActive(0);
+                setFile(null)
+              }}
               className="p-button-text btn-primary"
             />
           )}
@@ -519,6 +511,11 @@ const Produk = () => {
           label="Simpan"
           icon="pi pi-check"
           onClick={() => onSubmit()}
+          // onClick={() => {
+          //   setUpdate(true);
+          //   setActive(0);
+          //   submitUpdate();
+          // }}
           autoFocus
           loading={update}
         />
@@ -662,7 +659,7 @@ const Produk = () => {
     return typ;
   };
 
-  const getMetodeHPP = (value) => {  
+  const getMetodeHPP = (value) => {
     let met = {};
     metode.forEach((element) => {
       if (value === element.id) {
@@ -724,12 +721,12 @@ const Produk = () => {
                 header={renderHeader}
                 filters={filters1}
                 globalFilterFields={[
-                  "product.code",
-                  "product.barcode",
-                  "product.name",
+                  "code",
+                  "barcode",
+                  "name",
                   "group.group",
-                  "product.type",
-                  "product.stock",
+                  "type",
+                  "stock",
                 ]}
                 emptyMessage="Tidak ada data"
                 paginator
@@ -763,19 +760,19 @@ const Produk = () => {
                 />
                 <Column
                   header="Group Barang"
-                  field={(e) => e?.group?.name ??""}
+                  field={(e) => e?.group?.name ?? ""}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
-                <Column
+                {/* <Column
                   header="Departemen Barang"
-                  field={(e) => e?.type ?? ""}
+                  field={(e) => e?.type?.name ?? ""}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
-                />
+                /> */}
                 <Column
                   header="Informasi Stock"
-                  field={(e) => e?.max_stock ?? "" }
+                  field={(e) => e?.max_stock ?? ""}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
@@ -800,6 +797,8 @@ const Produk = () => {
         onHide={() => {
           setEdit(false);
           setDisplayData(false);
+          setActive(0);
+          setFile(null)
         }}
       >
         <TabView activeIndex={active} onTabChange={(e) => setActive(e.index)}>
@@ -811,7 +810,7 @@ const Produk = () => {
                   <InputText
                     value={`${currentItem?.code ?? ""}`}
                     onChange={(e) =>
-                      setCurrentItem({...currentItem, code: e.target.value})
+                      setCurrentItem({ ...currentItem, code: e.target.value })
                     }
                     placeholder="Masukan Kode Produk"
                   />
@@ -824,7 +823,7 @@ const Produk = () => {
                   <InputText
                     value={`${currentItem?.name ?? ""}`}
                     onChange={(e) =>
-                      setCurrentItem({...currentItem, name: e.target.value})
+                      setCurrentItem({ ...currentItem, name: e.target.value })
                     }
                     placeholder="Masukan Nama Barang"
                   />
@@ -837,18 +836,18 @@ const Produk = () => {
                 <label className="text-label">Kode Group</label>
                 <div className="p-inputgroup">
                   <Dropdown
-                    value={currentItem !== null ? currentItem.groupPro : null}
+                    value={currentItem !== null ? currentItem.group : null}
                     options={group}
                     onChange={(e) => {
                       console.log(e.value);
                       setCurrentItem({
                         ...currentItem,
-                        groupPro: e.target.value,
+                        group: e.target.value,
                       });
                     }}
-                    optionLabel="groupPro.name"
+                    optionLabel="name"
                     filter
-                    filterBy="groupPro.name"
+                    filterBy="name"
                     placeholder="Pilih Group Barang"
                   />
                 </div>
@@ -864,9 +863,13 @@ const Produk = () => {
                         : null
                     }
                     options={type}
-                    onChange={(e) =>
-                      setCurrentItem({...currentItem, type: e.target.value})
-                    }
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        type: e.value.id,
+                      });
+                    }}
                     optionLabel="name"
                     filter
                     filterBy="name"
@@ -883,7 +886,7 @@ const Produk = () => {
                   <InputText
                     value={`${currentItem?.codeb ?? ""}`}
                     onChange={(e) =>
-                      setCurrentItem({...currentItem, codeb: e.target.value})
+                      setCurrentItem({ ...currentItem, codeb: e.target.value })
                     }
                     placeholder="Masukan Kode Sebelumnya"
                   />
@@ -905,9 +908,9 @@ const Produk = () => {
                         unit: e.target.value,
                       });
                     }}
-                    optionLabel="unit.name"
+                    optionLabel="name"
                     filter
-                    filterBy="unit.name"
+                    filterBy="name"
                     placeholder="Pilih Satuan Barang"
                   />
                 </div>
@@ -917,18 +920,18 @@ const Produk = () => {
                 <label className="text-label">Pemasok</label>
                 <div className="p-inputgroup">
                   <Dropdown
-                    value={currentItem !== null ? currentItem.supplier : null}
-                    options={supplier}
+                    value={currentItem !== null ? currentItem.suplier : null}
+                    options={suplier}
                     onChange={(e) => {
                       console.log(e.value);
                       setCurrentItem({
                         ...currentItem,
-                        supplier: e.target.value,
+                        suplier: e.target.value,
                       });
                     }}
-                    optionLabel="supplier.sup_name"
+                    optionLabel="sup_name"
                     filter
-                    filterBy="supplier.sup_name"
+                    filterBy="sup_name"
                     placeholder="Pilih Pemasok"
                   />
                 </div>
@@ -942,7 +945,7 @@ const Produk = () => {
                   <InputNumber
                     value={`${currentItem?.b_price ?? ""}`}
                     onChange={(e) =>
-                      setCurrentItem({...currentItem, b_price: e.value})
+                      setCurrentItem({ ...currentItem, b_price: e.value })
                     }
                     placeholder="Masukan Harga Beli"
                   />
@@ -955,7 +958,7 @@ const Produk = () => {
                   <InputNumber
                     value={`${currentItem?.s_price ?? ""}`}
                     onChange={(e) =>
-                      setCurrentItem({...currentItem, s_price: e.value})
+                      setCurrentItem({ ...currentItem, s_price: e.value })
                     }
                     placeholder="Masukan Harga Jual"
                   />
@@ -975,7 +978,10 @@ const Produk = () => {
                   <InputText
                     value={`${currentItem?.barcode ?? ""}`}
                     onChange={(e) =>
-                      setCurrentItem({...currentItem, barcode: e.target.value})
+                      setCurrentItem({
+                        ...currentItem,
+                        barcode: e.target.value,
+                      })
                     }
                     placeholder="Masukan Kode Barcode"
                   />
@@ -996,10 +1002,7 @@ const Produk = () => {
                       console.log(e.value);
                       setCurrentItem({
                         ...currentItem,
-                        product: {
-                          ...currentItem.product,
-                          metode: e.value.id,
-                        },
+                        metode: e.value.id,
                       });
                     }}
                     optionLabel="name"
@@ -1018,7 +1021,7 @@ const Produk = () => {
                   <InputNumber
                     value={`${currentItem?.max_stock ?? ""}`}
                     onChange={(e) =>
-                      setCurrentItem({...currentItem, max_stock: e.value})
+                      setCurrentItem({ ...currentItem, max_stock: e.value })
                     }
                     placeholder="Masukan Maksimum Stock"
                     showButtons
@@ -1032,7 +1035,7 @@ const Produk = () => {
                   <InputNumber
                     value={`${currentItem?.min_stock ?? ""}`}
                     onChange={(e) =>
-                      setCurrentItem({...currentItem, min_stock: e.value})
+                      setCurrentItem({ ...currentItem, min_stock: e.value })
                     }
                     placeholder="Masukan Minimum Stock"
                     showButtons
@@ -1048,7 +1051,7 @@ const Produk = () => {
                   <InputNumber
                     value={`${currentItem?.re_stock ?? ""}`}
                     onChange={(e) =>
-                      setCurrentItem({...currentItem, re_stock: e.value})
+                      setCurrentItem({ ...currentItem, re_stock: e.value })
                     }
                     placeholder="Masukan Reorder Stock"
                     showButtons
@@ -1062,7 +1065,10 @@ const Produk = () => {
                   <InputText
                     value={`${currentItem?.lt_stock ?? ""}`}
                     onChange={(e) =>
-                      setCurrentItem({...currentItem, lt_stock: e.target.value})
+                      setCurrentItem({
+                        ...currentItem,
+                        lt_stock: e.target.value,
+                      })
                     }
                     placeholder="Masukan Lead Timeout Stock"
                   />
@@ -1077,13 +1083,7 @@ const Produk = () => {
                   <InputNumber
                     value={`${currentItem?.max_order ?? ""}`}
                     onChange={(e) =>
-                      setCurrentItem({
-                        ...currentItem,
-                        product: {
-                          ...currentItem.product,
-                          max_order: e.value,
-                        },
-                      })
+                      setCurrentItem({ ...currentItem, max_order: e.value })
                     }
                     placeholder="Masukan Maksimal Order"
                     showButtons
@@ -1107,7 +1107,7 @@ const Produk = () => {
                     setFile(e.target.files[0]);
                   }}
                 />
-                <div className="flex align-items-center flex-column">
+                <div>
                   <Card
                     className="upload mb-3"
                     data-pr-tooltip="Klik untuk memilih foto"
@@ -1115,6 +1115,7 @@ const Produk = () => {
                       cursor: "pointer",
                       height: "200px",
                       width: "200px",
+                      background: "var(--input-bg)"
                     }}
                     onClick={() => {
                       picker.current.click();
@@ -1127,7 +1128,7 @@ const Produk = () => {
                           src={URL.createObjectURL(file)}
                           alt=""
                         />
-                      ) : currentItem && currentItem.image !== "" ? (
+                      ) : currentItem && currentItem.image && currentItem.image !== "" ? (
                         <img
                           style={{ maxWidth: "150px" }}
                           src={currentItem.image}

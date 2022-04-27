@@ -135,12 +135,12 @@ const GroupProduk = () => {
         div_code: currentItem.divisi.id,
         acc_sto: setup.sto.id,
         acc_send: setup.sls_shipping.id,
-        acc_terima: setup.sls_shipping.id,
-        hrg_pokok: setup.sls_shipping.id,
-        acc_penj: setup.sls_shipping.id,
-        potongan: setup.sls_shipping.id,
+        acc_terima: setup.sto.id,
+        hrg_pokok: setup.pur_cogs.id,
+        acc_penj: setup.sls_rev.id,
+        potongan: setup.sls_disc.id,
         pengembalian: setup.sls_shipping.id,
-        selisih: setup.sls_shipping.id,
+        selisih: setup.sto_hpp_diff.id,
       },
     };
     console.log(config.data);
@@ -183,12 +183,12 @@ const GroupProduk = () => {
         div_code: currentItem.divisi.id,
         acc_sto: setup.sto.id,
         acc_send: setup.sls_shipping.id,
-        acc_terima: setup.sls_shipping.id,
-        hrg_pokok: setup.sls_shipping.id,
-        acc_penj: setup.sls_shipping.id,
-        potongan: setup.sls_shipping.id,
+        acc_terima: setup.sto.id,
+        hrg_pokok: setup.pur_cogs.id,
+        acc_penj: setup.sls_rev.id,
+        potongan: setup.sls_disc.id,
         pengembalian: setup.sls_shipping.id,
-        selisih: setup.sls_shipping.id,
+        selisih: setup.sto_hpp_diff.id,
       },
     };
     console.log(config.data);
@@ -684,11 +684,10 @@ const GroupProduk = () => {
                 <label className="text-label">Akun Penerimaan Barang</label>
                 <div className="p-inputgroup">
                   <InputText
-                    value={
-                      setup !== null
-                        ? `(${setup.sls_shipping.acc_code}) - ${setup.sls_shipping.acc_name}`
-                        : ""
-                    }
+                    value={`(${setup?.sto?.acc_code ?? ""}) - ${
+                      setup?.sto?.acc_name ?? ""
+                    }`}
+                    placeholder= "Akun Penerimaan Barang"
                     disabled
                   />
                 </div>
@@ -707,7 +706,7 @@ const GroupProduk = () => {
                   <InputText
                     value={
                       setup !== null
-                        ? `(${setup.sls_shipping.acc_code}) - ${setup.sls_shipping.acc_name}`
+                        ? `(${setup.pur_cogs.acc_code}) - ${setup.pur_cogs.acc_name}`
                         : ""
                     }
                     disabled
@@ -721,7 +720,7 @@ const GroupProduk = () => {
                   <InputText
                     value={
                       setup !== null
-                        ? `(${setup.sls_shipping.acc_code}) - ${setup.sls_shipping.acc_name}`
+                        ? `(${setup.sls_rev.acc_code}) - ${setup.sls_rev.acc_name}`
                         : ""
                     }
                     disabled
@@ -737,7 +736,7 @@ const GroupProduk = () => {
                   <InputText
                     value={
                       setup !== null
-                        ? `(${setup.sls_shipping.acc_code}) - ${setup.sls_shipping.acc_name}`
+                        ? `(${setup.sls_disc.acc_code}) - ${setup.sls_disc.acc_name}`
                         : ""
                     }
                     disabled
@@ -767,7 +766,7 @@ const GroupProduk = () => {
                   <InputText
                     value={
                       setup !== null
-                        ? `(${setup.sls_shipping.acc_code}) - ${setup.sls_shipping.acc_name}`
+                        ? `(${setup.sto_hpp_diff.acc_code}) - ${setup.sto_hpp_diff.acc_name}`
                         : ""
                     }
                     disabled

@@ -18,6 +18,7 @@ import { InputNumber } from "primereact/inputnumber";
 import { InputSwitch } from "primereact/inputswitch";
 import { Divider } from "@material-ui/core";
 import { Badge } from "react-bootstrap";
+import { Badge as PBadge } from "primereact/badge";
 
 const data = {
   id: 0,
@@ -35,6 +36,7 @@ const addKonversi = [];
 
 const DataSatuan = () => {
   const [satuan, setSatuan] = useState(null);
+  const [satuanDasar, setSatuanDasar] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
@@ -47,8 +49,13 @@ const DataSatuan = () => {
   const [isEdit, setEdit] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
-  const [active, setActive] = useState(0);
-  const [konversi, setKonversi] = useState([{ qty: 0, unit: null }]);
+  const [konversi, setKonversi] = useState([
+    {
+      qty: 1,
+      u_from: null,
+      u_to: null,
+    },
+  ]);
 
   const dummy = Array.from({ length: 10 });
 
@@ -72,6 +79,13 @@ const DataSatuan = () => {
         const { data } = response;
         console.log(data);
         setSatuan(data);
+        let dasar = [];
+        data.forEach((el) => {
+          if (el.type == "d") {
+            dasar.push(el);
+          }
+        });
+        setSatuanDasar(dasar);
       }
     } catch (error) {}
     if (isUpdate) {
@@ -123,7 +137,7 @@ const DataSatuan = () => {
   const addSatuan = async () => {
     const config = {
       ...endpoints.addSatuan,
-      data: currentItem,
+      data: { ...currentItem, konversi: konversi },
     };
     console.log(config.data);
     let response = null;
@@ -215,11 +229,19 @@ const DataSatuan = () => {
           onClick={() => {
             setEdit(true);
             onClick("displayData", data);
-            data = {
-              ...data,
-              u_from: data.u_from && data.u_from.id,
-              u_to: data.u_to && data.u_to.id,
-            };
+            if (data.type == "k") {
+              let conv = [];
+              satuan.forEach((el) => {
+                if (el.code == data.code) {
+                  conv.push({
+                    qty: el.qty,
+                    u_from: el.u_from.id,
+                    u_to: el.u_to.id,
+                  });
+                }
+              });
+              setKonversi(conv);
+            }
             setCurrentItem(data);
           }}
           className="btn btn-primary shadow btn-xs sharp ml-1"
@@ -334,8 +356,14 @@ const DataSatuan = () => {
           onClick={() => {
             setEdit(false);
             setCurrentItem(data);
+            setKonversi([
+              {
+                qty: 1,
+                u_from: null,
+                u_to: null,
+              },
+            ])
             setDisplayData(true);
-            setActive(0);
           }}
         >
           Tambah{" "}
@@ -419,6 +447,18 @@ const DataSatuan = () => {
                 dataKey="id"
                 rowHover
                 header={renderHeader}
+                rowGroupMode="subheader"
+                rowGroupHeaderTemplate={(e) =>
+                  loading ? (
+                    <Skeleton />
+                  ) : (
+                    <PBadge
+                      className="mt-4 active"
+                      value={`${e?.code}`}
+                    ></PBadge>
+                  )
+                }
+                groupRowsBy="code"
                 filters={filters1}
                 globalFilterFields={[
                   "satuan.code",
@@ -434,17 +474,35 @@ const DataSatuan = () => {
                 onPage={onCustomPage2}
                 paginatorClassName="justify-content-end mt-3"
               >
-                <Column
+                {/* <Column
                   header="Kode Satuan"
                   style={{
                     minWidth: "8rem",
                   }}
-                  field={(e) => e.code}
+                  field="code"
+                  body={loading && <Skeleton />}
+                /> */}
+                <Column
+                  header="Nama Satuan"
+                  field="name"
+                  style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Nama Satuan"
-                  field={(e) => e.name}
+                  header="Kuantitas"
+                  field={(e) => e?.qty ?? "-"}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Satuan Besar"
+                  field={(e) => e?.u_to?.code ?? e.code}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Satuan Kecil"
+                  field={(e) => e?.u_from?.code ?? e.code}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
@@ -455,26 +513,17 @@ const DataSatuan = () => {
                     loading ? (
                       <Skeleton />
                     ) : e.type == "d" ? (
-                      <Badge variant="warning light">
-                        {" "}Dasar
-                      </Badge>
+                      <Badge variant="warning light"> Dasar</Badge>
                     ) : (
-                      <Badge variant="info light">
-                        {" "}Konversi
-                      </Badge>
+                      <Badge variant="info light"> Konversi</Badge>
                     )
                   }
-                />
-                <Column
-                  header="Keterangan"
-                  field={(e) => e?.desc ?? "-"}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
                 />
                 <Column
                   header="Action"
                   dataType="boolean"
                   bodyClassName="text-center"
+                  field="code"
                   style={{ minWidth: "2rem" }}
                   body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
                 />
@@ -558,6 +607,15 @@ const DataSatuan = () => {
                 ...currentItem,
                 type: e.value ? "d" : "k",
               });
+              if (!e.value) {
+                setKonversi([
+                  {
+                    qty: 1,
+                    u_from: null,
+                    u_to: null,
+                  },
+                ])
+              }
             }}
           />
           <label className="mr-3 mt-1" htmlFor="email">
@@ -572,61 +630,117 @@ const DataSatuan = () => {
             </h4>
             <Divider className="mb-2 ml-3 mr-3"></Divider>
 
-            <div className="row ml-0 mr-0">
+            <div className="row ml-0 mr-0 mb-0">
               <div className="col-3">
-                <label className="text-label">Nilai/Kuantiti</label>
-                <div className="p-inputgroup">
-                  <InputNumber
-                    value={currentItem && currentItem.qty}
-                    onChange={(e) => {
-                      setCurrentItem({ ...currentItem, qty: e.value });
-                    }}
-                    placeholder="Masukan Nilai"
-                    showButtons
-                  />
-                </div>
+                <label className="text-label">Nilai/Kuantitas</label>
               </div>
 
               <div className="col-4">
-                <label className="text-label"> </label>
-                <div className="p-inputgroup mt-2">
-                  <Dropdown
-                    value={currentItem && checkUnit(currentItem.u_to)}
-                    options={satuan}
-                    onChange={(e) => {
-                      setCurrentItem({ ...currentItem, u_to: e.value.id });
-                    }}
-                    placeholder="Pilih Satuan"
-                    optionLabel="name"
-                    filter
-                    filterBy="name"
-                  />
-                </div>
+                <label className="text-label">Satuan Besar</label>
               </div>
-              <div
-                className="col-1 mt-4"
-                style={{ fontSize: "1rem", paddingTop: "1.5rem" }}
-              >
-                {" "}
-                /
-              </div>
+
+              <div className="ml-1"> </div>
+
               <div className="col-4">
-                <label className="text-label"> </label>
-                <div className="p-inputgroup mt-2">
-                  <Dropdown
-                    value={currentItem && checkUnit(currentItem.u_from)}
-                    options={satuan}
-                    onChange={(e) => {
-                      setCurrentItem({ ...currentItem, u_from: e.value.id });
-                    }}
-                    placeholder="Pilih Satuan"
-                    optionLabel="name"
-                    filter
-                    filterBy="name"
-                  />
-                </div>
+                <label className="text-label">Satuan Kecil</label>
+              </div>
+
+              <div className="d-flex">
+                <div className="mt-5"></div>
               </div>
             </div>
+
+            {konversi.map((v, i) => {
+              return (
+                <div className="row ml-0 mr-0">
+                  <div className="col-3">
+                    <div className="p-inputgroup">
+                      <InputNumber
+                        value={v.qty}
+                        onChange={(e) => {
+                          let temp = [...konversi];
+                          temp[i].qty = e.value;
+                          setKonversi(temp);
+                        }}
+                        placeholder="Masukan Nilai"
+                        showButtons
+                      />
+                    </div>
+                  </div>
+
+                  <div className="col-4">
+                    <div className="p-inputgroup">
+                      <Dropdown
+                        value={v.u_to && checkUnit(konversi[i].u_to)}
+                        options={satuanDasar}
+                        onChange={(e) => {
+                          let temp = [...konversi];
+                          temp[i].u_to = e.value.id;
+                          setKonversi(temp);
+                        }}
+                        placeholder="Pilih Satuan"
+                        optionLabel="name"
+                        filter
+                        filterBy="name"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="col-4">
+                    <div className="p-inputgroup">
+                      <Dropdown
+                        value={v.u_from && checkUnit(konversi[i].u_from)}
+                        options={satuanDasar}
+                        onChange={(e) => {
+                          let temp = [...konversi];
+                          temp[i].u_from = e.value.id;
+                          setKonversi(temp);
+                        }}
+                        placeholder="Pilih Satuan"
+                        optionLabel="name"
+                        filter
+                        filterBy="name"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="d-flex">
+                    <div className="mt-3">
+                      {i == konversi.length - 1 ? (
+                        <Link
+                          onClick={() => {
+                            setKonversi([
+                              ...konversi,
+                              {
+                                qty: 1,
+                                u_from: null,
+                                u_to: null,
+                              },
+                            ]);
+                          }}
+                          className="btn btn-primary shadow btn-xs sharp ml-1"
+                        >
+                          <i className="fa fa-plus"></i>
+                        </Link>
+                      ) : (
+                        <Link
+                          onClick={() => {
+                            console.log(konversi);
+                            console.log(i);
+                            let temp = [...konversi];
+                            temp.splice(i, 1);
+                            setKonversi(temp);
+                          }}
+                          className="btn btn-danger shadow btn-xs sharp ml-1"
+                        >
+                          <i className="fa fa-trash"></i>
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </>
         )}
       </Dialog>

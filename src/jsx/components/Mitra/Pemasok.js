@@ -20,24 +20,24 @@ import { Badge } from "primereact/badge";
 
 const data = {
   supplier: {
-    id: 0,
-    sup_code: "",
-    sup_name: "",
-    sup_jpem: 0,
-    sup_ppn: "",
-    sup_npwp: "",
-    sup_address: "",
+    id: null,
+    sup_code: null,
+    sup_name: null,
+    sup_jpem: null,
+    sup_ppn: null,
+    sup_npwp: null,
+    sup_address: null,
     sup_kota: null,
-    sup_kpos: 0,
-    sup_telp1: 0,
-    sup_telp2: 0,
-    sup_fax: "",
-    sup_cp: "",
-    sup_curren: 0,
-    sup_ket: "",
-    sup_hutang: 0,
-    sup_uang_muka: 0,
-    sup_limit: 0,
+    sup_kpos: null,
+    sup_telp1: null,
+    sup_telp2: null,
+    sup_fax: null,
+    sup_cp: null,
+    sup_curren: null,
+    sup_ket: null,
+    sup_hutang: null,
+    sup_uang_muka: null,
+    sup_limit: null,
   },
 
   currency: {
@@ -75,6 +75,7 @@ const Supplier = () => {
   const [currency, setCurrency] = useState(null);
   const [city, setCity] = useState(null);
   const [setup, setSetup] = useState(null);
+  const [account, setAccount] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
@@ -97,6 +98,7 @@ const Supplier = () => {
     getCurrency();
     getCity();
     getSetup();
+    getAccount();
     initFilters1();
   }, []);
 
@@ -230,6 +232,32 @@ const Supplier = () => {
     }
   };
 
+  const getAccount = async (isUpdate = false) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.account,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setAccount(data);
+      }
+    } catch (error) {}
+    if (isUpdate) {
+      setLoading(false);
+    } else {
+      setTimeout(() => {
+        setLoading(false);
+      }, 1500);
+    }
+  };
+
   const editSupplier = async () => {
     const config = {
       ...endpoints.editSupplier,
@@ -249,8 +277,8 @@ const Supplier = () => {
         sup_cp: currentItem.supplier.sup_cp,
         sup_curren: currentItem.currency.id,
         sup_ket: currentItem.supplier.sup_ket,
-        sup_hutang: setup.ap.id,
-        sup_uang_muka: setup.pur_advance.id,
+        sup_hutang: currentItem.supplier.sup_hutang,
+        sup_uang_muka: currentItem.supplier.sup_uang_muka,
         sup_limit: currentItem.supplier.sup_limit,
       },
     };
@@ -303,8 +331,8 @@ const Supplier = () => {
         sup_cp: currentItem.supplier.sup_cp,
         sup_curren: currentItem.currency.id,
         sup_ket: currentItem.supplier.sup_ket,
-        sup_hutang: setup.ap.id,
-        sup_uang_muka: setup.pur_advance.id,
+        sup_hutang: currentItem.supplier.sup_hutang,
+        sup_uang_muka: currentItem.supplier.sup_uang_muka,
         sup_limit: currentItem.supplier.sup_limit,
       },
     };
@@ -433,9 +461,11 @@ const Supplier = () => {
     if (isEdit) {
       setUpdate(true);
       editSupplier();
+      setActive(0)
     } else {
       setUpdate(true);
       addSupplier();
+      setActive(0)
     }
   };
 
@@ -547,7 +577,14 @@ const Supplier = () => {
           variant="primary"
           onClick={() => {
             setEdit(false);
-            setCurrentItem(data);
+            setCurrentItem({
+              ...data,
+              supplier: {
+                ...data.supplier,
+                sup_hutang: setup.ap.id,
+                sup_uang_muka: setup.pur_advance.id,
+              },
+            });
             setDisplayData(true);
           }}
         >
@@ -625,6 +662,40 @@ const Supplier = () => {
     });
     console.log(selected);
     return selected;
+  };
+
+  const gl = (value) => {
+    let gl = {};
+    account.forEach((element) => {
+      if (value === element.account.id) {
+        gl = element;
+      }
+    });
+    return gl;
+  };
+
+  const glTemplate = (option) => {
+    return (
+      <div>
+        {option !== null
+          ? `${option.account.acc_name} - (${option.account.acc_code})`
+          : ""}
+      </div>
+    );
+  };
+
+  const clear = (option, props) => {
+    if (option) {
+      return (
+        <div>
+          {option !== null
+            ? `${option.account.acc_name} - (${option.account.acc_code})`
+            : ""}
+        </div>
+      );
+    }
+
+    return <span>{props.placeholder}</span>;
   };
 
   const renderTabHeader = (options) => {
@@ -777,7 +848,7 @@ const Supplier = () => {
                   <InputText
                     value={
                       currentItem !== null
-                        ? `${currentItem.supplier.sup_code}`
+                        ? `${currentItem?.supplier?.sup_code ?? ""}`
                         : ""
                     }
                     onChange={(e) =>
@@ -800,7 +871,7 @@ const Supplier = () => {
                   <InputText
                     value={
                       currentItem !== null
-                        ? `${currentItem.supplier.sup_name}`
+                        ? `${currentItem?.supplier?.sup_name ?? ""}`
                         : ""
                     }
                     onChange={(e) =>
@@ -846,7 +917,7 @@ const Supplier = () => {
                   <Dropdown
                     value={
                       currentItem !== null
-                        ? getPpn(currentItem.supplier.sup_ppn)
+                        ? getPpn(currentItem?.supplier?.sup_ppn ?? "")
                         : null
                     }
                     options={pajak}
@@ -876,7 +947,7 @@ const Supplier = () => {
                   <InputText
                     value={
                       currentItem !== null
-                        ? `${currentItem.supplier.sup_npwp}`
+                        ? `${currentItem?.supplier?.sup_npwp ?? ""}`
                         : ""
                     }
                     onChange={(e) =>
@@ -907,7 +978,7 @@ const Supplier = () => {
                   <InputText
                     value={
                       currentItem !== null
-                        ? `${currentItem.supplier.sup_address}`
+                        ? `${currentItem?.supplier?.sup_address ?? ""}`
                         : ""
                     }
                     onChange={(e) =>
@@ -961,7 +1032,7 @@ const Supplier = () => {
                   <InputNumber
                     value={
                       currentItem !== null
-                        ? `${currentItem.supplier.sup_kpos}`
+                        ? `${currentItem?.supplier?.sup_kpos ?? ""}`
                         : ""
                     }
                     onChange={(e) =>
@@ -990,7 +1061,7 @@ const Supplier = () => {
                   <InputNumber
                     value={
                       currentItem !== null
-                        ? `${currentItem.supplier.sup_telp1}`
+                        ? `${currentItem?.supplier?.sup_telp1 ?? ""}`
                         : ""
                     }
                     onChange={(e) =>
@@ -1015,7 +1086,7 @@ const Supplier = () => {
                   <InputNumber
                     value={
                       currentItem !== null
-                        ? `${currentItem.supplier.sup_telp2}`
+                        ? `${currentItem?.supplier?.sup_telp2 ?? ""}`
                         : ""
                     }
                     onChange={(e) =>
@@ -1042,7 +1113,7 @@ const Supplier = () => {
                   <InputText
                     value={
                       currentItem !== null
-                        ? `${currentItem.supplier.sup_fax}`
+                        ? `${currentItem?.supplier?.sup_fax ?? ""}`
                         : ""
                     }
                     onChange={(e) =>
@@ -1065,7 +1136,7 @@ const Supplier = () => {
                   <InputText
                     value={
                       currentItem !== null
-                        ? `${currentItem.supplier.sup_cp}`
+                        ? `${currentItem?.supplier?.sup_cp ?? ""}`
                         : ""
                     }
                     onChange={(e) =>
@@ -1116,7 +1187,7 @@ const Supplier = () => {
                   <InputNumber
                     value={
                       currentItem !== null
-                        ? `${currentItem.supplier.sup_limit}`
+                        ? `${currentItem?.supplier?.sup_limit ?? ""}`
                         : ""
                     }
                     onChange={(e) =>
@@ -1141,7 +1212,7 @@ const Supplier = () => {
                   <InputTextarea
                     value={
                       currentItem !== null
-                        ? `${currentItem.supplier.sup_ket}`
+                        ? `${currentItem?.supplier?.sup_ket ?? ""}`
                         : ""
                     }
                     onChange={(e) =>
@@ -1168,13 +1239,31 @@ const Supplier = () => {
               <div className="col-6">
                 <label className="text-label">Hutang</label>
                 <div className="p-inputgroup">
-                  <InputText
+                <Dropdown
                     value={
-                      setup !== null
-                        ? `(${setup.ap.acc_code}) - ${setup.ap.acc_name}`
-                        : ""
+                      currentItem !== null &&
+                      currentItem.supplier.sup_hutang !== null
+                        ? gl(currentItem.supplier.sup_hutang)
+                        : null
                     }
-                    disabled
+                    options={account}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        supplier: {
+                          ...currentItem.supplier,
+                          sup_hutang: e.value?.account?.id ?? null,
+                        },
+                      });
+                    }}
+                    optionLabel="account.acc_name"
+                    valueTemplate={clear}
+                    itemTemplate={glTemplate}
+                    filter
+                    filterBy="account.acc_name"
+                    placeholder="Pilih Kode Distribusi Hutang"
+                    showClear
                   />
                 </div>
               </div>
@@ -1182,13 +1271,31 @@ const Supplier = () => {
               <div className="col-6">
                 <label className="text-label">Uang Muka Pembelian</label>
                 <div className="p-inputgroup">
-                  <InputText
+                <Dropdown
                     value={
-                      setup !== null
-                        ? `(${setup.pur_advance.acc_code}) - ${setup.pur_advance.acc_name}`
-                        : ""
+                      currentItem !== null &&
+                      currentItem.supplier.sup_uang_muka !== null
+                        ? gl(currentItem.supplier.sup_uang_muka)
+                        : null
                     }
-                    disabled
+                    options={account}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        supplier: {
+                          ...currentItem.supplier,
+                          sup_uang_muka: e.value?.account?.id ?? null,
+                        },
+                      });
+                    }}
+                    optionLabel="account.acc_name"
+                    valueTemplate={clear}
+                    itemTemplate={glTemplate}
+                    filter
+                    filterBy="account.acc_name"
+                    placeholder="Pilih Kode Distribusi Hutang"
+                    showClear
                   />
                 </div>
               </div>

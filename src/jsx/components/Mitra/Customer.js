@@ -76,6 +76,7 @@ const Customer = () => {
   const [jpel, setJpel] = useState(null);
   const [subArea, setSubArea] = useState(null);
   const [setup, setSetup] = useState(null);
+  const [account, setAccount] = useState(null);
   const [currency, setCurrency] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
@@ -100,6 +101,7 @@ const Customer = () => {
     getSubArea();
     getCurrency();
     getAR();
+    getSetup();
     initFilters1();
   }, []);
 
@@ -174,6 +176,25 @@ const Customer = () => {
   const getAR = async (isUpdate = false) => {
     setLoading(true);
     const config = {
+      ...endpoints.account,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setAccount(data);
+      }
+    } catch (error) {}
+  };
+
+  const getSetup = async (isUpdate = false) => {
+    setLoading(true);
+    const config = {
       ...endpoints.getSetup,
       data: {},
     };
@@ -188,13 +209,6 @@ const Customer = () => {
         setSetup(data);
       }
     } catch (error) {}
-    if (isUpdate) {
-      setLoading(false);
-    } else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1500);
-    }
   };
 
   const getSubArea = async (isUpdate = false) => {
@@ -274,8 +288,8 @@ const Customer = () => {
         cus_curren: currentItem.currency.id,
         cus_pjk: currentItem.customer.cus_pjk,
         cus_ket: currentItem.customer.cus_ket,
-        cus_gl: setup.ar.id,
-        cus_uang_muka: setup.pur_advance.id,
+        cus_gl: currentItem.customer.cus_gl,
+        cus_uang_muka: currentItem.customer.cus_uang_muka,
         cus_limit: currentItem.customer.cus_limit,
       },
     };
@@ -330,8 +344,8 @@ const Customer = () => {
         cus_curren: currentItem.currency.id,
         cus_pjk: currentItem.customer.cus_pjk,
         cus_ket: currentItem.customer.cus_ket,
-        cus_gl: setup.ar.id,
-        cus_uang_muka: setup.pur_advance.id,
+        cus_gl: currentItem.customer.cus_gl,
+        cus_uang_muka: currentItem.customer.cus_uang_muka,
         cus_limit: currentItem.customer.cus_limit,
       },
     };
@@ -461,9 +475,11 @@ const Customer = () => {
     if (isEdit) {
       setUpdate(true);
       editCustomer();
+      setActive(0);
     } else {
       setUpdate(true);
       addCustomer();
+      setActive(0);
     }
   };
 
@@ -575,7 +591,14 @@ const Customer = () => {
           variant="primary"
           onClick={() => {
             setEdit(false);
-            setCurrentItem(data);
+            setCurrentItem({
+              ...data,
+              customer: {
+                ...data.customer,
+                cus_gl: setup.ar.id,
+                cus_uang_muka: setup.pur_advance.id,
+              },
+            });
             setDisplayData(true);
           }}
         >
@@ -655,6 +678,40 @@ const Customer = () => {
     return selected;
   };
 
+  const gl = (value) => {
+    let gl = {};
+    account.forEach((element) => {
+      if (value === element.account.id) {
+        gl = element;
+      }
+    });
+    return gl;
+  };
+
+  const glTemplate = (option) => {
+    return (
+      <div>
+        {option !== null
+          ? `${option.account.acc_name} - (${option.account.acc_code})`
+          : ""}
+      </div>
+    );
+  };
+
+  const clear = (option, props) => {
+    if (option) {
+      return (
+        <div>
+          {option !== null
+            ? `${option.account.acc_name} - (${option.account.acc_code})`
+            : ""}
+        </div>
+      );
+    }
+
+    return <span>{props.placeholder}</span>;
+  };
+
   const renderTabHeader = (options) => {
     return (
       <button
@@ -663,7 +720,10 @@ const Customer = () => {
         className={options.className}
       >
         {options.titleElement}
-        <Badge value={`${options.index+1}`} className={`${active === options.index ? "active" : ""} ml-2`}></Badge>
+        <Badge
+          value={`${options.index + 1}`}
+          className={`${active === options.index ? "active" : ""} ml-2`}
+        ></Badge>
       </button>
     );
   };
@@ -1089,7 +1149,10 @@ const Customer = () => {
             </div>
           </TabPanel>
 
-          <TabPanel header="Currency & Distribusi AR" headerTemplate={renderTabHeader}>
+          <TabPanel
+            header="Currency & Distribusi AR"
+            headerTemplate={renderTabHeader}
+          >
             <div className="row mr-0 ml-0">
               <div className="col-6">
                 <label className="text-label">Currency</label>
@@ -1172,13 +1235,31 @@ const Customer = () => {
               <div className="col-6">
                 <label className="text-label">Kode Distribusi AR</label>
                 <div className="p-inputgroup">
-                  <InputText
+                  <Dropdown
                     value={
-                      setup !== null
-                        ? `(${setup.ar.acc_code}) - ${setup.ar.acc_name}`
-                        : ""
+                      currentItem !== null &&
+                      currentItem.customer.cus_gl !== null
+                        ? gl(currentItem.customer.cus_gl)
+                        : null
                     }
-                    disabled
+                    options={account}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        customer: {
+                          ...currentItem.customer,
+                          cus_gl: e.value?.account?.id ?? null,
+                        },
+                      });
+                    }}
+                    optionLabel="account.acc_name"
+                    valueTemplate={clear}
+                    itemTemplate={glTemplate}
+                    filter
+                    filterBy="account.acc_name"
+                    placeholder="Pilih Kode Distribusi"
+                    showClear
                   />
                 </div>
               </div>
@@ -1188,13 +1269,31 @@ const Customer = () => {
                   Kode Distribusi Uang Muka Penjualan
                 </label>
                 <div className="p-inputgroup">
-                  <InputText
+                  <Dropdown
                     value={
-                      setup !== null
-                        ? `(${setup.pur_advance.acc_code}) - ${setup.pur_advance.acc_name}`
-                        : ""
+                      currentItem !== null &&
+                      currentItem.customer.cus_uang_muka !== null
+                        ? gl(currentItem.customer.cus_uang_muka)
+                        : null
                     }
-                    disabled
+                    options={account}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        customer: {
+                          ...currentItem.customer,
+                          cus_uang_muka: e.value?.account?.id ?? null,
+                        },
+                      });
+                    }}
+                    optionLabel="account.acc_name"
+                    valueTemplate={clear}
+                    itemTemplate={glTemplate}
+                    filter
+                    filterBy="account.acc_name"
+                    placeholder="Pilih Kode Distribusi Uang Muka Penjualan"
+                    showClear
                   />
                 </div>
               </div>

@@ -44,6 +44,7 @@ const GroupProduk = () => {
   const [groupPro, setGroup] = useState(null);
   const [divisi, setDivisi] = useState(null);
   const [setup, setSetup] = useState(null);
+  const [account, setAccount] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
@@ -64,6 +65,7 @@ const GroupProduk = () => {
     getGroupProduk();
     getDivisi();
     getSetup();
+    getAccount();
     initFilters1();
   }, []);
 
@@ -125,6 +127,22 @@ const GroupProduk = () => {
     } catch (error) {}
   };
 
+  const getAccount = async (isUpdate = false) => {
+    const config = {
+      ...endpoints.account,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setAccount(data);
+      }
+    } catch (error) {}
+  };
+
   const editGroupProduk = async () => {
     const config = {
       ...endpoints.editGroupPro,
@@ -133,14 +151,14 @@ const GroupProduk = () => {
         code: currentItem.groupPro.code,
         name: currentItem.groupPro.name,
         div_code: currentItem.divisi.id,
-        acc_sto: setup.sto.id,
-        acc_send: setup.sls_shipping.id,
-        acc_terima: setup.sto.id,
-        hrg_pokok: setup.pur_cogs.id,
-        acc_penj: setup.sls_rev.id,
-        potongan: setup.sls_disc.id,
-        pengembalian: setup.sls_shipping.id,
-        selisih: setup.sto_hpp_diff.id,
+        acc_sto: currentItem.groupPro.acc_sto,
+        acc_send: currentItem.groupPro.acc_send,
+        acc_terima: currentItem.groupPro.acc_terima,
+        hrg_pokok: currentItem.groupPro.hrg_pokok,
+        acc_penj: currentItem.groupPro.acc_penj,
+        potongan: currentItem.groupPro.potongan,
+        pengembalian: currentItem.groupPro.pengembalian,
+        selisih: currentItem.groupPro.selisih,
       },
     };
     console.log(config.data);
@@ -181,14 +199,14 @@ const GroupProduk = () => {
         code: currentItem.groupPro.code,
         name: currentItem.groupPro.name,
         div_code: currentItem.divisi.id,
-        acc_sto: setup.sto.id,
-        acc_send: setup.sls_shipping.id,
-        acc_terima: setup.sto.id,
-        hrg_pokok: setup.pur_cogs.id,
-        acc_penj: setup.sls_rev.id,
-        potongan: setup.sls_disc.id,
-        pengembalian: setup.sls_shipping.id,
-        selisih: setup.sto_hpp_diff.id,
+        acc_sto: currentItem.groupPro.acc_sto,
+        acc_send: currentItem.groupPro.acc_send,
+        acc_terima: currentItem.groupPro.acc_terima,
+        hrg_pokok: currentItem.groupPro.hrg_pokok,
+        acc_penj: currentItem.groupPro.acc_penj,
+        potongan: currentItem.groupPro.potongan,
+        pengembalian: currentItem.groupPro.pengembalian,
+        selisih: currentItem.groupPro.selisih,
       },
     };
     console.log(config.data);
@@ -317,9 +335,11 @@ const GroupProduk = () => {
     if (isEdit) {
       setUpdate(true);
       editGroupProduk();
+      setActive(0);
     } else {
       setUpdate(true);
       addGroupProduk();
+      setActive(0);
     }
   };
 
@@ -431,7 +451,20 @@ const GroupProduk = () => {
           variant="primary"
           onClick={() => {
             setEdit(false);
-            setCurrentItem(data);
+            setCurrentItem({
+              ...data,
+              groupPro: {
+                ...data.groupPro,
+                acc_sto: setup.sto.id,
+                acc_send: setup.pur_shipping.id,
+                acc_terima: setup.ap.id,
+                hrg_pokok: setup.pur_cogs.id,
+                acc_penj: setup.sls_rev.id,
+                potongan: setup.sls_disc.id,
+                pengembalian: setup.sls_shipping.id,
+                selisih: setup.sto_hpp_diff.id,
+              },
+            });
             setDisplayData(true);
           }}
         >
@@ -504,6 +537,41 @@ const GroupProduk = () => {
         ></Badge>
       </button>
     );
+  };
+
+  const gl = (value) => {
+    let gl = {};
+    account.forEach((element) => {
+      if (value === element.account.id) {
+        gl = element;
+      }
+    });
+    return gl;
+  };
+
+
+  const glTemplate = (option) => {
+    return (
+      <div>
+        {option !== null
+          ? `${option.account.acc_name} - (${option.account.acc_code})`
+          : ""}
+      </div>
+    );
+  };
+
+  const clear = (option, props) => {
+    if (option) {
+      return (
+        <div>
+          {option !== null
+            ? `${option.account.acc_name} - (${option.account.acc_code})`
+            : ""}
+        </div>
+      );
+    }
+
+    return <span>{props.placeholder}</span>;
   };
 
   return (
@@ -653,13 +721,31 @@ const GroupProduk = () => {
               <div className="col-6">
                 <label className="text-label">Akun Persediaan</label>
                 <div className="p-inputgroup">
-                  <InputText
+                <Dropdown
                     value={
-                      setup !== null
-                        ? `(${setup.sto.acc_code}) - ${setup.sto.acc_name}`
-                        : ""
+                      currentItem !== null &&
+                      currentItem.groupPro.acc_sto!== null
+                        ? gl(currentItem.groupPro.acc_sto)
+                        : null
                     }
-                    disabled
+                    options={account}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        groupPro: {
+                          ...currentItem.groupPro,
+                          acc_sto: e.value?.account?.id ?? null,
+                        },
+                      });
+                    }}
+                    optionLabel="account.acc_name"
+                    valueTemplate={clear}
+                    itemTemplate={glTemplate}
+                    filter
+                    filterBy="account.acc_name"
+                    placeholder="Pilih Akun Persediaan"
+                    showClear
                   />
                 </div>
               </div>
@@ -667,13 +753,31 @@ const GroupProduk = () => {
               <div className="col-6">
                 <label className="text-label">Akun Pengiriman Barang</label>
                 <div className="p-inputgroup">
-                  <InputText
+                <Dropdown
                     value={
-                      setup !== null
-                        ? `(${setup.sls_shipping.acc_code}) - ${setup.sls_shipping.acc_name}`
-                        : ""
+                      currentItem !== null &&
+                      currentItem.groupPro.acc_send!== null
+                        ? gl(currentItem.groupPro.acc_send)
+                        : null
                     }
-                    disabled
+                    options={account}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        groupPro: {
+                          ...currentItem.groupPro,
+                          acc_send: e.value?.account?.id ?? null,
+                        },
+                      });
+                    }}
+                    optionLabel="account.acc_name"
+                    valueTemplate={clear}
+                    itemTemplate={glTemplate}
+                    filter
+                    filterBy="account.acc_name"
+                    placeholder="Pilih Akun Pengiriman"
+                    showClear
                   />
                 </div>
               </div>
@@ -683,12 +787,31 @@ const GroupProduk = () => {
               <div className="col-12">
                 <label className="text-label">Akun Penerimaan Barang</label>
                 <div className="p-inputgroup">
-                  <InputText
-                    value={`(${setup?.sto?.acc_code ?? ""}) - ${
-                      setup?.sto?.acc_name ?? ""
-                    }`}
-                    placeholder= "Akun Penerimaan Barang"
-                    disabled
+                <Dropdown
+                    value={
+                      currentItem !== null &&
+                      currentItem.groupPro.acc_terima!== null
+                        ? gl(currentItem.groupPro.acc_terima)
+                        : null
+                    }
+                    options={account}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        groupPro: {
+                          ...currentItem.groupPro,
+                          acc_terima: e.value?.account?.id ?? null,
+                        },
+                      });
+                    }}
+                    optionLabel="account.acc_name"
+                    valueTemplate={clear}
+                    itemTemplate={glTemplate}
+                    filter
+                    filterBy="account.acc_name"
+                    placeholder="Pilih Akun Penerimaan"
+                    showClear
                   />
                 </div>
               </div>
@@ -703,13 +826,31 @@ const GroupProduk = () => {
               <div className="col-6">
                 <label className="text-label">Harga Pokok Penjualan</label>
                 <div className="p-inputgroup">
-                  <InputText
+                <Dropdown
                     value={
-                      setup !== null
-                        ? `(${setup.pur_cogs.acc_code}) - ${setup.pur_cogs.acc_name}`
-                        : ""
+                      currentItem !== null &&
+                      currentItem.groupPro.hrg_pokok!== null
+                        ? gl(currentItem.groupPro.hrg_pokok)
+                        : null
                     }
-                    disabled
+                    options={account}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        groupPro: {
+                          ...currentItem.groupPro,
+                          hrg_pokok: e.value?.account?.id ?? null,
+                        },
+                      });
+                    }}
+                    optionLabel="account.acc_name"
+                    valueTemplate={clear}
+                    itemTemplate={glTemplate}
+                    filter
+                    filterBy="account.acc_name"
+                    placeholder="Pilih Harga Pokok Penjualan"
+                    showClear
                   />
                 </div>
               </div>
@@ -717,13 +858,31 @@ const GroupProduk = () => {
               <div className="col-6">
                 <label className="text-label">Penjualan</label>
                 <div className="p-inputgroup">
-                  <InputText
+                <Dropdown
                     value={
-                      setup !== null
-                        ? `(${setup.sls_rev.acc_code}) - ${setup.sls_rev.acc_name}`
-                        : ""
+                      currentItem !== null &&
+                      currentItem.groupPro.acc_penj!== null
+                        ? gl(currentItem.groupPro.acc_penj)
+                        : null
                     }
-                    disabled
+                    options={setup}
+                    onChange={(e) => {
+                      console.log(e.account);
+                      setCurrentItem({
+                        ...currentItem,
+                        groupPro: {
+                          ...currentItem.groupPro,
+                          acc_penj: e.value?.account?.id ?? null,
+                        },
+                      });
+                    }}
+                    optionLabel="account.acc_name"
+                    valueTemplate={clear}
+                    itemTemplate={glTemplate}
+                    filter
+                    filterBy="account.acc_name"
+                    placeholder="Pilih Akun Penjualan"
+                    showClear
                   />
                 </div>
               </div>
@@ -733,13 +892,31 @@ const GroupProduk = () => {
               <div className="col-6">
                 <label className="text-label">Potongan Penjualan</label>
                 <div className="p-inputgroup">
-                  <InputText
+                <Dropdown
                     value={
-                      setup !== null
-                        ? `(${setup.sls_disc.acc_code}) - ${setup.sls_disc.acc_name}`
-                        : ""
+                      currentItem !== null &&
+                      currentItem.groupPro.potongan!== null
+                        ? gl(currentItem.groupPro.potongan)
+                        : null
                     }
-                    disabled
+                    options={account}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        groupPro: {
+                          ...currentItem.groupPro,
+                          potongan: e.value?.account?.id ?? null,
+                        },
+                      });
+                    }}
+                    optionLabel="account.acc_name"
+                    valueTemplate={clear}
+                    itemTemplate={glTemplate}
+                    filter
+                    filterBy="account.acc_name"
+                    placeholder="Pilih Akun Potongan Penjualan"
+                    showClear
                   />
                 </div>
               </div>
@@ -747,13 +924,31 @@ const GroupProduk = () => {
               <div className="col-6">
                 <label className="text-label">Pengembalian Penjualan</label>
                 <div className="p-inputgroup">
-                  <InputText
+                <Dropdown
                     value={
-                      setup !== null
-                        ? `(${setup.sls_shipping.acc_code}) - ${setup.sls_shipping.acc_name}`
-                        : ""
+                      currentItem !== null &&
+                      currentItem.groupPro.pengembalian!== null
+                        ? gl(currentItem.groupPro.pengembalian)
+                        : null
                     }
-                    disabled
+                    options={account}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        groupPro: {
+                          ...currentItem.groupPro,
+                          pengembalian: e.value?.account?.id ?? null,
+                        },
+                      });
+                    }}
+                    optionLabel="account.acc_name"
+                    valueTemplate={clear}
+                    itemTemplate={glTemplate}
+                    filter
+                    filterBy="account.acc_name"
+                    placeholder="Pilih Akun Pengembalian"
+                    showClear
                   />
                 </div>
               </div>
@@ -763,13 +958,31 @@ const GroupProduk = () => {
               <div className="col-12">
                 <label className="text-label">Selisih Harga Pokok</label>
                 <div className="p-inputgroup">
-                  <InputText
+                <Dropdown
                     value={
-                      setup !== null
-                        ? `(${setup.sto_hpp_diff.acc_code}) - ${setup.sto_hpp_diff.acc_name}`
-                        : ""
+                      currentItem !== null &&
+                      currentItem.groupPro.selisih!== null
+                        ? gl(currentItem.groupPro.selisih)
+                        : null
                     }
-                    disabled
+                    options={account}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        groupPro: {
+                          ...currentItem.groupPro,
+                          selisih: e.value?.account?.id ?? null,
+                        },
+                      });
+                    }}
+                    optionLabel="account.acc_name"
+                    valueTemplate={clear}
+                    itemTemplate={glTemplate}
+                    filter
+                    filterBy="account.acc_name"
+                    placeholder="Pilih Akun Selisih Harga Pokok"
+                    showClear
                   />
                 </div>
               </div>

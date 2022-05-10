@@ -51,6 +51,7 @@ const DataSatuan = () => {
   const [rows2, setRows2] = useState(20);
   const [konversi, setKonversi] = useState([
     {
+      id: 0,
       qty: 1,
       u_from: null,
       u_to: null,
@@ -101,7 +102,7 @@ const DataSatuan = () => {
     const config = {
       ...endpoints.updateSatuan,
       endpoint: endpoints.updateSatuan.endpoint + currentItem.id,
-      data: currentItem,
+      data: {...currentItem, konversi: konversi},
     };
     console.log(config.data);
     let response = null;
@@ -234,6 +235,7 @@ const DataSatuan = () => {
               satuan.forEach((el) => {
                 if (el.code == data.code) {
                   conv.push({
+                    id: el.id,
                     qty: el.qty,
                     u_from: el.u_from.id,
                     u_to: el.u_to.id,
@@ -241,6 +243,15 @@ const DataSatuan = () => {
                 }
               });
               setKonversi(conv);
+            } else {
+              setKonversi([
+                {
+                  id: 0,
+                  qty: 1,
+                  u_from: null,
+                  u_to: null,
+                },
+              ])
             }
             setCurrentItem(data);
           }}
@@ -316,6 +327,7 @@ const DataSatuan = () => {
           label="Hapus"
           icon="pi pi-trash"
           onClick={() => {
+            setUpdate(true)
             delSatuan();
           }}
           autoFocus
@@ -358,6 +370,7 @@ const DataSatuan = () => {
             setCurrentItem(data);
             setKonversi([
               {
+                id: 0,
                 qty: 1,
                 u_from: null,
                 u_to: null,
@@ -442,7 +455,7 @@ const DataSatuan = () => {
               <DataTable
                 responsiveLayout="scroll"
                 value={loading ? dummy : satuan}
-                className="display w-150 datatable-wrapper"
+                className="display w-150 datatable-wrapper header-white"
                 showGridlines
                 dataKey="id"
                 rowHover
@@ -453,12 +466,12 @@ const DataSatuan = () => {
                     <Skeleton />
                   ) : (
                     <PBadge
-                      className="mt-4 active"
-                      value={`${e?.code}`}
+                      className="mt-2 active"
+                      value={`${e?.name}`}
                     ></PBadge>
                   )
                 }
-                groupRowsBy="code"
+                groupRowsBy="name"
                 filters={filters1}
                 globalFilterFields={[
                   "satuan.code",
@@ -483,8 +496,8 @@ const DataSatuan = () => {
                   body={loading && <Skeleton />}
                 /> */}
                 <Column
-                  header="Nama Satuan"
-                  field="name"
+                  header="Kode Satuan"
+                  field="code"
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
@@ -610,6 +623,7 @@ const DataSatuan = () => {
               if (!e.value) {
                 setKonversi([
                   {
+                    id: 0,
                     qty: 1,
                     u_from: null,
                     u_to: null,
@@ -712,6 +726,7 @@ const DataSatuan = () => {
                             setKonversi([
                               ...konversi,
                               {
+                                id: 0,
                                 qty: 1,
                                 u_from: null,
                                 u_to: null,

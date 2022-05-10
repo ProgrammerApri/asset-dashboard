@@ -89,8 +89,12 @@
   background: #e9ecef63;
 }
 
+.p-rowgroup-header {
+  background: var(--body-bg) !important;
+}
+
 .p-rowgroup-header:hover {
-  background: transparent !important;
+  background: var(--body-bg) !important;
 }
 .p-datatable .p-datatable-tbody > tr {
   background: #00000000;
@@ -121,6 +125,10 @@
   background: var(--input-bg);
   font-weight: 500;
   color: var(--text-color);
+}
+
+.header-white.p-datatable .p-datatable-thead > tr > th {
+  background: var(--card-bg);
 }
 
 .p-dropdown {

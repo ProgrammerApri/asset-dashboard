@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 
-const CircleProgress = ({ percent, icon }) => {
+const CircleProgress = ({ percent, icon, colors }) => {
   const circle = React.createRef();
 
   useEffect(() => {
@@ -17,23 +17,23 @@ const CircleProgress = ({ percent, icon }) => {
   });
 
   var letters = '0123456789ABCDEF';
-  var colors = '#';
-  for (var i = 0; colors.length < 7; i++) {
-    colors += letters[Math.floor(Math.random() * 16)];
-  }
+  // var colors = '#0080ff';
+  // for (var i = 0; colors.length < 7; i++) {
+  //   colors += letters[Math.floor(Math.random() * 16)];
+  // }
 
   var primaryColor = colors;
   var secondaryColor = `${primaryColor}40`;
 
   return (
-    <div className="d-inline-block mb-4 ml--12 position-relative donut-chart-sale">
+    <div className="d-inline-block position-relative donut-chart-sale">
       <svg className="peity progress-ring" width="110" height="110">
         <circle
           className="progress-ring__circle"
           stroke={secondaryColor}
-          strokeWidth={10}
+          strokeWidth={8}
           fill="transparent"
-          r="50"
+          r="38"
           cx="55"
           cy="55"
           ref={circle}

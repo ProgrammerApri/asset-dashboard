@@ -43963,8 +43963,8 @@ span#counter {
   font-weight: 600;
 }
 .donut-chart-sale .circle {
-  height: 91px;
-  width: 91px;
+  height: 70px;
+  width: 70px;
   z-index: -1;
   content: "";
   position: absolute;

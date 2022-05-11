@@ -433,67 +433,73 @@ const KategoriAkun = () => {
           onHide("displayData");
         }}
       >
-        <div className="col-12 mb-2">
-          <label className="text-label">Nama Kategori</label>
-          <div className="p-inputgroup">
-            <InputText
-              value={currentItem !== null ? `${currentItem.kategory.name}` : ""}
-              onChange={(e) =>
-                setCurrentItem({
-                  ...currentItem,
-                  kategory: { ...currentItem.kategory, name: e.target.value },
-                })
-              }
-              placeholder="Masukan Nama Kategori"
-            />
+        <div className="row mr-0 ml-0">
+          <div className="col-6 mb-2">
+            <label className="text-label">Nama Kategori</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={
+                  currentItem !== null ? `${currentItem.kategory.name}` : ""
+                }
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    kategory: { ...currentItem.kategory, name: e.target.value },
+                  })
+                }
+                placeholder="Masukan Nama Kategori"
+              />
+            </div>
           </div>
-        </div>
-        <div className="col-12 mb-2">
-          <label className="text-label">Nama Klasifikasi</label>
-          <div className="p-inputgroup">
-            <Dropdown
-              value={currentItem !== null ? currentItem.klasifikasi : null}
-              options={klasifikasi}
-              onChange={(e) => {
-                console.log(e.value);
-                setCurrentItem({
-                  ...currentItem,
-                  klasifikasi: e.value,
-                });
-              }}
-              optionLabel="klasiname"
-              filter
-              filterBy="klasiname"
-              placeholder="Pilih Klasifikasi"
-            />
+          <div className="col-6 mb-2">
+            <label className="text-label">Nama Klasifikasi</label>
+            <div className="p-inputgroup">
+              <Dropdown
+                value={currentItem !== null ? currentItem.klasifikasi : null}
+                options={klasifikasi}
+                onChange={(e) => {
+                  console.log(e.value);
+                  setCurrentItem({
+                    ...currentItem,
+                    klasifikasi: e.value,
+                  });
+                }}
+                optionLabel="klasiname"
+                filter
+                filterBy="klasiname"
+                placeholder="Pilih Klasifikasi"
+              />
+            </div>
           </div>
         </div>
 
-        <div className="col-12 mb-2">
-          <label className="text-label">Kode Saldo Normal</label>
-          <div className="p-inputgroup">
-            <SelectButton
-              value={
-                currentItem !== null && currentItem.kategory.kode_saldo !== ""
-                  ? currentItem.kategory.kode_saldo === "D"
-                    ? { name: "Debit", code: "D" }
-                    : { name: "Kredit", code: "K" }
-                  : null
-              }
-              options={kodesaldo}
-              onChange={(e) => {
-                console.log(e.value);
-                setCurrentItem({
-                  ...currentItem,
-                  kategory: {
-                    ...currentItem.kategory,
-                    kode_saldo: e.value.code,
-                  },
-                });
-              }}
-              optionLabel="name"
-              placeholder="Pilih Kode Saldo"
-            />
+        <div className="row mr-0 ml-0">
+          <div className="col-12 mb-2">
+            <label className="text-label">Kode Saldo Normal</label>
+            <div className="p-inputgroup">
+              <SelectButton
+                value={
+                  currentItem !== null && currentItem.kategory.kode_saldo !== ""
+                    ? currentItem.kategory.kode_saldo === "D"
+                      ? { name: "Debit", code: "D" }
+                      : { name: "Kredit", code: "K" }
+                    : null
+                }
+                options={kodesaldo}
+                onChange={(e) => {
+                  console.log(e.value);
+                  setCurrentItem({
+                    ...currentItem,
+                    kategory: {
+                      ...currentItem.kategory,
+                      kode_saldo: e.value.code,
+                    },
+                  });
+                }}
+                optionLabel="name"
+                placeholder="Pilih Kode Saldo"
+              />
+            </div>
           </div>
         </div>
       </Dialog>

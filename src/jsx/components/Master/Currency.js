@@ -13,16 +13,15 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { InputNumber } from "primereact/inputnumber";
-import { Calendar } from 'primereact/calendar';
+import { Calendar } from "primereact/calendar";
 
 const data = {
-    id: 1,
-    code: "", 
-    name: "", 
-    date: "",
-    rate: 0,
+  id: 1,
+  code: "",
+  name: "",
+  date: "",
+  rate: 0,
 };
-
 
 const Currency = () => {
   const [currency, setCurrency] = useState(null);
@@ -46,7 +45,6 @@ const Currency = () => {
     getCurrency();
     initFilters1();
   }, []);
-
 
   const getCurrency = async (isUpdate = false) => {
     setLoading(true);
@@ -340,7 +338,6 @@ const Currency = () => {
     );
   };
 
-
   const template2 = {
     layout: "RowsPerPageDropdown CurrentPageReport PrevPageLink NextPageLink",
     RowsPerPageDropdown: (options) => {
@@ -466,67 +463,64 @@ const Currency = () => {
           setDisplayData(false);
         }}
       >
-        <div className="col-12">
-          <label className="text-label">Kode Currency</label>
-          <div className="p-inputgroup">
-            <InputText
-              value={
-                currentItem !== null ? `${currentItem.code}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({...currentItem, code: e.target.value})
-              }
-              placeholder="Masukan Kode"
-            
-            />
+        <div className="row mr-0 ml-0">
+          <div className="col-6">
+            <label className="text-label">Kode Currency</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={currentItem !== null ? `${currentItem.code}` : ""}
+                onChange={(e) =>
+                  setCurrentItem({ ...currentItem, code: e.target.value })
+                }
+                placeholder="Masukan Kode"
+              />
+            </div>
+          </div>
+
+          <div className="col-6">
+            <label className="text-label">Nama Currency</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={currentItem !== null ? `${currentItem.name}` : ""}
+                onChange={(e) =>
+                  setCurrentItem({ ...currentItem, name: e.target.value })
+                }
+                placeholder="Masukan Nama"
+              />
+            </div>
           </div>
         </div>
 
-        <div className="col-12">
-          <label className="text-label">Nama Currency</label>
-          <div className="p-inputgroup">
-            <InputText
-              value={
-                currentItem !== null ? `${currentItem.name}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({...currentItem, name: e.target.value})
-              }
-              placeholder="Masukan Nama"
-            />
+        <div className="row mr-0 ml-0">
+          <div className="col-6">
+            <label className="text-label" htmlFor="tanggal">
+              Tanggal
+            </label>
+            <div className="p-inputgroup">
+              <Calendar
+                inputId="tanggal"
+                value={currentItem !== null ? `${currentItem.date}` : ""}
+                onChange={(e) =>
+                  setCurrentItem({ ...currentItem, date: e.target.value })
+                }
+                placeholder="Masukan Tanggal"
+                dateFormat="yy-mm-dd"
+                showIcon
+              />
+            </div>
           </div>
-        </div>
 
-        <div className="col-12">
-          <label className="text-label" htmlFor="tanggal">Tanggal</label>
-          <div className="p-inputgroup">
-            <Calendar
-            inputId="tanggal"
-              value={
-                currentItem !== null ? `${currentItem.date}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({...currentItem, date: e.target.value})
-              }
-              placeholder="Masukan Tanggal"
-              // dateFormat="dd-mm-yy"
-              showIcon
-            />
-          </div>
-        </div>
-
-        <div className="col-12">
-          <label className="text-label">Rate Currency</label>
-          <div className="p-inputgroup">
-          <InputNumber
-              value={
-                currentItem !== null ? `${currentItem.rate}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({...currentItem, rate: e.value})
-              }
-              placeholder="Masukan Rate"
-            />
+          <div className="col-6">
+            <label className="text-label">Rate Currency</label>
+            <div className="p-inputgroup">
+              <InputNumber
+                value={currentItem !== null ? `${currentItem.rate}` : ""}
+                onChange={(e) =>
+                  setCurrentItem({ ...currentItem, rate: e.value })
+                }
+                placeholder="Masukan Rate"
+              />
+            </div>
           </div>
         </div>
       </Dialog>

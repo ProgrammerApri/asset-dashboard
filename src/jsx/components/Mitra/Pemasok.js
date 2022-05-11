@@ -76,7 +76,8 @@ const Supplier = () => {
   const [currency, setCurrency] = useState(null);
   const [city, setCity] = useState(null);
   const [setup, setSetup] = useState(null);
-  const [account, setAccount] = useState(null);
+  const [accHut, setAccHut] = useState(null);
+  const [accUm, setAccUm] = useState(null);
   const [company, setComp] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
@@ -100,8 +101,9 @@ const Supplier = () => {
     getCurrency();
     getCity();
     getSetup();
-    getAccount();
-    getCompany()
+    getAccHut();
+    getAccUm();
+    getCompany();
     initFilters1();
   }, []);
 
@@ -235,7 +237,7 @@ const Supplier = () => {
     }
   };
 
-  const getAccount = async (isUpdate = false) => {
+  const getAccHut = async () => {
     setLoading(true);
     const config = {
       ...endpoints.account,
@@ -248,17 +250,43 @@ const Supplier = () => {
       console.log(response);
       if (response.status) {
         const { data } = response;
+        let filt = [];
+        data.forEach((elem) => {
+          if (elem.account.kat_code === 9) {
+            filt.push(elem.account);
+          }
+        });
         console.log(data);
-        setAccount(data);
+        setAccHut(filt);
       }
     } catch (error) {}
-    if (isUpdate) {
-      setLoading(false);
-    } else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1500);
-    }
+    getSupplier();
+  };
+
+  const getAccUm = async () => {
+    setLoading(true);
+    const config = {
+      ...endpoints.account,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        let filt = [];
+        data.forEach((elem) => {
+          if (elem.account.kat_code === 5) {
+            filt.push(elem.account);
+          }
+        });
+        console.log(data);
+        setAccUm(filt);
+      }
+    } catch (error) {}
+    getSupplier();
   };
 
   const getCompany = async (isUpdate = false) => {
@@ -693,21 +721,31 @@ const Supplier = () => {
     return selected;
   };
 
-  const gl = (value) => {
-    let gl = {};
-    account.forEach((element) => {
-      if (value === element.account.id) {
-        gl = element;
+  const hut = (value) => {
+    let hut = {};
+    accHut.forEach((element) => {
+      if (value === element.id) {
+        hut = element;
       }
     });
-    return gl;
+    return hut;
+  };
+
+  const um = (value) => {
+    let um = {};
+    accUm.forEach((element) => {
+      if (value === element.id) {
+        um = element;
+      }
+    });
+    return um;
   };
 
   const glTemplate = (option) => {
     return (
       <div>
         {option !== null
-          ? `${option.account.acc_name} - (${option.account.acc_code})`
+          ? `${option.acc_name} - (${option.acc_code})`
           : ""}
       </div>
     );
@@ -718,7 +756,7 @@ const Supplier = () => {
       return (
         <div>
           {option !== null
-            ? `${option.account.acc_name} - (${option.account.acc_code})`
+            ? `${option.acc_name} - (${option.acc_code})`
             : ""}
         </div>
       );
@@ -1329,6 +1367,10 @@ const Supplier = () => {
                     disabled={company && !company.multi_currency}
                   />
                 </div>
+                  <small className="text-blue">
+                    *Aktifkan Multi Currency Pada Setup
+                    Perusahaan Terlebih Dahulu
+                  </small>
               </div>
 
               <div className="col-6">
@@ -1398,17 +1440,17 @@ const Supplier = () => {
                     value={
                       currentItem !== null &&
                       currentItem.supplier.sup_hutang !== null
-                        ? gl(currentItem.supplier.sup_hutang)
+                        ? hut(currentItem.supplier.sup_hutang)
                         : null
                     }
-                    options={account}
+                    options={accHut}
                     onChange={(e) => {
                       console.log(e.value);
                       setCurrentItem({
                         ...currentItem,
                         supplier: {
                           ...currentItem.supplier,
-                          sup_hutang: e.value?.account?.id ?? null,
+                          sup_hutang: e.value?.id ?? null,
                         },
                       });
                     }}
@@ -1430,17 +1472,17 @@ const Supplier = () => {
                     value={
                       currentItem !== null &&
                       currentItem.supplier.sup_uang_muka !== null
-                        ? gl(currentItem.supplier.sup_uang_muka)
+                        ? um(currentItem.supplier.sup_uang_muka)
                         : null
                     }
-                    options={account}
+                    options={accUm}
                     onChange={(e) => {
                       console.log(e.value);
                       setCurrentItem({
                         ...currentItem,
                         supplier: {
                           ...currentItem.supplier,
-                          sup_uang_muka: e.value?.account?.id ?? null,
+                          sup_uang_muka: e.value?.id ?? null,
                         },
                       });
                     }}

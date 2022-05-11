@@ -865,7 +865,7 @@ const GroupProduk = () => {
                         ? gl(currentItem.groupPro.acc_penj)
                         : null
                     }
-                    options={setup}
+                    options={account}
                     onChange={(e) => {
                       console.log(e.account);
                       setCurrentItem({

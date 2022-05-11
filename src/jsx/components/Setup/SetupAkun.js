@@ -4,6 +4,7 @@ import { Dropdown } from "primereact/dropdown";
 import { endpoints, request } from "src/utils";
 import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
+import CustomAccordion from "../Accordion/Accordion";
 
 const set = {
   id: null,
@@ -33,6 +34,7 @@ const set = {
   sto_general: null,
   sto_production: null,
   sto_hpp_diff: null,
+  sto_wip: null,
   fixed_assets: null,
 };
 
@@ -189,6 +191,7 @@ const SetupAkun = () => {
         sto_general: data?.sto?.sto_general ?? null,
         sto_production: data?.sto?.sto_production ?? null,
         sto_hpp_diff: data?.sto_hpp_diff?.id ?? null,
+        sto_wip: data?.sto_wip?.id ?? null,
         fixed_assets: data?.fixed_assets?.id ?? null,
       },
     };
@@ -246,6 +249,7 @@ const SetupAkun = () => {
         sto_general: data?.sto?.sto_general ?? null,
         sto_production: data?.sto?.sto_production ?? null,
         sto_hpp_diff: data?.sto_hpp_diff?.id ?? null,
+        sto_wip: data?.sto_wip?.id ?? null,
         fixed_assets: data?.fixed_assets?.id ?? null,
       },
     };
@@ -285,7 +289,33 @@ const SetupAkun = () => {
     }
   };
 
-  const renderAccountDropdown = (label, value, onChange, expanded = false) => {
+  const renderAccountDropdown = (
+    label,
+    value,
+    onChange,
+    expanded = false,
+    type = "all"
+  ) => {
+    let option = [];
+    if (type === "u") {
+      if (account) {
+        account.forEach((el) => {
+          if (el.dou_type === "U") {
+            option.push(el);
+          }
+        });
+      }
+    } else if (type === "d") {
+      if (account) {
+        account.forEach((el) => {
+          if (el.dou_type === "D") {
+            option.push(el);
+          }
+        });
+      }
+    } else {
+      option = account;
+    }
     return (
       <div className={`${expanded ? "col-12" : "col-6"} mb-2`}>
         {loading ? (
@@ -299,7 +329,7 @@ const SetupAkun = () => {
             <div className="p-inputgroup">
               <Dropdown
                 value={value}
-                options={account && account}
+                options={option && option}
                 onChange={onChange}
                 optionLabel={(option) => (
                   <div>
@@ -328,39 +358,32 @@ const SetupAkun = () => {
 
   const renderOthers = () => {
     return (
-      <Accordion className="acordion" defaultActiveKey="1">
-        <div className="accordion__item" key={1}>
-          <Accordion.Toggle
-            as={Card.Text}
-            eventKey={`0`}
-            className={`accordion__header ${accor.lainnya ? "collapsed" : ""}`}
-            onClick={() => {
-              setAccor({
-                ...accor,
-                lainnya: !accor.lainnya,
-              });
-            }}
-          >
-            <span className="accordion__header--text">Aset</span>
-            <span className="accordion__header--indicator indicator_bordered"></span>
-          </Accordion.Toggle>
-          <Accordion.Collapse eventKey={"0"}>
-            <div className="accordion__body--text">
-              <Row className="mr-0 ml-0">
-                {renderAccountDropdown(
-                  "Aset Tetap",
-                  setup && setup.fixed_assets,
-                  (e) => {
-                    setSetup({ ...setup, fixed_assets: e.value });
-                    submitUpdate({ ...setup, fixed_assets: e.value });
-                  },
-                  true
-                )}
-              </Row>
-            </div>
-          </Accordion.Collapse>
-        </div>
-      </Accordion>
+      <CustomAccordion
+        tittle={"Aset"}
+        defaultActive={false}
+        active={accor.lainnya}
+        onClick={() => {
+          setAccor({
+            ...accor,
+            lainnya: !accor.lainnya,
+          });
+        }}
+        key={1}
+        body={
+          <Row className="mr-0 ml-0">
+            {renderAccountDropdown(
+              "Aset Tetap",
+              setup && setup.fixed_assets,
+              (e) => {
+                setSetup({ ...setup, fixed_assets: e.value });
+                submitUpdate({ ...setup, fixed_assets: e.value });
+              },
+              true,
+              "d"
+            )}
+          </Row>
+        }
+      />
     );
   };
 
@@ -543,183 +566,154 @@ const SetupAkun = () => {
 
   const renderArAp = () => {
     return (
-      <Accordion className="accordion " defaultActiveKey="0">
-        <div className="accordion__item" key={0}>
-          <Accordion.Toggle
-            as={Card.Text}
-            eventKey={`0`}
-            className={`accordion__header ${accor.ar_ap ? "collapsed" : ""}`}
-            onClick={() => {
-              setAccor({
-                ...accor,
-                ar_ap: !accor.ar_ap,
-              });
-            }}
-          >
-            <span className="accordion__header--text">AR/AP</span>
-            <span className="accordion__header--indicator indicator_bordered"></span>
-          </Accordion.Toggle>
-          <Accordion.Collapse eventKey={"0"}>
-            <div className="accordion__body--text">
-              <Row className="mr-0 ml-0">
-                {renderAccountDropdown(
-                  "Piutang Usaha",
-                  setup && setup.ar,
-                  (e) => {
-                    setSetup({ ...setup, ar: e.value });
-                    submitUpdate({ ...setup, ar: e.value });
-                  }
-                )}
+      <CustomAccordion
+        tittle={"AR/AP"}
+        active={accor.ar_ap}
+        key={1}
+        defaultActive={true}
+        onClick={() => {
+          setAccor({
+            ...accor,
+            ar_ap: !accor.ar_ap,
+          });
+        }}
+        body={
+          <Row className="mr-0 ml-0">
+            {renderAccountDropdown("Piutang Usaha", setup && setup.ar, (e) => {
+              setSetup({ ...setup, ar: e.value });
+              submitUpdate({ ...setup, ar: e.value });
+            })}
 
-                {renderAccountDropdown(
-                  "Hutang Usaha",
-                  setup && setup.ap,
-                  (e) => {
-                    setSetup({ ...setup, ap: e.value });
-                    submitUpdate({ ...setup, ap: e.value });
-                  }
-                )}
-              </Row>
-            </div>
-          </Accordion.Collapse>
-        </div>
-      </Accordion>
+            {renderAccountDropdown("Hutang Usaha", setup && setup.ap, (e) => {
+              setSetup({ ...setup, ap: e.value });
+              submitUpdate({ ...setup, ap: e.value });
+            })}
+          </Row>
+        }
+      />
     );
   };
 
   const renderPersediaan = () => {
     return (
-      <Accordion className="accordion " defaultActiveKey="1">
-        <div className="accordion__item" key={0}>
-          <Accordion.Toggle
-            as={Card.Text}
-            eventKey={`0`}
-            className={`accordion__header ${
-              accor.persediaan ? "collapsed" : ""
-            }`}
-            onClick={() => {
-              setAccor({
-                ...accor,
-                persediaan: !accor.persediaan,
-              });
-            }}
-          >
-            <span className="accordion__header--text">Persediaan</span>
-            <span className="accordion__header--indicator indicator_bordered"></span>
-          </Accordion.Toggle>
-          <Accordion.Collapse eventKey={"0"}>
-            <div className="accordion__body--text">
-              <Row className="mr-0 ml-0">
-                {renderAccountDropdown(
-                  "Persediaan",
-                  setup && setup.sto,
-                  (e) => {
-                    setSetup({ ...setup, sto: e.value });
-                    submitUpdate({ ...setup, sto: e.value });
-                  }
-                )}
+      <CustomAccordion
+        tittle={"Persediaan"}
+        active={accor.persediaan}
+        key={1}
+        defaultActive={false}
+        onClick={() => {
+          setAccor({
+            ...accor,
+            persediaan: !accor.persediaan,
+          });
+        }}
+        body={
+          <Row className="mr-0 ml-0">
+            {renderAccountDropdown("Persediaan", setup && setup.sto, (e) => {
+              setSetup({ ...setup, sto: e.value });
+              submitUpdate({ ...setup, sto: e.value });
+            })}
 
-                {renderAccountDropdown(
-                  "Persediaan Rusak",
-                  setup && setup.sto_broken,
-                  (e) => {
-                    setSetup({ ...setup, sto_broken: e.value });
-                    submitUpdate({ ...setup, sto_broken: e.value });
-                  }
-                )}
+            {renderAccountDropdown(
+              "Persediaan Rusak",
+              setup && setup.sto_broken,
+              (e) => {
+                setSetup({ ...setup, sto_broken: e.value });
+                submitUpdate({ ...setup, sto_broken: e.value });
+              }
+            )}
 
-                {renderAccountDropdown(
-                  "Persediaan Umum",
-                  setup && setup.sto_general,
-                  (e) => {
-                    setSetup({ ...setup, sto_general: e.value });
-                    submitUpdate({ ...setup, sto_general: e.value });
-                  }
-                )}
+            {renderAccountDropdown(
+              "Persediaan Umum",
+              setup && setup.sto_general,
+              (e) => {
+                setSetup({ ...setup, sto_general: e.value });
+                submitUpdate({ ...setup, sto_general: e.value });
+              }
+            )}
 
-                {renderAccountDropdown(
-                  "Persediaan Produksi",
-                  setup && setup.sto_production,
-                  (e) => {
-                    setSetup({ ...setup, sto_production: e.value });
-                    submitUpdate({ ...setup, sto_production: e.value });
-                  }
-                )}
+            {renderAccountDropdown(
+              "Persediaan Produksi",
+              setup && setup.sto_production,
+              (e) => {
+                setSetup({ ...setup, sto_production: e.value });
+                submitUpdate({ ...setup, sto_production: e.value });
+              }
+            )}
 
-                {renderAccountDropdown(
-                  "Persediaan Selisih HPP",
-                  setup && setup.sto_hpp_diff,
-                  (e) => {
-                    setSetup({ ...setup, sto_hpp_diff: e.value });
-                    submitUpdate({ ...setup, sto_hpp_diff: e.value });
-                  }
-                )}
-              </Row>
-            </div>
-          </Accordion.Collapse>
-        </div>
-      </Accordion>
+            {renderAccountDropdown(
+              "Persediaan Selisih HPP",
+              setup && setup.sto_hpp_diff,
+              (e) => {
+                setSetup({ ...setup, sto_hpp_diff: e.value });
+                submitUpdate({ ...setup, sto_hpp_diff: e.value });
+              }
+            )}
+
+            {renderAccountDropdown(
+              "Persediaan WIP",
+              setup && setup.sto_wip,
+              (e) => {
+                setSetup({ ...setup, sto_wip: e.value });
+                submitUpdate({ ...setup, sto_wip: e.value });
+              }
+            )}
+          </Row>
+        }
+      />
     );
   };
 
   const renderLabaRugi = () => {
     return (
-      <Accordion className="accordion " defaultActiveKey="0">
-        <div className="accordion__item" key={0}>
-          <Accordion.Toggle
-            as={Card.Text}
-            eventKey={`0`}
-            className={`accordion__header ${accor.labarugi ? "collapsed" : ""}`}
-            onClick={() => {
-              setAccor({
-                ...accor,
-                labarugi: !accor.labarugi,
-              });
-            }}
-          >
-            <span className="accordion__header--text">Laba Rugi</span>
-            <span className="accordion__header--indicator indicator_bordered"></span>
-          </Accordion.Toggle>
-          <Accordion.Collapse eventKey={"0"}>
-            <div className="accordion__body--text">
-              <Row className="mr-0 ml-0">
-                {renderAccountDropdown(
-                  "Laba Rugi Berjalan",
-                  setup && setup.pnl,
-                  (e) => {
-                    setSetup({ ...setup, pnl: e.value });
-                    submitUpdate({ ...setup, pnl: e.value });
-                  }
-                )}
+      <CustomAccordion
+      tittle={"Laba Rugi"}
+      active={accor.labarugi}
+      key={1}
+      defaultActive={true}
+      onClick={() => {
+        setAccor({
+          ...accor,
+          labarugi: !accor.labarugi,
+        });
+      }}
+      body={
+        <Row className="mr-0 ml-0">
+        {renderAccountDropdown(
+          "Laba Rugi Berjalan",
+          setup && setup.pnl,
+          (e) => {
+            setSetup({ ...setup, pnl: e.value });
+            submitUpdate({ ...setup, pnl: e.value });
+          }
+        )}
 
-                {renderAccountDropdown(
-                  "Laba Rugi Tahun Berjalan",
-                  setup && setup.pnl_year,
-                  (e) => {
-                    setSetup({ ...setup, pnl_year: e.value });
-                    submitUpdate({ ...setup, pnl_year: e.value });
-                  }
-                )}
+        {renderAccountDropdown(
+          "Laba Rugi Tahun Berjalan",
+          setup && setup.pnl_year,
+          (e) => {
+            setSetup({ ...setup, pnl_year: e.value });
+            submitUpdate({ ...setup, pnl_year: e.value });
+          }
+        )}
 
-                {renderAccountDropdown(
-                  "Laba Rugi Ditahan",
-                  setup && setup.rtn_income,
-                  (e) => {
-                    setSetup({ ...setup, rtn_income: e.value });
-                    submitUpdate({ ...setup, rtn_income: e.value });
-                  }
-                )}
-              </Row>
-            </div>
-          </Accordion.Collapse>
-        </div>
-      </Accordion>
+        {renderAccountDropdown(
+          "Laba Rugi Ditahan",
+          setup && setup.rtn_income,
+          (e) => {
+            setSetup({ ...setup, rtn_income: e.value });
+            submitUpdate({ ...setup, rtn_income: e.value });
+          }
+        )}
+      </Row>
+      }
+    />
     );
   };
 
   return (
     <>
-    <Toast ref={toast} />
+      <Toast ref={toast} />
       <Row>
         <Col className="col-lg-6 col-sm-12 col-xs-12">
           {renderArAp()} {renderPenjualan()} {renderPersediaan()}

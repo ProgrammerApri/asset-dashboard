@@ -85,9 +85,9 @@ const SideMenu = () => {
         icon: "bx-user-voice",
       },
       {
-        tittle: "Transaksi Penjualan",
+        tittle: "Transaksi Pembelian",
         to: "transaksi",
-        icon: "bx-map-pin",
+        icon: "bx-receipt",
       },
     ],
     lainnya: [

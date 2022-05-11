@@ -77,6 +77,7 @@ const Supplier = () => {
   const [city, setCity] = useState(null);
   const [setup, setSetup] = useState(null);
   const [account, setAccount] = useState(null);
+  const [company, setComp] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
@@ -100,6 +101,7 @@ const Supplier = () => {
     getCity();
     getSetup();
     getAccount();
+    getCompany()
     initFilters1();
   }, []);
 
@@ -259,6 +261,32 @@ const Supplier = () => {
     }
   };
 
+  const getCompany = async (isUpdate = false) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.getCompany,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setComp(data);
+      }
+    } catch (error) {}
+    if (isUpdate) {
+      setLoading(false);
+    } else {
+      setTimeout(() => {
+        setLoading(false);
+      }, 1500);
+    }
+  };
+
   const editSupplier = async () => {
     const config = {
       ...endpoints.editSupplier,
@@ -381,7 +409,7 @@ const Supplier = () => {
     }
   };
 
-  const delSupplier = async (id) => {
+  const delSupplier = async () => {
     const config = {
       ...endpoints.delSupplier,
       endpoint: endpoints.delSupplier.endpoint + currentItem.supplier.id,
@@ -984,6 +1012,7 @@ const Supplier = () => {
         onHide={() => {
           setEdit(false);
           setDisplayData(false);
+          setActive(0);
         }}
       >
         <TabView activeIndex={active} onTabChange={(e) => setActive(e.index)}>
@@ -1297,6 +1326,7 @@ const Supplier = () => {
                     filter
                     filterBy="code"
                     placeholder="Pilih Jenis Currency"
+                    disabled={company && !company.multi_currency}
                   />
                 </div>
               </div>

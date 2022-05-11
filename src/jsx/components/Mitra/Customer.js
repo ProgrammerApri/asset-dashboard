@@ -176,7 +176,7 @@ const Customer = () => {
     }
   };
 
-  const getAR = async (isUpdate = false) => {
+  const getAR = async () => {
     setLoading(true);
     const config = {
       ...endpoints.account,
@@ -195,7 +195,7 @@ const Customer = () => {
     } catch (error) {}
   };
 
-  const getComp = async (isUpdate = false) => {
+  const getComp = async () => {
     setLoading(true);
     const config = {
       ...endpoints.getCompany,
@@ -214,7 +214,7 @@ const Customer = () => {
     } catch (error) {}
   };
 
-  const getSetup = async (isUpdate = false) => {
+  const getSetup = async () => {
     setLoading(true);
     const config = {
       ...endpoints.getSetup,
@@ -415,7 +415,7 @@ const Customer = () => {
     }
   };
 
-  const delCustomer = async (id) => {
+  const delCustomer = async () => {
     const config = {
       ...endpoints.delCustomer,
       endpoint: endpoints.delCustomer.endpoint + currentItem.customer.id,
@@ -1018,6 +1018,7 @@ const Customer = () => {
         onHide={() => {
           setEdit(false);
           setDisplayData(false);
+          setActive(0);
         }}
       >
         <TabView activeIndex={active} onTabChange={(e) => setActive(e.index)}>

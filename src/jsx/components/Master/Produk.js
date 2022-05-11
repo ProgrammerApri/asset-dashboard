@@ -46,7 +46,7 @@ const type = [
 
 const metode = [
   { name: "First In First Out (FIFO)", id: 1 },
-  { name: "Avarage", id: 2 },
+  { name: "Average", id: 2 },
 ];
 
 const Produk = () => {
@@ -69,8 +69,6 @@ const Produk = () => {
   const [active, setActive] = useState(0);
   const picker = useRef(null);
   const [file, setFile] = useState(null);
-  // const [currentData, setCurrentData] = useState(null);
-  const [onUpload, setSubmit] = useState(false);
 
   const dummy = Array.from({ length: 10 });
 
@@ -108,7 +106,7 @@ const Produk = () => {
     }
   };
 
-  const getGroup = async (isUpdate = false) => {
+  const getGroup = async () => {
     setLoading(true);
     const config = {
       ...endpoints.groupPro,
@@ -130,7 +128,7 @@ const Produk = () => {
     } catch (error) {}
   };
 
-  const getUnit = async (isUpdate = false) => {
+  const getUnit = async () => {
     setLoading(true);
     const config = {
       ...endpoints.getSatuan,
@@ -149,7 +147,7 @@ const Produk = () => {
     } catch (error) {}
   };
 
-  const getSupplier = async (isUpdate = false) => {
+  const getSupplier = async () => {
     setLoading(true);
     const config = {
       ...endpoints.supplier,
@@ -272,71 +270,7 @@ const Produk = () => {
     }
   };
 
-  // const postProduct = async (image, isUpdate = false, data) => {
-  //   let config = {};
-  //   if (isUpdate) {
-  //     if (data) {
-  //       config = {
-  //         ...endpoints.editProduct,
-  //         endpoint: endpoints.editProduct.endpoint + currentItem.id,
-  //         data: {
-  //           ...currentItem,
-  //           group: currentItem?.group?.id ?? null,
-  //           suplier: currentItem?.suplier?.id ?? null,
-  //           unit: currentItem?.unit?.id ?? null,
-  //         },
-  //       };
-  //     } else {
-  //       config = {
-  //         ...endpoints.editProduct,
-  //         endpoint: endpoints.editProduct.endpoint + currentItem.id,
-  //         data: {
-  //           ...currentItem,
-  //           image: image !== "" ? image : currentItem.image,
-  //         },
-  //       };
-  //     }
-  //   } else {
-  //     config = {
-  //       ...endpoints.addProduct,
-  //       data: {
-  //         ...currentItem,
-  //         group: currentItem?.group?.id ?? null,
-  //         suplier: currentItem?.suplier?.id ?? null,
-  //         unit: currentItem?.unit?.id ?? null,
-  //         image: image,
-  //       },
-  //     };
-  //   }
-  //   let response = null;
-  //   try {
-  //     response = await request(null, config);
-  //     console.log(response);
-  //     if (response.status) {
-  //       setTimeout(() => {
-  //         setUpdate(false);
-  //         setDisplayData(false);
-  //         getProduk(true);
-  //         toast.current.show({
-  //           severity: "info",
-  //           summary: "Berhasil",
-  //           detail: "Data Berhasil Diperbarui",
-  //           life: 3000,
-  //         });
-  //       }, 500);
-  //     }
-  //   } catch (error) {
-  //     setSubmit(false);
-  //     toast.current.show({
-  //       severity: "error",
-  //       summary: "Gagal",
-  //       detail: "Gagal memperbarui data",
-  //       life: 3000,
-  //     });
-  //   }
-  // };
-
-  const delProduk = async (id) => {
+  const delProduk = async () => {
     const config = {
       ...endpoints.delProduct,
       endpoint: endpoints.delProduct.endpoint + currentItem.id,
@@ -680,7 +614,7 @@ const Produk = () => {
               <Row>
                 <div className="ml-3 mt-1">
                   <CircleProgress
-                    percent={50}
+                    percent={30}
                     colors={"#F2D182"}
                     icon={
                       <svg
@@ -739,7 +673,7 @@ const Produk = () => {
               <Row>
                 <div className="ml-3 mt-1">
                   <CircleProgress
-                    percent={50}
+                    percent={70}
                     colors={"#B05B57"}
                     icon={
                       <svg
@@ -976,7 +910,7 @@ const Produk = () => {
 
             <div className="row mr-0 ml-0">
               <div className="col-6">
-                <label className="text-label">Kode Group</label>
+                <label className="text-label">Group Barang</label>
                 <div className="p-inputgroup">
                   <Dropdown
                     value={currentItem !== null ? currentItem.group : null}

@@ -1,47 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { Button, Col, Row } from "react-bootstrap";
+import { Button, Card, Col, Row } from "react-bootstrap";
 import PermintaanPembelian from "./PermintaanPembelian";
 import InputOrder from "./InputOrder";
 
 const RequestPurchase = () => {
   const [active, setActive] = useState(0);
-  const [subMenu, setSubMenu] = useState([
-    {
-      component: <InputOrder />,
-    },
+  const [view, setView] = useState([
+    <PermintaanPembelian onAdd={() => setActive(1)} />,
+    <InputOrder 
+      onCancel={() => setActive(0)} 
+      onSubmit={() => {}} 
+    />,
   ]);
 
-  const renderSubMenu = () => {
-    let menu = [];
-
-    subMenu.forEach((el, i) => {
-      menu.push(
-        <Button
-          className={`sub-menu mr-4 mb-4 ${active == i ? "act" : ""}`}
-          role="button"
-          onClick={() => {
-            setActive(i);
-          }}
-          data-toggle="dropdown"
-        >
-          <Row className="ml-0 mr-0 align-items-center">
-            <div className="sub-icon">
-              <i className={`bx ${el.icon}`}></i>
-            </div>
-            <span className="ml-3 mr-3">{el.tittle}</span>
-          </Row>
-        </Button>
-      );
-    });
-    return menu;
-  };
-
   return (
-    <Row className="mb-0">
-      <Col className="col-12 pb-0">
-        <div className="">{renderSubMenu()}</div>
+    <Row>
+      <Col className="pt-0">
+        <Card>
+          <Card.Body>{view[active]}</Card.Body>
+        </Card>
       </Col>
-      <Col className="pt-0">{subMenu[active].component}</Col>
     </Row>
   );
 };

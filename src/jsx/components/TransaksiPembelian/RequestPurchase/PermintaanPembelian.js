@@ -16,11 +16,9 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { InputNumber } from "primereact/inputnumber";
 import { Divider } from "@material-ui/core";
 
-const data = {
+const data = {};
 
-};
-
-const PermintaanPembelian = () => {
+const PermintaanPembelian = ({onAdd}) => {
   const [permintaan, setPermintaan] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
@@ -74,7 +72,6 @@ const PermintaanPembelian = () => {
       endpoint: endpoints.editPermintaan.endpoint + currentItem.id,
       data: {
         cus_code: currentItem.customer.cus_code,
-       
       },
     };
     console.log(config.data);
@@ -113,7 +110,6 @@ const PermintaanPembelian = () => {
       ...endpoints.addPermintaan,
       data: {
         cus_code: currentItem.customer.cus_code,
-  
       },
     };
     console.log(config.data);
@@ -315,11 +311,7 @@ const PermintaanPembelian = () => {
         </span>
         <Button
           variant="primary"
-          onClick={() => {
-            setEdit(false);
-            setCurrentItem(data);
-            setDisplayData(true);
-          }}
+          onClick={onAdd}
         >
           Tambah{" "}
           <span className="btn-icon-right">
@@ -378,66 +370,59 @@ const PermintaanPembelian = () => {
 
   return (
     <>
-      <Toast ref={toast} />
-      <Row>
-        <Col className="pt-0">
-          <Card>
-            <Card.Body>
-              <DataTable
-                responsiveLayout="scroll"
-                value={loading ? dummy : permintaan}
-                className="display w-150 datatable-wrapper"
-                showGridlines
-                dataKey="id"
-                rowHover
-                header={renderHeader}
-                filters={filters1}
-                globalFilterFields={[
-                  "customer.cus_code",
-                 
-                ]}
-                emptyMessage="Tidak ada data"
-                paginator
-                paginatorTemplate={template2}
-                first={first2}
-                rows={rows2}
-                onPage={onCustomPage2}
-                paginatorClassName="justify-content-end mt-3"
-              >
-                <Column
-                  header="Tanggal"
-                  style={{
-                    minWidth: "10rem" }}
-                  field={(e) => e.tanggal}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Nomor Permintaan"
-                  field={(e) => e.no}
-                  style={{ minWidth: "10rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Status"
-                  field={(e) => e.status}
-                  style={{ minWidth: "10rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Action"
-                  dataType="boolean"
-                  bodyClassName="text-center"
-                  style={{ minWidth: "2rem" }}
-                  body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
-                />
-              </DataTable>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+      {/* <Toast ref={toast} /> */}
 
-      <Dialog
-        header={isEdit ? "Edit Permintaan Pembelian" : "Tambah Permintaan Pembelian"}
+      <DataTable
+        responsiveLayout="scroll"
+        value={loading ? dummy : permintaan}
+        className="display w-150 datatable-wrapper"
+        showGridlines
+        dataKey="id"
+        rowHover
+        header={renderHeader}
+        filters={filters1}
+        globalFilterFields={["customer.cus_code"]}
+        emptyMessage="Tidak ada data"
+        paginator
+        paginatorTemplate={template2}
+        first={first2}
+        rows={rows2}
+        onPage={onCustomPage2}
+        paginatorClassName="justify-content-end mt-3"
+      >
+        <Column
+          header="Tanggal"
+          style={{
+            minWidth: "10rem",
+          }}
+          field={(e) => e.tanggal}
+          body={loading && <Skeleton />}
+        />
+        <Column
+          header="Nomor Permintaan"
+          field={(e) => e.no}
+          style={{ minWidth: "10rem" }}
+          body={loading && <Skeleton />}
+        />
+        <Column
+          header="Status"
+          field={(e) => e.status}
+          style={{ minWidth: "10rem" }}
+          body={loading && <Skeleton />}
+        />
+        <Column
+          header="Action"
+          dataType="boolean"
+          bodyClassName="text-center"
+          style={{ minWidth: "2rem" }}
+          body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
+        />
+      </DataTable>
+
+      {/* <Dialog
+        header={
+          isEdit ? "Edit Permintaan Pembelian" : "Tambah Permintaan Pembelian"
+        }
         visible={displayData}
         style={{ width: "50vw" }}
         footer={renderFooter("displayData")}
@@ -445,9 +430,7 @@ const PermintaanPembelian = () => {
           setEdit(false);
           setDisplayData(false);
         }}
-      >
-        
-      </Dialog>
+      ></Dialog> */}
 
       <Dialog
         header={"Hapus Data"}

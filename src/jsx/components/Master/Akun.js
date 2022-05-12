@@ -679,9 +679,6 @@ const Akun = () => {
       <Row>
         <Col>
           <Card>
-            {/* <Card.Header>
-              <Card.Title>Akun</Card.Title>
-            </Card.Header> */}
             <Card.Body>
               <DataTable
                 responsiveLayout="scroll"

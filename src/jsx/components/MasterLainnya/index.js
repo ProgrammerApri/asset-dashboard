@@ -7,6 +7,8 @@ import Divisi from "../Master/Divisi";
 import JenisPelanggan from "../Master/JenisPelanggan";
 import JenisPemasok from "../Master/JenisPemasok";
 import Project from "../Master/Project";
+import PusatBiaya from "../Master/PusatBiaya";
+import RulesPay from "../Master/RulesPay";
 import Satuan from "../Satuan";
 import TransaksiPembelian from "../TransaksiPembelian/TransaksiPembelian";
 
@@ -26,7 +28,7 @@ const MasterLainnya = () => {
     {
       tittle: "Departemen",
       icon: "bx-globe-alt",
-      component: <></>,
+      component: <PusatBiaya />,
     },
     {
       tittle: "Project",

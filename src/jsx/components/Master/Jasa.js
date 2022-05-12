@@ -15,14 +15,30 @@ import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 
 const data = {
-  id: 1,
-  ccost_code: "",
-  ccost_name: "",
-  ccost_ket: "",
+  jasa: {
+    id: null,
+    code: null,
+    name: null,
+    desc: null,
+    acc_id: null,
+  },
+
+  account: {
+    id: 0,
+    acc_code: "",
+    acc_name: "",
+    umm_code: null,
+    kat_code: 0,
+    dou_type: "",
+    sld_type: "",
+    connect: true,
+    sld_awal: 0,
+  },
 };
 
-const PusatBiaya = () => {
-  const [pusatBiaya, setPusatBiaya] = useState(null);
+const Jasa = () => {
+  const [jasa, setJasa] = useState(null);
+  const [account, setAccount] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
@@ -39,14 +55,42 @@ const PusatBiaya = () => {
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getPusatBiaya();
+    getJasa();
+    getAccount();
     initFilters1();
   }, []);
 
-  const getPusatBiaya = async (isUpdate = false) => {
+  const getAccount = async () => {
+    console.log("-------------------");
+    // console.log(currentItem);
     setLoading(true);
     const config = {
-      ...endpoints.pusatBiaya,
+      ...endpoints.account,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        // let filt = [];
+        // data.forEach((element) => {
+        //   if (element.account.kat_code === 2 && element.account.connect) {
+        //     filt.push(element.account);
+        //   }
+        // });
+        console.log(data);
+        setAccount(data);
+      }
+    } catch (error) {}
+  };
+
+  const getJasa = async (isUpdate = false) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.jasa,
       data: {},
     };
     console.log(config.data);
@@ -57,7 +101,7 @@ const PusatBiaya = () => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        setPusatBiaya(data);
+        setJasa(data);
       }
     } catch (error) {}
     if (isUpdate) {
@@ -69,14 +113,15 @@ const PusatBiaya = () => {
     }
   };
 
-  const editPusatBiaya = async () => {
+  const editJasa = async () => {
     const config = {
-      ...endpoints.editPusatBiaya,
-      endpoint: endpoints.editPusatBiaya.endpoint + currentItem.id,
+      ...endpoints.editJasa,
+      endpoint: endpoints.editJasa.endpoint + currentItem.jasa.id,
       data: {
-        ccost_code: currentItem.ccost_code,
-        ccost_name: currentItem.ccost_name,
-        ccost_ket: currentItem.ccost_ket,
+        code: currentItem.jasa.code,
+        name: currentItem.jasa.name,
+        desc: currentItem.jasa.desc,
+        acc_id: currentItem.account.account.id,
       },
     };
     console.log(config.data);
@@ -88,7 +133,7 @@ const PusatBiaya = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayData(false);
-          getPusatBiaya(true);
+          getJasa(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -110,13 +155,14 @@ const PusatBiaya = () => {
     }
   };
 
-  const addPusatBiaya = async () => {
+  const addJasa = async () => {
     const config = {
-      ...endpoints.addPusatBiaya,
+      ...endpoints.addJasa,
       data: {
-        ccost_code: currentItem.ccost_code,
-        ccost_name: currentItem.ccost_name,
-        ccost_ket: currentItem.ccost_ket,
+        code: currentItem.jasa.code,
+        name: currentItem.jasa.name,
+        desc: currentItem.jasa.desc,
+        acc_id: currentItem.account.account.id,
       },
     };
     console.log(config.data);
@@ -128,7 +174,7 @@ const PusatBiaya = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayData(false);
-          getPusatBiaya(true);
+          getJasa(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -145,7 +191,7 @@ const PusatBiaya = () => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${currentItem.ccost_code} Sudah Digunakan`,
+            detail: `Kode ${currentItem.jasa.code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -163,10 +209,10 @@ const PusatBiaya = () => {
     }
   };
 
-  const delPusatBiaya = async (id) => {
+  const delJasa = async (id) => {
     const config = {
-      ...endpoints.delPusatBiaya,
-      endpoint: endpoints.delPusatBiaya.endpoint + currentItem.id,
+      ...endpoints.delJasa,
+      endpoint: endpoints.delJasa.endpoint + currentItem.jasa.id,
     };
     console.log(config.data);
     let response = null;
@@ -177,7 +223,7 @@ const PusatBiaya = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayDel(false);
-          getPusatBiaya(true);
+          getJasa(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -242,10 +288,10 @@ const PusatBiaya = () => {
   const onSubmit = () => {
     if (isEdit) {
       setUpdate(true);
-      editPusatBiaya();
+      editJasa();
     } else {
       setUpdate(true);
-      addPusatBiaya();
+      addJasa();
     }
   };
 
@@ -281,7 +327,7 @@ const PusatBiaya = () => {
           className="p-button btn-s btn-primary"
           icon="pi pi-trash"
           onClick={() => {
-            delPusatBiaya();
+            delJasa();
           }}
           autoFocus
           loading={update}
@@ -379,6 +425,30 @@ const PusatBiaya = () => {
     setRows2(event.rows);
   };
 
+  const glTemplate = (option) => {
+    return (
+      <div>
+        {option !== null
+          ? `${option.account.acc_name} - (${option.account.acc_code})`
+          : ""}
+      </div>
+    );
+  };
+
+  const clear = (option, props) => {
+    if (option) {
+      return (
+        <div>
+          {option !== null
+            ? `${option.account.acc_name} - (${option.account.acc_code})`
+            : ""}
+        </div>
+      );
+    }
+
+    return <span>{props.placeholder}</span>;
+  };
+
   return (
     <>
       <Toast ref={toast} />
@@ -388,7 +458,7 @@ const PusatBiaya = () => {
             <Card.Body>
               <DataTable
                 responsiveLayout="scroll"
-                value={loading ? dummy : pusatBiaya}
+                value={loading ? dummy : jasa}
                 className="display w-150 datatable-wrapper"
                 showGridlines
                 dataKey="id"
@@ -396,9 +466,10 @@ const PusatBiaya = () => {
                 header={renderHeader}
                 filters={filters1}
                 globalFilterFields={[
-                  "pusatBiaya.ccost_code",
-                  "pusatBiaya.ccost_name",
-                  "pusatBiaya.ccost_ket",
+                  "bank.code",
+                  "bank.name",
+                  "bank.desc",
+                  "account.acc_name",
                 ]}
                 emptyMessage="Tidak ada data"
                 paginator
@@ -409,22 +480,28 @@ const PusatBiaya = () => {
                 paginatorClassName="justify-content-end mt-3"
               >
                 <Column
-                  header="Kode"
+                  header="Kode Jasa"
                   style={{
                     minWidth: "8rem",
                   }}
-                  field={(e) => e.ccost_code}
+                  field={(e) => e.jasa.code}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Nama"
-                  field={(e) => e.ccost_name}
+                  header="Nama Jasa"
+                  field={(e) => e.jasa.name}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Akun Distribusi GL"
+                  field={(e) => e.account.acc_name}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Keterangan"
-                  field={(e) => e.ccost_ket}
+                  field={(e) => e.jasa.desc}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
@@ -442,7 +519,7 @@ const PusatBiaya = () => {
       </Row>
 
       <Dialog
-        header={isEdit ? "Edit Pusat Biaya" : "Tambah Pusat Biaya"}
+        header={isEdit ? "Edit Jasa" : "Tambah Jasa"}
         visible={displayData}
         style={{ width: "40vw" }}
         footer={renderFooter("displayData")}
@@ -451,42 +528,83 @@ const PusatBiaya = () => {
           setDisplayData(false);
         }}
       >
-        <div className="row mr-0 mt-0">
+        <div className="row ml-0 mt-0">
           <div className="col-6">
-            <label className="text-label">Kode</label>
+            <label className="text-label">Kode Jasa</label>
             <div className="p-inputgroup">
               <InputText
-                value={currentItem !== null ? `${currentItem.ccost_code}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, ccost_code: e.target.value })
+                value={
+                  currentItem !== null ? `${currentItem?.jasa?.code ?? ""}` : ""
                 }
-                placeholder="Masukan Kode"
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    jasa: { ...currentItem.jasa, code: e.target.value },
+                  })
+                }
+                placeholder="Masukan Kode Jasa"
               />
             </div>
           </div>
 
           <div className="col-6">
-            <label className="text-label">Nama</label>
+            <label className="text-label">Nama Jasa</label>
             <div className="p-inputgroup">
               <InputText
-                value={currentItem !== null ? `${currentItem.ccost_name}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, ccost_name: e.target.value })
+                value={
+                  currentItem !== null ? `${currentItem?.jasa?.name ?? ""}` : ""
                 }
-                placeholder="Masukan Nama Akun"
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    jasa: { ...currentItem.jasa, name: e.target.value },
+                  })
+                }
+                placeholder="Masukan Nama Jasa"
               />
             </div>
           </div>
         </div>
 
-        <div className="row mr-0 mt-0">
+        <div className="row ml-0 mt-0">
+          <div className="col-12">
+            <label className="text-label">Akun Distribusi GL</label>
+            <div className="p-inputgroup">
+              <Dropdown
+                value={currentItem !== null ? currentItem.account : null}
+                options={account}
+                onChange={(e) => {
+                  console.log(e.value);
+                  setCurrentItem({
+                    ...currentItem,
+                    account: e.value,
+                  });
+                }}
+                optionLabel="acc_name"
+                valueTemplate={clear}
+                itemTemplate={glTemplate}
+                filter
+                filterBy="acc_name"
+                placeholder="Pilih Akun Distribusi GL"
+                // showClear
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="row ml-0 mt-0">
           <div className="col-12">
             <label className="text-label">Keterangan</label>
             <div className="p-inputgroup">
               <InputTextarea
-                value={currentItem !== null ? `${currentItem.ccost_ket}` : ""}
+                value={
+                  currentItem !== null ? `${currentItem?.jasa?.desc ?? ""}` : ""
+                }
                 onChange={(e) =>
-                  setCurrentItem({ ...currentItem, ccost_ket: e.target.value })
+                  setCurrentItem({
+                    ...currentItem,
+                    jasa: { ...currentItem.jasa, desc: e.target.value },
+                  })
                 }
                 placeholder="Masukan Keterangan"
               />
@@ -516,4 +634,4 @@ const PusatBiaya = () => {
   );
 };
 
-export default PusatBiaya;
+export default Jasa;

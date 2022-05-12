@@ -509,6 +509,7 @@ const endpoints = {
     method: "GET",
     data: {},
   },
+
   /// Produk
   product: {
     endpoint: "/v1/api/product",
@@ -521,7 +522,7 @@ const endpoints = {
     method: "POST",
     data: {},
   },
-  
+
   addProduct: {
     endpoint: "/v1/api/product",
     method: "POST",
@@ -533,7 +534,7 @@ const endpoints = {
     method: "PUT",
     data: {},
   },
-  
+
   editProduct: {
     endpoint: "/v1/api/product/",
     method: "PUT",
@@ -551,9 +552,59 @@ const endpoints = {
     method: "POST",
     data: {},
   },
-  
+
   delProduct: {
     endpoint: "/v1/api/product/",
+    method: "DELETE",
+    data: {},
+  },
+
+  /// Pajak
+  pajak: {
+    endpoint: "/v1/api/pajak",
+    method: "GET",
+    data: {},
+  },
+
+  addPajak: {
+    endpoint: "/v1/api/pajak",
+    method: "POST",
+    data: {},
+  },
+
+  editPajak: {
+    endpoint: "/v1/api/pajak/",
+    method: "PUT",
+    data: {},
+  },
+
+  delPajak: {
+    endpoint: "/v1/api/pajak/",
+    method: "DELETE",
+    data: {},
+  },
+
+  /// Jasa
+  jasa: {
+    endpoint: "/v1/api/jasa",
+    method: "GET",
+    data: {},
+  },
+
+  addJasa: {
+    endpoint: "/v1/api/jasa",
+    method: "POST",
+    data: {},
+  },
+
+  editJasa: {
+    endpoint: "/v1/api/jasa/",
+    method: "PUT",
+    data: {},
+  },
+
+  delJasa: {
+    endpoint: "/v1/api/jasa/",
     method: "DELETE",
     data: {},
   },

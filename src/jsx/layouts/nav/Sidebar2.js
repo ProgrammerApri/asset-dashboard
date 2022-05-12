@@ -14,82 +14,92 @@ const SideMenu = () => {
     ],
     master: [
       {
-        tittle: "Akun",
-        to: "akun",
-        icon: "bx-category-alt",
+        tittle: "Master",
+        to: "master",
+        icon: "bx-data",
       },
       {
-        tittle: "Mitra",
-        to: "mitra",
-        icon: "bx-shape-circle",
+        tittle: "Master Lainnya",
+        to: "master-lainnya",
+        icon: "bx-hdd",
       },
-      {
-        tittle: "Group Produk",
-        to: "group-produk",
-        icon: "bx-cabinet",
-      },
-      {
-        tittle: "Produk",
-        to: "produk",
-        icon: "bx-archive",
-      },
-      {
-        tittle: "Gudang",
-        to: "gudang",
-        icon: "bx-building",
-      },
-      {
-        tittle: "Aset",
-        to: "aset",
-        icon: "bx-car",
-      },
+      // {
+      //   tittle: "Akun",
+      //   to: "akun",
+      //   icon: "bx-category-alt",
+      // },
+      // {
+      //   tittle: "Mitra",
+      //   to: "mitra",
+      //   icon: "bx-shape-circle",
+      // },
+      // {
+      //   tittle: "Group Produk",
+      //   to: "group-produk",
+      //   icon: "bx-cabinet",
+      // },
+      // {
+      //   tittle: "Produk",
+      //   to: "produk",
+      //   icon: "bx-archive",
+      // },
+      // {
+      //   tittle: "Gudang",
+      //   to: "gudang",
+      //   icon: "bx-building",
+      // },
+      // {
+      //   tittle: "Aset",
+      //   to: "aset",
+      //   icon: "bx-car",
+      // },
     ],
-    master_lainnya: [
-      {
-        tittle: "Satuan",
-        to: "satuan",
-        icon: "bx-barcode",
-      },{
-        tittle: "Divisi",
-        to: "divisi",
-        icon: "bx-scatter-chart",
-      },
-      {
-        tittle: "Departemen",
-        to: "departemen",
-        icon: "bx-globe-alt",
-      },
-      {
-        tittle: "Project",
-        to: "project",
-        icon: "bx-poll",
-      },
-      {
-        tittle: "Currency",
-        to: "currency",
-        icon: "bx-dollar-circle",
-      },
-      {
-        tittle: "bank",
-        to: "bank",
-        icon: "bx-money-withdraw",
-      },
-      {
-        tittle: "jenis pelanggan",
-        to: "jenis-pelanggan",
-        icon: "bx-street-view",
-      },
-      {
-        tittle: "jenis pemasok",
-        to: "jenis-pemasok",
-        icon: "bx-user-voice",
-      },
-      {
-        tittle: "Transaksi Pembelian",
-        to: "transaksi",
-        icon: "bx-receipt",
-      },
-    ],
+    // master_lainnya: [
+    //   {
+    //     tittle: "Satuan",
+    //     to: "satuan",
+    //     icon: "bx-barcode",
+    //   },{
+    //     tittle: "Divisi",
+    //     to: "divisi",
+    //     icon: "bx-scatter-chart",
+    //   },
+    //   {
+    //     tittle: "Departemen",
+    //     to: "departemen",
+    //     icon: "bx-globe-alt",
+    //   },
+    //   {
+    //     tittle: "Project",
+    //     to: "project",
+    //     icon: "bx-poll",
+    //   },
+    //   {
+    //     tittle: "Currency",
+    //     to: "currency",
+    //     icon: "bx-dollar-circle",
+    //   },
+    //   {
+    //     tittle: "bank",
+    //     to: "bank",
+    //     icon: "bx-money-withdraw",
+    //   },
+    //   {
+    //     tittle: "jenis pelanggan",
+    //     to: "jenis-pelanggan",
+    //     icon: "bx-street-view",
+    //   },
+    //   {
+    //     tittle: "jenis pemasok",
+    //     to: "jenis-pemasok",
+    //     icon: "bx-user-voice",
+    //   },
+    //   {
+    //     tittle: "Transaksi Pembelian",
+    //     to: "transaksi",
+    //     icon: "bx-receipt",
+    //   },
+    // ],
     lainnya: [
       {
         tittle: "Klasifikasi",

@@ -47444,20 +47444,20 @@ a .sidebar-logo .logo{
   background: #EBF0FE;
   color: #5877E0;
   font-weight: 510;
-  transition: color 0.2s ease-in-out;
+  transition: background 0.35s ease-in-out;
 }
 
 .sidebar-menu .menu-sub > li > a.active:hover{
   background: #EBF0FE;
   color: #5877E0;
   font-weight: 510;
-  transition: color 0.2s ease-in-out;
+  transition: background 0.2s ease-in-out;
 }
 
 .sidebar-menu .menu-sub > li > a:hover{
   background: var(--body-bg);
   color: #5877E0;
-  transition: color 0.2s ease-in-out;
+  transition: background 0.2s ease-in-out;
 }
 
 .sidebar-menu .menu-sub > li > a > span {
@@ -47490,3 +47490,62 @@ a .sidebar-logo .logo{
 }
 
 
+/* submenu */
+.sub-menu {
+  position: relative;
+  color: #7A80AB;
+  background: var(--card-bg);
+  box-shadow: 0px 12px 23px 0px rgb(59 40 62 / 8%) !important;
+  border-radius: 0.875rem;
+  padding: 11px;
+  line-height: 1;
+  border-color: transparent;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.sub-menu:hover {
+  background: var(--card-bg);
+  color: #7A80AB;
+  border-color: transparent;
+  box-shadow: 0px 12px 23px 0px rgb(59 40 62 / 8%) !important;
+}
+
+.sub-menu:focus {
+  background: var(--card-bg);
+  color: #7A80AB;
+  border-color: transparent;
+  box-shadow: 0px 12px 23px 0px rgb(59 40 62 / 8%) !important;
+}
+
+.sub-menu:active {
+  background: #EBF0FE !important;
+  color: #7A80AB !important;
+  border-color: transparent !important;
+  box-shadow: 0px 12px 23px 0px rgb(59 40 62 / 8%) !important;
+}
+
+.sub-menu.act {
+  color: #5877E0;
+  font-weight: 510;
+}
+
+.sub-icon {
+  padding: 12px;
+  background: var(--input-bg);
+  border-radius: 0.75rem;
+  font-weight: 500;
+}
+
+.sub-menu.act .sub-icon {
+  padding: 12px;
+  background: var(--primary-button);
+  border-radius: 0.75rem;
+  font-weight: 510;
+  color: white;
+  transition: background 0.35s ease-in-out;
+}
+
+.sub-menu-item {
+  white-space: nowrap;
+}

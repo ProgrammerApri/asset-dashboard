@@ -51,6 +51,8 @@ import TransaksiPembelian from "./components/TransaksiPembelian/TransaksiPembeli
 import Produk from "./components/Master/Produk";
 import GroupProduk from "./components/Master/GroupProduk";
 import Satuan from "./components/Satuan";
+import Master from "./components/Master";
+import MasterLainnya from "./components/MasterLainnya";
 
 const Markup = ({ width }) => {
   const routes = [
@@ -60,6 +62,8 @@ const Markup = ({ width }) => {
     // Login
     { url: "login", component: Login },
 
+    { url: "master", component: Master },
+    { url: "master-lainnya", component: MasterLainnya },
     /// Klasifikasi
     { url: "klasifikasi", component: KlasifikasiAkun },
     { url: "kategori", component: KategoriAkun },

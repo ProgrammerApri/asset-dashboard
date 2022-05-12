@@ -1,7 +1,7 @@
 import React from "react";
 import { TabView, TabPanel } from 'primereact/tabview';
-import PermintaanPembelian from "./PermintaanPembelian";
-import PesananPO from "./PesananPembelian";
+import PermintaanPembelian from "./RequestPurchase/PermintaanPembelian";
+import PesananPO from "./PO/PesananPembelian";
 import PembelianLangsung from "./PembelianLangsung";
 import Faktur from "./Faktur";
 

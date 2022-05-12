@@ -40,10 +40,10 @@ import Neraca from "./components/Report/Neraca";
 import Perusahaan from "./components/Setup/Perusahaan";
 import Currency from "./components/Master/Currency";
 import Lokasi from "./components/Master/Lokasi";
-import RulesPay from "./components/Master/RulesPayment";
+import RulesPay from "./components/Master/RulesPay";
 import Setup from "./components/Setup";
 import Divisi from "./components/Master/Divisi";
-import NonStock from "./components/Master/NonStock";
+import PPN from "./components/MasterLainnya/PPN";
 import SubCustomer from "./components/Master/SubCustomer";
 import SetupKhusus from "./components/Master/SetupKhusus";
 import Mitra from "./components/Mitra/Mitra";
@@ -80,7 +80,7 @@ const Markup = ({ width }) => {
     { url: "lokasi", component: Lokasi },
     { url: "syarat-pembayaran", component: RulesPay },
     { url: "divisi", component: Divisi },
-    { url: "non-stok", component: NonStock },
+    { url: "non-stok", component: PPN },
     { url: "sub-pelanggan", component: SubCustomer },
     { url: "setup-perkiraan", component: SetupKhusus },
     { url: "satuan", component: Satuan },

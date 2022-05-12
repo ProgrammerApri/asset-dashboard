@@ -15,12 +15,11 @@ import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 
 const data = {
-    id: 1,
-    code: "",
-    name: "",
-    desc: "",
+  id: 1,
+  code: "",
+  name: "",
+  desc: "",
 };
-
 
 const Divisi = () => {
   const [divisi, setDivisi] = useState(null);
@@ -43,7 +42,6 @@ const Divisi = () => {
     getDivisi();
     initFilters1();
   }, []);
-
 
   const getDivisi = async (isUpdate = false) => {
     setLoading(true);
@@ -335,7 +333,6 @@ const Divisi = () => {
     );
   };
 
-
   const template2 = {
     layout: "RowsPerPageDropdown CurrentPageReport PrevPageLink NextPageLink",
     RowsPerPageDropdown: (options) => {
@@ -454,49 +451,46 @@ const Divisi = () => {
           setDisplayData(false);
         }}
       >
-        <div className="col-12">
-          <label className="text-label">Kode Group</label>
-          <div className="p-inputgroup">
-            <InputText
-              value={
-                currentItem !== null ? `${currentItem.code}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({...currentItem, code: e.target.value})
-              }
-              placeholder="Masukan Kode Group"
-            
-            />
+        <div className="row ml-0 mt-0">
+          <div className="col-6">
+            <label className="text-label">Kode Group</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={currentItem !== null ? `${currentItem.code}` : ""}
+                onChange={(e) =>
+                  setCurrentItem({ ...currentItem, code: e.target.value })
+                }
+                placeholder="Masukan Kode Group"
+              />
+            </div>
+          </div>
+
+          <div className="col-6">
+            <label className="text-label">Nama Group</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={currentItem !== null ? `${currentItem.name}` : ""}
+                onChange={(e) =>
+                  setCurrentItem({ ...currentItem, name: e.target.value })
+                }
+                placeholder="Masukan Nama Group"
+              />
+            </div>
           </div>
         </div>
 
-        <div className="col-12">
-          <label className="text-label">Nama Group</label>
-          <div className="p-inputgroup">
-            <InputText
-              value={
-                currentItem !== null ? `${currentItem.name}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({...currentItem, name: e.target.value})
-              }
-              placeholder="Masukan Nama Group"
-            />
-          </div>
-        </div>
-
-        <div className="col-12">
-          <label className="text-label">Keterangan</label>
-          <div className="p-inputgroup">
-            <InputTextarea
-              value={
-                currentItem !== null ? `${currentItem.desc}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({...currentItem, desc: e.target.value})
-              }
-              placeholder="Masukan Keterangan"
-            />
+        <div className="row ml-0 mt-0">
+          <div className="col-12">
+            <label className="text-label">Keterangan</label>
+            <div className="p-inputgroup">
+              <InputTextarea
+                value={currentItem !== null ? `${currentItem.desc}` : ""}
+                onChange={(e) =>
+                  setCurrentItem({ ...currentItem, desc: e.target.value })
+                }
+                placeholder="Masukan Keterangan"
+              />
+            </div>
           </div>
         </div>
       </Dialog>

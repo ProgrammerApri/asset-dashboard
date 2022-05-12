@@ -15,12 +15,11 @@ import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 
 const data = {
-    id: 1,
-    area_pen_code: "",
-    area_pen_name: "",
-    area_pen_ket: "",
+  id: 1,
+  area_pen_code: "",
+  area_pen_name: "",
+  area_pen_ket: "",
 };
-
 
 const AreaPenjualan = () => {
   const [areaPen, setAreaPen] = useState(null);
@@ -43,7 +42,6 @@ const AreaPenjualan = () => {
     getAreaPen();
     initFilters1();
   }, []);
-
 
   const getAreaPen = async (isUpdate = false) => {
     setLoading(true);
@@ -335,7 +333,6 @@ const AreaPenjualan = () => {
     );
   };
 
-
   const template2 = {
     layout: "RowsPerPageDropdown CurrentPageReport PrevPageLink NextPageLink",
     RowsPerPageDropdown: (options) => {
@@ -454,49 +451,61 @@ const AreaPenjualan = () => {
           setDisplayData(false);
         }}
       >
-        <div className="col-12">
-          <label className="text-label">Kode</label>
-          <div className="p-inputgroup">
-            <InputText
-              value={
-                currentItem !== null ? `${currentItem.area_pen_code}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({...currentItem, area_pen_code: e.target.value})
-              }
-              placeholder="Masukan Kode"
-            
-            />
+        <div className="row mr-0 ml-0">
+          <div className="col-6">
+            <label className="text-label">Kode</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={
+                  currentItem !== null ? `${currentItem.area_pen_code}` : ""
+                }
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    area_pen_code: e.target.value,
+                  })
+                }
+                placeholder="Masukan Kode"
+              />
+            </div>
+          </div>
+
+          <div className="col-6">
+            <label className="text-label">Nama</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={
+                  currentItem !== null ? `${currentItem.area_pen_name}` : ""
+                }
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    area_pen_name: e.target.value,
+                  })
+                }
+                placeholder="Masukan Nama Akun"
+              />
+            </div>
           </div>
         </div>
 
-        <div className="col-12">
-          <label className="text-label">Nama</label>
-          <div className="p-inputgroup">
-            <InputText
-              value={
-                currentItem !== null ? `${currentItem.area_pen_name}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({...currentItem, area_pen_name: e.target.value})
-              }
-              placeholder="Masukan Nama Akun"
-            />
-          </div>
-        </div>
-
-        <div className="col-12">
-          <label className="text-label">Keterangan</label>
-          <div className="p-inputgroup">
-            <InputTextarea
-              value={
-                currentItem !== null ? `${currentItem.area_pen_ket}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({...currentItem, area_pen_ket: e.target.value})
-              }
-              placeholder="Masukan Keterangan"
-            />
+        <div className="row mr-0 ml-0">
+          <div className="col-12">
+            <label className="text-label">Keterangan</label>
+            <div className="p-inputgroup">
+              <InputTextarea
+                value={
+                  currentItem !== null ? `${currentItem.area_pen_ket}` : ""
+                }
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    area_pen_ket: e.target.value,
+                  })
+                }
+                placeholder="Masukan Keterangan"
+              />
+            </div>
           </div>
         </div>
       </Dialog>

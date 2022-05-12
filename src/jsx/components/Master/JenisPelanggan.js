@@ -15,12 +15,11 @@ import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 
 const data = {
-    id: 0,
-    jpel_code: "",
-    jpel_name: "",
-    jpel_ket: "",
+  id: 0,
+  jpel_code: "",
+  jpel_name: "",
+  jpel_ket: "",
 };
-
 
 const JenisPelanggan = () => {
   const [jenisPel, setJenisPel] = useState(null);
@@ -43,7 +42,6 @@ const JenisPelanggan = () => {
     getJenisPel();
     initFilters1();
   }, []);
-
 
   const getJenisPel = async (isUpdate = false) => {
     setLoading(true);
@@ -335,7 +333,6 @@ const JenisPelanggan = () => {
     );
   };
 
-
   const template2 = {
     layout: "RowsPerPageDropdown CurrentPageReport PrevPageLink NextPageLink",
     RowsPerPageDropdown: (options) => {
@@ -454,49 +451,46 @@ const JenisPelanggan = () => {
           setDisplayData(false);
         }}
       >
-        <div className="col-12">
-          <label className="text-label">Kode</label>
-          <div className="p-inputgroup">
-            <InputText
-              value={
-                currentItem !== null ? `${currentItem.jpel_code}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({...currentItem, jpel_code: e.target.value})
-              }
-              placeholder="Masukan Kode"
-            
-            />
+        <div className="row mr-0 ml-0">
+          <div className="col-6">
+            <label className="text-label">Kode</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={currentItem !== null ? `${currentItem.jpel_code}` : ""}
+                onChange={(e) =>
+                  setCurrentItem({ ...currentItem, jpel_code: e.target.value })
+                }
+                placeholder="Masukan Kode"
+              />
+            </div>
+          </div>
+
+          <div className="col-6">
+            <label className="text-label">Nama</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={currentItem !== null ? `${currentItem.jpel_name}` : ""}
+                onChange={(e) =>
+                  setCurrentItem({ ...currentItem, jpel_name: e.target.value })
+                }
+                placeholder="Masukan Nama Akun"
+              />
+            </div>
           </div>
         </div>
 
-        <div className="col-12">
-          <label className="text-label">Nama</label>
-          <div className="p-inputgroup">
-            <InputText
-              value={
-                currentItem !== null ? `${currentItem.jpel_name}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({...currentItem, jpel_name: e.target.value})
-              }
-              placeholder="Masukan Nama Akun"
-            />
-          </div>
-        </div>
-
-        <div className="col-12">
-          <label className="text-label">Keterangan</label>
-          <div className="p-inputgroup">
-            <InputTextarea
-              value={
-                currentItem !== null ? `${currentItem.jpel_ket}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({...currentItem, jpel_ket: e.target.value})
-              }
-              placeholder="Masukan Keterangan"
-            />
+        <div className="row mr-0 ml-0">
+          <div className="col-12">
+            <label className="text-label">Keterangan</label>
+            <div className="p-inputgroup">
+              <InputTextarea
+                value={currentItem !== null ? `${currentItem.jpel_ket}` : ""}
+                onChange={(e) =>
+                  setCurrentItem({ ...currentItem, jpel_ket: e.target.value })
+                }
+                placeholder="Masukan Keterangan"
+              />
+            </div>
           </div>
         </div>
       </Dialog>

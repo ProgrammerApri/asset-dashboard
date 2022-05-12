@@ -78,6 +78,7 @@ const Customer = () => {
   const [subArea, setSubArea] = useState(null);
   const [setup, setSetup] = useState(null);
   const [account, setAccount] = useState(null);
+  const [accU, setAcc] = useState(null);
   const [company, setComp] = useState(null);
   const [currency, setCurrency] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -105,6 +106,7 @@ const Customer = () => {
     getAR();
     getSetup();
     getComp();
+    getAcc();
     initFilters1();
   }, []);
 
@@ -189,10 +191,43 @@ const Customer = () => {
       console.log(response);
       if (response.status) {
         const { data } = response;
+        let filt = [];
+        data.forEach((elem) => {
+          if (elem.account.kat_code === 3) {
+            filt.push(elem.account);
+          }
+        });
         console.log(data);
-        setAccount(data);
+        setAccount(filt);
       }
     } catch (error) {}
+    getCustomer();
+  };
+
+  const getAcc = async () => {
+    setLoading(true);
+    const config = {
+      ...endpoints.account,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        let filt = [];
+        data.forEach((elem) => {
+          if (elem.account.kat_code === 5) {
+            filt.push(elem.account);
+          }
+        });
+        console.log(data);
+        setAcc(filt);
+      }
+    } catch (error) {}
+    getCustomer();
   };
 
   const getComp = async () => {
@@ -487,7 +522,7 @@ const Customer = () => {
   const onClick = () => {
     setDisplayData(true);
     setCurrentItem();
-    setActive(0)
+    setActive(0);
 
     if (position) {
       setPosition(position);
@@ -704,18 +739,28 @@ const Customer = () => {
   const gl = (value) => {
     let gl = {};
     account.forEach((element) => {
-      if (value === element.account.id) {
+      if (value === element.id) {
         gl = element;
       }
     });
     return gl;
   };
 
+  const um = (value) => {
+    let um = {};
+    accU.forEach((element) => {
+      if (value === element.id) {
+        um = element;
+      }
+    });
+    return um;
+  };
+
   const glTemplate = (option) => {
     return (
       <div>
         {option !== null
-          ? `${option.account.acc_name} - (${option.account.acc_code})`
+          ? `${option.acc_name} - (${option.acc_code})`
           : ""}
       </div>
     );
@@ -726,7 +771,7 @@ const Customer = () => {
       return (
         <div>
           {option !== null
-            ? `${option.account.acc_name} - (${option.account.acc_code})`
+            ? `${option.acc_name} - (${option.acc_code})`
             : ""}
         </div>
       );
@@ -820,7 +865,7 @@ const Customer = () => {
           <Card>
             <Card.Body className="p-0">
               <Row className="align-center">
-              <div className="ml-3 mt-1">
+                <div className="ml-3 mt-1">
                   <CircleProgress
                     percent={50}
                     colors={"#7A93C3"}
@@ -866,7 +911,7 @@ const Customer = () => {
                 </div>
                 <div className="col-8 mt-4">
                   <span className="fs-13 text-black font-w600 mb-0">
-                      Piutang Jatuh Tempo <b>Belum Jatuh Tempo</b>
+                    Piutang Jatuh Tempo <b>Belum Jatuh Tempo</b>
                   </span>
                   <h4 className="fs-140 text-black font-w600 mt-1">
                     <b>Rp. </b>
@@ -881,7 +926,7 @@ const Customer = () => {
           <Card>
             <Card.Body className="p-0">
               <Row className="align-center">
-              <div className="ml-3 mt-1">
+                <div className="ml-3 mt-1">
                   <CircleProgress
                     percent={50}
                     colors={"#A79AFD"}
@@ -1342,6 +1387,9 @@ const Customer = () => {
                     disabled={company && !company.multi_currency}
                   />
                 </div>
+                <small className="text-blue">
+                  *Aktifkan Multi Currency Pada Setup Perusahaan Terlebih Dahulu
+                </small>
               </div>
 
               <div className="col-6">
@@ -1418,7 +1466,7 @@ const Customer = () => {
                         ...currentItem,
                         customer: {
                           ...currentItem.customer,
-                          cus_gl: e.value?.account?.id ?? null,
+                          cus_gl: e.value?.id ?? null,
                         },
                       });
                     }}
@@ -1442,17 +1490,17 @@ const Customer = () => {
                     value={
                       currentItem !== null &&
                       currentItem.customer.cus_uang_muka !== null
-                        ? gl(currentItem.customer.cus_uang_muka)
+                        ? um(currentItem.customer.cus_uang_muka)
                         : null
                     }
-                    options={account}
+                    options={accU}
                     onChange={(e) => {
                       console.log(e.value);
                       setCurrentItem({
                         ...currentItem,
                         customer: {
                           ...currentItem.customer,
-                          cus_uang_muka: e.value?.account?.id ?? null,
+                          cus_uang_muka: e.value?.id ?? null,
                         },
                       });
                     }}

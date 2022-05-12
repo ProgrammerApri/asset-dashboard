@@ -16,12 +16,11 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { classNames } from "primereact/utils";
 
 const data = {
-    id: 1,
-    proj_code: "",
-    proj_name: "",
-    proj_ket: "",
+  id: 1,
+  proj_code: "",
+  proj_name: "",
+  proj_ket: "",
 };
-
 
 const Project = () => {
   const [project, setProject] = useState(null);
@@ -44,7 +43,6 @@ const Project = () => {
     getProject();
     initFilters1();
   }, []);
-
 
   const getProject = async (isUpdate = false) => {
     setLoading(true);
@@ -336,7 +334,6 @@ const Project = () => {
     );
   };
 
-
   const template2 = {
     layout: "RowsPerPageDropdown CurrentPageReport PrevPageLink NextPageLink",
     RowsPerPageDropdown: (options) => {
@@ -455,49 +452,46 @@ const Project = () => {
           setDisplayData(false);
         }}
       >
-        <div className="col-12">
-          <label className="text-label">Kode</label>
-          <div className="p-inputgroup">
-            <InputText
-              value={
-                currentItem !== null ? `${currentItem.proj_code}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({...currentItem, proj_code: e.target.value})
-              }
-              placeholder="Masukan Kode"
-            
-            />
+        <div className="row ml-0 mt-0">
+          <div className="col-6">
+            <label className="text-label">Kode</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={currentItem !== null ? `${currentItem.proj_code}` : ""}
+                onChange={(e) =>
+                  setCurrentItem({ ...currentItem, proj_code: e.target.value })
+                }
+                placeholder="Masukan Kode"
+              />
+            </div>
+          </div>
+
+          <div className="col-6">
+            <label className="text-label">Nama</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={currentItem !== null ? `${currentItem.proj_name}` : ""}
+                onChange={(e) =>
+                  setCurrentItem({ ...currentItem, proj_name: e.target.value })
+                }
+                placeholder="Masukan Nama Akun"
+              />
+            </div>
           </div>
         </div>
 
-        <div className="col-12">
-          <label className="text-label">Nama</label>
-          <div className="p-inputgroup">
-            <InputText
-              value={
-                currentItem !== null ? `${currentItem.proj_name}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({...currentItem, proj_name: e.target.value})
-              }
-              placeholder="Masukan Nama Akun"
-            />
-          </div>
-        </div>
-
-        <div className="col-12">
-          <label className="text-label">Keterangan</label>
-          <div className="p-inputgroup">
-            <InputTextarea
-              value={
-                currentItem !== null ? `${currentItem.proj_ket}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({...currentItem, proj_ket: e.target.value})
-              }
-              placeholder="Masukan Keterangan"
-            />
+        <div className="row ml-0 mt-0">
+          <div className="col-12">
+            <label className="text-label">Keterangan</label>
+            <div className="p-inputgroup">
+              <InputTextarea
+                value={currentItem !== null ? `${currentItem.proj_ket}` : ""}
+                onChange={(e) =>
+                  setCurrentItem({ ...currentItem, proj_ket: e.target.value })
+                }
+                placeholder="Masukan Keterangan"
+              />
+            </div>
           </div>
         </div>
       </Dialog>

@@ -646,6 +646,7 @@ const GroupProduk = () => {
         onHide={() => {
           setEdit(false);
           setDisplayData(false);
+          setActive(0)
         }}
       >
         <TabView activeIndex={active} onTabChange={(e) => setActive(e.index)}>

@@ -24,9 +24,9 @@ const data = {
     user_entry: 0,
     user_edit: null,
     entry_date: "",
-    edit_date: ""
+    edit_date: "",
   },
-  
+
   account: {
     id: 0,
     acc_code: "",
@@ -36,8 +36,8 @@ const data = {
     dou_type: "",
     sld_type: "",
     connect: true,
-    sld_awal: 0
-  }
+    sld_awal: 0,
+  },
 };
 
 const Bank = () => {
@@ -509,79 +509,85 @@ const Bank = () => {
           setDisplayData(false);
         }}
       >
-        <div className="col-12">
-          <label className="text-label">Kode Bank</label>
-          <div className="p-inputgroup">
-            <InputText
-              value={
-                currentItem !== null ? `${currentItem.bank.BANK_CODE}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({
-                  ...currentItem,
-                  bank: { ...currentItem.bank, BANK_CODE: e.target.value },
-                })
-              }
-              placeholder="Masukan Kode Bank"
-            />
+        <div className="row ml-0 mt-0">
+          <div className="col-6">
+            <label className="text-label">Kode Bank</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={
+                  currentItem !== null ? `${currentItem.bank.BANK_CODE}` : ""
+                }
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    bank: { ...currentItem.bank, BANK_CODE: e.target.value },
+                  })
+                }
+                placeholder="Masukan Kode Bank"
+              />
+            </div>
+          </div>
+
+          <div className="col-6">
+            <label className="text-label">Nama</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={
+                  currentItem !== null ? `${currentItem.bank.BANK_NAME}` : ""
+                }
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    bank: { ...currentItem.bank, BANK_NAME: e.target.value },
+                  })
+                }
+                placeholder="Masukan Nama Akun"
+              />
+            </div>
           </div>
         </div>
 
-        <div className="col-12">
-          <label className="text-label">Nama</label>
-          <div className="p-inputgroup">
-            <InputText
-              value={
-                currentItem !== null ? `${currentItem.bank.BANK_NAME}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({
-                  ...currentItem,
-                  bank: { ...currentItem.bank, BANK_NAME: e.target.value },
-                })
-              }
-              placeholder="Masukan Nama Akun"
-            />
+        <div className="row ml-0 mt-0">
+          <div className="col-12">
+            <label className="text-label">Keterangan</label>
+            <div className="p-inputgroup">
+              <InputTextarea
+                value={
+                  currentItem !== null ? `${currentItem.bank.BANK_DESC}` : ""
+                }
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    bank: { ...currentItem.bank, BANK_DESC: e.target.value },
+                  })
+                }
+                placeholder="Masukan Keterangan"
+              />
+            </div>
           </div>
         </div>
 
-        <div className="col-12">
-          <label className="text-label">Keterangan</label>
-          <div className="p-inputgroup">
-            <InputTextarea
-              value={
-                currentItem !== null ? `${currentItem.bank.BANK_DESC}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({
-                  ...currentItem,
-                  bank: { ...currentItem.bank, BANK_DESC: e.target.value },
-                })
-              }
-              placeholder="Masukan Keterangan"
-            />
-          </div>
-        </div>
-
-        <div className="col-12">
-          <label className="text-label">GL</label>
-          <div className="p-inputgroup">
-            <Dropdown
-              value={currentItem !== null ? currentItem.account : null}
-              options={account && account}
-              onChange={(e) => {
-                console.log(e.value);
-                setCurrentItem({
-                  ...currentItem,
-                  account: e.value,
-                });
-                // console.log(currentItem.account);
-              }}
-              optionLabel="acc_name"
-              filter
-              filterBy="acc_name"
-              placeholder="Pilih Akun GL"
-            />
+        <div className="row ml-0 mt-0">
+          <div className="col-12">
+            <label className="text-label">Akun Distribusi GL</label>
+            <div className="p-inputgroup">
+              <Dropdown
+                value={currentItem !== null ? currentItem.account : null}
+                options={account && account}
+                onChange={(e) => {
+                  console.log(e.value);
+                  setCurrentItem({
+                    ...currentItem,
+                    account: e.value,
+                  });
+                  // console.log(currentItem.account);
+                }}
+                optionLabel="acc_name"
+                filter
+                filterBy="acc_name"
+                placeholder="Pilih Akun GL"
+              />
+            </div>
           </div>
         </div>
       </Dialog>

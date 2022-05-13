@@ -466,9 +466,9 @@ const Jasa = () => {
                 header={renderHeader}
                 filters={filters1}
                 globalFilterFields={[
-                  "bank.code",
-                  "bank.name",
-                  "bank.desc",
+                  "jasa.code",
+                  "jasa.name",
+                  "jasa.desc",
                   "account.acc_name",
                 ]}
                 emptyMessage="Tidak ada data"

@@ -153,9 +153,47 @@ const InputOrder = ({ onCancel, onSubmit }) => {
     return (
       <>
         {/* Put content body here */}
-        <h6 className="mt-5">
-          <b>Input nya taro sini</b>
-        </h6>
+        <Row>
+            <div className="col-6">
+              <label className="text-label">Kode</label>
+              <div className="p-inputgroup">
+                <InputText
+                  value={
+                    currentItem !== null
+                      ? `${currentItem?.jasa?.code ?? ""}`
+                      : ""
+                  }
+                  onChange={(e) =>
+                    setCurrentItem({
+                      ...currentItem,
+                      jasa: { ...currentItem.jasa, code: e.target.value },
+                    })
+                  }
+                  placeholder="Masukan Kode"
+                />
+              </div>
+            </div>
+
+            <div className="col-6">
+              <label className="text-label">Nama</label>
+              <div className="p-inputgroup">
+                <InputText
+                  value={
+                    currentItem !== null
+                      ? `${currentItem?.jasa?.name ?? ""}`
+                      : ""
+                  }
+                  onChange={(e) =>
+                    setCurrentItem({
+                      ...currentItem,
+                      jasa: { ...currentItem.jasa, name: e.target.value },
+                    })
+                  }
+                  placeholder="Masukan Nama"
+                />
+              </div>
+            </div>
+        </Row>
       </>
     );
   };

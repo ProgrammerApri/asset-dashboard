@@ -4,7 +4,7 @@ import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "react-bootstrap";
-import { Row, Col, Card } from "react-bootstrap";
+import { Row, Col, Card, Badge } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { Dialog } from "primereact/dialog";
@@ -13,16 +13,31 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
+import { InputNumber } from "primereact/inputnumber";
+import { Checkbox } from "primereact/checkbox";
+import { RadioButton } from "primereact/radiobutton";
+import { SelectButton } from "primereact/selectbutton";
+import { MultiSelect } from "primereact/multiselect";
 
 const data = {
-  id: 1,
-  code: "",
-  name: "",
-  nilai: "",
+  id: null,
+  type: null,
+  name: null,
+  nilai: null,
+  cutting: null,
+  acc_sls_fax: null,
+  acc_pur_fax: null,
+  combined: null,
 };
+
+const type = [
+  { name: "Tunggal", code: "T" },
+  { name: "Ganda", code: "G" },
+];
 
 const Pajak = () => {
   const [pajak, setPajak] = useState(null);
+  const [account, setAccount] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
@@ -40,6 +55,7 @@ const Pajak = () => {
 
   useEffect(() => {
     getPajak();
+    getAccount();
     initFilters1();
   }, []);
 
@@ -69,14 +85,43 @@ const Pajak = () => {
     }
   };
 
+  const getAccount = async () => {
+    setLoading(true);
+    const config = {
+      ...endpoints.account,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        let filt = [];
+        data.forEach((elem) => {
+          if (elem.account.kat_code === 5) {
+            filt.push(elem.account);
+          }
+        });
+        console.log(data);
+        setAccount(filt);
+      }
+    } catch (error) {}
+  };
+
   const editPajak = async () => {
     const config = {
       ...endpoints.editPajak,
       endpoint: endpoints.editPajak.endpoint + currentItem.id,
       data: {
-        code: currentItem.code,
+        type: currentItem.type,
         name: currentItem.name,
         nilai: currentItem.nilai,
+        cutting: currentItem.cutting,
+        acc_sls_fax: currentItem.account.id,
+        acc_pur_fax: currentItem.account.id,
+        combined: currentItem.combined,
       },
     };
     console.log(config.data);
@@ -114,9 +159,13 @@ const Pajak = () => {
     const config = {
       ...endpoints.addPajak,
       data: {
-        code: currentItem.code,
+        type: currentItem.type,
         name: currentItem.name,
         nilai: currentItem.nilai,
+        cutting: currentItem.cutting,
+        acc_sls_fax: currentItem.id,
+        acc_pur_fax: currentItem.id,
+        combined: currentItem.combined,
       },
     };
     console.log(config.data);
@@ -139,17 +188,6 @@ const Pajak = () => {
       }
     } catch (error) {
       console.log(error);
-      if (error.status === 400) {
-        setTimeout(() => {
-          setUpdate(false);
-          toast.current.show({
-            severity: "error",
-            summary: "Gagal",
-            detail: `Kode ${currentItem.code} Sudah Digunakan`,
-            life: 3000,
-          });
-        }, 500);
-      } else {
         setTimeout(() => {
           setUpdate(false);
           toast.current.show({
@@ -159,7 +197,7 @@ const Pajak = () => {
             life: 3000,
           });
         }, 500);
-      }
+      
     }
   };
 
@@ -379,6 +417,36 @@ const Pajak = () => {
     setRows2(event.rows);
   };
 
+  const acc = (value) => {
+    let acc = {};
+    account.forEach((element) => {
+      if (value === element.id) {
+        acc = element;
+      }
+    });
+    return acc;
+  };
+
+  const glTemplate = (option) => {
+    return (
+      <div>
+        {option !== null ? `${option.acc_name} - (${option.acc_code})` : ""}
+      </div>
+    );
+  };
+
+  const clear = (option, props) => {
+    if (option) {
+      return (
+        <div>
+          {option !== null ? `${option.acc_name} - (${option.acc_code})` : ""}
+        </div>
+      );
+    }
+
+    return <span>{props.placeholder}</span>;
+  };
+
   return (
     <>
       <Toast ref={toast} />
@@ -395,7 +463,7 @@ const Pajak = () => {
                 rowHover
                 header={renderHeader}
                 filters={filters1}
-                globalFilterFields={["code", "name", "nilai"]}
+                globalFilterFields={["name", "nilai"]}
                 emptyMessage="Tidak ada data"
                 paginator
                 paginatorTemplate={template2}
@@ -405,22 +473,68 @@ const Pajak = () => {
                 paginatorClassName="justify-content-end mt-3"
               >
                 <Column
-                  header="Kode"
-                  style={{
-                    minWidth: "8rem",
-                  }}
-                  field={(e) => e.code}
-                  body={loading && <Skeleton />}
-                />
-                <Column
                   header="Nama"
-                  field={(e) => e.name}
+                  field={(e) => e?.name ?? ""}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Nilai"
-                  field={(e) => e.nilai}
+                  header="Nilai (%)"
+                  field={(e) => e?.nilai ?? ""}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Tipe Pajak"
+                  field={(e) => e?.type ?? ""}
+                  style={{ minWidth: "8rem" }}
+                  body={(e) =>
+                    loading ? (
+                      <Skeleton />
+                    ) : (
+                      <div>
+                        {e.type === "T" ? (
+                          <Badge variant="success light">
+                            <i className="bx bxs-circle text-success mr-1"></i>{" "}
+                            Tunggal
+                          </Badge>
+                        ) : (
+                          <Badge variant="info light">
+                            <i className="bx bxs-circle text-info mr-1"></i>{" "}
+                            Ganda
+                          </Badge>
+                        )}
+                      </div>
+                    )
+                  }
+                />
+                <Column
+                  header="Potongan"
+                  field={(e) => e?.cutting ?? ""}
+                  style={{ minWidth: "8rem" }}
+                  body={(e) =>
+                    loading ? (
+                      <Skeleton />
+                    ) : (
+                      <div>
+                        {e.cutting === false ? (
+                          <Badge variant="danger light">
+                            <i className="bx bxs-circle text-danger mr-1"></i>{" "}
+                            Tidak Ada Potongan
+                          </Badge>
+                        ) : (
+                          <Badge variant="info light">
+                            <i className="bx bxs-circle text-info mr-1"></i>{" "}
+                            Potongan
+                          </Badge>
+                        )}
+                      </div>
+                    )
+                  }
+                />
+                <Column
+                  header="Gabungan Dari"
+                  field={(e) => e?.combined ?? ""}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
@@ -447,46 +561,217 @@ const Pajak = () => {
           setDisplayData(false);
         }}
       >
-        <div className="row mr-0 mt-0">
-          <div className="col-4">
-            <label className="text-label">Kode</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={currentItem !== null ? `${currentItem.code}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, code: e.target.value })
-                }
-                placeholder="Masukan Kode Pajak"
-              />
-            </div>
-          </div>
-
-          <div className="col-4">
-            <label className="text-label">Nama</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={currentItem !== null ? `${currentItem.name}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, name: e.target.value })
-                }
-                placeholder="Masukan Nama Pajak"
-              />
-            </div>
-          </div>
-
-          <div className="col-4">
-            <label className="text-label">Nilai</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={currentItem !== null ? `${currentItem.nilai}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, nilai: e.target.value })
-                }
-                placeholder="Masukan Nilai"
-              />
-            </div>
+        <div className="col-12 mb-2">
+          <label className="text-label">Pajak</label>
+          <div className="p-inputgroup">
+            <SelectButton
+              value={
+                currentItem !== null && currentItem.type !== ""
+                  ? currentItem.type === "T"
+                    ? { name: "Tunggal", code: "T" }
+                    : { name: "Ganda", code: "G" }
+                  : null
+              }
+              options={type}
+              onChange={(e) =>
+                setCurrentItem({ ...currentItem, type: e.value.code })
+              }
+              optionLabel="name"
+            />
           </div>
         </div>
+
+        {currentItem !== null && currentItem.type === "T" ? (
+          // currentItem.type === "T" ? (
+            <>
+              <div className="row ml-0 mt-0">
+                <div className="col-6">
+                  <label className="text-label">Nama Pajak</label>
+                  <div className="p-inputgroup">
+                    <InputText
+                      value={currentItem !== null ? `${currentItem?.name ?? ""}` : ""}
+                      onChange={(e) =>
+                        setCurrentItem({ ...currentItem, name: e.target.value })
+                      }
+                      placeholder="Masukan Nama Pajak"
+                    />
+                  </div>
+                </div>
+
+                <div className="col-5">
+                  <label className="text-label">Nilai</label>
+                  <div className="p-inputgroup">
+                    <InputNumber
+                      value={currentItem !== null ? `${currentItem?.nilai ?? ""}` : ""}
+                      onChange={(e) =>
+                        setCurrentItem({ ...currentItem, nilai: e.value })
+                      }
+                      placeholder="Masukan Nilai"
+                    />
+                    <span className="fs-14 text-black font-w600 ml-2 mt-3">
+                      %
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="row ml-0 mt-0">
+                <div className="col-12 mb-2">
+                  <label className="mt-2" htmlFor="binary">
+                    {"Pemotongan"}
+                  </label>
+                  <Checkbox
+                    className="mt-0 ml-5"
+                    inputId="binary"
+                    checked={currentItem ? currentItem.cutting : false}
+                    onChange={(e) =>
+                      setCurrentItem({ ...currentItem, cutting: e.checked
+                      })
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="row ml-0 mt-0">
+                <div className="col-6">
+                  <label className="text-label">Akun Pajak Pembelian</label>
+                  <div className="p-inputgroup">
+                    <Dropdown
+                      value={
+                        currentItem !== null &&
+                        currentItem.acc_sls_fax !== null
+                          ? acc(currentItem.acc_sls_fax)
+                          : null
+                      }
+                      options={account}
+                      onChange={(e) => {
+                        console.log(e.value);
+                        setCurrentItem({
+                            ...currentItem,
+                            acc_sls_fax: e.target?.value?.id ?? null,
+                        });
+                      }}
+                      optionLabel="account.acc_name"
+                      valueTemplate={clear}
+                      itemTemplate={glTemplate}
+                      filter
+                      filterBy="account.acc_name"
+                      placeholder="Pilih Ppn Masukan"
+                    />
+                  </div>
+                </div>
+
+                <div className="col-6">
+                  <label className="text-label">Akun Pajak Penjualan</label>
+                  <div className="p-inputgroup">
+                    <Dropdown
+                      value={
+                        currentItem !== null &&
+                        currentItem.acc_pur_fax !== null
+                          ? acc(currentItem.acc_pur_fax)
+                          : null
+                      }
+                      options={account}
+                      onChange={(e) => {
+                        console.log(e.value);
+                        setCurrentItem({
+                            ...currentItem,
+                            acc_pur_fax: e.target?.value?.id ?? null,
+                        });
+                      }}
+                      optionLabel="account.acc_name"
+                      valueTemplate={clear}
+                      itemTemplate={glTemplate}
+                      filter
+                      filterBy="account.acc_name"
+                      placeholder="Pilih Ppn Keluaran"
+                    />
+                  </div>
+                </div>
+              </div>
+            </>
+          // ) : null
+        ) : null}
+
+        {currentItem !== null && currentItem.type === "G" ? (
+          // currentItem.type === "G" ? (
+            <>
+              <div className="row ml-0 mt-0">
+                <div className="col-6">
+                  <label className="text-label">Nama Pajak</label>
+                  <div className="p-inputgroup">
+                    <InputText
+                      value={currentItem !== null ? `${currentItem?.name ?? ""}` : ""}
+                      onChange={(e) =>
+                        setCurrentItem({ ...currentItem, name: e.target.value })
+                      }
+                      placeholder="Masukan Nama Pajak"
+                    />
+                  </div>
+                </div>
+
+                <div className="col-6">
+                  <label className="text-label">Penggabungan Dari</label>
+                  <div className="p-inputgroup">
+                    <MultiSelect
+                    className="p-invalid"
+                      value={currentItem !== null ? currentItem.pajak : null}
+                      options={pajak}
+                      onChange={(e) => {
+                        console.log(e.value);
+                        setCurrentItem({
+                          ...currentItem,
+                          pajak: e.value,
+                        });
+                      }}
+                      optionLabel="name"
+                      filter
+                      filterBy="name"
+                      placeholder="Pilih Ppn"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="row ml-0 mt-0">
+                <div className="col-12 mb-2">
+                  <label className="text-label">Detail :</label>
+                </div>
+              </div>
+            </>
+          // ) : null
+        ) : null}
+
+        {/* <div className="row ml-0 mt-0">
+           <label className="text-label ml-2">Pajak</label>
+          <div className="col-12 field-radiobutton">
+            <RadioButton
+            className="mb-0"
+              inputId="binary"
+              // checked={currentItem ? currentItem.pajak.pemotongan : false}
+              onChange={(e) =>
+                setCurrentItem({
+                  // ...currentItem,
+                  // pajak: { ...currentItem.pajak, pemotongan: e.checked },
+                })
+              }
+            />
+            <label className="ml-2 mt-2">Tunggal</label>
+
+            <RadioButton
+            className="mb-0 ml-8"
+              inputId="binary"
+              // checked={currentItem ? currentItem.pajak.pemotongan : false}
+              onChange={(e) =>
+                setCurrentItem({
+                  // ...currentItem,
+                  // pajak: { ...currentItem.pajak, pemotongan: e.checked },
+                })
+              }
+            />
+            <label className="ml-2 mt-2">Ganda</label>
+          </div>
+        </div> */}
       </Dialog>
 
       <Dialog

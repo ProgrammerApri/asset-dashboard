@@ -5,6 +5,7 @@ import PesananPO from "./PO/PesananPembelian";
 import PembelianLangsung from "./PembelianLangsung";
 import Faktur from "./Faktur";
 import RequestPurchase from "./RequestPurchase";
+import PermintaanPO from "./PO";
 
 const TransaksiPembelian = () => {
   return (
@@ -13,7 +14,7 @@ const TransaksiPembelian = () => {
           <RequestPurchase/>
       </TabPanel>
       <TabPanel header="Pembelian Dengan PO">
-        <PesananPO/>
+        <PermintaanPO/>
       </TabPanel>
       <TabPanel header="Pembelian Langsung">
         <PembelianLangsung/>

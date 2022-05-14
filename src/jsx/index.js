@@ -42,7 +42,7 @@ import Lokasi from "./components/Master/Lokasi";
 import RulesPay from "./components/Master/RulesPay";
 import Setup from "./components/Setup";
 import Divisi from "./components/Master/Divisi";
-import PPN from "./components/MasterLainnya/PPN";
+import PPN from "./components/Master/Pajak";
 import SubCustomer from "./components/Master/SubCustomer";
 import SetupKhusus from "./components/Master/SetupKhusus";
 import Mitra from "./components/Mitra/Mitra";
@@ -53,6 +53,8 @@ import Satuan from "./components/Satuan";
 import Master from "./components/Master";
 import MasterLainnya from "./components/MasterLainnya";
 import JenisPelanggan from "./components/Master/JenisPelanggan";
+import Pajak from "./components/Master/Pajak";
+import Jasa from "./components/Master/Jasa";
 
 const Markup = ({ width }) => {
   const routes = [
@@ -86,6 +88,8 @@ const Markup = ({ width }) => {
     { url: "satuan", component: Satuan },
     { url: "produk", component: Produk },
     { url: "group-produk", component: GroupProduk },
+    { url: "pajak", component: Pajak },
+    { url: "jasa", component: Jasa },
 
 
     // Report

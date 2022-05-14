@@ -18,7 +18,7 @@ import { Divider } from "@material-ui/core";
 
 const data = {};
 
-const PesananPO = () => {
+const PesananPO = ({ onAdd }) => {
   const [po, setPO] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
@@ -62,7 +62,7 @@ const PesananPO = () => {
     } else {
       setTimeout(() => {
         setLoading(false);
-      }, 1500);
+      }, 500);
     }
   };
 
@@ -309,14 +309,7 @@ const PesananPO = () => {
             placeholder="Cari disini"
           />
         </span>
-        <Button
-          variant="primary"
-          onClick={() => {
-            setEdit(false);
-            setCurrentItem(data);
-            setDisplayData(true);
-          }}
-        >
+        <Button variant="primary" onClick={onAdd}>
           Tambah{" "}
           <span className="btn-icon-right">
             <i class="bx bx-plus"></i>
@@ -437,7 +430,11 @@ const PesananPO = () => {
       </Row>
 
       <Dialog
-        header={isEdit ? "Edit Pesanan Pembelian (PO)" : "Tambah Pesanan Pembelian (PO)"}
+        header={
+          isEdit
+            ? "Edit Pesanan Pembelian (PO)"
+            : "Tambah Pesanan Pembelian (PO)"
+        }
         visible={displayData}
         style={{ width: "50vw" }}
         footer={renderFooter("displayData")}
@@ -445,9 +442,7 @@ const PesananPO = () => {
           setEdit(false);
           setDisplayData(false);
         }}
-      >
-        
-      </Dialog>
+      ></Dialog>
 
       <Dialog
         header={"Hapus Data"}

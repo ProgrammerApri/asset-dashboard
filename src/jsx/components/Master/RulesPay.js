@@ -17,12 +17,11 @@ import { classNames } from "primereact/utils";
 import { InputNumber } from "primereact/inputnumber";
 
 const data = {
-    id: 1,
-    name: "",
-    day: 0,
-    ket: "",
+  id: 1,
+  name: "",
+  day: 0,
+  ket: "",
 };
-
 
 const RulesPay = () => {
   const [rules_pay, setRulesPay] = useState(null);
@@ -45,7 +44,6 @@ const RulesPay = () => {
     getRulesPay();
     initFilters1();
   }, []);
-
 
   const getRulesPay = async (isUpdate = false) => {
     setLoading(true);
@@ -337,7 +335,6 @@ const RulesPay = () => {
     );
   };
 
-
   const template2 = {
     layout: "RowsPerPageDropdown CurrentPageReport PrevPageLink NextPageLink",
     RowsPerPageDropdown: (options) => {
@@ -454,49 +451,47 @@ const RulesPay = () => {
           setDisplayData(false);
         }}
       >
+        <div className="row mr-0 mt-0">
+          <div className="col-6">
+            <label className="text-label">Nama</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={currentItem !== null ? `${currentItem.name}` : ""}
+                onChange={(e) =>
+                  setCurrentItem({ ...currentItem, name: e.target.value })
+                }
+                placeholder="Masukan Nama"
+              />
+            </div>
+          </div>
 
-        <div className="col-12">
-          <label className="text-label">Nama</label>
-          <div className="p-inputgroup">
-            <InputText
-              value={
-                currentItem !== null ? `${currentItem.name}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({...currentItem, name: e.target.value})
-              }
-              placeholder="Masukan Nama"
-            />
+          <div className="col-6">
+            <label className="text-label">Jumlah Hari</label>
+            <div className="p-inputgroup">
+              <InputNumber
+                value={currentItem !== null ? `${currentItem.day}` : ""}
+                onChange={(e) =>
+                  setCurrentItem({ ...currentItem, day: e.value })
+                }
+                placeholder="Masukan Jumlah Hari"
+                showButtons
+              />
+            </div>
           </div>
         </div>
 
-        <div className="col-12">
-          <label className="text-label">Jumlah Hari</label>
-          <div className="p-inputgroup">
-            <InputNumber
-              value={
-                currentItem !== null ? `${currentItem.day}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({...currentItem, day: e.value})
-              }
-              placeholder="Masukan Jumlah Hari"
-            />
-          </div>
-        </div>
-
-        <div className="col-12">
-          <label className="text-label">Keterangan</label>
-          <div className="p-inputgroup">
-            <InputTextarea
-              value={
-                currentItem !== null ? `${currentItem.ket}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({...currentItem, ket: e.target.value})
-              }
-              placeholder="Masukan Keterangan"
-            />
+        <div className="row mr-0 mt-0">
+          <div className="col-12">
+            <label className="text-label">Keterangan</label>
+            <div className="p-inputgroup">
+              <InputTextarea
+                value={currentItem !== null ? `${currentItem.ket}` : ""}
+                onChange={(e) =>
+                  setCurrentItem({ ...currentItem, ket: e.target.value })
+                }
+                placeholder="Masukan Keterangan"
+              />
+            </div>
           </div>
         </div>
       </Dialog>

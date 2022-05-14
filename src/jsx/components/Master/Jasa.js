@@ -13,19 +13,32 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
-import { classNames } from "primereact/utils";
 
 const data = {
-    id: 1,
-    code: "",
-    name: "",
-    address: "",
-    desc: "",
+  jasa: {
+    id: null,
+    code: null,
+    name: null,
+    desc: null,
+    acc_id: null,
+  },
+
+  account: {
+    id: 0,
+    acc_code: "",
+    acc_name: "",
+    umm_code: null,
+    kat_code: 0,
+    dou_type: "",
+    sld_type: "",
+    connect: true,
+    sld_awal: 0,
+  },
 };
 
-
-const NonStock = () => {
-  const [nonStock, setNonStock] = useState(null);
+const Jasa = () => {
+  const [jasa, setJasa] = useState(null);
+  const [account, setAccount] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
@@ -42,15 +55,42 @@ const NonStock = () => {
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getNonStock();
+    getJasa();
+    getAccount();
     initFilters1();
   }, []);
 
-
-  const getNonStock = async (isUpdate = false) => {
+  const getAccount = async () => {
+    console.log("-------------------");
+    // console.log(currentItem);
     setLoading(true);
     const config = {
-      ...endpoints.noStock,
+      ...endpoints.account,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        // let filt = [];
+        // data.forEach((element) => {
+        //   if (element.account.kat_code === 2 && element.account.connect) {
+        //     filt.push(element.account);
+        //   }
+        // });
+        console.log(data);
+        setAccount(data);
+      }
+    } catch (error) {}
+  };
+
+  const getJasa = async (isUpdate = false) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.jasa,
       data: {},
     };
     console.log(config.data);
@@ -61,7 +101,7 @@ const NonStock = () => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        setNonStock(data);
+        setJasa(data);
       }
     } catch (error) {}
     if (isUpdate) {
@@ -73,14 +113,15 @@ const NonStock = () => {
     }
   };
 
-  const editNonStock = async () => {
+  const editJasa = async () => {
     const config = {
-      ...endpoints.editNonStock,
-      endpoint: endpoints.editNonStock.endpoint + currentItem.id,
+      ...endpoints.editJasa,
+      endpoint: endpoints.editJasa.endpoint + currentItem.jasa.id,
       data: {
-        code: currentItem.code,
-        name: currentItem.name,
-        desc: currentItem.desc,
+        code: currentItem.jasa.code,
+        name: currentItem.jasa.name,
+        desc: currentItem.jasa.desc,
+        acc_id: currentItem.account.account.id,
       },
     };
     console.log(config.data);
@@ -92,7 +133,7 @@ const NonStock = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayData(false);
-          getNonStock(true);
+          getJasa(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -114,13 +155,14 @@ const NonStock = () => {
     }
   };
 
-  const addNonStock = async () => {
+  const addJasa = async () => {
     const config = {
-      ...endpoints.addNonStock,
+      ...endpoints.addJasa,
       data: {
-        code: currentItem.code,
-        name: currentItem.name,
-        desc: currentItem.desc,
+        code: currentItem.jasa.code,
+        name: currentItem.jasa.name,
+        desc: currentItem.jasa.desc,
+        acc_id: currentItem.account.account.id,
       },
     };
     console.log(config.data);
@@ -132,7 +174,7 @@ const NonStock = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayData(false);
-          getNonStock(true);
+          getJasa(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -149,7 +191,7 @@ const NonStock = () => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${currentItem.code} Sudah Digunakan`,
+            detail: `Kode ${currentItem.jasa.code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -167,10 +209,10 @@ const NonStock = () => {
     }
   };
 
-  const delNonStock = async (id) => {
+  const delJasa = async (id) => {
     const config = {
-      ...endpoints.delNonStock,
-      endpoint: endpoints.delNonStock.endpoint + currentItem.id,
+      ...endpoints.delJasa,
+      endpoint: endpoints.delJasa.endpoint + currentItem.jasa.id,
     };
     console.log(config.data);
     let response = null;
@@ -181,7 +223,7 @@ const NonStock = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayDel(false);
-          getNonStock(true);
+          getJasa(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -198,7 +240,7 @@ const NonStock = () => {
         toast.current.show({
           severity: "error",
           summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Project`,
+          detail: `Tidak Dapat Menghapus Data`,
           life: 3000,
         });
       }, 500);
@@ -215,7 +257,7 @@ const NonStock = () => {
             onClick("displayData", data);
             setCurrentItem(data);
           }}
-          className="btn btn-primary shadow btn-xs sharp ml-1"
+          className="btn btn-primary shadow btn-xs sharp ml-2"
         >
           <i className="fa fa-pencil"></i>
         </Link>
@@ -226,7 +268,7 @@ const NonStock = () => {
             setDisplayDel(true);
             setCurrentItem(data);
           }}
-          className="btn btn-danger shadow btn-xs sharp ml-1"
+          className="btn btn-danger shadow btn-xs sharp ml-2"
         >
           <i className="fa fa-trash"></i>
         </Link>
@@ -237,7 +279,6 @@ const NonStock = () => {
 
   const onClick = () => {
     setDisplayData(true);
-    setCurrentItem();
 
     if (position) {
       setPosition(position);
@@ -247,10 +288,10 @@ const NonStock = () => {
   const onSubmit = () => {
     if (isEdit) {
       setUpdate(true);
-      editNonStock();
+      editJasa();
     } else {
       setUpdate(true);
-      addNonStock();
+      addJasa();
     }
   };
 
@@ -273,19 +314,20 @@ const NonStock = () => {
     );
   };
 
-  const renderFooterDel = () => {
+  const renderFooterDel = (kode) => {
     return (
       <div>
         <PButton
           label="Batal"
           onClick={() => setDisplayDel(false)}
-          className="p-button-text btn-primary"
+          className="p-button-text btn-s btn-primary"
         />
         <PButton
           label="Hapus"
+          className="p-button btn-s btn-primary"
           icon="pi pi-trash"
           onClick={() => {
-            delNonStock();
+            delJasa();
           }}
           autoFocus
           loading={update}
@@ -337,7 +379,6 @@ const NonStock = () => {
     );
   };
 
-
   const template2 = {
     layout: "RowsPerPageDropdown CurrentPageReport PrevPageLink NextPageLink",
     RowsPerPageDropdown: (options) => {
@@ -384,6 +425,30 @@ const NonStock = () => {
     setRows2(event.rows);
   };
 
+  const glTemplate = (option) => {
+    return (
+      <div>
+        {option !== null
+          ? `${option.account.acc_name} - (${option.account.acc_code})`
+          : ""}
+      </div>
+    );
+  };
+
+  const clear = (option, props) => {
+    if (option) {
+      return (
+        <div>
+          {option !== null
+            ? `${option.account.acc_name} - (${option.account.acc_code})`
+            : ""}
+        </div>
+      );
+    }
+
+    return <span>{props.placeholder}</span>;
+  };
+
   return (
     <>
       <Toast ref={toast} />
@@ -393,7 +458,7 @@ const NonStock = () => {
             <Card.Body>
               <DataTable
                 responsiveLayout="scroll"
-                value={loading ? dummy : nonStock}
+                value={loading ? dummy : jasa}
                 className="display w-150 datatable-wrapper"
                 showGridlines
                 dataKey="id"
@@ -401,9 +466,10 @@ const NonStock = () => {
                 header={renderHeader}
                 filters={filters1}
                 globalFilterFields={[
-                  "groupStock.code",
-                  "groupStock.name",
-                  "groupStock.desc",
+                  "jasa.code",
+                  "jasa.name",
+                  "jasa.desc",
+                  "account.acc_name",
                 ]}
                 emptyMessage="Tidak ada data"
                 paginator
@@ -414,46 +480,28 @@ const NonStock = () => {
                 paginatorClassName="justify-content-end mt-3"
               >
                 <Column
-                  header="Kode"
+                  header="Kode Jasa"
                   style={{
                     minWidth: "8rem",
                   }}
-                  field={(e) => e.code}
+                  field={(e) => e.jasa.code}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Nama"
-                  field={(e) => e.name}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                 <Column
-                  header="Kode Group"
-                  field={(e) => e.name}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                 <Column
-                  header="Spek 1"
-                  field={(e) => e.name}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                 <Column
-                  header="Konversi 1"
-                  field={(e) => e.name}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                 <Column
-                  header="Nilai Konversi 1"
-                  field={(e) => e.name}
+                  header="Nama Jasa"
+                  field={(e) => e.jasa.name}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Kode Account"
-                  field={(e) => e.desc}
+                  header="Akun Distribusi GL"
+                  field={(e) => e.account.acc_name}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Keterangan"
+                  field={(e) => e.jasa.desc}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
@@ -471,7 +519,7 @@ const NonStock = () => {
       </Row>
 
       <Dialog
-        header={isEdit ? "Edit Non Stock" : "Tambah Non Stock"}
+        header={isEdit ? "Edit Jasa" : "Tambah Jasa"}
         visible={displayData}
         style={{ width: "40vw" }}
         footer={renderFooter("displayData")}
@@ -480,49 +528,87 @@ const NonStock = () => {
           setDisplayData(false);
         }}
       >
-        <div className="col-12">
-          <label className="text-label">Kode Group</label>
-          <div className="p-inputgroup">
-            <InputText
-              value={
-                currentItem !== null ? `${currentItem.code}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({...currentItem, code: e.target.value})
-              }
-              placeholder="Masukan Kode Group"
-            
-            />
+        <div className="row ml-0 mt-0">
+          <div className="col-6">
+            <label className="text-label">Kode Jasa</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={
+                  currentItem !== null ? `${currentItem?.jasa?.code ?? ""}` : ""
+                }
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    jasa: { ...currentItem.jasa, code: e.target.value },
+                  })
+                }
+                placeholder="Masukan Kode Jasa"
+              />
+            </div>
+          </div>
+
+          <div className="col-6">
+            <label className="text-label">Nama Jasa</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={
+                  currentItem !== null ? `${currentItem?.jasa?.name ?? ""}` : ""
+                }
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    jasa: { ...currentItem.jasa, name: e.target.value },
+                  })
+                }
+                placeholder="Masukan Nama Jasa"
+              />
+            </div>
           </div>
         </div>
 
-        <div className="col-12">
-          <label className="text-label">Nama Group</label>
-          <div className="p-inputgroup">
-            <InputText
-              value={
-                currentItem !== null ? `${currentItem.name}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({...currentItem, name: e.target.value})
-              }
-              placeholder="Masukan Nama Group"
-            />
+        <div className="row ml-0 mt-0">
+          <div className="col-12">
+            <label className="text-label">Akun Distribusi GL</label>
+            <div className="p-inputgroup">
+              <Dropdown
+                value={currentItem !== null ? currentItem.account : null}
+                options={account}
+                onChange={(e) => {
+                  console.log(e.value);
+                  setCurrentItem({
+                    ...currentItem,
+                    account: e.value,
+                  });
+                }}
+                optionLabel="acc_name"
+                valueTemplate={clear}
+                itemTemplate={glTemplate}
+                filter
+                filterBy="acc_name"
+                placeholder="Pilih Akun Distribusi GL"
+                // showClear
+              />
+            </div>
           </div>
         </div>
 
-        <div className="col-12">
-          <label className="text-label">Keterangan</label>
-          <div className="p-inputgroup">
-            <InputTextarea
-              value={
-                currentItem !== null ? `${currentItem.desc}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({...currentItem, desc: e.target.value})
-              }
-              placeholder="Masukan Keterangan"
-            />
+        <div className="row ml-0 mt-0">
+          <div className="col-12">
+            <label className="text-label">Keterangan</label>
+            <div className="p-inputgroup">
+              <InputTextarea
+                value={
+                  currentItem !== null ? `${currentItem?.jasa?.desc ?? ""}` : ""
+                }
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    jasa: { ...currentItem.jasa, desc: e.target.value },
+                  })
+                }
+                placeholder="Masukan Keterangan"
+              />
+            </div>
           </div>
         </div>
       </Dialog>
@@ -536,10 +622,10 @@ const NonStock = () => {
           setDisplayDel(false);
         }}
       >
-        <div className="ml-3 mr-3">
+        <div className="ml-2 mr-3">
           <i
-            className="pi pi-exclamation-triangle mr-3 align-middle"
-            style={{ fontSize: "2rem" }}
+            className="pi pi-exclamation-triangle mr-2 align-middle"
+            style={{ fontSize: "1rem" }}
           />
           <span>Apakah anda yakin ingin menghapus data ?</span>
         </div>
@@ -548,4 +634,4 @@ const NonStock = () => {
   );
 };
 
-export default NonStock;
+export default Jasa;

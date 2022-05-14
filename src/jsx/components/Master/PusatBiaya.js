@@ -15,11 +15,10 @@ import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 
 const data = {
-    
-    id: 1,
-    ccost_code: "",
-    ccost_name: "",
-    ccost_ket: "",
+  id: 1,
+  ccost_code: "",
+  ccost_name: "",
+  ccost_ket: "",
 };
 
 const PusatBiaya = () => {
@@ -452,46 +451,46 @@ const PusatBiaya = () => {
           setDisplayData(false);
         }}
       >
-        <div className="col-12">
-          <label className="text-label">Kode</label>
-          <div className="p-inputgroup">
-            <InputText
-                value={
-                  currentItem !== null ? `${currentItem.ccost_code}` : ""
+        <div className="row mr-0 mt-0">
+          <div className="col-6">
+            <label className="text-label">Kode</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={currentItem !== null ? `${currentItem.ccost_code}` : ""}
+                onChange={(e) =>
+                  setCurrentItem({ ...currentItem, ccost_code: e.target.value })
                 }
-              onChange={(e) =>
-                setCurrentItem({...currentItem, ccost_code: e.target.value})
-              }
-              placeholder="Masukan Kode"
-            />
+                placeholder="Masukan Kode"
+              />
+            </div>
+          </div>
+
+          <div className="col-6">
+            <label className="text-label">Nama</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={currentItem !== null ? `${currentItem.ccost_name}` : ""}
+                onChange={(e) =>
+                  setCurrentItem({ ...currentItem, ccost_name: e.target.value })
+                }
+                placeholder="Masukan Nama Akun"
+              />
+            </div>
           </div>
         </div>
 
-        <div className="col-12">
-          <label className="text-label">Nama</label>
-          <div className="p-inputgroup">
-            <InputText
-                value={
-                  currentItem !== null ? `${currentItem.ccost_name}` : ""
+        <div className="row mr-0 mt-0">
+          <div className="col-12">
+            <label className="text-label">Keterangan</label>
+            <div className="p-inputgroup">
+              <InputTextarea
+                value={currentItem !== null ? `${currentItem.ccost_ket}` : ""}
+                onChange={(e) =>
+                  setCurrentItem({ ...currentItem, ccost_ket: e.target.value })
                 }
-              onChange={(e) => setCurrentItem({...currentItem, ccost_name: e.target.value})
-              }
-              placeholder="Masukan Nama Akun"
-            />
-          </div>
-        </div>
-
-        <div className="col-12">
-          <label className="text-label">Keterangan</label>
-          <div className="p-inputgroup">
-            <InputTextarea
-                value={
-                  currentItem !== null ? `${currentItem.ccost_ket}` : ""
-                }
-              onChange={(e) => setCurrentItem({...currentItem, ccost_ket: e.target.value})
-              }
-              placeholder="Masukan Keterangan"
-            />
+                placeholder="Masukan Keterangan"
+              />
+            </div>
           </div>
         </div>
       </Dialog>

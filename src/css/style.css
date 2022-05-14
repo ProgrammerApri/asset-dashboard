@@ -158,9 +158,9 @@ textarea.p-inputtext {
   height: 120px;
 }
 
-.p-inputgroup > .p-component, .p-inputgroup > .p-inputwrapper > .p-inputtext, .p-inputgroup > .p-float-label > .p-component {
+/* .p-inputgroup > .p-component, .p-inputgroup > .p-inputwrapper > .p-inputtext, .p-inputgroup > .p-float-label > .p-component {
   border-radius: 6px;
-}
+} */
 
 .p-dropdown:not(.p-disabled).p-focus {
   box-shadow: 0 0 0 0 #c7d2fe;

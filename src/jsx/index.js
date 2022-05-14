@@ -31,7 +31,6 @@ import Akun from "./components/Master/Akun";
 import PusatBiaya from "./components/Master/PusatBiaya";
 import Project from "./components/Master/Project";
 import Bank from "./components/Master/Bank";
-import JenisPelanggan from "./components/Master/JenisPelanggan";
 import JenisPemasok from "./components/Master/JenisPemasok";
 import Salesman from "./components/Master/Salesman";
 import AreaPenjualan from "./components/Master/AreaPenjualan";
@@ -53,6 +52,7 @@ import GroupProduk from "./components/Master/GroupProduk";
 import Satuan from "./components/Satuan";
 import Master from "./components/Master";
 import MasterLainnya from "./components/MasterLainnya";
+import JenisPelanggan from "./components/Master/JenisPelanggan";
 
 const Markup = ({ width }) => {
   const routes = [

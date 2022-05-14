@@ -18,6 +18,7 @@ import { Divider } from "@material-ui/core";
 import { TabPanel, TabView } from "primereact/tabview";
 import { Badge } from "primereact/badge";
 import CircleProgress from "../CircleProgress/circleProgress";
+import DataJenisPelanggan from "../Master/JenisPelanggan/DataJenisPelanggan";
 
 const data = {
   customer: {
@@ -94,6 +95,8 @@ const Customer = () => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const [active, setActive] = useState(0);
+  const [showJenisPelanggan, setShowJenisPelanggan] = useState(false);
+  const [doubleClick, setDoubleClick] = useState(false);
 
   const dummy = Array.from({ length: 10 });
 
@@ -759,9 +762,7 @@ const Customer = () => {
   const glTemplate = (option) => {
     return (
       <div>
-        {option !== null
-          ? `${option.acc_name} - (${option.acc_code})`
-          : ""}
+        {option !== null ? `${option.acc_name} - (${option.acc_code})` : ""}
       </div>
     );
   };
@@ -770,9 +771,7 @@ const Customer = () => {
     if (option) {
       return (
         <div>
-          {option !== null
-            ? `${option.acc_name} - (${option.acc_code})`
-            : ""}
+          {option !== null ? `${option.acc_name} - (${option.acc_code})` : ""}
         </div>
       );
     }
@@ -1130,6 +1129,13 @@ const Customer = () => {
                     filterBy="jpel_name"
                     placeholder="Pilih Jenis Pelanggan"
                   />
+                  <PButton
+                    onClick={() => {
+                      setShowJenisPelanggan(true);
+                    }}
+                  >
+                    <i class="bx bx-food-menu"></i>
+                  </PButton>
                 </div>
               </div>
 
@@ -1557,6 +1563,30 @@ const Customer = () => {
           <span>Apakah anda yakin ingin menghapus data ?</span>
         </div>
       </Dialog>
+
+      <DataJenisPelanggan
+        data={jpel}
+        loading={false}
+        popUp={true}
+        show={showJenisPelanggan}
+        onHide={()=> setShowJenisPelanggan(false)}
+        onSuccessInput={() => getJpel()}
+        onRowSelect={(e)=>{
+          if (doubleClick) {
+            setShowJenisPelanggan(false);
+            setCurrentItem({
+              ...currentItem,
+              jpel: e.data,
+            });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
     </>
   );
 };

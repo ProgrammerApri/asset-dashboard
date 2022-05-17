@@ -6,10 +6,16 @@ import InputOrder from "./InputOrder";
 const RequestPurchase = () => {
   const [active, setActive] = useState(0);
   const [view, setView] = useState([
-    <PermintaanPembelian onAdd={() => setActive(1)} />,
-    <InputOrder 
-      onCancel={() => setActive(0)} 
-      onSubmit={() => {}} 
+    <PermintaanPembelian
+      onAdd={() => {
+        setActive(1);
+      }}
+    />,
+    <InputOrder
+      onCancel={() => {
+        setActive(0);
+      }}
+      onSubmit={() => {}}
     />,
   ]);
 

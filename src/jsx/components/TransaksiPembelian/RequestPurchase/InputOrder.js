@@ -42,7 +42,13 @@ const InputOrder = ({ onCancel, onSubmit }) => {
     },
   ]);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth",
+    });
+  }, []);
 
   // const editPermintaan = async () => {
   //   const config = {

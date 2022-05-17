@@ -42,7 +42,13 @@ const InputPO = ({ onCancel, onSubmit }) => {
     },
   ]);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth",
+    });
+  }, []);
 
   // const editPermintaan = async () => {
   //   const config = {
@@ -902,44 +908,46 @@ const InputPO = ({ onCancel, onSubmit }) => {
             </div>
 
             <div className="col-12">
-                <div className="p-inputgroup">
-                    <label className="text-label mr-7">Sub Total Barang</label>
-                  <InputText
-                    // value={
-                    //   currentItem !== null
-                    //     ? `${currentItem?.jasa?.name ?? ""}`
-                    //     : ""
-                    // }
-                    onChange={(e) =>
-                      setCurrentItem({
-                        // ...currentItem,
-                        // jasa: { ...currentItem.jasa, name: e.target.value },
-                      })
-                    }
-                    placeholder="Sub Total"
-                  />
-                </div>
+              <div className="p-inputgroup">
+                <label className="text-label mr-7">Sub Total Barang</label>
+                <InputText
+                  // value={
+                  //   currentItem !== null
+                  //     ? `${currentItem?.jasa?.name ?? ""}`
+                  //     : ""
+                  // }
+                  onChange={(e) =>
+                    setCurrentItem({
+                      // ...currentItem,
+                      // jasa: { ...currentItem.jasa, name: e.target.value },
+                    })
+                  }
+                  placeholder="Sub Total"
+                />
               </div>
+            </div>
 
-              <div className="col-12">
-                <div className="p-inputgroup">
-                    <label className="text-label mr-2">Diskon Tambahan (%/Rp)</label>
-                  <InputText
-                    // value={
-                    //   currentItem !== null
-                    //     ? `${currentItem?.jasa?.name ?? ""}`
-                    //     : ""
-                    // }
-                    onChange={(e) =>
-                      setCurrentItem({
-                        // ...currentItem,
-                        // jasa: { ...currentItem.jasa, name: e.target.value },
-                      })
-                    }
-                    placeholder="Diskon Tambahan"
-                  />
-                </div>
+            <div className="col-12">
+              <div className="p-inputgroup">
+                <label className="text-label mr-2">
+                  Diskon Tambahan (%/Rp)
+                </label>
+                <InputText
+                  // value={
+                  //   currentItem !== null
+                  //     ? `${currentItem?.jasa?.name ?? ""}`
+                  //     : ""
+                  // }
+                  onChange={(e) =>
+                    setCurrentItem({
+                      // ...currentItem,
+                      // jasa: { ...currentItem.jasa, name: e.target.value },
+                    })
+                  }
+                  placeholder="Diskon Tambahan"
+                />
               </div>
+            </div>
           </div>
         </div>
       </>

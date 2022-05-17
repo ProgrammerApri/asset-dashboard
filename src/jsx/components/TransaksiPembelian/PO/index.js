@@ -9,7 +9,6 @@ const PermintaanPO = () => {
     <PesananPO
       onAdd={() => {
         setActive(1);
-        console.log("uytfuytgjhg");
       }}
     />,
     <InputPO onCancel={() => setActive(0)} onSubmit={() => {}} />,

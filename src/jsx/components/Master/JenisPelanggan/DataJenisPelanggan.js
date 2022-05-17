@@ -225,42 +225,44 @@ const DataJenisPelanggan = ({
     }
   };
 
-  // const delJenisPel = async (id) => {
-  //   const config = {
-  //     ...endpoints.delJenisPel,
-  //     endpoint: endpoints.delJenisPel.endpoint + currentItem.id,
-  //   };
-  //   console.log(config.data);
-  //   let response = null;
-  //   try {
-  //     response = await request(null, config);
-  //     console.log(response);
-  //     if (response.status) {
-  //       setTimeout(() => {
-  //         setLoading(false);
-  //         onSuccessDelete();
-  //         toast.current.show({
-  //           severity: "info",
-  //           summary: "Berhasil",
-  //           detail: "Data Berhasil Diperbarui",
-  //           life: 3000,
-  //         });
-  //       }, 500);
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //     setTimeout(() => {
-  //       onFailedDelete();
-  //       setLoading(false);
-  //       toast.current.show({
-  //         severity: "error",
-  //         summary: "Gagal",
-  //         detail: `Tidak Dapat Menghapus Project`,
-  //         life: 3000,
-  //       });
-  //     }, 500);
-  //   }
-  // };
+  const delJenisPel = async (id) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.delJenisPel,
+      endpoint: endpoints.delJenisPel.endpoint + currentItem.id,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setTimeout(() => {
+          setLoading(false);
+          setShowDelete(false);
+          onSuccessInput();
+          toast.current.show({
+            severity: "info",
+            summary: "Berhasil",
+            detail: "Data Berhasil Diperbarui",
+            life: 3000,
+          });
+        }, 500);
+      }
+    } catch (error) {
+      console.log(error);
+      setTimeout(() => {
+        setLoading(false);
+        setShowDelete(false);
+        toast.current.show({
+          severity: "error",
+          summary: "Gagal",
+          detail: `Tidak Dapat Menghapus Project`,
+          life: 3000,
+        });
+      }, 500);
+    }
+  };
 
   const renderFooter = () => {
     return (
@@ -294,14 +296,17 @@ const DataJenisPelanggan = ({
       <div>
         <PButton
           label="Batal"
-          onClick={() => {}}
+          onClick={() => {
+            setShowDelete(false);
+            setLoading(false);
+          }}
           className="p-button-text btn-primary"
         />
         <PButton
           label="Hapus"
           icon="pi pi-trash"
           onClick={() => {
-            // delJenisPel();
+            delJenisPel();
           }}
           autoFocus
           loading={loading}
@@ -326,7 +331,10 @@ const DataJenisPelanggan = ({
         </Link>
 
         <Link
-          onClick={() => {}}
+          onClick={() => {
+            setCurrentItem(data);
+            setShowDelete(true)
+          }}
           className="btn btn-danger shadow btn-xs sharp ml-1"
         >
           <i className="fa fa-trash"></i>
@@ -467,14 +475,14 @@ const DataJenisPelanggan = ({
           </div>
         </Dialog>
 
-        {/* <Dialog
+        <Dialog
           header={"Hapus Data"}
           visible={showDelete}
           style={{ width: "30vw" }}
-          footer={renderFooterDel("displayDel")}
+          footer={renderFooterDel()}
           onHide={() => {
             setLoading(false);
-            onHideDelete();
+            setShowDelete(false);
           }}
         >
           <div className="ml-3 mr-3">
@@ -484,7 +492,7 @@ const DataJenisPelanggan = ({
             />
             <span>Apakah anda yakin ingin menghapus data ?</span>
           </div>
-        </Dialog> */}
+        </Dialog>
       </>
     );
   };

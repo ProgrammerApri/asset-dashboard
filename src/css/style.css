@@ -286,7 +286,7 @@ textarea.p-inputtext {
   padding: 0;
 }
 
-.p-inputnumber-input {
+.p-inputgroup .p-inputnumber .p-inputnumber-input {
   border-bottom-right-radius: 0 !important;
   border-top-right-radius: 0 !important;
 }

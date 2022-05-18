@@ -14,60 +14,37 @@ import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 
-const data = {
+const def = {
   id: 1,
   ccost_code: "",
   ccost_name: "",
   ccost_ket: "",
 };
 
-const PusatBiaya = () => {
-  const [pusatBiaya, setPusatBiaya] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [update, setUpdate] = useState(false);
-  const [displayData, setDisplayData] = useState(false);
-  const [displayDel, setDisplayDel] = useState(false);
-  const [position, setPosition] = useState("center");
-  const [currentItem, setCurrentItem] = useState(null);
-  const toast = useRef(null);
-  const [filters1, setFilters1] = useState(null);
-  const [globalFilterValue1, setGlobalFilterValue1] = useState("");
-  const [isEdit, setEdit] = useState(false);
+const DataPusatBiaya = ({
+  data,
+  load,
+  popUp = false,
+  show = false,
+  onHide = () => {},
+  onRowSelect,
+  onSuccessInput,
+}) => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+  const [filters1, setFilters1] = useState(null);
+  const [globalFilterValue1, setGlobalFilterValue1] = useState("");
+  const [loading, setLoading] = useState(false);
+  const toast = useRef(null);
+  const [currentItem, setCurrentItem] = useState(def);
+  const [isEdit, setEdit] = useState(def);
+  const [showInput, setShowInput] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
 
-  const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getPusatBiaya();
     initFilters1();
   }, []);
-
-  const getPusatBiaya = async (isUpdate = false) => {
-    setLoading(true);
-    const config = {
-      ...endpoints.pusatBiaya,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setPusatBiaya(data);
-      }
-    } catch (error) {}
-    if (isUpdate) {
-      setLoading(false);
-    } else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1500);
-    }
-  };
 
   const editPusatBiaya = async () => {
     const config = {
@@ -86,9 +63,9 @@ const PusatBiaya = () => {
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setUpdate(false);
-          setDisplayData(false);
-          getPusatBiaya(true);
+          onSuccessInput();
+          setLoading(false);
+          onHideInput();
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -99,7 +76,7 @@ const PusatBiaya = () => {
       }
     } catch (error) {
       setTimeout(() => {
-        setUpdate(false);
+        setLoading(false);
         toast.current.show({
           severity: "error",
           summary: "Gagal",
@@ -126,9 +103,9 @@ const PusatBiaya = () => {
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setUpdate(false);
-          setDisplayData(false);
-          getPusatBiaya(true);
+          onSuccessInput();
+          setLoading(false);
+          onHideInput();
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -141,7 +118,7 @@ const PusatBiaya = () => {
       console.log(error);
       if (error.status === 400) {
         setTimeout(() => {
-          setUpdate(false);
+          setLoading(false);
           toast.current.show({
             severity: "error",
             summary: "Gagal",
@@ -151,7 +128,7 @@ const PusatBiaya = () => {
         }, 500);
       } else {
         setTimeout(() => {
-          setUpdate(false);
+          setLoading(false);
           toast.current.show({
             severity: "error",
             summary: "Gagal",
@@ -175,9 +152,9 @@ const PusatBiaya = () => {
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setUpdate(false);
-          setDisplayDel(false);
-          getPusatBiaya(true);
+          setLoading(false);
+          setShowDelete(false);
+          onSuccessInput();
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -189,8 +166,8 @@ const PusatBiaya = () => {
     } catch (error) {
       console.log(error);
       setTimeout(() => {
-        setUpdate(false);
-        setDisplayDel(false);
+        setLoading(false);
+        setShowDelete(false);
         toast.current.show({
           severity: "error",
           summary: "Gagal",
@@ -208,21 +185,20 @@ const PusatBiaya = () => {
         <Link
           onClick={() => {
             setEdit(true);
-            onClick("displayData", data);
             setCurrentItem(data);
+            setShowInput(true);
           }}
-          className="btn btn-primary shadow btn-xs sharp ml-2"
+          className="btn btn-primary shadow btn-xs sharp ml-1"
         >
           <i className="fa fa-pencil"></i>
         </Link>
 
         <Link
           onClick={() => {
-            setEdit(true);
-            setDisplayDel(true);
             setCurrentItem(data);
+            setShowDelete(true);
           }}
-          className="btn btn-danger shadow btn-xs sharp ml-2"
+          className="btn btn-danger shadow btn-xs sharp ml-1"
         >
           <i className="fa fa-trash"></i>
         </Link>
@@ -231,38 +207,28 @@ const PusatBiaya = () => {
     );
   };
 
-  const onClick = () => {
-    setDisplayData(true);
-
-    if (position) {
-      setPosition(position);
-    }
-  };
-
-  const onSubmit = () => {
-    if (isEdit) {
-      setUpdate(true);
-      editPusatBiaya();
-    } else {
-      setUpdate(true);
-      addPusatBiaya();
-    }
-  };
-
   const renderFooter = () => {
     return (
       <div>
         <PButton
           label="Batal"
-          onClick={() => setDisplayData(false)}
+          onClick={() => {
+            onHideInput();
+          }}
           className="p-button-text btn-primary"
         />
         <PButton
           label="Simpan"
           icon="pi pi-check"
-          onClick={() => onSubmit()}
+          onClick={() => {
+            if (isEdit) {
+              editPusatBiaya();
+            } else {
+              addPusatBiaya();
+            }
+          }}
           autoFocus
-          loading={update}
+          loading={loading}
         />
       </div>
     );
@@ -273,7 +239,10 @@ const PusatBiaya = () => {
       <div>
         <PButton
           label="Batal"
-          onClick={() => setDisplayDel(false)}
+          onClick={() => {
+            setShowDelete(false);
+            setLoading(false);
+          }}
           className="p-button-text btn-s btn-primary"
         />
         <PButton
@@ -284,7 +253,7 @@ const PusatBiaya = () => {
             delPusatBiaya();
           }}
           autoFocus
-          loading={update}
+          loading={loading}
         />
       </div>
     );
@@ -319,9 +288,10 @@ const PusatBiaya = () => {
         <Button
           variant="primary"
           onClick={() => {
+            setShowInput(true);
             setEdit(false);
-            setCurrentItem(data);
-            setDisplayData(true);
+            setLoading(false);
+            setCurrentItem(def);
           }}
         >
           Tambah{" "}
@@ -379,141 +349,182 @@ const PusatBiaya = () => {
     setRows2(event.rows);
   };
 
-  return (
-    <>
-      <Toast ref={toast} />
-      <Row>
-        <Col>
-          <Card>
-            <Card.Body>
-              <DataTable
-                responsiveLayout="scroll"
-                value={loading ? dummy : pusatBiaya}
-                className="display w-150 datatable-wrapper"
-                showGridlines
-                dataKey="id"
-                rowHover
-                header={renderHeader}
-                filters={filters1}
-                globalFilterFields={[
-                  "pusatBiaya.ccost_code",
-                  "pusatBiaya.ccost_name",
-                  "pusatBiaya.ccost_ket",
-                ]}
-                emptyMessage="Tidak ada data"
-                paginator
-                paginatorTemplate={template2}
-                first={first2}
-                rows={rows2}
-                onPage={onCustomPage2}
-                paginatorClassName="justify-content-end mt-3"
-              >
-                <Column
-                  header="Kode"
-                  style={{
-                    minWidth: "8rem",
-                  }}
-                  field={(e) => e.ccost_code}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Nama"
-                  field={(e) => e.ccost_name}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Keterangan"
-                  field={(e) => e.ccost_ket}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Action"
-                  dataType="boolean"
-                  bodyClassName="text-center"
-                  style={{ minWidth: "2rem" }}
-                  body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
-                />
-              </DataTable>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-
-      <Dialog
-        header={isEdit ? "Edit Pusat Biaya" : "Tambah Pusat Biaya"}
-        visible={displayData}
-        style={{ width: "40vw" }}
-        footer={renderFooter("displayData")}
-        onHide={() => {
-          setEdit(false);
-          setDisplayData(false);
-        }}
+  const renderBody = () => {
+    return (
+      <DataTable
+        responsiveLayout="scroll"
+        value={data}
+        className="display w-150 datatable-wrapper"
+        showGridlines
+        dataKey="id"
+        rowHover
+        header={renderHeader}
+        filters={filters1}
+        globalFilterFields={[
+          "pusatBiaya.ccost_code",
+          "pusatBiaya.ccost_name",
+          "pusatBiaya.ccost_ket",
+        ]}
+        emptyMessage="Tidak ada data"
+        paginator
+        paginatorTemplate={template2}
+        first={first2}
+        rows={rows2}
+        onPage={onCustomPage2}
+        paginatorClassName="justify-content-end mt-3"
+        selectionMode="single"
+        onRowSelect={onRowSelect}
       >
-        <div className="row mr-0 mt-0">
-          <div className="col-6">
-            <label className="text-label">Kode</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={currentItem !== null ? `${currentItem.ccost_code}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, ccost_code: e.target.value })
-                }
-                placeholder="Masukan Kode"
-              />
+        <Column
+          header="Kode"
+          style={{
+            minWidth: "8rem",
+          }}
+          field={(e) => e.ccost_code}
+          body={load && <Skeleton />}
+        />
+        <Column
+          header="Nama"
+          field={(e) => e.ccost_name}
+          style={{ minWidth: "8rem" }}
+          body={load && <Skeleton />}
+        />
+        <Column
+          header="Keterangan"
+          field={(e) => e.ccost_ket}
+          style={{ minWidth: "8rem" }}
+          body={load && <Skeleton />}
+        />
+        <Column
+          header="Action"
+          dataType="boolean"
+          bodyClassName="text-center"
+          style={{ minWidth: "2rem" }}
+          body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
+        />
+      </DataTable>
+    );
+  };
+
+  const renderDialog = () => {
+    return (
+      <>
+        <Toast ref={toast} />
+        <Dialog
+          header={isEdit ? "Edit Pusat Biaya" : "Tambah Pusat Biaya"}
+          visible={showInput}
+          style={{ width: "40vw" }}
+          footer={renderFooter()}
+          onHide={onHideInput}
+        >
+          <div className="row mr-0 mt-0">
+            <div className="col-6">
+              <label className="text-label">Kode</label>
+              <div className="p-inputgroup">
+                <InputText
+                  value={
+                    currentItem !== null ? `${currentItem.ccost_code}` : ""
+                  }
+                  onChange={(e) =>
+                    setCurrentItem({
+                      ...currentItem,
+                      ccost_code: e.target.value,
+                    })
+                  }
+                  placeholder="Masukan Kode"
+                />
+              </div>
+            </div>
+
+            <div className="col-6">
+              <label className="text-label">Nama</label>
+              <div className="p-inputgroup">
+                <InputText
+                  value={
+                    currentItem !== null ? `${currentItem.ccost_name}` : ""
+                  }
+                  onChange={(e) =>
+                    setCurrentItem({
+                      ...currentItem,
+                      ccost_name: e.target.value,
+                    })
+                  }
+                  placeholder="Masukan Nama Akun"
+                />
+              </div>
             </div>
           </div>
 
-          <div className="col-6">
-            <label className="text-label">Nama</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={currentItem !== null ? `${currentItem.ccost_name}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, ccost_name: e.target.value })
-                }
-                placeholder="Masukan Nama Akun"
-              />
+          <div className="row mr-0 mt-0">
+            <div className="col-12">
+              <label className="text-label">Keterangan</label>
+              <div className="p-inputgroup">
+                <InputTextarea
+                  value={currentItem !== null ? `${currentItem.ccost_ket}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({
+                      ...currentItem,
+                      ccost_ket: e.target.value,
+                    })
+                  }
+                  placeholder="Masukan Keterangan"
+                />
+              </div>
             </div>
           </div>
-        </div>
+        </Dialog>
 
-        <div className="row mr-0 mt-0">
-          <div className="col-12">
-            <label className="text-label">Keterangan</label>
-            <div className="p-inputgroup">
-              <InputTextarea
-                value={currentItem !== null ? `${currentItem.ccost_ket}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, ccost_ket: e.target.value })
-                }
-                placeholder="Masukan Keterangan"
-              />
-            </div>
+        <Dialog
+          visible={showDelete}
+          style={{ width: "30vw" }}
+          footer={renderFooterDel()}
+          onHide={() => {
+            setLoading(false);
+            setShowDelete(false);
+          }}
+        >
+          <div className="ml-2 mr-3">
+            <i
+              className="pi pi-exclamation-triangle mr-2 align-middle"
+              style={{ fontSize: "1rem" }}
+            />
+            <span>Apakah anda yakin ingin menghapus data ?</span>
           </div>
-        </div>
-      </Dialog>
+        </Dialog>
+      </>
+    );
+  };
 
-      <Dialog
-        header={"Hapus Data"}
-        visible={displayDel}
-        style={{ width: "30vw" }}
-        footer={renderFooterDel("displayDel")}
-        onHide={() => {
-          setDisplayDel(false);
-        }}
-      >
-        <div className="ml-2 mr-3">
-          <i
-            className="pi pi-exclamation-triangle mr-2 align-middle"
-            style={{ fontSize: "1rem" }}
-          />
-          <span>Apakah anda yakin ingin menghapus data ?</span>
-        </div>
-      </Dialog>
-    </>
-  );
+  const onHideInput = () => {
+    setLoading(false);
+    setCurrentItem(def);
+    setEdit(false);
+    setShowInput(false);
+  };
+
+  if (popUp) {
+    return (
+      <>
+        <Dialog
+          header={"Data Pusat Biaya"}
+          visible={show}
+          footer={() => <div></div>}
+          style={{ width: "40vw" }}
+          onHide={onHide}
+        >
+          {renderBody()}
+        </Dialog>
+        {renderDialog()}
+      </>
+    );
+  } else {
+    return (
+      <>
+        {renderBody()}
+        {renderDialog()}
+      </>
+    );
+  }
 };
 
-export default PusatBiaya;
+export default DataPusatBiaya;

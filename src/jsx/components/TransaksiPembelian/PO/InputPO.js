@@ -340,6 +340,33 @@ const InputPO = ({ onCancel, onSubmit }) => {
           </div>
 
           <div className="col-4">
+            <label className="text-label">Departemen</label>
+            <div className="p-inputgroup mt-2">
+              <Dropdown
+                // value={
+                //   currentItem !== null
+                //     ? `${currentItem?.jasa?.name ?? ""}`
+                //     : ""
+                // }
+                onChange={(e) =>
+                  setCurrentItem({
+                    // ...currentItem,
+                    // jasa: { ...currentItem.jasa, name: e.target.value },
+                  })
+                }
+                placeholder="Pilih Departemen"
+              />
+              <PButton
+              // onClick={() => {
+              //   setShowJenisPelanggan(true);
+              // }}
+              >
+                <i class="bx bx-food-menu"></i>
+              </PButton>
+            </div>
+          </div>
+
+          <div className="col-4">
             <label className="text-label">Ppn</label>
             <div className="p-inputgroup mt-2">
               <Dropdown
@@ -355,33 +382,6 @@ const InputPO = ({ onCancel, onSubmit }) => {
                   })
                 }
                 placeholder="Pilih Jenis Pajak"
-              />
-              <PButton
-              // onClick={() => {
-              //   setShowJenisPelanggan(true);
-              // }}
-              >
-                <i class="bx bx-food-menu"></i>
-              </PButton>
-            </div>
-          </div>
-
-          <div className="col-4">
-            <label className="text-label">Departemen</label>
-            <div className="p-inputgroup mt-2">
-              <Dropdown
-                // value={
-                //   currentItem !== null
-                //     ? `${currentItem?.jasa?.name ?? ""}`
-                //     : ""
-                // }
-                onChange={(e) =>
-                  setCurrentItem({
-                    // ...currentItem,
-                    // jasa: { ...currentItem.jasa, name: e.target.value },
-                  })
-                }
-                placeholder="Tanggal Permintaan"
               />
               <PButton
               // onClick={() => {
@@ -572,6 +572,7 @@ const InputPO = ({ onCancel, onSubmit }) => {
                           }
                           placeholder="0"
                           type="number"
+                          disabled
                         />
                       </div>
                     </div>
@@ -612,6 +613,7 @@ const InputPO = ({ onCancel, onSubmit }) => {
                           }
                           placeholder="0"
                           type="number"
+                          disabled
                         />
                       </div>
                     </div>
@@ -1055,7 +1057,10 @@ const InputPO = ({ onCancel, onSubmit }) => {
                   onClick={() => setRp(true)}
                 />
                 <InputText placeholder="Diskon" />
-                <PButton className={`${isRp ? "p-button-outlined" : ""}`} onClick={() => setRp(false)}>
+                <PButton
+                  className={`${isRp ? "p-button-outlined" : ""}`}
+                  onClick={() => setRp(false)}
+                >
                   {" "}
                   <b>%</b>{" "}
                 </PButton>

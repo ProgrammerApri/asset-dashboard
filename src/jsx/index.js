@@ -28,7 +28,6 @@ import Login from "./Login";
 import { withResizeDetector } from "react-resize-detector";
 import KategoriAkun from "./components/Master/KategoriAkun";
 import Akun from "./components/Master/Akun";
-import PusatBiaya from "./components/Master/PusatBiaya";
 import Project from "./components/Master/Project";
 import Bank from "./components/Master/Bank";
 import JenisPemasok from "./components/Master/JenisPemasok";
@@ -55,6 +54,7 @@ import MasterLainnya from "./components/MasterLainnya";
 import JenisPelanggan from "./components/Master/JenisPelanggan";
 import Pajak from "./components/Master/Pajak";
 import Jasa from "./components/Master/Jasa";
+import PusatBiaya from "./components/MasterLainnya/PusatBiaya/DataPusatBiaya";
 
 const Markup = ({ width }) => {
   const routes = [

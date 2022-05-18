@@ -18,14 +18,24 @@ import { Divider } from "@material-ui/core";
 import { Calendar } from "primereact/calendar";
 import { InputSwitch } from "primereact/inputswitch";
 import CustomAccordion from "../../Accordion/Accordion";
+import DataPusatBiaya from "../../MasterLainnya/PusatBiaya/DataPusatBiaya";
 
 const data = {};
+
+const type = [
+  {name: "Aktif", code: "A"},
+  {name: "Non Aktif", code: "N"}
+];
 
 const InputOrder = ({ onCancel, onSubmit }) => {
   const [update, setUpdate] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
   const [isEdit, setEdit] = useState(false);
+  const [showDepartemen, setShowDepartemen] = useState(false);
+  const [pusatBiaya, setPusatBiaya] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [doubleClick, setDoubleClick] = useState(false);
   const [inProd, setInProd] = useState([
     {
       id: 0,
@@ -53,7 +63,27 @@ const InputOrder = ({ onCancel, onSubmit }) => {
       left: 0,
       behavior: "smooth",
     });
+    getPusatBiaya()
   }, []);
+
+  const getPusatBiaya = async (isUpdate = false) => {
+    setLoading(!isUpdate);
+    const config = {
+      ...endpoints.pusatBiaya,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setPusatBiaya(data);
+      }
+    } catch (error) {}
+  };
 
   // const editPermintaan = async () => {
   //   const config = {
@@ -242,9 +272,9 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                 placeholder="Pilih Departemen"
               />
               <PButton
-              // onClick={() => {
-              //   setShowJenisPelanggan(true);
-              // }}
+              onClick={() => {
+                setShowDepartemen(true);
+              }}
               >
                 <i class="bx bx-food-menu"></i>
               </PButton>
@@ -574,11 +604,11 @@ const InputOrder = ({ onCancel, onSubmit }) => {
             <label className="ml-0 mt-1">{"Referensi Tambahan"}</label>
             <InputSwitch
               className="ml-4"
-              // checked={currentItem && currentItem.type == "d"}
+              checked={currentItem && currentItem.type === "A"}
               onChange={(e) => {
                 setCurrentItem({
                   ...currentItem,
-                  type: e.value ? "y" : "t",
+                  type: e.value ? "A" : "N",
                 });
               }}
             />
@@ -600,7 +630,7 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                   })
                 }
                 placeholder="Pilih Kode Supplier"
-                disabled
+                disabled={currentItem && currentItem.type == "N"}
               />
               <PButton
               // onClick={() => {
@@ -628,7 +658,7 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                   })
                 }
                 placeholder="Masukan Keterangan"
-                disabled
+                disabled={currentItem && currentItem.type == "N"}
               />
             </div>
           </div>
@@ -663,6 +693,68 @@ const InputOrder = ({ onCancel, onSubmit }) => {
       {header()}
       {body()}
       {footer()}
+
+      <DataPusatBiaya
+        data={pusatBiaya}
+        loading={false}
+        popUp={true}
+        show={showDepartemen}
+        onHide={() => {
+          setShowDepartemen(false);
+        }}
+        onInput={(e) => {
+          setShowDepartemen(!e);
+        }}
+        onSuccessInput={(e) => {
+          getPusatBiaya(true);
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowDepartemen(false);
+            // setCurrentItem({
+            //   ...currentItem,
+            //   jpel: e.data,
+            // });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+<DataPusatBiaya
+        data={pusatBiaya}
+        loading={false}
+        popUp={true}
+        show={showDepartemen}
+        onHide={() => {
+          setShowDepartemen(false);
+        }}
+        onInput={(e) => {
+          setShowDepartemen(!e);
+        }}
+        onSuccessInput={(e) => {
+          getPusatBiaya(true);
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowDepartemen(false);
+            // setCurrentItem({
+            //   ...currentItem,
+            //   jpel: e.data,
+            // });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
     </>
   );
 };

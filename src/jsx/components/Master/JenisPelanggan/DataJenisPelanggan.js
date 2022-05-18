@@ -37,7 +37,7 @@ const DataJenisPelanggan = ({
   const [loading, setLoading] = useState(false);
   const toast = useRef(null);
   const [currentItem, setCurrentItem] = useState(def);
-  const [isEdit, setEdit] = useState(def);
+  const [isEdit, setEdit] = useState(false);
   const [showInput, setShowInput] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
 

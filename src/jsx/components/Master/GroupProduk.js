@@ -577,7 +577,7 @@ const GroupProduk = () => {
   return (
     <>
       <Toast ref={toast} />
-      <Row>
+      <Row className="mt-2">
         <Col className="pt-0">
           <Card>
             <Card.Body>

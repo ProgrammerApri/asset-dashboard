@@ -18,7 +18,7 @@ import { Divider } from "@material-ui/core";
 import { Calendar } from "primereact/calendar";
 import { InputSwitch } from "primereact/inputswitch";
 import { SelectButton } from "primereact/selectbutton";
-import CustomAccordion from "../../Accordion/Accordion";
+import CustomAccordion from "../../../Accordion/Accordion";
 
 const data = {};
 

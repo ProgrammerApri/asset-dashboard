@@ -248,6 +248,7 @@ const DataProduk = ({
   };
 
   const delProduk = async () => {
+    setUpdate(true);
     const config = {
       ...endpoints.delProduct,
       endpoint: endpoints.delProduct.endpoint + currentItem.id,

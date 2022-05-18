@@ -71,7 +71,6 @@ const InputOrder = ({ onCancel, onSubmit }) => {
   }, []);
 
   const getPusatBiaya = async (isUpdate = false) => {
-    setLoading(!isUpdate);
     const config = {
       ...endpoints.pusatBiaya,
       data: {},
@@ -653,7 +652,7 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                   })
                 }
                 placeholder="Pilih Kode Supplier"
-                disabled={currentItem && currentItem.type == "N"}
+                disabled={currentItem && currentItem.type === "N"}
               />
               <PButton
               // onClick={() => {
@@ -681,7 +680,7 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                   })
                 }
                 placeholder="Masukan Keterangan"
-                disabled={currentItem && currentItem.type == "N"}
+                disabled={currentItem && currentItem.type === "N"}
               />
             </div>
           </div>
@@ -729,7 +728,7 @@ const InputOrder = ({ onCancel, onSubmit }) => {
           setShowDepartemen(!e);
         }}
         onSuccessInput={(e) => {
-          getPusatBiaya(true);
+          getPusatBiaya();
         }}
         onRowSelect={(e) => {
           if (doubleClick) {

@@ -27,6 +27,7 @@ const DataPusatBiaya = ({
   popUp = false,
   show = false,
   onHide = () => {},
+  onInput = () => {},
   onRowSelect,
   onSuccessInput,
 }) => {
@@ -40,7 +41,6 @@ const DataPusatBiaya = ({
   const [isEdit, setEdit] = useState(def);
   const [showInput, setShowInput] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
-
 
   useEffect(() => {
     initFilters1();
@@ -66,6 +66,7 @@ const DataPusatBiaya = ({
           onSuccessInput();
           setLoading(false);
           onHideInput();
+          onInput(false);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -106,6 +107,7 @@ const DataPusatBiaya = ({
           onSuccessInput();
           setLoading(false);
           onHideInput();
+          onInput(false);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -141,6 +143,7 @@ const DataPusatBiaya = ({
   };
 
   const delPusatBiaya = async (id) => {
+    setLoading(true);
     const config = {
       ...endpoints.delPusatBiaya,
       endpoint: endpoints.delPusatBiaya.endpoint + currentItem.id,
@@ -155,6 +158,7 @@ const DataPusatBiaya = ({
           setLoading(false);
           setShowDelete(false);
           onSuccessInput();
+          onInput(false);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -168,6 +172,7 @@ const DataPusatBiaya = ({
       setTimeout(() => {
         setLoading(false);
         setShowDelete(false);
+        onInput(false);
         toast.current.show({
           severity: "error",
           summary: "Gagal",
@@ -187,6 +192,7 @@ const DataPusatBiaya = ({
             setEdit(true);
             setCurrentItem(data);
             setShowInput(true);
+            onInput(true);
           }}
           className="btn btn-primary shadow btn-xs sharp ml-1"
         >
@@ -197,6 +203,7 @@ const DataPusatBiaya = ({
           onClick={() => {
             setCurrentItem(data);
             setShowDelete(true);
+            onInput(true);
           }}
           className="btn btn-danger shadow btn-xs sharp ml-1"
         >
@@ -214,6 +221,7 @@ const DataPusatBiaya = ({
           label="Batal"
           onClick={() => {
             onHideInput();
+            onInput(false);
           }}
           className="p-button-text btn-primary"
         />
@@ -242,6 +250,7 @@ const DataPusatBiaya = ({
           onClick={() => {
             setShowDelete(false);
             setLoading(false);
+            onInput(false);
           }}
           className="p-button-text btn-s btn-primary"
         />
@@ -292,6 +301,7 @@ const DataPusatBiaya = ({
             setEdit(false);
             setLoading(false);
             setCurrentItem(def);
+            onInput(true);
           }}
         >
           Tambah{" "}
@@ -415,7 +425,10 @@ const DataPusatBiaya = ({
           visible={showInput}
           style={{ width: "40vw" }}
           footer={renderFooter()}
-          onHide={onHideInput}
+          onHide={() => {
+            onHideInput();
+            onInput(false);
+          }}
         >
           <div className="row mr-0 mt-0">
             <div className="col-6">
@@ -475,12 +488,14 @@ const DataPusatBiaya = ({
         </Dialog>
 
         <Dialog
+          header={"Hapus Data"}
           visible={showDelete}
           style={{ width: "30vw" }}
           footer={renderFooterDel()}
           onHide={() => {
             setLoading(false);
             setShowDelete(false);
+            onInput(false);
           }}
         >
           <div className="ml-2 mr-3">
@@ -509,10 +524,12 @@ const DataPusatBiaya = ({
           header={"Data Pusat Biaya"}
           visible={show}
           footer={() => <div></div>}
-          style={{ width: "40vw" }}
+          style={{ width: "60vw" }}
           onHide={onHide}
         >
-          {renderBody()}
+          <Row className="ml-0 mr-0">
+            <Col>{renderBody()}</Col>
+          </Row>
         </Dialog>
         {renderDialog()}
       </>

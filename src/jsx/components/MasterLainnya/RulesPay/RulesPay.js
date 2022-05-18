@@ -13,24 +13,30 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
-import { classNames } from "primereact/utils";
 import { InputNumber } from "primereact/inputnumber";
 
-const data = {
+const def = {
   id: 1,
   name: "",
   day: 0,
   ket: "",
 };
 
-const RulesPay = () => {
-  const [rules_pay, setRulesPay] = useState(null);
+const DataRulesPay = ({
+  data,
+  load,
+  popUp = false,
+  show = false,
+  onHide = () => {},
+  onInput = () => {},
+  onRowSelect,
+  onSuccessInput,
+  
+}) => {
   const [loading, setLoading] = useState(true);
-  const [update, setUpdate] = useState(false);
-  const [displayData, setDisplayData] = useState(false);
-  const [displayDel, setDisplayDel] = useState(false);
-  const [position, setPosition] = useState("center");
-  const [currentItem, setCurrentItem] = useState(null);
+  const [showInput, setShowInput] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
+  const [currentItem, setCurrentItem] = useState(def);
   const toast = useRef(null);
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
@@ -38,38 +44,10 @@ const RulesPay = () => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
 
-  const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getRulesPay();
     initFilters1();
   }, []);
-
-  const getRulesPay = async (isUpdate = false) => {
-    setLoading(true);
-    const config = {
-      ...endpoints.rules_pay,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setRulesPay(data);
-      }
-    } catch (error) {}
-    if (isUpdate) {
-      setLoading(false);
-    } else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1500);
-    }
-  };
 
   const editRulesPay = async () => {
     const config = {
@@ -88,9 +66,10 @@ const RulesPay = () => {
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setUpdate(false);
-          setDisplayData(false);
-          getRulesPay(true);
+          onSuccessInput();
+          setLoading(false);
+          onHideInput();
+          onInput(false);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -101,7 +80,7 @@ const RulesPay = () => {
       }
     } catch (error) {
       setTimeout(() => {
-        setUpdate(false);
+        setLoading(false);
         toast.current.show({
           severity: "error",
           summary: "Gagal",
@@ -128,9 +107,10 @@ const RulesPay = () => {
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setUpdate(false);
-          setDisplayData(false);
-          getRulesPay(true);
+          onSuccessInput();
+          setLoading(false);
+          onHideInput();
+          onInput(false);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -143,7 +123,7 @@ const RulesPay = () => {
       console.log(error);
       if (error.status === 400) {
         setTimeout(() => {
-          setUpdate(false);
+          setLoading(false);
           toast.current.show({
             severity: "error",
             summary: "Gagal",
@@ -153,7 +133,7 @@ const RulesPay = () => {
         }, 500);
       } else {
         setTimeout(() => {
-          setUpdate(false);
+          setLoading(false);
           toast.current.show({
             severity: "error",
             summary: "Gagal",
@@ -166,6 +146,7 @@ const RulesPay = () => {
   };
 
   const delRulesPay = async (id) => {
+    setLoading(true);
     const config = {
       ...endpoints.delRulesPay,
       endpoint: endpoints.delRulesPay.endpoint + currentItem.id,
@@ -177,9 +158,10 @@ const RulesPay = () => {
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setUpdate(false);
-          setDisplayDel(false);
-          getRulesPay(true);
+          setLoading(false);
+          setShowDelete(false);
+          onSuccessInput();
+          onInput(false);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -191,8 +173,10 @@ const RulesPay = () => {
     } catch (error) {
       console.log(error);
       setTimeout(() => {
-        setUpdate(false);
-        setDisplayDel(false);
+        setLoading(false);
+        setShowDelete(false);
+        onSuccessInput();
+        onInput(false);
         toast.current.show({
           severity: "error",
           summary: "Gagal",
@@ -210,8 +194,9 @@ const RulesPay = () => {
         <Link
           onClick={() => {
             setEdit(true);
-            onClick("displayData", data);
             setCurrentItem(data);
+            setShowInput(true);
+            onInput(true);
           }}
           className="btn btn-primary shadow btn-xs sharp ml-1"
         >
@@ -220,9 +205,9 @@ const RulesPay = () => {
 
         <Link
           onClick={() => {
-            setEdit(true);
-            setDisplayDel(true);
             setCurrentItem(data);
+            setShowInput(true);
+            onInput(true);
           }}
           className="btn btn-danger shadow btn-xs sharp ml-1"
         >
@@ -233,21 +218,12 @@ const RulesPay = () => {
     );
   };
 
-  const onClick = () => {
-    setDisplayData(true);
-    setCurrentItem();
-
-    if (position) {
-      setPosition(position);
-    }
-  };
-
   const onSubmit = () => {
     if (isEdit) {
-      setUpdate(true);
+      setLoading(true);
       editRulesPay();
     } else {
-      setUpdate(true);
+      setLoading(true);
       addRulesPay();
     }
   };
@@ -257,7 +233,10 @@ const RulesPay = () => {
       <div>
         <PButton
           label="Batal"
-          onClick={() => setDisplayData(false)}
+          onClick={() => {
+            onHideInput();
+            onInput(false);
+          }}
           className="p-button-text btn-primary"
         />
         <PButton
@@ -265,7 +244,7 @@ const RulesPay = () => {
           icon="pi pi-check"
           onClick={() => onSubmit()}
           autoFocus
-          loading={update}
+          loading={loading}
         />
       </div>
     );
@@ -276,7 +255,11 @@ const RulesPay = () => {
       <div>
         <PButton
           label="Batal"
-          onClick={() => setDisplayDel(false)}
+          onClick={() => {
+            setShowDelete(false);
+            setLoading(false);
+            onInput(false);
+          }}
           className="p-button-text btn-primary"
         />
         <PButton
@@ -286,7 +269,7 @@ const RulesPay = () => {
             delRulesPay();
           }}
           autoFocus
-          loading={update}
+          loading={loading}
         />
       </div>
     );
@@ -321,9 +304,11 @@ const RulesPay = () => {
         <Button
           variant="primary"
           onClick={() => {
+            setShowInput(true);
             setEdit(false);
-            setCurrentItem(data);
-            setDisplayData(true);
+            setLoading(false);
+            setCurrentItem(def);
+            onInput(true);
           }}
         >
           Tambah{" "}
@@ -381,140 +366,176 @@ const RulesPay = () => {
     setRows2(event.rows);
   };
 
-  return (
-    <>
-      <Toast ref={toast} />
-      <Row>
-        <Col>
-          <Card>
-            <Card.Body>
-              <DataTable
-                responsiveLayout="scroll"
-                value={loading ? dummy : rules_pay}
-                className="display w-150 datatable-wrapper"
-                showGridlines
-                dataKey="id"
-                rowHover
-                header={renderHeader}
-                filters={filters1}
-                globalFilterFields={[
-                  "rules_pay.name",
-                  "rules_pay.day",
-                  "rules_pay.ket",
-                ]}
-                emptyMessage="Tidak ada data"
-                paginator
-                paginatorTemplate={template2}
-                first={first2}
-                rows={rows2}
-                onPage={onCustomPage2}
-                paginatorClassName="justify-content-end mt-3"
-              >
-                <Column
-                  header="Nama"
-                  field={(e) => e.name}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Jumlah Hari"
-                  field={(e) => e.day}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Keterangan"
-                  field={(e) => e.ket}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Action"
-                  dataType="boolean"
-                  bodyClassName="text-center"
-                  style={{ minWidth: "2rem" }}
-                  body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
-                />
-              </DataTable>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+  const onHideInput = () => {
+    setLoading(false);
+    setCurrentItem(def);
+    setEdit(false);
+    setShowInput(false);
+  };
 
-      <Dialog
-        header={isEdit ? "Edit Syarat Pembayaran" : "Tambah Syarat Pembayaran"}
-        visible={displayData}
-        style={{ width: "40vw" }}
-        footer={renderFooter("displayData")}
-        onHide={() => {
-          setEdit(false);
-          setDisplayData(false);
-        }}
+  const renderBody = () => {
+    return (
+      <DataTable
+        responsiveLayout="scroll"
+        value={data}
+        className="display w-150 datatable-wrapper"
+        showGridlines
+        dataKey="id"
+        rowHover
+        header={renderHeader}
+        filters={filters1}
+        globalFilterFields={[
+          "rules_pay.name",
+          "rules_pay.day",
+          "rules_pay.ket",
+        ]}
+        emptyMessage="Tidak ada data"
+        paginator
+        paginatorTemplate={template2}
+        first={first2}
+        rows={rows2}
+        onPage={onCustomPage2}
+        paginatorClassName="justify-content-end mt-3"
+        selectionMode="single"
+        onRowSelect={onRowSelect}
       >
-        <div className="row mr-0 mt-0">
-          <div className="col-6">
-            <label className="text-label">Nama</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={currentItem !== null ? `${currentItem.name}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, name: e.target.value })
-                }
-                placeholder="Masukan Nama"
-              />
+        <Column
+          header="Nama"
+          field={(e) => e.name}
+          style={{ minWidth: "8rem" }}
+          body={load && <Skeleton />}
+        />
+        <Column
+          header="Jumlah Hari"
+          field={(e) => e.day}
+          style={{ minWidth: "8rem" }}
+          body={load && <Skeleton />}
+        />
+        <Column
+          header="Keterangan"
+          field={(e) => e.ket}
+          style={{ minWidth: "8rem" }}
+          body={load && <Skeleton />}
+        />
+        <Column
+          header="Action"
+          dataType="boolean"
+          bodyClassName="text-center"
+          style={{ minWidth: "2rem" }}
+          body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
+        />
+      </DataTable>
+    );
+  };
+
+  const renderDialog = () => {
+    return (
+      <>
+        <Dialog
+          header={
+            isEdit ? "Edit Syarat Pembayaran" : "Tambah Syarat Pembayaran"
+          }
+          visible={showInput}
+          style={{ width: "40vw" }}
+          footer={renderFooter()}
+          onHide={() => {
+            onHideInput();
+            onInput(false);
+          }}
+        >
+          <div className="row mr-0 mt-0">
+            <div className="col-6">
+              <label className="text-label">Nama</label>
+              <div className="p-inputgroup">
+                <InputText
+                  value={currentItem !== null ? `${currentItem.name}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, name: e.target.value })
+                  }
+                  placeholder="Masukan Nama"
+                />
+              </div>
+            </div>
+
+            <div className="col-6">
+              <label className="text-label">Jumlah Hari</label>
+              <div className="p-inputgroup">
+                <InputNumber
+                  value={currentItem !== null ? `${currentItem.day}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, day: e.value })
+                  }
+                  placeholder="Masukan Jumlah Hari"
+                  showButtons
+                />
+              </div>
             </div>
           </div>
 
-          <div className="col-6">
-            <label className="text-label">Jumlah Hari</label>
-            <div className="p-inputgroup">
-              <InputNumber
-                value={currentItem !== null ? `${currentItem.day}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, day: e.value })
-                }
-                placeholder="Masukan Jumlah Hari"
-                showButtons
-              />
+          <div className="row mr-0 mt-0">
+            <div className="col-12">
+              <label className="text-label">Keterangan</label>
+              <div className="p-inputgroup">
+                <InputTextarea
+                  value={currentItem !== null ? `${currentItem.ket}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, ket: e.target.value })
+                  }
+                  placeholder="Masukan Keterangan"
+                />
+              </div>
             </div>
           </div>
-        </div>
+        </Dialog>
 
-        <div className="row mr-0 mt-0">
-          <div className="col-12">
-            <label className="text-label">Keterangan</label>
-            <div className="p-inputgroup">
-              <InputTextarea
-                value={currentItem !== null ? `${currentItem.ket}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, ket: e.target.value })
-                }
-                placeholder="Masukan Keterangan"
-              />
-            </div>
+        <Dialog
+          header={"Hapus Data"}
+          visible={showDelete}
+          style={{ width: "30vw" }}
+          footer={renderFooterDel()}
+          onHide={() => {
+            setLoading(false);
+            setShowDelete(false);
+            onInput(false);
+          }}
+        >
+          <div className="ml-3 mr-3">
+            <i
+              className="pi pi-exclamation-triangle mr-3 align-middle"
+              style={{ fontSize: "2rem" }}
+            />
+            <span>Apakah anda yakin ingin menghapus data ?</span>
           </div>
-        </div>
-      </Dialog>
+        </Dialog>
+      </>
+    );
+  };
 
-      <Dialog
-        header={"Hapus Data"}
-        visible={displayDel}
-        style={{ width: "30vw" }}
-        footer={renderFooterDel("displayDel")}
-        onHide={() => {
-          setDisplayDel(false);
-        }}
-      >
-        <div className="ml-3 mr-3">
-          <i
-            className="pi pi-exclamation-triangle mr-3 align-middle"
-            style={{ fontSize: "2rem" }}
-          />
-          <span>Apakah anda yakin ingin menghapus data ?</span>
-        </div>
-      </Dialog>
-    </>
-  );
+  if (popUp) {
+    return (
+      <>
+        <Dialog
+          header={"Data Syarat Pembayaran"}
+          visible={show}
+          footer={() => <div></div>}
+          style={{ width: "60vw" }}
+          onHide={onHide}
+        >
+          <Row className="ml-0 mr-0">
+            <Col>{renderBody()}</Col>
+          </Row>
+        </Dialog>
+        {renderDialog()}
+      </>
+    );
+  } else {
+    return (
+      <>
+        {renderBody()}
+        {renderDialog()}
+      </>
+    );
+  }
 };
 
-export default RulesPay;
+export default DataRulesPay;

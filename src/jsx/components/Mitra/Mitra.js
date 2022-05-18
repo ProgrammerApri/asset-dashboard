@@ -1,7 +1,7 @@
 import React from "react";
 import Customer from "./Customer";
 import { TabView, TabPanel } from 'primereact/tabview';
-import Pemasok from "./Pemasok";
+import Pemasok from "./Pemasok/DataPemasok";
 
 const Mitra = () => {
   return (

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import DataSatuan from "./Satuan";
+import DataSatuan from "./DataSatuan";
 import { request, endpoints } from "src/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";

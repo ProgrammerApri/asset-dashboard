@@ -1,29 +1,29 @@
 import React, { useState, useEffect, useRef } from "react";
 import { request, endpoints } from "src/utils";
 import { Row, Col, Card } from "react-bootstrap";
-import DataPusatBiaya from "./DataPusatBiaya";
+import DataRulesPay from "./RulesPay";
 
 const data = {
-  id: 0,
-  jpel_code: "",
-  jpel_name: "",
-  jpel_ket: "",
+  id: 1,
+  name: "",
+  day: 0,
+  ket: "",
 };
 
-const PusatBiaya = () => {
-  const [pusatBiaya, setPusatBiaya] = useState(null);
+const RulesPay = () => {
+  const [rulesPay, setRulesPay] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getPusatBiaya();
+    getRulesPay();
   }, []);
 
-  const getPusatBiaya = async (isUpdate = false) => {
+  const getRulesPay = async () => {
     setLoading(true);
     const config = {
-      ...endpoints.pusatBiaya,
+      ...endpoints.rules_pay,
       data: {},
     };
     console.log(config.data);
@@ -34,16 +34,9 @@ const PusatBiaya = () => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        setPusatBiaya(data);
+        setRulesPay(data);
       }
     } catch (error) {}
-    if (isUpdate) {
-      setLoading(false);
-    } else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 500);
-    }
   };
 
   return (
@@ -52,10 +45,10 @@ const PusatBiaya = () => {
         <Col>
           <Card>
             <Card.Body>
-              <DataPusatBiaya
-                data={loading ? dummy : pusatBiaya}
+              <DataRulesPay
+                data={loading ? dummy : rulesPay}
                 load={loading}
-                onSuccessInput={() => getPusatBiaya()}
+                onSuccessInput={() => getRulesPay()}
               />
             </Card.Body>
           </Card>
@@ -65,4 +58,4 @@ const PusatBiaya = () => {
   );
 };
 
-export default PusatBiaya;
+export default RulesPay;

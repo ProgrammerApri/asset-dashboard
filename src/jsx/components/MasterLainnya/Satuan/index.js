@@ -1,29 +1,34 @@
 import React, { useState, useEffect, useRef } from "react";
 import { request, endpoints } from "src/utils";
 import { Row, Col, Card } from "react-bootstrap";
-import DataPusatBiaya from "./DataPusatBiaya";
+import DataSatuan from "./DataSatuan";
 
 const data = {
   id: 0,
-  jpel_code: "",
-  jpel_name: "",
-  jpel_ket: "",
+  code: null,
+  name: null,
+  type: "d",
+  desc: null,
+  active: true,
+  qty: 1,
+  u_from: null,
+  u_to: null,
 };
 
-const PusatBiaya = () => {
-  const [pusatBiaya, setPusatBiaya] = useState(null);
+const Satuan = () => {
+  const [satuan, setSatuan] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getPusatBiaya();
+    getSatuan();
   }, []);
 
-  const getPusatBiaya = async (isUpdate = false) => {
-    setLoading(true);
+  const getSatuan = async (isUpdate = false) => {
+    // setLoading(true);
     const config = {
-      ...endpoints.pusatBiaya,
+      ...endpoints.getSatuan,
       data: {},
     };
     console.log(config.data);
@@ -34,7 +39,14 @@ const PusatBiaya = () => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        setPusatBiaya(data);
+        setSatuan(data);
+        let dasar = [];
+        data.forEach((el) => {
+          if (el.type == "d") {
+            dasar.push(el);
+          }
+        });
+        setSatuan(dasar);
       }
     } catch (error) {}
     if (isUpdate) {
@@ -52,10 +64,10 @@ const PusatBiaya = () => {
         <Col>
           <Card>
             <Card.Body>
-              <DataPusatBiaya
-                data={loading ? dummy : pusatBiaya}
+              <DataSatuan
+                data={loading ? dummy : satuan}
                 load={loading}
-                onSuccessInput={() => getPusatBiaya()}
+                onSuccessInput={() => getSatuan()}
               />
             </Card.Body>
           </Card>
@@ -65,4 +77,4 @@ const PusatBiaya = () => {
   );
 };
 
-export default PusatBiaya;
+export default Satuan;

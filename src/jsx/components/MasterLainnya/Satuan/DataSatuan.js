@@ -20,7 +20,7 @@ import { Divider } from "@material-ui/core";
 import { Badge } from "react-bootstrap";
 import { Badge as PBadge } from "primereact/badge";
 
-const data = {
+const def = {
   id: 0,
   code: null,
   name: null,
@@ -34,21 +34,29 @@ const data = {
 
 const addKonversi = [];
 
-const DataSatuan = () => {
+const DataSatuan = ({
+  data,
+  load,
+  popUp = false,
+  show = false,
+  onHide = () => {},
+  onInput = () => {},
+  onRowSelect,
+  onSuccessInput,
+}) => {
   const [satuan, setSatuan] = useState(null);
   const [satuanDasar, setSatuanDasar] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [update, setUpdate] = useState(false);
-  const [displayData, setDisplayData] = useState(false);
-  const [displayDel, setDisplayDel] = useState(false);
   const [position, setPosition] = useState("center");
-  const [currentItem, setCurrentItem] = useState(null);
+  const [currentItem, setCurrentItem] = useState(def);
   const toast = useRef(null);
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
-  const [isEdit, setEdit] = useState(false);
+  const [isEdit, setEdit] = useState(def);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+  const [showInput, setShowInput] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
   const [konversi, setKonversi] = useState([
     {
       id: 0,
@@ -58,51 +66,17 @@ const DataSatuan = () => {
     },
   ]);
 
-  const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getSatuan();
     initFilters1();
   }, []);
 
-  const getSatuan = async (isUpdate = false) => {
-    setLoading(true);
-    const config = {
-      ...endpoints.getSatuan,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setSatuan(data);
-        let dasar = [];
-        data.forEach((el) => {
-          if (el.type == "d") {
-            dasar.push(el);
-          }
-        });
-        setSatuanDasar(dasar);
-      }
-    } catch (error) {}
-    if (isUpdate) {
-      setLoading(false);
-    } else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 500);
-    }
-  };
-
   const editSatuan = async () => {
+    // setLoading(true);
     const config = {
       ...endpoints.updateSatuan,
       endpoint: endpoints.updateSatuan.endpoint + currentItem.id,
-      data: {...currentItem, konversi: konversi},
+      data: { ...currentItem, konversi: konversi },
     };
     console.log(config.data);
     let response = null;
@@ -111,9 +85,10 @@ const DataSatuan = () => {
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setUpdate(false);
-          setDisplayData(false);
-          getSatuan(true);
+          onSuccessInput();
+          setLoading(false);
+          onHideInput();
+          onInput(false);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -124,7 +99,7 @@ const DataSatuan = () => {
       }
     } catch (error) {
       setTimeout(() => {
-        setUpdate(false);
+        setLoading(false);
         toast.current.show({
           severity: "error",
           summary: "Gagal",
@@ -136,6 +111,7 @@ const DataSatuan = () => {
   };
 
   const addSatuan = async () => {
+    // setLoading(true);
     const config = {
       ...endpoints.addSatuan,
       data: { ...currentItem, konversi: konversi },
@@ -147,9 +123,10 @@ const DataSatuan = () => {
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setUpdate(false);
-          setDisplayData(false);
-          getSatuan(true);
+          onSuccessInput();
+          setLoading(false);
+          onHideInput();
+          onInput(false);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -162,7 +139,7 @@ const DataSatuan = () => {
       console.log(error);
       if (error.status === 400) {
         setTimeout(() => {
-          setUpdate(false);
+          setLoading(false);
           toast.current.show({
             severity: "error",
             summary: "Gagal",
@@ -172,7 +149,7 @@ const DataSatuan = () => {
         }, 500);
       } else {
         setTimeout(() => {
-          setUpdate(false);
+          setLoading(false);
           toast.current.show({
             severity: "error",
             summary: "Gagal",
@@ -185,6 +162,7 @@ const DataSatuan = () => {
   };
 
   const delSatuan = async (id) => {
+    setLoading(true);
     const config = {
       ...endpoints.deleteSatuan,
       endpoint: endpoints.deleteSatuan.endpoint + currentItem.id,
@@ -196,9 +174,10 @@ const DataSatuan = () => {
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setUpdate(false);
-          setDisplayDel(false);
-          getSatuan(true);
+          setLoading(false);
+          setShowDelete(false);
+          onSuccessInput();
+          onInput(false);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -210,8 +189,9 @@ const DataSatuan = () => {
     } catch (error) {
       console.log(error);
       setTimeout(() => {
-        setUpdate(false);
-        setDisplayDel(false);
+        setLoading(false);
+        setShowDelete(false);
+        onInput(false);
         toast.current.show({
           severity: "error",
           summary: "Gagal",
@@ -229,7 +209,7 @@ const DataSatuan = () => {
         <Link
           onClick={() => {
             setEdit(true);
-            onClick("displayData", data);
+            onClick("showInput", data);
             if (data.type == "k") {
               let conv = [];
               satuan.forEach((el) => {
@@ -251,9 +231,11 @@ const DataSatuan = () => {
                   u_from: null,
                   u_to: null,
                 },
-              ])
+              ]);
             }
             setCurrentItem(data);
+            setShowInput(true);
+            onInput(true);
           }}
           className="btn btn-primary shadow btn-xs sharp ml-1"
         >
@@ -262,9 +244,9 @@ const DataSatuan = () => {
 
         <Link
           onClick={() => {
-            setEdit(true);
-            setDisplayDel(true);
             setCurrentItem(data);
+            setShowDelete(true);
+            onInput(true);
           }}
           className="btn btn-danger shadow btn-xs sharp ml-1"
         >
@@ -276,7 +258,7 @@ const DataSatuan = () => {
   };
 
   const onClick = () => {
-    setDisplayData(true);
+    setShowInput(true)
     setCurrentItem();
 
     if (position) {
@@ -286,10 +268,10 @@ const DataSatuan = () => {
 
   const onSubmit = () => {
     if (isEdit) {
-      setUpdate(true);
+      setLoading(true);
       editSatuan();
     } else {
-      setUpdate(true);
+      setLoading(true);
       addSatuan();
     }
   };
@@ -300,7 +282,8 @@ const DataSatuan = () => {
         <PButton
           label="Batal"
           onClick={() => {
-            setDisplayData(false);
+            onHideInput();
+            onInput(false);
           }}
           className="p-button-text btn-primary"
         />
@@ -309,7 +292,7 @@ const DataSatuan = () => {
           icon="pi pi-check"
           onClick={() => onSubmit()}
           autoFocus
-          loading={update}
+          loading={loading}
         />
       </div>
     );
@@ -320,18 +303,22 @@ const DataSatuan = () => {
       <div>
         <PButton
           label="Batal"
-          onClick={() => setDisplayDel(false)}
+          onClick={() => {
+            setShowDelete(false);
+            setLoading(false);
+            onInput(false);
+          }}
           className="p-button-text btn-primary"
         />
         <PButton
           label="Hapus"
           icon="pi pi-trash"
           onClick={() => {
-            setUpdate(true)
+            setLoading(true);
             delSatuan();
           }}
           autoFocus
-          loading={update}
+          loading={loading}
         />
       </div>
     );
@@ -367,7 +354,7 @@ const DataSatuan = () => {
           variant="primary"
           onClick={() => {
             setEdit(false);
-            setCurrentItem(data);
+            setCurrentItem(def);
             setKonversi([
               {
                 id: 0,
@@ -375,8 +362,10 @@ const DataSatuan = () => {
                 u_from: null,
                 u_to: null,
               },
-            ])
-            setDisplayData(true);
+            ]);
+            setShowInput(true);
+            onInput(true);
+            setLoading(false);
           }}
         >
           Tambah{" "}
@@ -445,49 +434,50 @@ const DataSatuan = () => {
     return selected;
   };
 
-  return (
-    <>
-      <Toast ref={toast} />
-      <Row>
-        <Col>
-          <Card>
-            <Card.Body>
-              <DataTable
-                responsiveLayout="scroll"
-                value={loading ? dummy : satuan}
-                className="display w-150 datatable-wrapper header-white"
-                showGridlines
-                dataKey="id"
-                rowHover
-                header={renderHeader}
-                rowGroupMode="subheader"
-                rowGroupHeaderTemplate={(e) =>
-                  loading ? (
-                    <Skeleton />
-                  ) : (
-                    <PBadge
-                      className="mt-2 active"
-                      value={`${e?.name}`}
-                    ></PBadge>
-                  )
-                }
-                groupRowsBy="name"
-                filters={filters1}
-                globalFilterFields={[
-                  "satuan.code",
-                  "satuan.name",
-                  "satuan.status",
-                  "satuan.ket",
-                ]}
-                emptyMessage="Tidak ada data"
-                paginator
-                paginatorTemplate={template2}
-                first={first2}
-                rows={rows2}
-                onPage={onCustomPage2}
-                paginatorClassName="justify-content-end mt-3"
-              >
-                {/* <Column
+  const onHideInput = () => {
+    setLoading(false);
+    setCurrentItem(def);
+    setEdit(false);
+    setShowInput(false);
+  };
+
+  const renderBody = () => {
+    return (
+      <DataTable
+        responsiveLayout="scroll"
+        value={data}
+        className="display w-150 datatable-wrapper header-white"
+        showGridlines
+        dataKey="id"
+        rowHover
+        header={renderHeader}
+        rowGroupMode="subheader"
+        rowGroupHeaderTemplate={(e) =>
+          load ? (
+            <Skeleton />
+          ) : (
+            <PBadge className="mt-2 active" value={`${e?.name}`}></PBadge>
+          )
+        }
+        groupRowsBy="name"
+        filters={filters1}
+        globalFilterFields={[
+          "satuan.code",
+          "satuan.name",
+          "satuan.status",
+          "satuan.ket",
+        ]}
+        emptyMessage="Tidak ada data"
+        paginator
+        paginatorTemplate={template2}
+        first={first2}
+        rows={rows2}
+        onPage={onCustomPage2}
+        paginatorClassName="justify-content-end mt-3"
+        selectionMode="single"
+        onRowSelect={onRowSelect}
+      >
+        {/* <Column
                   header="Kode Satuan"
                   style={{
                     minWidth: "8rem",
@@ -495,65 +485,66 @@ const DataSatuan = () => {
                   field="code"
                   body={loading && <Skeleton />}
                 /> */}
-                <Column
-                  header="Kode Satuan"
-                  field="code"
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Kuantitas"
-                  field={(e) => e?.qty ?? "-"}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Satuan Besar"
-                  field={(e) => e?.u_to?.code ?? e.code}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Satuan Kecil"
-                  field={(e) => e?.u_from?.code ?? e.code}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Status Satuan"
-                  style={{ minWidth: "8rem" }}
-                  body={(e) =>
-                    loading ? (
-                      <Skeleton />
-                    ) : e.type == "d" ? (
-                      <Badge variant="warning light"> Dasar</Badge>
-                    ) : (
-                      <Badge variant="info light"> Konversi</Badge>
-                    )
-                  }
-                />
-                <Column
-                  header="Action"
-                  dataType="boolean"
-                  bodyClassName="text-center"
-                  field="code"
-                  style={{ minWidth: "2rem" }}
-                  body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
-                />
-              </DataTable>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+        <Column
+          header="Kode Satuan"
+          field="code"
+          style={{ minWidth: "8rem" }}
+          body={load && <Skeleton />}
+        />
+        <Column
+          header="Kuantitas"
+          field={(e) => e?.qty ?? "-"}
+          style={{ minWidth: "8rem" }}
+          body={load && <Skeleton />}
+        />
+        <Column
+          header="Satuan Besar"
+          field={(e) => e?.u_to?.code ?? e.code}
+          style={{ minWidth: "8rem" }}
+          body={load && <Skeleton />}
+        />
+        <Column
+          header="Satuan Kecil"
+          field={(e) => e?.u_from?.code ?? e.code}
+          style={{ minWidth: "8rem" }}
+          body={load && <Skeleton />}
+        />
+        <Column
+          header="Status Satuan"
+          style={{ minWidth: "8rem" }}
+          body={(e) =>
+            load ? (
+              <Skeleton />
+            ) : e.type == "d" ? (
+              <Badge variant="warning light"> Dasar</Badge>
+            ) : (
+              <Badge variant="info light"> Konversi</Badge>
+            )
+          }
+        />
+        <Column
+          header="Action"
+          dataType="boolean"
+          bodyClassName="text-center"
+          field="code"
+          style={{ minWidth: "2rem" }}
+          body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
+        />
+      </DataTable>
+    );
+  };
 
+  const renderDialog = () => {
+    return (
+      <>
       <Dialog
         header={isEdit ? "Edit Satuan" : "Tambah Satuan"}
-        visible={displayData}
+        visible={showInput}
         style={{ width: "40vw" }}
         footer={renderFooter()}
         onHide={() => {
-          setEdit(false);
-          setDisplayData(false);
+          onHideInput();
+          onInput(false);
         }}
       >
         <div className="row mr-0 ml-0">
@@ -628,7 +619,7 @@ const DataSatuan = () => {
                     u_from: null,
                     u_to: null,
                   },
-                ])
+                ]);
               }
             }}
           />
@@ -762,11 +753,13 @@ const DataSatuan = () => {
 
       <Dialog
         header={"Hapus Data"}
-        visible={displayDel}
+        visible={showDelete}
         style={{ width: "30vw" }}
         footer={renderFooterDel("displayDel")}
         onHide={() => {
-          setDisplayDel(false);
+          setLoading(false);
+          setShowDelete(false);
+          onInput(false);
         }}
       >
         <div className="ml-3 mr-3">
@@ -777,8 +770,35 @@ const DataSatuan = () => {
           <span>Apakah anda yakin ingin menghapus data ?</span>
         </div>
       </Dialog>
-    </>
-  );
+      </>
+    )
+  }
+
+  if (popUp) {
+    return (
+      <>
+        <Dialog
+          header={"Data Satuan"}
+          visible={show}
+          footer={() => <div></div>}
+          style={{ width: "60vw" }}
+          onHide={onHide}
+        >
+          <Row className="ml-0 mr-0">
+            <Col>{renderBody()}</Col>
+          </Row>
+        </Dialog>
+        {renderDialog()}
+      </>
+    );
+  } else {
+    return (
+      <>
+        {renderBody()}
+        {renderDialog()}
+      </>
+    );
+  }
 };
 
 export default DataSatuan;

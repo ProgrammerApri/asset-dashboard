@@ -1,29 +1,44 @@
 import React, { useState, useEffect, useRef } from "react";
 import { request, endpoints } from "src/utils";
 import { Row, Col, Card } from "react-bootstrap";
-import DataPusatBiaya from "./DataPusatBiaya";
+import DataJasa from "./DataJasa";
 
 const data = {
-  id: 0,
-  jpel_code: "",
-  jpel_name: "",
-  jpel_ket: "",
-};
+    jasa: {
+      id: null,
+      code: null,
+      name: null,
+      desc: null,
+      acc_id: null,
+    },
+  
+    account: {
+      id: 0,
+      acc_code: "",
+      acc_name: "",
+      umm_code: null,
+      kat_code: 0,
+      dou_type: "",
+      sld_type: "",
+      connect: true,
+      sld_awal: 0,
+    },
+  };
 
-const PusatBiaya = () => {
-  const [pusatBiaya, setPusatBiaya] = useState(null);
+const Jasa = () => {
+  const [jasa, setJasa] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getPusatBiaya();
+    getJasa();
   }, []);
 
-  const getPusatBiaya = async (isUpdate = false) => {
+  const getJasa = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.pusatBiaya,
+      ...endpoints.jasa,
       data: {},
     };
     console.log(config.data);
@@ -34,7 +49,7 @@ const PusatBiaya = () => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        setPusatBiaya(data);
+        setJasa(data);
       }
     } catch (error) {}
     if (isUpdate) {
@@ -52,10 +67,10 @@ const PusatBiaya = () => {
         <Col>
           <Card>
             <Card.Body>
-              <DataPusatBiaya
-                data={loading ? dummy : pusatBiaya}
+              <DataJasa
+                data={loading ? dummy : jasa}
                 load={loading}
-                onSuccessInput={() => getPusatBiaya()}
+                onSuccessInput={() => getJasa()}
               />
             </Card.Body>
           </Card>
@@ -65,4 +80,4 @@ const PusatBiaya = () => {
   );
 };
 
-export default PusatBiaya;
+export default Jasa;

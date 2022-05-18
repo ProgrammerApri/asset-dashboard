@@ -3,7 +3,7 @@ import { Button, Col, Row } from "react-bootstrap";
 import Mitra from "../Mitra/Mitra";
 import Akun from "./Akun";
 import GroupProduk from "./GroupProduk";
-import Jasa from "./Jasa";
+import Jasa from "./Jasa/DataJasa";
 import Pajak from "./Pajak";
 import Produk from "./Produk";
 

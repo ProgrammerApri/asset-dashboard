@@ -1,31 +1,28 @@
 import React, { useState, useEffect, useRef } from "react";
 import { request, endpoints } from "src/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import { Button } from "react-bootstrap";
-import { Row, Col, Card } from "react-bootstrap";
+import { Row } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
-import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
-import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
-import { InputNumber } from "primereact/inputnumber";
 import { Divider } from "@material-ui/core";
 import { Calendar } from "primereact/calendar";
 import { InputSwitch } from "primereact/inputswitch";
 import CustomAccordion from "../../Accordion/Accordion";
 import DataPusatBiaya from "../../MasterLainnya/PusatBiaya/DataPusatBiaya";
 import DataProduk from "../../Master/Produk/DataProduk";
+import DataJasa from "../../Master/Jasa/DataJasa";
+import DataSatuan from "../../MasterLainnya/Satuan/DataSatuan";
+import DataSupplier from "../../Mitra/Pemasok/DataPemasok";
 
 const data = {};
 
 const type = [
-  {name: "Aktif", code: "A"},
-  {name: "Non Aktif", code: "N"}
+  { name: "Aktif", code: "A" },
+  { name: "Non Aktif", code: "N" },
 ];
 
 const InputOrder = ({ onCancel, onSubmit }) => {
@@ -35,9 +32,15 @@ const InputOrder = ({ onCancel, onSubmit }) => {
   const [isEdit, setEdit] = useState(false);
   const [showDepartemen, setShowDepartemen] = useState(false);
   const [pusatBiaya, setPusatBiaya] = useState(null);
+  const [jasa, setJasa] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showProduk, setShowProduk] = useState(false);
+  const [showJasa, setShowJasa] = useState(false);
+  const [showSatuan, setShowSatuan] = useState(false);
+  const [showSupplier, setShowSupplier] = useState(false);
   const [product, setProduk] = useState(null);
+  const [satuan, setSatuan] = useState(null);
+  const [supplier, setSupplier] = useState(null);
   const [doubleClick, setDoubleClick] = useState(false);
   const [inProd, setInProd] = useState([
     {
@@ -66,11 +69,14 @@ const InputOrder = ({ onCancel, onSubmit }) => {
       left: 0,
       behavior: "smooth",
     });
-    getPusatBiaya()
+    getPusatBiaya();
     getProduk();
+    getJasa();
+    getSatuan();
+    getSupplier();
   }, []);
 
-  const getPusatBiaya = async (isUpdate = false) => {
+  const getPusatBiaya = async () => {
     const config = {
       ...endpoints.pusatBiaya,
       data: {},
@@ -219,6 +225,54 @@ const InputOrder = ({ onCancel, onSubmit }) => {
     } catch (error) {}
   };
 
+  const getJasa = async () => {
+    const config = {
+      ...endpoints.jasa,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setJasa(data);
+      }
+    } catch (error) {}
+  };
+
+  const getSatuan = async () => {
+    const config = {
+      ...endpoints.getSatuan,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setSatuan(data);
+      }
+    } catch (error) {}
+  };
+
+  const getSupplier = async () => {
+    const config = {
+      ...endpoints.supplier,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setSupplier(data);
+      }
+    } catch (error) {}
+  };
+
   const header = () => {
     return (
       <h4 className="mb-4">
@@ -291,9 +345,9 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                 placeholder="Pilih Departemen"
               />
               <PButton
-              onClick={() => {
-                setShowDepartemen(true);
-              }}
+                onClick={() => {
+                  setShowDepartemen(true);
+                }}
               >
                 <i class="bx bx-food-menu"></i>
               </PButton>
@@ -422,9 +476,9 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                           placeholder="Pilih Satuan"
                         />
                         <PButton
-                        // onClick={() => {
-                        //   setShowJenisPelanggan(true);
-                        // }}
+                          onClick={() => {
+                            setShowSatuan(true);
+                          }}
                         >
                           <i class="bx bx-food-menu"></i>
                         </PButton>
@@ -522,11 +576,15 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                             })
                           }
                           placeholder="Pilih Kode Jasa"
+                          options={jasa}
+                          optionLabel="name"
+                          filter
+                          filterBy="name"
                         />
                         <PButton
-                        // onClick={() => {
-                        //   setShowJenisPelanggan(true);
-                        // }}
+                          onClick={() => {
+                            setShowJasa(true);
+                          }}
                         >
                           <i class="bx bx-food-menu"></i>
                         </PButton>
@@ -570,9 +628,9 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                           placeholder="Pilih Satuan"
                         />
                         <PButton
-                        // onClick={() => {
-                        //   setShowJenisPelanggan(true);
-                        // }}
+                          onClick={() => {
+                            setShowSatuan(true);
+                          }}
                         >
                           <i class="bx bx-food-menu"></i>
                         </PButton>
@@ -655,9 +713,10 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                 disabled={currentItem && currentItem.type === "N"}
               />
               <PButton
-              // onClick={() => {
-              //   setShowJenisPelanggan(true);
-              // }}
+                onClick={() => {
+                  setShowSupplier(true);
+                }}
+                disabled={currentItem && currentItem.type === "N"}
               >
                 <i class="bx bx-food-menu"></i>
               </PButton>
@@ -747,7 +806,6 @@ const InputOrder = ({ onCancel, onSubmit }) => {
         }}
       />
 
-
       <DataProduk
         data={product}
         loading={false}
@@ -765,6 +823,99 @@ const InputOrder = ({ onCancel, onSubmit }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowProduk(false);
+            // setCurrentItem({
+            //   ...currentItem,
+            //   jpel: e.data,
+            // });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataJasa
+        data={jasa}
+        loading={false}
+        popUp={true}
+        show={showJasa}
+        onHide={() => {
+          setShowJasa(false);
+        }}
+        onInput={(e) => {
+          setShowJasa(!e);
+        }}
+        onSuccessInput={(e) => {
+          getJasa();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowJasa(false);
+            // setCurrentItem({
+            //   ...currentItem,
+            //   jpel: e.data,
+            // });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataSatuan
+        data={satuan}
+        loading={false}
+        popUp={true}
+        show={showSatuan}
+        onHide={() => {
+          setShowSatuan(false);
+        }}
+        onInput={(e) => {
+          setShowSatuan(!e);
+        }}
+        onSuccessInput={(e) => {
+          getJasa();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowSatuan(false);
+            // setCurrentItem({
+            //   ...currentItem,
+            //   jpel: e.data,
+            // });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataSupplier
+        data={supplier}
+        loading={false}
+        popUp={true}
+        show={showSupplier}
+        onHide={() => {
+          setShowSupplier(false);
+        }}
+        onInput={(e) => {
+          setShowSupplier(!e);
+        }}
+        onSuccessInput={(e) => {
+          getJasa();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowSupplier(false);
             // setCurrentItem({
             //   ...currentItem,
             //   jpel: e.data,

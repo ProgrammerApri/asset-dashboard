@@ -14,7 +14,7 @@ import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 
-const data = {
+const def = {
   jasa: {
     id: null,
     code: null,
@@ -36,26 +36,32 @@ const data = {
   },
 };
 
-const Jasa = () => {
-  const [jasa, setJasa] = useState(null);
+const DataJasa = ({
+  data,
+  load,
+  popUp = false,
+  show = false,
+  onHide = () => {},
+  onInput = () => {},
+  onRowSelect,
+  onSuccessInput,
+
+}) => {
   const [account, setAccount] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [update, setUpdate] = useState(false);
-  const [displayData, setDisplayData] = useState(false);
-  const [displayDel, setDisplayDel] = useState(false);
-  const [position, setPosition] = useState("center");
-  const [currentItem, setCurrentItem] = useState(null);
-  const toast = useRef(null);
-  const [filters1, setFilters1] = useState(null);
-  const [globalFilterValue1, setGlobalFilterValue1] = useState("");
-  const [isEdit, setEdit] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+  const [filters1, setFilters1] = useState(null);
+  const [globalFilterValue1, setGlobalFilterValue1] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [update, setUpdate] = useState(false);
+  const toast = useRef(null);
+  const [currentItem, setCurrentItem] = useState(def);
+  const [isEdit, setEdit] = useState(false);
+  const [showInput, setShowInput] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
 
-  const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getJasa();
     getAccount();
     initFilters1();
   }, []);
@@ -87,33 +93,8 @@ const Jasa = () => {
     } catch (error) {}
   };
 
-  const getJasa = async (isUpdate = false) => {
-    setLoading(true);
-    const config = {
-      ...endpoints.jasa,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setJasa(data);
-      }
-    } catch (error) {}
-    if (isUpdate) {
-      setLoading(false);
-    } else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1500);
-    }
-  };
-
   const editJasa = async () => {
+    setLoading(true);
     const config = {
       ...endpoints.editJasa,
       endpoint: endpoints.editJasa.endpoint + currentItem.jasa.id,
@@ -131,9 +112,10 @@ const Jasa = () => {
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setUpdate(false);
-          setDisplayData(false);
-          getJasa(true);
+          onSuccessInput();
+          setLoading(false);
+          onHideInput();
+          onInput(false);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -156,6 +138,7 @@ const Jasa = () => {
   };
 
   const addJasa = async () => {
+    setLoading(true);
     const config = {
       ...endpoints.addJasa,
       data: {
@@ -172,9 +155,10 @@ const Jasa = () => {
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setUpdate(false);
-          setDisplayData(false);
-          getJasa(true);
+          onSuccessInput();
+          setLoading(false);
+          onHideInput();
+          onInput(false);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -210,6 +194,7 @@ const Jasa = () => {
   };
 
   const delJasa = async (id) => {
+    setLoading(true);
     const config = {
       ...endpoints.delJasa,
       endpoint: endpoints.delJasa.endpoint + currentItem.jasa.id,
@@ -221,9 +206,10 @@ const Jasa = () => {
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setUpdate(false);
-          setDisplayDel(false);
-          getJasa(true);
+          onSuccessInput();
+          setLoading(false);
+          onHideInput();
+          onInput(false);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -236,7 +222,6 @@ const Jasa = () => {
       console.log(error);
       setTimeout(() => {
         setUpdate(false);
-        setDisplayDel(false);
         toast.current.show({
           severity: "error",
           summary: "Gagal",
@@ -254,8 +239,9 @@ const Jasa = () => {
         <Link
           onClick={() => {
             setEdit(true);
-            onClick("displayData", data);
             setCurrentItem(data);
+            setShowInput(true);
+            onInput(true);
           }}
           className="btn btn-primary shadow btn-xs sharp ml-2"
         >
@@ -265,8 +251,9 @@ const Jasa = () => {
         <Link
           onClick={() => {
             setEdit(true);
-            setDisplayDel(true);
             setCurrentItem(data);
+            setShowInput(true);
+            onInput(true);
           }}
           className="btn btn-danger shadow btn-xs sharp ml-2"
         >
@@ -277,36 +264,27 @@ const Jasa = () => {
     );
   };
 
-  const onClick = () => {
-    setDisplayData(true);
-
-    if (position) {
-      setPosition(position);
-    }
-  };
-
-  const onSubmit = () => {
-    if (isEdit) {
-      setUpdate(true);
-      editJasa();
-    } else {
-      setUpdate(true);
-      addJasa();
-    }
-  };
-
   const renderFooter = () => {
     return (
       <div>
         <PButton
           label="Batal"
-          onClick={() => setDisplayData(false)}
+          onClick={() => {
+            onHideInput();
+            onInput(false);
+          }}
           className="p-button-text btn-primary"
         />
         <PButton
           label="Simpan"
           icon="pi pi-check"
-          onClick={() => onSubmit()}
+          onClick={() => {
+            if (isEdit) {
+              editJasa();
+            } else {
+              addJasa();
+            }
+          }}
           autoFocus
           loading={update}
         />
@@ -319,7 +297,11 @@ const Jasa = () => {
       <div>
         <PButton
           label="Batal"
-          onClick={() => setDisplayDel(false)}
+          onClick={() => {
+            setShowDelete(false);
+            setLoading(false);
+            onInput(false);
+          }}
           className="p-button-text btn-s btn-primary"
         />
         <PButton
@@ -365,9 +347,11 @@ const Jasa = () => {
         <Button
           variant="primary"
           onClick={() => {
+            setShowInput(true);
             setEdit(false);
-            setCurrentItem(data);
-            setDisplayData(true);
+            setLoading(false);
+            setCurrentItem(def);
+            onInput(true);
           }}
         >
           Tambah{" "}
@@ -449,189 +433,232 @@ const Jasa = () => {
     return <span>{props.placeholder}</span>;
   };
 
-  return (
-    <>
-      <Toast ref={toast} />
-      <Row>
-        <Col>
-          <Card>
-            <Card.Body>
-              <DataTable
-                responsiveLayout="scroll"
-                value={loading ? dummy : jasa}
-                className="display w-150 datatable-wrapper"
-                showGridlines
-                dataKey="id"
-                rowHover
-                header={renderHeader}
-                filters={filters1}
-                globalFilterFields={[
-                  "jasa.code",
-                  "jasa.name",
-                  "jasa.desc",
-                  "account.acc_name",
-                ]}
-                emptyMessage="Tidak ada data"
-                paginator
-                paginatorTemplate={template2}
-                first={first2}
-                rows={rows2}
-                onPage={onCustomPage2}
-                paginatorClassName="justify-content-end mt-3"
-              >
-                <Column
-                  header="Kode Jasa"
-                  style={{
-                    minWidth: "8rem",
+  const onHideInput = () => {
+    setLoading(false);
+    setCurrentItem(def);
+    setEdit(false);
+    setShowInput(false);
+  };
+
+  
+
+  const renderBody = () => {
+    return (
+      <DataTable
+        responsiveLayout="scroll"
+        value={data}
+        className="display w-150 datatable-wrapper"
+        showGridlines
+        dataKey="id"
+        rowHover
+        header={renderHeader}
+        filters={filters1}
+        globalFilterFields={[
+          "jasa.code",
+          "jasa.name",
+          "jasa.desc",
+          "account.acc_name",
+        ]}
+        emptyMessage="Tidak ada data"
+        paginator
+        paginatorTemplate={template2}
+        first={first2}
+        rows={rows2}
+        onPage={onCustomPage2}
+        paginatorClassName="justify-content-end mt-3"
+        selectionMode="single"
+        onRowSelect={onRowSelect}
+      >
+        <Column
+          header="Kode Jasa"
+          style={{
+            minWidth: "8rem",
+          }}
+          field={(e) => e.jasa.code}
+          body={load && <Skeleton />}
+        />
+        <Column
+          header="Nama Jasa"
+          field={(e) => e.jasa.name}
+          style={{ minWidth: "8rem" }}
+          body={load && <Skeleton />}
+        />
+        <Column
+          header="Akun Distribusi GL"
+          field={(e) => e.account.acc_name}
+          style={{ minWidth: "8rem" }}
+          body={load && <Skeleton />}
+        />
+        <Column
+          header="Keterangan"
+          field={(e) => e.jasa.desc}
+          style={{ minWidth: "8rem" }}
+          body={load && <Skeleton />}
+        />
+        <Column
+          header="Action"
+          dataType="boolean"
+          bodyClassName="text-center"
+          style={{ minWidth: "2rem" }}
+          body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
+        />
+      </DataTable>
+    );
+  };
+
+  const renderDialog = () => {
+    return (
+      <>
+        <Toast ref={toast} />
+        <Dialog
+          header={isEdit ? "Edit Jasa" : "Tambah Jasa"}
+          visible={showInput}
+          style={{ width: "60vw" }}
+          footer={renderFooter()}
+          onHide={() => {
+            onHideInput();
+            onInput(false);
+          }}
+        >
+          <div className="row ml-0 mt-0">
+            <div className="col-6">
+              <label className="text-label">Kode Jasa</label>
+              <div className="p-inputgroup">
+                <InputText
+                  value={
+                    currentItem !== null
+                      ? `${currentItem?.jasa?.code ?? ""}`
+                      : ""
+                  }
+                  onChange={(e) =>
+                    setCurrentItem({
+                      ...currentItem,
+                      jasa: { ...currentItem.jasa, code: e.target.value },
+                    })
+                  }
+                  placeholder="Masukan Kode Jasa"
+                />
+              </div>
+            </div>
+
+            <div className="col-6">
+              <label className="text-label">Nama Jasa</label>
+              <div className="p-inputgroup">
+                <InputText
+                  value={
+                    currentItem !== null
+                      ? `${currentItem?.jasa?.name ?? ""}`
+                      : ""
+                  }
+                  onChange={(e) =>
+                    setCurrentItem({
+                      ...currentItem,
+                      jasa: { ...currentItem.jasa, name: e.target.value },
+                    })
+                  }
+                  placeholder="Masukan Nama Jasa"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="row ml-0 mt-0">
+            <div className="col-12">
+              <label className="text-label">Akun Distribusi GL</label>
+              <div className="p-inputgroup">
+                <Dropdown
+                  value={currentItem !== null ? currentItem.account : null}
+                  options={account}
+                  onChange={(e) => {
+                    console.log(e.value);
+                    setCurrentItem({
+                      ...currentItem,
+                      account: e.value,
+                    });
                   }}
-                  field={(e) => e.jasa.code}
-                  body={loading && <Skeleton />}
+                  optionLabel="acc_name"
+                  valueTemplate={clear}
+                  itemTemplate={glTemplate}
+                  filter
+                  filterBy="acc_name"
+                  placeholder="Pilih Akun Distribusi GL"
+                  // showClear
                 />
-                <Column
-                  header="Nama Jasa"
-                  field={(e) => e.jasa.name}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Akun Distribusi GL"
-                  field={(e) => e.account.acc_name}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Keterangan"
-                  field={(e) => e.jasa.desc}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Action"
-                  dataType="boolean"
-                  bodyClassName="text-center"
-                  style={{ minWidth: "2rem" }}
-                  body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
-                />
-              </DataTable>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-
-      <Dialog
-        header={isEdit ? "Edit Jasa" : "Tambah Jasa"}
-        visible={displayData}
-        style={{ width: "40vw" }}
-        footer={renderFooter("displayData")}
-        onHide={() => {
-          setEdit(false);
-          setDisplayData(false);
-        }}
-      >
-        <div className="row ml-0 mt-0">
-          <div className="col-6">
-            <label className="text-label">Kode Jasa</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={
-                  currentItem !== null ? `${currentItem?.jasa?.code ?? ""}` : ""
-                }
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    jasa: { ...currentItem.jasa, code: e.target.value },
-                  })
-                }
-                placeholder="Masukan Kode Jasa"
-              />
+              </div>
             </div>
           </div>
 
-          <div className="col-6">
-            <label className="text-label">Nama Jasa</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={
-                  currentItem !== null ? `${currentItem?.jasa?.name ?? ""}` : ""
-                }
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    jasa: { ...currentItem.jasa, name: e.target.value },
-                  })
-                }
-                placeholder="Masukan Nama Jasa"
-              />
+          <div className="row ml-0 mt-0">
+            <div className="col-12">
+              <label className="text-label">Keterangan</label>
+              <div className="p-inputgroup">
+                <InputTextarea
+                  value={
+                    currentItem !== null
+                      ? `${currentItem?.jasa?.desc ?? ""}`
+                      : ""
+                  }
+                  onChange={(e) =>
+                    setCurrentItem({
+                      ...currentItem,
+                      jasa: { ...currentItem.jasa, desc: e.target.value },
+                    })
+                  }
+                  placeholder="Masukan Keterangan"
+                />
+              </div>
             </div>
           </div>
-        </div>
+        </Dialog>
 
-        <div className="row ml-0 mt-0">
-          <div className="col-12">
-            <label className="text-label">Akun Distribusi GL</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={currentItem !== null ? currentItem.account : null}
-                options={account}
-                onChange={(e) => {
-                  console.log(e.value);
-                  setCurrentItem({
-                    ...currentItem,
-                    account: e.value,
-                  });
-                }}
-                optionLabel="acc_name"
-                valueTemplate={clear}
-                itemTemplate={glTemplate}
-                filter
-                filterBy="acc_name"
-                placeholder="Pilih Akun Distribusi GL"
-                // showClear
-              />
-            </div>
+        <Dialog
+          header={"Hapus Data"}
+          visible={showDelete}
+          style={{ width: "30vw" }}
+          footer={renderFooterDel()}
+          onHide={() => {
+            setLoading(false);
+            setShowDelete(false);
+            onInput(false);
+          }}
+        >
+          <div className="ml-2 mr-3">
+            <i
+              className="pi pi-exclamation-triangle mr-2 align-middle"
+              style={{ fontSize: "1rem" }}
+            />
+            <span>Apakah anda yakin ingin menghapus data ?</span>
           </div>
-        </div>
+        </Dialog>
+      </>
+    );
+  };
 
-        <div className="row ml-0 mt-0">
-          <div className="col-12">
-            <label className="text-label">Keterangan</label>
-            <div className="p-inputgroup">
-              <InputTextarea
-                value={
-                  currentItem !== null ? `${currentItem?.jasa?.desc ?? ""}` : ""
-                }
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    jasa: { ...currentItem.jasa, desc: e.target.value },
-                  })
-                }
-                placeholder="Masukan Keterangan"
-              />
-            </div>
-          </div>
-        </div>
-      </Dialog>
-
-      <Dialog
-        header={"Hapus Data"}
-        visible={displayDel}
-        style={{ width: "30vw" }}
-        footer={renderFooterDel("displayDel")}
-        onHide={() => {
-          setDisplayDel(false);
-        }}
-      >
-        <div className="ml-2 mr-3">
-          <i
-            className="pi pi-exclamation-triangle mr-2 align-middle"
-            style={{ fontSize: "1rem" }}
-          />
-          <span>Apakah anda yakin ingin menghapus data ?</span>
-        </div>
-      </Dialog>
-    </>
-  );
+  if (popUp) {
+    return (
+      <>
+        <Dialog
+          header={"Data Jasa"}
+          visible={show}
+          footer={() => <div></div>}
+          style={{ width: "60vw" }}
+          onHide={onHide}
+        >
+          <Row className="ml-0 mr-0">
+            <Col>{renderBody()}</Col>
+          </Row>
+        </Dialog>
+        {renderDialog()}
+      </>
+    );
+  } else {
+    return (
+      <>
+        {renderBody()}
+        {renderDialog()}
+      </>
+    );
+  }
 };
 
-export default Jasa;
+export default DataJasa;

@@ -7,8 +7,8 @@ import Divisi from "../Master/Divisi";
 import JenisPelanggan from "../Master/JenisPelanggan";
 import JenisPemasok from "../Master/JenisPemasok";
 import Project from "../Master/Project";
-import RulesPay from "../Master/RulesPay";
-import Satuan from "../Satuan";
+import RulesPay from "./RulesPay/RulesPay";
+import Satuan from "./Satuan";
 import TransaksiPembelian from "../TransaksiPembelian/TransaksiPembelian";
 import PusatBiaya from "./PusatBiaya";
 
@@ -39,6 +39,11 @@ const MasterLainnya = () => {
       tittle: "Currency",
       icon: "bx-dollar-circle",
       component: <Currency />,
+    },
+    {
+      tittle: "Syarat Pembayaran",
+      icon: "bx-dollar-circle",
+      component: <RulesPay />,
     },
     {
       tittle: "bank",

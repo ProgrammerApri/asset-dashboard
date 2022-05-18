@@ -38,7 +38,7 @@ import Neraca from "./components/Report/Neraca";
 import Perusahaan from "./components/Setup/Perusahaan";
 import Currency from "./components/Master/Currency";
 import Lokasi from "./components/Master/Lokasi";
-import RulesPay from "./components/Master/RulesPay";
+import RulesPay from "./components/MasterLainnya/RulesPay/RulesPay";
 import Setup from "./components/Setup";
 import Divisi from "./components/Master/Divisi";
 import PPN from "./components/Master/Pajak";
@@ -47,12 +47,12 @@ import SetupKhusus from "./components/Master/SetupKhusus";
 import Mitra from "./components/Mitra/Mitra";
 import TransaksiPembelian from "./components/TransaksiPembelian/TransaksiPembelian";
 import GroupProduk from "./components/Master/GroupProduk";
-import Satuan from "./components/Satuan";
+import Satuan from "./components/MasterLainnya/Satuan";
 import Master from "./components/Master";
 import MasterLainnya from "./components/MasterLainnya";
 import JenisPelanggan from "./components/Master/JenisPelanggan";
 import Pajak from "./components/Master/Pajak";
-import Jasa from "./components/Master/Jasa";
+import Jasa from "./components/Master/Jasa/DataJasa";
 import PusatBiaya from "./components/MasterLainnya/PusatBiaya/DataPusatBiaya";
 
 const Markup = ({ width }) => {

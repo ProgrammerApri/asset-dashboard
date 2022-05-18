@@ -46,7 +46,6 @@ import SubCustomer from "./components/Master/SubCustomer";
 import SetupKhusus from "./components/Master/SetupKhusus";
 import Mitra from "./components/Mitra/Mitra";
 import TransaksiPembelian from "./components/TransaksiPembelian/TransaksiPembelian";
-import Produk from "./components/Master/Produk";
 import GroupProduk from "./components/Master/GroupProduk";
 import Satuan from "./components/Satuan";
 import Master from "./components/Master";
@@ -86,7 +85,6 @@ const Markup = ({ width }) => {
     { url: "sub-pelanggan", component: SubCustomer },
     { url: "setup-perkiraan", component: SetupKhusus },
     { url: "satuan", component: Satuan },
-    { url: "produk", component: Produk },
     { url: "group-produk", component: GroupProduk },
     { url: "pajak", component: Pajak },
     { url: "jasa", component: Jasa },

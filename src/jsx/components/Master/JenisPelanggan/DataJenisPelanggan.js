@@ -3,7 +3,7 @@ import { request, endpoints } from "src/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Button } from "react-bootstrap";
+import { Button, Col, Row } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { Dialog } from "primereact/dialog";
@@ -37,7 +37,7 @@ const DataJenisPelanggan = ({
   const [loading, setLoading] = useState(false);
   const toast = useRef(null);
   const [currentItem, setCurrentItem] = useState(def);
-  const [isEdit, setEdit] = useState(def);
+  const [isEdit, setEdit] = useState(false);
   const [showInput, setShowInput] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
 
@@ -517,10 +517,12 @@ const DataJenisPelanggan = ({
           header={"Data Jenis Pelanggan"}
           visible={show}
           footer={() => <div></div>}
-          style={{ width: "40vw" }}
+          style={{ width: "60vw" }}
           onHide={onHide}
         >
-          {renderBody()}
+          <Row className="ml-0 mr-0">
+            <Col>{renderBody()}</Col>
+          </Row>
         </Dialog>
         {renderDialog()}
       </>

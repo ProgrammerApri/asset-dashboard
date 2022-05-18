@@ -17,6 +17,7 @@ import { InputNumber } from "primereact/inputnumber";
 import { Divider } from "@material-ui/core";
 import { Calendar } from "primereact/calendar";
 import { InputSwitch } from "primereact/inputswitch";
+import CustomAccordion from "../../Accordion/Accordion";
 
 const data = {};
 
@@ -41,6 +42,10 @@ const InputOrder = ({ onCancel, onSubmit }) => {
       u_to: null,
     },
   ]);
+  const [accor, setAccor] = useState({
+    produk: true,
+    jasa: false,
+  });
 
   useEffect(() => {
     window.scrollTo({
@@ -177,7 +182,7 @@ const InputOrder = ({ onCancel, onSubmit }) => {
     return (
       <>
         {/* Put content body here */}
-        <Row>
+        <Row className="mb-4">
           <div className="col-4">
             <label className="text-label">Tanggal</label>
             <div className="p-inputgroup">
@@ -236,6 +241,13 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                 }
                 placeholder="Pilih Departemen"
               />
+              <PButton
+              // onClick={() => {
+              //   setShowJenisPelanggan(true);
+              // }}
+              >
+                <i class="bx bx-food-menu"></i>
+              </PButton>
             </div>
           </div>
 
@@ -260,355 +272,302 @@ const InputOrder = ({ onCancel, onSubmit }) => {
           </div>
         </Row>
 
-        <h4 className="mt-4 ml-0 mr-3">
-          <b>Permintaan Produk</b>
-        </h4>
-        <div className="row mb-0 mt-4">
-          <div className="col-3">
-            <label className="text-label">Kode Produk</label>
-          </div>
+        <CustomAccordion
+          tittle={"Permintaan Produk"}
+          defaultActive={true}
+          active={accor.produk}
+          onClick={() => {
+            setAccor({
+              ...accor,
+              produk: !accor.produk,
+            });
+          }}
+          key={1}
+          body={
+            <Row>
+              <div className="row col-12 mr-0 ml-0 mb-0">
+                <div className="col-4">
+                  <label className="text-label">Kode Produk</label>
+                </div>
 
-          <div className="col-2">
-            <label className="text-label">Jumlah</label>
-          </div>
+                <div className="col-2">
+                  <label className="text-label">Jumlah</label>
+                </div>
 
-          <div className="col-2">
-            <label className="text-label">Satuan</label>
-          </div>
+                <div className="col-4">
+                  <label className="text-label">Satuan</label>
+                </div>
 
-          <div className="col-2">
-            <label className="text-label">Harga Satuan</label>
-          </div>
-
-          <div className="col-2">
-            <label className="text-label">Total</label>
-          </div>
-
-          <div className="col-1">
-            <label className="text-label">Action</label>
-          </div>
-
-          <div className="d-flex">
-            <div className="mt-5"></div>
-          </div>
-        </div>
-        <Divider className="mb-2 ml-0 mr-3"></Divider>
-
-        {inProd.map((v, i) => {
-          return (
-            <div className="row mb-1">
-              <div className="col-3">
-                <div className="p-inputgroup">
-                  <Dropdown
-                    // value={
-                    //   currentItem !== null
-                    //     ? `${currentItem?.jasa?.name ?? ""}`
-                    //     : ""
-                    // }
-                    onChange={(e) =>
-                      setCurrentItem({
-                        // ...currentItem,
-                        // jasa: { ...currentItem.jasa, name: e.target.value },
-                      })
-                    }
-                    placeholder="Pilih Kode Produk"
-                  />
+                <div className="col-2">
+                  <label className="text-label">Action</label>
                 </div>
               </div>
 
-              <div className="col-2">
-                <div className="p-inputgroup">
-                  <InputNumber
-                    // value={
-                    //   currentItem !== null
-                    //     ? `${currentItem?.jasa?.name ?? ""}`
-                    //     : ""
-                    // }
-                    onChange={(e) =>
-                      setCurrentItem({
-                        // ...currentItem,
-                        // jasa: { ...currentItem.jasa, name: e.target.value },
-                      })
-                    }
-                    placeholder="Masukan Jumlah"
-                    showButtons
-                  />
+              {inProd.map((v, i) => {
+                return (
+                  <div className="row col-12 mr-0 ml-0 mt-0">
+                    <div className="col-4">
+                      <div className="p-inputgroup">
+                        <Dropdown
+                          // value={
+                          //   currentItem !== null
+                          //     ? `${currentItem?.jasa?.name ?? ""}`
+                          //     : ""
+                          // }
+                          onChange={(e) =>
+                            setCurrentItem({
+                              // ...currentItem,
+                              // jasa: { ...currentItem.jasa, name: e.target.value },
+                            })
+                          }
+                          placeholder="Pilih Kode Produk"
+                        />
+                        <PButton
+                        // onClick={() => {
+                        //   setShowJenisPelanggan(true);
+                        // }}
+                        >
+                          <i class="bx bx-food-menu"></i>
+                        </PButton>
+                      </div>
+                    </div>
+
+                    <div className="col-2">
+                      <div className="p-inputgroup">
+                        <InputText
+                          // value={
+                          //   currentItem !== null
+                          //     ? `${currentItem?.jasa?.name ?? ""}`
+                          //     : ""
+                          // }
+                          onChange={(e) =>
+                            setCurrentItem({
+                              // ...currentItem,
+                              // jasa: { ...currentItem.jasa, name: e.target.value },
+                            })
+                          }
+                          placeholder="Masukan Jumlah"
+                          type="number"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="col-4">
+                      <div className="p-inputgroup">
+                        <Dropdown
+                          // value={
+                          //   currentItem !== null
+                          //     ? `${currentItem?.jasa?.name ?? ""}`
+                          //     : ""
+                          // }
+                          onChange={(e) =>
+                            setCurrentItem({
+                              // ...currentItem,
+                              // jasa: { ...currentItem.jasa, name: e.target.value },
+                            })
+                          }
+                          placeholder="Pilih Satuan"
+                        />
+                        <PButton
+                        // onClick={() => {
+                        //   setShowJenisPelanggan(true);
+                        // }}
+                        >
+                          <i class="bx bx-food-menu"></i>
+                        </PButton>
+                      </div>
+                    </div>
+
+                    <div className="col-2 d-flex ml-0">
+                      <div className="mt-2">
+                        {i == inProd.length - 1 ? (
+                          <Link
+                            onClick={() => {
+                              setInProd([
+                                ...inProd,
+                                {
+                                  id: 0,
+                                  qty: 1,
+                                  u_from: null,
+                                  u_to: null,
+                                },
+                              ]);
+                            }}
+                            className="btn btn-primary shadow btn-xs sharp ml-1"
+                          >
+                            <i className="fa fa-plus"></i>
+                          </Link>
+                        ) : (
+                          <Link
+                            onClick={() => {
+                              console.log(inProd);
+                              console.log(i);
+                              let temp = [...inProd];
+                              temp.splice(i, 1);
+                              setInProd(temp);
+                            }}
+                            className="btn btn-danger shadow btn-xs sharp ml-1"
+                          >
+                            <i className="fa fa-trash"></i>
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+              
+            </Row>
+          }
+        />
+
+        <CustomAccordion
+          tittle={"Permintaan Jasa"}
+          defaultActive={false}
+          active={accor.jasa}
+          onClick={() => {
+            setAccor({
+              ...accor,
+              jasa: !accor.jasa,
+            });
+          }}
+          key={1}
+          body={
+            <Row>
+              <div className="row col-12 mr-0 ml-0 mb-0">
+                <div className="col-4">
+                  <label className="text-label">Kode Jasa</label>
+                </div>
+
+                <div className="col-2">
+                  <label className="text-label">Jumlah</label>
+                </div>
+
+                <div className="col-4">
+                  <label className="text-label">Satuan</label>
+                </div>
+
+                <div className="col-2">
+                  <label className="text-label">Action</label>
                 </div>
               </div>
 
-              <div className="col-2">
-                <div className="p-inputgroup">
-                  <Dropdown
-                    // value={
-                    //   currentItem !== null
-                    //     ? `${currentItem?.jasa?.name ?? ""}`
-                    //     : ""
-                    // }
-                    onChange={(e) =>
-                      setCurrentItem({
-                        // ...currentItem,
-                        // jasa: { ...currentItem.jasa, name: e.target.value },
-                      })
-                    }
-                    placeholder="Pilih Satuan"
-                  />
-                </div>
-              </div>
+              {inJasa.map((v, i) => {
+                return (
+                  <div className="row col-12 mr-0 ml-0 mb-0">
+                    <div className="col-4">
+                      <div className="p-inputgroup">
+                        <Dropdown
+                          // value={
+                          //   currentItem !== null
+                          //     ? `${currentItem?.jasa?.name ?? ""}`
+                          //     : ""
+                          // }
+                          onChange={(e) =>
+                            setCurrentItem({
+                              // ...currentItem,
+                              // jasa: { ...currentItem.jasa, name: e.target.value },
+                            })
+                          }
+                          placeholder="Pilih Kode Jasa"
+                        />
+                        <PButton
+                        // onClick={() => {
+                        //   setShowJenisPelanggan(true);
+                        // }}
+                        >
+                          <i class="bx bx-food-menu"></i>
+                        </PButton>
+                      </div>
+                    </div>
 
-              <div className="col-2">
-                <div className="p-inputgroup">
-                  <InputNumber
-                    // value={
-                    //   currentItem !== null
-                    //     ? `${currentItem?.jasa?.name ?? ""}`
-                    //     : ""
-                    // }
-                    onChange={(e) =>
-                      setCurrentItem({
-                        // ...currentItem,
-                        // jasa: { ...currentItem.jasa, name: e.target.value },
-                      })
-                    }
-                    placeholder="Masukan Harga Satuan"
-                    disabled
-                  />
-                </div>
-              </div>
+                    <div className="col-2">
+                      <div className="p-inputgroup">
+                        <InputText
+                          // value={
+                          //   currentItem !== null
+                          //     ? `${currentItem?.jasa?.name ?? ""}`
+                          //     : ""
+                          // }
+                          onChange={(e) =>
+                            setCurrentItem({
+                              // ...currentItem,
+                              // jasa: { ...currentItem.jasa, name: e.target.value },
+                            })
+                          }
+                          placeholder="Masukan Jumlah"
+                          type="number"
+                        />
+                      </div>
+                    </div>
 
-              <div className="col-2">
-                <div className="p-inputgroup">
-                  <InputNumber
-                    // value={
-                    //   currentItem !== null
-                    //     ? `${currentItem?.jasa?.name ?? ""}`
-                    //     : ""
-                    // }
-                    onChange={(e) =>
-                      setCurrentItem({
-                        // ...currentItem,
-                        // jasa: { ...currentItem.jasa, name: e.target.value },
-                      })
-                    }
-                    placeholder="Total Harga"
-                    disabled
-                  />
-                </div>
-              </div>
+                    <div className="col-4">
+                      <div className="p-inputgroup">
+                        <Dropdown
+                          // value={
+                          //   currentItem !== null
+                          //     ? `${currentItem?.jasa?.name ?? ""}`
+                          //     : ""
+                          // }
+                          onChange={(e) =>
+                            setCurrentItem({
+                              // ...currentItem,
+                              // jasa: { ...currentItem.jasa, name: e.target.value },
+                            })
+                          }
+                          placeholder="Pilih Satuan"
+                        />
+                        <PButton
+                        // onClick={() => {
+                        //   setShowJenisPelanggan(true);
+                        // }}
+                        >
+                          <i class="bx bx-food-menu"></i>
+                        </PButton>
+                      </div>
+                    </div>
 
-              <div className="col-1 d-flex ml-0">
-                <div className="mt-2">
-                  {i == inProd.length - 1 ? (
-                    <Link
-                      onClick={() => {
-                        setInProd([
-                          ...inProd,
-                          {
-                            id: 0,
-                            qty: 1,
-                            u_from: null,
-                            u_to: null,
-                          },
-                        ]);
-                      }}
-                      className="btn btn-primary shadow btn-xs sharp ml-1"
-                    >
-                      <i className="fa fa-plus"></i>
-                    </Link>
-                  ) : (
-                    <Link
-                      onClick={() => {
-                        console.log(inProd);
-                        console.log(i);
-                        let temp = [...inProd];
-                        temp.splice(i, 1);
-                        setInProd(temp);
-                      }}
-                      className="btn btn-danger shadow btn-xs sharp ml-1"
-                    >
-                      <i className="fa fa-trash"></i>
-                    </Link>
-                  )}
-                </div>
-              </div>
-            </div>
-          );
-        })}
-        <Divider className="mb-2 ml-0 mr-3"></Divider>
-
-        <h4 className="mt-6 ml-0 mr-3">
-          <b>Permintaan Jasa</b>
-        </h4>
-        <div className="row mb-0 mt-4">
-          <div className="col-3">
-            <label className="text-label">Kode Jasa</label>
-          </div>
-
-          <div className="col-2">
-            <label className="text-label">Jumlah</label>
-          </div>
-
-          <div className="col-2">
-            <label className="text-label">Satuan</label>
-          </div>
-
-          <div className="col-2">
-            <label className="text-label">Harga</label>
-          </div>
-
-          <div className="col-2">
-            <label className="text-label">Total</label>
-          </div>
-
-          <div className="col-1">
-            <label className="text-label">Action</label>
-          </div>
-
-          <div className="d-flex">
-            <div className="mt-5"></div>
-          </div>
-        </div>
-        <Divider className="mb-2 ml-0 mr-3"></Divider>
-
-        {inJasa.map((v, i) => {
-          return (
-            <div className="row mb-1">
-              <div className="col-3">
-                <div className="p-inputgroup">
-                  <Dropdown
-                    // value={
-                    //   currentItem !== null
-                    //     ? `${currentItem?.jasa?.name ?? ""}`
-                    //     : ""
-                    // }
-                    onChange={(e) =>
-                      setCurrentItem({
-                        // ...currentItem,
-                        // jasa: { ...currentItem.jasa, name: e.target.value },
-                      })
-                    }
-                    placeholder="Pilih Kode Jasa"
-                  />
-                </div>
-              </div>
-
-              <div className="col-2">
-                <div className="p-inputgroup">
-                  <InputNumber
-                    // value={
-                    //   currentItem !== null
-                    //     ? `${currentItem?.jasa?.name ?? ""}`
-                    //     : ""
-                    // }
-                    onChange={(e) =>
-                      setCurrentItem({
-                        // ...currentItem,
-                        // jasa: { ...currentItem.jasa, name: e.target.value },
-                      })
-                    }
-                    placeholder="Masukan Jumlah"
-                    showButtons
-                  />
-                </div>
-              </div>
-
-              <div className="col-2">
-                <div className="p-inputgroup">
-                  <Dropdown
-                    // value={
-                    //   currentItem !== null
-                    //     ? `${currentItem?.jasa?.name ?? ""}`
-                    //     : ""
-                    // }
-                    onChange={(e) =>
-                      setCurrentItem({
-                        // ...currentItem,
-                        // jasa: { ...currentItem.jasa, name: e.target.value },
-                      })
-                    }
-                    placeholder="Pilih Satuan"
-                  />
-                </div>
-              </div>
-
-              <div className="col-2">
-                <div className="p-inputgroup">
-                  <InputNumber
-                    // value={
-                    //   currentItem !== null
-                    //     ? `${currentItem?.jasa?.name ?? ""}`
-                    //     : ""
-                    // }
-                    onChange={(e) =>
-                      setCurrentItem({
-                        // ...currentItem,
-                        // jasa: { ...currentItem.jasa, name: e.target.value },
-                      })
-                    }
-                    placeholder="Masukan Harga"
-                    disabled
-                  />
-                </div>
-              </div>
-
-              <div className="col-2">
-                <div className="p-inputgroup">
-                  <InputNumber
-                    // value={
-                    //   currentItem !== null
-                    //     ? `${currentItem?.jasa?.name ?? ""}`
-                    //     : ""
-                    // }
-                    onChange={(e) =>
-                      setCurrentItem({
-                        // ...currentItem,
-                        // jasa: { ...currentItem.jasa, name: e.target.value },
-                      })
-                    }
-                    placeholder="Total Harga"
-                    disabled
-                  />
-                </div>
-              </div>
-
-              <div className="col-1 d-flex ml-0">
-                <div className="mt-2">
-                  {i == inJasa.length - 1 ? (
-                    <Link
-                      onClick={() => {
-                        setInJasa([
-                          ...inJasa,
-                          {
-                            id: 0,
-                            qty: 1,
-                            u_from: null,
-                            u_to: null,
-                          },
-                        ]);
-                      }}
-                      className="btn btn-primary shadow btn-xs sharp ml-1"
-                    >
-                      <i className="fa fa-plus"></i>
-                    </Link>
-                  ) : (
-                    <Link
-                      onClick={() => {
-                        console.log(inJasa);
-                        console.log(i);
-                        let temp = [...inJasa];
-                        temp.splice(i, 1);
-                        setInJasa(temp);
-                      }}
-                      className="btn btn-danger shadow btn-xs sharp ml-1"
-                    >
-                      <i className="fa fa-trash"></i>
-                    </Link>
-                  )}
-                </div>
-              </div>
-            </div>
-          );
-        })}
-        <Divider className="mb-2 ml-0 mr-3"></Divider>
+                    <div className="col-2 d-flex ml-0">
+                      <div className="mt-2">
+                        {i == inJasa.length - 1 ? (
+                          <Link
+                            onClick={() => {
+                              setInJasa([
+                                ...inJasa,
+                                {
+                                  id: 0,
+                                  qty: 1,
+                                  u_from: null,
+                                  u_to: null,
+                                },
+                              ]);
+                            }}
+                            className="btn btn-primary shadow btn-xs sharp ml-1"
+                          >
+                            <i className="fa fa-plus"></i>
+                          </Link>
+                        ) : (
+                          <Link
+                            onClick={() => {
+                              console.log(inJasa);
+                              console.log(i);
+                              let temp = [...inJasa];
+                              temp.splice(i, 1);
+                              setInJasa(temp);
+                            }}
+                            className="btn btn-danger shadow btn-xs sharp ml-1"
+                          >
+                            <i className="fa fa-trash"></i>
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </Row>
+          }
+        />
 
         <div className="row mb-0">
           <div className="d-flex col-12 align-items-center mt-4">
@@ -643,6 +602,13 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                 placeholder="Pilih Kode Supplier"
                 disabled
               />
+              <PButton
+              // onClick={() => {
+              //   setShowJenisPelanggan(true);
+              // }}
+              >
+                <i class="bx bx-food-menu"></i>
+              </PButton>
             </div>
           </div>
 

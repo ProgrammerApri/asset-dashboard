@@ -734,8 +734,16 @@ const Pajak = () => {
               </div>
 
               <div className="row ml-0 mt-0">
-                <div className="col-12 mb-2">
+                <div className="col-2 mb-2">
                   <label className="text-label">Detail :</label>
+                </div>
+
+                <div className="col-10 mb-2">
+                  <label className="text-label">1. .... <b>%</b></label>
+                </div>
+
+                <div className="col-10 mb-2">
+                  <label className="text-label">1. ..... <b>%</b></label>
                 </div>
               </div>
             </>

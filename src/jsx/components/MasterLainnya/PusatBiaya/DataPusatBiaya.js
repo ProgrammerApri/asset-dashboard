@@ -47,6 +47,7 @@ const DataPusatBiaya = ({
   }, []);
 
   const editPusatBiaya = async () => {
+    setLoading(true)
     const config = {
       ...endpoints.editPusatBiaya,
       endpoint: endpoints.editPusatBiaya.endpoint + currentItem.id,
@@ -89,6 +90,7 @@ const DataPusatBiaya = ({
   };
 
   const addPusatBiaya = async () => {
+    setLoading(true)
     const config = {
       ...endpoints.addPusatBiaya,
       data: {
@@ -256,7 +258,6 @@ const DataPusatBiaya = ({
         />
         <PButton
           label="Hapus"
-          className="p-button btn-s btn-primary"
           icon="pi pi-trash"
           onClick={() => {
             delPusatBiaya();

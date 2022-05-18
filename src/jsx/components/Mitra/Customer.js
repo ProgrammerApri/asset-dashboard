@@ -135,7 +135,7 @@ const Customer = () => {
     } else {
       setTimeout(() => {
         setLoading(false);
-      }, 1500);
+      }, 500);
     }
   };
 
@@ -156,7 +156,7 @@ const Customer = () => {
   };
 
   const getJpel = async (isUpdate = false) => {
-    setLoading(true);
+    setLoading(!isUpdate);
     const config = {
       ...endpoints.jenisPel,
       data: {},
@@ -177,7 +177,7 @@ const Customer = () => {
     } else {
       setTimeout(() => {
         setLoading(false);
-      }, 1500);
+      }, 500);
     }
   };
 
@@ -297,7 +297,7 @@ const Customer = () => {
     } else {
       setTimeout(() => {
         setLoading(false);
-      }, 1500);
+      }, 500);
     }
   };
 
@@ -323,7 +323,7 @@ const Customer = () => {
     } else {
       setTimeout(() => {
         setLoading(false);
-      }, 1500);
+      }, 500);
     }
   };
 
@@ -1132,6 +1132,7 @@ const Customer = () => {
                   <PButton
                     onClick={() => {
                       setShowJenisPelanggan(true);
+                      setDisplayData(false);
                     }}
                   >
                     <i class="bx bx-food-menu"></i>
@@ -1569,11 +1570,20 @@ const Customer = () => {
         loading={false}
         popUp={true}
         show={showJenisPelanggan}
-        onHide={()=> setShowJenisPelanggan(false)}
-        onSuccessInput={() => getJpel()}
-        onRowSelect={(e)=>{
+        onHide={() => {
+          setShowJenisPelanggan(false);
+          setDisplayData(true);
+        }}
+        onInput={(e) => {
+          setShowJenisPelanggan(!e);
+        }}
+        onSuccessInput={(e) => {
+          getJpel(true);
+        }}
+        onRowSelect={(e) => {
           if (doubleClick) {
             setShowJenisPelanggan(false);
+            setDisplayData(true);
             setCurrentItem({
               ...currentItem,
               jpel: e.data,

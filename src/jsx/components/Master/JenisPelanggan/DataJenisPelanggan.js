@@ -26,6 +26,7 @@ const DataJenisPelanggan = ({
   popUp = false,
   show = false,
   onHide = () => {},
+  onInput = () => {},
   onRowSelect,
   onSuccessInput,
 }) => {
@@ -77,6 +78,7 @@ const DataJenisPelanggan = ({
             setEdit(false);
             setLoading(false);
             setCurrentItem(def);
+            onInput(true);
           }}
         >
           Tambah{" "}
@@ -150,6 +152,7 @@ const DataJenisPelanggan = ({
           onSuccessInput();
           setLoading(false);
           onHideInput();
+          onInput(false);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -191,6 +194,7 @@ const DataJenisPelanggan = ({
           onSuccessInput();
           setLoading(false);
           onHideInput();
+          onInput(false);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -241,6 +245,7 @@ const DataJenisPelanggan = ({
           setLoading(false);
           setShowDelete(false);
           onSuccessInput();
+          onInput(false);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -254,6 +259,8 @@ const DataJenisPelanggan = ({
       setTimeout(() => {
         setLoading(false);
         setShowDelete(false);
+        onSuccessInput();
+        onInput(false);
         toast.current.show({
           severity: "error",
           summary: "Gagal",
@@ -271,6 +278,7 @@ const DataJenisPelanggan = ({
           label="Batal"
           onClick={() => {
             onHideInput();
+            onInput(false);
           }}
           className="p-button-text btn-primary"
         />
@@ -299,6 +307,7 @@ const DataJenisPelanggan = ({
           onClick={() => {
             setShowDelete(false);
             setLoading(false);
+            onInput(false);
           }}
           className="p-button-text btn-primary"
         />
@@ -323,7 +332,8 @@ const DataJenisPelanggan = ({
           onClick={() => {
             setEdit(true);
             setCurrentItem(data);
-            setShowInput(true)
+            setShowInput(true);
+            onInput(true);
           }}
           className="btn btn-primary shadow btn-xs sharp ml-1"
         >
@@ -333,7 +343,8 @@ const DataJenisPelanggan = ({
         <Link
           onClick={() => {
             setCurrentItem(data);
-            setShowDelete(true)
+            setShowDelete(true);
+            onInput(true);
           }}
           className="btn btn-danger shadow btn-xs sharp ml-1"
         >
@@ -411,7 +422,8 @@ const DataJenisPelanggan = ({
     setLoading(false);
     setCurrentItem(def);
     setEdit(false);
-    setShowInput(false)
+    setShowInput(false);
+    onInput(false);
   };
 
   const renderDialog = () => {
@@ -483,6 +495,7 @@ const DataJenisPelanggan = ({
           onHide={() => {
             setLoading(false);
             setShowDelete(false);
+            onInput(false);
           }}
         >
           <div className="ml-3 mr-3">
@@ -513,10 +526,12 @@ const DataJenisPelanggan = ({
       </>
     );
   } else {
-    return <>
-      {renderBody()}  
-      {renderDialog()}
-    </>;
+    return (
+      <>
+        {renderBody()}
+        {renderDialog()}
+      </>
+    );
   }
 };
 

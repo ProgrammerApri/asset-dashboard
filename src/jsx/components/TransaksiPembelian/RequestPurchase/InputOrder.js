@@ -18,6 +18,7 @@ import { Divider } from "@material-ui/core";
 import { Calendar } from "primereact/calendar";
 import { InputSwitch } from "primereact/inputswitch";
 import CustomAccordion from "../../Accordion/Accordion";
+import DataProduk from "../../Master/Produk/DataProduk";
 
 const data = {};
 
@@ -26,6 +27,9 @@ const InputOrder = ({ onCancel, onSubmit }) => {
   const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
   const [isEdit, setEdit] = useState(false);
+  const [showProduk, setShowProduk] = useState(false);
+  const [product, setProduk] = useState(null);
+  const [doubleClick, setDoubleClick] = useState(false);
   const [inProd, setInProd] = useState([
     {
       id: 0,
@@ -53,6 +57,7 @@ const InputOrder = ({ onCancel, onSubmit }) => {
       left: 0,
       behavior: "smooth",
     });
+    getProduk();
   }, []);
 
   // const editPermintaan = async () => {
@@ -169,6 +174,22 @@ const InputOrder = ({ onCancel, onSubmit }) => {
   //     </div>
   //   );
   // };
+
+  const getProduk = async () => {
+    const config = {
+      ...endpoints.product,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setProduk(data);
+      }
+    } catch (error) {}
+  };
 
   const header = () => {
     return (
@@ -287,7 +308,7 @@ const InputOrder = ({ onCancel, onSubmit }) => {
             <Row>
               <div className="row col-12 mr-0 ml-0 mb-0">
                 <div className="col-4">
-                  <label className="text-label">Kode Produk</label>
+                  <label className="text-label">Produk</label>
                 </div>
 
                 <div className="col-2">
@@ -320,12 +341,16 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                               // jasa: { ...currentItem.jasa, name: e.target.value },
                             })
                           }
-                          placeholder="Pilih Kode Produk"
+                          placeholder="Pilih Produk"
+                          options={product}
+                          optionLabel="name"
+                          filter
+                          filterBy="name"
                         />
                         <PButton
-                        // onClick={() => {
-                        //   setShowJenisPelanggan(true);
-                        // }}
+                          onClick={() => {
+                            setShowProduk(true);
+                          }}
                         >
                           <i class="bx bx-food-menu"></i>
                         </PButton>
@@ -416,7 +441,6 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                   </div>
                 );
               })}
-              
             </Row>
           }
         />
@@ -663,6 +687,37 @@ const InputOrder = ({ onCancel, onSubmit }) => {
       {header()}
       {body()}
       {footer()}
+
+      <DataProduk
+        data={product}
+        loading={false}
+        popUp={true}
+        show={showProduk}
+        onHide={() => {
+          setShowProduk(false);
+        }}
+        onInput={(e) => {
+          setShowProduk(!e);
+        }}
+        onSuccessInput={(e) => {
+          getProduk();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowProduk(false);
+            // setCurrentItem({
+            //   ...currentItem,
+            //   jpel: e.data,
+            // });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
     </>
   );
 };

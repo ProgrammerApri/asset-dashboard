@@ -3,7 +3,7 @@ import { request, endpoints } from "src/utils";
 import { FilterMatchMode } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Button } from "react-bootstrap";
+import { Button, Col, Row } from "react-bootstrap";
 import { Card } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
@@ -336,6 +336,7 @@ const DataProduk = ({
             setEdit(true);
             onClick("displayData", data);
             setCurrentItem(data);
+            onInput(true);
           }}
           className="btn btn-primary shadow btn-xs sharp ml-1"
         >
@@ -347,6 +348,7 @@ const DataProduk = ({
             setEdit(true);
             setDisplayDel(true);
             setCurrentItem(data);
+            onInput(true);
           }}
           className="btn btn-danger shadow btn-xs sharp ml-1"
         >
@@ -392,6 +394,7 @@ const DataProduk = ({
                 setDisplayData(false);
                 setActive(0);
                 setFile(null);
+                onInput(false);
               }}
               className="p-button-text btn-primary"
             />
@@ -442,7 +445,10 @@ const DataProduk = ({
       <div>
         <PButton
           label="Batal"
-          onClick={() => setDisplayDel(false)}
+          onClick={() => {
+            setDisplayDel(false);
+            onInput(false);
+          }}
           className="p-button-text btn-primary"
         />
         <PButton
@@ -490,6 +496,7 @@ const DataProduk = ({
             setEdit(false);
             setCurrentItem(data);
             setDisplayData(true);
+            onInput(true);
           }}
         >
           Tambah{" "}
@@ -1070,10 +1077,12 @@ const DataProduk = ({
           header={"Data Produk"}
           visible={show}
           footer={() => <div></div>}
-          style={{ width: "40vw" }}
+          style={{ width: "60vw" }}
           onHide={onHide}
         >
-          {renderBody()}
+          <Row className="ml-0 mr-0">
+            <Col>{renderBody()}</Col>
+          </Row>
         </Dialog>
         {renderDialog()}
       </>

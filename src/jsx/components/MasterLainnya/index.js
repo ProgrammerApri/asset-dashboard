@@ -9,7 +9,6 @@ import JenisPemasok from "../Master/JenisPemasok";
 import Project from "../Master/Project";
 import RulesPay from "./RulesPay/RulesPay";
 import Satuan from "./Satuan";
-import TransaksiPembelian from "../TransaksiPembelian/TransaksiPembelian";
 import PusatBiaya from "./PusatBiaya";
 
 const MasterLainnya = () => {
@@ -59,11 +58,6 @@ const MasterLainnya = () => {
       tittle: "jenis pemasok",
       icon: "bx-user-voice",
       component: <JenisPemasok />,
-    },
-    {
-      tittle: "Transaksi Pembelian",
-      icon: "bx-receipt",
-      component: <TransaksiPembelian />,
     },
   ]);
 

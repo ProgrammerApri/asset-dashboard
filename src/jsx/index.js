@@ -45,7 +45,7 @@ import PPN from "./components/Master/Pajak";
 import SubCustomer from "./components/Master/SubCustomer";
 import SetupKhusus from "./components/Master/SetupKhusus";
 import Mitra from "./components/Mitra/Mitra";
-import TransaksiPembelian from "./components/TransaksiPembelian/TransaksiPembelian";
+import TransaksiPembelian from "./components/Transaksi/TransaksiPembelian/TransaksiPembelian";
 import GroupProduk from "./components/Master/GroupProduk";
 import Satuan from "./components/MasterLainnya/Satuan";
 import Master from "./components/Master";
@@ -54,6 +54,7 @@ import JenisPelanggan from "./components/Master/JenisPelanggan";
 import Pajak from "./components/Master/Pajak";
 import Jasa from "./components/Master/Jasa/DataJasa";
 import PusatBiaya from "./components/MasterLainnya/PusatBiaya/DataPusatBiaya";
+import Transaksi from "./components/Transaksi";
 
 const Markup = ({ width }) => {
   const routes = [
@@ -65,6 +66,8 @@ const Markup = ({ width }) => {
 
     { url: "master", component: Master },
     { url: "master-lainnya", component: MasterLainnya },
+    { url: "transaksi", component: Transaksi },
+
     /// Klasifikasi
     { url: "klasifikasi", component: KlasifikasiAkun },
     { url: "kategori", component: KategoriAkun },

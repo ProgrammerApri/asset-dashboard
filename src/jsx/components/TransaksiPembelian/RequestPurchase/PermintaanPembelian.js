@@ -16,7 +16,97 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { InputNumber } from "primereact/inputnumber";
 import { Divider } from "@material-ui/core";
 
-const data = {};
+const data = {
+  id: null,
+  req_code: null,
+  req_date: null,
+  req_dep: {
+    id: null,
+    ccost_code: null,
+    ccost_name: null,
+    ccost_ket: null,
+  },
+  req_ket: null,
+  refrence: true,
+  ref_sup: {
+    id: null,
+    sup_code: null,
+    sup_name: null,
+    sup_jpem: null,
+    sup_ppn: null,
+    sup_npwp: null,
+    sup_address: null,
+    sup_kota: null,
+    sup_kpos: null,
+    sup_telp1: null,
+    sup_telp2: null,
+    sup_fax: null,
+    sup_cp: null,
+    sup_curren: null,
+    sup_ket: null,
+    sup_hutang: null,
+    sup_uang_muka: null,
+    sup_limit: null,
+  },
+  ref_ket: null,
+  rprod: [
+    {
+      id: null,
+      preq_id: null,
+      prod_id: {
+        id: null,
+        code: null,
+        name: null,
+        group: null,
+        type: null,
+        codeb: null,
+        unit: null,
+        suplier: null,
+        b_price: null,
+        s_price: null,
+        barcode: null,
+        metode: null,
+        max_stock: null,
+        min_stock: null,
+        re_stock: null,
+        lt_stock: null,
+        max_order: null,
+        image: null,
+      },
+      unit_id: {
+        id: null,
+        code: null,
+        name: null,
+        type: null,
+        desc: null,
+        active: null,
+        qty: null,
+        u_from: null,
+        u_to: null,
+      },
+      request: null,
+      order: null,
+      remain: null,
+      disc: null,
+      nett_price: null,
+      total: null,
+    },
+  ],
+  rjasa: [
+    {
+        id: null,
+        preq_id: null,
+        sup_id: null,
+        jasa_id: {
+          id: null,
+          code: null,
+          name: null,
+          desc: null,
+          acc_id: null
+        },
+      },
+  ]
+};
 
 const PermintaanPembelian = ({onAdd}) => {
   const [permintaan, setPermintaan] = useState(null);
@@ -43,7 +133,7 @@ const PermintaanPembelian = ({onAdd}) => {
   const getPermintaan = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.permintaan,
+      ...endpoints.rPurchase,
       data: {},
     };
     console.log(config.data);
@@ -62,7 +152,7 @@ const PermintaanPembelian = ({onAdd}) => {
     } else {
       setTimeout(() => {
         setLoading(false);
-      }, 1500);
+      }, 500);
     }
   };
 
@@ -395,18 +485,24 @@ const PermintaanPembelian = ({onAdd}) => {
           style={{
             minWidth: "10rem",
           }}
-          field={(e) => e.tanggal}
+          field={(e) => e.req_date}
           body={loading && <Skeleton />}
         />
         <Column
           header="Nomor Permintaan"
-          field={(e) => e.no}
+          field={(e) => e.req_code}
           style={{ minWidth: "10rem" }}
           body={loading && <Skeleton />}
         />
         <Column
-          header="Status"
-          field={(e) => e.status}
+          header="Departemen"
+          field={(e) => e.req_dep.ccost_name}
+          style={{ minWidth: "10rem" }}
+          body={loading && <Skeleton />}
+        />
+        <Column
+          header="Produk"
+          field={(e) => e.rprod.name}
           style={{ minWidth: "10rem" }}
           body={loading && <Skeleton />}
         />

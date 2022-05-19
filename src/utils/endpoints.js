@@ -608,6 +608,31 @@ const endpoints = {
     method: "DELETE",
     data: {},
   },
+
+  /// Request Puechase
+  rPurchase: {
+    endpoint: "/v1/api/rp",
+    method: "GET",
+    data: {},
+  },
+
+  addRp: {
+    endpoint: "/v1/api/rp",
+    method: "POST",
+    data: {},
+  },
+
+  editRp: {
+    endpoint: "/v1/api/rp/",
+    method: "PUT",
+    data: {},
+  },
+
+  delRp: {
+    endpoint: "/v1/api/rp/",
+    method: "DELETE",
+    data: {},
+  },
 };
 
 export default endpoints;

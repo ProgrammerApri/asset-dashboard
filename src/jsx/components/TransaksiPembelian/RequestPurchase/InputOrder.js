@@ -17,13 +17,99 @@ import DataProduk from "../../Master/Produk/DataProduk";
 import DataJasa from "../../Master/Jasa/DataJasa";
 import DataSatuan from "../../MasterLainnya/Satuan/DataSatuan";
 import DataSupplier from "../../Mitra/Pemasok/DataPemasok";
+import { findRenderedDOMComponentWithClass } from "react-dom/test-utils";
 
-const data = {};
-
-const type = [
-  { name: "Aktif", code: "A" },
-  { name: "Non Aktif", code: "N" },
-];
+const data = {
+  id: null,
+  req_code: null,
+  req_date: null,
+  req_dep: {
+    id: null,
+    ccost_code: null,
+    ccost_name: null,
+    ccost_ket: null,
+  },
+  req_ket: null,
+  refrence: true,
+  ref_sup: {
+    id: null,
+    sup_code: null,
+    sup_name: null,
+    sup_jpem: null,
+    sup_ppn: null,
+    sup_npwp: null,
+    sup_address: null,
+    sup_kota: null,
+    sup_kpos: null,
+    sup_telp1: null,
+    sup_telp2: null,
+    sup_fax: null,
+    sup_cp: null,
+    sup_curren: null,
+    sup_ket: null,
+    sup_hutang: null,
+    sup_uang_muka: null,
+    sup_limit: null,
+  },
+  ref_ket: null,
+  rprod: [
+    {
+      id: null,
+      preq_id: null,
+      prod_id: {
+        id: null,
+        code: null,
+        name: null,
+        group: null,
+        type: null,
+        codeb: null,
+        unit: null,
+        suplier: null,
+        b_price: null,
+        s_price: null,
+        barcode: null,
+        metode: null,
+        max_stock: null,
+        min_stock: null,
+        re_stock: null,
+        lt_stock: null,
+        max_order: null,
+        image: null,
+      },
+      unit_id: {
+        id: null,
+        code: null,
+        name: null,
+        type: null,
+        desc: null,
+        active: null,
+        qty: null,
+        u_from: null,
+        u_to: null,
+      },
+      request: null,
+      order: null,
+      remain: null,
+      disc: null,
+      nett_price: null,
+      total: null,
+    },
+  ],
+  rjasa: [
+    {
+      id: null,
+      preq_id: null,
+      sup_id: null,
+      jasa_id: {
+        id: null,
+        code: null,
+        name: null,
+        desc: null,
+        acc_id: null,
+      },
+    },
+  ],
+};
 
 const InputOrder = ({ onCancel, onSubmit }) => {
   const [update, setUpdate] = useState(false);
@@ -45,17 +131,17 @@ const InputOrder = ({ onCancel, onSubmit }) => {
   const [inProd, setInProd] = useState([
     {
       id: 0,
-      qty: 1,
-      u_from: null,
-      u_to: null,
+      prod_id: 1,
+      unit_id: null,
+      request: null,
     },
   ]);
   const [inJasa, setInJasa] = useState([
     {
       id: 0,
-      qty: 1,
-      u_from: null,
-      u_to: null,
+      jasa_id: 1,
+      unit_id: null,
+      qty: null,
     },
   ]);
   const [accor, setAccor] = useState({
@@ -94,97 +180,100 @@ const InputOrder = ({ onCancel, onSubmit }) => {
     } catch (error) {}
   };
 
-  // const editPermintaan = async () => {
-  //   const config = {
-  //     ...endpoints.editPermintaan,
-  //     endpoint: endpoints.editPermintaan.endpoint + currentItem.id,
-  //     data: {
-  //       cus_code: currentItem.customer.cus_code,
+  const editRp = async () => {
+    const config = {
+      ...endpoints.editRp,
+      endpoint: endpoints.editRp.endpoint + currentItem.id,
+      data: {
+        cus_code: currentItem.customer.cus_code,
+      },
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setTimeout(() => {
+          setUpdate(false);
+          // setDisplayData(false);
+          // getPermintaan(true);
+          toast.current.show({
+            severity: "info",
+            summary: "Berhasil",
+            detail: "Data Berhasil Diperbarui",
+            life: 3000,
+          });
+        }, 500);
+      }
+    } catch (error) {
+      setTimeout(() => {
+        setUpdate(false);
+        toast.current.show({
+          severity: "error",
+          summary: "Gagal",
+          detail: "Gagal Memperbarui Data",
+          life: 3000,
+        });
+      }, 500);
+    }
+  };
 
-  //     },
-  //   };
-  //   console.log(config.data);
-  //   let response = null;
-  //   try {
-  //     response = await request(null, config);
-  //     console.log(response);
-  //     if (response.status) {
-  //       setTimeout(() => {
-  //         setUpdate(false);
-  //         setDisplayData(false);
-  //         getPermintaan(true);
-  //         toast.current.show({
-  //           severity: "info",
-  //           summary: "Berhasil",
-  //           detail: "Data Berhasil Diperbarui",
-  //           life: 3000,
-  //         });
-  //       }, 500);
-  //     }
-  //   } catch (error) {
-  //     setTimeout(() => {
-  //       setUpdate(false);
-  //       toast.current.show({
-  //         severity: "error",
-  //         summary: "Gagal",
-  //         detail: "Gagal Memperbarui Data",
-  //         life: 3000,
-  //       });
-  //     }, 500);
-  //   }
-  // };
+  const addRp = async () => {
+    const config = {
+      ...endpoints.addRp,
+      data: {
+        ...currentItem,
+        prod_id: currentItem?.rprod?.prod_id ?? null,
+        unit_id: currentItem?.rprod?.unit_id ?? null,
+        request: currentItem?.rprod?.request ?? null,
 
-  // const addPermintaan = async () => {
-  //   const config = {
-  //     ...endpoints.addPermintaan,
-  //     data: {
-  //       cus_code: currentItem.customer.cus_code,
-
-  //     },
-  //   };
-  //   console.log(config.data);
-  //   let response = null;
-  //   try {
-  //     response = await request(null, config);
-  //     console.log(response);
-  //     if (response.status) {
-  //       setTimeout(() => {
-  //         setUpdate(false);
-  //         setDisplayData(false);
-  //         getPermintaan(true);
-  //         toast.current.show({
-  //           severity: "info",
-  //           summary: "Berhasil",
-  //           detail: "Data Berhasil Diperbarui",
-  //           life: 3000,
-  //         });
-  //       }, 500);
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //     if (error.status === 400) {
-  //       setTimeout(() => {
-  //         setUpdate(false);
-  //         toast.current.show({
-  //           severity: "error",
-  //           summary: "Gagal",
-  //           detail: `Kode ${currentItem.customer.cus_code} Sudah Digunakan`,
-  //           life: 3000,
-  //         });
-  //       }, 500);
-  //     } else {
-  //       setTimeout(() => {
-  //         setUpdate(false);
-  //         toast.current.show({
-  //           severity: "error",
-  //           summary: "Gagal",
-  //           detail: "Gagal Memperbarui Data",
-  //           life: 3000,
-  //         });
-  //       }, 500);
-  //     }
-  //   }
-  // };
+        jasa_id: currentItem?.rjasa?.jasa_id ?? null,
+      },
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setTimeout(() => {
+          setUpdate(false);
+          // setDisplayData(false);
+          // getPermintaan(true);
+          toast.current.show({
+            severity: "info",
+            summary: "Berhasil",
+            detail: "Data Berhasil Diperbarui",
+            life: 3000,
+          });
+        }, 500);
+      }
+    } catch (error) {
+      console.log(error);
+      if (error.status === 400) {
+        setTimeout(() => {
+          setUpdate(false);
+          toast.current.show({
+            severity: "error",
+            summary: "Gagal",
+            detail: `Kode ${currentItem.req_code} Sudah Digunakan`,
+            life: 3000,
+          });
+        }, 500);
+      } else {
+        setTimeout(() => {
+          setUpdate(false);
+          toast.current.show({
+            severity: "error",
+            summary: "Gagal",
+            detail: "Gagal Memperbarui Data",
+            life: 3000,
+          });
+        }, 500);
+      }
+    }
+  };
 
   // const onClick = () => {
   //   setCurrentItem();
@@ -290,15 +379,13 @@ const InputOrder = ({ onCancel, onSubmit }) => {
             <label className="text-label">Tanggal</label>
             <div className="p-inputgroup">
               <Calendar
-                // value={
-                //   currentItem !== null
-                //     ? `${currentItem?.jasa?.code ?? ""}`
-                //     : ""
-                // }
+                value={
+                  currentItem !== null ? `${currentItem?.req_date ?? ""}` : ""
+                }
                 onChange={(e) =>
                   setCurrentItem({
-                    // ...currentItem,
-                    // jasa: { ...currentItem.jasa, code: e.target.value },
+                    ...currentItem,
+                    req_date: e.target.value,
                   })
                 }
                 placeholder="Pilih Tanggal"
@@ -311,15 +398,13 @@ const InputOrder = ({ onCancel, onSubmit }) => {
             <label className="text-label">Kode Referensi</label>
             <div className="p-inputgroup">
               <InputText
-                // value={
-                //   currentItem !== null
-                //     ? `${currentItem?.jasa?.name ?? ""}`
-                //     : ""
-                // }
+                value={
+                  currentItem !== null ? `${currentItem?.req_code ?? ""}` : ""
+                }
                 onChange={(e) =>
                   setCurrentItem({
-                    // ...currentItem,
-                    // jasa: { ...currentItem.jasa, name: e.target.value },
+                    ...currentItem,
+                    req_code: e.target.value,
                   })
                 }
                 placeholder="Masukan Kode Referensi"
@@ -331,17 +416,18 @@ const InputOrder = ({ onCancel, onSubmit }) => {
             <label className="text-label">Departemen</label>
             <div className="p-inputgroup">
               <Dropdown
-                // value={
-                //   currentItem !== null
-                //     ? `${currentItem?.jasa?.name ?? ""}`
-                //     : ""
-                // }
-                onChange={(e) =>
+                value={currentItem !== null ? currentItem.req_dep : null}
+                options={pusatBiaya}
+                onChange={(e) => {
+                  console.log(e.value);
                   setCurrentItem({
-                    // ...currentItem,
-                    // jasa: { ...currentItem.jasa, name: e.target.value },
-                  })
-                }
+                    ...currentItem,
+                    req_dep: e.target.value,
+                  });
+                }}
+                optionLabel="ccost_name"
+                filter
+                filterBy="ccost_name"
                 placeholder="Pilih Departemen"
               />
               <PButton
@@ -358,15 +444,13 @@ const InputOrder = ({ onCancel, onSubmit }) => {
             <label className="text-label">Keterangan</label>
             <div className="p-inputgroup">
               <InputTextarea
-                // value={
-                //   currentItem !== null
-                //     ? `${currentItem?.jasa?.name ?? ""}`
-                //     : ""
-                // }
+                value={
+                  currentItem !== null ? `${currentItem?.req_ket ?? ""}` : ""
+                }
                 onChange={(e) =>
                   setCurrentItem({
-                    // ...currentItem,
-                    // jasa: { ...currentItem.jasa, name: e.target.value },
+                    ...currentItem,
+                    req_ket: e.target.value,
                   })
                 }
                 placeholder="Masukan Keterangan"
@@ -412,22 +496,21 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                     <div className="col-4">
                       <div className="p-inputgroup">
                         <Dropdown
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
+                          value={
+                            currentItem !== null ? currentItem.rprod : null
                           }
-                          placeholder="Pilih Produk"
                           options={product}
+                          onChange={(e) => {
+                            console.log(e.value);
+                            setCurrentItem({
+                              ...currentItem,
+                              rprod: e.target.value,
+                            });
+                          }}
                           optionLabel="name"
                           filter
                           filterBy="name"
+                          placeholder="Pilih Produk"
                         />
                         <PButton
                           onClick={() => {
@@ -442,15 +525,15 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                     <div className="col-2">
                       <div className="p-inputgroup">
                         <InputText
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
+                          value={
+                            currentItem !== null
+                              ? `${currentItem?.request ?? ""}`
+                              : ""
+                          }
                           onChange={(e) =>
                             setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
+                              ...currentItem,
+                              request: e.target.value,
                             })
                           }
                           placeholder="Masukan Jumlah"
@@ -462,17 +545,20 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                     <div className="col-4">
                       <div className="p-inputgroup">
                         <Dropdown
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
+                          value={
+                            currentItem !== null ? currentItem.unit_id : null
                           }
+                          options={satuan}
+                          onChange={(e) => {
+                            console.log(e.value);
+                            setCurrentItem({
+                              ...currentItem,
+                              unit_id: e.target.value,
+                            });
+                          }}
+                          optionLabel="name"
+                          filter
+                          filterBy="name"
                           placeholder="Pilih Satuan"
                         />
                         <PButton
@@ -494,9 +580,9 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                                 ...inProd,
                                 {
                                   id: 0,
-                                  qty: 1,
-                                  u_from: null,
-                                  u_to: null,
+                                  prod_id: 1,
+                                  unit_id: null,
+                                  request: null,
                                 },
                               ]);
                             }}
@@ -564,22 +650,21 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                     <div className="col-4">
                       <div className="p-inputgroup">
                         <Dropdown
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
+                          value={
+                            currentItem !== null ? currentItem.rjasa : null
                           }
-                          placeholder="Pilih Kode Jasa"
                           options={jasa}
-                          optionLabel="name"
+                          onChange={(e) => {
+                            console.log(e.value);
+                            setCurrentItem({
+                              ...currentItem,
+                              rjasa: e.target.value,
+                            });
+                          }}
+                          optionLabel="rjasa.name"
                           filter
-                          filterBy="name"
+                          filterBy="rjasa.name"
+                          placeholder="Pilih Jasa"
                         />
                         <PButton
                           onClick={() => {
@@ -594,15 +679,18 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                     <div className="col-2">
                       <div className="p-inputgroup">
                         <InputText
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
+                          value={
+                            currentItem !== null
+                              ? `${currentItem?.rjasa?.qty ?? ""}`
+                              : ""
+                          }
                           onChange={(e) =>
                             setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
+                              ...currentItem,
+                              rjasa: {
+                                ...currentItem.rjasa,
+                                qty: e.target.value,
+                              },
                             })
                           }
                           placeholder="Masukan Jumlah"
@@ -614,18 +702,21 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                     <div className="col-4">
                       <div className="p-inputgroup">
                         <Dropdown
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
+                          value={
+                            currentItem !== null ? currentItem.unit_id : null
                           }
-                          placeholder="Pilih Satuan"
+                          options={satuan}
+                          onChange={(e) => {
+                            console.log(e.value);
+                            setCurrentItem({
+                              ...currentItem,
+                              unit_id: e.target.value,
+                            });
+                          }}
+                          optionLabel="name"
+                          filter
+                          filterBy="name"
+                          placeholder="Pilih Jasa"
                         />
                         <PButton
                           onClick={() => {
@@ -646,9 +737,9 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                                 ...inJasa,
                                 {
                                   id: 0,
-                                  qty: 1,
-                                  u_from: null,
-                                  u_to: null,
+                                  jasa_id: 1,
+                                  unit_id: null,
+                                  qty: null,
                                 },
                               ]);
                             }}
@@ -684,11 +775,11 @@ const InputOrder = ({ onCancel, onSubmit }) => {
             <label className="ml-0 mt-1">{"Referensi Tambahan"}</label>
             <InputSwitch
               className="ml-4"
-              checked={currentItem && currentItem.type === "A"}
+              checked={currentItem && currentItem.refrence === true}
               onChange={(e) => {
                 setCurrentItem({
                   ...currentItem,
-                  type: e.value ? "A" : "N",
+                  refrence: e.target.value,
                 });
               }}
             />
@@ -698,25 +789,26 @@ const InputOrder = ({ onCancel, onSubmit }) => {
             <label className="text-label">Kode Supplier</label>
             <div className="p-inputgroup">
               <Dropdown
-                // value={
-                //   currentItem !== null
-                //     ? `${currentItem?.jasa?.name ?? ""}`
-                //     : ""
-                // }
-                onChange={(e) =>
+                value={currentItem !== null ? currentItem.ref_sup : null}
+                options={supplier}
+                onChange={(e) => {
+                  console.log(e.value);
                   setCurrentItem({
-                    // ...currentItem,
-                    // jasa: { ...currentItem.jasa, name: e.target.value },
-                  })
-                }
-                placeholder="Pilih Kode Supplier"
-                disabled={currentItem && currentItem.type === "N"}
+                    ...currentItem,
+                    ref_sup: e.target.value,
+                  });
+                }}
+                optionLabel="ref_sup.sup_name"
+                filter
+                filterBy="ref_sup.sup_name"
+                placeholder="Pilih Supplier"
+                disabled={currentItem && currentItem.refrence === false}
               />
               <PButton
                 onClick={() => {
                   setShowSupplier(true);
                 }}
-                disabled={currentItem && currentItem.type === "N"}
+                disabled={currentItem && currentItem.refrence === false}
               >
                 <i class="bx bx-food-menu"></i>
               </PButton>

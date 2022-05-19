@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button, Col, Row } from "react-bootstrap";
 import TransaksiPembelian from "./TransaksiPembelian/TransaksiPembelian";
+import TransaksiPenjualan from "./TransaksiPenjualan/TransaksiPenjualan";
 
 const Transaksi = () => {
   const [active, setActive] = useState(0);
@@ -13,7 +14,7 @@ const Transaksi = () => {
     {
         tittle: "Transaksi Penjualan",
         icon: "bx-receipt",
-        component: <TransaksiPembelian />,
+        component: <TransaksiPenjualan />,
       },
   ]);
 

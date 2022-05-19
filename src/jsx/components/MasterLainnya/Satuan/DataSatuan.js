@@ -68,8 +68,42 @@ const DataSatuan = ({
 
 
   useEffect(() => {
+    getSatuan();
     initFilters1();
   }, []);
+
+  const getSatuan = async (isUpdate = false) => {
+    // setLoading(true);
+    const config = {
+      ...endpoints.getSatuan,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setSatuan(data);
+        let dasar = [];
+        data.forEach((el) => {
+          if (el.type == "d") {
+            dasar.push(el);
+          }
+        });
+        setSatuanDasar(dasar);
+      }
+    } catch (error) {}
+    if (isUpdate) {
+      setLoading(false);
+    } else {
+      setTimeout(() => {
+        setLoading(false);
+      }, 500);
+    }
+  };
 
   const editSatuan = async () => {
     // setLoading(true);

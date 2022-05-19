@@ -51,8 +51,8 @@ const data = {
   ref_ket: null,
 };
 
-const PermintaanPembelian = ({onAdd}) => {
-  const [permintaan, setPermintaan] = useState(null);
+const DataSalesOrder = ({onAdd}) => {
+  const [so, setSO] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
@@ -69,14 +69,14 @@ const PermintaanPembelian = ({onAdd}) => {
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getPermintaan();
+    getSO();
     initFilters1();
   }, []);
 
-  const getPermintaan = async (isUpdate = false) => {
+  const getSO = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.rPurchase,
+      ...endpoints.salesOrder,
       data: {},
     };
     console.log(config.data);
@@ -87,7 +87,7 @@ const PermintaanPembelian = ({onAdd}) => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        setPermintaan(data);
+        setSO(data);
       }
     } catch (error) {}
     if (isUpdate) {
@@ -101,8 +101,8 @@ const PermintaanPembelian = ({onAdd}) => {
 
   const delPermintaan = async (id) => {
     const config = {
-      ...endpoints.delRp,
-      endpoint: endpoints.delRp.endpoint + currentItem.id,
+      ...endpoints.delPermintaan,
+      endpoint: endpoints.delPermintaan.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -113,7 +113,7 @@ const PermintaanPembelian = ({onAdd}) => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayDel(false);
-          getPermintaan(true);
+          getSO(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -285,93 +285,87 @@ const PermintaanPembelian = ({onAdd}) => {
 
   return (
     <>
-      <Toast ref={toast} />
+    <Toast ref={toast} />
+    <Row>
+      <Col className="pt-0">
+        <Card>
+          <Card.Body>
+            <DataTable
+              responsiveLayout="scroll"
+              value={loading ? dummy : so}
+              className="display w-150 datatable-wrapper"
+              showGridlines
+              dataKey="id"
+              rowHover
+              header={renderHeader}
+              filters={filters1}
+              globalFilterFields={["customer.cus_code", "customer.cus_limit"]}
+              emptyMessage="Tidak ada data"
+              paginator
+              paginatorTemplate={template2}
+              first={first2}
+              rows={rows2}
+              onPage={onCustomPage2}
+              paginatorClassName="justify-content-end mt-3"
+            >
+              <Column
+                header="Tanggal"
+                style={{
+                  minWidth: "10rem",
+                }}
+                field={(e) => e.customer.cus_code}
+                body={loading && <Skeleton />}
+              />
+              <Column
+                header="Nomor Pesanan"
+                field={(e) => e.customer.cus_name}
+                style={{ minWidth: "10rem" }}
+                body={loading && <Skeleton />}
+              />
+              <Column
+                header="Nomor Pesanan"
+                field={(e) => e.customer.cus_address}
+                style={{ minWidth: "10rem" }}
+                body={loading && <Skeleton />}
+              />
+              <Column
+                header="Status"
+                field={(e) => e.cus_telp}
+                style={{ minWidth: "10rem" }}
+                body={loading && <Skeleton />}
+              />
+              <Column
+                header="Action"
+                dataType="boolean"
+                bodyClassName="text-center"
+                style={{ minWidth: "2rem" }}
+                body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
+              />
+            </DataTable>
+          </Card.Body>
+        </Card>
+      </Col>
+    </Row>
 
-      <DataTable
-        responsiveLayout="scroll"
-        value={loading ? dummy : permintaan}
-        className="display w-150 datatable-wrapper"
-        showGridlines
-        dataKey="id"
-        rowHover
-        header={renderHeader}
-        filters={filters1}
-        globalFilterFields={["customer.cus_code"]}
-        emptyMessage="Tidak ada data"
-        paginator
-        paginatorTemplate={template2}
-        first={first2}
-        rows={rows2}
-        onPage={onCustomPage2}
-        paginatorClassName="justify-content-end mt-3"
-      >
-        <Column
-          header="Tanggal"
-          style={{
-            minWidth: "10rem",
-          }}
-          field={(e) => e.req_date}
-          body={loading && <Skeleton />}
+    <Dialog
+      header={"Hapus Data"}
+      visible={displayDel}
+      style={{ width: "30vw" }}
+      footer={renderFooterDel("displayDel")}
+      onHide={() => {
+        setDisplayDel(false);
+      }}
+    >
+      <div className="ml-3 mr-3">
+        <i
+          className="pi pi-exclamation-triangle mr-3 align-middle"
+          style={{ fontSize: "2rem" }}
         />
-        <Column
-          header="Nomor Permintaan"
-          field={(e) => e.req_code}
-          style={{ minWidth: "10rem" }}
-          body={loading && <Skeleton />}
-        />
-        <Column
-          header="Departemen"
-          field={(e) => e.req_dep.ccost_name}
-          style={{ minWidth: "10rem" }}
-          body={loading && <Skeleton />}
-        />
-        <Column
-          header="Produk"
-          field={(e) => e.rprod.name}
-          style={{ minWidth: "10rem" }}
-          body={loading && <Skeleton />}
-        />
-        <Column
-          header="Action"
-          dataType="boolean"
-          bodyClassName="text-center"
-          style={{ minWidth: "2rem" }}
-          body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
-        />
-      </DataTable>
-
-      {/* <Dialog
-        header={
-          isEdit ? "Edit Permintaan Pembelian" : "Tambah Permintaan Pembelian"
-        }
-        visible={displayData}
-        style={{ width: "50vw" }}
-        footer={renderFooter("displayData")}
-        onHide={() => {
-          setEdit(false);
-          setDisplayData(false);
-        }}
-      ></Dialog> */}
-
-      <Dialog
-        header={"Hapus Data"}
-        visible={displayDel}
-        style={{ width: "30vw" }}
-        footer={renderFooterDel("displayDel")}
-        onHide={() => {
-          setDisplayDel(false);
-        }}
-      >
-        <div className="ml-3 mr-3">
-          <i
-            className="pi pi-exclamation-triangle mr-3 align-middle"
-            style={{ fontSize: "2rem" }}
-          />
-          <span>Apakah anda yakin ingin menghapus data ?</span>
-        </div>
-      </Dialog>
-    </>
+        <span>Apakah anda yakin ingin menghapus data ?</span>
+      </div>
+    </Dialog>
+  </>
   );
 };
 
-export default PermintaanPembelian;
+export default DataSalesOrder;

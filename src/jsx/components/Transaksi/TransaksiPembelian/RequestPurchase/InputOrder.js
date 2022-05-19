@@ -17,6 +17,7 @@ import DataProduk from "../../../Master/Produk/DataProduk";
 import DataJasa from "../../../Master/Jasa/DataJasa";
 import DataSatuan from "../../../MasterLainnya/Satuan/DataSatuan";
 import DataSupplier from "../../../Mitra/Pemasok/DataPemasok";
+import PermintaanPembelian from "./PermintaanPembelian";
 
 const data = {
   id: null,
@@ -29,7 +30,7 @@ const data = {
     ccost_ket: null,
   },
   req_ket: null,
-  refrence: true,
+  refrence: false,
   ref_sup: {
     id: null,
     sup_code: null,
@@ -51,68 +52,11 @@ const data = {
     sup_limit: null,
   },
   ref_ket: null,
-  rprod: [
-    {
-      id: null,
-      preq_id: null,
-      prod_id: {
-        id: null,
-        code: null,
-        name: null,
-        group: null,
-        type: null,
-        codeb: null,
-        unit: null,
-        suplier: null,
-        b_price: null,
-        s_price: null,
-        barcode: null,
-        metode: null,
-        max_stock: null,
-        min_stock: null,
-        re_stock: null,
-        lt_stock: null,
-        max_order: null,
-        image: null,
-      },
-      unit_id: {
-        id: null,
-        code: null,
-        name: null,
-        type: null,
-        desc: null,
-        active: null,
-        qty: null,
-        u_from: null,
-        u_to: null,
-      },
-      request: null,
-      order: null,
-      remain: null,
-      disc: null,
-      nett_price: null,
-      total: null,
-    },
-  ],
-  rjasa: [
-    {
-      id: null,
-      preq_id: null,
-      sup_id: null,
-      jasa_id: {
-        id: null,
-        code: null,
-        name: null,
-        desc: null,
-        acc_id: null,
-      },
-    },
-  ],
 };
 
-const InputOrder = ({ onCancel, onSubmit }) => {
+const InputOrder = ({ onCancel }) => {
   const [update, setUpdate] = useState(false);
-  const [currentItem, setCurrentItem] = useState(null);
+  const [currentItem, setCurrentItem] = useState(data);
   const toast = useRef(null);
   const [isEdit, setEdit] = useState(false);
   const [showDepartemen, setShowDepartemen] = useState(false);
@@ -127,10 +71,11 @@ const InputOrder = ({ onCancel, onSubmit }) => {
   const [satuan, setSatuan] = useState(null);
   const [supplier, setSupplier] = useState(null);
   const [doubleClick, setDoubleClick] = useState(false);
+  const [satProd, setSatProd] = useState("");
   const [inProd, setInProd] = useState([
     {
       id: 0,
-      prod_id: 1,
+      prod_id: null,
       unit_id: null,
       request: null,
     },
@@ -138,7 +83,7 @@ const InputOrder = ({ onCancel, onSubmit }) => {
   const [inJasa, setInJasa] = useState([
     {
       id: 0,
-      jasa_id: 1,
+      jasa_id: null,
       unit_id: null,
       qty: null,
     },
@@ -184,7 +129,10 @@ const InputOrder = ({ onCancel, onSubmit }) => {
       ...endpoints.editRp,
       endpoint: endpoints.editRp.endpoint + currentItem.id,
       data: {
-        cus_code: currentItem.customer.cus_code,
+        ...currentItem,
+        prod_id: currentItem?.rprod?.prod_id ?? null,
+        unit_id: currentItem?.rprod?.unit_id ?? null,
+        request: currentItem?.rprod?.request ?? null,
       },
     };
     console.log(config.data);
@@ -223,11 +171,8 @@ const InputOrder = ({ onCancel, onSubmit }) => {
       ...endpoints.addRp,
       data: {
         ...currentItem,
-        prod_id: currentItem?.rprod?.prod_id ?? null,
-        unit_id: currentItem?.rprod?.unit_id ?? null,
-        request: currentItem?.rprod?.request ?? null,
-
-        jasa_id: currentItem?.rjasa?.jasa_id ?? null,
+        rprod: inProd,
+        rjasa: inJasa,
       },
     };
     console.log(config.data);
@@ -238,7 +183,7 @@ const InputOrder = ({ onCancel, onSubmit }) => {
       if (response.status) {
         setTimeout(() => {
           setUpdate(false);
-          // setDisplayData(false);
+          <PermintaanPembelian />;
           // getPermintaan(true);
           toast.current.show({
             severity: "info",
@@ -274,28 +219,15 @@ const InputOrder = ({ onCancel, onSubmit }) => {
     }
   };
 
-  // const onClick = () => {
-  //   setCurrentItem();
-  // };
-
-  // const renderFooter = () => {
-  //   return (
-  //     <div>
-  //       <PButton
-  //         label="Batal"
-  //         onClick={() => setDisplayData(false)}
-  //         className="p-button-text btn-primary"
-  //       />
-  //       <PButton
-  //         label="Simpan"
-  //         icon="pi pi-check"
-  //         onClick={() => onSubmit()}
-  //         autoFocus
-  //         loading={update}
-  //       />
-  //     </div>
-  //   );
-  // };
+  const onSubmit = () => {
+    if (isEdit) {
+      setUpdate(true);
+      editRp();
+    } else {
+      setUpdate(true);
+      addRp();
+    }
+  };
 
   const getProduk = async () => {
     const config = {
@@ -369,22 +301,125 @@ const InputOrder = ({ onCancel, onSubmit }) => {
     );
   };
 
+  const prodTemp = (option) => {
+    return (
+      <div>{option !== null ? `${option.name} (${option.code})` : ""}</div>
+    );
+  };
+
+  const clear = (option, props) => {
+    if (option) {
+      return (
+        <div>{option !== null ? `${option.name} (${option.code})` : ""}</div>
+      );
+    }
+
+    return <span>{props.placeholder}</span>;
+  };
+
+  const jasTemp = (option) => {
+    return (
+      <div>
+        {option !== null ? `${option.jasa.name} (${option.jasa.code})` : ""}
+      </div>
+    );
+  };
+
+  const valueTemp = (option, props) => {
+    if (option) {
+      return (
+        <div>
+          {option !== null ? `${option.jasa.name} (${option.jasa.code})` : ""}
+        </div>
+      );
+    }
+
+    return <span>{props.placeholder}</span>;
+  };
+
+  const suppTemp = (option) => {
+    return (
+      <div>
+        {option !== null
+          ? `${option.supplier.sup_name} (${option.supplier.sup_code})`
+          : ""}
+      </div>
+    );
+  };
+
+  const valueSupTemp = (option, props) => {
+    if (option) {
+      return (
+        <div>
+          {option !== null
+            ? `${option.supplier.sup_name} (${option.supplier.sup_code})`
+            : ""}
+        </div>
+      );
+    }
+
+    return <span>{props.placeholder}</span>;
+  };
+
+  const checkUnit = (value) => {
+    let selected = {};
+    satuan.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkProd = (value) => {
+    let selected = {};
+    product.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const dept = (value) => {
+    let selected = {};
+    pusatBiaya?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const supp = (value) => {
+    let selected = {};
+    supplier?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
   const body = () => {
     return (
       <>
+        <Toast ref={toast} />
         {/* Put content body here */}
         <Row className="mb-4">
           <div className="col-4">
             <label className="text-label">Tanggal</label>
             <div className="p-inputgroup">
               <Calendar
-                value={
-                  currentItem !== null ? `${currentItem?.req_date ?? ""}` : ""
-                }
+                value={currentItem !== null ? `${currentItem.req_date}` : ""}
                 onChange={(e) =>
                   setCurrentItem({
                     ...currentItem,
-                    req_date: e.target.value,
+                    req_date: e.value,
                   })
                 }
                 placeholder="Pilih Tanggal"
@@ -415,13 +450,18 @@ const InputOrder = ({ onCancel, onSubmit }) => {
             <label className="text-label">Departemen</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={currentItem !== null ? currentItem.req_dep : null}
+                value={
+                  currentItem !== null &&
+                  currentItem.req_dep !== null
+                    ? dept(currentItem.req_dep)
+                    : null
+                }
                 options={pusatBiaya}
                 onChange={(e) => {
                   console.log(e.value);
                   setCurrentItem({
                     ...currentItem,
-                    req_dep: e.target.value,
+                      req_dep: e.value?.id ?? null,
                   });
                 }}
                 optionLabel="ccost_name"
@@ -471,12 +511,12 @@ const InputOrder = ({ onCancel, onSubmit }) => {
           key={1}
           body={
             <Row>
-              <div className="row col-12 mr-0 ml-0 mb-0">
+              <div className="row col-12 mr-0 ml-0">
                 <div className="col-4">
                   <label className="text-label">Produk</label>
                 </div>
 
-                <div className="col-2">
+                <div className="col-3">
                   <label className="text-label">Jumlah</label>
                 </div>
 
@@ -484,8 +524,12 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                   <label className="text-label">Satuan</label>
                 </div>
 
-                <div className="col-2">
+                <div className="col-1 mr-0">
                   <label className="text-label">Action</label>
+                </div>
+
+                <div className="col-12">
+                  <Divider></Divider>
                 </div>
               </div>
 
@@ -495,21 +539,32 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                     <div className="col-4">
                       <div className="p-inputgroup">
                         <Dropdown
-                          value={
-                            currentItem !== null ? currentItem.rprod : null
-                          }
+                          value={v.prod_id && checkProd(inProd[i].prod_id)}
+                          //  value={
+                          //   currentItem !== null ? currentItem.rprod : null
+                          // }
                           options={product}
                           onChange={(e) => {
-                            console.log(e.value);
-                            setCurrentItem({
-                              ...currentItem,
-                              rprod: e.target.value,
-                            });
+                            let temp = [...inProd];
+                            temp[i].prod_id = e.value.id;
+                            setInProd(temp);
                           }}
+                          // onChange={(e) => {
+                          //   console.log(e.value);
+                          //   // if (isEdit && e.value.rprod.id ===) {
+
+                          //   // }
+                          //   setCurrentItem({
+                          //     ...currentItem,
+                          //     rprod: e.target.value,
+                          //   });
+                          // }}
                           optionLabel="name"
                           filter
                           filterBy="name"
                           placeholder="Pilih Produk"
+                          valueTemplate={clear}
+                          itemTemplate={prodTemp}
                         />
                         <PButton
                           onClick={() => {
@@ -521,20 +576,26 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                       </div>
                     </div>
 
-                    <div className="col-2">
+                    <div className="col-3">
                       <div className="p-inputgroup">
                         <InputText
-                          value={
-                            currentItem !== null
-                              ? `${currentItem?.request ?? ""}`
-                              : ""
-                          }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              ...currentItem,
-                              request: e.target.value,
-                            })
-                          }
+                          // value={
+                          //   currentItem !== null
+                          //     ? `${currentItem?.request ?? ""}`
+                          //     : ""
+                          // }
+                          value={v.request && checkUnit(inProd[i].request)}
+                          onChange={(e) => {
+                            let temp = [...inProd];
+                            temp[i].request = e.value;
+                            setInProd(temp);
+                          }}
+                          // onChange={(e) =>
+                          //   setCurrentItem({
+                          //     ...currentItem,
+                          //     request: e.target.value,
+                          //   })
+                          // }
                           placeholder="Masukan Jumlah"
                           type="number"
                         />
@@ -544,17 +605,13 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                     <div className="col-4">
                       <div className="p-inputgroup">
                         <Dropdown
-                          value={
-                            currentItem !== null ? currentItem.unit_id : null
-                          }
-                          options={satuan}
+                          value={v.unit_id && checkUnit(inProd[i].unit_id)}
                           onChange={(e) => {
-                            console.log(e.value);
-                            setCurrentItem({
-                              ...currentItem,
-                              unit_id: e.target.value,
-                            });
+                            let temp = [...inProd];
+                            temp[i].unit_id = e.value.id;
+                            setInProd(temp);
                           }}
+                          options={satuan}
                           optionLabel="name"
                           filter
                           filterBy="name"
@@ -570,7 +627,7 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                       </div>
                     </div>
 
-                    <div className="col-2 d-flex ml-0">
+                    <div className="col-1 d-flex ml-0 mr-0">
                       <div className="mt-2">
                         {i == inProd.length - 1 ? (
                           <Link
@@ -579,7 +636,7 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                                 ...inProd,
                                 {
                                   id: 0,
-                                  prod_id: 1,
+                                  prod_id: null,
                                   unit_id: null,
                                   request: null,
                                 },
@@ -630,7 +687,7 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                   <label className="text-label">Kode Jasa</label>
                 </div>
 
-                <div className="col-2">
+                <div className="col-3">
                   <label className="text-label">Jumlah</label>
                 </div>
 
@@ -638,8 +695,12 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                   <label className="text-label">Satuan</label>
                 </div>
 
-                <div className="col-2">
+                <div className="col-1">
                   <label className="text-label">Action</label>
+                </div>
+
+                <div className="col-12">
+                  <Divider></Divider>
                 </div>
               </div>
 
@@ -649,21 +710,21 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                     <div className="col-4">
                       <div className="p-inputgroup">
                         <Dropdown
-                          value={
-                            currentItem !== null ? currentItem.rjasa : null
-                          }
+                          value={currentItem !== null ? currentItem.jasa : null}
                           options={jasa}
                           onChange={(e) => {
                             console.log(e.value);
                             setCurrentItem({
                               ...currentItem,
-                              rjasa: e.target.value,
+                              jasa: e.target.value,
                             });
                           }}
-                          optionLabel="rjasa.name"
+                          optionLabel="jasa.name"
                           filter
-                          filterBy="rjasa.name"
+                          filterBy="jasa.name"
                           placeholder="Pilih Jasa"
+                          valueTemplate={valueTemp}
+                          itemTemplate={jasTemp}
                         />
                         <PButton
                           onClick={() => {
@@ -675,7 +736,7 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                       </div>
                     </div>
 
-                    <div className="col-2">
+                    <div className="col-3">
                       <div className="p-inputgroup">
                         <InputText
                           value={
@@ -727,7 +788,7 @@ const InputOrder = ({ onCancel, onSubmit }) => {
                       </div>
                     </div>
 
-                    <div className="col-2 d-flex ml-0">
+                    <div className="col-1 d-flex ml-0">
                       <div className="mt-2">
                         {i == inJasa.length - 1 ? (
                           <Link
@@ -774,7 +835,7 @@ const InputOrder = ({ onCancel, onSubmit }) => {
             <label className="ml-0 mt-1">{"Referensi Tambahan"}</label>
             <InputSwitch
               className="ml-4"
-              checked={currentItem && currentItem.refrence === true}
+              checked={currentItem && currentItem.refrence}
               onChange={(e) => {
                 setCurrentItem({
                   ...currentItem,
@@ -788,26 +849,33 @@ const InputOrder = ({ onCancel, onSubmit }) => {
             <label className="text-label">Kode Supplier</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={currentItem !== null ? currentItem.ref_sup : null}
+                value={
+                  currentItem !== null &&
+                  currentItem.ref_sup !== null
+                    ? supp(currentItem.ref_sup)
+                    : null
+                }
                 options={supplier}
                 onChange={(e) => {
                   console.log(e.value);
                   setCurrentItem({
                     ...currentItem,
-                    ref_sup: e.target.value,
+                      ref_sup: e.value?.id ?? null,
                   });
                 }}
                 optionLabel="ref_sup.sup_name"
                 filter
                 filterBy="ref_sup.sup_name"
                 placeholder="Pilih Supplier"
-                disabled={currentItem && currentItem.refrence === false}
+                itemTemplate={suppTemp}
+                valueTemplate={valueSupTemp}
+                disabled={currentItem && !currentItem.refrence}
               />
               <PButton
                 onClick={() => {
                   setShowSupplier(true);
                 }}
-                disabled={currentItem && currentItem.refrence === false}
+                disabled={currentItem && !currentItem.refrence}
               >
                 <i class="bx bx-food-menu"></i>
               </PButton>
@@ -818,19 +886,17 @@ const InputOrder = ({ onCancel, onSubmit }) => {
             <label className="text-label">Keterangan</label>
             <div className="p-inputgroup">
               <InputTextarea
-                // value={
-                //   currentItem !== null
-                //     ? `${currentItem?.jasa?.name ?? ""}`
-                //     : ""
-                // }
+                value={
+                  currentItem !== null ? `${currentItem?.ref_ket ?? ""}` : ""
+                }
                 onChange={(e) =>
                   setCurrentItem({
-                    // ...currentItem,
-                    // jasa: { ...currentItem.jasa, name: e.target.value },
+                    ...currentItem,
+                    ref_ket: e.target.value,
                   })
                 }
                 placeholder="Masukan Keterangan"
-                disabled={currentItem && currentItem.type === "N"}
+                disabled={currentItem && !currentItem.refrence}
               />
             </div>
           </div>
@@ -851,7 +917,7 @@ const InputOrder = ({ onCancel, onSubmit }) => {
           <PButton
             label="Simpan"
             icon="pi pi-check"
-            onClick={onSubmit}
+            onClick={() => onSubmit()}
             autoFocus
             loading={update}
           />

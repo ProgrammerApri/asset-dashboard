@@ -51,7 +51,7 @@ const data = {
   ref_ket: null,
 };
 
-const PermintaanPembelian = ({onAdd}) => {
+const PermintaanPembelian = ({ onAdd, onEdit }) => {
   const [permintaan, setPermintaan] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
@@ -143,9 +143,7 @@ const PermintaanPembelian = ({onAdd}) => {
       <div className="d-flex">
         <Link
           onClick={() => {
-            setEdit(true);
-            onClick("displayData", data);
-            setCurrentItem(data);
+            onEdit(data);
           }}
           className="btn btn-primary shadow btn-xs sharp ml-1"
         >
@@ -175,7 +173,6 @@ const PermintaanPembelian = ({onAdd}) => {
       setPosition(position);
     }
   };
-
 
   const renderFooterDel = () => {
     return (
@@ -224,10 +221,7 @@ const PermintaanPembelian = ({onAdd}) => {
             placeholder="Cari disini"
           />
         </span>
-        <Button
-          variant="primary"
-          onClick={onAdd}
-        >
+        <Button variant="primary" onClick={onAdd}>
           Tambah{" "}
           <span className="btn-icon-right">
             <i class="bx bx-plus"></i>
@@ -326,12 +320,6 @@ const PermintaanPembelian = ({onAdd}) => {
           body={loading && <Skeleton />}
         />
         <Column
-          header="Produk"
-          field={(e) => e.rprod.name}
-          style={{ minWidth: "10rem" }}
-          body={loading && <Skeleton />}
-        />
-        <Column
           header="Action"
           dataType="boolean"
           bodyClassName="text-center"
@@ -339,19 +327,6 @@ const PermintaanPembelian = ({onAdd}) => {
           body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
         />
       </DataTable>
-
-      {/* <Dialog
-        header={
-          isEdit ? "Edit Permintaan Pembelian" : "Tambah Permintaan Pembelian"
-        }
-        visible={displayData}
-        style={{ width: "50vw" }}
-        footer={renderFooter("displayData")}
-        onHide={() => {
-          setEdit(false);
-          setDisplayData(false);
-        }}
-      ></Dialog> */}
 
       <Dialog
         header={"Hapus Data"}

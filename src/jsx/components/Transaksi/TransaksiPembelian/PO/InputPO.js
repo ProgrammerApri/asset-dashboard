@@ -454,57 +454,12 @@ const InputPO = ({ onCancel, onSubmit }) => {
           }}
           key={1}
           body={
-            <Row>
-              <div className="row col-12 mr-0 ml-0">
-                <div className="col-2 ml-0">
-                  <label className="text-label">Kode Produk</label>
-                </div>
-
-                <div className="col-2">
-                  <label className="text-label">Satuan</label>
-                </div>
-
-                <div className="col-1">
-                  <label className="text-label">Permintaan</label>
-                </div>
-
-                <div className="col-1">
-                  <label className="text-label">Pesanan</label>
-                </div>
-
-                <div className="col-1">
-                  <label className="text-label">Sisa</label>
-                </div>
-
-                <div className="col-1">
-                  <label className="text-label">Harga</label>
-                </div>
-
-                <div className="col-1">
-                  <label className="text-label">Diskon</label>
-                </div>
-
-                <div className="col-1">
-                  <label className="text-label">Harga Nett</label>
-                </div>
-
-                <div className="col-1">
-                  <label className="text-label">Total</label>
-                </div>
-
-                <div className="col-1">
-                  <label className="text-label">Action</label>
-                </div>
-              </div>
-
-              <div className="col-12">
-                <Divider></Divider>
-              </div>
-
+            <Row className="justify-content-between">
               {inProd.map((v, i) => {
                 return (
-                  <div className="row col-12 mb-0 mr-0 ml-0">
-                    <div className="col-2">
+                  <div className="row mr-0 ml-0 justify-content-right col-12">
+                    <div className="col-5">
+                      <label className="text-label">Kode Produk</label>
                       <div className="p-inputgroup">
                         <Dropdown
                           // value={
@@ -530,7 +485,8 @@ const InputPO = ({ onCancel, onSubmit }) => {
                       </div>
                     </div>
 
-                    <div className="col-2">
+                    <div className="col-3">
+                      <label className="text-label">Satuan</label>
                       <div className="p-inputgroup">
                         <Dropdown
                           // value={
@@ -557,27 +513,7 @@ const InputPO = ({ onCancel, onSubmit }) => {
                     </div>
 
                     <div className="col-1">
-                      <div className="p-inputgroup">
-                        <InputText
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
-                          placeholder="0"
-                          type="number"
-                          disabled
-                        />
-                      </div>
-                    </div>
-
-                    <div className="col-1">
+                      <label className="text-label">Permintaan</label>
                       <div className="p-inputgroup">
                         <InputText
                           // value={
@@ -598,6 +534,7 @@ const InputPO = ({ onCancel, onSubmit }) => {
                     </div>
 
                     <div className="col-1">
+                      <label className="text-label">Pesanan</label>
                       <div className="p-inputgroup">
                         <InputText
                           // value={
@@ -613,12 +550,33 @@ const InputPO = ({ onCancel, onSubmit }) => {
                           }
                           placeholder="0"
                           type="number"
-                          disabled
                         />
                       </div>
                     </div>
 
                     <div className="col-1">
+                      <label className="text-label">Sisa</label>
+                      <div className="p-inputgroup">
+                        <InputText
+                          // value={
+                          //   currentItem !== null
+                          //     ? `${currentItem?.jasa?.name ?? ""}`
+                          //     : ""
+                          // }
+                          onChange={(e) =>
+                            setCurrentItem({
+                              // ...currentItem,
+                              // jasa: { ...currentItem.jasa, name: e.target.value },
+                            })
+                          }
+                          placeholder="0"
+                          type="number"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="col-3">
+                      <label className="text-label">Harga Satuan</label>
                       <div className="p-inputgroup">
                         <InputText
                           // value={
@@ -638,7 +596,8 @@ const InputPO = ({ onCancel, onSubmit }) => {
                       </div>
                     </div>
 
-                    <div className="col-1">
+                    <div className="col-2">
+                      <label className="text-label">Diskon</label>
                       <div className="p-inputgroup">
                         <InputText
                           // value={
@@ -658,7 +617,8 @@ const InputPO = ({ onCancel, onSubmit }) => {
                       </div>
                     </div>
 
-                    <div className="col-1">
+                    <div className="col-3">
+                      <label className="text-label">Harga Nett</label>
                       <div className="p-inputgroup">
                         <InputText
                           // value={
@@ -672,13 +632,14 @@ const InputPO = ({ onCancel, onSubmit }) => {
                               // jasa: { ...currentItem.jasa, name: e.target.value },
                             })
                           }
-                          placeholder="Harga Nett"
+                          placeholder="Masukan Harga Nett"
                           type="number"
                         />
                       </div>
                     </div>
 
-                    <div className="col-1">
+                    <div className="col-3">
+                      <label className="text-label">Total Harga</label>
                       <div className="p-inputgroup">
                         <InputText
                           // value={
@@ -692,47 +653,44 @@ const InputPO = ({ onCancel, onSubmit }) => {
                               // jasa: { ...currentItem.jasa, name: e.target.value },
                             })
                           }
-                          placeholder="Total Harga"
+                          placeholder="Masukan Total Harga"
                           type="number"
-                          disabled
                         />
                       </div>
                     </div>
 
                     <div className="col-1 d-flex ml-0">
-                      <div className="mt-2">
-                        {i == inProd.length - 1 ? (
-                          <Link
-                            onClick={() => {
-                              setInProd([
-                                ...inProd,
-                                {
-                                  id: 0,
-                                  qty: 1,
-                                  u_from: null,
-                                  u_to: null,
-                                },
-                              ]);
-                            }}
-                            className="btn btn-primary shadow btn-xs sharp ml-1"
-                          >
-                            <i className="fa fa-plus"></i>
-                          </Link>
-                        ) : (
-                          <Link
-                            onClick={() => {
-                              console.log(inProd);
-                              console.log(i);
-                              let temp = [...inProd];
-                              temp.splice(i, 1);
-                              setInProd(temp);
-                            }}
-                            className="btn btn-danger shadow btn-xs sharp ml-1"
-                          >
-                            <i className="fa fa-trash"></i>
-                          </Link>
-                        )}
-                      </div>
+                      {i === inProd.length - 1 ? (
+                        <Link
+                          onClick={() => {
+                            setInProd([
+                              ...inProd,
+                              {
+                                id: 0,
+                                qty: 1,
+                                u_from: null,
+                                u_to: null,
+                              },
+                            ]);
+                          }}
+                          className="btn btn-primary shadow btn-xs sharp ml-1"
+                        >
+                          <i className="fa fa-plus"></i>
+                        </Link>
+                      ) : (
+                        <Link
+                          onClick={() => {
+                            console.log(inProd);
+                            console.log(i);
+                            let temp = [...inProd];
+                            temp.splice(i, 1);
+                            setInProd(temp);
+                          }}
+                          className="btn btn-danger shadow btn-xs sharp ml-1"
+                        >
+                          <i className="fa fa-trash"></i>
+                        </Link>
+                      )}
                     </div>
                   </div>
                 );
@@ -753,48 +711,12 @@ const InputPO = ({ onCancel, onSubmit }) => {
           }}
           key={1}
           body={
-            <Row>
-              <div className="row col-12 mt-0 mr-0 ml-0">
-                <div className="col-2">
-                  <label className="text-label">Kode Supplier</label>
-                </div>
-                <div className="col-2">
-                  <label className="text-label">Kode Jasa</label>
-                </div>
-
-                <div className="col-2">
-                  <label className="text-label">Satuan</label>
-                </div>
-
-                <div className="col-1">
-                  <label className="text-label">Jumlah</label>
-                </div>
-
-                <div className="col-2">
-                  <label className="text-label">Harga</label>
-                </div>
-
-                <div className="col-1">
-                  <label className="text-label">Diskon</label>
-                </div>
-
-                <div className="col-1">
-                  <label className="text-label">Total</label>
-                </div>
-
-                <div className="col-1">
-                  <label className="text-label">Action</label>
-                </div>
-              </div>
-
-              <div className="col-12">
-                <Divider></Divider>
-              </div>
-
+            <Row className="justify-content-between">
               {inJasa.map((v, i) => {
                 return (
-                  <div className="row col-12 mb-1 mr-0 ml-0">
-                    <div className="col-2">
+                  <div className="row mr-0 ml-0 justify-content-right col-12">
+                    <div className="col-4">
+                      <label className="text-label">Kode Supplier</label>
                       <div className="p-inputgroup">
                         <Dropdown
                           // value={
@@ -820,7 +742,8 @@ const InputPO = ({ onCancel, onSubmit }) => {
                       </div>
                     </div>
 
-                    <div className="col-2">
+                    <div className="col-4">
+                      <label className="text-label">Kode Jasa</label>
                       <div className="p-inputgroup">
                         <Dropdown
                           // value={
@@ -846,7 +769,8 @@ const InputPO = ({ onCancel, onSubmit }) => {
                       </div>
                     </div>
 
-                    <div className="col-2">
+                    <div className="col-3">
+                      <label className="text-label">Satuan</label>
                       <div className="p-inputgroup">
                         <Dropdown
                           // value={
@@ -872,7 +796,8 @@ const InputPO = ({ onCancel, onSubmit }) => {
                       </div>
                     </div>
 
-                    <div className="col-1">
+                    <div className="col-2">
+                      <label className="text-label">Pesanan</label>
                       <div className="p-inputgroup">
                         <InputText
                           // value={
@@ -886,13 +811,35 @@ const InputPO = ({ onCancel, onSubmit }) => {
                               // jasa: { ...currentItem.jasa, name: e.target.value },
                             })
                           }
-                          placeholder="0"
+                          placeholder="Jumlah Pesanan"
+                          type="number"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="col-3">
+                      <label className="text-label">Harga Satuan</label>
+                      <div className="p-inputgroup">
+                        <InputText
+                          // value={
+                          //   currentItem !== null
+                          //     ? `${currentItem?.jasa?.name ?? ""}`
+                          //     : ""
+                          // }
+                          onChange={(e) =>
+                            setCurrentItem({
+                              // ...currentItem,
+                              // jasa: { ...currentItem.jasa, name: e.target.value },
+                            })
+                          }
+                          placeholder="Masukan Harga Satuan"
                           type="number"
                         />
                       </div>
                     </div>
 
                     <div className="col-2">
+                      <label className="text-label">Diskon</label>
                       <div className="p-inputgroup">
                         <InputText
                           // value={
@@ -906,13 +853,14 @@ const InputPO = ({ onCancel, onSubmit }) => {
                               // jasa: { ...currentItem.jasa, name: e.target.value },
                             })
                           }
-                          placeholder="Masukan Harga"
+                          placeholder="Diskon"
                           type="number"
                         />
                       </div>
                     </div>
 
-                    <div className="col-1">
+                    <div className="col-4">
+                      <label className="text-label">Total Harga</label>
                       <div className="p-inputgroup">
                         <InputText
                           // value={
@@ -926,67 +874,44 @@ const InputPO = ({ onCancel, onSubmit }) => {
                               // jasa: { ...currentItem.jasa, name: e.target.value },
                             })
                           }
-                          placeholder="0"
+                          placeholder="Masukan Total Harga"
                           type="number"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="col-1">
-                      <div className="p-inputgroup">
-                        <InputText
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
-                          placeholder="0"
-                          type="number"
-                          disabled
                         />
                       </div>
                     </div>
 
                     <div className="col-1 d-flex ml-0">
-                      <div className="mt-2">
-                        {i == inJasa.length - 1 ? (
-                          <Link
-                            onClick={() => {
-                              setInJasa([
-                                ...inJasa,
-                                {
-                                  id: 0,
-                                  qty: 1,
-                                  u_from: null,
-                                  u_to: null,
-                                },
-                              ]);
-                            }}
-                            className="btn btn-primary shadow btn-xs sharp ml-1"
-                          >
-                            <i className="fa fa-plus"></i>
-                          </Link>
-                        ) : (
-                          <Link
-                            onClick={() => {
-                              console.log(inJasa);
-                              console.log(i);
-                              let temp = [...inJasa];
-                              temp.splice(i, 1);
-                              setInJasa(temp);
-                            }}
-                            className="btn btn-danger shadow btn-xs sharp ml-1"
-                          >
-                            <i className="fa fa-trash"></i>
-                          </Link>
-                        )}
-                      </div>
+                      {i === inJasa.length - 1 ? (
+                        <Link
+                          onClick={() => {
+                            setInJasa([
+                              ...inJasa,
+                              {
+                                id: 0,
+                                qty: 1,
+                                u_from: null,
+                                u_to: null,
+                              },
+                            ]);
+                          }}
+                          className="btn btn-primary shadow btn-xs sharp ml-1"
+                        >
+                          <i className="fa fa-plus"></i>
+                        </Link>
+                      ) : (
+                        <Link
+                          onClick={() => {
+                            console.log(inJasa);
+                            console.log(i);
+                            let temp = [...inJasa];
+                            temp.splice(i, 1);
+                            setInJasa(temp);
+                          }}
+                          className="btn btn-danger shadow btn-xs sharp ml-1"
+                        >
+                          <i className="fa fa-trash"></i>
+                        </Link>
+                      )}
                     </div>
                   </div>
                 );
@@ -1002,11 +927,11 @@ const InputPO = ({ onCancel, onSubmit }) => {
                 <label className="mt-1">{"Pisah Faktur"}</label>
                 <InputSwitch
                   className="ml-4"
-                  // checked={currentItem && currentItem.type == "d"}
+                  checked={currentItem && currentItem.faktur}
                   onChange={(e) => {
                     setCurrentItem({
                       ...currentItem,
-                      type: e.value ? "y" : "t",
+                      faktur: e.target.value,
                     });
                   }}
                 />
@@ -1082,32 +1007,22 @@ const InputPO = ({ onCancel, onSubmit }) => {
                 <b>Rp. </b>
               </label>
             </div>
-          </div>
 
-          {/* {currentItem !== null && currentItem.faktur === true ? (
-            // currentItem.type === "G" ? (
-            <>
-              <div className="row justify-content-right col-6">
-                <div className="col-6">
+            <div className="col-12">
+              <Divider className="ml-12"></Divider>
+            </div>
+
+            {currentItem !== null && currentItem.faktur ? (
+              <>
+                {/* <div className="row justify-content-right col-12 mt-4"> */}
+                <div className="col-6 mt-4">
                   <label className="text-label">Sub Total Jasa</label>
                 </div>
 
-                <div className="col-6">
+                <div className="col-6 mt-4">
                   <label className="text-label">
                     <b>Rp. </b>
                   </label>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label">Diskon Tambahan</label>
-                </div>
-
-                <div className="col-6">
-                  <div className="p-inputgroup">
-                    <Button icon="pi pi-check" className="p-button-success" />
-                    <InputText placeholder="Diskon" />
-                    <Button icon="pi pi-times" className="p-button-danger" />
-                  </div>
                 </div>
 
                 <div className="col-6">
@@ -1130,6 +1045,28 @@ const InputPO = ({ onCancel, onSubmit }) => {
                   </label>
                 </div>
 
+                <div className="col-6 mt-3">
+                  <label className="text-label">Diskon Tambahan</label>
+                </div>
+
+                <div className="col-6">
+                  <div className="p-inputgroup">
+                    <PButton
+                      label="Rp."
+                      className={`${isRp ? "" : "p-button-outlined"}`}
+                      onClick={() => setRp(true)}
+                    />
+                    <InputText placeholder="Diskon" />
+                    <PButton
+                      className={`${isRp ? "p-button-outlined" : ""}`}
+                      onClick={() => setRp(false)}
+                    >
+                      {" "}
+                      <b>%</b>{" "}
+                    </PButton>
+                  </div>
+                </div>
+
                 <div className="col-12">
                   <Divider className="ml-12"></Divider>
                 </div>
@@ -1145,10 +1082,14 @@ const InputPO = ({ onCancel, onSubmit }) => {
                     <b>Rp. </b>
                   </label>
                 </div>
-              </div>
-            </>
-          ) : // ) : null
-          null} */}
+
+                <div className="col-12">
+                  <Divider className="ml-12"></Divider>
+                </div>
+                {/* </div> */}
+              </>
+            ) : null}
+          </div>
         </div>
       </>
     );

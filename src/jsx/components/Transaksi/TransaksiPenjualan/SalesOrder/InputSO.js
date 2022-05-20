@@ -1,12 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { request, endpoints } from "src/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
-import { Row, Col, Card } from "react-bootstrap";
+import { Row, Card, Col } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
-import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
-import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { Divider } from "@material-ui/core";
@@ -14,7 +12,9 @@ import { Calendar } from "primereact/calendar";
 import { InputSwitch } from "primereact/inputswitch";
 import CustomAccordion from "../../../Accordion/Accordion";
 
-const data = {};
+const data = {
+  faktur: false,
+};
 
 const InputSO = ({ onCancel, onSubmit }) => {
   const [update, setUpdate] = useState(false);
@@ -180,7 +180,7 @@ const InputSO = ({ onCancel, onSubmit }) => {
         {/* Put content body here */}
         <Row className="mb-6">
           <div className="col-6">
-            <label className="text-label">Tanggal</label>
+            <label className="text-black fs-15">Tanggal</label>
             <div className="p-inputgroup">
               <Calendar
                 // value={
@@ -201,7 +201,7 @@ const InputSO = ({ onCancel, onSubmit }) => {
           </div>
 
           <div className="col-6">
-            <label className="text-label">Kode Referensi</label>
+            <label className="text-black fs-14">Kode Referensi</label>
             <div className="p-inputgroup">
               <InputText
                 // value={
@@ -221,7 +221,7 @@ const InputSO = ({ onCancel, onSubmit }) => {
           </div>
 
           <div className="col-4">
-            <label className="text-label">Kode Pelanggan</label>
+            <label className="text-black fs-14">Kode Pelanggan</label>
             <div className="p-inputgroup">
               <Dropdown
                 // value={
@@ -248,7 +248,7 @@ const InputSO = ({ onCancel, onSubmit }) => {
           </div>
 
           <div className="col-4">
-            <label className="text-label"></label>
+            <label className="text-black fs-14"></label>
             <div className="p-inputgroup mt-2">
               <InputText
                 // value={
@@ -268,7 +268,7 @@ const InputSO = ({ onCancel, onSubmit }) => {
           </div>
 
           <div className="col-4">
-            <label className="text-label"></label>
+            <label className="text-black fs-14"></label>
             <div className="p-inputgroup mt-2">
               <InputText
                 // value={
@@ -288,7 +288,7 @@ const InputSO = ({ onCancel, onSubmit }) => {
           </div>
 
           <div className="col-12">
-            <label className="text-label">Ppn</label>
+            <label className="text-black fs-14">Ppn</label>
             <div className="p-inputgroup mt-2">
               <Dropdown
                 // value={
@@ -314,22 +314,22 @@ const InputSO = ({ onCancel, onSubmit }) => {
             </div>
           </div>
 
-          <div className="d-flex col-12 align-items-center mt-5">
-            <label className="ml-0 mt-1">{"Alamat Pengiriman"}</label>
+          <div className="d-flex col-12 align-items-center mt-4">
+            <label className="ml-0 mt-1 text-black fs-14">{"Alamat Pengiriman"}</label>
             <InputSwitch
               className="ml-4"
-              // checked={currentItem && currentItem.refrence}
+              checked={currentItem && currentItem.send_add}
               onChange={(e) => {
                 setCurrentItem({
-                  // ...currentItem,
-                  // refrence: e.target.value,
+                  ...currentItem,
+                  send_add: e.target.value,
                 });
               }}
             />
           </div>
 
           <div className="col-4">
-            <label className="text-label">Sub Pelanggan</label>
+            <label className="text-black fs-14">Sub Pelanggan</label>
             <div className="p-inputgroup">
               <Dropdown
                 // value={
@@ -344,11 +344,13 @@ const InputSO = ({ onCancel, onSubmit }) => {
                   })
                 }
                 placeholder="Pilih Sub Pelanggan"
+                disabled={currentItem && !currentItem.send_add}
               />
               <PButton
-              // onClick={() => {
-              //   setShowJenisPelanggan(true);
-              // }}
+                // onClick={() => {
+                //   setShowJenisPelanggan(true);
+                // }}
+                disabled={currentItem && !currentItem.send_add}
               >
                 <i class="bx bx-food-menu"></i>
               </PButton>
@@ -356,7 +358,7 @@ const InputSO = ({ onCancel, onSubmit }) => {
           </div>
 
           <div className="col-4">
-            <label className="text-label"></label>
+            <label className="text-black fs-14"></label>
             <div className="p-inputgroup mt-1">
               <InputText
                 // value={
@@ -371,12 +373,13 @@ const InputSO = ({ onCancel, onSubmit }) => {
                   })
                 }
                 placeholder="Alamat Sub Pelanggan"
+                disabled={currentItem && !currentItem.send_add}
               />
             </div>
           </div>
 
           <div className="col-4">
-            <label className="text-label"></label>
+            <label className="text-black fs-14"></label>
             <div className="p-inputgroup mt-1">
               <InputText
                 // value={
@@ -391,12 +394,13 @@ const InputSO = ({ onCancel, onSubmit }) => {
                   })
                 }
                 placeholder="Kontak Person"
+                disabled={currentItem && !currentItem.send_add}
               />
             </div>
           </div>
 
           <div className="col-4">
-            <label className="text-label">Tanggal Permintaan</label>
+            <label className="text-black fs-14">Tanggal Permintaan</label>
             <div className="p-inputgroup mt-2">
               <Calendar
                 // value={
@@ -417,7 +421,7 @@ const InputSO = ({ onCancel, onSubmit }) => {
           </div>
 
           <div className="col-4">
-            <label className="text-label">Syarat Pembayaran</label>
+            <label className="text-black fs-14">Syarat Pembayaran</label>
             <div className="p-inputgroup mt-2">
               <Dropdown
                 // value={
@@ -444,7 +448,7 @@ const InputSO = ({ onCancel, onSubmit }) => {
           </div>
 
           <div className="col-4">
-            <label className="text-label">Tanggal Jatuh Tempo</label>
+            <label className="text-black fs-14">Tanggal Jatuh Tempo</label>
             <div className="p-inputgroup mt-2">
               <Calendar
                 // value={
@@ -477,57 +481,12 @@ const InputSO = ({ onCancel, onSubmit }) => {
           }}
           key={1}
           body={
-            <Row>
-              <div className="row col-12 mr-0 ml-0">
-                <div className="col-2 ml-0">
-                  <label className="text-label">Kode Produk</label>
-                </div>
-
-                <div className="col-2">
-                  <label className="text-label">Satuan</label>
-                </div>
-
-                <div className="col-1">
-                  <label className="text-label">Permintaan</label>
-                </div>
-
-                <div className="col-1">
-                  <label className="text-label">Pesanan</label>
-                </div>
-
-                <div className="col-1">
-                  <label className="text-label">Sisa</label>
-                </div>
-
-                <div className="col-1">
-                  <label className="text-label">Harga</label>
-                </div>
-
-                <div className="col-1">
-                  <label className="text-label">Diskon</label>
-                </div>
-
-                <div className="col-1">
-                  <label className="text-label">Harga Nett</label>
-                </div>
-
-                <div className="col-1">
-                  <label className="text-label">Total</label>
-                </div>
-
-                <div className="col-1">
-                  <label className="text-label">Action</label>
-                </div>
-              </div>
-
-              <div className="col-12">
-                <Divider></Divider>
-              </div>
-
+            <Row className="justify-content-between">
               {inProd.map((v, i) => {
                 return (
-                  <div className="row col-12 mb-0 mr-0 ml-0">
-                    <div className="col-2">
+                  <div className="row mr-0 ml-0 justify-content-right col-12">
+                    <div className="col-5">
+                      <label className="text-black fs-14">Kode Produk</label>
                       <div className="p-inputgroup">
                         <Dropdown
                           // value={
@@ -553,7 +512,8 @@ const InputSO = ({ onCancel, onSubmit }) => {
                       </div>
                     </div>
 
-                    <div className="col-2">
+                    <div className="col-4">
+                      <label className="text-black fs-14">Satuan</label>
                       <div className="p-inputgroup">
                         <Dropdown
                           // value={
@@ -579,7 +539,8 @@ const InputSO = ({ onCancel, onSubmit }) => {
                       </div>
                     </div>
 
-                    <div className="col-1">
+                    <div className="col-2">
+                      <label className="text-black fs-14">Pesanan</label>
                       <div className="p-inputgroup">
                         <InputText
                           // value={
@@ -593,55 +554,14 @@ const InputSO = ({ onCancel, onSubmit }) => {
                               // jasa: { ...currentItem.jasa, name: e.target.value },
                             })
                           }
-                          placeholder="0"
-                          type="number"
-                          disabled
-                        />
-                      </div>
-                    </div>
-
-                    <div className="col-1">
-                      <div className="p-inputgroup">
-                        <InputText
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
-                          placeholder="0"
+                          placeholder="Jumlah Pesanan"
                           type="number"
                         />
                       </div>
                     </div>
 
-                    <div className="col-1">
-                      <div className="p-inputgroup">
-                        <InputText
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
-                          placeholder="0"
-                          type="number"
-                          disabled
-                        />
-                      </div>
-                    </div>
-
-                    <div className="col-1">
+                    <div className="col-3">
+                      <label className="text-black fs-14">Harga Satuan</label>
                       <div className="p-inputgroup">
                         <InputText
                           // value={
@@ -661,7 +581,8 @@ const InputSO = ({ onCancel, onSubmit }) => {
                       </div>
                     </div>
 
-                    <div className="col-1">
+                    <div className="col-2">
+                      <label className="text-black fs-14">Diskon</label>
                       <div className="p-inputgroup">
                         <InputText
                           // value={
@@ -681,7 +602,8 @@ const InputSO = ({ onCancel, onSubmit }) => {
                       </div>
                     </div>
 
-                    <div className="col-1">
+                    <div className="col-3">
+                      <label className="text-black fs-14">Harga Nett</label>
                       <div className="p-inputgroup">
                         <InputText
                           // value={
@@ -695,13 +617,14 @@ const InputSO = ({ onCancel, onSubmit }) => {
                               // jasa: { ...currentItem.jasa, name: e.target.value },
                             })
                           }
-                          placeholder="Harga Nett"
+                          placeholder="Masukan Harga Nett"
                           type="number"
                         />
                       </div>
                     </div>
 
-                    <div className="col-1">
+                    <div className="col-3">
+                      <label className="text-black fs-14">Total Harga</label>
                       <div className="p-inputgroup">
                         <InputText
                           // value={
@@ -715,47 +638,44 @@ const InputSO = ({ onCancel, onSubmit }) => {
                               // jasa: { ...currentItem.jasa, name: e.target.value },
                             })
                           }
-                          placeholder="Total Harga"
+                          placeholder="Masukan Total Harga"
                           type="number"
-                          disabled
                         />
                       </div>
                     </div>
 
                     <div className="col-1 d-flex ml-0">
-                      <div className="mt-2">
-                        {i == inProd.length - 1 ? (
-                          <Link
-                            onClick={() => {
-                              setInProd([
-                                ...inProd,
-                                {
-                                  id: 0,
-                                  qty: 1,
-                                  u_from: null,
-                                  u_to: null,
-                                },
-                              ]);
-                            }}
-                            className="btn btn-primary shadow btn-xs sharp ml-1"
-                          >
-                            <i className="fa fa-plus"></i>
-                          </Link>
-                        ) : (
-                          <Link
-                            onClick={() => {
-                              console.log(inProd);
-                              console.log(i);
-                              let temp = [...inProd];
-                              temp.splice(i, 1);
-                              setInProd(temp);
-                            }}
-                            className="btn btn-danger shadow btn-xs sharp ml-1"
-                          >
-                            <i className="fa fa-trash"></i>
-                          </Link>
-                        )}
-                      </div>
+                      {i === inProd.length - 1 ? (
+                        <Link
+                          onClick={() => {
+                            setInProd([
+                              ...inProd,
+                              {
+                                id: 0,
+                                qty: 1,
+                                u_from: null,
+                                u_to: null,
+                              },
+                            ]);
+                          }}
+                          className="btn btn-primary shadow btn-xs sharp ml-1"
+                        >
+                          <i className="fa fa-plus"></i>
+                        </Link>
+                      ) : (
+                        <Link
+                          onClick={() => {
+                            console.log(inProd);
+                            console.log(i);
+                            let temp = [...inProd];
+                            temp.splice(i, 1);
+                            setInProd(temp);
+                          }}
+                          className="btn btn-danger shadow btn-xs sharp ml-1"
+                        >
+                          <i className="fa fa-trash"></i>
+                        </Link>
+                      )}
                     </div>
                   </div>
                 );
@@ -776,48 +696,12 @@ const InputSO = ({ onCancel, onSubmit }) => {
           }}
           key={1}
           body={
-            <Row>
-              <div className="row col-12 mt-0 mr-0 ml-0">
-                <div className="col-2">
-                  <label className="text-label">Kode Supplier</label>
-                </div>
-                <div className="col-2">
-                  <label className="text-label">Kode Jasa</label>
-                </div>
-
-                <div className="col-2">
-                  <label className="text-label">Satuan</label>
-                </div>
-
-                <div className="col-1">
-                  <label className="text-label">Jumlah</label>
-                </div>
-
-                <div className="col-2">
-                  <label className="text-label">Harga</label>
-                </div>
-
-                <div className="col-1">
-                  <label className="text-label">Diskon</label>
-                </div>
-
-                <div className="col-1">
-                  <label className="text-label">Total</label>
-                </div>
-
-                <div className="col-1">
-                  <label className="text-label">Action</label>
-                </div>
-              </div>
-
-              <div className="col-12">
-                <Divider></Divider>
-              </div>
-
+            <Row className="justify-content-between">
               {inJasa.map((v, i) => {
                 return (
-                  <div className="row col-12 mb-1 mr-0 ml-0">
-                    <div className="col-2">
+                  <div className="row mr-0 ml-0 justify-content-right col-12">
+                    <div className="col-4">
+                      <label className="text-black fs-14">Kode Supplier</label>
                       <div className="p-inputgroup">
                         <Dropdown
                           // value={
@@ -843,7 +727,8 @@ const InputSO = ({ onCancel, onSubmit }) => {
                       </div>
                     </div>
 
-                    <div className="col-2">
+                    <div className="col-4">
+                      <label className="text-black fs-14">Kode Jasa</label>
                       <div className="p-inputgroup">
                         <Dropdown
                           // value={
@@ -869,7 +754,8 @@ const InputSO = ({ onCancel, onSubmit }) => {
                       </div>
                     </div>
 
-                    <div className="col-2">
+                    <div className="col-3">
+                      <label className="text-black fs-14">Satuan</label>
                       <div className="p-inputgroup">
                         <Dropdown
                           // value={
@@ -895,7 +781,8 @@ const InputSO = ({ onCancel, onSubmit }) => {
                       </div>
                     </div>
 
-                    <div className="col-1">
+                    <div className="col-2">
+                      <label className="text-black fs-14">Pesanan</label>
                       <div className="p-inputgroup">
                         <InputText
                           // value={
@@ -909,13 +796,35 @@ const InputSO = ({ onCancel, onSubmit }) => {
                               // jasa: { ...currentItem.jasa, name: e.target.value },
                             })
                           }
-                          placeholder="0"
+                          placeholder="Jumlah Pesanan"
+                          type="number"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="col-3">
+                      <label className="text-black fs-14">Harga Satuan</label>
+                      <div className="p-inputgroup">
+                        <InputText
+                          // value={
+                          //   currentItem !== null
+                          //     ? `${currentItem?.jasa?.name ?? ""}`
+                          //     : ""
+                          // }
+                          onChange={(e) =>
+                            setCurrentItem({
+                              // ...currentItem,
+                              // jasa: { ...currentItem.jasa, name: e.target.value },
+                            })
+                          }
+                          placeholder="Masukan Harga Satuan"
                           type="number"
                         />
                       </div>
                     </div>
 
                     <div className="col-2">
+                      <label className="text-black fs-14">Diskon</label>
                       <div className="p-inputgroup">
                         <InputText
                           // value={
@@ -929,13 +838,14 @@ const InputSO = ({ onCancel, onSubmit }) => {
                               // jasa: { ...currentItem.jasa, name: e.target.value },
                             })
                           }
-                          placeholder="Masukan Harga"
+                          placeholder="Diskon"
                           type="number"
                         />
                       </div>
                     </div>
 
-                    <div className="col-1">
+                    <div className="col-4">
+                      <label className="text-black fs-14">Total Harga</label>
                       <div className="p-inputgroup">
                         <InputText
                           // value={
@@ -949,67 +859,44 @@ const InputSO = ({ onCancel, onSubmit }) => {
                               // jasa: { ...currentItem.jasa, name: e.target.value },
                             })
                           }
-                          placeholder="0"
+                          placeholder="Masukan Total Harga"
                           type="number"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="col-1">
-                      <div className="p-inputgroup">
-                        <InputText
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
-                          placeholder="0"
-                          type="number"
-                          disabled
                         />
                       </div>
                     </div>
 
                     <div className="col-1 d-flex ml-0">
-                      <div className="mt-2">
-                        {i == inJasa.length - 1 ? (
-                          <Link
-                            onClick={() => {
-                              setInJasa([
-                                ...inJasa,
-                                {
-                                  id: 0,
-                                  qty: 1,
-                                  u_from: null,
-                                  u_to: null,
-                                },
-                              ]);
-                            }}
-                            className="btn btn-primary shadow btn-xs sharp ml-1"
-                          >
-                            <i className="fa fa-plus"></i>
-                          </Link>
-                        ) : (
-                          <Link
-                            onClick={() => {
-                              console.log(inJasa);
-                              console.log(i);
-                              let temp = [...inJasa];
-                              temp.splice(i, 1);
-                              setInJasa(temp);
-                            }}
-                            className="btn btn-danger shadow btn-xs sharp ml-1"
-                          >
-                            <i className="fa fa-trash"></i>
-                          </Link>
-                        )}
-                      </div>
+                      {i === inJasa.length - 1 ? (
+                        <Link
+                          onClick={() => {
+                            setInJasa([
+                              ...inJasa,
+                              {
+                                id: 0,
+                                qty: 1,
+                                u_from: null,
+                                u_to: null,
+                              },
+                            ]);
+                          }}
+                          className="btn btn-primary shadow btn-xs sharp ml-1"
+                        >
+                          <i className="fa fa-plus"></i>
+                        </Link>
+                      ) : (
+                        <Link
+                          onClick={() => {
+                            console.log(inJasa);
+                            console.log(i);
+                            let temp = [...inJasa];
+                            temp.splice(i, 1);
+                            setInJasa(temp);
+                          }}
+                          className="btn btn-danger shadow btn-xs sharp ml-1"
+                        >
+                          <i className="fa fa-trash"></i>
+                        </Link>
+                      )}
                     </div>
                   </div>
                 );
@@ -1022,14 +909,14 @@ const InputSO = ({ onCancel, onSubmit }) => {
           <div>
             <div className="row ml-1">
               <div className="d-flex col-12 align-items-center">
-                <label className="mt-1">{"Pisah Faktur"}</label>
+                <label className="mt-1 text-black fs-14">{"Pisah Faktur"}</label>
                 <InputSwitch
                   className="ml-4"
-                  // checked={currentItem && currentItem.type == "d"}
+                  checked={currentItem && currentItem.faktur}
                   onChange={(e) => {
                     setCurrentItem({
                       ...currentItem,
-                      type: e.value ? "y" : "t",
+                      faktur: e.target.value,
                     });
                   }}
                 />
@@ -1039,37 +926,37 @@ const InputSO = ({ onCancel, onSubmit }) => {
 
           <div className="row justify-content-right col-6">
             <div className="col-6">
-              <label className="text-label">Sub Total Barang</label>
+              <label className="text-black fs-14">Sub Total Barang</label>
             </div>
 
             <div className="col-6">
-              <label className="text-label">
+              <label className="text-black fs-14">
                 <b>Rp. </b>
               </label>
             </div>
 
             <div className="col-6">
-              <label className="text-label">DPP Barang</label>
+              <label className="text-black fs-14">DPP Barang</label>
             </div>
 
             <div className="col-6">
-              <label className="text-label">
+              <label className="text-black fs-14">
                 <b>Rp. </b>
               </label>
             </div>
 
             <div className="col-6">
-              <label className="text-label">Pajak Atas Barang (11%)</label>
+              <label className="text-black fs-14">Pajak Atas Barang (11%)</label>
             </div>
 
             <div className="col-6">
-              <label className="text-label">
+              <label className="text-black fs-14">
                 <b>Rp. </b>
               </label>
             </div>
 
             <div className="col-6 mt-3">
-              <label className="text-label">Diskon Tambahan</label>
+              <label className="text-black fs-14">Diskon Tambahan</label>
             </div>
 
             <div className="col-6">
@@ -1095,62 +982,74 @@ const InputSO = ({ onCancel, onSubmit }) => {
             </div>
 
             <div className="col-6">
-              <label className="text-label">
+              <label className="text-black fs-15">
                 <b>Total Pembayaran</b>
               </label>
             </div>
 
             <div className="col-6">
-              <label className="text-label fs-16">
+              <label className="text-black fs-15">
                 <b>Rp. </b>
               </label>
             </div>
-          </div>
 
-          {/* {currentItem !== null && currentItem.faktur === true ? (
-            // currentItem.type === "G" ? (
-            <>
-              <div className="row justify-content-right col-6">
-                <div className="col-6">
-                  <label className="text-label">Sub Total Jasa</label>
+            <div className="col-12">
+              <Divider className="ml-12"></Divider>
+            </div>
+
+            {currentItem !== null && currentItem.faktur ? (
+              <>
+                {/* <div className="row justify-content-right col-12 mt-4"> */}
+                <div className="col-6 mt-4">
+                  <label className="text-black fs-14">Sub Total Jasa</label>
                 </div>
 
-                <div className="col-6">
-                  <label className="text-label">
+                <div className="col-6 mt-4">
+                  <label className="text-black fs-14">
                     <b>Rp. </b>
                   </label>
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">Diskon Tambahan</label>
+                  <label className="text-black fs-14">DPP Jasa</label>
+                </div>
+
+                <div className="col-6">
+                  <label className="text-black fs-14">
+                    <b>Rp. </b>
+                  </label>
+                </div>
+
+                <div className="col-6">
+                  <label className="text-black fs-14">Pajak Atas Jasa (2%)</label>
+                </div>
+
+                <div className="col-6">
+                  <label className="text-black fs-14">
+                    <b>Rp. </b>
+                  </label>
+                </div>
+
+                <div className="col-6 mt-3">
+                  <label className="text-black fs-14">Diskon Tambahan</label>
                 </div>
 
                 <div className="col-6">
                   <div className="p-inputgroup">
-                    <Button icon="pi pi-check" className="p-button-success" />
+                    <PButton
+                      label="Rp."
+                      className={`${isRp ? "" : "p-button-outlined"}`}
+                      onClick={() => setRp(true)}
+                    />
                     <InputText placeholder="Diskon" />
-                    <Button icon="pi pi-times" className="p-button-danger" />
+                    <PButton
+                      className={`${isRp ? "p-button-outlined" : ""}`}
+                      onClick={() => setRp(false)}
+                    >
+                      {" "}
+                      <b>%</b>{" "}
+                    </PButton>
                   </div>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label">DPP Jasa</label>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label">
-                    <b>Rp. </b>
-                  </label>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label">Pajak Atas Jasa (2%)</label>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label">
-                    <b>Rp. </b>
-                  </label>
                 </div>
 
                 <div className="col-12">
@@ -1158,20 +1057,24 @@ const InputSO = ({ onCancel, onSubmit }) => {
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">
+                  <label className="text-black fs-15">
                     <b>Total Pembayaran</b>
                   </label>
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label fs-16">
+                  <label className="text-black fs-15">
                     <b>Rp. </b>
                   </label>
                 </div>
-              </div>
-            </>
-          ) : // ) : null
-          null} */}
+
+                <div className="col-12">
+                  <Divider className="ml-12"></Divider>
+                </div>
+                {/* </div> */}
+              </>
+            ) : null}
+          </div>
         </div>
       </>
     );

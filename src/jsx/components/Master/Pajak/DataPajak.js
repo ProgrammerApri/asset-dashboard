@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { request, endpoints } from "src/utils";
-import { FilterMatchMode, FilterOperator } from "primereact/api";
+import { FilterMatchMode } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "react-bootstrap";
-import { Row, Col, Card, Badge } from "react-bootstrap";
+import { Row, Col, Badge } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { Dialog } from "primereact/dialog";
@@ -12,14 +12,12 @@ import { InputText } from "primereact/inputtext";
 import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
-import { InputTextarea } from "primereact/inputtextarea";
 import { InputNumber } from "primereact/inputnumber";
 import { Checkbox } from "primereact/checkbox";
-import { RadioButton } from "primereact/radiobutton";
 import { SelectButton } from "primereact/selectbutton";
 import { MultiSelect } from "primereact/multiselect";
 
-const data = {
+const def = {
   id: null,
   type: null,
   name: null,
@@ -35,31 +33,38 @@ const type = [
   { name: "Ganda", code: "G" },
 ];
 
-const Pajak = () => {
+const DataPajak = ({
+  data,
+  load,
+  popUp = false,
+  show = false,
+  onHide = () => {},
+  onInput = () => {},
+  onRowSelect,
+  onSuccessInput,
+}) => {
   const [pajak, setPajak] = useState(null);
   const [account, setAccount] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [update, setUpdate] = useState(false);
-  const [displayData, setDisplayData] = useState(false);
-  const [displayDel, setDisplayDel] = useState(false);
-  const [position, setPosition] = useState("center");
-  const [currentItem, setCurrentItem] = useState(null);
-  const toast = useRef(null);
-  const [filters1, setFilters1] = useState(null);
-  const [globalFilterValue1, setGlobalFilterValue1] = useState("");
-  const [isEdit, setEdit] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+  const [filters1, setFilters1] = useState(null);
+  const [globalFilterValue1, setGlobalFilterValue1] = useState("");
+  const [loading, setLoading] = useState(false);
+  const toast = useRef(null);
+  const [currentItem, setCurrentItem] = useState(def);
+  const [isEdit, setEdit] = useState(def);
+  const [showInput, setShowInput] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
 
-  const dummy = Array.from({ length: 10 });
+  
 
   useEffect(() => {
-    getPajak();
+    getPajak()
     getAccount();
     initFilters1();
   }, []);
 
-  const getPajak = async (isUpdate = false) => {
+  const getPajak= async (isUpdate = false) => {
     setLoading(true);
     const config = {
       ...endpoints.pajak,
@@ -81,7 +86,7 @@ const Pajak = () => {
     } else {
       setTimeout(() => {
         setLoading(false);
-      }, 1500);
+      }, 500);
     }
   };
 
@@ -131,9 +136,10 @@ const Pajak = () => {
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setUpdate(false);
-          setDisplayData(false);
-          getPajak(true);
+          onSuccessInput();
+          setLoading(false);
+          onHideInput();
+          onInput(false);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -144,7 +150,7 @@ const Pajak = () => {
       }
     } catch (error) {
       setTimeout(() => {
-        setUpdate(false);
+        setLoading(false);
         toast.current.show({
           severity: "error",
           summary: "Gagal",
@@ -175,9 +181,10 @@ const Pajak = () => {
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setUpdate(false);
-          setDisplayData(false);
-          getPajak(true);
+          onSuccessInput();
+          setLoading(false);
+          onHideInput();
+          onInput(false);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -188,16 +195,15 @@ const Pajak = () => {
       }
     } catch (error) {
       console.log(error);
-        setTimeout(() => {
-          setUpdate(false);
-          toast.current.show({
-            severity: "error",
-            summary: "Gagal",
-            detail: "Gagal Memperbarui Data",
-            life: 3000,
-          });
-        }, 500);
-      
+      setTimeout(() => {
+        setLoading(false);
+        toast.current.show({
+          severity: "error",
+          summary: "Gagal",
+          detail: "Gagal Memperbarui Data",
+          life: 3000,
+        });
+      }, 500);
     }
   };
 
@@ -213,9 +219,10 @@ const Pajak = () => {
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setUpdate(false);
-          setDisplayDel(false);
-          getPajak(true);
+          setLoading(false);
+          setShowDelete(false);
+          onSuccessInput();
+          onInput(false);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -227,8 +234,8 @@ const Pajak = () => {
     } catch (error) {
       console.log(error);
       setTimeout(() => {
-        setUpdate(false);
-        setDisplayDel(false);
+        setLoading(false);
+        setShowDelete(false);
         toast.current.show({
           severity: "error",
           summary: "Gagal",
@@ -246,8 +253,9 @@ const Pajak = () => {
         <Link
           onClick={() => {
             setEdit(true);
-            onClick("displayData", data);
             setCurrentItem(data);
+            setShowInput(true);
+            onInput(true);
           }}
           className="btn btn-primary shadow btn-xs sharp ml-1"
         >
@@ -256,9 +264,9 @@ const Pajak = () => {
 
         <Link
           onClick={() => {
-            setEdit(true);
-            setDisplayDel(true);
             setCurrentItem(data);
+            setShowDelete(true);
+            onInput(true);
           }}
           className="btn btn-danger shadow btn-xs sharp ml-1"
         >
@@ -269,21 +277,12 @@ const Pajak = () => {
     );
   };
 
-  const onClick = () => {
-    setDisplayData(true);
-    setCurrentItem();
-
-    if (position) {
-      setPosition(position);
-    }
-  };
-
   const onSubmit = () => {
     if (isEdit) {
-      setUpdate(true);
+      setLoading(true);
       editPajak();
     } else {
-      setUpdate(true);
+      setLoading(true);
       addPajak();
     }
   };
@@ -293,7 +292,10 @@ const Pajak = () => {
       <div>
         <PButton
           label="Batal"
-          onClick={() => setDisplayData(false)}
+          onClick={() => {
+            onHideInput();
+            onInput(false);
+          }}
           className="p-button-text btn-primary"
         />
         <PButton
@@ -301,7 +303,7 @@ const Pajak = () => {
           icon="pi pi-check"
           onClick={() => onSubmit()}
           autoFocus
-          loading={update}
+          loading={loading}
         />
       </div>
     );
@@ -312,7 +314,11 @@ const Pajak = () => {
       <div>
         <PButton
           label="Batal"
-          onClick={() => setDisplayDel(false)}
+          onClick={() => {
+            setShowDelete(false);
+            setLoading(false);
+            onInput(false);
+          }}
           className="p-button-text btn-primary"
         />
         <PButton
@@ -322,7 +328,7 @@ const Pajak = () => {
             delPajak();
           }}
           autoFocus
-          loading={update}
+          loading={loading}
         />
       </div>
     );
@@ -357,9 +363,11 @@ const Pajak = () => {
         <Button
           variant="primary"
           onClick={() => {
+            setShowInput(true);
             setEdit(false);
-            setCurrentItem(data);
-            setDisplayData(true);
+            setLoading(false);
+            setCurrentItem(def);
+            onInput(true);
           }}
         >
           Tambah{" "}
@@ -447,149 +455,155 @@ const Pajak = () => {
     return <span>{props.placeholder}</span>;
   };
 
-  return (
-    <>
-      <Toast ref={toast} />
-      <Row>
-        <Col>
-          <Card>
-            <Card.Body>
-              <DataTable
-                responsiveLayout="scroll"
-                value={loading ? dummy : pajak}
-                className="display w-150 datatable-wrapper"
-                showGridlines
-                dataKey="id"
-                rowHover
-                header={renderHeader}
-                filters={filters1}
-                globalFilterFields={["name", "nilai"]}
-                emptyMessage="Tidak ada data"
-                paginator
-                paginatorTemplate={template2}
-                first={first2}
-                rows={rows2}
-                onPage={onCustomPage2}
-                paginatorClassName="justify-content-end mt-3"
-              >
-                <Column
-                  header="Nama"
-                  field={(e) => e?.name ?? ""}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Nilai (%)"
-                  field={(e) => e?.nilai ?? ""}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Tipe Pajak"
-                  field={(e) => e?.type ?? ""}
-                  style={{ minWidth: "8rem" }}
-                  body={(e) =>
-                    loading ? (
-                      <Skeleton />
-                    ) : (
-                      <div>
-                        {e.type === "T" ? (
-                          <Badge variant="success light">
-                            <i className="bx bxs-circle text-success mr-1"></i>{" "}
-                            Tunggal
-                          </Badge>
-                        ) : (
-                          <Badge variant="info light">
-                            <i className="bx bxs-circle text-info mr-1"></i>{" "}
-                            Ganda
-                          </Badge>
-                        )}
-                      </div>
-                    )
-                  }
-                />
-                <Column
-                  header="Potongan"
-                  field={(e) => e?.cutting ?? ""}
-                  style={{ minWidth: "8rem" }}
-                  body={(e) =>
-                    loading ? (
-                      <Skeleton />
-                    ) : (
-                      <div>
-                        {e.cutting === false ? (
-                          <Badge variant="danger light">
-                            <i className="bx bxs-circle text-danger mr-1"></i>{" "}
-                            Tidak Ada Potongan
-                          </Badge>
-                        ) : (
-                          <Badge variant="info light">
-                            <i className="bx bxs-circle text-info mr-1"></i>{" "}
-                            Potongan
-                          </Badge>
-                        )}
-                      </div>
-                    )
-                  }
-                />
-                <Column
-                  header="Gabungan Dari"
-                  field={(e) => e?.combined ?? ""}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Action"
-                  dataType="boolean"
-                  bodyClassName="text-center"
-                  style={{ minWidth: "2rem" }}
-                  body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
-                />
-              </DataTable>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+  const onHideInput = () => {
+    setLoading(false);
+    setCurrentItem(def);
+    setEdit(false);
+    setShowInput(false);
+  };
 
-      <Dialog
-        header={isEdit ? "Edit Data Pajak" : "Tambah Data Pajak"}
-        visible={displayData}
-        style={{ width: "40vw" }}
-        footer={renderFooter("displayData")}
-        onHide={() => {
-          setEdit(false);
-          setDisplayData(false);
-        }}
+  const renderBody = () => {
+    return (
+      <DataTable
+        responsiveLayout="scroll"
+        value={data}
+        className="display w-150 datatable-wrapper"
+        showGridlines
+        dataKey="id"
+        rowHover
+        header={renderHeader}
+        filters={filters1}
+        globalFilterFields={["name", "nilai"]}
+        emptyMessage="Tidak ada data"
+        paginator
+        paginatorTemplate={template2}
+        first={first2}
+        rows={rows2}
+        onPage={onCustomPage2}
+        paginatorClassName="justify-content-end mt-3"
+        selectionMode="single"
+        onRowSelect={onRowSelect}
       >
-        <div className="col-12 mb-2">
-          <label className="text-label">Pajak</label>
-          <div className="p-inputgroup">
-            <SelectButton
-              value={
-                currentItem !== null && currentItem.type !== ""
-                  ? currentItem.type === "T"
-                    ? { name: "Tunggal", code: "T" }
-                    : { name: "Ganda", code: "G" }
-                  : null
-              }
-              options={type}
-              onChange={(e) =>
-                setCurrentItem({ ...currentItem, type: e.value.code })
-              }
-              optionLabel="name"
-            />
-          </div>
-        </div>
+        <Column
+          header="Nama"
+          field={(e) => e?.name ?? ""}
+          style={{ minWidth: "8rem" }}
+          body={load && <Skeleton />}
+        />
+        <Column
+          header="Nilai (%)"
+          field={(e) => e?.nilai ?? ""}
+          style={{ minWidth: "8rem" }}
+          body={load && <Skeleton />}
+        />
+        <Column
+          header="Tipe Pajak"
+          field={(e) => e?.type ?? ""}
+          style={{ minWidth: "8rem" }}
+          body={(e) =>
+            load ? (
+              <Skeleton />
+            ) : (
+              <div>
+                {e.type === "T" ? (
+                  <Badge variant="success light">
+                    <i className="bx bxs-circle text-success mr-1"></i> Tunggal
+                  </Badge>
+                ) : (
+                  <Badge variant="info light">
+                    <i className="bx bxs-circle text-info mr-1"></i> Ganda
+                  </Badge>
+                )}
+              </div>
+            )
+          }
+        />
+        <Column
+          header="Potongan"
+          field={(e) => e?.cutting ?? ""}
+          style={{ minWidth: "8rem" }}
+          body={(e) =>
+            load ? (
+              <Skeleton />
+            ) : (
+              <div>
+                {e.cutting === false ? (
+                  <Badge variant="danger light">
+                    <i className="bx bxs-circle text-danger mr-1"></i> Tidak Ada
+                    Potongan
+                  </Badge>
+                ) : (
+                  <Badge variant="info light">
+                    <i className="bx bxs-circle text-info mr-1"></i> Potongan
+                  </Badge>
+                )}
+              </div>
+            )
+          }
+        />
+        <Column
+          header="Gabungan Dari"
+          field={(e) => e?.combined ?? ""}
+          style={{ minWidth: "8rem" }}
+          body={load && <Skeleton />}
+        />
+        <Column
+          header="Action"
+          dataType="boolean"
+          bodyClassName="text-center"
+          style={{ minWidth: "2rem" }}
+          body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
+        />
+      </DataTable>
+    );
+  };
 
-        {currentItem !== null && currentItem.type === "T" ? (
-          // currentItem.type === "T" ? (
+
+  const renderDialog = () => {
+    return (
+      <>
+      <Toast ref={toast} />
+        <Dialog
+          header={isEdit ? "Edit Data Pajak" : "Tambah Data Pajak"}
+          visible={showInput}
+          style={{ width: "40vw" }}
+          footer={renderFooter("displayData")}
+          onHide={() => {
+            onHideInput();
+            onInput(false);
+          }}
+        >
+          <div className="col-12 mb-2">
+            <label className="text-label">Pajak</label>
+            <div className="p-inputgroup">
+              <SelectButton
+                value={
+                  currentItem !== null && currentItem.type !== ""
+                    ? currentItem.type === "T"
+                      ? { name: "Tunggal", code: "T" }
+                      : { name: "Ganda", code: "G" }
+                    : null
+                }
+                options={type}
+                onChange={(e) =>
+                  setCurrentItem({ ...currentItem, type: e.value.code })
+                }
+                optionLabel="name"
+              />
+            </div>
+          </div>
+
+          {currentItem !== null && currentItem.type === "T" ? (
+            // currentItem.type === "T" ? (
             <>
               <div className="row ml-0 mt-0">
                 <div className="col-6">
                   <label className="text-label">Nama Pajak</label>
                   <div className="p-inputgroup">
                     <InputText
-                      value={currentItem !== null ? `${currentItem?.name ?? ""}` : ""}
+                      value={
+                        currentItem !== null ? `${currentItem?.name ?? ""}` : ""
+                      }
                       onChange={(e) =>
                         setCurrentItem({ ...currentItem, name: e.target.value })
                       }
@@ -602,7 +616,11 @@ const Pajak = () => {
                   <label className="text-label">Nilai</label>
                   <div className="p-inputgroup">
                     <InputNumber
-                      value={currentItem !== null ? `${currentItem?.nilai ?? ""}` : ""}
+                      value={
+                        currentItem !== null
+                          ? `${currentItem?.nilai ?? ""}`
+                          : ""
+                      }
                       onChange={(e) =>
                         setCurrentItem({ ...currentItem, nilai: e.value })
                       }
@@ -625,8 +643,7 @@ const Pajak = () => {
                     inputId="binary"
                     checked={currentItem ? currentItem.cutting : false}
                     onChange={(e) =>
-                      setCurrentItem({ ...currentItem, cutting: e.checked
-                      })
+                      setCurrentItem({ ...currentItem, cutting: e.checked })
                     }
                   />
                 </div>
@@ -638,8 +655,7 @@ const Pajak = () => {
                   <div className="p-inputgroup">
                     <Dropdown
                       value={
-                        currentItem !== null &&
-                        currentItem.acc_sls_fax !== null
+                        currentItem !== null && currentItem.acc_sls_fax !== null
                           ? acc(currentItem.acc_sls_fax)
                           : null
                       }
@@ -647,8 +663,8 @@ const Pajak = () => {
                       onChange={(e) => {
                         console.log(e.value);
                         setCurrentItem({
-                            ...currentItem,
-                            acc_sls_fax: e.target?.value?.id ?? null,
+                          ...currentItem,
+                          acc_sls_fax: e.target?.value?.id ?? null,
                         });
                       }}
                       optionLabel="account.acc_name"
@@ -666,8 +682,7 @@ const Pajak = () => {
                   <div className="p-inputgroup">
                     <Dropdown
                       value={
-                        currentItem !== null &&
-                        currentItem.acc_pur_fax !== null
+                        currentItem !== null && currentItem.acc_pur_fax !== null
                           ? acc(currentItem.acc_pur_fax)
                           : null
                       }
@@ -675,8 +690,8 @@ const Pajak = () => {
                       onChange={(e) => {
                         console.log(e.value);
                         setCurrentItem({
-                            ...currentItem,
-                            acc_pur_fax: e.target?.value?.id ?? null,
+                          ...currentItem,
+                          acc_pur_fax: e.target?.value?.id ?? null,
                         });
                       }}
                       optionLabel="account.acc_name"
@@ -690,18 +705,20 @@ const Pajak = () => {
                 </div>
               </div>
             </>
-          // ) : null
-        ) : null}
+          ) : // ) : null
+          null}
 
-        {currentItem !== null && currentItem.type === "G" ? (
-          // currentItem.type === "G" ? (
+          {currentItem !== null && currentItem.type === "G" ? (
+            // currentItem.type === "G" ? (
             <>
               <div className="row ml-0 mt-0">
                 <div className="col-6">
                   <label className="text-label">Nama Pajak</label>
                   <div className="p-inputgroup">
                     <InputText
-                      value={currentItem !== null ? `${currentItem?.name ?? ""}` : ""}
+                      value={
+                        currentItem !== null ? `${currentItem?.name ?? ""}` : ""
+                      }
                       onChange={(e) =>
                         setCurrentItem({ ...currentItem, name: e.target.value })
                       }
@@ -714,7 +731,7 @@ const Pajak = () => {
                   <label className="text-label">Penggabungan Dari</label>
                   <div className="p-inputgroup">
                     <MultiSelect
-                    className="p-invalid"
+                      className="p-invalid"
                       value={currentItem !== null ? currentItem.pajak : null}
                       options={pajak}
                       onChange={(e) => {
@@ -739,68 +756,70 @@ const Pajak = () => {
                 </div>
 
                 <div className="col-10 mb-2">
-                  <label className="text-label">1. .... <b>%</b></label>
+                  <label className="text-label">
+                    1. .... <b>%</b>
+                  </label>
                 </div>
 
                 <div className="col-10 mb-2">
-                  <label className="text-label">1. ..... <b>%</b></label>
+                  <label className="text-label">
+                    1. ..... <b>%</b>
+                  </label>
                 </div>
               </div>
             </>
-          // ) : null
-        ) : null}
+          ) : // ) : null
+          null}
+        </Dialog>
 
-        {/* <div className="row ml-0 mt-0">
-           <label className="text-label ml-2">Pajak</label>
-          <div className="col-12 field-radiobutton">
-            <RadioButton
-            className="mb-0"
-              inputId="binary"
-              // checked={currentItem ? currentItem.pajak.pemotongan : false}
-              onChange={(e) =>
-                setCurrentItem({
-                  // ...currentItem,
-                  // pajak: { ...currentItem.pajak, pemotongan: e.checked },
-                })
-              }
+        <Dialog
+          header={"Hapus Data"}
+          visible={showDelete}
+          style={{ width: "30vw" }}
+          footer={renderFooterDel("displayDel")}
+          onHide={() => {
+            setLoading(false);
+            setShowDelete(false);
+            onInput(false);
+          }}
+        >
+          <div className="ml-3 mr-3">
+            <i
+              className="pi pi-exclamation-triangle mr-3 align-middle"
+              style={{ fontSize: "2rem" }}
             />
-            <label className="ml-2 mt-2">Tunggal</label>
-
-            <RadioButton
-            className="mb-0 ml-8"
-              inputId="binary"
-              // checked={currentItem ? currentItem.pajak.pemotongan : false}
-              onChange={(e) =>
-                setCurrentItem({
-                  // ...currentItem,
-                  // pajak: { ...currentItem.pajak, pemotongan: e.checked },
-                })
-              }
-            />
-            <label className="ml-2 mt-2">Ganda</label>
+            <span>Apakah anda yakin ingin menghapus data ?</span>
           </div>
-        </div> */}
-      </Dialog>
+        </Dialog>
+      </>
+    );
+  };
 
-      <Dialog
-        header={"Hapus Data"}
-        visible={displayDel}
-        style={{ width: "30vw" }}
-        footer={renderFooterDel("displayDel")}
-        onHide={() => {
-          setDisplayDel(false);
-        }}
-      >
-        <div className="ml-3 mr-3">
-          <i
-            className="pi pi-exclamation-triangle mr-3 align-middle"
-            style={{ fontSize: "2rem" }}
-          />
-          <span>Apakah anda yakin ingin menghapus data ?</span>
-        </div>
-      </Dialog>
-    </>
-  );
+  if (popUp) {
+    return (
+      <>
+        <Dialog
+          header={"Data Pajak"}
+          visible={show}
+          footer={() => <div></div>}
+          style={{ width: "60vw" }}
+          onHide={onHide}
+        >
+          <Row className="ml-0 mr-0">
+            <Col>{renderBody()}</Col>
+          </Row>
+        </Dialog>
+        {renderDialog()}
+      </>
+    );
+  } else {
+    return (
+      <>
+        {renderBody()}
+        {renderDialog()}
+      </>
+    );
+  }
 };
 
-export default Pajak;
+export default DataPajak;

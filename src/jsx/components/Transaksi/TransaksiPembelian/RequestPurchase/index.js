@@ -7,12 +7,7 @@ const data = {
   id: null,
   req_code: null,
   req_date: null,
-  req_dep: {
-    id: null,
-    ccost_code: null,
-    ccost_name: null,
-    ccost_ket: null,
-  },
+  req_dep: null,
   req_ket: null,
   refrence: false,
   ref_sup: null,
@@ -21,14 +16,15 @@ const data = {
 
 const RequestPurchase = () => {
   const [active, setActive] = useState(0);
-  const [currentItem, setCurrentItem] = useState(data);
+  const [current, updateCurrent] = useState(data);
+
   const [view, setView] = useState([
     <PermintaanPembelian
       onAdd={() => {
         setActive(1);
       }}
       onEdit={(e) => {
-        setCurrentItem(e);
+        // updateCurrent(e);
         setActive(1);
       }}
     />,
@@ -37,7 +33,6 @@ const RequestPurchase = () => {
         setActive(0);
       }}
       onSubmit={() => {}}
-      data={currentItem}
     />,
   ]);
 

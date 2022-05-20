@@ -18,12 +18,13 @@ import DataJasa from "../../../Master/Jasa/DataJasa";
 import DataSatuan from "../../../MasterLainnya/Satuan/DataSatuan";
 import DataSupplier from "../../../Mitra/Pemasok/DataPemasok";
 import PermintaanPembelian from "./PermintaanPembelian";
+import { useDispatch, useSelector } from "react-redux";
+import { SET_CURRENT_RP, UPDATE_CURRENT_RP } from "src/redux/actions";
+import { te } from "date-fns/locale";
 
-
-
-const InputOrder = ({ data, onCancel }) => {
+const InputOrder = ({ onCancel }) => {
   const [update, setUpdate] = useState(false);
-  const [currentItem, setCurrentItem] = useState(data);
+  const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
   const [isEdit, setEdit] = useState(false);
   const [showDepartemen, setShowDepartemen] = useState(false);
@@ -39,6 +40,8 @@ const InputOrder = ({ data, onCancel }) => {
   const [supplier, setSupplier] = useState(null);
   const [doubleClick, setDoubleClick] = useState(false);
   const [satProd, setSatProd] = useState("");
+  const rp = useSelector((state) => state.rp.current);
+  const dispatch = useDispatch();
   const [inProd, setInProd] = useState([
     {
       id: 0,
@@ -71,8 +74,6 @@ const InputOrder = ({ data, onCancel }) => {
     getJasa();
     getSatuan();
     getSupplier();
-    console.log("jdhhsd");
-    console.log(currentItem);
   }, []);
 
   const getPusatBiaya = async () => {
@@ -332,7 +333,7 @@ const InputOrder = ({ data, onCancel }) => {
 
   const checkUnit = (value) => {
     let selected = {};
-    satuan.forEach((element) => {
+    satuan?.forEach((element) => {
       if (value === element.id) {
         selected = element;
       }
@@ -343,7 +344,7 @@ const InputOrder = ({ data, onCancel }) => {
 
   const checkProd = (value) => {
     let selected = {};
-    product.forEach((element) => {
+    product?.forEach((element) => {
       if (value === element.id) {
         selected = element;
       }
@@ -386,18 +387,23 @@ const InputOrder = ({ data, onCancel }) => {
   };
 
   const formatDate = (date) => {
-    var d = new Date(date),
-        month = '' + (d.getMonth() + 1),
-        day = '' + d.getDate(),
-        year = d.getFullYear();
+    var d = new Date(`${date}Z`),
+      month = "" + (d.getMonth() + 1),
+      day = "" + d.getDate(),
+      year = d.getFullYear();
 
-    if (month.length < 2) 
-        month = '0' + month;
-    if (day.length < 2) 
-        day = '0' + day;
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
 
-    return [year, month, day].join('-');
-};
+    return [year, month, day].join("-");
+  };
+
+  const updateRp = (e) => {
+    dispatch({
+      type: SET_CURRENT_RP,
+      payload: e,
+    });
+  };
 
   const body = () => {
     return (
@@ -409,17 +415,10 @@ const InputOrder = ({ data, onCancel }) => {
             <label className="text-label">Tanggal</label>
             <div className="p-inputgroup">
               <Calendar
-                value={
-                  currentItem !== null && currentItem.req_date !== null
-                    ? formatDate(currentItem.req_date)
-                    : null
-                }
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    req_date: e.value,
-                  })
-                }
+                value={new Date(`${rp.req_date}Z`)}
+                onChange={(e) => {
+                  updateRp({ ...rp, req_date: e.value });
+                }}
                 placeholder="Pilih Tanggal"
                 showIcon
               />
@@ -430,15 +429,8 @@ const InputOrder = ({ data, onCancel }) => {
             <label className="text-label">Kode Referensi</label>
             <div className="p-inputgroup">
               <InputText
-                value={
-                  currentItem !== null ? `${currentItem?.req_code ?? ""}` : ""
-                }
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    req_code: e.target.value,
-                  })
-                }
+                value={rp.req_code}
+                onChange={(e) => updateRp({ ...rp, req_code: e.target.value })}
                 placeholder="Masukan Kode Referensi"
               />
             </div>
@@ -448,18 +440,10 @@ const InputOrder = ({ data, onCancel }) => {
             <label className="text-label">Departemen</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={
-                  currentItem !== null && currentItem.req_dep !== null
-                    ? dept(currentItem.req_dep)
-                    : null
-                }
+                value={rp.req_dep !== null ? dept(rp.req_dep) : null}
                 options={pusatBiaya}
                 onChange={(e) => {
-                  console.log(e.value);
-                  setCurrentItem({
-                    ...currentItem,
-                    req_dep: e.value?.id ?? null,
-                  });
+                  updateRp({ ...rp, req_dep: e.value.id });
                 }}
                 optionLabel="ccost_name"
                 filter
@@ -480,15 +464,14 @@ const InputOrder = ({ data, onCancel }) => {
             <label className="text-label">Keterangan</label>
             <div className="p-inputgroup">
               <InputTextarea
-                value={
-                  currentItem !== null ? `${currentItem?.req_ket ?? ""}` : ""
-                }
-                onChange={(e) =>
+                value={`${rp?.req_ket ?? ""}`}
+                onChange={(e) => {
                   setCurrentItem({
                     ...currentItem,
                     req_ket: e.target.value,
-                  })
-                }
+                  });
+                  updateRp({ ...rp, req_ket: e.target.value });
+                }}
                 placeholder="Masukan Keterangan"
               />
             </div>
@@ -530,19 +513,19 @@ const InputOrder = ({ data, onCancel }) => {
                 </div>
               </div>
 
-              {inProd.map((v, i) => {
+              {rp.rprod.map((v, i) => {
                 return (
                   <div className="row col-12 mr-0 ml-0 mt-0">
                     <div className="col-4">
                       <div className="p-inputgroup">
                         <Dropdown
-                          value={v.prod_id && checkProd(inProd[i].prod_id)}
+                          value={v.prod_id && checkProd(v.prod_id)}
                           options={product}
                           onChange={(e) => {
                             console.log(e.value);
-                            let temp = [...inProd];
+                            let temp = [...rp.rprod];
                             temp[i].prod_id = e.value.id;
-                            setInProd(temp);
+                            updateRp({ ...rp, rprod: temp });
                           }}
                           optionLabel="name"
                           filter
@@ -564,11 +547,11 @@ const InputOrder = ({ data, onCancel }) => {
                     <div className="col-3">
                       <div className="p-inputgroup">
                         <InputText
-                          value={v.request && inProd[i].request}
+                          value={v.request && v.request}
                           onChange={(e) => {
-                            let temp = [...inProd];
+                            let temp = [...rp.rprod];
                             temp[i].request = e.target.value;
-                            setInProd(temp);
+                            updateRp({ ...rp, rprod: temp });
                             console.log(temp);
                           }}
                           placeholder="Masukan Jumlah"
@@ -580,11 +563,11 @@ const InputOrder = ({ data, onCancel }) => {
                     <div className="col-4">
                       <div className="p-inputgroup">
                         <Dropdown
-                          value={v.unit_id && checkUnit(inProd[i].unit_id)}
+                          value={v.unit_id && checkUnit(v.unit_id)}
                           onChange={(e) => {
-                            let temp = [...inProd];
-                            temp[i].unit_id = e.value.id;
-                            setInProd(temp);
+                            let temp = [...rp.rprod];
+                            temp[i].request = e.value.id;
+                            updateRp({ ...rp, rprod: temp });
                           }}
                           options={satuan}
                           optionLabel="name"
@@ -604,18 +587,21 @@ const InputOrder = ({ data, onCancel }) => {
 
                     <div className="col-1 d-flex ml-0 mr-0">
                       <div className="mt-2">
-                        {i == inProd.length - 1 ? (
+                        {i == rp.rprod.length - 1 ? (
                           <Link
                             onClick={() => {
-                              setInProd([
-                                ...inProd,
-                                {
-                                  id: 0,
-                                  prod_id: null,
-                                  unit_id: null,
-                                  request: null,
-                                },
-                              ]);
+                              updateRp({
+                                ...rp,
+                                rprod: [
+                                  ...rp.rprod,
+                                  {
+                                    id: 0,
+                                    prod_id: null,
+                                    unit_id: null,
+                                    request: null,
+                                  },
+                                ],
+                              });
                             }}
                             className="btn btn-primary shadow btn-xs sharp ml-1"
                           >
@@ -624,11 +610,12 @@ const InputOrder = ({ data, onCancel }) => {
                         ) : (
                           <Link
                             onClick={() => {
-                              console.log(inProd);
-                              console.log(i);
-                              let temp = [...inProd];
+                              let temp = [...rp.rprod];
                               temp.splice(i, 1);
-                              setInProd(temp);
+                              updateRp({
+                                ...rp,
+                                rprod: temp,
+                              });
                             }}
                             className="btn btn-danger shadow btn-xs sharp ml-1"
                           >
@@ -679,19 +666,18 @@ const InputOrder = ({ data, onCancel }) => {
                 </div>
               </div>
 
-              {inJasa.map((v, i) => {
+              {rp.rjasa.map((v, i) => {
                 return (
                   <div className="row col-12 mr-0 ml-0 mb-0">
                     <div className="col-4">
                       <div className="p-inputgroup">
                         <Dropdown
-                          value={v.jasa_id && jas(inJasa[i].jasa_id)}
+                          value={v.jasa_id && jas(v.jasa_id)}
                           options={jasa}
                           onChange={(e) => {
-                            console.log(e.value);
-                            let temp = [...inJasa];
+                            let temp = [...rp.rjasa];
                             temp[i].jasa_id = e.value.jasa.id;
-                            setInJasa(temp);
+                            updateRp({ ...rp, rjasa: temp });
                           }}
                           optionLabel="jasa.name"
                           filter
@@ -713,11 +699,11 @@ const InputOrder = ({ data, onCancel }) => {
                     <div className="col-3">
                       <div className="p-inputgroup">
                         <InputText
-                          value={v.qty && inJasa[i].qty}
+                          value={v.qty && v.qty}
                           onChange={(e) => {
-                            let temp = [...inJasa];
+                            let temp = [...rp.rjasa];
                             temp[i].qty = e.target.value;
-                            setInJasa(temp);
+                            updateRp({ ...rp, rjasa: temp });
                           }}
                           placeholder="Masukan Jumlah"
                           type="number"
@@ -728,11 +714,11 @@ const InputOrder = ({ data, onCancel }) => {
                     <div className="col-4">
                       <div className="p-inputgroup">
                         <Dropdown
-                          value={v.unit_id && checkUnit(inJasa[i].unit_id)}
+                          value={v.unit_id && checkUnit(v.unit_id)}
                           onChange={(e) => {
-                            let temp = [...inJasa];
+                            let temp = [...rp.rjasa];
                             temp[i].unit_id = e.value.id;
-                            setInJasa(temp);
+                            updateRp({ ...rp, rjasa: temp });
                           }}
                           options={satuan}
                           optionLabel="name"
@@ -752,18 +738,21 @@ const InputOrder = ({ data, onCancel }) => {
 
                     <div className="col-1 d-flex ml-0">
                       <div className="mt-2">
-                        {i === inJasa.length - 1 ? (
+                        {i === rp.rjasa.length - 1 ? (
                           <Link
                             onClick={() => {
-                              setInJasa([
-                                ...inJasa,
-                                {
-                                  id: 0,
-                                  jasa_id: null,
-                                  unit_id: null,
-                                  qty: null,
-                                },
-                              ]);
+                              updateRp({
+                                ...rp,
+                                rjasa: [
+                                  ...rp.rjasa,
+                                  {
+                                    id: 0,
+                                    jasa_id: null,
+                                    unit_id: null,
+                                    qty: null,
+                                  },
+                                ],
+                              });
                             }}
                             className="btn btn-primary shadow btn-xs sharp ml-1"
                           >
@@ -772,11 +761,9 @@ const InputOrder = ({ data, onCancel }) => {
                         ) : (
                           <Link
                             onClick={() => {
-                              console.log(inJasa);
-                              console.log(i);
-                              let temp = [...inJasa];
+                              let temp = [...rp.rjasa];
                               temp.splice(i, 1);
-                              setInJasa(temp);
+                              updateRp({ ...rp, rjasa: temp });
                             }}
                             className="btn btn-danger shadow btn-xs sharp ml-1"
                           >
@@ -910,10 +897,7 @@ const InputOrder = ({ data, onCancel }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowDepartemen(false);
-            // setCurrentItem({
-            //   ...currentItem,
-            //   jpel: e.data,
-            // });
+            updateRp({ ...rp, req_dep: e.data.id });
           }
 
           setDoubleClick(true);

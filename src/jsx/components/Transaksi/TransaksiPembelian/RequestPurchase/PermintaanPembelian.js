@@ -15,40 +15,20 @@ import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { InputNumber } from "primereact/inputnumber";
 import { Divider } from "@material-ui/core";
+import { useDispatch, useSelector } from "react-redux";
+import { SET_CURRENT_RP } from "src/redux/actions";
 
 const data = {
   id: null,
   req_code: null,
   req_date: null,
-  req_dep: {
-    id: null,
-    ccost_code: null,
-    ccost_name: null,
-    ccost_ket: null,
-  },
+  req_dep: null,
   req_ket: null,
-  refrence: true,
-  ref_sup: {
-    id: null,
-    sup_code: null,
-    sup_name: null,
-    sup_jpem: null,
-    sup_ppn: null,
-    sup_npwp: null,
-    sup_address: null,
-    sup_kota: null,
-    sup_kpos: null,
-    sup_telp1: null,
-    sup_telp2: null,
-    sup_fax: null,
-    sup_cp: null,
-    sup_curren: null,
-    sup_ket: null,
-    sup_hutang: null,
-    sup_uang_muka: null,
-    sup_limit: null,
-  },
+  refrence: false,
+  ref_sup: null,
   ref_ket: null,
+  rprod: [],
+  rjasa: [],
 };
 
 const PermintaanPembelian = ({ onAdd, onEdit }) => {
@@ -65,6 +45,8 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
   const [isEdit, setEdit] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+  const dispatch = useDispatch();
+  const rp = useSelector((state) => state.rp);
 
   const dummy = Array.from({ length: 10 });
 
@@ -144,6 +126,26 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
         <Link
           onClick={() => {
             onEdit(data);
+            let rprod = data.rprod;
+            rprod.forEach(el => {
+              el.prod_id = el.prod_id.id
+              el.unit_id = el.unit_id.id
+            });
+            let rjasa = data.rjasa;
+            rjasa.forEach(el => {
+              el.jasa_id = el.jasa_id.id
+              el.unit_id = el.unit_id.id
+            });
+            dispatch({
+              type: SET_CURRENT_RP,
+              payload: {
+                ...data,
+                req_dep: data?.req_dep?.id ?? null,
+                ref_sup: data?.ref_sup?.id ?? null,
+                rprod: rprod,
+                rjasa: rjasa,
+              },
+            });
           }}
           className="btn btn-primary shadow btn-xs sharp ml-1"
         >
@@ -221,7 +223,36 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
             placeholder="Cari disini"
           />
         </span>
-        <Button variant="primary" onClick={onAdd}>
+        <Button
+          variant="primary"
+          onClick={() => {
+            onAdd();
+            dispatch({
+              type: SET_CURRENT_RP,
+              payload: {
+                ...data,
+                req_dep: data?.req_dep?.id ?? null,
+                ref_sup: data?.ref_sup?.id ?? null,
+                rprod: [
+                  {
+                    id: 0,
+                    prod_id: null,
+                    unit_id: null,
+                    request: null,
+                  },
+                ],
+                rjasa: [
+                  {
+                    id: 0,
+                    jasa_id: null,
+                    unit_id: null,
+                    qty: null,
+                  },
+                ]
+              },
+            });
+          }}
+        >
           Tambah{" "}
           <span className="btn-icon-right">
             <i class="bx bx-plus"></i>

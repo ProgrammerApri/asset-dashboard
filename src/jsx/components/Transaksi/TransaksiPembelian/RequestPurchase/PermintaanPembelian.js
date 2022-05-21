@@ -127,14 +127,14 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
           onClick={() => {
             onEdit(data);
             let rprod = data.rprod;
-            rprod.forEach(el => {
-              el.prod_id = el.prod_id.id
-              el.unit_id = el.unit_id.id
+            rprod.forEach((el) => {
+              el.prod_id = el.prod_id.id;
+              el.unit_id = el.unit_id.id;
             });
             let rjasa = data.rjasa;
-            rjasa.forEach(el => {
-              el.jasa_id = el.jasa_id.id
-              el.unit_id = el.unit_id.id
+            rjasa.forEach((el) => {
+              el.jasa_id = el.jasa_id.id;
+              el.unit_id = el.unit_id.id;
             });
             dispatch({
               type: SET_CURRENT_RP,
@@ -142,8 +142,28 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
                 ...data,
                 req_dep: data?.req_dep?.id ?? null,
                 ref_sup: data?.ref_sup?.id ?? null,
-                rprod: rprod,
-                rjasa: rjasa,
+                rprod:
+                  rprod.length > 0
+                    ? rprod
+                    : [
+                        {
+                          id: 0,
+                          prod_id: null,
+                          unit_id: null,
+                          request: null,
+                        },
+                      ],
+                rjasa:
+                  rjasa.length > 0
+                    ? rjasa
+                    : [
+                        {
+                          id: 0,
+                          jasa_id: null,
+                          unit_id: null,
+                          qty: null,
+                        },
+                      ],
               },
             });
           }}
@@ -223,8 +243,6 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
               type: SET_CURRENT_RP,
               payload: {
                 ...data,
-                req_dep: data?.req_dep?.id ?? null,
-                ref_sup: data?.ref_sup?.id ?? null,
                 rprod: [
                   {
                     id: 0,
@@ -240,7 +258,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
                     unit_id: null,
                     qty: null,
                   },
-                ]
+                ],
               },
             });
           }}

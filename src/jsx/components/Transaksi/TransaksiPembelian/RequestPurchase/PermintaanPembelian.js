@@ -4,7 +4,6 @@ import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "react-bootstrap";
-import { Row, Col, Card } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { Dialog } from "primereact/dialog";
@@ -12,11 +11,8 @@ import { InputText } from "primereact/inputtext";
 import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
-import { InputTextarea } from "primereact/inputtextarea";
-import { InputNumber } from "primereact/inputnumber";
-import { Divider } from "@material-ui/core";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_RP } from "src/redux/actions";
+import { SET_CURRENT_RP, SET_EDIT } from "src/redux/actions";
 
 const data = {
   id: null,
@@ -35,9 +31,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
   const [permintaan, setPermintaan] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
-  const [displayData, setDisplayData] = useState(false);
   const [displayDel, setDisplayDel] = useState(false);
-  const [position, setPosition] = useState("center");
   const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
   const [filters1, setFilters1] = useState(null);
@@ -127,6 +121,10 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
           onClick={() => {
             onEdit(data);
             let rprod = data.rprod;
+            dispatch({
+              type: SET_EDIT,
+              payload: true
+            })
             rprod.forEach((el) => {
               el.prod_id = el.prod_id.id;
               el.unit_id = el.unit_id.id;
@@ -187,7 +185,6 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
     );
   };
 
-
   const renderFooterDel = () => {
     return (
       <div>
@@ -239,6 +236,10 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
           variant="primary"
           onClick={() => {
             onAdd();
+            dispatch({
+              type: SET_EDIT,
+              payload: false
+            })
             dispatch({
               type: SET_CURRENT_RP,
               payload: {

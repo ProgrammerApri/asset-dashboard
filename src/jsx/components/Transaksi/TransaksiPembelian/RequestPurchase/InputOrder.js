@@ -17,20 +17,16 @@ import DataProduk from "../../../Master/Produk/DataProduk";
 import DataJasa from "../../../Master/Jasa/DataJasa";
 import DataSatuan from "../../../MasterLainnya/Satuan/DataSatuan";
 import DataSupplier from "../../../Mitra/Pemasok/DataPemasok";
-import PermintaanPembelian from "./PermintaanPembelian";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_RP, UPDATE_CURRENT_RP } from "src/redux/actions";
-import { te } from "date-fns/locale";
 
-const InputOrder = ({ onCancel }) => {
+const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
   const [update, setUpdate] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
-  const [isEdit, setEdit] = useState(false);
   const [showDepartemen, setShowDepartemen] = useState(false);
   const [pusatBiaya, setPusatBiaya] = useState(null);
   const [jasa, setJasa] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [showProduk, setShowProduk] = useState(false);
   const [showJasa, setShowJasa] = useState(false);
   const [showSatuan, setShowSatuan] = useState(false);
@@ -39,25 +35,9 @@ const InputOrder = ({ onCancel }) => {
   const [satuan, setSatuan] = useState(null);
   const [supplier, setSupplier] = useState(null);
   const [doubleClick, setDoubleClick] = useState(false);
-  const [satProd, setSatProd] = useState("");
   const rp = useSelector((state) => state.rp.current);
+  const isEdit = useSelector((state) => state.rp.editRp);
   const dispatch = useDispatch();
-  const [inProd, setInProd] = useState([
-    {
-      id: 0,
-      prod_id: null,
-      unit_id: null,
-      request: null,
-    },
-  ]);
-  const [inJasa, setInJasa] = useState([
-    {
-      id: 0,
-      jasa_id: null,
-      unit_id: null,
-      qty: null,
-    },
-  ]);
   const [accor, setAccor] = useState({
     produk: true,
     jasa: false,
@@ -106,28 +86,10 @@ const InputOrder = ({ onCancel }) => {
       response = await request(null, config);
       console.log(response);
       if (response.status) {
-        setTimeout(() => {
-          setUpdate(false);
-          // setDisplayData(false);
-          // getPermintaan(true);
-          toast.current.show({
-            severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
-            life: 3000,
-          });
-        }, 500);
+        onSuccess();
       }
     } catch (error) {
-      setTimeout(() => {
-        setUpdate(false);
-        toast.current.show({
-          severity: "error",
-          summary: "Gagal",
-          detail: "Gagal Memperbarui Data",
-          life: 3000,
-        });
-      }, 500);
+      onFail()
     }
   };
 
@@ -142,41 +104,11 @@ const InputOrder = ({ onCancel }) => {
       response = await request(null, config);
       console.log(response);
       if (response.status) {
-        setTimeout(() => {
-          setUpdate(false);
-          <PermintaanPembelian />;
-          // getPermintaan(true);
-          toast.current.show({
-            severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
-            life: 3000,
-          });
-        }, 500);
+        onSuccess();
       }
     } catch (error) {
       console.log(error);
-      if (error.status === 400) {
-        setTimeout(() => {
-          setUpdate(false);
-          toast.current.show({
-            severity: "error",
-            summary: "Gagal",
-            detail: `Kode ${currentItem.req_code} Sudah Digunakan`,
-            life: 3000,
-          });
-        }, 500);
-      } else {
-        setTimeout(() => {
-          setUpdate(false);
-          toast.current.show({
-            severity: "error",
-            summary: "Gagal",
-            detail: "Gagal Memperbarui Data",
-            life: 3000,
-          });
-        }, 500);
-      }
+      onFailAdd(error, rp.req_code);
     }
   };
 
@@ -512,6 +444,7 @@ const InputOrder = ({ onCancel }) => {
                             console.log(e.value);
                             let temp = [...rp.rprod];
                             temp[i].prod_id = e.value.id;
+                            temp[i].unit_id = e.value.unit.id;
                             updateRp({ ...rp, rprod: temp });
                           }}
                           optionLabel="name"
@@ -767,12 +700,9 @@ const InputOrder = ({ onCancel }) => {
             <label className="ml-0 mt-1">{"Referensi Tambahan"}</label>
             <InputSwitch
               className="ml-4"
-              checked={currentItem && currentItem.refrence}
+              checked={rp && rp.refrence}
               onChange={(e) => {
-                setCurrentItem({
-                  ...currentItem,
-                  refrence: e.target.value,
-                });
+                updateRp({ ...rp, refrence: e.target.value });
               }}
             />
           </div>
@@ -792,7 +722,7 @@ const InputOrder = ({ onCancel }) => {
                 placeholder="Pilih Supplier"
                 itemTemplate={suppTemp}
                 valueTemplate={valueSupTemp}
-                disabled={currentItem && !currentItem.refrence}
+                disabled={rp && !rp.refrence}
               />
               <PButton
                 onClick={() => {
@@ -812,7 +742,7 @@ const InputOrder = ({ onCancel }) => {
                 value={rp.ref_ket}
                 onChange={(e) => updateRp({ ...rp, ref_ket: e.target.value })}
                 placeholder="Masukan Keterangan"
-                disabled={currentItem && !currentItem.refrence}
+                disabled={rp && !rp.refrence}
               />
             </div>
           </div>

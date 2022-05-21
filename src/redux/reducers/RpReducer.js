@@ -1,8 +1,9 @@
-import { SET_CURRENT_RP, SET_RP, RESET_CURRENT_RP, UPDATE_CURRENT_RP } from "../actions";
+import { SET_CURRENT_RP, SET_RP, RESET_CURRENT_RP, UPDATE_CURRENT_RP, SET_EDIT } from "../actions";
 
 const initialState = {
   rp: [],
   current: {},
+  editRp: false
 };
 
 const RpReducer = (state = initialState, { type, payload }) => {
@@ -17,6 +18,11 @@ const RpReducer = (state = initialState, { type, payload }) => {
         ...state,
         rp: payload,
       };
+      case SET_EDIT:
+        return {
+          ...state,
+          editRp: payload,
+        };
 
     default:
       return state;

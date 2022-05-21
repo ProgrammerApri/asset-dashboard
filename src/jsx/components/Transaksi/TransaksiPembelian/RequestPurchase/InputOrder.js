@@ -97,13 +97,8 @@ const InputOrder = ({ onCancel }) => {
   const editRp = async () => {
     const config = {
       ...endpoints.editRp,
-      endpoint: endpoints.editRp.endpoint + currentItem.id,
-      data: {
-        ...currentItem,
-        prod_id: currentItem?.rprod?.prod_id ?? null,
-        unit_id: currentItem?.rprod?.unit_id ?? null,
-        request: currentItem?.rprod?.request ?? null,
-      },
+      endpoint: endpoints.editRp.endpoint + rp.id,
+      data: rp
     };
     console.log(config.data);
     let response = null;
@@ -139,11 +134,7 @@ const InputOrder = ({ onCancel }) => {
   const addRp = async () => {
     const config = {
       ...endpoints.addRp,
-      data: {
-        ...currentItem,
-        rprod: inProd,
-        rjasa: inJasa,
-      },
+      data: rp
     };
     console.log(config.data);
     let response = null;
@@ -504,10 +495,6 @@ const InputOrder = ({ onCancel }) => {
                   <label className="text-label">Satuan</label>
                 </div>
 
-                <div className="col-1 mr-0">
-                  <label className="text-label">Action</label>
-                </div>
-
                 <div className="col-12">
                   <Divider></Divider>
                 </div>
@@ -657,10 +644,6 @@ const InputOrder = ({ onCancel }) => {
                   <label className="text-label">Satuan</label>
                 </div>
 
-                <div className="col-1">
-                  <label className="text-label">Action</label>
-                </div>
-
                 <div className="col-12">
                   <Divider></Divider>
                 </div>
@@ -798,18 +781,10 @@ const InputOrder = ({ onCancel }) => {
             <label className="text-label">Kode Supplier</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={
-                  currentItem !== null && currentItem.ref_sup !== null
-                    ? supp(currentItem.ref_sup)
-                    : null
-                }
+                value={rp.ref_sup !== null ? supp(rp.ref_sup) : null}
                 options={supplier}
                 onChange={(e) => {
-                  console.log(e.value);
-                  setCurrentItem({
-                    ...currentItem,
-                    ref_sup: e.value?.supplier?.id ?? null,
-                  });
+                  updateRp({ ...rp, ref_sup: e.value.supplier.id });
                 }}
                 optionLabel="ref_sup.sup_name"
                 filter
@@ -834,15 +809,8 @@ const InputOrder = ({ onCancel }) => {
             <label className="text-label">Keterangan</label>
             <div className="p-inputgroup">
               <InputTextarea
-                value={
-                  currentItem !== null ? `${currentItem?.ref_ket ?? ""}` : ""
-                }
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    ref_ket: e.target.value,
-                  })
-                }
+                value={rp.ref_ket}
+                onChange={(e) => updateRp({ ...rp, ref_ket: e.target.value })}
                 placeholder="Masukan Keterangan"
                 disabled={currentItem && !currentItem.refrence}
               />
@@ -925,10 +893,7 @@ const InputOrder = ({ onCancel }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowProduk(false);
-            // setCurrentItem({
-            //   ...currentItem,
-            //   jpel: e.data,
-            // });
+            updateRp({ ...rp, rprod: e.data.id });
           }
 
           setDoubleClick(true);
@@ -956,10 +921,7 @@ const InputOrder = ({ onCancel }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowJasa(false);
-            // setCurrentItem({
-            //   ...currentItem,
-            //   jpel: e.data,
-            // });
+            updateRp({ ...rp, rjasa: e.data.id });
           }
 
           setDoubleClick(true);
@@ -987,10 +949,7 @@ const InputOrder = ({ onCancel }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowSatuan(false);
-            // setCurrentItem({
-            //   ...currentItem,
-            //   jpel: e.data,
-            // });
+            updateRp({ ...rp, unit_id: e.data.id });
           }
 
           setDoubleClick(true);
@@ -1018,10 +977,7 @@ const InputOrder = ({ onCancel }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowSupplier(false);
-            // setCurrentItem({
-            //   ...currentItem,
-            //   jpel: e.data,
-            // });
+            updateRp({ ...rp, ref_sup: e.data.id });
           }
 
           setDoubleClick(true);

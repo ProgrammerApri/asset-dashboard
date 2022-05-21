@@ -221,7 +221,7 @@ const InputSO = ({ onCancel, onSubmit }) => {
           </div>
 
           <div className="col-4">
-            <label className="text-black fs-14">Kode Pelanggan</label>
+            <label className="text-black fs-14">Pelanggan</label>
             <div className="p-inputgroup">
               <Dropdown
                 // value={
@@ -235,7 +235,7 @@ const InputSO = ({ onCancel, onSubmit }) => {
                     // jasa: { ...currentItem.jasa, name: e.target.value },
                   })
                 }
-                placeholder="Pilih Kode Pelanggan"
+                placeholder="Pilih Pelanggan"
               />
               <PButton
               // onClick={() => {

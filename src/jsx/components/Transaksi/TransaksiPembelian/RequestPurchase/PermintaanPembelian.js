@@ -167,14 +167,6 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
     );
   };
 
-  const onClick = () => {
-    setDisplayData(true);
-    setCurrentItem();
-
-    if (position) {
-      setPosition(position);
-    }
-  };
 
   const renderFooterDel = () => {
     return (
@@ -308,6 +300,18 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
     setRows2(event.rows);
   };
 
+  const formatDate = (date) => {
+    var d = new Date(`${date}Z`),
+      month = "" + (d.getMonth() + 1),
+      day = "" + d.getDate(),
+      year = d.getFullYear();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+
+    return [year, month, day].join("-");
+  };
+
   return (
     <>
       <Toast ref={toast} />
@@ -335,7 +339,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
           style={{
             minWidth: "10rem",
           }}
-          field={(e) => e.req_date}
+          field={(e) => formatDate(e.req_date)}
           body={loading && <Skeleton />}
         />
         <Column

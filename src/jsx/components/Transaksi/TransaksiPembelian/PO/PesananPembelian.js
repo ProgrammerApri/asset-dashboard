@@ -4,7 +4,6 @@ import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "react-bootstrap";
-import { Row, Col, Card, Badge } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { Dialog } from "primereact/dialog";
@@ -12,11 +11,24 @@ import { InputText } from "primereact/inputtext";
 import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
-import { InputTextarea } from "primereact/inputtextarea";
-import { InputNumber } from "primereact/inputnumber";
-import { Divider } from "@material-ui/core";
+import { useDispatch, useSelector } from "react-redux";
+import { SET_CURRENT_PO, SET_CURRENT_RP, SET_EDIT } from "src/redux/actions";
 
-const data = {};
+const data = {
+  id: null,
+  po_code: null,
+  po_date: null,
+  preq_id: null,
+  supp_id: null,
+  top: null,
+  due_date: false,
+  split_inv: null,
+  prod_disc: null,
+  jasa_disc: null,
+  total_disc: null,
+  rprod: [],
+  rjasa: [],
+};
 
 const PesananPO = ({ onAdd }) => {
   const [po, setPO] = useState(null);
@@ -32,6 +44,8 @@ const PesananPO = ({ onAdd }) => {
   const [isEdit, setEdit] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+  const dispatch = useDispatch();
+  const PO = useSelector((state) => state.po);
 
   const dummy = Array.from({ length: 10 });
 
@@ -43,7 +57,7 @@ const PesananPO = ({ onAdd }) => {
   const getPO = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.noStock,
+      ...endpoints.po,
       data: {},
     };
     console.log(config.data);
@@ -309,7 +323,22 @@ const PesananPO = ({ onAdd }) => {
             placeholder="Cari disini"
           />
         </span>
-        <Button variant="primary" onClick={onAdd}>
+        <Button variant="primary" 
+          onClick={() => {
+            onAdd();
+            dispatch({
+              type: SET_EDIT,
+              payload: false,
+            });
+            dispatch({
+              type: SET_CURRENT_PO,
+              payload: {
+                ...data,
+                rprod: [],
+                rjasa: [],
+              },
+            });
+          }}>
           Tambah{" "}
           <span className="btn-icon-right">
             <i class="bx bx-plus"></i>
@@ -365,84 +394,68 @@ const PesananPO = ({ onAdd }) => {
     setRows2(event.rows);
   };
 
+  const formatDate = (date) => {
+    var d = new Date(`${date}Z`),
+      month = "" + (d.getMonth() + 1),
+      day = "" + d.getDate(),
+      year = d.getFullYear();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+
+    return [year, month, day].join("-");
+  };
+
   return (
     <>
       <Toast ref={toast} />
-      <Row>
-        <Col className="pt-0">
-          <Card>
-            <Card.Body>
-              <DataTable
-                responsiveLayout="scroll"
-                value={loading ? dummy : po}
-                className="display w-150 datatable-wrapper"
-                showGridlines
-                dataKey="id"
-                rowHover
-                header={renderHeader}
-                filters={filters1}
-                globalFilterFields={["customer.cus_code", "customer.cus_limit"]}
-                emptyMessage="Tidak ada data"
-                paginator
-                paginatorTemplate={template2}
-                first={first2}
-                rows={rows2}
-                onPage={onCustomPage2}
-                paginatorClassName="justify-content-end mt-3"
-              >
-                <Column
-                  header="Tanggal"
-                  style={{
-                    minWidth: "10rem",
-                  }}
-                  field={(e) => e.customer.cus_code}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Nomor Pesanan"
-                  field={(e) => e.customer.cus_name}
-                  style={{ minWidth: "10rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Nomor Pesanan"
-                  field={(e) => e.customer.cus_address}
-                  style={{ minWidth: "10rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Status"
-                  field={(e) => e.cus_telp}
-                  style={{ minWidth: "10rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Action"
-                  dataType="boolean"
-                  bodyClassName="text-center"
-                  style={{ minWidth: "2rem" }}
-                  body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
-                />
-              </DataTable>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+      <DataTable
+        responsiveLayout="scroll"
+        value={loading ? dummy : po}
+        className="display w-150 datatable-wrapper"
+        showGridlines
+        dataKey="id"
+        rowHover
+        header={renderHeader}
+        filters={filters1}
+        globalFilterFields={["customer.cus_code", "customer.cus_limit"]}
+        emptyMessage="Tidak ada data"
+        paginator
+        paginatorTemplate={template2}
+        first={first2}
+        rows={rows2}
+        onPage={onCustomPage2}
+        paginatorClassName="justify-content-end mt-3"
+      >
+        <Column
+          header="Tanggal"
+          style={{
+            minWidth: "10rem",
+          }}
+          field={(e) => formatDate(e.po_date)}
+          body={loading && <Skeleton />}
+        />
+        <Column
+          header="Nomor PO"
+          field={(e) => e.po_code}
+          style={{ minWidth: "10rem" }}
+          body={loading && <Skeleton />}
+        />
+        <Column
+          header="Nomor Permintaan"
+          field={(e) => e.preq_id.req_code}
+          style={{ minWidth: "10rem" }}
+          body={loading && <Skeleton />}
+        />
+        <Column
+          header="Action"
+          dataType="boolean"
+          bodyClassName="text-center"
+          style={{ minWidth: "2rem" }}
+          body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
+        />
+      </DataTable>
 
-      <Dialog
-        header={
-          isEdit
-            ? "Edit Pesanan Pembelian (PO)"
-            : "Tambah Pesanan Pembelian (PO)"
-        }
-        visible={displayData}
-        style={{ width: "50vw" }}
-        footer={renderFooter("displayData")}
-        onHide={() => {
-          setEdit(false);
-          setDisplayData(false);
-        }}
-      ></Dialog>
 
       <Dialog
         header={"Hapus Data"}

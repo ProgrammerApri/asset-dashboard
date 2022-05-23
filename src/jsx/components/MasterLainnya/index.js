@@ -7,9 +7,9 @@ import Divisi from "../Master/Divisi";
 import JenisPelanggan from "../Master/JenisPelanggan";
 import JenisPemasok from "../Master/JenisPemasok";
 import Project from "../Master/Project";
-import RulesPay from "./RulesPay/RulesPay";
 import Satuan from "./Satuan";
 import PusatBiaya from "./PusatBiaya";
+import RulesPay from "./RulesPay";
 
 const MasterLainnya = () => {
   const [active, setActive] = useState(0);

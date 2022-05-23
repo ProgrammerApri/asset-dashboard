@@ -3,7 +3,7 @@ import { request, endpoints } from "src/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Button } from "react-bootstrap";
+import { Badge, Button } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { Dialog } from "primereact/dialog";
@@ -123,8 +123,8 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
             let rprod = data.rprod;
             dispatch({
               type: SET_EDIT,
-              payload: true
-            })
+              payload: true,
+            });
             rprod.forEach((el) => {
               el.prod_id = el.prod_id.id;
               el.unit_id = el.unit_id.id;
@@ -238,8 +238,8 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
             onAdd();
             dispatch({
               type: SET_EDIT,
-              payload: false
-            })
+              payload: false,
+            });
             dispatch({
               type: SET_CURRENT_RP,
               payload: {
@@ -372,6 +372,34 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
           field={(e) => e.req_dep.ccost_name}
           style={{ minWidth: "10rem" }}
           body={loading && <Skeleton />}
+        />
+        <Column
+          header="Status"
+          field={(e) => e?.status ?? ""}
+          style={{ minWidth: "8rem" }}
+          body={(e) =>
+            loading ? (
+              <Skeleton />
+            ) : (
+              <div>
+                {e.status === 0 ? (
+                  <Badge variant="danger light">
+                    <i className="bx bxs-circle text-danger mr-1"></i> Belum Selesai
+                  </Badge>
+                ) : (
+                  <Badge variant="success light">
+                    <i className="bx bxs-circle text-success mr-1"></i> Selesai
+                  </Badge>
+                ) 
+                // (
+                //   <Badge variant="success light">
+                //     <i className="bx bxs-circle text-success mr-1"></i> Selesai
+                //   </Badge>
+                // )
+                }
+              </div>
+            )
+          }
         />
         <Column
           header="Action"

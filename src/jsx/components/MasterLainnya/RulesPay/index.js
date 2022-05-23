@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { request, endpoints } from "src/utils";
 import { Row, Col, Card } from "react-bootstrap";
-import DataRulesPay from "./RulesPay";
+import DataRulesPay from "./DataRulesPay";
 
 const data = {
   id: 1,
@@ -20,7 +20,7 @@ const RulesPay = () => {
     getRulesPay();
   }, []);
 
-  const getRulesPay = async () => {
+  const getRulesPay = async (isUpdate) => {
     setLoading(true);
     const config = {
       ...endpoints.rules_pay,
@@ -37,6 +37,13 @@ const RulesPay = () => {
         setRulesPay(data);
       }
     } catch (error) {}
+    if (isUpdate) {
+      setLoading(false);
+    } else {
+      setTimeout(() => {
+        setLoading(false);
+      }, 500);
+    }
   };
 
   return (

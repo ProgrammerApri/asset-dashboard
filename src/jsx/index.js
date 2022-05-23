@@ -38,7 +38,7 @@ import Neraca from "./components/Report/Neraca";
 import Perusahaan from "./components/Setup/Perusahaan";
 import Currency from "./components/Master/Currency";
 import Lokasi from "./components/Master/Lokasi";
-import RulesPay from "./components/MasterLainnya/RulesPay/RulesPay";
+import RulesPay from "./components/MasterLainnya/RulesPay/DataRulesPay";
 import Setup from "./components/Setup";
 import Divisi from "./components/Master/Divisi";
 import PPN from "./components/Master/Pajak/DataPajak";

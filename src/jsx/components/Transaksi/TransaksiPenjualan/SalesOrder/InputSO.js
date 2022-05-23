@@ -606,7 +606,7 @@ const InputSO = ({ onCancel, onSubmit }) => {
                   // }}
                   body={(e) => (
                     <label className="text-nowrap">
-                      <b>{e.index*500}</b>
+                      <b>{`Rp. ${e.index*500}`}</b>
                     </label>
                   )}
                 />

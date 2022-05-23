@@ -604,10 +604,9 @@ const InputSO = ({ onCancel, onSubmit }) => {
                   // style={{
                   //   minWidth: "12rem",
                   // }}
-                  field={""}
-                  body={() => (
-                    <label className="text-label">
-                      <b>Rp. 1.000.000.000</b>
+                  body={(e) => (
+                    <label className="text-nowrap">
+                      <b>{e.index*500}</b>
                     </label>
                   )}
                 />

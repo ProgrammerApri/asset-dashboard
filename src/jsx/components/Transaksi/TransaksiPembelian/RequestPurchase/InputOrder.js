@@ -444,7 +444,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                             console.log(e.value);
                             let temp = [...rp.rprod];
                             temp[i].prod_id = e.value.id;
-                            temp[i].unit_id = e.value.unit.id;
+                            temp[i].unit_id = e.value.unit?.id;
                             updateRp({ ...rp, rprod: temp });
                           }}
                           optionLabel="name"
@@ -486,7 +486,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                           value={v.unit_id && checkUnit(v.unit_id)}
                           onChange={(e) => {
                             let temp = [...rp.rprod];
-                            temp[i].request = e.value.id;
+                            temp[i].unit_id = e.value.id;
                             updateRp({ ...rp, rprod: temp });
                           }}
                           options={satuan}

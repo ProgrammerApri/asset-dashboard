@@ -154,7 +154,7 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
               el.prod_id = el.prod_id.id;
               el.unit_id = el.unit_id.id;
             });
-            elem.rjasa.forEach(element => {
+            elem.rjasa.forEach((element) => {
               element.jasa_id = element.jasa_id.id;
               element.unit_id = element.unit_id.id;
             });
@@ -174,12 +174,12 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      
+
       if (response.status) {
         const { data } = response;
         setProduct(data);
         console.log("jsdj");
-      console.log(data);
+        console.log(data);
       }
     } catch (error) {}
   };
@@ -342,6 +342,8 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
     product?.forEach((element) => {
       if (value === element.id) {
         selected = element;
+        console.log("SELEC");
+        console.log(selected);
       }
     });
 
@@ -538,8 +540,13 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
                 value={po.preq_id && req_pur(po.preq_id)}
                 options={rp}
                 onChange={(e) => {
-                  console.log(e.value);
-                  updatePo({ ...po, preq_id: e.value.id, rprod: e.value.rprod, rjasa:e.value.rjasa });
+                  console.log(e.value.rprod);
+                  updatePo({
+                    ...po,
+                    preq_id: e.value.id,
+                    rprod: e.value.rprod,
+                    rjasa: e.value.rjasa,
+                  });
                 }}
                 optionLabel="req_code"
                 placeholder="Pilih Kode Permintaan"
@@ -608,7 +615,11 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
             <label className="text-label">Departemen</label>
             <div className="p-inputgroup mt-2">
               <Dropdown
-                value={po.preq_id !== null ? dept(req_pur(po.preq_id)?.req_dep?.id) : null}
+                value={
+                  po.preq_id !== null
+                    ? dept(req_pur(po.preq_id)?.req_dep?.id)
+                    : null
+                }
                 options={pusatBiaya}
                 // onChange={(e) => {
                 //   updatePo({ ...po, req_dep: e.value?.id ?? "" });
@@ -732,7 +743,7 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
                       <label className="text-label">Kode Produk</label>
                       <div className="p-inputgroup">
                         <Dropdown
-                          // value={v.prod_id && checkProd(v.prod_id)}
+                          value={v.prod_id && checkProd(v.prod_id)}
                           options={product}
                           onChange={(e) => {
                             console.log(e.value);
@@ -742,6 +753,9 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
                             // updatePo({ ...po, rprod: temp });
                           }}
                           placeholder="Pilih Kode Produk"
+                          optionLabel="name"
+                          filter
+                          filterBy="name"
                           valueTemplate={valueProd}
                           itemTemplate={prodTemp}
                         />
@@ -759,7 +773,7 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
                       <label className="text-label">Satuan</label>
                       <div className="p-inputgroup">
                         <Dropdown
-                          // value={v.unit_id && checkUnit(v.unit_id)}
+                          value={v.unit_id && checkUnit(v.unit_id)}
                           onChange={(e) => {
                             let temp = [...po.rprod];
                             temp[i].unit_id = e.value.id;
@@ -768,6 +782,8 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
                           options={satuan}
                           optionLabel="name"
                           placeholder="Pilih Satuan"
+                          filter
+                          filterBy="name"
                         />
                         <PButton
                         // onClick={() => {

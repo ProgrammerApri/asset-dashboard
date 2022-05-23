@@ -19,7 +19,7 @@ const data = {
   po_code: null,
   po_date: null,
   preq_id: null,
-  supp_id: null,
+  sup_id: null,
   top: null,
   due_date: false,
   split_inv: null,
@@ -443,7 +443,7 @@ const PesananPO = ({ onAdd }) => {
         />
         <Column
           header="Nomor Permintaan"
-          field={(e) => e.preq_id.req_code}
+          field={(e) => e.preq_id?.req_code}
           style={{ minWidth: "10rem" }}
           body={loading && <Skeleton />}
         />

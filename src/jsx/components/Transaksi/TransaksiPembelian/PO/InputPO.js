@@ -151,12 +151,26 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
           if (elem.status === 0) {
             filt.push(elem);
             elem.rprod.forEach((el) => {
-              el.prod_id = el.prod_id.id;
-              el.unit_id = el.unit_id.id;
+              el.order = el.order ?? 0;
+              if (el.order === 0 || (el.request - el.order) !== 0) {
+                el.prod_id = el.prod_id.id;
+                el.unit_id = el.unit_id.id;
+              }
             });
             elem.rjasa.forEach((element) => {
               element.jasa_id = element.jasa_id.id;
               element.unit_id = element.unit_id.id;
+            });
+            elem.rjasa.push({
+              id: 0,
+              preq_id: elem.id,
+              sup_id: null,
+              jasa_id: null,
+              unit_id: null,
+              qty: null,
+              price: null,
+              disc: null,
+              total: null,
             });
           }
         });
@@ -486,6 +500,26 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
     return <span>{props.placeholder}</span>;
   };
 
+  const jasTemp = (option) => {
+    return (
+      <div>
+        {option !== null ? `${option.jasa.name} (${option.jasa.code})` : ""}
+      </div>
+    );
+  };
+
+  const valueJasTemp = (option, props) => {
+    if (option) {
+      return (
+        <div>
+          {option !== null ? `${option.jasa.name} (${option.jasa.code})` : ""}
+        </div>
+      );
+    }
+
+    return <span>{props.placeholder}</span>;
+  };
+
   const updatePo = (e) => {
     dispatch({
       type: SET_CURRENT_PO,
@@ -518,6 +552,7 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
                 }}
                 placeholder="Pilih Tanggal"
                 showIcon
+                dateFormat="dd/mm/yy"
               />
             </div>
           </div>
@@ -541,9 +576,17 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
                 options={rp}
                 onChange={(e) => {
                   console.log(e.value.rprod);
+                  let result = null;
+                  if (po.top) {
+                    result = new Date(`${req_pur(e.value.id).req_date}Z`);
+                    result.setDate(result.getDate() + rulPay(po?.top)?.day);
+                    console.log(result);
+                  }
                   updatePo({
                     ...po,
                     preq_id: e.value.id,
+                    due_date: result,
+                    sup_id: e.value?.ref_sup?.id ?? null,
                     rprod: e.value.rprod,
                     rjasa: e.value.rjasa,
                   });
@@ -560,10 +603,10 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
             <label className="text-label">Supplier</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={po.sup_id !== null ? dept(po.sup_id) : null}
+                value={po.sup_id !== null ? supp(po.sup_id) : null}
                 options={supplier}
                 onChange={(e) => {
-                  updatePo({ ...po, sup_id: e.value.id });
+                  updatePo({ ...po, sup_id: e.value.supplier.id });
                 }}
                 optionLabel="supplier.sup_name"
                 placeholder="Pilih Supplier"
@@ -584,9 +627,13 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
             <label className="text-label"></label>
             <div className="p-inputgroup mt-2">
               <InputText
-                value={po.po_code}
-                onChange={(e) => updatePo({ ...po, po_code: e.target.value })}
+                value={
+                  po.sup_id !== null
+                    ? supp(po.sup_id)?.supplier?.sup_address
+                    : ""
+                }
                 placeholder="Alamat Supplier"
+                disabled
               />
             </div>
           </div>
@@ -595,18 +642,26 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
             <label className="text-label"></label>
             <div className="p-inputgroup mt-2">
               <InputText
-                // value={
-                //   currentItem !== null
-                //     ? `${currentItem?.jasa?.name ?? ""}`
-                //     : ""
-                // }
-                onChange={(e) =>
-                  setCurrentItem({
-                    // ...currentItem,
-                    // jasa: { ...currentItem.jasa, name: e.target.value },
-                  })
+                value={
+                  po.sup_id !== null ? supp(po.sup_id)?.supplier?.sup_telp1 : ""
                 }
                 placeholder="Kontak Person"
+                disabled
+              />
+            </div>
+          </div>
+
+          <div className="col-4">
+            <label className="text-label">Ppn</label>
+            <div className="p-inputgroup mt-2">
+              <Dropdown
+                value={
+                  po.sup_id !== null ? pjk(supp(po.sup_id)?.supplier?.id) : null
+                }
+                options={ppn}
+                optionLabel="name"
+                placeholder="Pilih Jenis Pajak"
+                disabled
               />
             </div>
           </div>
@@ -621,43 +676,12 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
                     : null
                 }
                 options={pusatBiaya}
-                // onChange={(e) => {
-                //   updatePo({ ...po, req_dep: e.value?.id ?? "" });
-                // }}
                 optionLabel="ccost_name"
                 placeholder="Pilih Departemen"
                 itemTemplate={deptTemp}
                 valueTemplate={valueDeptTemp}
+                disabled
               />
-              <PButton
-                onClick={() => {
-                  setShowDept(true);
-                }}
-              >
-                <i class="bx bx-food-menu"></i>
-              </PButton>
-            </div>
-          </div>
-
-          <div className="col-4">
-            <label className="text-label">Ppn</label>
-            <div className="p-inputgroup mt-2">
-              <Dropdown
-                value={po.sup_id !== null ? dept(po.sup_id) : null}
-                options={ppn}
-                onChange={(e) => {
-                  updatePo({ ...po, sup_id: e.value.id });
-                }}
-                optionLabel="name"
-                placeholder="Pilih Jenis Pajak"
-              />
-              <PButton
-                onClick={() => {
-                  setShowPpn(true);
-                }}
-              >
-                <i class="bx bx-food-menu"></i>
-              </PButton>
             </div>
           </div>
 
@@ -668,7 +692,11 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
                 value={po.top !== null ? rulPay(po.top) : null}
                 options={rulesPay}
                 onChange={(e) => {
-                  updatePo({ ...po, top: e.value.id });
+                  let result = new Date(`${req_pur(po.preq_id).req_date}Z`);
+                  result.setDate(result.getDate() + e.value.day);
+                  console.log(result);
+
+                  updatePo({ ...po, top: e.value.id, due_date: result });
                 }}
                 optionLabel="name"
                 placeholder="Pilih Syarat Pembayaran"
@@ -689,13 +717,10 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
             <label className="text-label">Tanggal Permintaan</label>
             <div className="p-inputgroup mt-2">
               <Calendar
-                value={new Date(`${po.req_date}Z`)}
-                onChange={(e) => {
-                  updatePo({ ...po, req_date: e.value });
-                }}
+                value={new Date(`${req_pur(po.preq_id)?.req_date}Z`)}
                 placeholder="Tanggal Permintaan"
-                showIcon
                 disabled
+                dateFormat="dd/mm/yy"
               />
             </div>
           </div>
@@ -704,20 +729,11 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
             <label className="text-label">Tanggal Jatuh Tempo</label>
             <div className="p-inputgroup mt-2">
               <Calendar
-                // value={
-                //   currentItem !== null
-                //     ? `${currentItem?.jasa?.name ?? ""}`
-                //     : ""
-                // }
-                onChange={(e) =>
-                  setCurrentItem({
-                    // ...currentItem,
-                    // jasa: { ...currentItem.jasa, name: e.target.value },
-                  })
-                }
+                value={new Date(`${po?.due_date}Z`)}
+                onChange={(e) => {}}
                 placeholder="Tanggal Jatuh Tempo"
-                showIcon
                 disabled
+                dateFormat="dd/mm/yy"
               />
             </div>
           </div>
@@ -747,10 +763,6 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
                           options={product}
                           onChange={(e) => {
                             console.log(e.value);
-                            // let temp = [...po.rprod];
-                            // temp[i].preq_id = e.value.id;
-                            // temp[i].unit_id = e.value.unit.id;
-                            // updatePo({ ...po, rprod: temp });
                           }}
                           placeholder="Pilih Kode Produk"
                           optionLabel="name"
@@ -759,13 +771,6 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
                           valueTemplate={valueProd}
                           itemTemplate={prodTemp}
                         />
-                        {/* <PButton
-                        // onClick={() => {
-                        //   setShowJenisPelanggan(true);
-                        // }}
-                        >
-                          <i class="bx bx-food-menu"></i>
-                        </PButton> */}
                       </div>
                     </div>
 
@@ -785,13 +790,6 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
                           filter
                           filterBy="name"
                         />
-                        <PButton
-                        // onClick={() => {
-                        //   setShowJenisPelanggan(true);
-                        // }}
-                        >
-                          <i class="bx bx-food-menu"></i>
-                        </PButton>
                       </div>
                     </div>
 
@@ -799,7 +797,7 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
                       <label className="text-label">Permintaan</label>
                       <div className="p-inputgroup">
                         <InputText
-                          value={v.request && v.request}
+                          value={v.request ? v.request : 0}
                           onChange={(e) => {
                             let temp = [...po.rprod];
                             temp[i].request = e.target.value;
@@ -808,6 +806,7 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
                           }}
                           placeholder="0"
                           type="number"
+                          disabled
                         />
                       </div>
                     </div>
@@ -1002,11 +1001,7 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
                       <label className="text-label">Kode Supplier</label>
                       <div className="p-inputgroup">
                         <Dropdown
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
+                          value={v.jasa_id && checkjasa(v.jasa_id)}
                           onChange={(e) =>
                             setCurrentItem({
                               // ...currentItem,
@@ -1029,18 +1024,17 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
                       <label className="text-label">Kode Jasa</label>
                       <div className="p-inputgroup">
                         <Dropdown
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
+                          value={v.jasa_id && checkjasa(v.jasa_id)}
+                          onChange={(e) => {
+                            let temp = [...po.rjasa];
+                            temp[i].jasa_id = e.value.id;
+                            updatePo({ ...po, rjasa: temp });
+                          }}
+                          options={jasa}
+                          optionLabel="jasa.name"
                           placeholder="Pilih Kode Jasa"
+                          itemTemplate={jasTemp}
+                          valueTemplate={valueJasTemp}
                         />
                         <PButton
                         // onClick={() => {
@@ -1056,17 +1050,14 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
                       <label className="text-label">Satuan</label>
                       <div className="p-inputgroup">
                         <Dropdown
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
+                          value={v.unit_id && checkUnit(v.unit_id)}
+                          onChange={(e) => {
+                            let temp = [...po.rjasa];
+                            temp[i].unit_id = e.value.id;
+                            updatePo({ ...po, rjasa: temp });
+                          }}
+                          options={satuan}
+                          optionLabel="name"
                           placeholder="Pilih Satuan"
                         />
                         <PButton
@@ -1083,17 +1074,13 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
                       <label className="text-label">Pesanan</label>
                       <div className="p-inputgroup">
                         <InputText
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
+                          value={v.qty && v.qty}
+                          onChange={(e) => {
+                            let temp = [...po.rjasa];
+                            temp[i].qty = e.target.value;
+                            updatePo({ ...po, rjasa: temp });
+                            console.log(temp);
+                          }}
                           placeholder="Jumlah Pesanan"
                           type="number"
                         />

@@ -487,7 +487,7 @@ const InputSO = ({ onCancel, onSubmit }) => {
           body={
             <>
               <DataTable
-                responsiveLayout="scroll"
+                responsiveLayout="none"
                 value={inProd.map((v, i) => {
                   return { ...v, index: i };
                 })}
@@ -497,9 +497,9 @@ const InputSO = ({ onCancel, onSubmit }) => {
               >
                 <Column
                   header="Produk"
-                  style={{
-                    maxWidth: "20rem",
-                  }}
+                  // style={{
+                  //   maxWidth: "15rem",
+                  // }}
                   field={""}
                   body={() => (
                     <div className="p-inputgroup">
@@ -516,10 +516,10 @@ const InputSO = ({ onCancel, onSubmit }) => {
                 />
                 <Column
                   header="Satuan"
-                  style={{
-                    minWidth: "10rem",
-                    maxWidth: "15rem",
-                  }}
+                  // style={{
+                  //   minWidth: "10rem",
+                  //   maxWidth: "15rem",
+                  // }}
                   field={""}
                   body={() => (
                     <div className="p-inputgroup">
@@ -533,9 +533,9 @@ const InputSO = ({ onCancel, onSubmit }) => {
                 />
                 <Column
                   header="Pesanan"
-                  style={{
-                    maxWidth: "10rem",
-                  }}
+                  // style={{
+                  //   maxWidth: "10rem",
+                  // }}
                   field={""}
                   body={() => (
                     <div className="p-inputgroup">
@@ -550,9 +550,9 @@ const InputSO = ({ onCancel, onSubmit }) => {
                 />
                 <Column
                   header="Harga Satuan"
-                  style={{
-                    minWidth: "10rem",
-                  }}
+                  // style={{
+                  //   minWidth: "10rem",
+                  // }}
                   field={""}
                   body={() => (
                     <div className="p-inputgroup">
@@ -567,9 +567,9 @@ const InputSO = ({ onCancel, onSubmit }) => {
                 />
                 <Column
                   header="Diskon"
-                  style={{
-                    maxWidth: "10rem",
-                  }}
+                  // style={{
+                  //   maxWidth: "10rem",
+                  // }}
                   field={""}
                   body={() => (
                     <div className="p-inputgroup">
@@ -584,9 +584,9 @@ const InputSO = ({ onCancel, onSubmit }) => {
                 />
                 <Column
                   header="Harga Nett"
-                  style={{
-                    minWidth: "10rem",
-                  }}
+                  // style={{
+                  //   minWidth: "10rem",
+                  // }}
                   field={""}
                   body={() => (
                     <div className="p-inputgroup">
@@ -601,9 +601,9 @@ const InputSO = ({ onCancel, onSubmit }) => {
                 />
                 <Column
                   header="Total"
-                  style={{
-                    minWidth: "12rem",
-                  }}
+                  // style={{
+                  //   minWidth: "12rem",
+                  // }}
                   field={""}
                   body={() => (
                     <label className="text-label">
@@ -613,9 +613,9 @@ const InputSO = ({ onCancel, onSubmit }) => {
                 />
                 <Column
                   header=""
-                  style={{
-                    maxWidth: "10rem",
-                  }}
+                  // style={{
+                  //   maxWidth: "10rem",
+                  // }}
                   field={""}
                   body={(e) =>
                     e.index === inProd.length - 1 ? (

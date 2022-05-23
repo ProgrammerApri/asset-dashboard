@@ -11,6 +11,8 @@ import { Divider } from "@material-ui/core";
 import { Calendar } from "primereact/calendar";
 import { InputSwitch } from "primereact/inputswitch";
 import CustomAccordion from "../../../Accordion/Accordion";
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
 
 const data = {
   faktur: false,
@@ -315,7 +317,9 @@ const InputSO = ({ onCancel, onSubmit }) => {
           </div>
 
           <div className="d-flex col-12 align-items-center mt-4">
-            <label className="ml-0 mt-1 text-black fs-14">{"Alamat Pengiriman"}</label>
+            <label className="ml-0 mt-1 text-black fs-14">
+              {"Alamat Pengiriman"}
+            </label>
             <InputSwitch
               className="ml-4"
               checked={currentItem && currentItem.send_add}
@@ -481,206 +485,172 @@ const InputSO = ({ onCancel, onSubmit }) => {
           }}
           key={1}
           body={
-            <Row className="justify-content-between">
-              {inProd.map((v, i) => {
-                return (
-                  <div className="row mr-0 ml-0 justify-content-right col-12">
-                    <div className="col-5">
-                      <label className="text-black fs-14">Kode Produk</label>
-                      <div className="p-inputgroup">
-                        <Dropdown
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
-                          placeholder="Pilih Kode Produk"
-                        />
-                        <PButton
-                        // onClick={() => {
-                        //   setShowJenisPelanggan(true);
-                        // }}
-                        >
-                          <i class="bx bx-food-menu"></i>
-                        </PButton>
-                      </div>
+            <>
+              <DataTable
+                responsiveLayout="scroll"
+                value={inProd.map((v, i) => {
+                  return { ...v, index: i };
+                })}
+                className="display w-150 datatable-wrapper header-white no-border"
+                showGridlines={false}
+                emptyMessage={() => <div></div>}
+              >
+                <Column
+                  header="Produk"
+                  style={{
+                    maxWidth: "20rem",
+                  }}
+                  field={""}
+                  body={() => (
+                    <div className="p-inputgroup">
+                      <Dropdown
+                        value={null}
+                        onChange={(e) => {}}
+                        placeholder="Pilih Kode Produk"
+                      />
+                      <PButton onClick={() => {}}>
+                        <i class="bx bx-food-menu"></i>
+                      </PButton>
                     </div>
-
-                    <div className="col-4">
-                      <label className="text-black fs-14">Satuan</label>
-                      <div className="p-inputgroup">
-                        <Dropdown
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
-                          placeholder="Pilih Satuan"
-                        />
-                        <PButton
-                        // onClick={() => {
-                        //   setShowJenisPelanggan(true);
-                        // }}
-                        >
-                          <i class="bx bx-food-menu"></i>
-                        </PButton>
-                      </div>
+                  )}
+                />
+                <Column
+                  header="Satuan"
+                  style={{
+                    minWidth: "10rem",
+                    maxWidth: "15rem",
+                  }}
+                  field={""}
+                  body={() => (
+                    <div className="p-inputgroup">
+                      <Dropdown
+                        value={null}
+                        onChange={(e) => {}}
+                        placeholder="Pilih Satuan"
+                      />
                     </div>
-
-                    <div className="col-2">
-                      <label className="text-black fs-14">Pesanan</label>
-                      <div className="p-inputgroup">
-                        <InputText
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
-                          placeholder="Jumlah Pesanan"
-                          type="number"
-                        />
-                      </div>
+                  )}
+                />
+                <Column
+                  header="Pesanan"
+                  style={{
+                    maxWidth: "10rem",
+                  }}
+                  field={""}
+                  body={() => (
+                    <div className="p-inputgroup">
+                      <InputText
+                        value={null}
+                        onChange={(e) => {}}
+                        placeholder="0"
+                        type="number"
+                      />
                     </div>
-
-                    <div className="col-3">
-                      <label className="text-black fs-14">Harga Satuan</label>
-                      <div className="p-inputgroup">
-                        <InputText
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
-                          placeholder="Masukan Harga Satuan"
-                          type="number"
-                        />
-                      </div>
+                  )}
+                />
+                <Column
+                  header="Harga Satuan"
+                  style={{
+                    minWidth: "10rem",
+                  }}
+                  field={""}
+                  body={() => (
+                    <div className="p-inputgroup">
+                      <InputText
+                        value={null}
+                        onChange={(e) => {}}
+                        placeholder="0"
+                        type="number"
+                      />
                     </div>
-
-                    <div className="col-2">
-                      <label className="text-black fs-14">Diskon</label>
-                      <div className="p-inputgroup">
-                        <InputText
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
-                          placeholder="Diskon"
-                          type="number"
-                        />
-                      </div>
+                  )}
+                />
+                <Column
+                  header="Diskon"
+                  style={{
+                    maxWidth: "10rem",
+                  }}
+                  field={""}
+                  body={() => (
+                    <div className="p-inputgroup">
+                      <InputText
+                        value={null}
+                        onChange={(e) => {}}
+                        placeholder="0"
+                        type="number"
+                      />
                     </div>
-
-                    <div className="col-3">
-                      <label className="text-black fs-14">Harga Nett</label>
-                      <div className="p-inputgroup">
-                        <InputText
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
-                          placeholder="Masukan Harga Nett"
-                          type="number"
-                        />
-                      </div>
+                  )}
+                />
+                <Column
+                  header="Harga Nett"
+                  style={{
+                    minWidth: "10rem",
+                  }}
+                  field={""}
+                  body={() => (
+                    <div className="p-inputgroup">
+                      <InputText
+                        value={null}
+                        onChange={(e) => {}}
+                        placeholder="0"
+                        type="number"
+                      />
                     </div>
-
-                    <div className="col-3">
-                      <label className="text-black fs-14">Total Harga</label>
-                      <div className="p-inputgroup">
-                        <InputText
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
-                          placeholder="Masukan Total Harga"
-                          type="number"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="col-1 d-flex ml-0">
-                      {i === inProd.length - 1 ? (
-                        <Link
-                          onClick={() => {
-                            setInProd([
-                              ...inProd,
-                              {
-                                id: 0,
-                                qty: 1,
-                                u_from: null,
-                                u_to: null,
-                              },
-                            ]);
-                          }}
-                          className="btn btn-primary shadow btn-xs sharp ml-1"
-                        >
-                          <i className="fa fa-plus"></i>
-                        </Link>
-                      ) : (
-                        <Link
-                          onClick={() => {
-                            console.log(inProd);
-                            console.log(i);
-                            let temp = [...inProd];
-                            temp.splice(i, 1);
-                            setInProd(temp);
-                          }}
-                          className="btn btn-danger shadow btn-xs sharp ml-1"
-                        >
-                          <i className="fa fa-trash"></i>
-                        </Link>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </Row>
+                  )}
+                />
+                <Column
+                  header="Total"
+                  style={{
+                    minWidth: "12rem",
+                  }}
+                  field={""}
+                  body={() => (
+                    <label className="text-label">
+                      <b>Rp. 1.000.000.000</b>
+                    </label>
+                  )}
+                />
+                <Column
+                  header=""
+                  style={{
+                    maxWidth: "10rem",
+                  }}
+                  field={""}
+                  body={(e) =>
+                    e.index === inProd.length - 1 ? (
+                      <Link
+                        onClick={() => {
+                          setInProd([
+                            ...inProd,
+                            {
+                              id: 0,
+                              qty: 1,
+                              u_from: null,
+                              u_to: null,
+                            },
+                          ]);
+                        }}
+                        className="btn btn-primary shadow btn-xs sharp"
+                      >
+                        <i className="fa fa-plus"></i>
+                      </Link>
+                    ) : (
+                      <Link
+                        onClick={() => {
+                          let temp = [...inProd];
+                          temp.splice(e.index, 1);
+                          setInProd(temp);
+                        }}
+                        className="btn btn-danger shadow btn-xs sharp"
+                      >
+                        <i className="fa fa-trash"></i>
+                      </Link>
+                    )
+                  }
+                />
+              </DataTable>
+            </>
           }
         />
 
@@ -909,7 +879,9 @@ const InputSO = ({ onCancel, onSubmit }) => {
           <div>
             <div className="row ml-1">
               <div className="d-flex col-12 align-items-center">
-                <label className="mt-1 text-black fs-14">{"Pisah Faktur"}</label>
+                <label className="mt-1 text-black fs-14">
+                  {"Pisah Faktur"}
+                </label>
                 <InputSwitch
                   className="ml-4"
                   checked={currentItem && currentItem.faktur}
@@ -946,7 +918,9 @@ const InputSO = ({ onCancel, onSubmit }) => {
             </div>
 
             <div className="col-6">
-              <label className="text-black fs-14">Pajak Atas Barang (11%)</label>
+              <label className="text-black fs-14">
+                Pajak Atas Barang (11%)
+              </label>
             </div>
 
             <div className="col-6">
@@ -1021,7 +995,9 @@ const InputSO = ({ onCancel, onSubmit }) => {
                 </div>
 
                 <div className="col-6">
-                  <label className="text-black fs-14">Pajak Atas Jasa (2%)</label>
+                  <label className="text-black fs-14">
+                    Pajak Atas Jasa (2%)
+                  </label>
                 </div>
 
                 <div className="col-6">

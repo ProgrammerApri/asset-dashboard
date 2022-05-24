@@ -19,6 +19,7 @@ import { TabPanel, TabView } from "primereact/tabview";
 import { Badge } from "primereact/badge";
 import CircleProgress from "../CircleProgress/circleProgress";
 import DataJenisPelanggan from "../Master/JenisPelanggan/DataJenisPelanggan";
+import { InputSwitch } from "primereact/inputswitch";
 
 const data = {
   customer: {
@@ -42,6 +43,8 @@ const data = {
     cus_gl: null,
     cus_uang_muka: null,
     cus_limit: null,
+    sub_cus: false,
+    cus_id: null,
   },
 
   jpel: {
@@ -74,6 +77,7 @@ const pajak = [
 
 const Customer = () => {
   const [customer, setCustomer] = useState(null);
+  const [nonSub, setNonSub] = useState(null);
   const [city, setCity] = useState(null);
   const [jpel, setJpel] = useState(null);
   const [subArea, setSubArea] = useState(null);
@@ -128,6 +132,13 @@ const Customer = () => {
         const { data } = response;
         console.log(data);
         setCustomer(data);
+        let non = [];
+        data.forEach((el) => {
+          if (!el.customer.sub_cus) {
+            non.push(el);
+          }
+        });
+        setNonSub(non);
       }
     } catch (error) {}
     if (isUpdate) {
@@ -156,7 +167,6 @@ const Customer = () => {
   };
 
   const getJpel = async (isUpdate = false) => {
-    setLoading(!isUpdate);
     const config = {
       ...endpoints.jenisPel,
       data: {},
@@ -175,14 +185,10 @@ const Customer = () => {
     if (isUpdate) {
       setLoading(false);
     } else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 500);
     }
   };
 
   const getAR = async () => {
-    setLoading(true);
     const config = {
       ...endpoints.account,
       data: {},
@@ -204,11 +210,9 @@ const Customer = () => {
         setAccount(filt);
       }
     } catch (error) {}
-    getCustomer();
   };
 
   const getAcc = async () => {
-    setLoading(true);
     const config = {
       ...endpoints.account,
       data: {},
@@ -230,11 +234,9 @@ const Customer = () => {
         setAcc(filt);
       }
     } catch (error) {}
-    getCustomer();
   };
 
   const getComp = async () => {
-    setLoading(true);
     const config = {
       ...endpoints.getCompany,
       data: {},
@@ -253,7 +255,6 @@ const Customer = () => {
   };
 
   const getSetup = async () => {
-    setLoading(true);
     const config = {
       ...endpoints.getSetup,
       data: {},
@@ -272,7 +273,6 @@ const Customer = () => {
   };
 
   const getSubArea = async (isUpdate = false) => {
-    setLoading(true);
     const config = {
       ...endpoints.subArea,
       data: {},
@@ -292,17 +292,9 @@ const Customer = () => {
         setSubArea(sub);
       }
     } catch (error) {}
-    if (isUpdate) {
-      setLoading(false);
-    } else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 500);
-    }
   };
 
   const getCurrency = async (isUpdate = false) => {
-    setLoading(true);
     const config = {
       ...endpoints.currency,
       data: {},
@@ -318,13 +310,6 @@ const Customer = () => {
         setCurrency(data);
       }
     } catch (error) {}
-    if (isUpdate) {
-      setLoading(false);
-    } else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 500);
-    }
   };
 
   const editCustomer = async () => {
@@ -345,12 +330,14 @@ const Customer = () => {
         cus_email: currentItem.customer.cus_email,
         cus_fax: currentItem.customer.cus_fax,
         cus_cp: currentItem.customer.cus_cp,
-        cus_curren: currentItem.currency.id,
+        cus_curren: currentItem?.currency?.id ?? null,
         cus_pjk: currentItem.customer.cus_pjk,
         cus_ket: currentItem.customer.cus_ket,
         cus_gl: currentItem.customer.cus_gl,
         cus_uang_muka: currentItem.customer.cus_uang_muka,
         cus_limit: currentItem.customer.cus_limit,
+        sub_cus: currentItem.customer.sub_cus,
+        cus_id: currentItem.customer.cus_id,
       },
     };
     console.log(config.data);
@@ -407,6 +394,8 @@ const Customer = () => {
         cus_gl: currentItem.customer.cus_gl,
         cus_uang_muka: currentItem.customer.cus_uang_muka,
         cus_limit: currentItem.customer.cus_limit,
+        sub_cus: currentItem.customer.sub_cus,
+        cus_id: currentItem.customer.cus_id,
       },
     };
     console.log(config.data);
@@ -500,7 +489,7 @@ const Customer = () => {
             console.log(data);
             setEdit(true);
             onClick("displayData", data);
-            setCurrentItem(data);
+            setCurrentItem({...data, customer: {...data.customer, cus_id: data.customer.cus_id.id}});
           }}
           className="btn btn-primary shadow btn-xs sharp ml-1"
         >
@@ -795,6 +784,17 @@ const Customer = () => {
     );
   };
 
+  const checkPelanggan = (value) => {
+    let selected = {};
+    customer?.forEach((element) => {
+      if (value === element.customer.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
   return (
     <>
       <Toast ref={toast} />
@@ -1015,7 +1015,21 @@ const Customer = () => {
                     minWidth: "8rem",
                   }}
                   field={(e) => e.customer.cus_code}
-                  body={loading && <Skeleton />}
+                  body={(e) =>
+                    loading ? (
+                      <Skeleton />
+                    ) : e.customer.sub_cus ? (
+                      <div>
+                        <span>{e.customer.cus_code} </span>
+                        <Badge
+                          value={`Sub ${e.customer.cus_id.cus_code}`}
+                          className={"active ml-2"}
+                        ></Badge>
+                      </div>
+                    ) : (
+                      <span>{e.customer.cus_code} </span>
+                    )
+                  }
                 />
                 <Column
                   header="Nama Pelanggan"
@@ -1183,10 +1197,68 @@ const Customer = () => {
               </div>
             </div>
 
-            <h4 className="mt-4">
+            <div className="d-flex col-12 align-items-center">
+              <InputSwitch
+                className="mr-3"
+                inputId="email"
+                checked={currentItem && currentItem?.customer?.sub_cus}
+                onChange={(e) => {
+                  setCurrentItem({
+                    ...currentItem,
+                    customer: { ...currentItem.customer, sub_cus: e.value },
+                  });
+                }}
+              />
+              <label className="mr-3 mt-1" htmlFor="email">
+                {"Jadikan Sub Pelanggan"}
+              </label>
+            </div>
+
+            {currentItem?.customer?.sub_cus && (
+              <div className="col-12">
+                <label className="text-label">Induk Pelanggan</label>
+                <div className="p-inputgroup">
+                  <Dropdown
+                    value={
+                      currentItem !== null
+                        ? checkPelanggan(currentItem?.customer?.cus_id)
+                        : null
+                    }
+                    options={nonSub}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        customer: {
+                          ...currentItem.customer,
+                          cus_id: e.value.customer.id,
+                        },
+                      });
+                      console.log(currentItem);
+                    }}
+                    optionLabel="customer.cus_name"
+                    filter
+                    filterBy="customer.cus_name"
+                    placeholder="Pilih Pelanggan"
+                    itemTemplate={(e) => (
+                      <div>{`${e?.customer.cus_name} (${e?.customer.cus_code})`}</div>
+                    )}
+                    valueTemplate={(e, props) =>
+                      e ? (
+                        <div>{`${e?.customer.cus_name} (${e?.customer.cus_code})`}</div>
+                      ) : (
+                        <span>{props.placeholder}</span>
+                      )
+                    }
+                  />
+                </div>
+              </div>
+            )}
+
+            <h4 className="mt-4 ml-3">
               <b>Informasi Alamat</b>
             </h4>
-            <Divider className="mb-2"></Divider>
+            <Divider className="mb-2 ml-3 mr-3"></Divider>
 
             <div className="row mr-0 ml-0">
               <div className="col-12">
@@ -1450,10 +1522,10 @@ const Customer = () => {
               </div>
             </div>
 
-            <h4 className="mt-4 ml-0 mr-0">
+            <h4 className="mt-4 ml-3 mr-3">
               <b>Distribusi GL/AR</b>
             </h4>
-            <Divider className="mb-2 ml-0 mr-0"></Divider>
+            <Divider className="mb-2 ml-3 mr-3"></Divider>
 
             <div className="row mr-0 ml-0">
               <div className="col-6">

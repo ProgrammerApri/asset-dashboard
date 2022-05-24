@@ -16,8 +16,10 @@ import DataPusatBiaya from "../../../MasterLainnya/PusatBiaya/DataPusatBiaya";
 import DataSupplier from "../../../Mitra/Pemasok/DataPemasok";
 import DataRulesPay from "src/jsx/components/MasterLainnya/RulesPay/DataRulesPay";
 import DataPajak from "src/jsx/components/Master/Pajak/DataPajak";
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
 
-const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
+const InputPO = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
@@ -152,7 +154,7 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
             filt.push(elem);
             elem.rprod.forEach((el) => {
               el.order = el.order ?? 0;
-              if (el.order === 0 || (el.request - el.order) !== 0) {
+              if (el.order === 0 || el.request - el.order !== 0) {
                 el.prod_id = el.prod_id.id;
                 el.unit_id = el.unit_id.id;
               }
@@ -232,7 +234,7 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
 
   const editPO = async () => {
     const config = {
-      ...endpoints.editPermintaan,
+      ...endpoints.editPO,
       endpoint: endpoints.editPO.endpoint + po.id,
       data: po,
     };
@@ -278,7 +280,7 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${currentItem.customer.cus_code} Sudah Digunakan`,
+            detail: `Kode ${po.po_code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -384,6 +386,16 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
     });
 
     return selected;
+  };
+
+  const onSubmit = () => {
+    if (isEdit) {
+      setUpdate(true);
+      editPO();
+    } else {
+      setUpdate(true);
+      addPO();
+    }
   };
 
   const formatDate = (date) => {
@@ -751,233 +763,287 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
           }}
           key={1}
           body={
-            <Row className="justify-content-between">
-              {po.rprod.map((v, i) => {
-                return (
-                  <div className="row mr-0 ml-0 justify-content-right col-12">
-                    <div className="col-5">
-                      <label className="text-label">Kode Produk</label>
-                      <div className="p-inputgroup">
-                        <Dropdown
-                          value={v.prod_id && checkProd(v.prod_id)}
-                          options={product}
-                          onChange={(e) => {
-                            console.log(e.value);
-                          }}
-                          placeholder="Pilih Kode Produk"
-                          optionLabel="name"
-                          filter
-                          filterBy="name"
-                          valueTemplate={valueProd}
-                          itemTemplate={prodTemp}
-                        />
-                      </div>
+            <>
+              <DataTable
+                responsiveLayout="none"
+                value={po.rprod.map((v, i) => {
+                  return { ...v, index: i };
+                })}
+                className="display w-150 datatable-wrapper header-white no-border"
+                showGridlines={false}
+                emptyMessage={() => <div></div>}
+              >
+                <Column
+                  header="Produk"
+                  style={{
+                    maxWidth: "15rem",
+                  }}
+                  field={""}
+                  body={(e) => (
+                    <div className="p-inputgroup">
+                      <Dropdown
+                        value={
+                          po.rprod[e.index].prod_id &&
+                          checkProd(po.rprod[e.index].prod_id)
+                        }
+                        options={product}
+                        onChange={(e) => {
+                          console.log(e.value);
+                        }}
+                        placeholder="Pilih Kode Produk"
+                        optionLabel="name"
+                        filter
+                        filterBy="name"
+                        valueTemplate={valueProd}
+                        itemTemplate={prodTemp}
+                      />
                     </div>
+                  )}
+                />
 
-                    <div className="col-3">
-                      <label className="text-label">Satuan</label>
-                      <div className="p-inputgroup">
-                        <Dropdown
-                          value={v.unit_id && checkUnit(v.unit_id)}
-                          onChange={(e) => {
-                            let temp = [...po.rprod];
-                            temp[i].unit_id = e.value.id;
-                            updatePo({ ...po, rprod: temp });
-                          }}
-                          options={satuan}
-                          optionLabel="name"
-                          placeholder="Pilih Satuan"
-                          filter
-                          filterBy="name"
-                        />
-                      </div>
+                <Column
+                  header="Satuan"
+                  style={{
+                    maxWidth: "15rem",
+                  }}
+                  field={""}
+                  body={(e) => (
+                    <div className="p-inputgroup">
+                      <Dropdown
+                        value={
+                          po.rprod[e.index].unit_id &&
+                          checkUnit(po.rprod[e.index].unit_id)
+                        }
+                        onChange={(e) => {
+                          let temp = [...po.rprod];
+                          temp[e.index].unit_id = e.value.id;
+                          updatePo({ ...po, rprod: temp });
+                        }}
+                        options={satuan}
+                        optionLabel="name"
+                        placeholder="Pilih Satuan"
+                        filter
+                        filterBy="name"
+                      />
                     </div>
+                  )}
+                />
 
-                    <div className="col-1">
-                      <label className="text-label">Permintaan</label>
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={v.request ? v.request : 0}
-                          onChange={(e) => {
-                            let temp = [...po.rprod];
-                            temp[i].request = e.target.value;
-                            updatePo({ ...po, rprod: temp });
-                            console.log(temp);
-                          }}
-                          placeholder="0"
-                          type="number"
-                          disabled
-                        />
-                      </div>
+                <Column
+                  header="Permintaan"
+                  style={{
+                    width: "10rem",
+                  }}
+                  field={""}
+                  body={(e) => (
+                    <div className="p-inputgroup">
+                      <InputText
+                        value={
+                          po.rprod[e.index].request
+                            ? po.rprod[e.index].request
+                            : 0
+                        }
+                        onChange={(e) => {
+                          let temp = [...po.rprod];
+                          temp[e.index].request = e.target.value;
+                          updatePo({ ...po, rprod: temp });
+                          console.log(temp);
+                        }}
+                        placeholder="0"
+                        type="number"
+                        disabled
+                      />
                     </div>
+                  )}
+                />
 
-                    <div className="col-1">
-                      <label className="text-label">Pesanan</label>
-                      <div className="p-inputgroup">
-                        <InputText
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
-                          placeholder="0"
-                          type="number"
-                        />
-                      </div>
+                <Column
+                  header="Pesanan"
+                  style={{
+                    width: "10rem",
+                  }}
+                  field={""}
+                  body={(e) => (
+                    <div className="p-inputgroup">
+                      <InputText
+                        value={
+                          po.rprod[e.index].order
+                            ? po.rprod[e.index].order
+                            : null
+                        }
+                        onChange={(a) => {
+                          let temp = [...po.rprod];
+                          let result = temp[e.index]?.request - a.target.value;
+                          temp[e.index].remain = result
+                          temp[e.index].order = a.target.value
+                          updatePo({ ...po, rprod: temp });
+                        }}
+                        placeholder="0"
+                        type="number"
+                      />
                     </div>
+                  )}
+                />
 
-                    <div className="col-1">
-                      <label className="text-label">Sisa</label>
-                      <div className="p-inputgroup">
-                        <InputText
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
-                          placeholder="0"
-                          type="number"
-                        />
-                      </div>
+                <Column
+                  header="Sisa"
+                  style={{
+                    width: "10rem",
+                  }}
+                  field={""}
+                  body={(e) => (
+                    <div className="p-inputgroup">
+                      <InputText
+                        value={
+                          po.rprod[e.index].remain
+                            ? po.rprod[e.index].remain
+                            : null
+                        }
+                        onChange={(e) => updatePo({})}
+                        placeholder="0"
+                        type="number"
+                        disabled
+                      />
                     </div>
+                  )}
+                />
 
-                    <div className="col-3">
-                      <label className="text-label">Harga Satuan</label>
-                      <div className="p-inputgroup">
-                        <InputText
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
-                          placeholder="Masukan Harga Satuan"
-                          type="number"
-                        />
-                      </div>
+                <Column
+                  header="Harga Satuan"
+                  style={{
+                    maxWidth: "15rem",
+                  }}
+                  field={""}
+                  body={(e) => (
+                    <div className="p-inputgroup">
+                      <InputText
+                        value={
+                          po.rprod[e.index].price
+                            ? po.rprod[e.index].price
+                            : null
+                        }
+                        onChange={(e) => {
+                          let temp = [...po.rprod];
+                          temp[e.index].price = e.target.value;
+                          updatePo({ ...po, rprod: temp });
+                          console.log(temp);
+                        }}
+                        placeholder="0"
+                        type="number"
+                      />
                     </div>
+                  )}
+                />
 
-                    <div className="col-2">
-                      <label className="text-label">Diskon</label>
-                      <div className="p-inputgroup">
-                        <InputText
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
-                          placeholder="Diskon"
-                          type="number"
-                        />
-                      </div>
+                <Column
+                  header="Diskon"
+                  style={{
+                    maxWidth: "10rem",
+                  }}
+                  field={""}
+                  body={(e) => (
+                    <div className="p-inputgroup">
+                      <InputText
+                        value={
+                          po.rprod[e.index].disc ? po.rprod[e.index].disc : null
+                        }
+                        onChange={(e) => {
+                          let temp = [...po.rprod];
+                          temp[e.index].disc = e.target.value;
+                          updatePo({ ...po, rprod: temp });
+                          console.log(temp);
+                        }}
+                        placeholder="0"
+                        type="number"
+                      />
                     </div>
+                  )}
+                />
 
-                    <div className="col-3">
-                      <label className="text-label">Harga Nett</label>
-                      <div className="p-inputgroup">
-                        <InputText
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
-                          placeholder="Masukan Harga Nett"
-                          type="number"
-                        />
-                      </div>
+                <Column
+                  header="Harga Nett"
+                  style={{
+                    maxWidth: "15rem",
+                  }}
+                  field={""}
+                  body={(e) => (
+                    <div className="p-inputgroup">
+                      <InputText
+                        value={
+                          po.rprod[e.index].nett_price
+                            ? po.rprod[e.index].nett_price
+                            : null
+                        }
+                        onChange={(e) => {
+                          let temp = [...po.rprod];
+                          temp[e.index].nett_price = e.target.value;
+                          updatePo({ ...po, rprod: temp });
+                          console.log(temp);
+                        }}
+                        placeholder="Masukan Harga Nett"
+                        type="number"
+                      />
                     </div>
+                  )}
+                />
 
-                    <div className="col-3">
-                      <label className="text-label">Total Harga</label>
-                      <div className="p-inputgroup">
-                        <InputText
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
-                          placeholder="Masukan Total Harga"
-                          type="number"
-                        />
-                      </div>
-                    </div>
+                <Column
+                  header="Total"
+                  style={{
+                    maxWidth: "15rem",
+                  }}
+                  field={""}
+                  body={(e) => (
+                    <label className="text-nowrap">
+                      <b>{`Rp. ${
+                        po.rprod[e.index].order * po.rprod[e.index].price -
+                        po.rprod[e.index].disc
+                      }`}</b>
+                    </label>
+                  )}
+                />
 
-                    <div className="col-1 d-flex ml-0">
-                      {i === po.rprod.length - 1 ? (
-                        <Link
-                          onClick={() => {
-                            updatePo({
-                              ...po,
-                              rprod: [
-                                ...po.rprod,
-                                {
-                                  id: 0,
-                                  prod_id: null,
-                                  unit_id: null,
-                                  request: null,
-                                },
-                              ],
-                            });
-                          }}
-                          className="btn btn-primary shadow btn-xs sharp ml-1"
-                        >
-                          <i className="fa fa-plus"></i>
-                        </Link>
-                      ) : (
-                        <Link
-                          onClick={() => {
-                            let temp = [...po.rprod];
-                            temp.splice(i, 1);
-                            updatePo({
-                              ...po,
-                              rprod: temp,
-                            });
-                          }}
-                          className="btn btn-danger shadow btn-xs sharp ml-1"
-                        >
-                          <i className="fa fa-trash"></i>
-                        </Link>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </Row>
+                <Column
+                  body={(e) =>
+                    e.index === po.rprod.length - 1 ? (
+                      <Link
+                        onClick={() => {
+                          updatePo({
+                            ...po,
+                            rprod: [
+                              ...po.rprod,
+                              {
+                                id: 0,
+                                prod_id: null,
+                                unit_id: null,
+                                request: null,
+                              },
+                            ],
+                          });
+                        }}
+                        className="btn btn-primary shadow btn-xs sharp ml-1"
+                      >
+                        <i className="fa fa-plus"></i>
+                      </Link>
+                    ) : (
+                      <Link
+                        onClick={() => {
+                          let temp = [...po.rprod];
+                          temp.splice(e.index, 1);
+                          updatePo({
+                            ...po,
+                            rprod: temp,
+                          });
+                        }}
+                        className="btn btn-danger shadow btn-xs sharp ml-1"
+                      >
+                        <i className="fa fa-trash"></i>
+                      </Link>
+                    )
+                  }
+                />
+              </DataTable>
+            </>
           }
         />
 
@@ -993,201 +1059,212 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
           }}
           key={1}
           body={
-            <Row className="justify-content-between">
-              {po.rjasa.map((v, i) => {
-                return (
-                  <div className="row mr-0 ml-0 justify-content-right col-12">
-                    <div className="col-4">
-                      <label className="text-label">Kode Supplier</label>
-                      <div className="p-inputgroup">
-                        <Dropdown
-                          value={v.jasa_id && checkjasa(v.jasa_id)}
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
-                          placeholder="Pilih Kode Supplier"
-                        />
-                        <PButton
-                        // onClick={() => {
-                        //   setShowJenisPelanggan(true);
-                        // }}
-                        >
-                          <i class="bx bx-food-menu"></i>
-                        </PButton>
-                      </div>
+            <>
+              <DataTable
+                responsiveLayout="none"
+                value={po.rjasa.map((v, i) => {
+                  return { ...v, index: i };
+                })}
+                className="display w-170 datatable-wrapper header-white no-border"
+                showGridlines={false}
+                emptyMessage={() => <div></div>}
+              >
+                <Column
+                  header="Supplier"
+                  style={{
+                    maxWidth: "12rem",
+                  }}
+                  field={""}
+                  body={(e) => (
+                    <div className="p-inputgroup">
+                      <Dropdown
+                        value={null}
+                        options={supplier}
+                        onChange={(e) => {
+                          updatePo({});
+                        }}
+                        optionLabel="supplier.sup_name"
+                        placeholder="Pilih Supplier"
+                        itemTemplate={suppTemp}
+                        valueTemplate={valueSupTemp}
+                      />
+                      <PButton
+                      // onClick={() => {
+                      //   setShowJenisPelanggan(true);
+                      // }}
+                      >
+                        <i class="bx bx-food-menu"></i>
+                      </PButton>
                     </div>
+                  )}
+                />
 
-                    <div className="col-4">
-                      <label className="text-label">Kode Jasa</label>
-                      <div className="p-inputgroup">
-                        <Dropdown
-                          value={v.jasa_id && checkjasa(v.jasa_id)}
-                          onChange={(e) => {
-                            let temp = [...po.rjasa];
-                            temp[i].jasa_id = e.value.id;
-                            updatePo({ ...po, rjasa: temp });
-                          }}
-                          options={jasa}
-                          optionLabel="jasa.name"
-                          placeholder="Pilih Kode Jasa"
-                          itemTemplate={jasTemp}
-                          valueTemplate={valueJasTemp}
-                        />
-                        <PButton
-                        // onClick={() => {
-                        //   setShowJenisPelanggan(true);
-                        // }}
-                        >
-                          <i class="bx bx-food-menu"></i>
-                        </PButton>
-                      </div>
+                <Column
+                  header="Jasa"
+                  style={{
+                    maxWidth: "12rem",
+                  }}
+                  field={""}
+                  body={(e) => (
+                    <div className="p-inputgroup">
+                      <Dropdown
+                        value={
+                          po.rjasa[e.index].jasa_id &&
+                          checkjasa(po.rjasa[e.index].jasa_id)
+                        }
+                        onChange={(e) => {
+                          let temp = [...po.rjasa];
+                          temp[e.index].jasa_id = e.value.id;
+                          updatePo({ ...po, rjasa: temp });
+                        }}
+                        options={jasa}
+                        optionLabel="jasa.name"
+                        placeholder="Pilih Kode Jasa"
+                        itemTemplate={jasTemp}
+                        valueTemplate={valueJasTemp}
+                      />
                     </div>
+                  )}
+                />
 
-                    <div className="col-3">
-                      <label className="text-label">Satuan</label>
-                      <div className="p-inputgroup">
-                        <Dropdown
-                          value={v.unit_id && checkUnit(v.unit_id)}
-                          onChange={(e) => {
-                            let temp = [...po.rjasa];
-                            temp[i].unit_id = e.value.id;
-                            updatePo({ ...po, rjasa: temp });
-                          }}
-                          options={satuan}
-                          optionLabel="name"
-                          placeholder="Pilih Satuan"
-                        />
-                        <PButton
-                        // onClick={() => {
-                        //   setShowJenisPelanggan(true);
-                        // }}
-                        >
-                          <i class="bx bx-food-menu"></i>
-                        </PButton>
-                      </div>
+                <Column
+                  header="Satuan"
+                  style={{
+                    maxWidth: "12rem",
+                  }}
+                  field={""}
+                  body={(e) => (
+                    <div className="p-inputgroup">
+                      <Dropdown
+                        value={
+                          po.rjasa[e.index].unit_id &&
+                          checkUnit(po.rjasa[e.index].unit_id)
+                        }
+                        onChange={(e) => {
+                          let temp = [...po.rjasa];
+                          temp[po.rjasa[e.index]].unit_id = e.value.id;
+                          updatePo({ ...po, rjasa: temp });
+                        }}
+                        options={satuan}
+                        optionLabel="name"
+                        placeholder="Pilih Satuan"
+                      />
                     </div>
+                  )}
+                />
 
-                    <div className="col-2">
-                      <label className="text-label">Pesanan</label>
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={v.qty && v.qty}
-                          onChange={(e) => {
-                            let temp = [...po.rjasa];
-                            temp[i].qty = e.target.value;
-                            updatePo({ ...po, rjasa: temp });
-                            console.log(temp);
-                          }}
-                          placeholder="Jumlah Pesanan"
-                          type="number"
-                        />
-                      </div>
+                <Column
+                  header="Pesanan"
+                  // style={{
+                  //   maxWidth: "15rem",
+                  // }}
+                  field={""}
+                  body={(e) => (
+                    <div className="p-inputgroup">
+                      <InputText
+                        value={po.rjasa[e.index].qty && po.rjasa[e.index].qty}
+                        onChange={(e) => {
+                          let temp = [...po.rjasa];
+                          temp[po.rjasa[e.index]].qty = e.target.value;
+                          updatePo({ ...po, rjasa: temp });
+                          console.log(temp);
+                        }}
+                        placeholder="Jumlah Pesanan"
+                        type="number"
+                      />
                     </div>
+                  )}
+                />
 
-                    <div className="col-3">
-                      <label className="text-label">Harga Satuan</label>
-                      <div className="p-inputgroup">
-                        <InputText
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
-                          placeholder="Masukan Harga Satuan"
-                          type="number"
-                        />
-                      </div>
+                <Column
+                  header="Harga Satuan"
+                  style={{
+                    width: "25rem",
+                  }}
+                  field={""}
+                  body={() => (
+                    <div className="p-inputgroup">
+                      <InputText
+                        value={null}
+                        onChange={(e) => {}}
+                        placeholder="0"
+                        type="number"
+                      />
                     </div>
+                  )}
+                />
 
-                    <div className="col-2">
-                      <label className="text-label">Diskon</label>
-                      <div className="p-inputgroup">
-                        <InputText
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
-                          placeholder="Diskon"
-                          type="number"
-                        />
-                      </div>
+                <Column
+                  header="Diskon"
+                  style={{
+                    width: "25rem",
+                  }}
+                  field={""}
+                  body={() => (
+                    <div className="p-inputgroup">
+                      <InputText
+                        value={null}
+                        onChange={(e) => {}}
+                        placeholder="0"
+                        type="number"
+                      />
                     </div>
+                  )}
+                />
 
-                    <div className="col-4">
-                      <label className="text-label">Total Harga</label>
-                      <div className="p-inputgroup">
-                        <InputText
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
-                          placeholder="Masukan Total Harga"
-                          type="number"
-                        />
-                      </div>
-                    </div>
+                <Column
+                  header="Total"
+                  // style={{
+                  //   minWidth: "12rem",
+                  // }}
+                  body={(e) => (
+                    <label className="text-nowrap">
+                      <b>{`Rp. ${e.index * 0}`}</b>
+                    </label>
+                  )}
+                />
 
-                    <div className="col-1 d-flex ml-0">
-                      {i === po.rjasa.length - 1 ? (
-                        <Link
-                          onClick={() => {
-                            updatePo({
-                              ...po,
-                              rjasa: [
-                                ...po.rjasa,
-                                {
-                                  id: 0,
-                                  jasa_id: null,
-                                  unit_id: null,
-                                  qty: null,
-                                },
-                              ],
-                            });
-                          }}
-                          className="btn btn-primary shadow btn-xs sharp ml-1"
-                        >
-                          <i className="fa fa-plus"></i>
-                        </Link>
-                      ) : (
-                        <Link
-                          onClick={() => {
-                            let temp = [...po.rjasa];
-                            temp.splice(i, 1);
-                            updatePo({ ...po, rjasa: temp });
-                          }}
-                          className="btn btn-danger shadow btn-xs sharp ml-1"
-                        >
-                          <i className="fa fa-trash"></i>
-                        </Link>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </Row>
+                <Column
+                  body={(e) =>
+                    e.index === po.rjasa.length - 1 ? (
+                      <Link
+                        onClick={() => {
+                          updatePo({
+                            ...po,
+                            rjasa: [
+                              ...po.rjasa,
+                              {
+                                id: 0,
+                                jasa_id: null,
+                                unit_id: null,
+                                qty: null,
+                              },
+                            ],
+                          });
+                        }}
+                        className="btn btn-primary shadow btn-xs sharp ml-1"
+                      >
+                        <i className="fa fa-plus"></i>
+                      </Link>
+                    ) : (
+                      <Link
+                        onClick={() => {
+                          let temp = [...po.rjasa];
+                          temp.splice(e.index, 1);
+                          updatePo({
+                            ...po,
+                            rjasa: temp,
+                          });
+                        }}
+                        className="btn btn-danger shadow btn-xs sharp ml-1"
+                      >
+                        <i className="fa fa-trash"></i>
+                      </Link>
+                    )
+                  }
+                />
+              </DataTable>
+            </>
           }
         />
 
@@ -1378,7 +1455,7 @@ const InputPO = ({ onCancel, onSubmit, onSuccess }) => {
           <PButton
             label="Simpan"
             icon="pi pi-check"
-            onClick={onSubmit}
+            onClick={() => onSubmit()}
             autoFocus
             loading={update}
           />

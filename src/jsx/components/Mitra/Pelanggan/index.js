@@ -1,68 +1,78 @@
 import React, { useState, useEffect, useRef } from "react";
 import { request, endpoints } from "src/utils";
 import { Row, Col, Card } from "react-bootstrap";
-import DataSupplier from "./DataPemasok";
 import CircleProgress from "../../CircleProgress/circleProgress";
+import DataCustomer from "./DataCustomer";
 
 const data = {
-  supplier: {
+  customer: {
     id: null,
-    sup_code: null,
-    sup_name: null,
-    sup_jpem: null,
-    sup_ppn: null,
-    sup_npwp: null,
-    sup_address: null,
-    sup_kota: null,
-    sup_kpos: null,
-    sup_telp1: null,
-    sup_telp2: null,
-    sup_fax: null,
-    sup_cp: null,
-    sup_curren: null,
-    sup_ket: null,
-    sup_hutang: null,
-    sup_uang_muka: null,
-    sup_limit: null,
+    cus_code: null,
+    cus_name: null,
+    cus_jpel: null,
+    cus_sub_area: null,
+    cus_npwp: null,
+    cus_address: null,
+    cus_kota: null,
+    cus_kpos: null,
+    cus_telp1: null,
+    cus_telp2: null,
+    cus_email: null,
+    cus_fax: null,
+    cus_cp: null,
+    cus_curren: null,
+    cus_pjk: null,
+    cus_ket: null,
+    cus_gl: null,
+    cus_uang_muka: null,
+    cus_limit: null,
+    sub_cus: false,
+    cus_id: null,
+  },
+
+  jpel: {
+    id: null,
+    jpel_code: "",
+    jpel_name: "",
+    jpel_ket: "",
+  },
+
+  subArea: {
+    id: null,
+    sub_code: "",
+    sub_area_code: "",
+    sub_name: "",
+    sub_ket: "",
   },
 
   currency: {
-    id: 0,
+    id: null,
     code: "",
     name: "",
   },
-
-  jenisPemasok: {
-    id: 1,
-    jpem_code: "",
-    jpem_name: "",
-    jpem_ket: "",
-  },
-
-  city: {
-    city_id: 0,
-    province_id: 0,
-    province: "",
-    type: "",
-    city_name: "",
-    postal_code: 0,
-  },
 };
 
-const Supplier = () => {
-  const [supplier, setSupplier] = useState(null);
+const pajak = [
+  { name: "Include", code: "I" },
+  { name: "Exclude", code: "E" },
+  { name: "Non PPN", code: "N" },
+];
+
+const Customer = () => {
+  const [customer, setCustomer] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [nonSub, setNonSub] = useState(true);
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getSupplier();
+    getCustomer();
   }, []);
 
-  const getSupplier = async (isUpdate = false) => {
+  const getCustomer = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.supplier,
+      ...endpoints.customer,
       data: {},
     };
     console.log(config.data);
@@ -73,7 +83,14 @@ const Supplier = () => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        setSupplier(data);
+        setCustomer(data);
+        let non = [];
+        data.forEach((el) => {
+          if (!el.customer.sub_cus) {
+            non.push(el);
+          }
+        });
+        setNonSub(non);
       }
     } catch (error) {}
     if (isUpdate) {
@@ -91,11 +108,11 @@ const Supplier = () => {
       <div className="col-md-4 col-sm-4">
         <Card>
           <Card.Body className="p-0">
-            <Row className="align-center">
+            <Row>
               <div className="ml-3 mt-1">
                 <CircleProgress
                   percent={50}
-                  colors={"#58B9DF"}
+                  colors={"#6EB6FF"}
                   icon={
                     <svg
                       width="30"
@@ -136,9 +153,9 @@ const Supplier = () => {
                   }
                 />
               </div>
-              <div className="col-8 mt-4">
+              <div className="col-8 mt-4 ml-0">
                 <span className="fs-13 text-black font-w600 ml-">
-                  Hutang Jatuh Tempo Lebih Dari <b>90 Hari</b>
+                  Piutang Jatuh Tempo Lebih Dari <b>90 Hari</b>
                 </span>
                 <h4 className="fs-140 text-black font-w600 mt-1">
                   <b>Rp. </b>
@@ -152,11 +169,11 @@ const Supplier = () => {
       <div className="col-md-4 col-sm-4">
         <Card>
           <Card.Body className="p-0">
-            <Row>
+            <Row className="align-center">
               <div className="ml-3 mt-1">
                 <CircleProgress
                   percent={50}
-                  colors={"#8D77A4"}
+                  colors={"#7A93C3"}
                   icon={
                     <svg
                       width="30"
@@ -198,12 +215,10 @@ const Supplier = () => {
                 />
               </div>
               <div className="col-8 mt-4">
-                <span className="fs-13 text-black mb-0">
-                  <b>
-                    Hutang Jatuh Tempo <b>Belum Jatuh Tempo</b>
-                  </b>
+                <span className="fs-13 text-black font-w600 mb-0">
+                  Piutang Jatuh Tempo <b>Belum Jatuh Tempo</b>
                 </span>
-                <h4 className="fs-140 text-black mt-1">
+                <h4 className="fs-140 text-black font-w600 mt-1">
                   <b>Rp. </b>
                 </h4>
               </div>
@@ -219,7 +234,7 @@ const Supplier = () => {
               <div className="ml-3 mt-1">
                 <CircleProgress
                   percent={50}
-                  colors={"#869AAC"}
+                  colors={"#A79AFD"}
                   icon={
                     <svg
                       width="30"
@@ -262,7 +277,7 @@ const Supplier = () => {
               </div>
               <div className="col-8 mt-4">
                 <span className="fs-13 text-black font-w600">
-                  <b>Total Hutang</b>
+                  <b>Total Piutang</b>
                 </span>
                 <h4 className="fs-140 text-black font-w600 mt-1">
                   <b>Rp. </b>
@@ -276,10 +291,10 @@ const Supplier = () => {
         <Col>
           <Card>
             <Card.Body>
-              <DataSupplier
-                data={loading ? dummy : supplier}
+              <DataCustomer
+                data={loading ? dummy : customer}
                 load={loading}
-                onSuccessInput={() => getSupplier()}
+                onSuccessInput={() => getCustomer()}
               />
             </Card.Body>
           </Card>
@@ -289,4 +304,4 @@ const Supplier = () => {
   );
 };
 
-export default Supplier;
+export default Customer;

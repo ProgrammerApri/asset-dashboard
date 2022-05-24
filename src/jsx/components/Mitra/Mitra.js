@@ -1,7 +1,7 @@
 import React from "react";
-import Customer from "./Customer";
 import { TabView, TabPanel } from 'primereact/tabview';
-import Pemasok from "./Pemasok/DataPemasok";
+import Customer from "./Pelanggan";
+import Supplier from "./Pemasok";
 
 const Mitra = () => {
   return (
@@ -10,7 +10,7 @@ const Mitra = () => {
           <Customer/>
       </TabPanel>
       <TabPanel header="Pemasok">
-        <Pemasok/>
+        <Supplier/>
       </TabPanel>
     </TabView>
   );

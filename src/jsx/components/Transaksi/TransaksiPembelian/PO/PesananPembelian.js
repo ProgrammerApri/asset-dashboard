@@ -12,7 +12,7 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_PO, SET_CURRENT_RP, SET_EDIT } from "src/redux/actions";
+import { SET_CURRENT_PO, SET_EDIT } from "src/redux/actions";
 
 const data = {
   id: null,
@@ -20,6 +20,7 @@ const data = {
   po_date: null,
   preq_id: null,
   sup_id: null,
+  ppn_type: null,
   top: null,
   due_date: false,
   split_inv: null,

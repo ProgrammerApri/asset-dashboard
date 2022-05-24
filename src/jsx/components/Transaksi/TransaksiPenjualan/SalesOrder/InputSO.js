@@ -606,7 +606,7 @@ const InputSO = ({ onCancel, onSubmit }) => {
                   // }}
                   body={(e) => (
                     <label className="text-nowrap">
-                      <b>{`Rp. ${e.index*500}`}</b>
+                      <b>{`Rp. ${e.index * 500}`}</b>
                     </label>
                   )}
                 />
@@ -665,212 +665,183 @@ const InputSO = ({ onCancel, onSubmit }) => {
           }}
           key={1}
           body={
-            <Row className="justify-content-between">
-              {inJasa.map((v, i) => {
-                return (
-                  <div className="row mr-0 ml-0 justify-content-right col-12">
-                    <div className="col-4">
-                      <label className="text-black fs-14">Kode Supplier</label>
-                      <div className="p-inputgroup">
-                        <Dropdown
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
-                          placeholder="Pilih Kode Supplier"
-                        />
-                        <PButton
-                        // onClick={() => {
-                        //   setShowJenisPelanggan(true);
-                        // }}
-                        >
-                          <i class="bx bx-food-menu"></i>
-                        </PButton>
-                      </div>
+            <>
+              <DataTable
+                responsiveLayout="scroll"
+                value={inJasa.map((v, i) => {
+                  return { ...v, index: i };
+                })}
+                className="display w-170 datatable-wrapper header-white no-border"
+                showGridlines={false}
+                sc
+                emptyMessage={() => <div></div>}
+              >
+                <Column
+                  header="Supplier"
+                  style={{
+                    width: "15rem",
+                  }}
+                  field={""}
+                  body={() => (
+                    <div className="p-inputgroup">
+                      <Dropdown
+                        value={null}
+                        onChange={(e) => {}}
+                        placeholder="Pilih Supplier"
+                      />
+                      <PButton onClick={() => {}}>
+                        <i class="bx bx-food-menu"></i>
+                      </PButton>
                     </div>
+                  )}
+                />
 
-                    <div className="col-4">
-                      <label className="text-black fs-14">Kode Jasa</label>
-                      <div className="p-inputgroup">
-                        <Dropdown
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
-                          placeholder="Pilih Kode Jasa"
-                        />
-                        <PButton
-                        // onClick={() => {
-                        //   setShowJenisPelanggan(true);
-                        // }}
-                        >
-                          <i class="bx bx-food-menu"></i>
-                        </PButton>
-                      </div>
+                <Column
+                  header="Jasa"
+                  style={{
+                    maxWidth: "15rem",
+                  }}
+                  field={""}
+                  body={() => (
+                    <div className="p-inputgroup">
+                      <Dropdown
+                        value={null}
+                        onChange={(e) => {}}
+                        placeholder="Pilih Jasa"
+                      />
+                      <PButton onClick={() => {}}>
+                        <i class="bx bx-food-menu"></i>
+                      </PButton>
                     </div>
+                  )}
+                />
 
-                    <div className="col-3">
-                      <label className="text-black fs-14">Satuan</label>
-                      <div className="p-inputgroup">
-                        <Dropdown
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
-                          placeholder="Pilih Satuan"
-                        />
-                        <PButton
-                        // onClick={() => {
-                        //   setShowJenisPelanggan(true);
-                        // }}
-                        >
-                          <i class="bx bx-food-menu"></i>
-                        </PButton>
-                      </div>
+                <Column
+                  header="Satuan"
+                  style={{
+                    maxWidth: "12rem",
+                  }}
+                  field={""}
+                  body={() => (
+                    <div className="p-inputgroup">
+                      <Dropdown
+                        value={null}
+                        onChange={(e) => {}}
+                        placeholder="Pilih Satuan"
+                      />
+                      {/* <PButton onClick={() => {}}>
+                        <i class="bx bx-food-menu"></i>
+                      </PButton> */}
                     </div>
+                  )}
+                />
 
-                    <div className="col-2">
-                      <label className="text-black fs-14">Pesanan</label>
-                      <div className="p-inputgroup">
-                        <InputText
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
-                          placeholder="Jumlah Pesanan"
-                          type="number"
-                        />
-                      </div>
+                <Column
+                  header="Pesanan"
+                  // style={{
+                  //   maxWidth: "15rem",
+                  // }}
+                  field={""}
+                  body={() => (
+                    <div className="p-inputgroup">
+                      <InputText
+                        value={null}
+                        onChange={(e) => {}}
+                        placeholder="0"
+                        type="number"
+                      />
                     </div>
+                  )}
+                />
 
-                    <div className="col-3">
-                      <label className="text-black fs-14">Harga Satuan</label>
-                      <div className="p-inputgroup">
-                        <InputText
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
-                          placeholder="Masukan Harga Satuan"
-                          type="number"
-                        />
-                      </div>
+                <Column
+                  header="Harga Satuan"
+                  style={{
+                    width: "25rem",
+                  }}
+                  field={""}
+                  body={() => (
+                    <div className="p-inputgroup">
+                      <InputText
+                        value={null}
+                        onChange={(e) => {}}
+                        placeholder="0"
+                        type="number"
+                      />
                     </div>
+                  )}
+                />
 
-                    <div className="col-2">
-                      <label className="text-black fs-14">Diskon</label>
-                      <div className="p-inputgroup">
-                        <InputText
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
-                          placeholder="Diskon"
-                          type="number"
-                        />
-                      </div>
+                <Column
+                  header="Diskon"
+                  style={{
+                    width: "25rem",
+                  }}
+                  field={""}
+                  body={() => (
+                    <div className="p-inputgroup">
+                      <InputText
+                        value={null}
+                        onChange={(e) => {}}
+                        placeholder="0"
+                        type="number"
+                      />
                     </div>
+                  )}
+                />
 
-                    <div className="col-4">
-                      <label className="text-black fs-14">Total Harga</label>
-                      <div className="p-inputgroup">
-                        <InputText
-                          // value={
-                          //   currentItem !== null
-                          //     ? `${currentItem?.jasa?.name ?? ""}`
-                          //     : ""
-                          // }
-                          onChange={(e) =>
-                            setCurrentItem({
-                              // ...currentItem,
-                              // jasa: { ...currentItem.jasa, name: e.target.value },
-                            })
-                          }
-                          placeholder="Masukan Total Harga"
-                          type="number"
-                        />
-                      </div>
-                    </div>
+                <Column
+                  header="Total"
+                  // style={{
+                  //   minWidth: "12rem",
+                  // }}
+                  body={(e) => (
+                    <label className="text-nowrap">
+                      <b>{`Rp. ${e.index * 500}`}</b>
+                    </label>
+                  )}
+                />
 
-                    <div className="col-1 d-flex ml-0">
-                      {i === inJasa.length - 1 ? (
-                        <Link
-                          onClick={() => {
-                            setInJasa([
-                              ...inJasa,
-                              {
-                                id: 0,
-                                qty: 1,
-                                u_from: null,
-                                u_to: null,
-                              },
-                            ]);
-                          }}
-                          className="btn btn-primary shadow btn-xs sharp ml-1"
-                        >
-                          <i className="fa fa-plus"></i>
-                        </Link>
-                      ) : (
-                        <Link
-                          onClick={() => {
-                            console.log(inJasa);
-                            console.log(i);
-                            let temp = [...inJasa];
-                            temp.splice(i, 1);
-                            setInJasa(temp);
-                          }}
-                          className="btn btn-danger shadow btn-xs sharp ml-1"
-                        >
-                          <i className="fa fa-trash"></i>
-                        </Link>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </Row>
+                <Column
+                  header=""
+                  // style={{
+                  //   maxWidth: "10rem",
+                  // }}
+                  field={""}
+                  body={(e) =>
+                    e.index === inJasa.length - 1 ? (
+                      <Link
+                        onClick={() => {
+                          setInJasa([
+                            ...inJasa,
+                            {
+                              id: 0,
+                              qty: 1,
+                              u_from: null,
+                              u_to: null,
+                            },
+                          ]);
+                        }}
+                        className="btn btn-primary shadow btn-xs sharp"
+                      >
+                        <i className="fa fa-plus"></i>
+                      </Link>
+                    ) : (
+                      <Link
+                        onClick={() => {
+                          let temp = [...inJasa];
+                          temp.splice(e.index, 1);
+                          setInJasa(temp);
+                        }}
+                        className="btn btn-danger shadow btn-xs sharp"
+                      >
+                        <i className="fa fa-trash"></i>
+                      </Link>
+                    )
+                  }
+                />
+              </DataTable>
+            </>
           }
         />
 

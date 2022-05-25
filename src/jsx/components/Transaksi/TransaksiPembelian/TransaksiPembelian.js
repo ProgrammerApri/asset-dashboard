@@ -6,6 +6,8 @@ import PembelianLangsung from "./PembelianLangsung";
 import Faktur from "./Faktur";
 import RequestPurchase from "./RequestPurchase";
 import PermintaanPO from "./PO";
+import ReturBeli from "./ReturBeli";
+
 
 const TransaksiPembelian = () => {
   return (
@@ -21,6 +23,9 @@ const TransaksiPembelian = () => {
       </TabPanel>
       <TabPanel header="Faktur">
         <Faktur/>
+      </TabPanel>
+      <TabPanel header="Retur Pembelian">
+        <ReturBeli/>
       </TabPanel>
     </TabView>
   );

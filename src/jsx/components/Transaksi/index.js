@@ -16,6 +16,7 @@ const Transaksi = () => {
         icon: "bx-receipt",
         component: <TransaksiPenjualan />,
       },
+      
   ]);
 
   const renderSubMenu = () => {

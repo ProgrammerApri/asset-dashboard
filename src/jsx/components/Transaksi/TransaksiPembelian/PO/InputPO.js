@@ -18,6 +18,7 @@ import DataRulesPay from "src/jsx/components/MasterLainnya/RulesPay/DataRulesPay
 import DataPajak from "src/jsx/components/Master/Pajak/DataPajak";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
+import { tr } from "date-fns/locale";
 
 const InputPO = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
@@ -163,17 +164,17 @@ const InputPO = ({ onCancel, onSuccess }) => {
               element.jasa_id = element.jasa_id.id;
               element.unit_id = element.unit_id.id;
             });
-            elem.rjasa.push({
-              id: 0,
-              preq_id: elem.id,
-              sup_id: null,
-              jasa_id: null,
-              unit_id: null,
-              qty: null,
-              price: null,
-              disc: null,
-              total: null,
-            });
+            // elem.rjasa.push({
+            //   id: 0,
+            //   preq_id: elem.id,
+            //   sup_id: null,
+            //   jasa_id: null,
+            //   unit_id: null,
+            //   qty: null,
+            //   price: null,
+            //   disc: null,
+            //   total: null,
+            // });
           }
         });
         console.log(data);
@@ -358,7 +359,6 @@ const InputPO = ({ onCancel, onSuccess }) => {
     product?.forEach((element) => {
       if (value === element.id) {
         selected = element;
-        console.log("SELEC");
         console.log(selected);
       }
     });
@@ -547,6 +547,23 @@ const InputPO = ({ onCancel, onSuccess }) => {
     );
   };
 
+  const getSubTotal = () => {
+    let total = 0;
+    po?.rprod?.forEach((el) => {
+      if (el.nett_price && el.nett_price > 0) {
+        total += parseInt(el.nett_price);
+      } else {
+        total += el.total - (el.total * el.disc) / 100;
+      }
+    });
+
+    po?.rjasa?.forEach((el) => {
+      total += el.total - (el.total * el.disc) / 100;
+    });
+
+    return `${total}`.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
   const body = () => {
     return (
       <>
@@ -607,6 +624,8 @@ const InputPO = ({ onCancel, onSuccess }) => {
                 placeholder="Pilih Kode Permintaan"
                 itemTemplate={reqTemp}
                 valueTemplate={valueReqTemp}
+                filter
+                filterBy="req_code"
               />
             </div>
           </div>
@@ -751,259 +770,233 @@ const InputPO = ({ onCancel, onSuccess }) => {
           </div>
         </Row>
 
-        <CustomAccordion
-          tittle={"Permintaan Produk"}
-          defaultActive={true}
-          active={accor.produk}
-          onClick={() => {
-            setAccor({
-              ...accor,
-              produk: !accor.produk,
-            });
-          }}
-          key={1}
-          body={
-            <>
-              <DataTable
-                responsiveLayout="none"
-                value={po.rprod.map((v, i) => {
-                  return { ...v, index: i };
-                })}
-                className="display w-150 datatable-wrapper header-white no-border"
-                showGridlines={false}
-                emptyMessage={() => <div></div>}
-              >
-                <Column
-                  header="Produk"
-                  style={{
-                    maxWidth: "15rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={
-                          po.rprod[e.index].prod_id &&
-                          checkProd(po.rprod[e.index].prod_id)
-                        }
-                        options={product}
-                        onChange={(e) => {
-                          console.log(e.value);
-                        }}
-                        placeholder="Pilih Kode Produk"
-                        optionLabel="name"
-                        filter
-                        filterBy="name"
-                        valueTemplate={valueProd}
-                        itemTemplate={prodTemp}
-                      />
-                    </div>
-                  )}
-                />
+        {po?.rprod?.length ? (
+          <CustomAccordion
+            tittle={"Permintaan Produk"}
+            defaultActive={true}
+            active={accor.produk}
+            onClick={() => {
+              setAccor({
+                ...accor,
+                produk: !accor.produk,
+              });
+            }}
+            key={1}
+            body={
+              <>
+                <DataTable
+                  responsiveLayout="none"
+                  value={po.rprod.map((v, i) => {
+                    return {
+                      ...v,
+                      index: i,
+                      price: v?.price ?? 0,
+                      disc: v?.disc ?? 0,
+                      total: v?.total ?? 0,
+                    };
+                  })}
+                  className="display w-150 datatable-wrapper header-white no-border"
+                  showGridlines={false}
+                  emptyMessage={() => <div></div>}
+                >
+                  <Column
+                    header="Produk"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <Dropdown
+                          value={e.prod_id && checkProd(e.prod_id)}
+                          options={product}
+                          onChange={(e) => {
+                            console.log(e.value);
+                          }}
+                          placeholder="Pilih Kode Produk"
+                          optionLabel="name"
+                          filter
+                          filterBy="name"
+                          valueTemplate={valueProd}
+                          itemTemplate={prodTemp}
+                          disabled={e.id !== 0}
+                        />
+                      </div>
+                    )}
+                  />
 
-                <Column
-                  header="Satuan"
-                  style={{
-                    maxWidth: "15rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={
-                          po.rprod[e.index].unit_id &&
-                          checkUnit(po.rprod[e.index].unit_id)
-                        }
-                        onChange={(e) => {
-                          let temp = [...po.rprod];
-                          temp[e.index].unit_id = e.value.id;
-                          updatePo({ ...po, rprod: temp });
-                        }}
-                        options={satuan}
-                        optionLabel="name"
-                        placeholder="Pilih Satuan"
-                        filter
-                        filterBy="name"
-                      />
-                    </div>
-                  )}
-                />
+                  <Column
+                    header="Satuan"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <Dropdown
+                          value={e.unit_id && checkUnit(e.unit_id)}
+                          onChange={(t) => {
+                            let temp = [...po.rprod];
+                            temp[e.index].unit_id = t.value.id;
+                            updatePo({ ...po, rprod: temp });
+                          }}
+                          options={satuan}
+                          optionLabel="name"
+                          placeholder="Pilih Satuan"
+                          filter
+                          filterBy="name"
+                          disabled={e.id !== 0}
+                        />
+                      </div>
+                    )}
+                  />
 
-                <Column
-                  header="Permintaan"
-                  style={{
-                    width: "10rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={
-                          po.rprod[e.index].request
-                            ? po.rprod[e.index].request
-                            : 0
-                        }
-                        onChange={(e) => {
-                          let temp = [...po.rprod];
-                          temp[e.index].request = e.target.value;
-                          updatePo({ ...po, rprod: temp });
-                          console.log(temp);
-                        }}
-                        placeholder="0"
-                        type="number"
-                        disabled
-                      />
-                    </div>
-                  )}
-                />
+                  <Column
+                    header="Permintaan"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.request ? e.request : 0}
+                          onChange={(t) => {
+                            let temp = [...po.rprod];
+                            temp[e.index].request = t.target.value;
+                            updatePo({ ...po, rprod: temp });
+                            console.log(temp);
+                          }}
+                          placeholder="0"
+                          type="number"
+                          disabled
+                        />
+                      </div>
+                    )}
+                  />
 
-                <Column
-                  header="Pesanan"
-                  style={{
-                    width: "10rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={
-                          po.rprod[e.index].order
-                            ? po.rprod[e.index].order
-                            : null
-                        }
-                        onChange={(a) => {
-                          let temp = [...po.rprod];
-                          let result = temp[e.index]?.request - a.target.value;
-                          temp[e.index].remain = result
-                          temp[e.index].order = a.target.value
-                          updatePo({ ...po, rprod: temp });
-                        }}
-                        placeholder="0"
-                        type="number"
-                      />
-                    </div>
-                  )}
-                />
+                  <Column
+                    header="Pesanan"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.order ? e.order : 0}
+                          onChange={(t) => {
+                            let temp = [...po.rprod];
+                            temp[e.index].order =
+                              t.target.value > e.request
+                                ? e.request
+                                : t.target.value;
+                            let result =
+                              temp[e.index].request - temp[e.index].order;
+                            temp[e.index].total =
+                              temp[e.index].price * temp[e.index].order;
+                            temp[e.index].remain = result;
+                            updatePo({ ...po, rprod: temp });
+                          }}
+                          min={0}
+                          placeholder="0"
+                          type="number"
+                        />
+                      </div>
+                    )}
+                  />
 
-                <Column
-                  header="Sisa"
-                  style={{
-                    width: "10rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={
-                          po.rprod[e.index].remain
-                            ? po.rprod[e.index].remain
-                            : null
-                        }
-                        onChange={(e) => updatePo({})}
-                        placeholder="0"
-                        type="number"
-                        disabled
-                      />
-                    </div>
-                  )}
-                />
+                  <Column
+                    header="Sisa"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.remain ? e.remain : 0}
+                          placeholder="0"
+                          type="number"
+                          disabled
+                        />
+                      </div>
+                    )}
+                  />
 
-                <Column
-                  header="Harga Satuan"
-                  style={{
-                    maxWidth: "15rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={
-                          po.rprod[e.index].price
-                            ? po.rprod[e.index].price
-                            : null
-                        }
-                        onChange={(e) => {
-                          let temp = [...po.rprod];
-                          temp[e.index].price = e.target.value;
-                          updatePo({ ...po, rprod: temp });
-                          console.log(temp);
-                        }}
-                        placeholder="0"
-                        type="number"
-                      />
-                    </div>
-                  )}
-                />
+                  <Column
+                    header="Harga Satuan"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.price ? e.price : 0}
+                          onChange={(t) => {
+                            let temp = [...po.rprod];
+                            temp[e.index].price = t.target.value;
+                            temp[e.index].total =
+                              temp[e.index].price * temp[e.index].order;
+                            updatePo({ ...po, rprod: temp });
+                          }}
+                          min={0}
+                          placeholder="0"
+                          type="number"
+                        />
+                      </div>
+                    )}
+                  />
 
-                <Column
-                  header="Diskon"
-                  style={{
-                    maxWidth: "10rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={
-                          po.rprod[e.index].disc ? po.rprod[e.index].disc : null
-                        }
-                        onChange={(e) => {
-                          let temp = [...po.rprod];
-                          temp[e.index].disc = e.target.value;
-                          updatePo({ ...po, rprod: temp });
-                          console.log(temp);
-                        }}
-                        placeholder="0"
-                        type="number"
-                      />
-                    </div>
-                  )}
-                />
+                  <Column
+                    header="Diskon"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.disc ? e.disc : 0}
+                          onChange={(t) => {
+                            let temp = [...po.rprod];
+                            temp[e.index].disc = t.target.value;
+                            // let disc = temp[e.index].total * temp[e.index].disc / 100
+                            // console.log(disc);
+                            // temp[e.index].total -= disc;
+                            updatePo({ ...po, rprod: temp });
+                            console.log(temp);
+                          }}
+                          placeholder="0"
+                          type="number"
+                          min={0}
+                        />
+                        <span className="p-inputgroup-addon">%</span>
+                      </div>
+                    )}
+                  />
 
-                <Column
-                  header="Harga Nett"
-                  style={{
-                    maxWidth: "15rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={
-                          po.rprod[e.index].nett_price
-                            ? po.rprod[e.index].nett_price
-                            : null
-                        }
-                        onChange={(e) => {
-                          let temp = [...po.rprod];
-                          temp[e.index].nett_price = e.target.value;
-                          updatePo({ ...po, rprod: temp });
-                          console.log(temp);
-                        }}
-                        placeholder="Masukan Harga Nett"
-                        type="number"
-                      />
-                    </div>
-                  )}
-                />
+                  <Column
+                    header="Harga Nett"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={
+                            po.rprod[e.index].nett_price
+                              ? po.rprod[e.index].nett_price
+                              : 0
+                          }
+                          onChange={(t) => {
+                            let temp = [...po.rprod];
+                            temp[e.index].nett_price = t.target.value;
+                            updatePo({ ...po, rprod: temp });
+                            console.log(temp);
+                          }}
+                          placeholder="0"
+                          type="number"
+                        />
+                      </div>
+                    )}
+                  />
 
-                <Column
-                  header="Total"
-                  style={{
-                    maxWidth: "15rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <label className="text-nowrap">
-                      <b>{`Rp. ${
-                        po.rprod[e.index].order * po.rprod[e.index].price -
-                        po.rprod[e.index].disc
-                      }`}</b>
-                    </label>
-                  )}
-                />
+                  <Column
+                    header="Total"
+                    body={(e) => (
+                      <label className="text-nowrap">
+                        <b>
+                          Rp.{" "}
+                          {`${
+                            e.nett_price && e.nett_price != 0
+                              ? e.nett_price
+                              : e.total - (e.total * e.disc) / 100
+                          }`.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.")}
+                        </b>
+                      </label>
+                    )}
+                  />
 
-                <Column
+                  {/* <Column
                   body={(e) =>
                     e.index === po.rprod.length - 1 ? (
                       <Link
@@ -1041,190 +1034,197 @@ const InputPO = ({ onCancel, onSuccess }) => {
                       </Link>
                     )
                   }
-                />
-              </DataTable>
-            </>
-          }
-        />
+                /> */}
+                </DataTable>
+              </>
+            }
+          />
+        ) : (
+          <></>
+        )}
 
-        <CustomAccordion
-          tittle={"Permintaan Jasa"}
-          defaultActive={false}
-          active={accor.jasa}
-          onClick={() => {
-            setAccor({
-              ...accor,
-              jasa: !accor.jasa,
-            });
-          }}
-          key={1}
-          body={
-            <>
-              <DataTable
-                responsiveLayout="none"
-                value={po.rjasa.map((v, i) => {
-                  return { ...v, index: i };
-                })}
-                className="display w-170 datatable-wrapper header-white no-border"
-                showGridlines={false}
-                emptyMessage={() => <div></div>}
-              >
-                <Column
-                  header="Supplier"
-                  style={{
-                    maxWidth: "12rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={null}
-                        options={supplier}
-                        onChange={(e) => {
-                          updatePo({});
-                        }}
-                        optionLabel="supplier.sup_name"
-                        placeholder="Pilih Supplier"
-                        itemTemplate={suppTemp}
-                        valueTemplate={valueSupTemp}
-                      />
-                      <PButton
-                      // onClick={() => {
-                      //   setShowJenisPelanggan(true);
-                      // }}
-                      >
-                        <i class="bx bx-food-menu"></i>
-                      </PButton>
-                    </div>
-                  )}
-                />
+        {po?.rjasa?.length ? (
+          <CustomAccordion
+            tittle={"Permintaan Jasa"}
+            defaultActive={true}
+            active={accor.jasa}
+            onClick={() => {
+              setAccor({
+                ...accor,
+                jasa: !accor.jasa,
+              });
+            }}
+            key={1}
+            body={
+              <>
+                <DataTable
+                  responsiveLayout="none"
+                  value={po.rjasa.map((v, i) => {
+                    return {
+                      ...v,
+                      index: i,
+                      price: v?.price ?? 0,
+                      disc: v?.disc ?? 0,
+                      total: v?.total ?? 0,
+                    };
+                  })}
+                  className="display w-170 datatable-wrapper header-white no-border"
+                  showGridlines={false}
+                  emptyMessage={() => <div></div>}
+                >
+                  <Column
+                    header="Supplier"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <Dropdown
+                          value={e.sup_id && supp(e.sup_id)}
+                          options={supplier}
+                          onChange={(t) => {
+                            let temp = [...po.rjasa];
+                            temp[e.index].sup_id = t.value.supplier.id;
+                            updatePo({ ...po, rjasa: temp });
+                            console.log(temp);
+                          }}
+                          optionLabel="supplier.sup_name"
+                          placeholder="Pilih Supplier"
+                          itemTemplate={suppTemp}
+                          valueTemplate={valueSupTemp}
+                        />
+                        <PButton
+                        // onClick={() => {
+                        //   setShowJenisPelanggan(true);
+                        // }}
+                        >
+                          <i class="bx bx-food-menu"></i>
+                        </PButton>
+                      </div>
+                    )}
+                  />
 
-                <Column
-                  header="Jasa"
-                  style={{
-                    maxWidth: "12rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={
-                          po.rjasa[e.index].jasa_id &&
-                          checkjasa(po.rjasa[e.index].jasa_id)
-                        }
-                        onChange={(e) => {
-                          let temp = [...po.rjasa];
-                          temp[e.index].jasa_id = e.value.id;
-                          updatePo({ ...po, rjasa: temp });
-                        }}
-                        options={jasa}
-                        optionLabel="jasa.name"
-                        placeholder="Pilih Kode Jasa"
-                        itemTemplate={jasTemp}
-                        valueTemplate={valueJasTemp}
-                      />
-                    </div>
-                  )}
-                />
+                  <Column
+                    header="Jasa"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <Dropdown
+                          value={e.jasa_id && checkjasa(e.jasa_id)}
+                          onChange={(t) => {
+                            let temp = [...po.rjasa];
+                            temp[e.index].jasa_id = t.value.jasa.id;
+                            updatePo({ ...po, rjasa: temp });
+                          }}
+                          options={jasa}
+                          optionLabel="jasa.name"
+                          placeholder="Pilih Kode Jasa"
+                          itemTemplate={jasTemp}
+                          valueTemplate={valueJasTemp}
+                          disabled={e.id !== 0}
+                        />
+                      </div>
+                    )}
+                  />
 
-                <Column
-                  header="Satuan"
-                  style={{
-                    maxWidth: "12rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={
-                          po.rjasa[e.index].unit_id &&
-                          checkUnit(po.rjasa[e.index].unit_id)
-                        }
-                        onChange={(e) => {
-                          let temp = [...po.rjasa];
-                          temp[po.rjasa[e.index]].unit_id = e.value.id;
-                          updatePo({ ...po, rjasa: temp });
-                        }}
-                        options={satuan}
-                        optionLabel="name"
-                        placeholder="Pilih Satuan"
-                      />
-                    </div>
-                  )}
-                />
+                  <Column
+                    header="Satuan"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <Dropdown
+                          value={e.unit_id && checkUnit(e.unit_id)}
+                          onChange={(t) => {
+                            let temp = [...po.rjasa];
+                            temp[e.index].unit_id = t.value.id;
+                            updatePo({ ...po, rjasa: temp });
+                          }}
+                          options={satuan}
+                          optionLabel="name"
+                          placeholder="Pilih Satuan"
+                          disabled={e.id !== 0}
+                        />
+                      </div>
+                    )}
+                  />
 
-                <Column
-                  header="Pesanan"
-                  // style={{
-                  //   maxWidth: "15rem",
-                  // }}
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={po.rjasa[e.index].qty && po.rjasa[e.index].qty}
-                        onChange={(e) => {
-                          let temp = [...po.rjasa];
-                          temp[po.rjasa[e.index]].qty = e.target.value;
-                          updatePo({ ...po, rjasa: temp });
-                          console.log(temp);
-                        }}
-                        placeholder="Jumlah Pesanan"
-                        type="number"
-                      />
-                    </div>
-                  )}
-                />
+                  <Column
+                    header="Pesanan"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.qty && e.qty}
+                          onChange={(t) => {
+                            let temp = [...po.rjasa];
+                            temp[e.index].qty = t.target.value;
+                            temp[e.index].total =
+                              temp[e.index].qty * temp[e.index].price;
+                            updatePo({ ...po, rjasa: temp });
+                            console.log(temp);
+                          }}
+                          placeholder="Jumlah Pesanan"
+                          type="number"
+                          min={0}
+                          disabled={e.id !== 0}
+                        />
+                      </div>
+                    )}
+                  />
 
-                <Column
-                  header="Harga Satuan"
-                  style={{
-                    width: "25rem",
-                  }}
-                  field={""}
-                  body={() => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={null}
-                        onChange={(e) => {}}
-                        placeholder="0"
-                        type="number"
-                      />
-                    </div>
-                  )}
-                />
+                  <Column
+                    header="Harga Satuan"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.price && e.price}
+                          onChange={(t) => {
+                            let temp = [...po.rjasa];
+                            temp[e.index].price = t.target.value;
+                            temp[e.index].total =
+                              temp[e.index].qty * temp[e.index].price;
+                            updatePo({ ...po, rjasa: temp });
+                            console.log(temp);
+                          }}
+                          placeholder="0"
+                          type="number"
+                          min={0}
+                        />
+                      </div>
+                    )}
+                  />
 
-                <Column
-                  header="Diskon"
-                  style={{
-                    width: "25rem",
-                  }}
-                  field={""}
-                  body={() => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={null}
-                        onChange={(e) => {}}
-                        placeholder="0"
-                        type="number"
-                      />
-                    </div>
-                  )}
-                />
+                  <Column
+                    header="Diskon"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.disc && e.disc}
+                          onChange={(t) => {
+                            let temp = [...po.rjasa];
+                            temp[e.index].disc = t.target.value;
+                            updatePo({ ...po, rjasa: temp });
+                            console.log(temp);
+                          }}
+                          placeholder="0"
+                          type="number"
+                          min={0}
+                        />
+                        <span className="p-inputgroup-addon">%</span>
+                      </div>
+                    )}
+                  />
 
-                <Column
-                  header="Total"
-                  // style={{
-                  //   minWidth: "12rem",
-                  // }}
-                  body={(e) => (
-                    <label className="text-nowrap">
-                      <b>{`Rp. ${e.index * 0}`}</b>
-                    </label>
-                  )}
-                />
+                  <Column
+                    header="Total"
+                    body={(e) => (
+                      <label className="text-nowrap">
+                        <b>{`Rp. ${e.total - (e.total * e.disc) / 100}`}</b>
+                      </label>
+                    )}
+                  />
 
-                <Column
+                  {/* <Column
                   body={(e) =>
                     e.index === po.rjasa.length - 1 ? (
                       <Link
@@ -1246,7 +1246,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                       >
                         <i className="fa fa-plus"></i>
                       </Link>
-                    ) : (
+                    ) : e.id === 0 ? (
                       <Link
                         onClick={() => {
                           let temp = [...po.rjasa];
@@ -1260,13 +1260,18 @@ const InputPO = ({ onCancel, onSuccess }) => {
                       >
                         <i className="fa fa-trash"></i>
                       </Link>
+                    ) : (
+                      <></>
                     )
                   }
-                />
-              </DataTable>
-            </>
-          }
-        />
+                /> */}
+                </DataTable>
+              </>
+            }
+          />
+        ) : (
+          <></>
+        )}
 
         <div className="row ml-0 mr-0 mb-0 mt-6 justify-content-between">
           <div>
@@ -1294,7 +1299,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
             <div className="col-6">
               <label className="text-label">
-                <b>Rp. </b>
+                <b>Rp. {getSubTotal()}</b>
               </label>
             </div>
 

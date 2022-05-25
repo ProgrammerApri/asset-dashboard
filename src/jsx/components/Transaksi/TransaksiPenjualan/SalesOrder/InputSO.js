@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { SET_CURRENT_SO } from "src/redux/actions";
 import { request, endpoints } from "src/utils";
-import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { Row, Card, Col } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
@@ -13,17 +14,42 @@ import { InputSwitch } from "primereact/inputswitch";
 import CustomAccordion from "../../../Accordion/Accordion";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
+import DataRulesPay from "src/jsx/components/MasterLainnya/RulesPay/DataRulesPay";
+import DataSupplier from "src/jsx/components/Mitra/Pemasok/DataPemasok";
+import DataPajak from "src/jsx/components/Master/Pajak/DataPajak";
+import Customer from "src/jsx/components/Mitra/Pelanggan/DataCustomer";
+import DataSatuan from "src/jsx/components/MasterLainnya/Satuan/DataSatuan";
+import DataProduk from "src/jsx/components/Master/Produk/DataProduk";
+import DataJasa from "src/jsx/components/Master/Jasa/DataJasa";
+import DataCustomer from "src/jsx/components/Mitra/Pelanggan/DataCustomer";
 
 const data = {
   faktur: false,
 };
 
-const InputSO = ({ onCancel, onSubmit }) => {
+const InputSO = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
-  const [currentItem, setCurrentItem] = useState(null);
+  const dispatch = useDispatch();
   const toast = useRef(null);
-  const [isEdit, setEdit] = useState(false);
+  const [doubleClick, setDoubleClick] = useState(false);
+  const [currentItem, setCurrentItem] = useState(null);
+  const so = useSelector((state) => state.so.current);
+  const isEdit = useSelector((state) => state.so.editso);
   const [isRp, setRp] = useState(true);
+  const [jasa, setJasa] = useState(null);
+  const [showProduk, setShowProduk] = useState(false);
+  const [showJasa, setShowJasa] = useState(false);
+  const [showSatuan, setShowSatuan] = useState(false);
+  const [showSupplier, setShowSupplier] = useState(false);
+  const [showCustomer, setShowCustomer] = useState(false);
+  const [showPpn, setShowPpn] = useState(false);
+  const [showRulesPay, setShowRulesPay] = useState(false);
+  const [product, setProduk] = useState(null);
+  const [satuan, setSatuan] = useState(null);
+  const [supplier, setSupplier] = useState(null);
+  const [rulesPay, setRulesPay] = useState(null);
+  const [ppn, setPpn] = useState(null);
+  const [customer, setCustomer] = useState(null);
   const [inProd, setInProd] = useState([
     {
       id: 0,
@@ -51,122 +77,429 @@ const InputSO = ({ onCancel, onSubmit }) => {
       left: 0,
       behavior: "smooth",
     });
+    getJasa();
+    getProduk();
+    getSupplier();
+    getSatuan();
+    getRulesPay();
+    getPpn();
+    getCustomer();
   }, []);
 
-  // const editPermintaan = async () => {
-  //   const config = {
-  //     ...endpoints.editPermintaan,
-  //     endpoint: endpoints.editPermintaan.endpoint + currentItem.id,
-  //     data: {
-  //       cus_code: currentItem.customer.cus_code,
+  const editSO = async () => {
+    const config = {
+      ...endpoints.editPermintaan,
+      endpoint: endpoints.editPermintaan.endpoint + currentItem.id,
+      data: {
+        cus_code: currentItem.customer.cus_code,
+      },
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        onSuccess();
+      }
+    } catch (error) {
+      setTimeout(() => {
+        setUpdate(false);
+        toast.current.show({
+          severity: "error",
+          summary: "Gagal",
+          detail: "Gagal Memperbarui Data",
+          life: 3000,
+        });
+      }, 500);
+    }
+  };
 
-  //     },
-  //   };
-  //   console.log(config.data);
-  //   let response = null;
-  //   try {
-  //     response = await request(null, config);
-  //     console.log(response);
-  //     if (response.status) {
-  //       setTimeout(() => {
-  //         setUpdate(false);
-  //         setDisplayData(false);
-  //         getPermintaan(true);
-  //         toast.current.show({
-  //           severity: "info",
-  //           summary: "Berhasil",
-  //           detail: "Data Berhasil Diperbarui",
-  //           life: 3000,
-  //         });
-  //       }, 500);
-  //     }
-  //   } catch (error) {
-  //     setTimeout(() => {
-  //       setUpdate(false);
-  //       toast.current.show({
-  //         severity: "error",
-  //         summary: "Gagal",
-  //         detail: "Gagal Memperbarui Data",
-  //         life: 3000,
-  //       });
-  //     }, 500);
-  //   }
-  // };
+  const addSO = async () => {
+    const config = {
+      ...endpoints.addPermintaan,
+      data: {
+        cus_code: currentItem.customer.cus_code,
+      },
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setTimeout(() => {
+          setUpdate(false);
+          toast.current.show({
+            severity: "info",
+            summary: "Berhasil",
+            detail: "Data Berhasil Diperbarui",
+            life: 3000,
+          });
+        }, 500);
+      }
+    } catch (error) {
+      console.log(error);
+      if (error.status === 400) {
+        setTimeout(() => {
+          setUpdate(false);
+          toast.current.show({
+            severity: "error",
+            summary: "Gagal",
+            detail: `Kode ${currentItem.customer.cus_code} Sudah Digunakan`,
+            life: 3000,
+          });
+        }, 500);
+      } else {
+        setTimeout(() => {
+          setUpdate(false);
+          toast.current.show({
+            severity: "error",
+            summary: "Gagal",
+            detail: "Gagal Memperbarui Data",
+            life: 3000,
+          });
+        }, 500);
+      }
+    }
+  };
 
-  // const addPermintaan = async () => {
-  //   const config = {
-  //     ...endpoints.addPermintaan,
-  //     data: {
-  //       cus_code: currentItem.customer.cus_code,
+  const onSubmit = () => {
+    if (isEdit) {
+      setUpdate(true);
+      editSO();
+    } else {
+      setUpdate(true);
+      addSO();
+    }
+  };
 
-  //     },
-  //   };
-  //   console.log(config.data);
-  //   let response = null;
-  //   try {
-  //     response = await request(null, config);
-  //     console.log(response);
-  //     if (response.status) {
-  //       setTimeout(() => {
-  //         setUpdate(false);
-  //         setDisplayData(false);
-  //         getPermintaan(true);
-  //         toast.current.show({
-  //           severity: "info",
-  //           summary: "Berhasil",
-  //           detail: "Data Berhasil Diperbarui",
-  //           life: 3000,
-  //         });
-  //       }, 500);
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //     if (error.status === 400) {
-  //       setTimeout(() => {
-  //         setUpdate(false);
-  //         toast.current.show({
-  //           severity: "error",
-  //           summary: "Gagal",
-  //           detail: `Kode ${currentItem.customer.cus_code} Sudah Digunakan`,
-  //           life: 3000,
-  //         });
-  //       }, 500);
-  //     } else {
-  //       setTimeout(() => {
-  //         setUpdate(false);
-  //         toast.current.show({
-  //           severity: "error",
-  //           summary: "Gagal",
-  //           detail: "Gagal Memperbarui Data",
-  //           life: 3000,
-  //         });
-  //       }, 500);
-  //     }
-  //   }
-  // };
+  const getProduk = async () => {
+    const config = {
+      ...endpoints.product,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setProduk(data);
+      }
+    } catch (error) {}
+  };
 
-  // const onClick = () => {
-  //   setCurrentItem();
-  // };
+  const getJasa = async () => {
+    const config = {
+      ...endpoints.jasa,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setJasa(data);
+      }
+    } catch (error) {}
+  };
 
-  // const renderFooter = () => {
-  //   return (
-  //     <div>
-  //       <PButton
-  //         label="Batal"
-  //         onClick={() => setDisplayData(false)}
-  //         className="p-button-text btn-primary"
-  //       />
-  //       <PButton
-  //         label="Simpan"
-  //         icon="pi pi-check"
-  //         onClick={() => onSubmit()}
-  //         autoFocus
-  //         loading={update}
-  //       />
-  //     </div>
-  //   );
-  // };
+  const getSatuan = async () => {
+    const config = {
+      ...endpoints.getSatuan,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setSatuan(data);
+      }
+    } catch (error) {}
+  };
+
+  const getSupplier = async () => {
+    const config = {
+      ...endpoints.supplier,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setSupplier(data);
+      }
+    } catch (error) {}
+  };
+
+  const getRulesPay = async () => {
+    const config = {
+      ...endpoints.rules_pay,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setRulesPay(data);
+      }
+    } catch (error) {}
+  };
+
+  const getPpn = async () => {
+    const config = {
+      ...endpoints.pajak,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setPpn(data);
+      }
+    } catch (error) {}
+  };
+
+  const getCustomer = async () => {
+    const config = {
+      ...endpoints.customer,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setCustomer(data);
+      }
+    } catch (error) {}
+  };
+
+  const checkUnit = (value) => {
+    let selected = {};
+    satuan?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkProd = (value) => {
+    let selected = {};
+    product?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkJasa = (value) => {
+    let selected = {};
+    jasa?.forEach((element) => {
+      if (value === element.jasa.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkRules = (value) => {
+    let selected = {};
+    rulesPay?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkSupp = (value) => {
+    let selected = {};
+    supplier?.forEach((element) => {
+      if (value === element.supplier.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkPpn = (value) => {
+    let selected = {};
+    ppn?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkCus = (value) => {
+    let selected = {};
+    customer?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkSubCus = (value) => {
+    let selected = {};
+    customer?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const suppTemp = (option) => {
+    return (
+      <div>
+        {option !== null
+          ? `${option.supplier.sup_code} (${option.supplier.sup_name})`
+          : ""}
+      </div>
+    );
+  };
+
+  const valueSupTemp = (option, props) => {
+    if (option) {
+      return (
+        <div>
+          {option !== null
+            ? `${option.supplier.sup_code} (${option.supplier.sup_name})`
+            : ""}
+        </div>
+      );
+    }
+
+    return <span>{props.placeholder}</span>;
+  };
+
+  const rulTemp = (option) => {
+    return (
+      <div>{option !== null ? `${option.name} (${option.day} Hari)` : ""}</div>
+    );
+  };
+
+  const valueRulTemp = (option, props) => {
+    if (option) {
+      return (
+        <div>
+          {option !== null ? `${option.name} (${option.day} Hari)` : ""}
+        </div>
+      );
+    }
+
+    return <span>{props.placeholder}</span>;
+  };
+
+  const prodTemp = (option) => {
+    return (
+      <div>{option !== null ? `${option.name} (${option.code})` : ""}</div>
+    );
+  };
+
+  const valueProd = (option, props) => {
+    if (option) {
+      return (
+        <div>{option !== null ? `${option.name} (${option.code})` : ""}</div>
+      );
+    }
+
+    return <span>{props.placeholder}</span>;
+  };
+
+  const jasTemp = (option) => {
+    return (
+      <div>
+        {option !== null ? `${option.jasa.name} (${option.jasa.code})` : ""}
+      </div>
+    );
+  };
+
+  const valueJasTemp = (option, props) => {
+    if (option) {
+      return (
+        <div>
+          {option !== null ? `${option.jasa.name} (${option.jasa.code})` : ""}
+        </div>
+      );
+    }
+
+    return <span>{props.placeholder}</span>;
+  };
+
+  const cusTemp = (option) => {
+    return (
+      <div>
+        {option !== null
+          ? `${option.customer.cus_name} (${option.customer.cus_code})`
+          : ""}
+      </div>
+    );
+  };
+
+  const valueCusTemp = (option, props) => {
+    if (option) {
+      return (
+        <div>
+          {option !== null
+            ? `${option.customer.cus_name} (${option.customer.cus_code})`
+            : ""}
+        </div>
+      );
+    }
+
+    return <span>{props.placeholder}</span>;
+  };
+
+  const formatDate = (date) => {
+    var d = new Date(`${date}Z`),
+      month = "" + (d.getMonth() + 1),
+      day = "" + d.getDate(),
+      year = d.getFullYear();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+
+    return [year, month, day].join("-");
+  };
+
+  const updateSo = (e) => {
+    dispatch({
+      type: SET_CURRENT_SO,
+      payload: e,
+    });
+  };
 
   const header = () => {
     return (
@@ -179,25 +512,20 @@ const InputSO = ({ onCancel, onSubmit }) => {
   const body = () => {
     return (
       <>
+      <Toast ref={toast} />
         {/* Put content body here */}
         <Row className="mb-6">
           <div className="col-6">
             <label className="text-black fs-15">Tanggal</label>
             <div className="p-inputgroup">
               <Calendar
-                // value={
-                //   currentItem !== null
-                //     ? `${currentItem?.jasa?.code ?? ""}`
-                //     : ""
-                // }
-                onChange={(e) =>
-                  setCurrentItem({
-                    // ...currentItem,
-                    // jasa: { ...currentItem.jasa, code: e.target.value },
-                  })
-                }
+                value={new Date(`${so.so_date}Z`)}
+                onChange={(e) => {
+                  updateSo({ ...so, po_date: e.value });
+                }}
                 placeholder="Pilih Tanggal"
                 showIcon
+                dateFormat="dd/mm/yy"
               />
             </div>
           </div>
@@ -206,17 +534,8 @@ const InputSO = ({ onCancel, onSubmit }) => {
             <label className="text-black fs-14">Kode Referensi</label>
             <div className="p-inputgroup">
               <InputText
-                // value={
-                //   currentItem !== null
-                //     ? `${currentItem?.jasa?.name ?? ""}`
-                //     : ""
-                // }
-                onChange={(e) =>
-                  setCurrentItem({
-                    // ...currentItem,
-                    // jasa: { ...currentItem.jasa, name: e.target.value },
-                  })
-                }
+                value={so.so_code}
+                onChange={(e) => updateSo({ ...so, so_code: e.target.value })}
                 placeholder="Masukan Kode Referensi"
               />
             </div>
@@ -226,23 +545,20 @@ const InputSO = ({ onCancel, onSubmit }) => {
             <label className="text-black fs-14">Pelanggan</label>
             <div className="p-inputgroup">
               <Dropdown
-                // value={
-                //   currentItem !== null
-                //     ? `${currentItem?.jasa?.name ?? ""}`
-                //     : ""
-                // }
-                onChange={(e) =>
-                  setCurrentItem({
-                    // ...currentItem,
-                    // jasa: { ...currentItem.jasa, name: e.target.value },
-                  })
-                }
+                // value={so.cus_id !== null ? checkCus(so.cus_id) : null}
+                options={customer}
+                onChange={(e) => {
+                  updateSo({ ...so, cus_id: e.value.customer.id });
+                }}
+                optionLabel="customer.cus_name"
                 placeholder="Pilih Pelanggan"
+                itemTemplate={cusTemp}
+                valueTemplate={valueCusTemp}
               />
               <PButton
-              // onClick={() => {
-              //   setShowJenisPelanggan(true);
-              // }}
+                onClick={() => {
+                  setShowCustomer(true);
+                }}
               >
                 <i class="bx bx-food-menu"></i>
               </PButton>
@@ -254,17 +570,12 @@ const InputSO = ({ onCancel, onSubmit }) => {
             <div className="p-inputgroup mt-2">
               <InputText
                 // value={
-                //   currentItem !== null
-                //     ? `${currentItem?.jasa?.name ?? ""}`
+                //   so.cus_id !== null
+                //     ? checkCus(so.cus_id)?.customer?.cus_address
                 //     : ""
                 // }
-                onChange={(e) =>
-                  setCurrentItem({
-                    // ...currentItem,
-                    // jasa: { ...currentItem.jasa, name: e.target.value },
-                  })
-                }
                 placeholder="Alamat Pelanggan"
+                disabled
               />
             </div>
           </div>
@@ -273,18 +584,13 @@ const InputSO = ({ onCancel, onSubmit }) => {
             <label className="text-black fs-14"></label>
             <div className="p-inputgroup mt-2">
               <InputText
-                // value={
-                //   currentItem !== null
-                //     ? `${currentItem?.jasa?.name ?? ""}`
-                //     : ""
-                // }
-                onChange={(e) =>
-                  setCurrentItem({
-                    // ...currentItem,
-                    // jasa: { ...currentItem.jasa, name: e.target.value },
-                  })
+                value={
+                  so.cus_id !== null
+                    ? checkCus(so.cus_id)?.customer?.cus_telp1
+                    : ""
                 }
                 placeholder="Kontak Person"
+                disabled
               />
             </div>
           </div>
@@ -293,23 +599,18 @@ const InputSO = ({ onCancel, onSubmit }) => {
             <label className="text-black fs-14">Ppn</label>
             <div className="p-inputgroup mt-2">
               <Dropdown
-                // value={
-                //   currentItem !== null
-                //     ? `${currentItem?.jasa?.name ?? ""}`
-                //     : ""
-                // }
-                onChange={(e) =>
-                  setCurrentItem({
-                    // ...currentItem,
-                    // jasa: { ...currentItem.jasa, name: e.target.value },
-                  })
-                }
+                // value={so.cus_id !== null ? checkCus(so.cus_id) : null}
+                options={ppn}
+                onChange={(e) => {
+                  // updateSo({ ...so, cus_id: e.value.customer.id });
+                }}
+                optionLabel="name"
                 placeholder="Pilih Jenis Ppn"
               />
               <PButton
-              // onClick={() => {
-              //   setShowJenisPelanggan(true);
-              // }}
+                onClick={() => {
+                  setShowPpn(true);
+                }}
               >
                 <i class="bx bx-food-menu"></i>
               </PButton>
@@ -318,16 +619,13 @@ const InputSO = ({ onCancel, onSubmit }) => {
 
           <div className="d-flex col-12 align-items-center mt-4">
             <label className="ml-0 mt-1 text-black fs-14">
-              {"Alamat Pengiriman"}
+              {"Kirim Ke Sub Pelanggan"}
             </label>
             <InputSwitch
               className="ml-4"
-              checked={currentItem && currentItem.send_add}
+              checked={so && so.refrence}
               onChange={(e) => {
-                setCurrentItem({
-                  ...currentItem,
-                  send_add: e.target.value,
-                });
+                updateSo({ ...so, refrence: e.target.value });
               }}
             />
           </div>
@@ -336,25 +634,22 @@ const InputSO = ({ onCancel, onSubmit }) => {
             <label className="text-black fs-14">Sub Pelanggan</label>
             <div className="p-inputgroup">
               <Dropdown
-                // value={
-                //   currentItem !== null
-                //     ? `${currentItem?.jasa?.name ?? ""}`
-                //     : ""
-                // }
-                onChange={(e) =>
-                  setCurrentItem({
-                    // ...currentItem,
-                    // jasa: { ...currentItem.jasa, name: e.target.value },
-                  })
-                }
-                placeholder="Pilih Sub Pelanggan"
-                disabled={currentItem && !currentItem.send_add}
+                // value={so.cus_id !== null ? checkCus(so.cus_id) : null}
+                options={customer}
+                onChange={(e) => {
+                  updateSo({ ...so, cus_id: e.value.customer.id });
+                }}
+                optionLabel="customer.cus_name"
+                placeholder="Pilih Pelanggan"
+                itemTemplate={cusTemp}
+                valueTemplate={valueCusTemp}
+                disabled={so && !so.refrence}
               />
               <PButton
-                // onClick={() => {
-                //   setShowJenisPelanggan(true);
-                // }}
-                disabled={currentItem && !currentItem.send_add}
+                onClick={() => {
+                  setShowCustomer(true);
+                }}
+                disabled={so && !so.refrence}
               >
                 <i class="bx bx-food-menu"></i>
               </PButton>
@@ -366,18 +661,12 @@ const InputSO = ({ onCancel, onSubmit }) => {
             <div className="p-inputgroup mt-1">
               <InputText
                 // value={
-                //   currentItem !== null
-                //     ? `${currentItem?.jasa?.name ?? ""}`
+                //   so.cus_id !== null
+                //     ? checkSubCus(so.cus_id)?.customer?.cus_address
                 //     : ""
                 // }
-                onChange={(e) =>
-                  setCurrentItem({
-                    // ...currentItem,
-                    // jasa: { ...currentItem.jasa, name: e.target.value },
-                  })
-                }
                 placeholder="Alamat Sub Pelanggan"
-                disabled={currentItem && !currentItem.send_add}
+                disabled
               />
             </div>
           </div>
@@ -386,19 +675,13 @@ const InputSO = ({ onCancel, onSubmit }) => {
             <label className="text-black fs-14"></label>
             <div className="p-inputgroup mt-1">
               <InputText
-                // value={
-                //   currentItem !== null
-                //     ? `${currentItem?.jasa?.name ?? ""}`
-                //     : ""
-                // }
-                onChange={(e) =>
-                  setCurrentItem({
-                    // ...currentItem,
-                    // jasa: { ...currentItem.jasa, name: e.target.value },
-                  })
+                value={
+                  so.cus_id !== null
+                    ? checkSubCus(so.cus_id)?.customer?.cus_telp1
+                    : ""
                 }
                 placeholder="Kontak Person"
-                disabled={currentItem && !currentItem.send_add}
+                disabled
               />
             </div>
           </div>
@@ -407,19 +690,13 @@ const InputSO = ({ onCancel, onSubmit }) => {
             <label className="text-black fs-14">Tanggal Permintaan</label>
             <div className="p-inputgroup mt-2">
               <Calendar
-                // value={
-                //   currentItem !== null
-                //     ? `${currentItem?.jasa?.name ?? ""}`
-                //     : ""
-                // }
-                onChange={(e) =>
-                  setCurrentItem({
-                    // ...currentItem,
-                    // jasa: { ...currentItem.jasa, name: e.target.value },
-                  })
-                }
-                placeholder="Tanggal Permintaan"
+                value={new Date(`${so.req_date}Z`)}
+                onChange={(e) => {
+                  updateSo({ ...so, req_date: e.value });
+                }}
+                placeholder="Pilih Tanggal Pemintaan"
                 showIcon
+                dateFormat="dd/mm/yy"
               />
             </div>
           </div>
@@ -428,23 +705,24 @@ const InputSO = ({ onCancel, onSubmit }) => {
             <label className="text-black fs-14">Syarat Pembayaran</label>
             <div className="p-inputgroup mt-2">
               <Dropdown
-                // value={
-                //   currentItem !== null
-                //     ? `${currentItem?.jasa?.name ?? ""}`
-                //     : ""
-                // }
-                onChange={(e) =>
-                  setCurrentItem({
-                    // ...currentItem,
-                    // jasa: { ...currentItem.jasa, name: e.target.value },
-                  })
-                }
+                value={so.top !== null ? checkRules(so.top) : null}
+                options={rulesPay}
+                onChange={(e) => {
+                  let result = new Date(`${so.req_date}Z`);
+                  result.setDate(result.getDate() + e.value.day);
+                  console.log(result);
+
+                  updateSo({ ...so, top: e.value.id, due_date: result });
+                }}
+                optionLabel="name"
                 placeholder="Pilih Syarat Pembayaran"
+                itemTemplate={rulTemp}
+                valueTemplate={valueRulTemp}
               />
               <PButton
-              // onClick={() => {
-              //   setShowJenisPelanggan(true);
-              // }}
+                onClick={() => {
+                  setShowRulesPay(true);
+                }}
               >
                 <i class="bx bx-food-menu"></i>
               </PButton>
@@ -455,19 +733,11 @@ const InputSO = ({ onCancel, onSubmit }) => {
             <label className="text-black fs-14">Tanggal Jatuh Tempo</label>
             <div className="p-inputgroup mt-2">
               <Calendar
-                // value={
-                //   currentItem !== null
-                //     ? `${currentItem?.jasa?.name ?? ""}`
-                //     : ""
-                // }
-                onChange={(e) =>
-                  setCurrentItem({
-                    // ...currentItem,
-                    // jasa: { ...currentItem.jasa, name: e.target.value },
-                  })
-                }
+                value={new Date(`${so?.due_date}Z`)}
+                onChange={(e) => {}}
                 placeholder="Tanggal Jatuh Tempo"
-                showIcon
+                disabled
+                dateFormat="dd/mm/yy"
               />
             </div>
           </div>
@@ -505,15 +775,28 @@ const InputSO = ({ onCancel, onSubmit }) => {
                     <div className="p-inputgroup">
                       <Dropdown
                         value={null}
-                        onChange={(e) => {}}
+                        options={product}
+                        onChange={(e) => {
+                          console.log(e.value);
+                        }}
                         placeholder="Pilih Kode Produk"
+                        optionLabel="name"
+                        filter
+                        filterBy="name"
+                        valueTemplate={valueProd}
+                        itemTemplate={prodTemp}
                       />
-                      <PButton onClick={() => {}}>
+                      <PButton
+                        onClick={() => {
+                          setShowProduk(true);
+                        }}
+                      >
                         <i class="bx bx-food-menu"></i>
                       </PButton>
                     </div>
                   )}
                 />
+
                 <Column
                   header="Satuan"
                   // style={{
@@ -525,12 +808,28 @@ const InputSO = ({ onCancel, onSubmit }) => {
                     <div className="p-inputgroup">
                       <Dropdown
                         value={null}
-                        onChange={(e) => {}}
+                        onChange={(e) => {
+                          // let temp = [...rp.rprod];
+                          // temp[i].unit_id = e.value.id;
+                          // updateRp({ ...rp, rprod: temp });
+                        }}
+                        options={satuan}
+                        optionLabel="name"
+                        filter
+                        filterBy="name"
                         placeholder="Pilih Satuan"
                       />
+                      <PButton
+                        onClick={() => {
+                          setShowSatuan(true);
+                        }}
+                      >
+                        <i class="bx bx-food-menu"></i>
+                      </PButton>
                     </div>
                   )}
                 />
+
                 <Column
                   header="Pesanan"
                   // style={{
@@ -548,6 +847,7 @@ const InputSO = ({ onCancel, onSubmit }) => {
                     </div>
                   )}
                 />
+
                 <Column
                   header="Harga Satuan"
                   // style={{
@@ -565,6 +865,7 @@ const InputSO = ({ onCancel, onSubmit }) => {
                     </div>
                   )}
                 />
+
                 <Column
                   header="Diskon"
                   // style={{
@@ -582,6 +883,7 @@ const InputSO = ({ onCancel, onSubmit }) => {
                     </div>
                   )}
                 />
+
                 <Column
                   header="Harga Nett"
                   // style={{
@@ -599,6 +901,7 @@ const InputSO = ({ onCancel, onSubmit }) => {
                     </div>
                   )}
                 />
+
                 <Column
                   header="Total"
                   // style={{
@@ -610,6 +913,7 @@ const InputSO = ({ onCancel, onSubmit }) => {
                     </label>
                   )}
                 />
+
                 <Column
                   header=""
                   // style={{
@@ -673,7 +977,6 @@ const InputSO = ({ onCancel, onSubmit }) => {
                 })}
                 className="display w-170 datatable-wrapper header-white no-border"
                 showGridlines={false}
-                sc
                 emptyMessage={() => <div></div>}
               >
                 <Column
@@ -687,9 +990,17 @@ const InputSO = ({ onCancel, onSubmit }) => {
                       <Dropdown
                         value={null}
                         onChange={(e) => {}}
+                        options={supplier}
+                        optionLabel="supplier.sup_name"
                         placeholder="Pilih Supplier"
+                        itemTemplate={suppTemp}
+                        valueTemplate={valueSupTemp}
                       />
-                      <PButton onClick={() => {}}>
+                      <PButton
+                        onClick={() => {
+                          setShowSupplier(true);
+                        }}
+                      >
                         <i class="bx bx-food-menu"></i>
                       </PButton>
                     </div>
@@ -707,9 +1018,17 @@ const InputSO = ({ onCancel, onSubmit }) => {
                       <Dropdown
                         value={null}
                         onChange={(e) => {}}
+                        options={jasa}
+                        optionLabel="jasa.name"
                         placeholder="Pilih Jasa"
+                        itemTemplate={jasTemp}
+                        valueTemplate={valueJasTemp}
                       />
-                      <PButton onClick={() => {}}>
+                      <PButton
+                        onClick={() => {
+                          setShowJasa(true);
+                        }}
+                      >
                         <i class="bx bx-food-menu"></i>
                       </PButton>
                     </div>
@@ -727,11 +1046,17 @@ const InputSO = ({ onCancel, onSubmit }) => {
                       <Dropdown
                         value={null}
                         onChange={(e) => {}}
+                        options={satuan}
+                        optionLabel="name"
                         placeholder="Pilih Satuan"
                       />
-                      {/* <PButton onClick={() => {}}>
+                      <PButton
+                        onClick={() => {
+                          setShowSatuan(true);
+                        }}
+                      >
                         <i class="bx bx-food-menu"></i>
-                      </PButton> */}
+                      </PButton>
                     </div>
                   )}
                 />
@@ -1049,17 +1374,205 @@ const InputSO = ({ onCancel, onSubmit }) => {
 
   return (
     <>
-      <Row>
-        <Col className="pt-0">
-          <Card>
-            <Card.Body>
-              {header()}
-              {body()}
-              {footer()}
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+      {header()}
+      {body()}
+      {footer()}
+
+      <DataRulesPay
+        data={rulesPay}
+        loading={false}
+        popUp={true}
+        show={showRulesPay}
+        onHide={() => {
+          setShowRulesPay(false);
+        }}
+        onInput={(e) => {
+          setShowRulesPay(!e);
+        }}
+        onSuccessInput={(e) => {
+          getRulesPay();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowRulesPay(false);
+            updateSo({ ...so, top: e.data.id });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataSupplier
+        data={supplier}
+        loading={false}
+        popUp={true}
+        show={showSupplier}
+        onHide={() => {
+          setShowSupplier(false);
+        }}
+        onInput={(e) => {
+          setShowSupplier(!e);
+        }}
+        onSuccessInput={(e) => {
+          getSupplier();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowSupplier(false);
+            updateSo({ ...so, sup: e.data.id });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataProduk
+        data={product}
+        loading={false}
+        popUp={true}
+        show={showProduk}
+        onHide={() => {
+          setShowProduk(false);
+        }}
+        onInput={(e) => {
+          setShowProduk(!e);
+        }}
+        onSuccessInput={(e) => {
+          getProduk();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowProduk(false);
+            // updateSo({ ...so, ppn: e.data.id });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataJasa
+        data={jasa}
+        loading={false}
+        popUp={true}
+        show={showJasa}
+        onHide={() => {
+          setShowJasa(false);
+        }}
+        onInput={(e) => {
+          setShowJasa(!e);
+        }}
+        onSuccessInput={(e) => {
+          getJasa();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowJasa(false);
+            // updateSo({ ...so, ppn: e.data.id });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataPajak
+        data={ppn}
+        loading={false}
+        popUp={true}
+        show={showPpn}
+        onHide={() => {
+          setShowPpn(false);
+        }}
+        onInput={(e) => {
+          setShowPpn(!e);
+        }}
+        onSuccessInput={(e) => {
+          getPpn();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowPpn(false);
+            updateSo({ ...so, ppn: e.data.id });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataSatuan
+        data={satuan}
+        loading={false}
+        popUp={true}
+        show={showSatuan}
+        onHide={() => {
+          setShowSatuan(false);
+        }}
+        onInput={(e) => {
+          setShowSatuan(!e);
+        }}
+        onSuccessInput={(e) => {
+          getSatuan();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowSatuan(false);
+            // updateSo({ ...so, ppn: e.data.id });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataCustomer
+        data={customer}
+        loading={false}
+        popUp={true}
+        show={showCustomer}
+        onHide={() => {
+          setShowCustomer(false);
+        }}
+        onInput={(e) => {
+          setShowCustomer(!e);
+        }}
+        onSuccessInput={(e) => {
+          getCustomer();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowCustomer(false);
+            // updateSo({ ...so, cus_id: e.data.id });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
     </>
   );
 };

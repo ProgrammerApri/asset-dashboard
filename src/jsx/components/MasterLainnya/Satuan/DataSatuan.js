@@ -66,7 +66,6 @@ const DataSatuan = ({
     },
   ]);
 
-
   useEffect(() => {
     getSatuan();
     initFilters1();
@@ -292,7 +291,7 @@ const DataSatuan = ({
   };
 
   const onClick = () => {
-    setShowInput(true)
+    setShowInput(true);
     setCurrentItem();
 
     if (position) {
@@ -477,41 +476,43 @@ const DataSatuan = ({
 
   const renderBody = () => {
     return (
-      <DataTable
-        responsiveLayout="scroll"
-        value={data}
-        className="display w-150 datatable-wrapper header-white"
-        showGridlines
-        dataKey="id"
-        rowHover
-        header={renderHeader}
-        rowGroupMode="subheader"
-        rowGroupHeaderTemplate={(e) =>
-          load ? (
-            <Skeleton />
-          ) : (
-            <PBadge className="mt-2 active" value={`${e?.name}`}></PBadge>
-          )
-        }
-        groupRowsBy="name"
-        filters={filters1}
-        globalFilterFields={[
-          "satuan.code",
-          "satuan.name",
-          "satuan.status",
-          "satuan.ket",
-        ]}
-        emptyMessage="Tidak ada data"
-        paginator
-        paginatorTemplate={template2}
-        first={first2}
-        rows={rows2}
-        onPage={onCustomPage2}
-        paginatorClassName="justify-content-end mt-3"
-        selectionMode="single"
-        onRowSelect={onRowSelect}
-      >
-        {/* <Column
+      <>
+        <Toast ref={toast} />
+        <DataTable
+          responsiveLayout="scroll"
+          value={data}
+          className="display w-150 datatable-wrapper header-white"
+          showGridlines
+          dataKey="id"
+          rowHover
+          header={renderHeader}
+          rowGroupMode="subheader"
+          rowGroupHeaderTemplate={(e) =>
+            load ? (
+              <Skeleton />
+            ) : (
+              <PBadge className="mt-2 active" value={`${e?.name}`}></PBadge>
+            )
+          }
+          groupRowsBy="name"
+          filters={filters1}
+          globalFilterFields={[
+            "satuan.code",
+            "satuan.name",
+            "satuan.status",
+            "satuan.ket",
+          ]}
+          emptyMessage="Tidak ada data"
+          paginator
+          paginatorTemplate={template2}
+          first={first2}
+          rows={rows2}
+          onPage={onCustomPage2}
+          paginatorClassName="justify-content-end mt-3"
+          selectionMode="single"
+          onRowSelect={onRowSelect}
+        >
+          {/* <Column
                   header="Kode Satuan"
                   style={{
                     minWidth: "8rem",
@@ -519,294 +520,295 @@ const DataSatuan = ({
                   field="code"
                   body={loading && <Skeleton />}
                 /> */}
-        <Column
-          header="Kode Satuan"
-          field="code"
-          style={{ minWidth: "8rem" }}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header="Kuantitas"
-          field={(e) => e?.qty ?? "-"}
-          style={{ minWidth: "8rem" }}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header="Satuan Besar"
-          field={(e) => e?.u_to?.code ?? e.code}
-          style={{ minWidth: "8rem" }}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header="Satuan Kecil"
-          field={(e) => e?.u_from?.code ?? e.code}
-          style={{ minWidth: "8rem" }}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header="Status Satuan"
-          style={{ minWidth: "8rem" }}
-          body={(e) =>
-            load ? (
-              <Skeleton />
-            ) : e.type == "d" ? (
-              <Badge variant="warning light"> Dasar</Badge>
-            ) : (
-              <Badge variant="info light"> Konversi</Badge>
-            )
-          }
-        />
-        <Column
-          header="Action"
-          dataType="boolean"
-          bodyClassName="text-center"
-          field="code"
-          style={{ minWidth: "2rem" }}
-          body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
-        />
-      </DataTable>
+          <Column
+            header="Kode Satuan"
+            field="code"
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Kuantitas"
+            field={(e) => e?.qty ?? "-"}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Satuan Besar"
+            field={(e) => e?.u_to?.code ?? e.code}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Satuan Kecil"
+            field={(e) => e?.u_from?.code ?? e.code}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Status Satuan"
+            style={{ minWidth: "8rem" }}
+            body={(e) =>
+              load ? (
+                <Skeleton />
+              ) : e.type == "d" ? (
+                <Badge variant="warning light"> Dasar</Badge>
+              ) : (
+                <Badge variant="info light"> Konversi</Badge>
+              )
+            }
+          />
+          <Column
+            header="Action"
+            dataType="boolean"
+            bodyClassName="text-center"
+            field="code"
+            style={{ minWidth: "2rem" }}
+            body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
+          />
+        </DataTable>
+      </>
     );
   };
 
   const renderDialog = () => {
     return (
       <>
-      <Dialog
-        header={isEdit ? "Edit Satuan" : "Tambah Satuan"}
-        visible={showInput}
-        style={{ width: "40vw" }}
-        footer={renderFooter()}
-        onHide={() => {
-          onHideInput();
-          onInput(false);
-        }}
-      >
-        <div className="row mr-0 ml-0">
-          <div className="col-6">
-            <label className="text-label">Kode Satuan</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={currentItem !== null ? currentItem.code : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, code: e.target.value })
-                }
-                placeholder="Masukan Kode Satuan"
-              />
+        <Dialog
+          header={isEdit ? "Edit Satuan" : "Tambah Satuan"}
+          visible={showInput}
+          style={{ width: "40vw" }}
+          footer={renderFooter()}
+          onHide={() => {
+            onHideInput();
+            onInput(false);
+          }}
+        >
+          <div className="row mr-0 ml-0">
+            <div className="col-6">
+              <label className="text-label">Kode Satuan</label>
+              <div className="p-inputgroup">
+                <InputText
+                  value={currentItem !== null ? currentItem.code : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, code: e.target.value })
+                  }
+                  placeholder="Masukan Kode Satuan"
+                />
+              </div>
+            </div>
+
+            <div className="col-6">
+              <label className="text-label">Nama Satuan</label>
+              <div className="p-inputgroup">
+                <InputText
+                  value={currentItem !== null ? currentItem.name : ""}
+                  onChange={(e) => {
+                    setCurrentItem({ ...currentItem, name: e.target.value });
+                  }}
+                  placeholder="Masukan Nama Satuan"
+                />
+              </div>
             </div>
           </div>
 
-          <div className="col-6">
-            <label className="text-label">Nama Satuan</label>
+          <div className="col-12">
+            <label className="text-label">Keterangan</label>
             <div className="p-inputgroup">
-              <InputText
-                value={currentItem !== null ? currentItem.name : ""}
+              <InputTextarea
+                value={currentItem !== null ? currentItem.desc : ""}
                 onChange={(e) => {
-                  setCurrentItem({ ...currentItem, name: e.target.value });
+                  setCurrentItem({ ...currentItem, desc: e.target.value });
                 }}
-                placeholder="Masukan Nama Satuan"
+                placeholder="Masukan Keterangan"
               />
             </div>
           </div>
-        </div>
 
-        <div className="col-12">
-          <label className="text-label">Keterangan</label>
-          <div className="p-inputgroup">
-            <InputTextarea
-              value={currentItem !== null ? currentItem.desc : ""}
+          <div className="d-flex col-12 align-items-center">
+            <InputSwitch
+              className="mr-3"
+              inputId="email"
+              checked={currentItem && currentItem.active}
               onChange={(e) => {
-                setCurrentItem({ ...currentItem, desc: e.target.value });
+                setCurrentItem({ ...currentItem, active: e.value });
               }}
-              placeholder="Masukan Keterangan"
             />
+            <label className="mr-3 mt-1" htmlFor="email">
+              {"Aktif"}
+            </label>
           </div>
-        </div>
+          <div className="d-flex col-12 align-items-center">
+            <InputSwitch
+              className="mr-3"
+              inputId="email"
+              checked={currentItem && currentItem.type == "d"}
+              onChange={(e) => {
+                setCurrentItem({
+                  ...currentItem,
+                  type: e.value ? "d" : "k",
+                });
+                if (!e.value) {
+                  setKonversi([
+                    {
+                      id: 0,
+                      qty: 1,
+                      u_from: null,
+                      u_to: null,
+                    },
+                  ]);
+                }
+              }}
+            />
+            <label className="mr-3 mt-1" htmlFor="email">
+              {"Satuan Dasar"}
+            </label>
+          </div>
 
-        <div className="d-flex col-12 align-items-center">
-          <InputSwitch
-            className="mr-3"
-            inputId="email"
-            checked={currentItem && currentItem.active}
-            onChange={(e) => {
-              setCurrentItem({ ...currentItem, active: e.value });
-            }}
-          />
-          <label className="mr-3 mt-1" htmlFor="email">
-            {"Aktif"}
-          </label>
-        </div>
-        <div className="d-flex col-12 align-items-center">
-          <InputSwitch
-            className="mr-3"
-            inputId="email"
-            checked={currentItem && currentItem.type == "d"}
-            onChange={(e) => {
-              setCurrentItem({
-                ...currentItem,
-                type: e.value ? "d" : "k",
-              });
-              if (!e.value) {
-                setKonversi([
-                  {
-                    id: 0,
-                    qty: 1,
-                    u_from: null,
-                    u_to: null,
-                  },
-                ]);
-              }
-            }}
-          />
-          <label className="mr-3 mt-1" htmlFor="email">
-            {"Satuan Dasar"}
-          </label>
-        </div>
+          {currentItem && currentItem.type == "k" && (
+            <>
+              <h4 className="mt-4 ml-3 mr-3">
+                <b>Konversi Satuan</b>
+              </h4>
+              <Divider className="mb-2 ml-3 mr-3"></Divider>
 
-        {currentItem && currentItem.type == "k" && (
-          <>
-            <h4 className="mt-4 ml-3 mr-3">
-              <b>Konversi Satuan</b>
-            </h4>
-            <Divider className="mb-2 ml-3 mr-3"></Divider>
+              <div className="row ml-0 mr-0 mb-0">
+                <div className="col-3">
+                  <label className="text-label">Nilai/Kuantitas</label>
+                </div>
 
-            <div className="row ml-0 mr-0 mb-0">
-              <div className="col-3">
-                <label className="text-label">Nilai/Kuantitas</label>
+                <div className="col-4">
+                  <label className="text-label">Satuan Besar</label>
+                </div>
+
+                <div className="ml-1"> </div>
+
+                <div className="col-4">
+                  <label className="text-label">Satuan Kecil</label>
+                </div>
+
+                <div className="d-flex">
+                  <div className="mt-5"></div>
+                </div>
               </div>
 
-              <div className="col-4">
-                <label className="text-label">Satuan Besar</label>
-              </div>
-
-              <div className="ml-1"> </div>
-
-              <div className="col-4">
-                <label className="text-label">Satuan Kecil</label>
-              </div>
-
-              <div className="d-flex">
-                <div className="mt-5"></div>
-              </div>
-            </div>
-
-            {konversi.map((v, i) => {
-              return (
-                <div className="row ml-0 mr-0">
-                  <div className="col-3">
-                    <div className="p-inputgroup">
-                      <InputNumber
-                        value={v.qty}
-                        onChange={(e) => {
-                          let temp = [...konversi];
-                          temp[i].qty = e.value;
-                          setKonversi(temp);
-                        }}
-                        placeholder="Masukan Nilai"
-                        showButtons
-                      />
-                    </div>
-                  </div>
-
-                  <div className="col-4">
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={v.u_to && checkUnit(konversi[i].u_to)}
-                        options={satuanDasar}
-                        onChange={(e) => {
-                          let temp = [...konversi];
-                          temp[i].u_to = e.value.id;
-                          setKonversi(temp);
-                        }}
-                        placeholder="Pilih Satuan"
-                        optionLabel="name"
-                        filter
-                        filterBy="name"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="col-4">
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={v.u_from && checkUnit(konversi[i].u_from)}
-                        options={satuanDasar}
-                        onChange={(e) => {
-                          let temp = [...konversi];
-                          temp[i].u_from = e.value.id;
-                          setKonversi(temp);
-                        }}
-                        placeholder="Pilih Satuan"
-                        optionLabel="name"
-                        filter
-                        filterBy="name"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="d-flex">
-                    <div className="mt-3">
-                      {i == konversi.length - 1 ? (
-                        <Link
-                          onClick={() => {
-                            setKonversi([
-                              ...konversi,
-                              {
-                                id: 0,
-                                qty: 1,
-                                u_from: null,
-                                u_to: null,
-                              },
-                            ]);
-                          }}
-                          className="btn btn-primary shadow btn-xs sharp ml-1"
-                        >
-                          <i className="fa fa-plus"></i>
-                        </Link>
-                      ) : (
-                        <Link
-                          onClick={() => {
-                            console.log(konversi);
-                            console.log(i);
+              {konversi.map((v, i) => {
+                return (
+                  <div className="row ml-0 mr-0">
+                    <div className="col-3">
+                      <div className="p-inputgroup">
+                        <InputNumber
+                          value={v.qty}
+                          onChange={(e) => {
                             let temp = [...konversi];
-                            temp.splice(i, 1);
+                            temp[i].qty = e.value;
                             setKonversi(temp);
                           }}
-                          className="btn btn-danger shadow btn-xs sharp ml-1"
-                        >
-                          <i className="fa fa-trash"></i>
-                        </Link>
-                      )}
+                          placeholder="Masukan Nilai"
+                          showButtons
+                        />
+                      </div>
+                    </div>
+
+                    <div className="col-4">
+                      <div className="p-inputgroup">
+                        <Dropdown
+                          value={v.u_to && checkUnit(konversi[i].u_to)}
+                          options={satuanDasar}
+                          onChange={(e) => {
+                            let temp = [...konversi];
+                            temp[i].u_to = e.value.id;
+                            setKonversi(temp);
+                          }}
+                          placeholder="Pilih Satuan"
+                          optionLabel="name"
+                          filter
+                          filterBy="name"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="col-4">
+                      <div className="p-inputgroup">
+                        <Dropdown
+                          value={v.u_from && checkUnit(konversi[i].u_from)}
+                          options={satuanDasar}
+                          onChange={(e) => {
+                            let temp = [...konversi];
+                            temp[i].u_from = e.value.id;
+                            setKonversi(temp);
+                          }}
+                          placeholder="Pilih Satuan"
+                          optionLabel="name"
+                          filter
+                          filterBy="name"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="d-flex">
+                      <div className="mt-3">
+                        {i == konversi.length - 1 ? (
+                          <Link
+                            onClick={() => {
+                              setKonversi([
+                                ...konversi,
+                                {
+                                  id: 0,
+                                  qty: 1,
+                                  u_from: null,
+                                  u_to: null,
+                                },
+                              ]);
+                            }}
+                            className="btn btn-primary shadow btn-xs sharp ml-1"
+                          >
+                            <i className="fa fa-plus"></i>
+                          </Link>
+                        ) : (
+                          <Link
+                            onClick={() => {
+                              console.log(konversi);
+                              console.log(i);
+                              let temp = [...konversi];
+                              temp.splice(i, 1);
+                              setKonversi(temp);
+                            }}
+                            className="btn btn-danger shadow btn-xs sharp ml-1"
+                          >
+                            <i className="fa fa-trash"></i>
+                          </Link>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
-          </>
-        )}
-      </Dialog>
+                );
+              })}
+            </>
+          )}
+        </Dialog>
 
-      <Dialog
-        header={"Hapus Data"}
-        visible={showDelete}
-        style={{ width: "30vw" }}
-        footer={renderFooterDel("displayDel")}
-        onHide={() => {
-          setLoading(false);
-          setShowDelete(false);
-          onInput(false);
-        }}
-      >
-        <div className="ml-3 mr-3">
-          <i
-            className="pi pi-exclamation-triangle mr-3 align-middle"
-            style={{ fontSize: "2rem" }}
-          />
-          <span>Apakah anda yakin ingin menghapus data ?</span>
-        </div>
-      </Dialog>
+        <Dialog
+          header={"Hapus Data"}
+          visible={showDelete}
+          style={{ width: "30vw" }}
+          footer={renderFooterDel("displayDel")}
+          onHide={() => {
+            setLoading(false);
+            setShowDelete(false);
+            onInput(false);
+          }}
+        >
+          <div className="ml-3 mr-3">
+            <i
+              className="pi pi-exclamation-triangle mr-3 align-middle"
+              style={{ fontSize: "2rem" }}
+            />
+            <span>Apakah anda yakin ingin menghapus data ?</span>
+          </div>
+        </Dialog>
       </>
-    )
-  }
+    );
+  };
 
   if (popUp) {
     return (

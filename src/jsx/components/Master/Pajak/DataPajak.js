@@ -56,15 +56,13 @@ const DataPajak = ({
   const [showInput, setShowInput] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
 
-  
-
   useEffect(() => {
-    getPajak()
+    getPajak();
     getAccount();
     initFilters1();
   }, []);
 
-  const getPajak= async (isUpdate = false) => {
+  const getPajak = async (isUpdate = false) => {
     setLoading(true);
     const config = {
       ...endpoints.pajak,
@@ -464,105 +462,108 @@ const DataPajak = ({
 
   const renderBody = () => {
     return (
-      <DataTable
-        responsiveLayout="scroll"
-        value={data}
-        className="display w-150 datatable-wrapper"
-        showGridlines
-        dataKey="id"
-        rowHover
-        header={renderHeader}
-        filters={filters1}
-        globalFilterFields={["name", "nilai"]}
-        emptyMessage="Tidak ada data"
-        paginator
-        paginatorTemplate={template2}
-        first={first2}
-        rows={rows2}
-        onPage={onCustomPage2}
-        paginatorClassName="justify-content-end mt-3"
-        selectionMode="single"
-        onRowSelect={onRowSelect}
-      >
-        <Column
-          header="Nama"
-          field={(e) => e?.name ?? ""}
-          style={{ minWidth: "8rem" }}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header="Nilai (%)"
-          field={(e) => e?.nilai ?? ""}
-          style={{ minWidth: "8rem" }}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header="Tipe Pajak"
-          field={(e) => e?.type ?? ""}
-          style={{ minWidth: "8rem" }}
-          body={(e) =>
-            load ? (
-              <Skeleton />
-            ) : (
-              <div>
-                {e.type === "T" ? (
-                  <Badge variant="success light">
-                    <i className="bx bxs-circle text-success mr-1"></i> Tunggal
-                  </Badge>
-                ) : (
-                  <Badge variant="info light">
-                    <i className="bx bxs-circle text-info mr-1"></i> Ganda
-                  </Badge>
-                )}
-              </div>
-            )
-          }
-        />
-        <Column
-          header="Potongan"
-          field={(e) => e?.cutting ?? ""}
-          style={{ minWidth: "8rem" }}
-          body={(e) =>
-            load ? (
-              <Skeleton />
-            ) : (
-              <div>
-                {e.cutting === false ? (
-                  <Badge variant="danger light">
-                    <i className="bx bxs-circle text-danger mr-1"></i> Tidak Ada
-                    Potongan
-                  </Badge>
-                ) : (
-                  <Badge variant="info light">
-                    <i className="bx bxs-circle text-info mr-1"></i> Potongan
-                  </Badge>
-                )}
-              </div>
-            )
-          }
-        />
-        <Column
-          header="Gabungan Dari"
-          field={(e) => e?.combined ?? ""}
-          style={{ minWidth: "8rem" }}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header="Action"
-          dataType="boolean"
-          bodyClassName="text-center"
-          style={{ minWidth: "2rem" }}
-          body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
-        />
-      </DataTable>
+      <>
+        <Toast ref={toast} />
+        <DataTable
+          responsiveLayout="scroll"
+          value={data}
+          className="display w-150 datatable-wrapper"
+          showGridlines
+          dataKey="id"
+          rowHover
+          header={renderHeader}
+          filters={filters1}
+          globalFilterFields={["name", "nilai"]}
+          emptyMessage="Tidak ada data"
+          paginator
+          paginatorTemplate={template2}
+          first={first2}
+          rows={rows2}
+          onPage={onCustomPage2}
+          paginatorClassName="justify-content-end mt-3"
+          selectionMode="single"
+          onRowSelect={onRowSelect}
+        >
+          <Column
+            header="Nama"
+            field={(e) => e?.name ?? ""}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Nilai (%)"
+            field={(e) => e?.nilai ?? ""}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Tipe Pajak"
+            field={(e) => e?.type ?? ""}
+            style={{ minWidth: "8rem" }}
+            body={(e) =>
+              load ? (
+                <Skeleton />
+              ) : (
+                <div>
+                  {e.type === "T" ? (
+                    <Badge variant="success light">
+                      <i className="bx bxs-circle text-success mr-1"></i>{" "}
+                      Tunggal
+                    </Badge>
+                  ) : (
+                    <Badge variant="info light">
+                      <i className="bx bxs-circle text-info mr-1"></i> Ganda
+                    </Badge>
+                  )}
+                </div>
+              )
+            }
+          />
+          <Column
+            header="Potongan"
+            field={(e) => e?.cutting ?? ""}
+            style={{ minWidth: "8rem" }}
+            body={(e) =>
+              load ? (
+                <Skeleton />
+              ) : (
+                <div>
+                  {e.cutting === false ? (
+                    <Badge variant="danger light">
+                      <i className="bx bxs-circle text-danger mr-1"></i> Tidak
+                      Ada Potongan
+                    </Badge>
+                  ) : (
+                    <Badge variant="info light">
+                      <i className="bx bxs-circle text-info mr-1"></i> Potongan
+                    </Badge>
+                  )}
+                </div>
+              )
+            }
+          />
+          <Column
+            header="Gabungan Dari"
+            field={(e) => e?.combined ?? ""}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Action"
+            dataType="boolean"
+            bodyClassName="text-center"
+            style={{ minWidth: "2rem" }}
+            body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
+          />
+        </DataTable>
+      </>
     );
   };
-
 
   const renderDialog = () => {
     return (
       <>
-      <Toast ref={toast} />
+        <Toast ref={toast} />
         <Dialog
           header={isEdit ? "Edit Data Pajak" : "Tambah Data Pajak"}
           visible={showInput}

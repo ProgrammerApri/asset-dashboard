@@ -362,59 +362,62 @@ const DataJenisPelanggan = ({
 
   const renderBody = () => {
     return (
-      <DataTable
-        responsiveLayout="scroll"
-        value={data}
-        className="display w-150 datatable-wrapper"
-        showGridlines
-        dataKey="id"
-        rowHover
-        header={renderHeader}
-        filters={filters1}
-        globalFilterFields={[
-          "jenisPel.jpel_code",
-          "jenisPel.jpel_name",
-          "jenisPel.jpel_ket",
-        ]}
-        emptyMessage="Tidak ada data"
-        paginator
-        paginatorTemplate={template2}
-        first={first2}
-        rows={rows2}
-        onPage={onCustomPage2}
-        paginatorClassName="justify-content-end mt-3"
-        selectionMode="single"
-        // selection={selectedProduct3}
-        onRowSelect={onRowSelect}
-      >
-        <Column
-          header="Kode"
-          style={{
-            minWidth: "8rem",
-          }}
-          field={(e) => e.jpel_code}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header="Nama"
-          field={(e) => e.jpel_name}
-          style={{ minWidth: "8rem" }}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header="Keterangan"
-          field={(e) => (e.jpel_ket != "" ? e.jpel_ket : "-")}
-          style={{ minWidth: "8rem" }}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header="Action"
-          dataType="boolean"
-          bodyClassName="text-center"
-          style={{ minWidth: "2rem" }}
-          body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
-        />
-      </DataTable>
+      <>
+        <Toast ref={toast} />
+        <DataTable
+          responsiveLayout="scroll"
+          value={data}
+          className="display w-150 datatable-wrapper"
+          showGridlines
+          dataKey="id"
+          rowHover
+          header={renderHeader}
+          filters={filters1}
+          globalFilterFields={[
+            "jenisPel.jpel_code",
+            "jenisPel.jpel_name",
+            "jenisPel.jpel_ket",
+          ]}
+          emptyMessage="Tidak ada data"
+          paginator
+          paginatorTemplate={template2}
+          first={first2}
+          rows={rows2}
+          onPage={onCustomPage2}
+          paginatorClassName="justify-content-end mt-3"
+          selectionMode="single"
+          // selection={selectedProduct3}
+          onRowSelect={onRowSelect}
+        >
+          <Column
+            header="Kode"
+            style={{
+              minWidth: "8rem",
+            }}
+            field={(e) => e.jpel_code}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Nama"
+            field={(e) => e.jpel_name}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Keterangan"
+            field={(e) => (e.jpel_ket != "" ? e.jpel_ket : "-")}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Action"
+            dataType="boolean"
+            bodyClassName="text-center"
+            style={{ minWidth: "2rem" }}
+            body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
+          />
+        </DataTable>
+      </>
     );
   };
 

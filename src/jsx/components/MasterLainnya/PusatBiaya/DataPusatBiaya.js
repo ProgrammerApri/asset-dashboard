@@ -47,7 +47,7 @@ const DataPusatBiaya = ({
   }, []);
 
   const editPusatBiaya = async () => {
-    setLoading(true)
+    setLoading(true);
     const config = {
       ...endpoints.editPusatBiaya,
       endpoint: endpoints.editPusatBiaya.endpoint + currentItem.id,
@@ -90,7 +90,7 @@ const DataPusatBiaya = ({
   };
 
   const addPusatBiaya = async () => {
-    setLoading(true)
+    setLoading(true);
     const config = {
       ...endpoints.addPusatBiaya,
       data: {
@@ -362,58 +362,61 @@ const DataPusatBiaya = ({
 
   const renderBody = () => {
     return (
-      <DataTable
-        responsiveLayout="scroll"
-        value={data}
-        className="display w-150 datatable-wrapper"
-        showGridlines
-        dataKey="id"
-        rowHover
-        header={renderHeader}
-        filters={filters1}
-        globalFilterFields={[
-          "pusatBiaya.ccost_code",
-          "pusatBiaya.ccost_name",
-          "pusatBiaya.ccost_ket",
-        ]}
-        emptyMessage="Tidak ada data"
-        paginator
-        paginatorTemplate={template2}
-        first={first2}
-        rows={rows2}
-        onPage={onCustomPage2}
-        paginatorClassName="justify-content-end mt-3"
-        selectionMode="single"
-        onRowSelect={onRowSelect}
-      >
-        <Column
-          header="Kode"
-          style={{
-            minWidth: "8rem",
-          }}
-          field={(e) => e.ccost_code}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header="Nama"
-          field={(e) => e.ccost_name}
-          style={{ minWidth: "8rem" }}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header="Keterangan"
-          field={(e) => e.ccost_ket}
-          style={{ minWidth: "8rem" }}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header="Action"
-          dataType="boolean"
-          bodyClassName="text-center"
-          style={{ minWidth: "2rem" }}
-          body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
-        />
-      </DataTable>
+      <>
+        <Toast ref={toast} />
+        <DataTable
+          responsiveLayout="scroll"
+          value={data}
+          className="display w-150 datatable-wrapper"
+          showGridlines
+          dataKey="id"
+          rowHover
+          header={renderHeader}
+          filters={filters1}
+          globalFilterFields={[
+            "pusatBiaya.ccost_code",
+            "pusatBiaya.ccost_name",
+            "pusatBiaya.ccost_ket",
+          ]}
+          emptyMessage="Tidak ada data"
+          paginator
+          paginatorTemplate={template2}
+          first={first2}
+          rows={rows2}
+          onPage={onCustomPage2}
+          paginatorClassName="justify-content-end mt-3"
+          selectionMode="single"
+          onRowSelect={onRowSelect}
+        >
+          <Column
+            header="Kode"
+            style={{
+              minWidth: "8rem",
+            }}
+            field={(e) => e.ccost_code}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Nama"
+            field={(e) => e.ccost_name}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Keterangan"
+            field={(e) => e.ccost_ket}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Action"
+            dataType="boolean"
+            bodyClassName="text-center"
+            style={{ minWidth: "2rem" }}
+            body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
+          />
+        </DataTable>
+      </>
     );
   };
 

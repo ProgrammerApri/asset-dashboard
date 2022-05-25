@@ -593,81 +593,84 @@ const DataProduk = ({
 
   const renderBody = () => {
     return (
-      <DataTable
-        responsiveLayout="scroll"
-        value={data}
-        className="display w-150 datatable-wrapper"
-        showGridlines
-        dataKey="id"
-        rowHover
-        header={renderHeader}
-        filters={filters1}
-        globalFilterFields={[
-          "code",
-          "barcode",
-          "name",
-          "group.group",
-          "type",
-          "stock",
-        ]}
-        emptyMessage="Tidak ada data"
-        paginator
-        paginatorTemplate={template2}
-        first={first2}
-        rows={rows2}
-        onPage={onCustomPage2}
-        paginatorClassName="justify-content-end mt-3"
-        selectionMode="single"
-        onRowSelect={onRowSelect}
-      >
-        <Column
-          header="Kode Barang"
-          style={{
-            minWidth: "8rem",
-          }}
-          field={(e) => e?.code ?? ""}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header="Kode Barcode"
-          style={{
-            minWidth: "8rem",
-          }}
-          field={(e) => e?.barcode ?? ""}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header="Nama Barang"
-          field={(e) => e.name}
-          style={{ minWidth: "8rem" }}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header="Group Barang"
-          field={(e) => e?.group?.name ?? ""}
-          style={{ minWidth: "8rem" }}
-          body={load && <Skeleton />}
-        />
-        {/* <Column
+      <>
+        <Toast ref={toast} />
+        <DataTable
+          responsiveLayout="scroll"
+          value={data}
+          className="display w-150 datatable-wrapper"
+          showGridlines
+          dataKey="id"
+          rowHover
+          header={renderHeader}
+          filters={filters1}
+          globalFilterFields={[
+            "code",
+            "barcode",
+            "name",
+            "group.group",
+            "type",
+            "stock",
+          ]}
+          emptyMessage="Tidak ada data"
+          paginator
+          paginatorTemplate={template2}
+          first={first2}
+          rows={rows2}
+          onPage={onCustomPage2}
+          paginatorClassName="justify-content-end mt-3"
+          selectionMode="single"
+          onRowSelect={onRowSelect}
+        >
+          <Column
+            header="Kode Barang"
+            style={{
+              minWidth: "8rem",
+            }}
+            field={(e) => e?.code ?? ""}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Kode Barcode"
+            style={{
+              minWidth: "8rem",
+            }}
+            field={(e) => e?.barcode ?? ""}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Nama Barang"
+            field={(e) => e.name}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Group Barang"
+            field={(e) => e?.group?.name ?? ""}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          {/* <Column
           header="Departemen Barang"
           field={(e) => e?.type?.name ?? ""}
           style={{ minWidth: "8rem" }}
           body={load && <Skeleton />}
         /> */}
-        <Column
-          header="Informasi Stock"
-          field={(e) => e?.max_stock ?? ""}
-          style={{ minWidth: "8rem" }}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header="Action"
-          dataType="boolean"
-          bodyClassName="text-center"
-          style={{ minWidth: "2rem" }}
-          body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
-        />
-      </DataTable>
+          <Column
+            header="Informasi Stock"
+            field={(e) => e?.max_stock ?? ""}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Action"
+            dataType="boolean"
+            bodyClassName="text-center"
+            style={{ minWidth: "2rem" }}
+            body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
+          />
+        </DataTable>
+      </>
     );
   };
 

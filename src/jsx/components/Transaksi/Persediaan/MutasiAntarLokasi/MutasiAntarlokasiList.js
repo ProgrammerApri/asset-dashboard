@@ -18,7 +18,9 @@ import { Divider } from "@material-ui/core";
 
 
 
-const ListX = ({onAdd}) => {
+const MutasiAntarList = ({onAdd}) => {
+   
+  
 
     const renderHeader = () => {
         return (
@@ -120,19 +122,25 @@ const ListX = ({onAdd}) => {
                    // body={loading && <Skeleton />}
                   />
                   <Column
-                    header="Nomor Retur Penjualan"
+                    header="Nomor Mutasi Persediaan"
                    // field={(e) => e.customer.cus_name}
                     style={{ minWidth: "8rem" }}
                   //  body={loading && <Skeleton />}
                   />
                   <Column
-                    header="Nomor Faktur"
+                    header="Mutasi Asal"
                    // field={(e) => e.customer.cus_address}
                     style={{ minWidth: "8rem" }}
                     // body={loading && <Skeleton />}
                   />
                   <Column
-                    header="Nama Pelanggan"
+                    header="Mutasi Tujuan"
+                   // field={(e) => e.customer.cus_name}
+                    style={{ minWidth: "8rem" }}
+                    // body={loading && <Skeleton />}
+                  />
+                  <Column
+                    header="Keterangan"
                    // field={(e) => e.customer.cus_name}
                     style={{ minWidth: "8rem" }}
                     // body={loading && <Skeleton />}
@@ -145,4 +153,4 @@ const ListX = ({onAdd}) => {
     );
   };
   
-  export default ListX;
+  export default MutasiAntarList;

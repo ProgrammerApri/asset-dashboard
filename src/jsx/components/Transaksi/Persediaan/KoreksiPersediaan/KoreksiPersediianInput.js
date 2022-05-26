@@ -19,7 +19,7 @@ import DataPajak from "src/jsx/components/Master/Pajak/DataPajak";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 
-const InputX = ({ onCancel, onSuccess }) => {
+const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
@@ -542,7 +542,7 @@ const InputX = ({ onCancel, onSuccess }) => {
   const header = () => {
     return (
       <h4 className="mb-5">
-        <b>Retur Penjualan</b>
+        <b>Koreksi Persediaan</b>
       </h4>
     );
   };
@@ -581,7 +581,7 @@ const InputX = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-4">
-            <label className="text-label">No. Faktur Penjualan</label>
+            <label className="text-label">Kode Akun</label>
             <div className="p-inputgroup">
               <Dropdown
                 value={po.preq_id && req_pur(po.preq_id)}
@@ -604,7 +604,69 @@ const InputX = ({ onCancel, onSuccess }) => {
                   });
                 }}
                 optionLabel="req_code"
-                placeholder="Pilih Kode Permintaan"
+                placeholder="Pilih Kode Akun"
+                itemTemplate={reqTemp}
+                valueTemplate={valueReqTemp}
+              />
+            </div>
+          </div>
+
+          <div className="col-4">
+            <label className="text-label">Kode Departemen</label>
+            <div className="p-inputgroup">
+              <Dropdown
+                value={po.preq_id && req_pur(po.preq_id)}
+                options={rp}
+                onChange={(e) => {
+                  console.log(e.value.rprod);
+                  let result = null;
+                  if (po.top) {
+                    result = new Date(`${req_pur(e.value.id).req_date}Z`);
+                    result.setDate(result.getDate() + rulPay(po?.top)?.day);
+                    console.log(result);
+                  }
+                  updatePo({
+                    ...po,
+                    preq_id: e.value.id,
+                    due_date: result,
+                    sup_id: e.value?.ref_sup?.id ?? null,
+                    rprod: e.value.rprod,
+                    rjasa: e.value.rjasa,
+                  });
+                }}
+                optionLabel="req_code"
+                placeholder="Pilih Kode Departemen"
+                itemTemplate={reqTemp}
+                valueTemplate={valueReqTemp}
+              />
+            </div>
+          </div>
+
+          <div className="col-4">
+            <label className="text-label">Kode Project</label>
+            <div className="p-inputgroup">
+              <Dropdown
+                value={po.preq_id && req_pur(po.preq_id)}
+                options={rp}
+                onChange={(e) => {
+                  console.log(e.value.rprod);
+                  let result = null;
+                  if (po.top) {
+                    result = new Date(`${req_pur(e.value.id).req_date}Z`);
+                    result.setDate(result.getDate() + rulPay(po?.top)?.day);
+                    console.log(result);
+                  }
+                  updatePo({
+                    ...po,
+                    preq_id: e.value.id,
+                    due_date: result,
+                    sup_id: e.value?.ref_sup?.id ?? null,
+                    rprod: e.value.rprod,
+                    rjasa: e.value.rjasa,
+                  });
+                }}
+                optionLabel="req_code"
+                placeholder="Pilih Kode Project"
                 itemTemplate={reqTemp}
                 valueTemplate={valueReqTemp}
               />
@@ -612,131 +674,11 @@ const InputX = ({ onCancel, onSuccess }) => {
           </div>
             {/* kode suplier otomatis keluar, karena sudah melekat di faktur pembelian  */}
             
-          <div className="col-4">
-            <label className="text-label">Pelanggan</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={po.sup_id !== null ? supp(po.sup_id) : null}
-                options={supplier}
-                onChange={(e) => {
-                  updatePo({ ...po, sup_id: e.value.supplier.id });
-                }}
-                optionLabel="supplier.sup_name"
-                placeholder="Pilih Pelanggan"
-                itemTemplate={suppTemp}
-                valueTemplate={valueSupTemp}
-              />
-              <PButton
-                onClick={() => {
-                  setShowSupplier(true);
-                }}
-              >
-                <i class="bx bx-food-menu"></i>
-              </PButton>
-            </div>
-          </div>
-
-          <div className="col-4">
-            <label className="text-label"></label>
-            <div className="p-inputgroup mt-2">
-              <InputText
-                value={
-                  po.sup_id !== null
-                    ? supp(po.sup_id)?.supplier?.sup_address
-                    : ""
-                }
-                placeholder="Alamat Pelanggan"
-                disabled
-              />
-            </div>
-          </div>
-
-          <div className="col-4">
-            <label className="text-label"></label>
-            <div className="p-inputgroup mt-2">
-              <InputText
-                value={
-                  po.sup_id !== null ? supp(po.sup_id)?.supplier?.sup_telp1 : ""
-                }
-                placeholder="Kontak Person"
-                disabled
-              />
-            </div>
-          </div>
-
-          <div className="col-4">
-            <label className="text-label">Ppn</label>
-            <div className="p-inputgroup mt-2">
-              <Dropdown
-                value={
-                  po.sup_id !== null ? pjk(supp(po.sup_id)?.supplier?.id) : null
-                }
-                options={ppn}
-                optionLabel="name"
-                placeholder="Pilih Jenis Pajak"
-                disabled
-              />
-            </div>
-          </div>
-
-     
-
-          {/* <div className="col-4">
-            <label className="text-label">Syarat Pembayaran</label>
-            <div className="p-inputgroup mt-2">
-              <Dropdown
-                value={po.top !== null ? rulPay(po.top) : null}
-                options={rulesPay}
-                onChange={(e) => {
-                  let result = new Date(`${req_pur(po.preq_id).req_date}Z`);
-                  result.setDate(result.getDate() + e.value.day);
-                  console.log(result);
-
-                  updatePo({ ...po, top: e.value.id, due_date: result });
-                }}
-                optionLabel="name"
-                placeholder="Pilih Syarat Pembayaran"
-                itemTemplate={rulTemp}
-                valueTemplate={valueRulTemp}
-              />
-              <PButton
-                onClick={() => {
-                  setShowRulesPay(true);
-                }}
-              >
-                <i class="bx bx-food-menu"></i>
-              </PButton>
-            </div>
-          </div> */}
-
-          {/* <div className="col-6">
-            <label className="text-label">Tanggal Permintaan</label>
-            <div className="p-inputgroup mt-2">
-              <Calendar
-                value={new Date(`${req_pur(po.preq_id)?.req_date}Z`)}
-                placeholder="Tanggal Permintaan"
-                disabled
-                dateFormat="dd/mm/yy"
-              />
-            </div>
-          </div>
-
-          <div className="col-6">
-            <label className="text-label">Tanggal Jatuh Tempo</label>
-            <div className="p-inputgroup mt-2">
-              <Calendar
-                value={new Date(`${po?.due_date}Z`)}
-                onChange={(e) => {}}
-                placeholder="Tanggal Jatuh Tempo"
-                disabled
-                dateFormat="dd/mm/yy"
-              />
-            </div>
-          </div> */}
+          
         </Row>
 
         <CustomAccordion
-          tittle={"Produk Retur"}
+          tittle={"Koreksi Produk"}
           defaultActive={true}
           active={accor.produk}
           onClick={() => {
@@ -811,36 +753,10 @@ const InputX = ({ onCancel, onSuccess }) => {
                   )}
                 />
 
-                {/* <Column
-                  header="Permintaan"
-                  style={{
-                    width: "10rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={
-                          po.rprod[e.index].request
-                            ? po.rprod[e.index].request
-                            : 0
-                        }
-                        onChange={(e) => {
-                          let temp = [...po.rprod];
-                          temp[e.index].request = e.target.value;
-                          updatePo({ ...po, rprod: temp });
-                          console.log(temp);
-                        }}
-                        placeholder="0"
-                        type="number"
-                        disabled
-                      />
-                    </div>
-                  )}
-                /> */}
+            
 
                 <Column
-                  header="Retur"
+                  header="D/K"
                   style={{
                     width: "10rem",
                   }}
@@ -860,38 +776,17 @@ const InputX = ({ onCancel, onSuccess }) => {
                           temp[e.index].order = a.target.value
                           updatePo({ ...po, rprod: temp });
                         }}
-                        placeholder="0"
-                        type="number"
+                        placeholder="D"
+                       // type="number"
                       />
                     </div>
                   )}
                 />
 
-                {/* <Column
-                  header="Sisa"
-                  style={{
-                    width: "10rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={
-                          po.rprod[e.index].remain
-                            ? po.rprod[e.index].remain
-                            : null
-                        }
-                        onChange={(e) => updatePo({})}
-                        placeholder="0"
-                        type="number"
-                        disabled
-                      />
-                    </div>
-                  )}
-                /> */}
+               
 
                 <Column
-                  header="Harga Satuan"
+                  header="Lokasi"
                   style={{
                     maxWidth: "15rem",
                   }}
@@ -911,14 +806,14 @@ const InputX = ({ onCancel, onSuccess }) => {
                           console.log(temp);
                         }}
                         placeholder="0"
-                        type="number"
+                        
                       />
                     </div>
                   )}
                 />
 
                 <Column
-                  header="Diskon"
+                  header="Qty"
                   style={{
                     maxWidth: "10rem",
                   }}
@@ -942,48 +837,9 @@ const InputX = ({ onCancel, onSuccess }) => {
                   )}
                 />
 
-                <Column
-                  header="Harga Nett"
-                  style={{
-                    maxWidth: "15rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={
-                          po.rprod[e.index].nett_price
-                            ? po.rprod[e.index].nett_price
-                            : null
-                        }
-                        onChange={(e) => {
-                          let temp = [...po.rprod];
-                          temp[e.index].nett_price = e.target.value;
-                          updatePo({ ...po, rprod: temp });
-                          console.log(temp);
-                        }}
-                        placeholder="Masukan Harga Nett"
-                        type="number"
-                      />
-                    </div>
-                  )}
-                />
+               
 
-                <Column
-                  header="Total"
-                  style={{
-                    maxWidth: "15rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <label className="text-nowrap">
-                      <b>{`Rp. ${
-                        po.rprod[e.index].order * po.rprod[e.index].price -
-                        po.rprod[e.index].disc
-                      }`}</b>
-                    </label>
-                  )}
-                />
+              
 
                 <Column
                   body={(e) =>
@@ -1029,396 +885,7 @@ const InputX = ({ onCancel, onSuccess }) => {
           }
         />
 
-        {/* <CustomAccordion
-          tittle={"Permintaan Jasa"}
-          defaultActive={false}
-          active={accor.jasa}
-          onClick={() => {
-            setAccor({
-              ...accor,
-              jasa: !accor.jasa,
-            });
-          }}
-          key={1}
-          body={
-            <>
-              <DataTable
-                responsiveLayout="none"
-                value={null}
-                className="display w-170 datatable-wrapper header-white no-border"
-                showGridlines={false}
-                emptyMessage={() => <div></div>}
-              >
-                <Column
-                  header="Supplier"
-                  style={{
-                    maxWidth: "12rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={null}
-                        options={supplier}
-                        onChange={(e) => {
-                          updatePo({});
-                        }}
-                        optionLabel="supplier.sup_name"
-                        placeholder="Pilih Supplier"
-                        itemTemplate={suppTemp}
-                        valueTemplate={valueSupTemp}
-                      />
-                      <PButton
-                      // onClick={() => {
-                      //   setShowJenisPelanggan(true);
-                      // }}
-                      >
-                        <i class="bx bx-food-menu"></i>
-                      </PButton>
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header="Jasa"
-                  style={{
-                    maxWidth: "12rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={
-                          po.rjasa[e.index].jasa_id &&
-                          checkjasa(po.rjasa[e.index].jasa_id)
-                        }
-                        onChange={(e) => {
-                          let temp = [...po.rjasa];
-                          temp[e.index].jasa_id = e.value.id;
-                          updatePo({ ...po, rjasa: temp });
-                        }}
-                        options={jasa}
-                        optionLabel="jasa.name"
-                        placeholder="Pilih Kode Jasa"
-                        itemTemplate={jasTemp}
-                        valueTemplate={valueJasTemp}
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header="Satuan"
-                  style={{
-                    maxWidth: "12rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={
-                          po.rjasa[e.index].unit_id &&
-                          checkUnit(po.rjasa[e.index].unit_id)
-                        }
-                        onChange={(e) => {
-                          let temp = [...po.rjasa];
-                          temp[po.rjasa[e.index]].unit_id = e.value.id;
-                          updatePo({ ...po, rjasa: temp });
-                        }}
-                        options={satuan}
-                        optionLabel="name"
-                        placeholder="Pilih Satuan"
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header="Pesanan"
-                  // style={{
-                  //   maxWidth: "15rem",
-                  // }}
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={po.rjasa[e.index].qty && po.rjasa[e.index].qty}
-                        onChange={(e) => {
-                          let temp = [...po.rjasa];
-                          temp[po.rjasa[e.index]].qty = e.target.value;
-                          updatePo({ ...po, rjasa: temp });
-                          console.log(temp);
-                        }}
-                        placeholder="Jumlah Pesanan"
-                        type="number"
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header="Harga Satuan"
-                  style={{
-                    width: "25rem",
-                  }}
-                  field={""}
-                  body={() => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={null}
-                        onChange={(e) => {}}
-                        placeholder="0"
-                        type="number"
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header="Diskon"
-                  style={{
-                    width: "25rem",
-                  }}
-                  field={""}
-                  body={() => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={null}
-                        onChange={(e) => {}}
-                        placeholder="0"
-                        type="number"
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header="Total"
-                  // style={{
-                  //   minWidth: "12rem",
-                  // }}
-                  body={(e) => (
-                    <label className="text-nowrap">
-                      <b>{`Rp. ${e.index * 0}`}</b>
-                    </label>
-                  )}
-                />
-
-                <Column
-                  body={(e) =>
-                    e.index === po.rjasa.length - 1 ? (
-                      <Link
-                        onClick={() => {
-                          updatePo({
-                            ...po,
-                            rjasa: [
-                              ...po.rjasa,
-                              {
-                                id: 0,
-                                jasa_id: null,
-                                unit_id: null,
-                                qty: null,
-                              },
-                            ],
-                          });
-                        }}
-                        className="btn btn-primary shadow btn-xs sharp ml-1"
-                      >
-                        <i className="fa fa-plus"></i>
-                      </Link>
-                    ) : (
-                      <Link
-                        onClick={() => {
-                          let temp = [...po.rjasa];
-                          temp.splice(e.index, 1);
-                          updatePo({
-                            ...po,
-                            rjasa: temp,
-                          });
-                        }}
-                        className="btn btn-danger shadow btn-xs sharp ml-1"
-                      >
-                        <i className="fa fa-trash"></i>
-                      </Link>
-                    )
-                  }
-                />
-              </DataTable>
-            </>
-          }
-        /> */}
-
-        <div className="row ml-0 mr-0 mb-0 mt-6 justify-content-between">
-          <div>
-            <div className="row ml-1">
-              <div className="d-flex col-12 align-items-center">
-                <label className="mt-1">{"Pisah Faktur"}</label>
-                <InputSwitch
-                  className="ml-4"
-                  checked={currentItem && currentItem.faktur}
-                  onChange={(e) => {
-                    setCurrentItem({
-                      ...currentItem,
-                      faktur: e.target.value,
-                    });
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="row justify-content-right col-6">
-            <div className="col-6">
-              <label className="text-label">Sub Total Barang</label>
-            </div>
-
-            <div className="col-6">
-              <label className="text-label">
-                <b>Rp. </b>
-              </label>
-            </div>
-
-            <div className="col-6">
-              <label className="text-label">DPP Barang</label>
-            </div>
-
-            <div className="col-6">
-              <label className="text-label">
-                <b>Rp. </b>
-              </label>
-            </div>
-
-            <div className="col-6">
-              <label className="text-label">Pajak Atas Barang (11%)</label>
-            </div>
-
-            <div className="col-6">
-              <label className="text-label">
-                <b>Rp. </b>
-              </label>
-            </div>
-
-            <div className="col-6 mt-3">
-              <label className="text-label">Diskon Tambahan</label>
-            </div>
-
-            <div className="col-6">
-              <div className="p-inputgroup">
-                <PButton
-                  label="Rp."
-                  className={`${isRp ? "" : "p-button-outlined"}`}
-                  onClick={() => setRp(true)}
-                />
-                <InputText placeholder="Diskon" />
-                <PButton
-                  className={`${isRp ? "p-button-outlined" : ""}`}
-                  onClick={() => setRp(false)}
-                >
-                  {" "}
-                  <b>%</b>{" "}
-                </PButton>
-              </div>
-            </div>
-
-            <div className="col-12">
-              <Divider className="ml-12"></Divider>
-            </div>
-
-            <div className="col-6">
-              <label className="text-label">
-                <b>Total Pembayaran</b>
-              </label>
-            </div>
-
-            <div className="col-6">
-              <label className="text-label fs-16">
-                <b>Rp. </b>
-              </label>
-            </div>
-
-            <div className="col-12">
-              <Divider className="ml-12"></Divider>
-            </div>
-
-            {currentItem !== null && currentItem.faktur ? (
-              <>
-                {/* <div className="row justify-content-right col-12 mt-4"> */}
-                <div className="col-6 mt-4">
-                  <label className="text-label">Sub Total Jasa</label>
-                </div>
-
-                <div className="col-6 mt-4">
-                  <label className="text-label">
-                    <b>Rp. </b>
-                  </label>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label">DPP Jasa</label>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label">
-                    <b>Rp. </b>
-                  </label>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label">Pajak Atas Jasa (2%)</label>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label">
-                    <b>Rp. </b>
-                  </label>
-                </div>
-
-                <div className="col-6 mt-3">
-                  <label className="text-label">Diskon Tambahan</label>
-                </div>
-
-                <div className="col-6">
-                  <div className="p-inputgroup">
-                    <PButton
-                      label="Rp."
-                      className={`${isRp ? "" : "p-button-outlined"}`}
-                      onClick={() => setRp(true)}
-                    />
-                    <InputText placeholder="Diskon" />
-                    <PButton
-                      className={`${isRp ? "p-button-outlined" : ""}`}
-                      onClick={() => setRp(false)}
-                    >
-                      {" "}
-                      <b>%</b>{" "}
-                    </PButton>
-                  </div>
-                </div>
-
-                <div className="col-12">
-                  <Divider className="ml-12"></Divider>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label">
-                    <b>Total Pembayaran</b>
-                  </label>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label fs-16">
-                    <b>Rp. </b>
-                  </label>
-                </div>
-
-                <div className="col-12">
-                  <Divider className="ml-12"></Divider>
-                </div>
-                {/* </div> */}
-              </>
-            ) : null}
-          </div>
-        </div>
+      
       </>
     );
   };
@@ -1565,4 +1032,4 @@ const InputX = ({ onCancel, onSuccess }) => {
   );
 };
 
-export default InputX;
+export default KoreksiPersediaanInput;

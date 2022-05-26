@@ -1,20 +1,24 @@
 import React, { useState, useRef } from "react";
 import { Toast } from "primereact/toast";
 import { Row, Col, Card } from "react-bootstrap";
-import ListX from "./ListX";
-import InputX from "./InputX";
+// import ListX from "./ListX";
+// import InputX from "./InputX";
+import KoreksiPersediaanInput from "./KoreksiPersediianInput";
+import KoreksiPersediaanList from "./KoreksiPersediaanList";
 
-const X = () => {
+
+
+const KoreksiStok = () => {
   const [active, setActive] = useState(0);
   const toast = useRef(null);
   const [view, setView] = useState([
-    <ListX
+    <KoreksiPersediaanList
       onAdd={() => {
         setActive(1);
       }}
     />,
     
-    <InputX
+    <KoreksiPersediaanInput
       onCancel={() => setActive(0)}
       onSuccess={() => {
         setTimeout(() => {
@@ -44,4 +48,4 @@ const X = () => {
   );
 };
 
-export default X;
+export default KoreksiStok;

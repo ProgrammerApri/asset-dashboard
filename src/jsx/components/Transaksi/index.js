@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Button, Col, Row } from "react-bootstrap";
+import Persediaan from "./Persediaan/Persediaan";
 import TransaksiPembelian from "./TransaksiPembelian/TransaksiPembelian";
 import TransaksiPenjualan from "./TransaksiPenjualan/TransaksiPenjualan";
 
@@ -12,11 +13,15 @@ const Transaksi = () => {
       component: <TransaksiPembelian />,
     },
     {
-        tittle: "Transaksi Penjualan",
-        icon: "bx-receipt",
-        component: <TransaksiPenjualan />,
-      },
-      
+      tittle: "Transaksi Penjualan",
+      icon: "bx-receipt",
+      component: <TransaksiPenjualan />,
+    },
+    {
+      tittle: "Persediaan",
+      icon: "bx-receipt",
+      component: <Persediaan />,
+    },
   ]);
 
   const renderSubMenu = () => {

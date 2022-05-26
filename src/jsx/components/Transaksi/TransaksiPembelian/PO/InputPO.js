@@ -162,13 +162,13 @@ const InputPO = ({ onCancel, onSuccess }) => {
                 ...el,
                 r_remain: el.remain,
               });
+
               let temp = [...po.pprod];
-              
               po.pprod.forEach((e, i) => {
                 if (el.id == e.rprod_id) {
                   temp[i].request = el.request;
-                  temp[i].r_remain = el.remain+e.order
-                  temp[i].remain = el.remain
+                  temp[i].r_remain = el.remain + e.order;
+                  temp[i].remain = el.remain;
                   updatePo({ ...po, pprod: temp });
                 }
               });
@@ -181,6 +181,16 @@ const InputPO = ({ onCancel, onSuccess }) => {
               jasa.push({
                 ...element,
                 r_remain: element.remain,
+              });
+
+              let temp = [...po.pjasa];
+              po.pprod.forEach((e, i) => {
+                if (el.id == e.rjasa_id) {
+                  temp[i].request = el.request;
+                  temp[i].r_remain = el.remain + e.order;
+                  temp[i].remain = el.remain;
+                  updatePo({ ...po, pjasa: temp });
+                }
               });
             });
             elem.rjasa = jasa;
@@ -1205,24 +1215,66 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
+                    header="Permintaan"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.request ? e.request : 0}
+                          onChange={(t) => {
+                            let temp = [...po.pjasa];
+                            temp[e.index].request = t.target.value;
+                            updatePo({ ...po, pjasa: temp });
+                            console.log(temp);
+                          }}
+                          placeholder="0"
+                          type="number"
+                          disabled
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
                     header="Pesanan"
                     field={""}
                     body={(e) => (
                       <div className="p-inputgroup">
                         <InputText
-                          value={e.qty && e.qty}
+                          value={e.order ? e.order : 0}
                           onChange={(t) => {
                             let temp = [...po.pjasa];
-                            temp[e.index].qty = t.target.value;
+                            let val =
+                              t.target.value > e.r_remain
+                                ? e.r_remain
+                                : t.target.value;
+                            let result =
+                              temp[e.index].order - val + temp[e.index].remain;
+                            temp[e.index].order = val;
+
                             temp[e.index].total =
-                              temp[e.index].qty * temp[e.index].price;
+                              temp[e.index].price * temp[e.index].order;
+                            temp[e.index].remain = result;
                             updatePo({ ...po, pjasa: temp });
-                            console.log(temp);
                           }}
-                          placeholder="Jumlah Pesanan"
-                          type="number"
                           min={0}
-                          disabled={e.id !== 0}
+                          placeholder="0"
+                          type="number"
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header="Sisa"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.remain ? e.remain : 0}
+                          placeholder="0"
+                          type="number"
+                          disabled
                         />
                       </div>
                     )}
@@ -1239,7 +1291,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                             let temp = [...po.pjasa];
                             temp[e.index].price = t.target.value;
                             temp[e.index].total =
-                              temp[e.index].qty * temp[e.index].price;
+                              temp[e.index].order * temp[e.index].price;
                             updatePo({ ...po, pjasa: temp });
                             console.log(temp);
                           }}
@@ -1278,10 +1330,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     body={(e) => (
                       <label className="text-nowrap">
                         <b>
-                          {`Rp. ${e.total - (e.total * e.disc) / 100}`.replace(
-                            /(\d)(?=(\d{3})+(?!\d))/g,
-                            "$1."
-                          )}
+                          Rp. {formatIdr(e.total - (e.total * e.disc) / 100)}
                         </b>
                       </label>
                     )}

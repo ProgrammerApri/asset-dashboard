@@ -1,4 +1,4 @@
-import { SET_CURRENT_PO, SET_PO, SET_EDIT } from "../actions";
+import { SET_CURRENT_PO, SET_PO, SET_EDIT_PO } from "../actions";
 
 const initialState = {
   po: [],
@@ -18,7 +18,7 @@ const POReducer = (state = initialState, { type, payload }) => {
         ...state,
         po: payload,
       };
-      case SET_EDIT:
+      case SET_EDIT_PO:
         return {
           ...state,
           editpo: payload,

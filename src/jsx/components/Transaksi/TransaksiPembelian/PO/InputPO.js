@@ -29,6 +29,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
   const isEdit = useSelector((state) => state.po.editpo);
   const dispatch = useDispatch();
   const [isRp, setRp] = useState(true);
+  const [isRpJasa, setRpJasa] = useState(true);
   const [pusatBiaya, setPusatBiaya] = useState(null);
   const [supplier, setSupplier] = useState(null);
   const [rulesPay, setRulesPay] = useState(null);
@@ -151,8 +152,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
         const { data } = response;
         let filt = [];
         data.forEach((elem) => {
-          if (elem.status === 0) {
+          if (isEdit) {
             filt.push(elem);
+            let remain = 0;
             elem.rprod.forEach((el) => {
               el.order = el.order ?? 0;
               if (el.order === 0 || el.request - el.order !== 0) {
@@ -164,17 +166,32 @@ const InputPO = ({ onCancel, onSuccess }) => {
               element.jasa_id = element.jasa_id.id;
               element.unit_id = element.unit_id.id;
             });
-            // elem.rjasa.push({
-            //   id: 0,
-            //   preq_id: elem.id,
-            //   sup_id: null,
-            //   jasa_id: null,
-            //   unit_id: null,
-            //   qty: null,
-            //   price: null,
-            //   disc: null,
-            //   total: null,
-            // });
+          } else {
+            if (elem.status === 0) {
+              filt.push(elem);
+              elem.rprod.forEach((el) => {
+                el.order = el.order ?? 0;
+                if (el.order === 0 || el.request - el.order !== 0) {
+                  el.prod_id = el.prod_id.id;
+                  el.unit_id = el.unit_id.id;
+                }
+              });
+              elem.rjasa.forEach((element) => {
+                element.jasa_id = element.jasa_id.id;
+                element.unit_id = element.unit_id.id;
+              });
+              // elem.rjasa.push({
+              //   id: 0,
+              //   preq_id: elem.id,
+              //   sup_id: null,
+              //   jasa_id: null,
+              //   unit_id: null,
+              //   qty: null,
+              //   price: null,
+              //   disc: null,
+              //   total: null,
+              // });
+            }
           }
         });
         console.log(data);
@@ -301,6 +318,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
   const req_pur = (value) => {
     let selected = {};
+    console.log(value);
     rp?.forEach((element) => {
       if (value === element.id) {
         selected = element;
@@ -542,12 +560,12 @@ const InputPO = ({ onCancel, onSuccess }) => {
   const header = () => {
     return (
       <h4 className="mb-5">
-        <b>Buat Permintaan PO</b>
+        <b>{isEdit ? "Edit" : "Buat"} Pembelian (PO)</b>
       </h4>
     );
   };
 
-  const getSubTotal = () => {
+  const getSubTotalBarang = () => {
     let total = 0;
     po?.rprod?.forEach((el) => {
       if (el.nett_price && el.nett_price > 0) {
@@ -557,11 +575,22 @@ const InputPO = ({ onCancel, onSuccess }) => {
       }
     });
 
+    return total;
+  };
+
+  const getSubTotalJasa = () => {
+    let total = 0;
     po?.rjasa?.forEach((el) => {
       total += el.total - (el.total * el.disc) / 100;
     });
 
-    return `${total}`.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+    return total;
+  };
+
+  const formatIdr = (value) => {
+    return `${value}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
 
   const body = () => {
@@ -626,6 +655,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                 valueTemplate={valueReqTemp}
                 filter
                 filterBy="req_code"
+                disabled={isEdit}
               />
             </div>
           </div>
@@ -986,11 +1016,11 @@ const InputPO = ({ onCancel, onSuccess }) => {
                       <label className="text-nowrap">
                         <b>
                           Rp.{" "}
-                          {`${
+                          {formatIdr(
                             e.nett_price && e.nett_price != 0
                               ? e.nett_price
                               : e.total - (e.total * e.disc) / 100
-                          }`.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.")}
+                          )}
                         </b>
                       </label>
                     )}
@@ -1219,7 +1249,12 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     header="Total"
                     body={(e) => (
                       <label className="text-nowrap">
-                        <b>{`Rp. ${e.total - (e.total * e.disc) / 100}`}</b>
+                        <b>
+                          {`Rp. ${e.total - (e.total * e.disc) / 100}`.replace(
+                            /(\d)(?=(\d{3})+(?!\d))/g,
+                            "$1."
+                          )}
+                        </b>
                       </label>
                     )}
                   />
@@ -1276,50 +1311,89 @@ const InputPO = ({ onCancel, onSuccess }) => {
         <div className="row ml-0 mr-0 mb-0 mt-6 justify-content-between">
           <div>
             <div className="row ml-1">
-              <div className="d-flex col-12 align-items-center">
-                <label className="mt-1">{"Pisah Faktur"}</label>
-                <InputSwitch
-                  className="ml-4"
-                  checked={currentItem && currentItem.faktur}
-                  onChange={(e) => {
-                    setCurrentItem({
-                      ...currentItem,
-                      faktur: e.target.value,
-                    });
-                  }}
-                />
-              </div>
+              {po.rjasa.length > 0 && po.rprod.length > 0 && (
+                <div className="d-flex col-12 align-items-center">
+                  <label className="mt-1">{"Pisah Faktur"}</label>
+                  <InputSwitch
+                    className="ml-4"
+                    checked={po.split_inv}
+                    onChange={(e) => {
+                      if (e.value) {
+                        updatePo({
+                          ...po,
+                          split_inv: e.value,
+                          total_disc: null,
+                        });
+                      } else {
+                        updatePo({
+                          ...po,
+                          split_inv: e.value,
+                          prod_disc: null,
+                          jasa_disc: null,
+                        });
+                      }
+                    }}
+                  />
+                </div>
+              )}
             </div>
           </div>
 
           <div className="row justify-content-right col-6">
             <div className="col-6">
-              <label className="text-label">Sub Total Barang</label>
-            </div>
-
-            <div className="col-6">
               <label className="text-label">
-                <b>Rp. {getSubTotal()}</b>
+                {po.split_inv ? "Sub Total Barang" : "Sub Total"}
               </label>
             </div>
 
             <div className="col-6">
-              <label className="text-label">DPP Barang</label>
-            </div>
-
-            <div className="col-6">
               <label className="text-label">
-                <b>Rp. </b>
+                {po.split_inv ? (
+                  <b>Rp. {formatIdr(getSubTotalBarang())}</b>
+                ) : (
+                  <b>
+                    Rp. {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
+                  </b>
+                )}
               </label>
             </div>
 
             <div className="col-6">
-              <label className="text-label">Pajak Atas Barang (11%)</label>
+              <label className="text-label">
+                {po.split_inv ? "DPP Barang" : "DPP"}
+              </label>
             </div>
 
             <div className="col-6">
               <label className="text-label">
-                <b>Rp. </b>
+                {po.split_inv ? (
+                  <b>Rp. {formatIdr(getSubTotalBarang())}</b>
+                ) : (
+                  <b>
+                    Rp. {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
+                  </b>
+                )}
+              </label>
+            </div>
+
+            <div className="col-6">
+              <label className="text-label">
+                {po.split_inv ? "Pajak Atas Barang (11%)" : "Pajak (11%)"}
+              </label>
+            </div>
+
+            <div className="col-6">
+              <label className="text-label">
+                {po.split_inv ? (
+                  <b>Rp. {formatIdr((getSubTotalBarang() * 11) / 100)}</b>
+                ) : (
+                  <b>
+                    Rp.{" "}
+                    {formatIdr(
+                      ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
+                    )}
+                  </b>
+                )}
               </label>
             </div>
 
@@ -1334,7 +1408,44 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   className={`${isRp ? "" : "p-button-outlined"}`}
                   onClick={() => setRp(true)}
                 />
-                <InputText placeholder="Diskon" />
+                <InputText
+                  value={
+                    po.split_inv
+                      ? isRp
+                        ? (getSubTotalBarang() * po.prod_disc) / 100
+                        : po.prod_disc
+                      : isRp
+                      ? ((getSubTotalBarang() + getSubTotalJasa()) *
+                          po.total_disc) /
+                        100
+                      : po.total_disc
+                  }
+                  placeholder="Diskon"
+                  type="number"
+                  min={0}
+                  onChange={(e) => {
+                    if (po.split_inv) {
+                      let disc = 0;
+                      if (isRp) {
+                        disc = (e.target.value / getSubTotalBarang()) * 100;
+                      } else {
+                        disc = e.target.value;
+                      }
+                      updatePo({ ...po, prod_disc: disc });
+                    } else {
+                      let disc = 0;
+                      if (isRp) {
+                        disc =
+                          (e.target.value /
+                            (getSubTotalBarang() + getSubTotalJasa())) *
+                          100;
+                      } else {
+                        disc = e.target.value;
+                      }
+                      updatePo({ ...po, total_disc: disc });
+                    }
+                  }}
+                />
                 <PButton
                   className={`${isRp ? "p-button-outlined" : ""}`}
                   onClick={() => setRp(false)}
@@ -1357,7 +1468,23 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
             <div className="col-6">
               <label className="text-label fs-16">
-                <b>Rp. </b>
+                {po.split_inv ? (
+                  <b>
+                    Rp.{" "}
+                    {formatIdr(
+                      getSubTotalBarang() + (getSubTotalBarang() * 11) / 100
+                    )}
+                  </b>
+                ) : (
+                  <b>
+                    Rp.{" "}
+                    {formatIdr(
+                      getSubTotalBarang() +
+                        getSubTotalJasa() +
+                        ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
+                    )}
+                  </b>
+                )}
               </label>
             </div>
 
@@ -1365,7 +1492,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
               <Divider className="ml-12"></Divider>
             </div>
 
-            {currentItem !== null && currentItem.faktur ? (
+            {po.split_inv ? (
               <>
                 {/* <div className="row justify-content-right col-12 mt-4"> */}
                 <div className="col-6 mt-4">
@@ -1374,7 +1501,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
                 <div className="col-6 mt-4">
                   <label className="text-label">
-                    <b>Rp. </b>
+                    <b>Rp. {formatIdr(getSubTotalJasa())}</b>
                   </label>
                 </div>
 
@@ -1384,7 +1511,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
                 <div className="col-6">
                   <label className="text-label">
-                    <b>Rp. </b>
+                    <b>Rp. {formatIdr(getSubTotalJasa())}</b>
                   </label>
                 </div>
 
@@ -1394,7 +1521,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
                 <div className="col-6">
                   <label className="text-label">
-                    <b>Rp. </b>
+                    <b>Rp. {formatIdr((getSubTotalJasa() * 2) / 100)}</b>
                   </label>
                 </div>
 
@@ -1406,13 +1533,31 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   <div className="p-inputgroup">
                     <PButton
                       label="Rp."
-                      className={`${isRp ? "" : "p-button-outlined"}`}
-                      onClick={() => setRp(true)}
+                      className={`${isRpJasa ? "" : "p-button-outlined"}`}
+                      onClick={() => setRpJasa(true)}
                     />
-                    <InputText placeholder="Diskon" />
+                    <InputText
+                      value={
+                        isRpJasa
+                          ? (getSubTotalJasa() * po.jasa_disc) / 100
+                          : po.jasa_disc
+                      }
+                      placeholder="Diskon"
+                      type="number"
+                      min={0}
+                      onChange={(e) => {
+                        let disc = 0;
+                        if (isRpJasa) {
+                          disc = (e.target.value / getSubTotalJasa()) * 100;
+                        } else {
+                          disc = e.target.value;
+                        }
+                        updatePo({ ...po, jasa_disc: disc });
+                      }}
+                    />
                     <PButton
-                      className={`${isRp ? "p-button-outlined" : ""}`}
-                      onClick={() => setRp(false)}
+                      className={`${isRpJasa ? "p-button-outlined" : ""}`}
+                      onClick={() => setRpJasa(false)}
                     >
                       {" "}
                       <b>%</b>{" "}
@@ -1432,7 +1577,12 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
                 <div className="col-6">
                   <label className="text-label fs-16">
-                    <b>Rp. </b>
+                    <b>
+                      Rp.{" "}
+                      {formatIdr(
+                        getSubTotalJasa() + (getSubTotalJasa() * 2) / 100
+                      )}
+                    </b>
                   </label>
                 </div>
 

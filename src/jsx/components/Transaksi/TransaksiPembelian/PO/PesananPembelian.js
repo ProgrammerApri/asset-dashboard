@@ -12,7 +12,7 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_PO, SET_EDIT } from "src/redux/actions";
+import { SET_CURRENT_PO, SET_EDIT_PO } from "src/redux/actions";
 
 const data = {
   id: null,
@@ -31,7 +31,7 @@ const data = {
   rjasa: [],
 };
 
-const PesananPO = ({ onAdd }) => {
+const PesananPO = ({ onAdd, onEdit }) => {
   const [po, setPO] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
@@ -215,9 +215,34 @@ const PesananPO = ({ onAdd }) => {
       <div className="d-flex">
         <Link
           onClick={() => {
-            setEdit(true);
-            onClick("displayData", data);
-            setCurrentItem(data);
+            onEdit();
+            dispatch({
+              type: SET_EDIT_PO,
+              payload: true,
+            });
+
+            let rprod = data.rprod;
+            rprod.forEach((el) => {
+              el.prod_id = el.prod_id.id;
+              el.unit_id = el.unit_id.id;
+            });
+            let rjasa = data.rjasa;
+            rjasa.forEach((el) => {
+              el.jasa_id = el.jasa_id.id;
+              el.unit_id = el.unit_id.id;
+            });
+
+            dispatch({
+              type: SET_CURRENT_PO,
+              payload: {
+                ...data,
+                preq_id: data?.preq_id?.id,
+                sup_id: data?.sup_id?.id,
+                top: data?.top?.id,
+                rprod: rprod,
+                rjasa: rjasa,
+              },
+            });
           }}
           className="btn btn-primary shadow btn-xs sharp ml-1"
         >
@@ -328,7 +353,7 @@ const PesananPO = ({ onAdd }) => {
           onClick={() => {
             onAdd();
             dispatch({
-              type: SET_EDIT,
+              type: SET_EDIT_PO,
               payload: false,
             });
             dispatch({

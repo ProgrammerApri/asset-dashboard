@@ -31,7 +31,6 @@ const DataRulesPay = ({
   onInput = () => {},
   onRowSelect,
   onSuccessInput,
-  
 }) => {
   const [loading, setLoading] = useState(true);
   const [showInput, setShowInput] = useState(false);
@@ -43,7 +42,6 @@ const DataRulesPay = ({
   const [isEdit, setEdit] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
-
 
   useEffect(() => {
     initFilters1();
@@ -375,56 +373,59 @@ const DataRulesPay = ({
 
   const renderBody = () => {
     return (
-      <DataTable
-        responsiveLayout="scroll"
-        value={data}
-        className="display w-150 datatable-wrapper"
-        showGridlines
-        dataKey="id"
-        rowHover
-        header={renderHeader}
-        filters={filters1}
-        globalFilterFields={[
-          "rules_pay.name",
-          "rules_pay.day",
-          "rules_pay.ket",
-        ]}
-        emptyMessage="Tidak ada data"
-        paginator
-        paginatorTemplate={template2}
-        first={first2}
-        rows={rows2}
-        onPage={onCustomPage2}
-        paginatorClassName="justify-content-end mt-3"
-        selectionMode="single"
-        onRowSelect={onRowSelect}
-      >
-        <Column
-          header="Nama"
-          field={(e) => e.name}
-          style={{ minWidth: "8rem" }}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header="Jumlah Hari"
-          field={(e) => e.day}
-          style={{ minWidth: "8rem" }}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header="Keterangan"
-          field={(e) => e.ket}
-          style={{ minWidth: "8rem" }}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header="Action"
-          dataType="boolean"
-          bodyClassName="text-center"
-          style={{ minWidth: "2rem" }}
-          body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
-        />
-      </DataTable>
+      <>
+        <Toast ref={toast} />
+        <DataTable
+          responsiveLayout="scroll"
+          value={data}
+          className="display w-150 datatable-wrapper"
+          showGridlines
+          dataKey="id"
+          rowHover
+          header={renderHeader}
+          filters={filters1}
+          globalFilterFields={[
+            "rules_pay.name",
+            "rules_pay.day",
+            "rules_pay.ket",
+          ]}
+          emptyMessage="Tidak ada data"
+          paginator
+          paginatorTemplate={template2}
+          first={first2}
+          rows={rows2}
+          onPage={onCustomPage2}
+          paginatorClassName="justify-content-end mt-3"
+          selectionMode="single"
+          onRowSelect={onRowSelect}
+        >
+          <Column
+            header="Nama"
+            field={(e) => e.name}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Jumlah Hari"
+            field={(e) => e.day}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Keterangan"
+            field={(e) => e.ket}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Action"
+            dataType="boolean"
+            bodyClassName="text-center"
+            style={{ minWidth: "2rem" }}
+            body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
+          />
+        </DataTable>
+      </>
     );
   };
 

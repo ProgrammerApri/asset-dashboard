@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { request, endpoints } from "src/utils";
 import { Row, Col, Card } from "react-bootstrap";
+import { Toast } from "primereact/toast";
 import DataRulesPay from "./DataRulesPay";
 
 const data = {
@@ -13,6 +14,7 @@ const data = {
 const RulesPay = () => {
   const [rulesPay, setRulesPay] = useState(null);
   const [loading, setLoading] = useState(true);
+  const toast = useRef(null);
 
   const dummy = Array.from({ length: 10 });
 
@@ -48,6 +50,7 @@ const RulesPay = () => {
 
   return (
     <>
+    <Toast ref={toast} />
       <Row>
         <Col>
           <Card>

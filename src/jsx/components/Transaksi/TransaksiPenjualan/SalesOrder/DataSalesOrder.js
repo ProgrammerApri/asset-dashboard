@@ -4,7 +4,6 @@ import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "react-bootstrap";
-import { Row, Col, Card } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { Dialog } from "primereact/dialog";
@@ -12,52 +11,34 @@ import { InputText } from "primereact/inputtext";
 import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
-import { InputTextarea } from "primereact/inputtextarea";
-import { InputNumber } from "primereact/inputnumber";
-import { Divider } from "@material-ui/core";
+import { useDispatch, useSelector } from "react-redux";
+import { SET_CURRENT_SO } from "src/redux/actions";
+import { SET_EDIT } from "src/redux/actions/SOActions";
 
 const data = {
   id: null,
-  req_code: null,
+  so_code: null,
+  so_date: null,
+  pel_id: null,
+  sub_id: null,
+  sub_addr: null,
+  ppn_type: null,
+  top: null,
   req_date: null,
-  req_dep: {
-    id: null,
-    ccost_code: null,
-    ccost_name: null,
-    ccost_ket: null,
-  },
-  req_ket: null,
-  refrence: true,
-  ref_sup: {
-    id: null,
-    sup_code: null,
-    sup_name: null,
-    sup_jpem: null,
-    sup_ppn: null,
-    sup_npwp: null,
-    sup_address: null,
-    sup_kota: null,
-    sup_kpos: null,
-    sup_telp1: null,
-    sup_telp2: null,
-    sup_fax: null,
-    sup_cp: null,
-    sup_curren: null,
-    sup_ket: null,
-    sup_hutang: null,
-    sup_uang_muka: null,
-    sup_limit: null,
-  },
-  ref_ket: null,
+  due_date: false,
+  split_inv: null,
+  prod_disc: null,
+  jasa_disc: null,
+  total_disc: null,
+  sprod: [],
+  sjasa: [],
 };
 
-const DataSalesOrder = ({ onAdd }) => {
+const DataSalesOrder = ({ onAdd, onEdit }) => {
   const [so, setSO] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
-  const [displayData, setDisplayData] = useState(false);
   const [displayDel, setDisplayDel] = useState(false);
-  const [position, setPosition] = useState("center");
   const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
   const [filters1, setFilters1] = useState(null);
@@ -65,6 +46,8 @@ const DataSalesOrder = ({ onAdd }) => {
   const [isEdit, setEdit] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+  const dispatch = useDispatch();
+  const So = useSelector((state) => state.so);
 
   const dummy = Array.from({ length: 10 });
 
@@ -76,7 +59,7 @@ const DataSalesOrder = ({ onAdd }) => {
   const getSO = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.salesOrder,
+      ...endpoints.so,
       data: {},
     };
     console.log(config.data);
@@ -143,9 +126,50 @@ const DataSalesOrder = ({ onAdd }) => {
       <div className="d-flex">
         <Link
           onClick={() => {
-            setEdit(true);
-            onClick("displayData", data);
-            setCurrentItem(data);
+            onEdit(data);
+            let inProd = data.inProd;
+            dispatch({
+              type: SET_EDIT,
+              payload: true,
+            });
+            inProd.forEach((el) => {
+              el.prod_id = el.prod_id.id;
+              el.unit_id = el.unit_id.id;
+            });
+            let inJasa = data.inJasa;
+            inJasa.forEach((el) => {
+              el.jasa_id = el.jasa_id.id;
+              el.unit_id = el.unit_id.id;
+            });
+            dispatch({
+              type: SET_CURRENT_SO,
+              payload: {
+                ...data,
+                pel_id: data?.pel_id?.id ?? null,
+                inProd:
+                  inProd.length > 0
+                    ? inProd
+                    : [
+                        {
+                          id: 0,
+                          prod_id: null,
+                          unit_id: null,
+                          request: null,
+                        },
+                      ],
+                inJasa:
+                  inJasa.length > 0
+                    ? inJasa
+                    : [
+                        {
+                          id: 0,
+                          jasa_id: null,
+                          unit_id: null,
+                          qty: null,
+                        },
+                      ],
+              },
+            });
           }}
           className="btn btn-primary shadow btn-xs sharp ml-1"
         >
@@ -165,15 +189,6 @@ const DataSalesOrder = ({ onAdd }) => {
       </div>
       // </React.Fragment>
     );
-  };
-
-  const onClick = () => {
-    setDisplayData(true);
-    setCurrentItem();
-
-    if (position) {
-      setPosition(position);
-    }
   };
 
   const renderFooterDel = () => {
@@ -223,7 +238,38 @@ const DataSalesOrder = ({ onAdd }) => {
             placeholder="Cari disini"
           />
         </span>
-        <Button variant="primary" onClick={onAdd}>
+        <Button
+          variant="primary"
+          onClick={() => {
+            onAdd();
+            dispatch({
+              type: SET_EDIT,
+              payload: false,
+            });
+            dispatch({
+              type: SET_CURRENT_SO,
+              payload: {
+                ...data,
+                inProd: [
+                  {
+                    id: 0,
+                    prod_id: null,
+                    unit_id: null,
+                    request: null,
+                  },
+                ],
+                inJasa: [
+                  {
+                    id: 0,
+                    jasa_id: null,
+                    unit_id: null,
+                    qty: null,
+                  },
+                ],
+              },
+            });
+          }}
+        >
           Tambah{" "}
           <span className="btn-icon-right">
             <i class="bx bx-plus"></i>
@@ -279,6 +325,18 @@ const DataSalesOrder = ({ onAdd }) => {
     setRows2(event.rows);
   };
 
+  const formatDate = (date) => {
+    var d = new Date(`${date}Z`),
+      month = "" + (d.getMonth() + 1),
+      day = "" + d.getDate(),
+      year = d.getFullYear();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+
+    return [year, month, day].join("-");
+  };
+
   return (
     <>
       <Toast ref={toast} />
@@ -291,7 +349,7 @@ const DataSalesOrder = ({ onAdd }) => {
         rowHover
         header={renderHeader}
         filters={filters1}
-        globalFilterFields={["customer.cus_code", "customer.cus_limit"]}
+        globalFilterFields={["so.so_code", "so.so_date"]}
         emptyMessage="Tidak ada data"
         paginator
         paginatorTemplate={template2}
@@ -305,18 +363,18 @@ const DataSalesOrder = ({ onAdd }) => {
           style={{
             minWidth: "10rem",
           }}
-          field={(e) => e.customer.cus_code}
+          field={(e) => formatDate(e.so_date)}
           body={loading && <Skeleton />}
         />
         <Column
-          header="Nomor Pesanan"
-          field={(e) => e.customer.cus_name}
+          header="Kode Referensi"
+          field={(e) => e.so_code}
           style={{ minWidth: "10rem" }}
           body={loading && <Skeleton />}
         />
         <Column
-          header="Nomor Pesanan"
-          field={(e) => e.customer.cus_address}
+          header="Pelanggan"
+          field={(e) => e.pel_id.cus_name}
           style={{ minWidth: "10rem" }}
           body={loading && <Skeleton />}
         />

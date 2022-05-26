@@ -658,6 +658,32 @@ const endpoints = {
     method: "DELETE",
     data: {},
   },
+
+
+  /// SO
+  so: {
+    endpoint: "/v1/api/so",
+    method: "GET",
+    data: {},
+  },
+
+  addSO: {
+    endpoint: "/v1/api/so",
+    method: "POST",
+    data: {},
+  },
+
+  editSO: {
+    endpoint: "/v1/api/so/",
+    method: "PUT",
+    data: {},
+  },
+
+  delSO: {
+    endpoint: "/v1/api/so/",
+    method: "DELETE",
+    data: {},
+  },
 };
 
 export default endpoints;

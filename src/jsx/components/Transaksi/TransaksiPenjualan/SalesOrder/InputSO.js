@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_SO } from "src/redux/actions";
 import { request, endpoints } from "src/utils";
-import { Row, Card, Col } from "react-bootstrap";
+import { Row } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
@@ -17,15 +17,10 @@ import { Column } from "primereact/column";
 import DataRulesPay from "src/jsx/components/MasterLainnya/RulesPay/DataRulesPay";
 import DataSupplier from "src/jsx/components/Mitra/Pemasok/DataPemasok";
 import DataPajak from "src/jsx/components/Master/Pajak/DataPajak";
-import Customer from "src/jsx/components/Mitra/Pelanggan/DataCustomer";
 import DataSatuan from "src/jsx/components/MasterLainnya/Satuan/DataSatuan";
 import DataProduk from "src/jsx/components/Master/Produk/DataProduk";
 import DataJasa from "src/jsx/components/Master/Jasa/DataJasa";
 import DataCustomer from "src/jsx/components/Mitra/Pelanggan/DataCustomer";
-
-const data = {
-  faktur: false,
-};
 
 const InputSO = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
@@ -50,20 +45,25 @@ const InputSO = ({ onCancel, onSuccess }) => {
   const [rulesPay, setRulesPay] = useState(null);
   const [ppn, setPpn] = useState(null);
   const [customer, setCustomer] = useState(null);
+  const [subCus, setSubCus] = useState(null);
   const [inProd, setInProd] = useState([
     {
-      id: 0,
-      qty: 1,
-      u_from: null,
-      u_to: null,
+      prod_id: null,
+      unit_id: null,
+      request: null,
+      price: null,
+      disc: null,
+      nett_price: null,
     },
   ]);
   const [inJasa, setInJasa] = useState([
     {
-      id: 0,
-      qty: 1,
-      u_from: null,
-      u_to: null,
+      jasa_id: null,
+      unit_id: null,
+      qty: null,
+      price: null,
+      disc: null,
+      nett_price: null,
     },
   ]);
   const [accor, setAccor] = useState({
@@ -84,15 +84,14 @@ const InputSO = ({ onCancel, onSuccess }) => {
     getRulesPay();
     getPpn();
     getCustomer();
+    getSubCus();
   }, []);
 
   const editSO = async () => {
     const config = {
-      ...endpoints.editPermintaan,
-      endpoint: endpoints.editPermintaan.endpoint + currentItem.id,
-      data: {
-        cus_code: currentItem.customer.cus_code,
-      },
+      ...endpoints.editSO,
+      endpoint: endpoints.editSO.endpoint + so.id,
+      data: so,
     };
     console.log(config.data);
     let response = null;
@@ -117,10 +116,8 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
   const addSO = async () => {
     const config = {
-      ...endpoints.addPermintaan,
-      data: {
-        cus_code: currentItem.customer.cus_code,
-      },
+      ...endpoints.addSO,
+      data: so,
     };
     console.log(config.data);
     let response = null;
@@ -128,15 +125,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
       response = await request(null, config);
       console.log(response);
       if (response.status) {
-        setTimeout(() => {
-          setUpdate(false);
-          toast.current.show({
-            severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
-            life: 3000,
-          });
-        }, 500);
+        onSuccess();
       }
     } catch (error) {
       console.log(error);
@@ -146,7 +135,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${currentItem.customer.cus_code} Sudah Digunakan`,
+            detail: `Kode ${so.so_code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -292,6 +281,30 @@ const InputSO = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
+  const getSubCus = async () => {
+    const config = {
+      ...endpoints.customer,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        let filt = [];
+        data.forEach((elem) => {
+          if (elem.customer.sub_cus === true) {
+            filt.push(elem.customer);
+          }
+        });
+        console.log(data);
+        setSubCus(filt);
+      }
+    } catch (error) {}
+  };
+
   const checkUnit = (value) => {
     let selected = {};
     satuan?.forEach((element) => {
@@ -361,7 +374,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
   const checkCus = (value) => {
     let selected = {};
     customer?.forEach((element) => {
-      if (value === element.id) {
+      if (value === element.customer.id) {
         selected = element;
       }
     });
@@ -372,7 +385,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
   const checkSubCus = (value) => {
     let selected = {};
     customer?.forEach((element) => {
-      if (value === element.id) {
+      if (value === element.customer.id) {
         selected = element;
       }
     });
@@ -482,6 +495,30 @@ const InputSO = ({ onCancel, onSuccess }) => {
     return <span>{props.placeholder}</span>;
   };
 
+  const SubcusTemp = (option) => {
+    return (
+      <div>
+        {option !== null
+          ? `${option.cus_name} (${option.cus_code})`
+          : ""}
+      </div>
+    );
+  };
+
+  const valueSubCusTemp = (option, props) => {
+    if (option) {
+      return (
+        <div>
+          {option !== null
+            ? `${option.cus_name} (${option.cus_code})`
+            : ""}
+        </div>
+      );
+    }
+
+    return <span>{props.placeholder}</span>;
+  };
+
   const formatDate = (date) => {
     var d = new Date(`${date}Z`),
       month = "" + (d.getMonth() + 1),
@@ -512,7 +549,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
   const body = () => {
     return (
       <>
-      <Toast ref={toast} />
+        <Toast ref={toast} />
         {/* Put content body here */}
         <Row className="mb-6">
           <div className="col-6">
@@ -545,12 +582,12 @@ const InputSO = ({ onCancel, onSuccess }) => {
             <label className="text-black fs-14">Pelanggan</label>
             <div className="p-inputgroup">
               <Dropdown
-                // value={so.cus_id !== null ? checkCus(so.cus_id) : null}
+                value={so.pel_id !== null ? checkCus(so.pel_id) : null}
                 options={customer}
                 onChange={(e) => {
-                  updateSo({ ...so, cus_id: e.value.customer.id });
+                  updateSo({ ...so, pel_id: e.value.customer.id });
                 }}
-                optionLabel="customer.cus_name"
+                optionLabel="cus_name"
                 placeholder="Pilih Pelanggan"
                 itemTemplate={cusTemp}
                 valueTemplate={valueCusTemp}
@@ -569,11 +606,11 @@ const InputSO = ({ onCancel, onSuccess }) => {
             <label className="text-black fs-14"></label>
             <div className="p-inputgroup mt-2">
               <InputText
-                // value={
-                //   so.cus_id !== null
-                //     ? checkCus(so.cus_id)?.customer?.cus_address
-                //     : ""
-                // }
+                value={
+                  so.pel_id !== null
+                    ? checkCus(so.pel_id)?.customer?.cus_address
+                    : ""
+                }
                 placeholder="Alamat Pelanggan"
                 disabled
               />
@@ -585,8 +622,8 @@ const InputSO = ({ onCancel, onSuccess }) => {
             <div className="p-inputgroup mt-2">
               <InputText
                 value={
-                  so.cus_id !== null
-                    ? checkCus(so.cus_id)?.customer?.cus_telp1
+                  so.pel_id !== null
+                    ? checkCus(so.pel_id)?.customer?.cus_telp1
                     : ""
                 }
                 placeholder="Kontak Person"
@@ -599,10 +636,10 @@ const InputSO = ({ onCancel, onSuccess }) => {
             <label className="text-black fs-14">Ppn</label>
             <div className="p-inputgroup mt-2">
               <Dropdown
-                // value={so.cus_id !== null ? checkCus(so.cus_id) : null}
+                value={so.ppn_type !== null ? checkPpn(so.ppn_type) : null}
                 options={ppn}
                 onChange={(e) => {
-                  // updateSo({ ...so, cus_id: e.value.customer.id });
+                  updateSo({ ...so, ppn_type: e.value.id });
                 }}
                 optionLabel="name"
                 placeholder="Pilih Jenis Ppn"
@@ -623,9 +660,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
             </label>
             <InputSwitch
               className="ml-4"
-              checked={so && so.refrence}
+              checked={so && so.sub_addr}
               onChange={(e) => {
-                updateSo({ ...so, refrence: e.target.value });
+                updateSo({ ...so, sub_addr: e.target.value });
               }}
             />
           </div>
@@ -634,22 +671,22 @@ const InputSO = ({ onCancel, onSuccess }) => {
             <label className="text-black fs-14">Sub Pelanggan</label>
             <div className="p-inputgroup">
               <Dropdown
-                // value={so.cus_id !== null ? checkCus(so.cus_id) : null}
-                options={customer}
+                value={so.sub_id !== null ? checkSubCus(so.sub_id) : null}
+                options={subCus}
                 onChange={(e) => {
-                  updateSo({ ...so, cus_id: e.value.customer.id });
+                  updateSo({ ...so, sub_id: e.value?.id });
                 }}
-                optionLabel="customer.cus_name"
+                optionLabel="cus_name"
                 placeholder="Pilih Pelanggan"
-                itemTemplate={cusTemp}
-                valueTemplate={valueCusTemp}
-                disabled={so && !so.refrence}
+                itemTemplate={SubcusTemp}
+                valueTemplate={valueSubCusTemp}
+                disabled={so && !so.sub_addr}
               />
               <PButton
                 onClick={() => {
                   setShowCustomer(true);
                 }}
-                disabled={so && !so.refrence}
+                disabled={so && !so.sub_addr}
               >
                 <i class="bx bx-food-menu"></i>
               </PButton>
@@ -660,11 +697,11 @@ const InputSO = ({ onCancel, onSuccess }) => {
             <label className="text-black fs-14"></label>
             <div className="p-inputgroup mt-1">
               <InputText
-                // value={
-                //   so.cus_id !== null
-                //     ? checkSubCus(so.cus_id)?.customer?.cus_address
-                //     : ""
-                // }
+                value={
+                  so.sub_id !== null
+                    ? checkSubCus(so.sub_id)?.customer?.cus_address
+                    : ""
+                }
                 placeholder="Alamat Sub Pelanggan"
                 disabled
               />
@@ -676,8 +713,8 @@ const InputSO = ({ onCancel, onSuccess }) => {
             <div className="p-inputgroup mt-1">
               <InputText
                 value={
-                  so.cus_id !== null
-                    ? checkSubCus(so.cus_id)?.customer?.cus_telp1
+                  so.sub_id !== null
+                    ? checkSubCus(so.sub_id)?.customer?.cus_telp1
                     : ""
                 }
                 placeholder="Kontak Person"
@@ -771,13 +808,17 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   //   maxWidth: "15rem",
                   // }}
                   field={""}
-                  body={() => (
+                  body={(e) => (
                     <div className="p-inputgroup">
                       <Dropdown
-                        value={null}
+                        value={e.prod_id && checkProd(e.prod_id)}
                         options={product}
-                        onChange={(e) => {
+                        onChange={(u) => {
                           console.log(e.value);
+                          let temp = [...inProd];
+                          temp[e.index].prod_id = u.value.id;
+                          temp[e.index].unit_id = u.value.unit?.id;
+                          updateSo({ inProd: temp });
                         }}
                         placeholder="Pilih Kode Produk"
                         optionLabel="name"
@@ -804,14 +845,14 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   //   maxWidth: "15rem",
                   // }}
                   field={""}
-                  body={() => (
+                  body={(e) => (
                     <div className="p-inputgroup">
                       <Dropdown
-                        value={null}
-                        onChange={(e) => {
-                          // let temp = [...rp.rprod];
-                          // temp[i].unit_id = e.value.id;
-                          // updateRp({ ...rp, rprod: temp });
+                        value={e.unit_id && checkUnit(e.unit_id)}
+                        onChange={(u) => {
+                          let temp = [...inProd];
+                          temp[e.index].unit_id = u.value.id;
+                          updateSo({ inProd: temp });
                         }}
                         options={satuan}
                         optionLabel="name"
@@ -836,13 +877,21 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   //   maxWidth: "10rem",
                   // }}
                   field={""}
-                  body={() => (
+                  body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        value={null}
-                        onChange={(e) => {}}
+                        value={e.request && e.request}
+                        onChange={(u) => {
+                          let temp = [...inProd];
+                          temp[e.index].request = u.target.value;
+                          temp[e.index].total =
+                            temp[e.index].request * temp[e.index].price;
+                          updateSo({ inProd: temp });
+                          console.log(temp);
+                        }}
                         placeholder="0"
                         type="number"
+                        min={0}
                       />
                     </div>
                   )}
@@ -854,13 +903,21 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   //   minWidth: "10rem",
                   // }}
                   field={""}
-                  body={() => (
+                  body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        value={null}
-                        onChange={(e) => {}}
+                        value={e.price && e.price}
+                        onChange={(u) => {
+                          let temp = [...inProd];
+                          temp[e.index].price = u.target.value;
+                          temp[e.index].total =
+                            temp[e.index].request * temp[e.index].price;
+                          updateSo({ inProd: temp });
+                          console.log(temp);
+                        }}
                         placeholder="0"
                         type="number"
+                        min={0}
                       />
                     </div>
                   )}
@@ -872,14 +929,21 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   //   maxWidth: "10rem",
                   // }}
                   field={""}
-                  body={() => (
+                  body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        value={null}
-                        onChange={(e) => {}}
+                        value={e.disc && e.disc}
+                        onChange={(u) => {
+                          let temp = [...inProd];
+                          temp[e.index].disc = u.target.value;
+                          updateSo({ inProd: temp });
+                          console.log(temp);
+                        }}
                         placeholder="0"
                         type="number"
+                        min={0}
                       />
+                      <span className="p-inputgroup-addon">%</span>
                     </div>
                   )}
                 />
@@ -890,13 +954,19 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   //   minWidth: "10rem",
                   // }}
                   field={""}
-                  body={() => (
+                  body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        value={null}
-                        onChange={(e) => {}}
+                        value={e.nett_price && e.nett_price}
+                        onChange={(u) => {
+                          let temp = [...inProd];
+                          temp[e.index].nett_price = u.target.value;
+                          updateSo({ inProd: temp });
+                          console.log(temp);
+                        }}
                         placeholder="0"
                         type="number"
+                        min={0}
                       />
                     </div>
                   )}
@@ -909,7 +979,14 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   // }}
                   body={(e) => (
                     <label className="text-nowrap">
-                      <b>{`Rp. ${e.index * 500}`}</b>
+                      <b>
+                        Rp.{" "}
+                        {`${
+                          e.nett_price && e.nett_price != 0
+                            ? e.nett_price
+                            : e.total - (e.total * e.disc) / 100
+                        }`.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.")}
+                      </b>
                     </label>
                   )}
                 />
@@ -927,10 +1004,12 @@ const InputSO = ({ onCancel, onSuccess }) => {
                           setInProd([
                             ...inProd,
                             {
-                              id: 0,
-                              qty: 1,
-                              u_from: null,
-                              u_to: null,
+                              prod_id: null,
+                              unit_id: null,
+                              request: null,
+                              price: null,
+                              disc: null,
+                              nett_price: null,
                             },
                           ]);
                         }}
@@ -985,12 +1064,17 @@ const InputSO = ({ onCancel, onSuccess }) => {
                     width: "15rem",
                   }}
                   field={""}
-                  body={() => (
+                  body={(e) => (
                     <div className="p-inputgroup">
                       <Dropdown
-                        value={null}
-                        onChange={(e) => {}}
+                        value={e.sup_id && checkSupp(e.sup_id)}
                         options={supplier}
+                        onChange={(u) => {
+                          console.log(e.value);
+                          let temp = [...inJasa];
+                          temp[e.index].sup_id = u.value.supplier.id;
+                          updateSo({ inJasa: temp });
+                        }}
                         optionLabel="supplier.sup_name"
                         placeholder="Pilih Supplier"
                         itemTemplate={suppTemp}
@@ -1013,12 +1097,17 @@ const InputSO = ({ onCancel, onSuccess }) => {
                     maxWidth: "15rem",
                   }}
                   field={""}
-                  body={() => (
+                  body={(e) => (
                     <div className="p-inputgroup">
                       <Dropdown
-                        value={null}
-                        onChange={(e) => {}}
+                        value={e.jasa_id && checkJasa(e.jasa_id)}
                         options={jasa}
+                        onChange={(u) => {
+                          console.log(e.value);
+                          let temp = [...inJasa];
+                          temp[e.index].jasa_id = u.value.jasa.id;
+                          updateSo({ inJasa: temp });
+                        }}
                         optionLabel="jasa.name"
                         placeholder="Pilih Jasa"
                         itemTemplate={jasTemp}
@@ -1041,12 +1130,17 @@ const InputSO = ({ onCancel, onSuccess }) => {
                     maxWidth: "12rem",
                   }}
                   field={""}
-                  body={() => (
+                  body={(e) => (
                     <div className="p-inputgroup">
                       <Dropdown
-                        value={null}
-                        onChange={(e) => {}}
+                        value={e.unit_id && checkUnit(e.unit_id)}
                         options={satuan}
+                        onChange={(u) => {
+                          console.log(e.value);
+                          let temp = [...inJasa];
+                          temp[e.index].unit_id = u.value.unit?.id;
+                          updateSo({ inJasa: temp });
+                        }}
                         optionLabel="name"
                         placeholder="Pilih Satuan"
                       />
@@ -1067,13 +1161,21 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   //   maxWidth: "15rem",
                   // }}
                   field={""}
-                  body={() => (
+                  body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        value={null}
-                        onChange={(e) => {}}
+                        value={e.qty && e.qty}
+                        onChange={(u) => {
+                          let temp = [...inJasa];
+                          temp[e.index].qty = u.target.value;
+                          temp[e.index].total =
+                            temp[e.index].qty * temp[e.index].price;
+                          updateSo({ inJasa: temp });
+                          console.log(temp);
+                        }}
                         placeholder="0"
                         type="number"
+                        min={0}
                       />
                     </div>
                   )}
@@ -1085,13 +1187,21 @@ const InputSO = ({ onCancel, onSuccess }) => {
                     width: "25rem",
                   }}
                   field={""}
-                  body={() => (
+                  body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        value={null}
-                        onChange={(e) => {}}
+                        value={e.price && e.price}
+                        onChange={(u) => {
+                          let temp = [...inJasa];
+                          temp[e.index].price = u.target.value;
+                          temp[e.index].total =
+                            temp[e.index].qty * temp[e.index].price;
+                          updateSo({ inJasa: temp });
+                          console.log(temp);
+                        }}
                         placeholder="0"
                         type="number"
+                        min={0}
                       />
                     </div>
                   )}
@@ -1103,14 +1213,21 @@ const InputSO = ({ onCancel, onSuccess }) => {
                     width: "25rem",
                   }}
                   field={""}
-                  body={() => (
+                  body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        value={null}
-                        onChange={(e) => {}}
+                        value={e.disc && e.disc}
+                        onChange={(u) => {
+                          let temp = [...inJasa];
+                          temp[e.index].disc = u.target.value;
+                          updateSo({ inJasa: temp });
+                          console.log(temp);
+                        }}
                         placeholder="0"
                         type="number"
+                        min={0}
                       />
+                      <span className="p-inputgroup-addon">%</span>
                     </div>
                   )}
                 />
@@ -1122,7 +1239,12 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   // }}
                   body={(e) => (
                     <label className="text-nowrap">
-                      <b>{`Rp. ${e.index * 500}`}</b>
+                      <b>
+                        {`Rp. ${e.total - (e.total * e.disc) / 100}`.replace(
+                          /(\d)(?=(\d{3})+(?!\d))/g,
+                          "$1."
+                        )}
+                      </b>
                     </label>
                   )}
                 />
@@ -1140,10 +1262,12 @@ const InputSO = ({ onCancel, onSuccess }) => {
                           setInJasa([
                             ...inJasa,
                             {
-                              id: 0,
-                              qty: 1,
-                              u_from: null,
-                              u_to: null,
+                              jasa_id: null,
+                              unit_id: null,
+                              qty: null,
+                              price: null,
+                              disc: null,
+                              nett_price: null,
                             },
                           ]);
                         }}
@@ -1193,7 +1317,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
           <div className="row justify-content-right col-6">
             <div className="col-6">
-              <label className="text-black fs-14">Sub Total Barang</label>
+              <label className="text-black fs-14">Sub Total</label>
             </div>
 
             <div className="col-6">
@@ -1203,7 +1327,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
             </div>
 
             <div className="col-6">
-              <label className="text-black fs-14">DPP Barang</label>
+              <label className="text-black fs-14">DPP</label>
             </div>
 
             <div className="col-6">

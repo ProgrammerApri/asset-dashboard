@@ -45,7 +45,6 @@ const DataJasa = ({
   onInput = () => {},
   onRowSelect,
   onSuccessInput,
-
 }) => {
   const [account, setAccount] = useState(null);
   const [first2, setFirst2] = useState(0);
@@ -59,7 +58,6 @@ const DataJasa = ({
   const [isEdit, setEdit] = useState(false);
   const [showInput, setShowInput] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
-
 
   useEffect(() => {
     getAccount();
@@ -440,69 +438,70 @@ const DataJasa = ({
     setShowInput(false);
   };
 
-  
-
   const renderBody = () => {
     return (
-      <DataTable
-        responsiveLayout="scroll"
-        value={data}
-        className="display w-150 datatable-wrapper"
-        showGridlines
-        dataKey="id"
-        rowHover
-        header={renderHeader}
-        filters={filters1}
-        globalFilterFields={[
-          "jasa.code",
-          "jasa.name",
-          "jasa.desc",
-          "account.acc_name",
-        ]}
-        emptyMessage="Tidak ada data"
-        paginator
-        paginatorTemplate={template2}
-        first={first2}
-        rows={rows2}
-        onPage={onCustomPage2}
-        paginatorClassName="justify-content-end mt-3"
-        selectionMode="single"
-        onRowSelect={onRowSelect}
-      >
-        <Column
-          header="Kode Jasa"
-          style={{
-            minWidth: "8rem",
-          }}
-          field={(e) => e.jasa.code}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header="Nama Jasa"
-          field={(e) => e.jasa.name}
-          style={{ minWidth: "8rem" }}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header="Akun Distribusi GL"
-          field={(e) => e.account.acc_name}
-          style={{ minWidth: "8rem" }}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header="Keterangan"
-          field={(e) => e.jasa.desc}
-          style={{ minWidth: "8rem" }}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header="Action"
-          dataType="boolean"
-          bodyClassName="text-center"
-          style={{ minWidth: "2rem" }}
-          body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
-        />
-      </DataTable>
+      <>
+        <Toast ref={toast} />
+        <DataTable
+          responsiveLayout="scroll"
+          value={data}
+          className="display w-150 datatable-wrapper"
+          showGridlines
+          dataKey="id"
+          rowHover
+          header={renderHeader}
+          filters={filters1}
+          globalFilterFields={[
+            "jasa.code",
+            "jasa.name",
+            "jasa.desc",
+            "account.acc_name",
+          ]}
+          emptyMessage="Tidak ada data"
+          paginator
+          paginatorTemplate={template2}
+          first={first2}
+          rows={rows2}
+          onPage={onCustomPage2}
+          paginatorClassName="justify-content-end mt-3"
+          selectionMode="single"
+          onRowSelect={onRowSelect}
+        >
+          <Column
+            header="Kode Jasa"
+            style={{
+              minWidth: "8rem",
+            }}
+            field={(e) => e.jasa.code}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Nama Jasa"
+            field={(e) => e.jasa.name}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Akun Distribusi GL"
+            field={(e) => e.account.acc_name}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Keterangan"
+            field={(e) => e.jasa.desc}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Action"
+            dataType="boolean"
+            bodyClassName="text-center"
+            style={{ minWidth: "2rem" }}
+            body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
+          />
+        </DataTable>
+      </>
     );
   };
 

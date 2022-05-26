@@ -12,8 +12,7 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_SO } from "src/redux/actions";
-import { SET_EDIT } from "src/redux/actions/SOActions";
+import { SET_CURRENT_SO, SET_EDIT_SO } from "src/redux/actions";
 
 const data = {
   id: null,
@@ -82,10 +81,10 @@ const DataSalesOrder = ({ onAdd, onEdit }) => {
     }
   };
 
-  const delPermintaan = async (id) => {
+  const delSO = async (id) => {
     const config = {
-      ...endpoints.delPermintaan,
-      endpoint: endpoints.delPermintaan.endpoint + currentItem.id,
+      ...endpoints.delSO,
+      endpoint: endpoints.delSO.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -127,17 +126,17 @@ const DataSalesOrder = ({ onAdd, onEdit }) => {
         <Link
           onClick={() => {
             onEdit(data);
-            let inProd = data.inProd;
+            let sprod = data.sprod;
             dispatch({
-              type: SET_EDIT,
+              type: SET_EDIT_SO,
               payload: true,
             });
-            inProd.forEach((el) => {
+            sprod.forEach((el) => {
               el.prod_id = el.prod_id.id;
               el.unit_id = el.unit_id.id;
             });
-            let inJasa = data.inJasa;
-            inJasa.forEach((el) => {
+            let sjasa = data.sjasa;
+            sjasa.forEach((el) => {
               el.jasa_id = el.jasa_id.id;
               el.unit_id = el.unit_id.id;
             });
@@ -146,26 +145,35 @@ const DataSalesOrder = ({ onAdd, onEdit }) => {
               payload: {
                 ...data,
                 pel_id: data?.pel_id?.id ?? null,
-                inProd:
-                  inProd.length > 0
-                    ? inProd
+                sprod:
+                  sprod.length > 0
+                    ? sprod
                     : [
                         {
                           id: 0,
                           prod_id: null,
                           unit_id: null,
                           request: null,
+                          order: null,
+                          remain: null,
+                          price: null,
+                          disc: null,
+                          nett_price: null,
+                          total: null,
                         },
                       ],
-                inJasa:
-                  inJasa.length > 0
-                    ? inJasa
+                sjasa:
+                  sjasa.length > 0
+                    ? sjasa
                     : [
                         {
                           id: 0,
                           jasa_id: null,
                           unit_id: null,
                           qty: null,
+                          price: null,
+                          disc: null,
+                          total: null,
                         },
                       ],
               },
@@ -203,7 +211,7 @@ const DataSalesOrder = ({ onAdd, onEdit }) => {
           label="Hapus"
           icon="pi pi-trash"
           onClick={() => {
-            delPermintaan();
+            delSO();
           }}
           autoFocus
           loading={update}
@@ -243,27 +251,37 @@ const DataSalesOrder = ({ onAdd, onEdit }) => {
           onClick={() => {
             onAdd();
             dispatch({
-              type: SET_EDIT,
+              type: SET_EDIT_SO,
               payload: false,
             });
             dispatch({
               type: SET_CURRENT_SO,
               payload: {
                 ...data,
-                inProd: [
+                sprod: [
                   {
                     id: 0,
                     prod_id: null,
                     unit_id: null,
                     request: null,
+                    order: null,
+                    remain: null,
+                    price: null,
+                    disc: null,
+                    nett_price: null,
+                    total: null,
                   },
                 ],
-                inJasa: [
+                sjasa: [
                   {
                     id: 0,
                     jasa_id: null,
+                    sup_id: null,
                     unit_id: null,
                     qty: null,
+                    price: null,
+                    disc: null,
+                    total: null,
                   },
                 ],
               },
@@ -379,8 +397,8 @@ const DataSalesOrder = ({ onAdd, onEdit }) => {
           body={loading && <Skeleton />}
         />
         <Column
-          header="Status"
-          field={(e) => e.cus_telp}
+          header="Tanggal Jatuh Tempo"
+          field={(e) => formatDate(e.due_date)}
           style={{ minWidth: "10rem" }}
           body={loading && <Skeleton />}
         />

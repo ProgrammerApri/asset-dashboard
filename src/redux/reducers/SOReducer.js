@@ -1,4 +1,4 @@
-import { SET_CURRENT_SO, SET_SO, SET_EDIT } from "../actions";
+import { SET_CURRENT_SO, SET_SO, SET_EDIT, SET_EDIT_SO } from "../actions";
 
 const initialState = {
   so: [],
@@ -18,7 +18,7 @@ const SOReducer = (state = initialState, { type, payload }) => {
         ...state,
         so: payload,
       };
-      case SET_EDIT:
+      case SET_EDIT_SO:
         return {
           ...state,
           editso: payload,

@@ -221,13 +221,13 @@ const PesananPO = ({ onAdd, onEdit }) => {
               payload: true,
             });
 
-            let rprod = data.rprod;
-            rprod.forEach((el) => {
+            let pprod = data.pprod;
+            pprod.forEach((el) => {
               el.prod_id = el.prod_id.id;
               el.unit_id = el.unit_id.id;
             });
-            let rjasa = data.rjasa;
-            rjasa.forEach((el) => {
+            let pjasa = data.pjasa;
+            pjasa.forEach((el) => {
               el.jasa_id = el.jasa_id.id;
               el.unit_id = el.unit_id.id;
             });
@@ -239,8 +239,8 @@ const PesananPO = ({ onAdd, onEdit }) => {
                 preq_id: data?.preq_id?.id,
                 sup_id: data?.sup_id?.id,
                 top: data?.top?.id,
-                rprod: rprod,
-                rjasa: rjasa,
+                pprod: pprod,
+                pjasa: pjasa,
               },
             });
           }}
@@ -360,8 +360,8 @@ const PesananPO = ({ onAdd, onEdit }) => {
               type: SET_CURRENT_PO,
               payload: {
                 ...data,
-                rprod: [],
-                rjasa: [],
+                pprod: [],
+                pjasa: [],
               },
             });
           }}>

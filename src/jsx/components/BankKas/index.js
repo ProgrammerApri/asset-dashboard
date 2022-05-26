@@ -1,26 +1,20 @@
 import React, { useState } from "react";
 import { Button, Col, Row } from "react-bootstrap";
-import Persediaan from "./Persediaan/Persediaan";
-import TransaksiPembelian from "./TransaksiPembelian/TransaksiPembelian";
-import TransaksiPenjualan from "./TransaksiPenjualan/TransaksiPenjualan";
+import Keluar from "./Keluar/Keluar";
+import Masuk from "./Masuk/Masuk";
 
-const Transaksi = () => {
+const BankKas = () => {
   const [active, setActive] = useState(0);
   const [subMenu, setSubMenu] = useState([
     {
-      tittle: "Transaksi Pembelian",
+      tittle: "Transaksi Masuk",
       icon: "bx-receipt",
-      component: <TransaksiPembelian />,
+      component: <Masuk />,
     },
     {
-      tittle: "Transaksi Penjualan",
+      tittle: "Transaksi Keluar",
       icon: "bx-receipt",
-      component: <TransaksiPenjualan />,
-    },
-    {
-      tittle: "Persediaan",
-      icon: "bx-receipt",
-      component: <Persediaan />,
+      component: <Keluar/>,
     },
   ]);
 
@@ -59,4 +53,4 @@ const Transaksi = () => {
   );
 };
 
-export default Transaksi;
+export default BankKas;

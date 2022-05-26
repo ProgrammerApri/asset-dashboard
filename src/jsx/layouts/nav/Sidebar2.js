@@ -29,6 +29,11 @@ const SideMenu = () => {
         tittle: "Transaksi",
         to: "transaksi",
         icon: "bx-barcode",
+      },
+      {
+        tittle: "Bank & Kas",
+        to: "bank-&-kas",
+        icon: "bx-barcode",
       }
     ],
     lainnya: [

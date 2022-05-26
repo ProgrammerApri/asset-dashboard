@@ -21,7 +21,7 @@ const Header = ({
   const patern = origin+"/#/"
   var path = window.location.href;
   var name = path.replace(patern, "");
-  var finalName = name.length > 0 && name.includes("-") ? name.replace("-", " ") : name;
+  var finalName = name.length > 0 && name.includes("-") ? name.replaceAll("-", " ") : name;
   const [isDark, setDark] = useState(false);
 
   const body = document.querySelector("body");

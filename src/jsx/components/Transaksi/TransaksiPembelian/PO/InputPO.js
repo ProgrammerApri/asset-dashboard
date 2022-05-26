@@ -18,7 +18,7 @@ import DataRulesPay from "src/jsx/components/MasterLainnya/RulesPay/DataRulesPay
 import DataPajak from "src/jsx/components/Master/Pajak/DataPajak";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { tr } from "date-fns/locale";
+import { el, te, tr } from "date-fns/locale";
 
 const InputPO = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
@@ -154,47 +154,87 @@ const InputPO = ({ onCancel, onSuccess }) => {
         data.forEach((elem) => {
           if (isEdit) {
             filt.push(elem);
-            let remain = 0;
+            let prod = [];
             elem.rprod.forEach((el) => {
-              el.order = el.order ?? 0;
-              if (el.order === 0 || el.request - el.order !== 0) {
-                el.prod_id = el.prod_id.id;
-                el.unit_id = el.unit_id.id;
-              }
+              el.prod_id = el.prod_id.id;
+              el.unit_id = el.unit_id.id;
+              prod.push({
+                ...el,
+                r_remain: el.remain,
+              });
+
+              let temp = [...po.pprod];
+              po.pprod.forEach((e, i) => {
+                if (el.id == e.rprod_id) {
+                  temp[i].request = el.request;
+                  temp[i].r_remain = el.remain + e.order;
+                  temp[i].remain = el.remain;
+                  updatePo({ ...po, pprod: temp });
+                }
+              });
             });
+            elem.rprod = prod;
+            let jasa = [];
             elem.rjasa.forEach((element) => {
               element.jasa_id = element.jasa_id.id;
               element.unit_id = element.unit_id.id;
-            });
-          } else {
-            if (elem.status === 0) {
-              filt.push(elem);
-              elem.rprod.forEach((el) => {
-                el.order = el.order ?? 0;
-                if (el.order === 0 || el.request - el.order !== 0) {
-                  el.prod_id = el.prod_id.id;
-                  el.unit_id = el.unit_id.id;
+              jasa.push({
+                ...element,
+                r_remain: element.remain,
+              });
+
+              let temp = [...po.pjasa];
+              po.pprod.forEach((e, i) => {
+                if (el.id == e.rjasa_id) {
+                  temp[i].request = el.request;
+                  temp[i].r_remain = el.remain + e.order;
+                  temp[i].remain = el.remain;
+                  updatePo({ ...po, pjasa: temp });
                 }
               });
-              elem.rjasa.forEach((element) => {
-                element.jasa_id = element.jasa_id.id;
-                element.unit_id = element.unit_id.id;
+            });
+            elem.rjasa = jasa;
+          } else {
+            if (elem.status !== 2) {
+              filt.push(elem);
+              let prod = [];
+              elem.rprod.forEach((el) => {
+                if (el.remain > 0) {
+                  el.prod_id = el.prod_id.id;
+                  el.unit_id = el.unit_id.id;
+                  prod.push({
+                    ...el,
+                    r_remain: el.remain,
+                    order: 0,
+                    price: 0,
+                    disc: 0,
+                    nett_price: 0,
+                    total: 0,
+                  });
+                }
               });
-              // elem.rjasa.push({
-              //   id: 0,
-              //   preq_id: elem.id,
-              //   sup_id: null,
-              //   jasa_id: null,
-              //   unit_id: null,
-              //   qty: null,
-              //   price: null,
-              //   disc: null,
-              //   total: null,
-              // });
+              elem.rprod = prod;
+              let jasa = [];
+              elem.rjasa.forEach((element) => {
+                if (element.remain > 0) {
+                  element.jasa_id = element.jasa_id.id;
+                  element.unit_id = element.unit_id.id;
+                  jasa.push({
+                    ...element,
+                    sup_id: null,
+                    r_remain: element.remain,
+                    order: 0,
+                    price: 0,
+                    disc: 0,
+                    nett_price: 0,
+                    total: 0,
+                  });
+                }
+              });
+              elem.rjasa = jasa;
             }
           }
         });
-        console.log(data);
         setRequest(filt);
       }
     } catch (error) {}
@@ -567,7 +607,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
   const getSubTotalBarang = () => {
     let total = 0;
-    po?.rprod?.forEach((el) => {
+    po?.pprod?.forEach((el) => {
       if (el.nett_price && el.nett_price > 0) {
         total += parseInt(el.nett_price);
       } else {
@@ -580,7 +620,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
   const getSubTotalJasa = () => {
     let total = 0;
-    po?.rjasa?.forEach((el) => {
+    po?.pjasa?.forEach((el) => {
       total += el.total - (el.total * el.disc) / 100;
     });
 
@@ -645,8 +685,8 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     preq_id: e.value.id,
                     due_date: result,
                     sup_id: e.value?.ref_sup?.id ?? null,
-                    rprod: e.value.rprod,
-                    rjasa: e.value.rjasa,
+                    pprod: e.value.rprod,
+                    pjasa: e.value.rjasa,
                   });
                 }}
                 optionLabel="req_code"
@@ -800,7 +840,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
           </div>
         </Row>
 
-        {po?.rprod?.length ? (
+        {po?.pprod?.length ? (
           <CustomAccordion
             tittle={"Permintaan Produk"}
             defaultActive={true}
@@ -816,7 +856,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
               <>
                 <DataTable
                   responsiveLayout="none"
-                  value={po.rprod.map((v, i) => {
+                  value={po.pprod.map((v, i) => {
                     return {
                       ...v,
                       index: i,
@@ -860,9 +900,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                         <Dropdown
                           value={e.unit_id && checkUnit(e.unit_id)}
                           onChange={(t) => {
-                            let temp = [...po.rprod];
+                            let temp = [...po.pprod];
                             temp[e.index].unit_id = t.value.id;
-                            updatePo({ ...po, rprod: temp });
+                            updatePo({ ...po, pprod: temp });
                           }}
                           options={satuan}
                           optionLabel="name"
@@ -883,9 +923,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                         <InputText
                           value={e.request ? e.request : 0}
                           onChange={(t) => {
-                            let temp = [...po.rprod];
+                            let temp = [...po.pprod];
                             temp[e.index].request = t.target.value;
-                            updatePo({ ...po, rprod: temp });
+                            updatePo({ ...po, pprod: temp });
                             console.log(temp);
                           }}
                           placeholder="0"
@@ -904,17 +944,19 @@ const InputPO = ({ onCancel, onSuccess }) => {
                         <InputText
                           value={e.order ? e.order : 0}
                           onChange={(t) => {
-                            let temp = [...po.rprod];
-                            temp[e.index].order =
-                              t.target.value > e.request
-                                ? e.request
+                            let temp = [...po.pprod];
+                            let val =
+                              t.target.value > e.r_remain
+                                ? e.r_remain
                                 : t.target.value;
                             let result =
-                              temp[e.index].request - temp[e.index].order;
+                              temp[e.index].order - val + temp[e.index].remain;
+                            temp[e.index].order = val;
+
                             temp[e.index].total =
                               temp[e.index].price * temp[e.index].order;
                             temp[e.index].remain = result;
-                            updatePo({ ...po, rprod: temp });
+                            updatePo({ ...po, pprod: temp });
                           }}
                           min={0}
                           placeholder="0"
@@ -947,11 +989,11 @@ const InputPO = ({ onCancel, onSuccess }) => {
                         <InputText
                           value={e.price ? e.price : 0}
                           onChange={(t) => {
-                            let temp = [...po.rprod];
+                            let temp = [...po.pprod];
                             temp[e.index].price = t.target.value;
                             temp[e.index].total =
                               temp[e.index].price * temp[e.index].order;
-                            updatePo({ ...po, rprod: temp });
+                            updatePo({ ...po, pprod: temp });
                           }}
                           min={0}
                           placeholder="0"
@@ -969,12 +1011,12 @@ const InputPO = ({ onCancel, onSuccess }) => {
                         <InputText
                           value={e.disc ? e.disc : 0}
                           onChange={(t) => {
-                            let temp = [...po.rprod];
+                            let temp = [...po.pprod];
                             temp[e.index].disc = t.target.value;
                             // let disc = temp[e.index].total * temp[e.index].disc / 100
                             // console.log(disc);
                             // temp[e.index].total -= disc;
-                            updatePo({ ...po, rprod: temp });
+                            updatePo({ ...po, pprod: temp });
                             console.log(temp);
                           }}
                           placeholder="0"
@@ -992,15 +1034,11 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     body={(e) => (
                       <div className="p-inputgroup">
                         <InputText
-                          value={
-                            po.rprod[e.index].nett_price
-                              ? po.rprod[e.index].nett_price
-                              : 0
-                          }
+                          value={e.nett_price ? e.nett_price : 0}
                           onChange={(t) => {
-                            let temp = [...po.rprod];
+                            let temp = [...po.pprod];
                             temp[e.index].nett_price = t.target.value;
-                            updatePo({ ...po, rprod: temp });
+                            updatePo({ ...po, pprod: temp });
                             console.log(temp);
                           }}
                           placeholder="0"
@@ -1028,13 +1066,13 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
                   {/* <Column
                   body={(e) =>
-                    e.index === po.rprod.length - 1 ? (
+                    e.index === po.pprod.length - 1 ? (
                       <Link
                         onClick={() => {
                           updatePo({
                             ...po,
-                            rprod: [
-                              ...po.rprod,
+                            pprod: [
+                              ...po.pprod,
                               {
                                 id: 0,
                                 prod_id: null,
@@ -1051,11 +1089,11 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     ) : (
                       <Link
                         onClick={() => {
-                          let temp = [...po.rprod];
+                          let temp = [...po.pprod];
                           temp.splice(e.index, 1);
                           updatePo({
                             ...po,
-                            rprod: temp,
+                            pprod: temp,
                           });
                         }}
                         className="btn btn-danger shadow btn-xs sharp ml-1"
@@ -1073,7 +1111,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
           <></>
         )}
 
-        {po?.rjasa?.length ? (
+        {po?.pjasa?.length ? (
           <CustomAccordion
             tittle={"Permintaan Jasa"}
             defaultActive={true}
@@ -1089,7 +1127,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
               <>
                 <DataTable
                   responsiveLayout="none"
-                  value={po.rjasa.map((v, i) => {
+                  value={po.pjasa.map((v, i) => {
                     return {
                       ...v,
                       index: i,
@@ -1111,9 +1149,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                           value={e.sup_id && supp(e.sup_id)}
                           options={supplier}
                           onChange={(t) => {
-                            let temp = [...po.rjasa];
+                            let temp = [...po.pjasa];
                             temp[e.index].sup_id = t.value.supplier.id;
-                            updatePo({ ...po, rjasa: temp });
+                            updatePo({ ...po, pjasa: temp });
                             console.log(temp);
                           }}
                           optionLabel="supplier.sup_name"
@@ -1140,9 +1178,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                         <Dropdown
                           value={e.jasa_id && checkjasa(e.jasa_id)}
                           onChange={(t) => {
-                            let temp = [...po.rjasa];
+                            let temp = [...po.pjasa];
                             temp[e.index].jasa_id = t.value.jasa.id;
-                            updatePo({ ...po, rjasa: temp });
+                            updatePo({ ...po, pjasa: temp });
                           }}
                           options={jasa}
                           optionLabel="jasa.name"
@@ -1163,9 +1201,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                         <Dropdown
                           value={e.unit_id && checkUnit(e.unit_id)}
                           onChange={(t) => {
-                            let temp = [...po.rjasa];
+                            let temp = [...po.pjasa];
                             temp[e.index].unit_id = t.value.id;
-                            updatePo({ ...po, rjasa: temp });
+                            updatePo({ ...po, pjasa: temp });
                           }}
                           options={satuan}
                           optionLabel="name"
@@ -1177,24 +1215,66 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
+                    header="Permintaan"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.request ? e.request : 0}
+                          onChange={(t) => {
+                            let temp = [...po.pjasa];
+                            temp[e.index].request = t.target.value;
+                            updatePo({ ...po, pjasa: temp });
+                            console.log(temp);
+                          }}
+                          placeholder="0"
+                          type="number"
+                          disabled
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
                     header="Pesanan"
                     field={""}
                     body={(e) => (
                       <div className="p-inputgroup">
                         <InputText
-                          value={e.qty && e.qty}
+                          value={e.order ? e.order : 0}
                           onChange={(t) => {
-                            let temp = [...po.rjasa];
-                            temp[e.index].qty = t.target.value;
+                            let temp = [...po.pjasa];
+                            let val =
+                              t.target.value > e.r_remain
+                                ? e.r_remain
+                                : t.target.value;
+                            let result =
+                              temp[e.index].order - val + temp[e.index].remain;
+                            temp[e.index].order = val;
+
                             temp[e.index].total =
-                              temp[e.index].qty * temp[e.index].price;
-                            updatePo({ ...po, rjasa: temp });
-                            console.log(temp);
+                              temp[e.index].price * temp[e.index].order;
+                            temp[e.index].remain = result;
+                            updatePo({ ...po, pjasa: temp });
                           }}
-                          placeholder="Jumlah Pesanan"
-                          type="number"
                           min={0}
-                          disabled={e.id !== 0}
+                          placeholder="0"
+                          type="number"
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header="Sisa"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.remain ? e.remain : 0}
+                          placeholder="0"
+                          type="number"
+                          disabled
                         />
                       </div>
                     )}
@@ -1208,11 +1288,11 @@ const InputPO = ({ onCancel, onSuccess }) => {
                         <InputText
                           value={e.price && e.price}
                           onChange={(t) => {
-                            let temp = [...po.rjasa];
+                            let temp = [...po.pjasa];
                             temp[e.index].price = t.target.value;
                             temp[e.index].total =
-                              temp[e.index].qty * temp[e.index].price;
-                            updatePo({ ...po, rjasa: temp });
+                              temp[e.index].order * temp[e.index].price;
+                            updatePo({ ...po, pjasa: temp });
                             console.log(temp);
                           }}
                           placeholder="0"
@@ -1231,9 +1311,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                         <InputText
                           value={e.disc && e.disc}
                           onChange={(t) => {
-                            let temp = [...po.rjasa];
+                            let temp = [...po.pjasa];
                             temp[e.index].disc = t.target.value;
-                            updatePo({ ...po, rjasa: temp });
+                            updatePo({ ...po, pjasa: temp });
                             console.log(temp);
                           }}
                           placeholder="0"
@@ -1250,10 +1330,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     body={(e) => (
                       <label className="text-nowrap">
                         <b>
-                          {`Rp. ${e.total - (e.total * e.disc) / 100}`.replace(
-                            /(\d)(?=(\d{3})+(?!\d))/g,
-                            "$1."
-                          )}
+                          Rp. {formatIdr(e.total - (e.total * e.disc) / 100)}
                         </b>
                       </label>
                     )}
@@ -1261,13 +1338,13 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
                   {/* <Column
                   body={(e) =>
-                    e.index === po.rjasa.length - 1 ? (
+                    e.index === po.pjasa.length - 1 ? (
                       <Link
                         onClick={() => {
                           updatePo({
                             ...po,
-                            rjasa: [
-                              ...po.rjasa,
+                            pjasa: [
+                              ...po.pjasa,
                               {
                                 id: 0,
                                 jasa_id: null,
@@ -1284,11 +1361,11 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     ) : e.id === 0 ? (
                       <Link
                         onClick={() => {
-                          let temp = [...po.rjasa];
+                          let temp = [...po.pjasa];
                           temp.splice(e.index, 1);
                           updatePo({
                             ...po,
-                            rjasa: temp,
+                            pjasa: temp,
                           });
                         }}
                         className="btn btn-danger shadow btn-xs sharp ml-1"
@@ -1311,7 +1388,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
         <div className="row ml-0 mr-0 mb-0 mt-6 justify-content-between">
           <div>
             <div className="row ml-1">
-              {po.rjasa.length > 0 && po.rprod.length > 0 && (
+              {po.pjasa.length > 0 && po.pprod.length > 0 && (
                 <div className="d-flex col-12 align-items-center">
                   <label className="mt-1">{"Pisah Faktur"}</label>
                   <InputSwitch

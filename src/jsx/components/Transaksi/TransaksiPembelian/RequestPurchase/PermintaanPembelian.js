@@ -165,7 +165,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
               },
             });
           }}
-          className="btn btn-primary shadow btn-xs sharp ml-1"
+          className={`btn ${data.status === 0 ? "" : "disabled"} btn-primary shadow btn-xs sharp ml-1`}
         >
           <i className="fa fa-pencil"></i>
         </Link>
@@ -176,7 +176,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
             setDisplayDel(true);
             setCurrentItem(data);
           }}
-          className="btn btn-danger shadow btn-xs sharp ml-1"
+          className={`btn ${data.status === 0 ? "" : "disabled"} btn-danger shadow btn-xs sharp ml-1`}
         >
           <i className="fa fa-trash"></i>
         </Link>
@@ -382,13 +382,13 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
               <Skeleton />
             ) : (
               <div>
-                {e.status === 0 ? (
-                  <Badge variant="danger light">
-                    <i className="bx bxs-circle text-danger mr-1"></i> Belum Selesai
+                {e.status !== 2 ? (
+                  <Badge variant="success light">
+                    <i className="bx bxs-circle text-success mr-1"></i> Open
                   </Badge>
                 ) : (
-                  <Badge variant="success light">
-                    <i className="bx bxs-circle text-success mr-1"></i> Selesai
+                  <Badge variant="danger light">
+                    <i className="bx bxs-circle text-danger mr-1"></i> Selesai
                   </Badge>
                 ) 
                 // (

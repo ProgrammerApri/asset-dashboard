@@ -55,6 +55,7 @@ import Pajak from "./components/Master/Pajak/DataPajak";
 import Jasa from "./components/Master/Jasa/DataJasa";
 import PusatBiaya from "./components/MasterLainnya/PusatBiaya/DataPusatBiaya";
 import Transaksi from "./components/Transaksi";
+import BankKas from "./components/BankKas";
 
 const Markup = ({ width }) => {
   const routes = [
@@ -67,6 +68,7 @@ const Markup = ({ width }) => {
     { url: "master", component: Master },
     { url: "master-lainnya", component: MasterLainnya },
     { url: "transaksi", component: Transaksi },
+    { url: "bank-&-kas", component: BankKas },
 
     /// Klasifikasi
     { url: "klasifikasi", component: KlasifikasiAkun },

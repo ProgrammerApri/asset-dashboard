@@ -86,6 +86,7 @@ const DataSupplier = ({
   const [accHut, setAccHut] = useState(null);
   const [accUm, setAccUm] = useState(null);
   const [company, setComp] = useState(null);
+  const [pajak, setPajak] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showInput, setShowInput] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
@@ -107,6 +108,7 @@ const DataSupplier = ({
     getAccHut();
     getAccUm();
     getCompany();
+    getPajak();
     initFilters1();
   }, []);
 
@@ -279,6 +281,32 @@ const DataSupplier = ({
         const { data } = response;
         console.log(data);
         setComp(data);
+      }
+    } catch (error) {}
+    if (isUpdate) {
+      setLoading(false);
+    } else {
+      setTimeout(() => {
+        setLoading(false);
+      }, 1500);
+    }
+  };
+
+  const getPajak = async (isUpdate = false) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.pajak,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setPajak(data);
       }
     } catch (error) {}
     if (isUpdate) {
@@ -681,14 +709,14 @@ const DataSupplier = ({
     setRows2(event.rows);
   };
 
-  const getPpn = (value) => {
-    let ppn = {};
-    pajak.forEach((element) => {
-      if (value === element.code) {
-        ppn = element;
+  const ppn = (value) => {
+    let selected = {};
+    pajak?.forEach((element) => {
+      if (element.id === `${value}`) {
+        selected = element;
       }
     });
-    return ppn;
+    return selected;
   };
 
   const kota = (value) => {
@@ -848,6 +876,7 @@ const DataSupplier = ({
           onHide={() => {
             onHideInput();
             onInput(false);
+            setActive(0)
           }}
         >
           <TabView activeIndex={active} onTabChange={(e) => setActive(e.index)}>
@@ -1178,8 +1207,8 @@ const DataSupplier = ({
                   <div className="p-inputgroup">
                     <Dropdown
                       value={
-                        currentItem !== null
-                          ? getPpn(currentItem?.supplier?.sup_ppn ?? "")
+                        currentItem !== null 
+                          ? ppn(currentItem?.supplier?.sup_ppn ?? "")
                           : null
                       }
                       options={pajak}
@@ -1189,7 +1218,7 @@ const DataSupplier = ({
                           ...currentItem,
                           supplier: {
                             ...currentItem.supplier,
-                            sup_ppn: e.value.code,
+                            sup_ppn: e.value.id,
                           },
                         });
                       }}

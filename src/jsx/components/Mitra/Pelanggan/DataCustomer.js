@@ -20,7 +20,6 @@ import { Badge } from "primereact/badge";
 import DataJenisPelanggan from "../../Master/JenisPelanggan/DataJenisPelanggan";
 import { InputSwitch } from "primereact/inputswitch";
 import DataPajak from "../../Master/Pajak/DataPajak";
-import Pajak from "../../Master/Pajak";
 
 const def = {
   customer: {
@@ -69,8 +68,6 @@ const def = {
     name: "",
   },
 };
-
-
 
 const DataCustomer = ({
   data,
@@ -338,11 +335,27 @@ const DataCustomer = ({
       ...endpoints.editCustomer,
       endpoint: endpoints.editCustomer.endpoint + currentItem.customer.id,
       data: {
-        ...currentItem,
-        jpel: currentItem?.jpel?.id ?? null,
-        cus_id: currentItem?.cus_id?.id ?? null,
-        subArea: currentItem?.subArea?.id ?? null,
-        currency: currentItem?.currency?.id ?? null,
+        cus_code: currentItem?.customer?.cus_code ?? null,
+        cus_name: currentItem?.customer?.cus_name ?? null,
+        cus_jpel: currentItem?.jpel?.id ?? null,
+        cus_sub_area: currentItem?.subArea?.id ?? null,
+        cus_pjk: currentItem?.pajak?.id ?? null,
+        cus_npwp: currentItem?.customer?.cus_npwp ?? null,
+        cus_address: currentItem?.customer?.cus_address ?? null,
+        cus_kota: currentItem?.customer?.cus_kota ?? null,
+        cus_kpos: currentItem?.customer?.cus_kpos ?? null,
+        cus_telp1: currentItem?.customer?.cus_telp1 ?? null,
+        cus_telp2: currentItem?.customer?.cus_telp2 ?? null,
+        cus_email: currentItem?.customer?.cus_email ?? null,
+        cus_fax: currentItem?.customer?.cus_fax ?? null,
+        cus_cp: currentItem?.customer?.cus_cp ?? null,
+        cus_curren: currentItem?.currency?.id ?? null,
+        cus_ket: currentItem?.customer?.cus_ket ?? null,
+        cus_gl: currentItem?.customer?.cus_gl ?? null,
+        cus_uang_muka: currentItem?.customer?.cus_uang_muka ?? null,
+        cus_limit: currentItem?.customer?.cus_limit ?? null,
+        sub_cus: currentItem?.customer?.sub_cus ?? null,
+        cus_id: currentItem?.customer?.cus_id ?? null,
       },
     };
     console.log(config.data);
@@ -380,7 +393,29 @@ const DataCustomer = ({
   const addCustomer = async () => {
     const config = {
       ...endpoints.addCustomer,
-      data: def,
+      data: {
+        cus_code: currentItem?.customer?.cus_code ?? null,
+        cus_name: currentItem?.customer?.cus_name ?? null,
+        cus_jpel: currentItem?.jpel?.id ?? null,
+        cus_sub_area: currentItem?.subArea?.id ?? null,
+        cus_pjk: currentItem?.pajak?.id ?? null,
+        cus_npwp: currentItem?.customer?.cus_npwp ?? null,
+        cus_address: currentItem?.customer?.cus_address ?? null,
+        cus_kota: currentItem?.customer?.cus_kota ?? null,
+        cus_kpos: currentItem?.customer?.cus_kpos ?? null,
+        cus_telp1: currentItem?.customer?.cus_telp1 ?? null,
+        cus_telp2: currentItem?.customer?.cus_telp2 ?? null,
+        cus_email: currentItem?.customer?.cus_email ?? null,
+        cus_fax: currentItem?.customer?.cus_fax ?? null,
+        cus_cp: currentItem?.customer?.cus_cp ?? null,
+        cus_curren: currentItem?.currency?.id ?? null,
+        cus_ket: currentItem?.customer?.cus_ket ?? null,
+        cus_gl: currentItem?.customer?.cus_gl ?? null,
+        cus_uang_muka: currentItem?.customer?.cus_uang_muka ?? null,
+        cus_limit: currentItem?.customer?.cus_limit ?? null,
+        sub_cus: currentItem?.customer?.sub_cus ?? null,
+        cus_id: currentItem?.customer?.cus_id ?? null,
+      },
     };
     console.log(config.data);
     let response = null;
@@ -428,6 +463,7 @@ const DataCustomer = ({
   };
 
   const delCustomer = async () => {
+    setLoading(true)
     const config = {
       ...endpoints.delCustomer,
       endpoint: endpoints.delCustomer.endpoint + currentItem.customer.id,
@@ -478,7 +514,7 @@ const DataCustomer = ({
             onInput(true);
             setCurrentItem({
               ...data,
-              customer: { ...data.customer, cus_id: data.customer.cus_id.id },
+              customer: { ...data.customer, cus_id: data.customer.id },
             });
           }}
           className="btn btn-primary shadow btn-xs sharp ml-1"
@@ -489,7 +525,7 @@ const DataCustomer = ({
         <Link
           onClick={() => {
             setCurrentItem(data);
-            setShowInput(true);
+            setShowDelete(true);
             onInput(true);
           }}
           className="btn btn-danger shadow btn-xs sharp ml-1"
@@ -696,19 +732,19 @@ const DataCustomer = ({
     setRows2(event.rows);
   };
 
-  const getPpn = (value) => {
-    let ppn = {};
-    pajak.forEach((element) => {
-      if (value === element.id) {
-        ppn = element;
+  const ppn = (value) => {
+    let selected = {};
+    pajak?.forEach((element) => {
+      if (element.id === `${value}`) {
+        selected = element;
       }
     });
-    return ppn;
+    return selected;
   };
 
   const kota = (value) => {
     let selected = {};
-    city.forEach((element) => {
+    city?.forEach((element) => {
       if (element.city_id === `${value}`) {
         selected = element;
       }
@@ -824,44 +860,44 @@ const DataCustomer = ({
           style={{
             minWidth: "8rem",
           }}
-          field={(e) => e.customer.cus_code}
+          field={(e) => e?.customer?.cus_code}
           body={(e) =>
             load ? (
               <Skeleton />
-            ) : e.customer.sub_cus ? (
+            ) : e?.customer?.sub_cus ? (
               <div>
-                <span>{e.customer.cus_code} </span>
+                <span>{e?.customer?.cus_code} </span>
                 <Badge
-                  value={`Sub ${e.customer.cus_id.cus_code}`}
+                  value={`Sub ${e?.customer?.cus_id?.cus_code}`}
                   className={"active ml-2"}
                 ></Badge>
               </div>
             ) : (
-              <span>{e.customer.cus_code} </span>
+              <span>{e?.customer?.cus_code} </span>
             )
           }
         />
         <Column
           header="Nama Pelanggan"
-          field={(e) => e.customer.cus_name}
+          field={(e) => e?.customer?.cus_name}
           style={{ minWidth: "8rem" }}
           body={load && <Skeleton />}
         />
         <Column
           header="Alamat"
-          field={(e) => e.customer.cus_address}
+          field={(e) => e?.customer?.cus_address}
           style={{ minWidth: "8rem" }}
           body={load && <Skeleton />}
         />
         <Column
           header="Telp"
-          field={(e) => e.customer.cus_telp1}
+          field={(e) => e?.customer?.cus_telp1}
           style={{ minWidth: "8rem" }}
           body={load && <Skeleton />}
         />
         <Column
           header="Limit Kredit"
-          field={(e) => e.customer.cus_limit}
+          field={(e) => e?.customer?.cus_limit}
           style={{ minWidth: "8rem" }}
           body={load && <Skeleton />}
         />
@@ -889,6 +925,7 @@ const DataCustomer = ({
           onHide={() => {
             onHideInput();
             onInput(false);
+            setActive(0)
           }}
         >
           <TabView activeIndex={active} onTabChange={(e) => setActive(e.index)}>
@@ -1003,6 +1040,7 @@ const DataCustomer = ({
                         })
                       }
                       placeholder="Masukan NPWP"
+                      type="number"
                     />
                   </div>
                 </div>
@@ -1198,7 +1236,7 @@ const DataCustomer = ({
                   <label className="text-label">Email</label>
                   <div className="p-inputgroup">
                     <InputText
-                      value={`${currentItem?.customer?.cus_email ?? ""}`}
+                      value={`${currentItem?.customer?.cus_email ?? null}`}
                       onChange={(e) =>
                         setCurrentItem({
                           ...currentItem,
@@ -1290,10 +1328,10 @@ const DataCustomer = ({
                   <label className="text-label">PPN</label>
                   <div className="p-inputgroup">
                     <Dropdown
-                       value={
+                      value={
                         currentItem !== null &&
                         currentItem.customer.cus_pjk !== null
-                          ? getPpn(currentItem.customer.cus_pjk)
+                          ? ppn(currentItem.customer.cus_pjk)
                           : null
                       }
                       options={pajak}
@@ -1303,7 +1341,7 @@ const DataCustomer = ({
                           ...currentItem,
                           customer: {
                             ...currentItem.customer,
-                            cus_pjk: e.value?.id ?? null,
+                            cus_pjk: e.value.id,
                           },
                         });
                       }}
@@ -1504,7 +1542,7 @@ const DataCustomer = ({
             setShowPajak(!e);
           }}
           onSuccessInput={(e) => {
-            getPpn(true);
+           getPajak(true);
           }}
           onRowSelect={(e) => {
             if (doubleClick) {

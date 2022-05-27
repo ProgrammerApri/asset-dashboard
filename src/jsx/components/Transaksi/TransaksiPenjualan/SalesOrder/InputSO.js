@@ -255,8 +255,14 @@ const InputSO = ({ onCancel, onSuccess }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
+        let filt = [];
+        data.forEach((elem) => {
+          if (elem.customer.sub_cus === false) {
+            filt.push(elem.customer);
+          }
+        });
         console.log(data);
-        setCustomer(data);
+        setCustomer(filt);
       }
     } catch (error) {}
   };
@@ -354,7 +360,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
   const checkCus = (value) => {
     let selected = {};
     customer?.forEach((element) => {
-      if (value === element.customer.id) {
+      if (value === element.id) {
         selected = element;
       }
     });
@@ -365,7 +371,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
   const checkSubCus = (value) => {
     let selected = {};
     customer?.forEach((element) => {
-      if (value === element.customer.id) {
+      if (value === element.id) {
         selected = element;
       }
     });
@@ -454,9 +460,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
   const cusTemp = (option) => {
     return (
       <div>
-        {option !== null
-          ? `${option.customer.cus_name} (${option.customer.cus_code})`
-          : ""}
+        {option !== null ? `${option.cus_name} (${option.cus_code})` : ""}
       </div>
     );
   };
@@ -465,9 +469,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
     if (option) {
       return (
         <div>
-          {option !== null
-            ? `${option.customer.cus_name} (${option.customer.cus_code})`
-            : ""}
+          {option !== null ? `${option.cus_name} (${option.cus_code})` : ""}
         </div>
       );
     }
@@ -582,14 +584,17 @@ const InputSO = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-4">
+          <div className="col-3">
             <label className="text-black fs-14">Pelanggan</label>
             <div className="p-inputgroup">
               <Dropdown
                 value={so.pel_id !== null ? checkCus(so.pel_id) : null}
                 options={customer}
                 onChange={(e) => {
-                  updateSo({ ...so, pel_id: e.value.customer.id });
+                  updateSo({
+                    ...so,
+                    pel_id: e.value.id,
+                  });
                 }}
                 optionLabel="cus_name"
                 placeholder="Pilih Pelanggan"
@@ -606,14 +611,12 @@ const InputSO = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-4">
+          <div className="col-3">
             <label className="text-black fs-14"></label>
             <div className="p-inputgroup mt-2">
               <InputText
                 value={
-                  so.pel_id !== null
-                    ? checkCus(so.pel_id)?.customer?.cus_address
-                    : ""
+                  so.pel_id !== null ? checkCus(so.pel_id)?.cus_address : ""
                 }
                 placeholder="Alamat Pelanggan"
                 disabled
@@ -621,15 +624,11 @@ const InputSO = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-4">
+          <div className="col-3">
             <label className="text-black fs-14"></label>
             <div className="p-inputgroup mt-2">
               <InputText
-                value={
-                  so.pel_id !== null
-                    ? checkCus(so.pel_id)?.customer?.cus_telp1
-                    : ""
-                }
+                value={so.pel_id !== null ? checkCus(so.pel_id)?.cus_telp1 : ""}
                 placeholder="Kontak Person"
                 disabled
               />
@@ -639,26 +638,16 @@ const InputSO = ({ onCancel, onSuccess }) => {
           <div className="col-3">
             <label className="text-black fs-14">Ppn</label>
             <div className="p-inputgroup">
-              <Dropdown
-                value={so.ppn_type !== null ? checkPpn(so.ppn_type) : null}
-                options={ppn}
-                onChange={(e) => {
-                  updateSo({ ...so, ppn_type: e.value.id });
-                }}
-                optionLabel="name"
-                placeholder="Pilih Jenis Ppn"
+              <InputText
+                value={so.pel_id !== null ? checkCus(so.pel_id)?.cus_pjk : ""}
+                onChange={(e) => {}}
+                placeholder="Jenis Ppn"
+                disabled
               />
-              <PButton
-                onClick={() => {
-                  setShowPpn(true);
-                }}
-              >
-                <i class="bx bx-food-menu"></i>
-              </PButton>
             </div>
           </div>
 
-          <div className="col-3">
+          <div className="col-4">
             <label className="text-black fs-14">Tanggal Permintaan</label>
             <div className="p-inputgroup mt-2">
               <Calendar
@@ -673,7 +662,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-3">
+          <div className="col-4">
             <label className="text-black fs-14">Jangka Pembayaran</label>
             <div className="p-inputgroup mt-2">
               <Dropdown
@@ -701,7 +690,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-3">
+          <div className="col-4">
             <label className="text-black fs-14">Tanggal Jatuh Tempo</label>
             <div className="p-inputgroup mt-2">
               <Calendar
@@ -733,10 +722,10 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 <label className="text-black fs-14">Sub Pelanggan</label>
                 <div className="p-inputgroup">
                   <Dropdown
-                    value={so.sub_id !== null ? checkSubCus(so.sub_id) : null}
+                    value={so.sub_id ? checkSubCus(so.sub_id) : null}
                     options={subCus}
                     onChange={(e) => {
-                      updateSo({ ...so, sub_id: e.value?.id });
+                      updateSo({ ...so, sub_id: e.value.id });
                     }}
                     optionLabel="cus_name"
                     placeholder="Pilih Sub Pelanggan"
@@ -761,7 +750,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   <InputText
                     value={
                       so.sub_id !== null
-                        ? checkSubCus(so.sub_id)?.customer?.cus_address
+                        ? checkCus(so.sub_id)?.cus_address
                         : ""
                     }
                     placeholder="Alamat Sub Pelanggan"
@@ -776,7 +765,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   <InputText
                     value={
                       so.sub_id !== null
-                        ? checkSubCus(so.sub_id)?.customer?.cus_telp1
+                        ? checkSubCus(so.sub_id)?.cus_telp1
                         : ""
                     }
                     placeholder="Kontak Person"

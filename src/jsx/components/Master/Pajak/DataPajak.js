@@ -613,7 +613,7 @@ const DataPajak = ({
                   </div>
                 </div>
 
-                <div className="col-5">
+                <div className="col-">
                   <label className="text-label">Nilai</label>
                   <div className="p-inputgroup">
                     <InputNumber
@@ -627,9 +627,7 @@ const DataPajak = ({
                       }
                       placeholder="Masukan Nilai"
                     />
-                    <span className="fs-14 text-black font-w600 ml-2 mt-3">
-                      %
-                    </span>
+                    <span className="p-inputgroup-addon">%</span>
                   </div>
                 </div>
               </div>
@@ -732,7 +730,6 @@ const DataPajak = ({
                   <label className="text-label">Penggabungan Dari</label>
                   <div className="p-inputgroup">
                     <MultiSelect
-                      className="p-invalid"
                       value={currentItem !== null ? currentItem.pajak : null}
                       options={pajak}
                       onChange={(e) => {
@@ -746,26 +743,33 @@ const DataPajak = ({
                       filter
                       filterBy="name"
                       placeholder="Pilih Ppn"
+                      display="chip"
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="row ml-0 mt-0">
-                <div className="col-2 mb-2">
-                  <label className="text-label">Detail :</label>
-                </div>
+             <div className="row ml-0 mr-0 mb-0 mt-6 justify-content-between">
+                <div className="row justify-content-right col-6">
+                <div className="col-4">
+                    <label className="text-label">Detail :</label>
+                  </div>
 
-                <div className="col-10 mb-2">
-                  <label className="text-label">
-                    1. .... <b>%</b>
-                  </label>
-                </div>
+                  <div className="col-6">
+                    <label className="text-label">
+                      <b>1. {currentItem.pajak !== null ? currentItem.pajak?.nilai : ""}%</b>
+                    </label>
+                  </div>
 
-                <div className="col-10 mb-2">
-                  <label className="text-label">
-                    1. ..... <b>%</b>
-                  </label>
+                  <div className="col-4">
+                    <label className="text-label"></label>
+                  </div>
+
+                  <div className="col-6">
+                    <label className="text-label">
+                      <b>2. {}%</b>
+                    </label>
+                  </div>
                 </div>
               </div>
             </>

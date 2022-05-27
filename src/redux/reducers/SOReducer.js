@@ -1,4 +1,4 @@
-import { SET_CURRENT_SO, SET_SO, SET_EDIT, SET_EDIT_SO } from "../actions";
+import { SET_CURRENT_SO, SET_SO, SET_EDIT_SO } from "../actions";
 
 const initialState = {
   so: [],

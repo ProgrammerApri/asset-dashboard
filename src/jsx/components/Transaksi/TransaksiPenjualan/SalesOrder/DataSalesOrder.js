@@ -145,6 +145,7 @@ const DataSalesOrder = ({ onAdd, onEdit }) => {
               payload: {
                 ...data,
                 pel_id: data?.pel_id?.id ?? null,
+                top: data?.top?.id ?? null,
                 sprod:
                   sprod.length > 0
                     ? sprod
@@ -169,6 +170,7 @@ const DataSalesOrder = ({ onAdd, onEdit }) => {
                         {
                           id: 0,
                           jasa_id: null,
+                          sup_id: null,
                           unit_id: null,
                           qty: null,
                           price: null,

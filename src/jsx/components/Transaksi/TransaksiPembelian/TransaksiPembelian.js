@@ -12,10 +12,10 @@ import ReturBeli from "./ReturBeli";
 const TransaksiPembelian = () => {
   return (
     <TabView>
-      <TabPanel header="Permintaan Pembelian">
+      <TabPanel header="Permintaan Pembelian (RP)">
           <RequestPurchase/>
       </TabPanel>
-      <TabPanel header="Pembelian Dengan PO">
+      <TabPanel header="Pesanan Pembelian (PO)">
         <PermintaanPO/>
       </TabPanel>
       <TabPanel header="Pembelian Langsung">

@@ -618,7 +618,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                           value={v.qty && v.qty}
                           onChange={(e) => {
                             let temp = [...rp.rjasa];
-                            temp[i].qty = e.target.value;
+                            temp[i].request = e.target.value;
                             updateRp({ ...rp, rjasa: temp });
                           }}
                           placeholder="Masukan Jumlah"
@@ -665,7 +665,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                                     id: 0,
                                     jasa_id: null,
                                     unit_id: null,
-                                    qty: null,
+                                    request: null,
                                   },
                                 ],
                               });

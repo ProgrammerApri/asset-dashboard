@@ -232,6 +232,35 @@ const PesananPO = ({ onAdd, onEdit }) => {
               el.unit_id = el.unit_id.id;
             });
 
+            if (!pprod.length) {
+              pprod.push({
+                id: 0,
+                prod_id: null,
+                rprod_id: null,
+                unit_id: null,
+                order: null,
+                price: null,
+                disc: null,
+                nett_price: null,
+                total: null,
+              });
+            }
+
+            if (!pjasa.length) {
+              pjasa.push({
+                id: 0,
+                jasa_id: null,
+                rjasa_id: null,
+                unit_id: null,
+                sup_id: null,
+                order: null,
+                price: null,
+                disc: null,
+                nett_price: null,
+                total: null,
+              });
+            }
+
             dispatch({
               type: SET_CURRENT_PO,
               payload: {
@@ -349,7 +378,8 @@ const PesananPO = ({ onAdd, onEdit }) => {
             placeholder="Cari disini"
           />
         </span>
-        <Button variant="primary" 
+        <Button
+          variant="primary"
           onClick={() => {
             onAdd();
             dispatch({
@@ -364,7 +394,8 @@ const PesananPO = ({ onAdd, onEdit }) => {
                 pjasa: [],
               },
             });
-          }}>
+          }}
+        >
           Tambah{" "}
           <span className="btn-icon-right">
             <i class="bx bx-plus"></i>
@@ -481,7 +512,6 @@ const PesananPO = ({ onAdd, onEdit }) => {
           body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
         />
       </DataTable>
-
 
       <Dialog
         header={"Hapus Data"}

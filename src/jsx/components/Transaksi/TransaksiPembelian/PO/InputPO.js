@@ -153,7 +153,6 @@ const InputPO = ({ onCancel, onSuccess }) => {
         let filt = [];
         data.forEach((elem) => {
           if (isEdit) {
-            filt.push(elem);
             let prod = [];
             elem.rprod.forEach((el) => {
               el.prod_id = el.prod_id.id;
@@ -184,7 +183,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
               });
 
               let temp = [...po.pjasa];
-              po.pprod.forEach((e, i) => {
+              po.pjasa.forEach((e, i) => {
                 if (el.id == e.rjasa_id) {
                   temp[i].request = el.request;
                   temp[i].r_remain = el.remain + e.order;
@@ -194,9 +193,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
               });
             });
             elem.rjasa = jasa;
+            filt.push(elem);
           } else {
             if (elem.status !== 2) {
-              filt.push(elem);
               let prod = [];
               elem.rprod.forEach((el) => {
                 if (el.remain > 0) {
@@ -232,12 +231,15 @@ const InputPO = ({ onCancel, onSuccess }) => {
                 }
               });
               elem.rjasa = jasa;
+              filt.push(elem);
             }
           }
         });
         setRequest(filt);
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const getProduct = async () => {
@@ -358,7 +360,6 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
   const req_pur = (value) => {
     let selected = {};
-    console.log(value);
     rp?.forEach((element) => {
       if (value === element.id) {
         selected = element;
@@ -855,7 +856,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
             body={
               <>
                 <DataTable
-                  responsiveLayout="none"
+                  responsiveLayout="scroll"
                   value={po.pprod.map((v, i) => {
                     return {
                       ...v,
@@ -872,13 +873,18 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   <Column
                     header="Produk"
                     field={""}
+                    style={{
+                      width: "12rem"
+                    }}
                     body={(e) => (
                       <div className="p-inputgroup">
                         <Dropdown
                           value={e.prod_id && checkProd(e.prod_id)}
                           options={product}
-                          onChange={(e) => {
-                            console.log(e.value);
+                          onChange={(t) => {
+                            let temp = [...po.pprod];
+                            temp[e.index].prod_id = t.value.id;
+                            updatePo({ ...po, pprod: temp });
                           }}
                           placeholder="Pilih Kode Produk"
                           optionLabel="name"
@@ -886,7 +892,6 @@ const InputPO = ({ onCancel, onSuccess }) => {
                           filterBy="name"
                           valueTemplate={valueProd}
                           itemTemplate={prodTemp}
-                          disabled={e.id !== 0}
                         />
                       </div>
                     )}
@@ -895,6 +900,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   <Column
                     header="Satuan"
                     field={""}
+                    style={{
+                      width: "8rem"
+                    }}
                     body={(e) => (
                       <div className="p-inputgroup">
                         <Dropdown
@@ -909,7 +917,6 @@ const InputPO = ({ onCancel, onSuccess }) => {
                           placeholder="Pilih Satuan"
                           filter
                           filterBy="name"
-                          disabled={e.id !== 0}
                         />
                       </div>
                     )}
@@ -918,6 +925,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   <Column
                     header="Permintaan"
                     field={""}
+                    style={{
+                      width: "5rem"
+                    }}
                     body={(e) => (
                       <div className="p-inputgroup">
                         <InputText
@@ -929,7 +939,6 @@ const InputPO = ({ onCancel, onSuccess }) => {
                             console.log(temp);
                           }}
                           placeholder="0"
-                          type="number"
                           disabled
                         />
                       </div>
@@ -939,6 +948,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   <Column
                     header="Pesanan"
                     field={""}
+                    style={{
+                      minWidth: "7rem"
+                    }}
                     body={(e) => (
                       <div className="p-inputgroup">
                         <InputText
@@ -969,6 +981,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   <Column
                     header="Sisa"
                     field={""}
+                    style={{
+                      minWidth: "7rem"
+                    }}
                     body={(e) => (
                       <div className="p-inputgroup">
                         <InputText
@@ -984,6 +999,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   <Column
                     header="Harga Satuan"
                     field={""}
+                    style={{
+                      minWidth: "10rem"
+                    }}
                     body={(e) => (
                       <div className="p-inputgroup">
                         <InputText
@@ -1006,6 +1024,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   <Column
                     header="Diskon"
                     field={""}
+                    style={{
+                      minWidth: "10rem"
+                    }}
                     body={(e) => (
                       <div className="p-inputgroup">
                         <InputText
@@ -1031,6 +1052,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   <Column
                     header="Harga Nett"
                     field={""}
+                    style={{
+                      minWidth: "10rem"
+                    }}
                     body={(e) => (
                       <div className="p-inputgroup">
                         <InputText
@@ -1064,45 +1088,50 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     )}
                   />
 
-                  {/* <Column
-                  body={(e) =>
-                    e.index === po.pprod.length - 1 ? (
-                      <Link
-                        onClick={() => {
-                          updatePo({
-                            ...po,
-                            pprod: [
-                              ...po.pprod,
-                              {
-                                id: 0,
-                                prod_id: null,
-                                unit_id: null,
-                                request: null,
-                              },
-                            ],
-                          });
-                        }}
-                        className="btn btn-primary shadow btn-xs sharp ml-1"
-                      >
-                        <i className="fa fa-plus"></i>
-                      </Link>
-                    ) : (
-                      <Link
-                        onClick={() => {
-                          let temp = [...po.pprod];
-                          temp.splice(e.index, 1);
-                          updatePo({
-                            ...po,
-                            pprod: temp,
-                          });
-                        }}
-                        className="btn btn-danger shadow btn-xs sharp ml-1"
-                      >
-                        <i className="fa fa-trash"></i>
-                      </Link>
-                    )
-                  }
-                /> */}
+                  <Column
+                    body={(e) =>
+                      e.index === po.pprod.length - 1 ? (
+                        <Link
+                          onClick={() => {
+                            updatePo({
+                              ...po,
+                              pprod: [
+                                ...po.pprod,
+                                {
+                                  id: 0,
+                                  prod_id: null,
+                                  rprod_id: null,
+                                  unit_id: null,
+                                  order: null,
+                                  price: null,
+                                  disc: null,
+                                  nett_price: null,
+                                  total: null,
+                                },
+                              ],
+                            });
+                          }}
+                          className="btn btn-primary shadow btn-xs sharp ml-1"
+                        >
+                          <i className="fa fa-plus"></i>
+                        </Link>
+                      ) : (
+                        <Link
+                          onClick={() => {
+                            let temp = [...po.pprod];
+                            temp.splice(e.index, 1);
+                            updatePo({
+                              ...po,
+                              pprod: temp,
+                            });
+                          }}
+                          className="btn btn-danger shadow btn-xs sharp ml-1"
+                        >
+                          <i className="fa fa-trash"></i>
+                        </Link>
+                      )
+                    }
+                  />
                 </DataTable>
               </>
             }
@@ -1126,7 +1155,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
             body={
               <>
                 <DataTable
-                  responsiveLayout="none"
+                  responsiveLayout="scroll"
                   value={po.pjasa.map((v, i) => {
                     return {
                       ...v,
@@ -1143,6 +1172,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   <Column
                     header="Supplier"
                     field={""}
+                    style={{
+                      maxWidth: "15rem"
+                    }}
                     body={(e) => (
                       <div className="p-inputgroup">
                         <Dropdown
@@ -1173,6 +1205,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   <Column
                     header="Jasa"
                     field={""}
+                    style={{
+                      maxWidth: "15rem"
+                    }}
                     body={(e) => (
                       <div className="p-inputgroup">
                         <Dropdown
@@ -1217,6 +1252,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   <Column
                     header="Permintaan"
                     field={""}
+                    style={{
+                      minWidth: "7rem"
+                    }}
                     body={(e) => (
                       <div className="p-inputgroup">
                         <InputText
@@ -1238,6 +1276,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   <Column
                     header="Pesanan"
                     field={""}
+                    style={{
+                      minWidth: "7rem"
+                    }}
                     body={(e) => (
                       <div className="p-inputgroup">
                         <InputText
@@ -1268,6 +1309,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   <Column
                     header="Sisa"
                     field={""}
+                    style={{
+                      minWidth: "7rem"
+                    }}
                     body={(e) => (
                       <div className="p-inputgroup">
                         <InputText
@@ -1283,6 +1327,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   <Column
                     header="Harga Satuan"
                     field={""}
+                    style={{
+                      minWidth: "10rem"
+                    }}
                     body={(e) => (
                       <div className="p-inputgroup">
                         <InputText
@@ -1306,6 +1353,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   <Column
                     header="Diskon"
                     field={""}
+                    style={{
+                      minWidth: "10rem"
+                    }}
                     body={(e) => (
                       <div className="p-inputgroup">
                         <InputText
@@ -1336,47 +1386,51 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     )}
                   />
 
-                  {/* <Column
-                  body={(e) =>
-                    e.index === po.pjasa.length - 1 ? (
-                      <Link
-                        onClick={() => {
-                          updatePo({
-                            ...po,
-                            pjasa: [
-                              ...po.pjasa,
-                              {
-                                id: 0,
-                                jasa_id: null,
-                                unit_id: null,
-                                qty: null,
-                              },
-                            ],
-                          });
-                        }}
-                        className="btn btn-primary shadow btn-xs sharp ml-1"
-                      >
-                        <i className="fa fa-plus"></i>
-                      </Link>
-                    ) : e.id === 0 ? (
-                      <Link
-                        onClick={() => {
-                          let temp = [...po.pjasa];
-                          temp.splice(e.index, 1);
-                          updatePo({
-                            ...po,
-                            pjasa: temp,
-                          });
-                        }}
-                        className="btn btn-danger shadow btn-xs sharp ml-1"
-                      >
-                        <i className="fa fa-trash"></i>
-                      </Link>
-                    ) : (
-                      <></>
-                    )
-                  }
-                /> */}
+                  <Column
+                    body={(e) =>
+                      e.index === po.pjasa.length - 1 ? (
+                        <Link
+                          onClick={() => {
+                            updatePo({
+                              ...po,
+                              pjasa: [
+                                ...po.pjasa,
+                                {
+                                  id: 0,
+                                  jasa_id: null,
+                                  rjasa_id: null,
+                                  unit_id: null,
+                                  sup_id: null,
+                                  order: null,
+                                  price: null,
+                                  disc: null,
+                                  nett_price: null,
+                                  total: null,
+                                },
+                              ],
+                            });
+                          }}
+                          className="btn btn-primary shadow btn-xs sharp ml-1"
+                        >
+                          <i className="fa fa-plus"></i>
+                        </Link>
+                      ) :  (
+                        <Link
+                          onClick={() => {
+                            let temp = [...po.pjasa];
+                            temp.splice(e.index, 1);
+                            updatePo({
+                              ...po,
+                              pjasa: temp,
+                            });
+                          }}
+                          className="btn btn-danger shadow btn-xs sharp ml-1"
+                        >
+                          <i className="fa fa-trash"></i>
+                        </Link>
+                      ) 
+                    }
+                  />
                 </DataTable>
               </>
             }

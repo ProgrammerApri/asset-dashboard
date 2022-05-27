@@ -19,6 +19,8 @@ import { TabPanel, TabView } from "primereact/tabview";
 import { Badge } from "primereact/badge";
 import DataJenisPelanggan from "../../Master/JenisPelanggan/DataJenisPelanggan";
 import { InputSwitch } from "primereact/inputswitch";
+import DataPajak from "../../Master/Pajak/DataPajak";
+import Pajak from "../../Master/Pajak";
 
 const def = {
   customer: {
@@ -68,11 +70,7 @@ const def = {
   },
 };
 
-const pajak = [
-  { name: "Include", code: "I" },
-  { name: "Exclude", code: "E" },
-  { name: "Non PPN", code: "N" },
-];
+
 
 const DataCustomer = ({
   data,
@@ -94,6 +92,7 @@ const DataCustomer = ({
   const [accU, setAcc] = useState(null);
   const [company, setComp] = useState(null);
   const [currency, setCurrency] = useState(null);
+  const [pajak, setPajak] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [showInput, setShowInput] = useState(false);
@@ -107,6 +106,7 @@ const DataCustomer = ({
   const [rows2, setRows2] = useState(20);
   const [active, setActive] = useState(0);
   const [showJenisPelanggan, setShowJenisPelanggan] = useState(false);
+  const [showPajak, setShowPajak] = useState(false);
   const [doubleClick, setDoubleClick] = useState(false);
 
   useEffect(() => {
@@ -119,6 +119,7 @@ const DataCustomer = ({
     getSetup();
     getComp();
     getAcc();
+    getPajak();
     initFilters1();
   }, []);
 
@@ -178,6 +179,28 @@ const DataCustomer = ({
         const { data } = response;
         console.log(data);
         setJpel(data);
+      }
+    } catch (error) {}
+    if (isUpdate) {
+      setLoading(false);
+    } else {
+    }
+  };
+
+  const getPajak = async (isUpdate = false) => {
+    const config = {
+      ...endpoints.pajak,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setPajak(data);
       }
     } catch (error) {}
     if (isUpdate) {
@@ -315,27 +338,11 @@ const DataCustomer = ({
       ...endpoints.editCustomer,
       endpoint: endpoints.editCustomer.endpoint + currentItem.customer.id,
       data: {
-        cus_code: currentItem.customer.cus_code,
-        cus_name: currentItem.customer.cus_name,
-        cus_jpel: currentItem.jpel.id,
-        cus_sub_area: currentItem.subArea.id,
-        cus_npwp: currentItem.customer.cus_npwp,
-        cus_address: currentItem.customer.cus_address,
-        cus_kota: currentItem.customer.cus_kota,
-        cus_kpos: currentItem.customer.cus_kpos,
-        cus_telp1: currentItem.customer.cus_telp1,
-        cus_telp2: currentItem.customer.cus_telp2,
-        cus_email: currentItem.customer.cus_email,
-        cus_fax: currentItem.customer.cus_fax,
-        cus_cp: currentItem.customer.cus_cp,
-        cus_curren: currentItem?.currency?.id ?? null,
-        cus_pjk: currentItem.customer.cus_pjk,
-        cus_ket: currentItem.customer.cus_ket,
-        cus_gl: currentItem.customer.cus_gl,
-        cus_uang_muka: currentItem.customer.cus_uang_muka,
-        cus_limit: currentItem.customer.cus_limit,
-        sub_cus: currentItem.customer.sub_cus,
-        cus_id: currentItem.customer.cus_id,
+        ...currentItem,
+        jpel: currentItem?.jpel?.id ?? null,
+        cus_id: currentItem?.cus_id?.id ?? null,
+        subArea: currentItem?.subArea?.id ?? null,
+        currency: currentItem?.currency?.id ?? null,
       },
     };
     console.log(config.data);
@@ -373,29 +380,7 @@ const DataCustomer = ({
   const addCustomer = async () => {
     const config = {
       ...endpoints.addCustomer,
-      data: {
-        cus_code: currentItem.customer.cus_code,
-        cus_name: currentItem.customer.cus_name,
-        cus_jpel: currentItem.jpel.id,
-        cus_sub_area: currentItem.subArea.id,
-        cus_npwp: currentItem.customer.cus_npwp,
-        cus_address: currentItem.customer.cus_address,
-        cus_kota: currentItem.customer.cus_kota,
-        cus_kpos: currentItem.customer.cus_kpos,
-        cus_telp1: currentItem.customer.cus_telp1,
-        cus_telp2: currentItem.customer.cus_telp2,
-        cus_email: currentItem.customer.cus_email,
-        cus_fax: currentItem.customer.cus_fax,
-        cus_cp: currentItem.customer.cus_cp,
-        cus_curren: currentItem.currency.id,
-        cus_pjk: currentItem.customer.cus_pjk,
-        cus_ket: currentItem.customer.cus_ket,
-        cus_gl: currentItem.customer.cus_gl,
-        cus_uang_muka: currentItem.customer.cus_uang_muka,
-        cus_limit: currentItem.customer.cus_limit,
-        sub_cus: currentItem.customer.sub_cus,
-        cus_id: currentItem.customer.cus_id,
-      },
+      data: def,
     };
     console.log(config.data);
     let response = null;
@@ -714,7 +699,7 @@ const DataCustomer = ({
   const getPpn = (value) => {
     let ppn = {};
     pajak.forEach((element) => {
-      if (value === element.code) {
+      if (value === element.id) {
         ppn = element;
       }
     });
@@ -1305,7 +1290,7 @@ const DataCustomer = ({
                   <label className="text-label">PPN</label>
                   <div className="p-inputgroup">
                     <Dropdown
-                      value={
+                       value={
                         currentItem !== null &&
                         currentItem.customer.cus_pjk !== null
                           ? getPpn(currentItem.customer.cus_pjk)
@@ -1318,7 +1303,7 @@ const DataCustomer = ({
                           ...currentItem,
                           customer: {
                             ...currentItem.customer,
-                            cus_pjk: e.value.code,
+                            cus_pjk: e.value?.id ?? null,
                           },
                         });
                       }}
@@ -1327,6 +1312,13 @@ const DataCustomer = ({
                       filterBy="name"
                       placeholder="Pilih Jenis Pajak"
                     />
+                    <PButton
+                      onClick={() => {
+                        setShowPajak(true);
+                      }}
+                    >
+                      <i class="bx bx-food-menu"></i>
+                    </PButton>
                   </div>
                 </div>
               </div>
@@ -1489,6 +1481,37 @@ const DataCustomer = ({
               setCurrentItem({
                 ...currentItem,
                 jpel: e.data,
+              });
+            }
+
+            setDoubleClick(true);
+
+            setTimeout(() => {
+              setDoubleClick(false);
+            }, 2000);
+          }}
+        />
+
+        <DataPajak
+          data={pajak}
+          loading={false}
+          popUp={true}
+          show={showPajak}
+          onHide={() => {
+            setShowPajak(false);
+          }}
+          onInput={(e) => {
+            setShowPajak(!e);
+          }}
+          onSuccessInput={(e) => {
+            getPpn(true);
+          }}
+          onRowSelect={(e) => {
+            if (doubleClick) {
+              setShowPajak(false);
+              setCurrentItem({
+                ...currentItem,
+                cus_pjk: e.data,
               });
             }
 

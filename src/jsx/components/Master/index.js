@@ -42,12 +42,12 @@ const Master = () => {
     },
     {
       tittle: "Pajak",
-      icon: "bx-",
+      icon: "bx-equalizer",
       component: <Pajak />,
     },
     {
       tittle: "Jasa",
-      icon: "bx-",
+      icon: "bx-run",
       component: <Jasa />,
     },
   ]);
@@ -58,7 +58,7 @@ const Master = () => {
     subMenu.forEach((el, i) => {
       menu.push(
         <Button
-          className={`sub-menu mr-4 ${active == i ? "act" : ""}`}
+          className={`sub-menu mr-4 mb-4 ${active == i ? "act" : ""}`}
           role="button"
           onClick={() => {
             setActive(i);
@@ -79,8 +79,8 @@ const Master = () => {
 
   return (
     <Row className="mb-0">
-      <Col className="col-12">{renderSubMenu()}</Col>
-      <Col className="mb-0">{subMenu[active].component}</Col>
+      <Col className="col-12 pb-0">{renderSubMenu()}</Col>
+      <Col className="mb-0 pt-0">{subMenu[active].component}</Col>
     </Row>
   );
 };

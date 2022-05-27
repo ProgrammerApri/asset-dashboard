@@ -586,9 +586,10 @@ const DataPajak = ({
                     : null
                 }
                 options={type}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, type: e.value.code })
-                }
+                onChange={(e) => {
+                  console.log(e.value);
+                  setCurrentItem({ ...currentItem, type: e.value.code });
+                }}
                 optionLabel="name"
               />
             </div>

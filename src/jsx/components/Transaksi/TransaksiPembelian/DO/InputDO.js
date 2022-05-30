@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_SO } from "src/redux/actions";
 import { request, endpoints } from "src/utils";
 import { Row } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
@@ -11,41 +10,39 @@ import { Dropdown } from "primereact/dropdown";
 import { Divider } from "@material-ui/core";
 import { Calendar } from "primereact/calendar";
 import { InputSwitch } from "primereact/inputswitch";
-import CustomAccordion from "../../../Accordion/Accordion";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import DataRulesPay from "src/jsx/components/MasterLainnya/RulesPay/DataRulesPay";
+import CustomAccordion from "../../../Accordion/Accordion";
+import { SET_CURRENT_DO } from "src/redux/actions";
 import DataSupplier from "src/jsx/components/Mitra/Pemasok/DataPemasok";
-import DataPajak from "src/jsx/components/Master/Pajak/DataPajak";
-import DataSatuan from "src/jsx/components/MasterLainnya/Satuan/DataSatuan";
+import DataRulesPay from "src/jsx/components/MasterLainnya/RulesPay/DataRulesPay";
+import DataPusatBiaya from "src/jsx/components/MasterLainnya/PusatBiaya/DataPusatBiaya";
 import DataProduk from "src/jsx/components/Master/Produk/DataProduk";
 import DataJasa from "src/jsx/components/Master/Jasa/DataJasa";
-import DataCustomer from "src/jsx/components/Mitra/Pelanggan/DataCustomer";
+import DataSatuan from "src/jsx/components/MasterLainnya/Satuan/DataSatuan";
 
-const InputSO = ({ onCancel, onSuccess }) => {
-  const [update, setUpdate] = useState(false);
-  const dispatch = useDispatch();
-  const toast = useRef(null);
-  const [doubleClick, setDoubleClick] = useState(false);
-  const so = useSelector((state) => state.so.current);
-  const isEdit = useSelector((state) => state.so.editso);
-  const [isRp, setRp] = useState(true);
-  const [isRpJasa, setRpJasa] = useState(true);
+const InputDO = ({ onCancel, onSuccess }) => {
+  const Do = useSelector((state) => state.Do.current);
+  const [dept, setDept] = useState(null);
+  const [supplier, setSupplier] = useState(null);
+  const [rulesPay, setRulesPay] = useState(null);
+  const [pajak, setPajak] = useState(null);
+  const [product, setProduct] = useState(null);
   const [jasa, setJasa] = useState(null);
+  const [satuan, setSatuan] = useState(null);
+  const [showSupplier, setShowSupplier] = useState(false);
+  const [showRulesPay, setShowRulesPay] = useState(false);
+  const [showDept, setShowDept] = useState(false);
   const [showProduk, setShowProduk] = useState(false);
   const [showJasa, setShowJasa] = useState(false);
   const [showSatuan, setShowSatuan] = useState(false);
-  const [showSupplier, setShowSupplier] = useState(false);
-  const [showCustomer, setShowCustomer] = useState(false);
-  const [showPpn, setShowPpn] = useState(false);
-  const [showRulesPay, setShowRulesPay] = useState(false);
-  const [product, setProduk] = useState(null);
-  const [satuan, setSatuan] = useState(null);
-  const [supplier, setSupplier] = useState(null);
-  const [rulesPay, setRulesPay] = useState(null);
-  const [ppn, setPpn] = useState(null);
-  const [customer, setCustomer] = useState(null);
-  const [subCus, setSubCus] = useState(null);
+  const isEdit = useSelector((state) => state.Do.editDo);
+  const [update, setUpdate] = useState(false);
+  const toast = useRef(null);
+  const [doubleClick, setDoubleClick] = useState(false);
+  const [isRp, setRp] = useState(true);
+  const [isRpJasa, setRpJasa] = useState(true);
+  const dispatch = useDispatch();
   const [accor, setAccor] = useState({
     produk: true,
     jasa: false,
@@ -57,21 +54,19 @@ const InputSO = ({ onCancel, onSuccess }) => {
       left: 0,
       behavior: "smooth",
     });
-    getJasa();
-    getProduk();
     getSupplier();
-    getSatuan();
     getRulesPay();
-    getPpn();
-    getCustomer();
-    getSubCus();
+    getDept();
+    getProduct();
+    getJasa();
+    getSatuan();
   }, []);
 
-  const editSO = async () => {
+  const editDO = async () => {
     const config = {
-      ...endpoints.editSO,
-      endpoint: endpoints.editSO.endpoint + so.id,
-      data: so,
+      ...endpoints.editDO,
+      endpoint: endpoints.editDO.endpoint + Do.id,
+      data: Do,
     };
     console.log(config.data);
     let response = null;
@@ -94,10 +89,10 @@ const InputSO = ({ onCancel, onSuccess }) => {
     }
   };
 
-  const addSO = async () => {
+  const addDO = async () => {
     const config = {
-      ...endpoints.addSO,
-      data: so,
+      ...endpoints.addDO,
+      data: Do,
     };
     console.log(config.data);
     let response = null;
@@ -115,7 +110,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${so.so_code} Sudah Digunakan`,
+            detail: `Kode ${Do.do_code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -131,64 +126,6 @@ const InputSO = ({ onCancel, onSuccess }) => {
         }, 500);
       }
     }
-  };
-
-  const onSubmit = () => {
-    if (isEdit) {
-      setUpdate(true);
-      editSO();
-    } else {
-      setUpdate(true);
-      addSO();
-    }
-  };
-
-  const getProduk = async () => {
-    const config = {
-      ...endpoints.product,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setProduk(data);
-      }
-    } catch (error) {}
-  };
-
-  const getJasa = async () => {
-    const config = {
-      ...endpoints.jasa,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setJasa(data);
-      }
-    } catch (error) {}
-  };
-
-  const getSatuan = async () => {
-    const config = {
-      ...endpoints.getSatuan,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setSatuan(data);
-      }
-    } catch (error) {}
   };
 
   const getSupplier = async () => {
@@ -225,9 +162,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
-  const getPpn = async () => {
+  const getDept = async () => {
     const config = {
-      ...endpoints.pajak,
+      ...endpoints.pusatBiaya,
       data: {},
     };
     console.log(config.data);
@@ -237,56 +174,59 @@ const InputSO = ({ onCancel, onSuccess }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
+        setDept(data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getProduct = async () => {
+    const config = {
+      ...endpoints.product,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+
+      if (response.status) {
+        const { data } = response;
+        setProduct(data);
+        console.log("jsdj");
         console.log(data);
-        setPpn(data);
       }
     } catch (error) {}
   };
 
-  const getCustomer = async () => {
+  const getJasa = async () => {
     const config = {
-      ...endpoints.customer,
+      ...endpoints.jasa,
       data: {},
     };
-    console.log(config.data);
     let response = null;
     try {
       response = await request(null, config);
       console.log(response);
       if (response.status) {
         const { data } = response;
-        let filt = [];
-        data.forEach((elem) => {
-          if (elem.customer.sub_cus === false) {
-            filt.push(elem);
-          }
-        });
-        console.log(data);
-        setCustomer(filt);
+        setJasa(data);
       }
     } catch (error) {}
   };
 
-  const getSubCus = async () => {
+  const getSatuan = async () => {
     const config = {
-      ...endpoints.customer,
+      ...endpoints.getSatuan,
       data: {},
     };
-    console.log(config.data);
     let response = null;
     try {
       response = await request(null, config);
       console.log(response);
       if (response.status) {
         const { data } = response;
-        let filt = [];
-        data.forEach((elem) => {
-          if (elem.customer.sub_cus === true) {
-            filt.push(elem.customer);
-          }
-        });
-        console.log(data);
-        setSubCus(filt);
+        setSatuan(data);
       }
     } catch (error) {}
   };
@@ -324,17 +264,6 @@ const InputSO = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
-  const checkRules = (value) => {
-    let selected = {};
-    rulesPay?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
   const checkSupp = (value) => {
     let selected = {};
     supplier?.forEach((element) => {
@@ -346,9 +275,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
-  const checkPpn = (value) => {
+  const checkDept = (value) => {
     let selected = {};
-    ppn?.forEach((element) => {
+    dept?.forEach((element) => {
       if (value === element.id) {
         selected = element;
       }
@@ -357,26 +286,46 @@ const InputSO = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
-  const checkCus = (value) => {
+  const checkpjk = (value) => {
     let selected = {};
-    customer?.forEach((element) => {
-      if (value === element.customer.id) {
-        selected = element.customer;
-      }
-    });
-
-    return selected;
-  };
-
-  const checkSubCus = (value) => {
-    let selected = {};
-    subCus?.forEach((element) => {
+    pajak?.forEach((element) => {
       if (value === element.id) {
         selected = element;
       }
     });
 
     return selected;
+  };
+
+  const checRulPay = (value) => {
+    let selected = {};
+    rulesPay?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const deptTemp = (option) => {
+    return (
+      <div>
+        {option !== null ? `${option.ccost_code} (${option.ccost_name})` : ""}
+      </div>
+    );
+  };
+
+  const valueDeptTemp = (option, props) => {
+    if (option) {
+      return (
+        <div>
+          {option !== null ? `${option.ccost_code} (${option.ccost_name})` : ""}
+        </div>
+      );
+    }
+
+    return <span>{props.placeholder}</span>;
   };
 
   const suppTemp = (option) => {
@@ -457,76 +406,26 @@ const InputSO = ({ onCancel, onSuccess }) => {
     return <span>{props.placeholder}</span>;
   };
 
-  const cusTemp = (option) => {
-    return (
-      <div>
-        {option !== null ? `${option.cus_name} (${option.cus_code})` : ""}
-      </div>
-    );
-  };
-
-  const valueCusTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null ? `${option.cus_name} (${option.cus_code})` : ""}
-        </div>
-      );
+  const onSubmit = () => {
+    if (isEdit) {
+      setUpdate(true);
+      editDO();
+    } else {
+      setUpdate(true);
+      addDO();
     }
-
-    return <span>{props.placeholder}</span>;
   };
 
-  const SubcusTemp = (option) => {
-    return (
-      <div>
-        {option !== null ? `${option.cus_name} (${option.cus_code})` : ""}
-      </div>
-    );
-  };
-
-  const valueSubCusTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null ? `${option.cus_name} (${option.cus_code})` : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const formatDate = (date) => {
-    var d = new Date(`${date}Z`),
-      month = "" + (d.getMonth() + 1),
-      day = "" + d.getDate(),
-      year = d.getFullYear();
-
-    if (month.length < 2) month = "0" + month;
-    if (day.length < 2) day = "0" + day;
-
-    return [year, month, day].join("-");
-  };
-
-  const updateSo = (e) => {
+  const updateDO = (e) => {
     dispatch({
-      type: SET_CURRENT_SO,
+      type: SET_CURRENT_DO,
       payload: e,
     });
   };
 
-  const header = () => {
-    return (
-      <h4 className="mb-5">
-        <b>Sales Order</b>
-      </h4>
-    );
-  };
-
   const getSubTotalBarang = () => {
     let total = 0;
-    so?.sprod?.forEach((el) => {
+    Do?.dprod?.forEach((el) => {
       if (el.nett_price && el.nett_price > 0) {
         total += parseInt(el.nett_price);
       } else {
@@ -539,7 +438,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
   const getSubTotalJasa = () => {
     let total = 0;
-    so?.sjasa?.forEach((el) => {
+    Do?.djasa?.forEach((el) => {
       total += el.total - (el.total * el.disc) / 100;
     });
 
@@ -552,19 +451,28 @@ const InputSO = ({ onCancel, onSuccess }) => {
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
 
+  const header = () => {
+    return (
+      <h4 className="mb-5">
+        <b>{isEdit ? "Edit" : "Buat"} Pembelian Langsung</b>
+      </h4>
+    );
+  };
+
   const body = () => {
     return (
       <>
-        <Toast ref={toast} />
         {/* Put content body here */}
-        <Row className="mb-6">
-          <div className="col-6">
-            <label className="text-black fs-15">Tanggal</label>
+        <Toast ref={toast} />
+
+        <Row className="mb-4">
+          <div className="col-4">
+            <label className="text-label">Tanggal</label>
             <div className="p-inputgroup">
               <Calendar
-                value={new Date(`${so.so_date}Z`)}
+                value={new Date(`${Do.do_date}Z`)}
                 onChange={(e) => {
-                  updateSo({ ...so, so_date: e.value });
+                  updateDO({ ...Do, do_date: e.value });
                 }}
                 placeholder="Pilih Tanggal"
                 showIcon
@@ -573,40 +481,36 @@ const InputSO = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-6">
-            <label className="text-black fs-14">Kode Referensi</label>
+          <div className="col-4">
+            <label className="text-label">Kode Pembelian</label>
             <div className="p-inputgroup">
               <InputText
-                value={so.so_code}
-                onChange={(e) => updateSo({ ...so, so_code: e.target.value })}
-                placeholder="Masukan Kode Referensi"
+                value={Do.do_code}
+                onChange={(e) => updateDO({ ...Do, do_code: e.target.value })}
+                placeholder="Masukan Kode Pembelian"
               />
             </div>
           </div>
 
-          <div className="col-3">
-            <label className="text-black fs-14">Pelanggan</label>
+          <div className="col-4">
+            <label className="text-label">Departemen</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={so.pel_id !== null ? checkCus(so.pel_id) : null}
-                options={customer?.map((v) => v.customer)}
+                value={Do.dep_id !== null ? checkDept(Do.dep_id) : null}
+                options={dept}
                 onChange={(e) => {
-                  console.log(e.value);
-                  updateSo({
-                    ...so,
-                    pel_id: e.value.id,
-                  });
+                  updateDO({ ...Do, dep_id: e.value.id });
                 }}
-                optionLabel="cus_name"
-                placeholder="Pilih Pelanggan"
+                placeholder="Departemen"
+                optionLabel="ccost_name"
                 filter
-                filterBy="cus_name"
-                itemTemplate={cusTemp}
-                valueTemplate={valueCusTemp}
+                filterBy="ccost_name"
+                valueTemplate={valueDeptTemp}
+                itemTemplate={deptTemp}
               />
               <PButton
                 onClick={() => {
-                  setShowCustomer(true);
+                  setShowDept(true);
                 }}
               >
                 <i class="bx bx-food-menu"></i>
@@ -615,23 +519,55 @@ const InputSO = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-3">
-            <label className="text-black fs-14"></label>
+            <label className="text-label">Supplier</label>
+            <div className="p-inputgroup">
+              <Dropdown
+                value={Do.sup_id !== null ? checkSupp(Do.sup_id) : null}
+                options={supplier}
+                onChange={(e) => {
+                  updateDO({ ...Do, sup_id: e.value.supplier.id });
+                }}
+                optionLabel="supplier.sup_name"
+                placeholder="Pilih Supplier"
+                filter
+                filterBy="supplier.sup_name"
+                itemTemplate={suppTemp}
+                valueTemplate={valueSupTemp}
+              />
+              <PButton
+                onClick={() => {
+                  setShowSupplier(true);
+                }}
+              >
+                <i class="bx bx-food-menu"></i>
+              </PButton>
+            </div>
+          </div>
+
+          <div className="col-3">
+            <label className="text-label"></label>
             <div className="p-inputgroup mt-2">
               <InputText
                 value={
-                  so.pel_id !== null ? checkCus(so.pel_id)?.cus_address : ""
+                  Do.sup_id !== null
+                    ? checkSupp(Do.sup_id)?.supplier?.sup_address
+                    : ""
                 }
-                placeholder="Alamat Pelanggan"
+                placeholder="Alamat Supplier"
                 disabled
               />
             </div>
           </div>
 
           <div className="col-3">
-            <label className="text-black fs-14"></label>
+            <label className="text-label"></label>
             <div className="p-inputgroup mt-2">
               <InputText
-                value={so.pel_id !== null ? checkCus(so.pel_id)?.cus_telp1 : ""}
+                value={
+                  Do.sup_id !== null
+                    ? checkSupp(Do.sup_id)?.supplier?.sup_telp1
+                    : ""
+                }
                 placeholder="Kontak Person"
                 disabled
               />
@@ -639,47 +575,35 @@ const InputSO = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-3">
-            <label className="text-black fs-14">Ppn</label>
-            <div className="p-inputgroup">
+            <label className="text-label"></label>
+            <div className="p-inputgroup mt-2">
               <InputText
-                value={so.pel_id !== null ? checkPpn(checkCus(so.pel_id)?.cus_pjk).name : null}
-                onChange={(e) => {}}
-                placeholder="Jenis Ppn"
+                value={
+                  Do.sup_id !== null
+                    ? checkpjk(checkSupp(Do.sup_id)?.sup_ppn).name
+                    : null
+                }
+                placeholder="Jenis Pajak"
                 disabled
               />
             </div>
           </div>
 
-          <div className="col-4">
-            <label className="text-black fs-14">Tanggal Permintaan</label>
-            <div className="p-inputgroup mt-2">
-              <Calendar
-                value={new Date(`${so.req_date}Z`)}
-                onChange={(e) => {
-                  updateSo({ ...so, req_date: e.value });
-                }}
-                placeholder="Pilih Tanggal Pemintaan"
-                showIcon
-                dateFormat="dd/mm/yy"
-              />
-            </div>
-          </div>
-
-          <div className="col-4">
-            <label className="text-black fs-14">Jangka Pembayaran</label>
+          <div className="col-6">
+            <label className="text-label">Syarat Pembayaran</label>
             <div className="p-inputgroup mt-2">
               <Dropdown
-                value={so.top !== null ? checkRules(so.top) : null}
+                value={Do.top !== null ? checRulPay(Do.top) : null}
                 options={rulesPay}
                 onChange={(e) => {
-                  let result = new Date(`${so.req_date}Z`);
+                  let result = new Date(`${Do.do_date}Z`);
                   result.setDate(result.getDate() + e.value.day);
                   console.log(result);
 
-                  updateSo({ ...so, top: e.value.id, due_date: result });
+                  updateDO({ ...Do, top: e.value.id, due_date: result });
                 }}
                 optionLabel="name"
-                placeholder="Pilih Jangka Waktu"
+                placeholder="Pilih Syarat Pembayaran"
                 filter
                 filterBy="name"
                 itemTemplate={rulTemp}
@@ -695,11 +619,11 @@ const InputSO = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-4">
-            <label className="text-black fs-14">Tanggal Jatuh Tempo</label>
+          <div className="col-6">
+            <label className="text-label">Tanggal Jatuh Tempo</label>
             <div className="p-inputgroup mt-2">
               <Calendar
-                value={new Date(`${so?.due_date}Z`)}
+                value={new Date(`${Do?.due_date}Z`)}
                 onChange={(e) => {}}
                 placeholder="Tanggal Jatuh Tempo"
                 disabled
@@ -707,81 +631,6 @@ const InputSO = ({ onCancel, onSuccess }) => {
               />
             </div>
           </div>
-
-          <div className="d-flex col-12 align-items-center mt-4">
-            <label className="ml-0 mt-1 text-black fs-14">
-              <b>{"Kirim Ke Sub Pelanggan"}</b>
-            </label>
-            <InputSwitch
-              className="ml-4"
-              checked={so && so.sub_addr}
-              onChange={(e) => {
-                updateSo({ ...so, sub_addr: e.target.value });
-              }}
-            />
-          </div>
-
-          {so && so.sub_addr === true && (
-            <>
-              <div className="col-4">
-                <label className="text-black fs-14">Sub Pelanggan</label>
-                <div className="p-inputgroup">
-                  <Dropdown
-                    value={so.sub_id ? checkSubCus(so.sub_id) : null}
-                    options={subCus}
-                    onChange={(e) => {
-                      updateSo({ ...so, sub_id: e.value.id });
-                    }}
-                    optionLabel="cus_name"
-                    placeholder="Pilih Sub Pelanggan"
-                    filter
-                    filterBy="cus_name"
-                    itemTemplate={SubcusTemp}
-                    valueTemplate={valueSubCusTemp}
-                    disabled={so && !so.sub_addr}
-                  />
-                  <PButton
-                    onClick={() => {
-                      setShowCustomer(true);
-                    }}
-                    disabled={so && !so.sub_addr}
-                  >
-                    <i class="bx bx-food-menu"></i>
-                  </PButton>
-                </div>
-              </div>
-
-              <div className="col-4">
-                <label className="text-black fs-14"></label>
-                <div className="p-inputgroup mt-1">
-                  <InputText
-                    value={
-                      so.sub_id !== null
-                        ? checkCus(so.sub_id)?.cus_address
-                        : ""
-                    }
-                    placeholder="Alamat Sub Pelanggan"
-                    disabled
-                  />
-                </div>
-              </div>
-
-              <div className="col-4">
-                <label className="text-black fs-14"></label>
-                <div className="p-inputgroup mt-1">
-                  <InputText
-                    value={
-                      so.sub_id !== null
-                        ? checkSubCus(so.sub_id)?.cus_telp1
-                        : ""
-                    }
-                    placeholder="Kontak Person"
-                    disabled
-                  />
-                </div>
-              </div>
-            </>
-          )}
         </Row>
 
         <CustomAccordion
@@ -799,7 +648,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
             <>
               <DataTable
                 responsiveLayout="none"
-                value={so.sprod?.map((v, i) => {
+                value={Do.dprod?.map((v, i) => {
                   return {
                     ...v,
                     index: i,
@@ -825,10 +674,10 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         options={product}
                         onChange={(u) => {
                           console.log(e.value);
-                          let temp = [...so.sprod];
+                          let temp = [...Do.dprod];
                           temp[e.index].prod_id = u.value.id;
                           temp[e.index].unit_id = u.value.unit?.id;
-                          updateSo({ ...so, sprod: temp });
+                          updateDO({ ...Do, dprod: temp });
                         }}
                         placeholder="Pilih Produk"
                         optionLabel="name"
@@ -860,9 +709,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
                       <Dropdown
                         value={e.unit_id && checkUnit(e.unit_id)}
                         onChange={(u) => {
-                          let temp = [...so.sprod];
+                          let temp = [...Do.dprod];
                           temp[e.index].unit_id = u.value.id;
-                          updateSo({ ...so, sprod: temp });
+                          updateDO({ ...Do, dprod: temp });
                         }}
                         options={satuan}
                         optionLabel="name"
@@ -892,11 +741,11 @@ const InputSO = ({ onCancel, onSuccess }) => {
                       <InputText
                         value={e.order && e.order}
                         onChange={(u) => {
-                          let temp = [...so.sprod];
+                          let temp = [...Do.dprod];
                           temp[e.index].order = u.target.value;
                           temp[e.index].total =
                             temp[e.index].order * temp[e.index].price;
-                          updateSo({ ...so, sprod: temp });
+                          updateDO({ ...Do, dprod: temp });
                           console.log(temp);
                         }}
                         placeholder="0"
@@ -918,11 +767,11 @@ const InputSO = ({ onCancel, onSuccess }) => {
                       <InputText
                         value={e.price && e.price}
                         onChange={(u) => {
-                          let temp = [...so.sprod];
+                          let temp = [...Do.dprod];
                           temp[e.index].price = u.target.value;
                           temp[e.index].total =
                             temp[e.index].order * temp[e.index].price;
-                          updateSo({ ...so, sprod: temp });
+                          updateDO({ ...Do, dprod: temp });
                           console.log(temp);
                         }}
                         placeholder="0"
@@ -944,9 +793,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
                       <InputText
                         value={e.disc && e.disc}
                         onChange={(u) => {
-                          let temp = [...so.sprod];
+                          let temp = [...Do.dprod];
                           temp[e.index].disc = u.target.value;
-                          updateSo({ ...so, sprod: temp });
+                          updateDO({ ...Do, dprod: temp });
                           console.log(temp);
                         }}
                         placeholder="0"
@@ -969,9 +818,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
                       <InputText
                         value={e.nett_price && e.nett_price}
                         onChange={(u) => {
-                          let temp = [...so.sprod];
+                          let temp = [...Do.dprod];
                           temp[e.index].nett_price = u.target.value;
-                          updateSo({ ...so, sprod: temp });
+                          updateDO({ ...Do, dprod: temp });
                           console.log(temp);
                         }}
                         placeholder="0"
@@ -1008,13 +857,13 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   // }}
                   field={""}
                   body={(e) =>
-                    e.index === so.sprod.length - 1 ? (
+                    e.index === Do.dprod.length - 1 ? (
                       <Link
                         onClick={() => {
-                          updateSo({
-                            ...so,
-                            sprod: [
-                              ...so.sprod,
+                          updateDO({
+                            ...Do,
+                            dprod: [
+                              ...Do.dprod,
                               {
                                 id: 0,
                                 prod_id: null,
@@ -1037,9 +886,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
                     ) : (
                       <Link
                         onClick={() => {
-                          let temp = [...so.sprod];
+                          let temp = [...Do.dprod];
                           temp.splice(e.index, 1);
-                          updateSo({ ...so, sprod: temp });
+                          updateDO({ ...Do, dprod: temp });
                         }}
                         className="btn btn-danger shadow btn-xs sharp"
                       >
@@ -1068,7 +917,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
             <>
               <DataTable
                 responsiveLayout="scroll"
-                value={so.sjasa?.map((v, i) => {
+                value={Do.djasa?.map((v, i) => {
                   return {
                     ...v,
                     index: i,
@@ -1094,9 +943,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         options={supplier}
                         onChange={(u) => {
                           console.log(e.value);
-                          let temp = [...so.sjasa];
+                          let temp = [...Do.djasa];
                           temp[e.index].sup_id = u.value.supplier.id;
-                          updateSo({ ...so, sjasa: temp });
+                          updateDO({ ...Do, djasa: temp });
                         }}
                         optionLabel="supplier.sup_name"
                         placeholder="Pilih Supplier"
@@ -1118,9 +967,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Jasa"
-                  style={{
-                    maxWidth: "15rem",
-                  }}
+                  // style={{
+                  //   maxWidth: "15rem",
+                  // }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
@@ -1129,9 +978,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         options={jasa}
                         onChange={(u) => {
                           console.log(e.value);
-                          let temp = [...so.sjasa];
+                          let temp = [...Do.djasa];
                           temp[e.index].jasa_id = u.value.jasa.id;
-                          updateSo({ ...so, sjasa: temp });
+                          updateDO({ ...Do, djasa: temp });
                         }}
                         optionLabel="jasa.name"
                         placeholder="Pilih Jasa"
@@ -1153,9 +1002,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Satuan"
-                  style={{
-                    maxWidth: "12rem",
-                  }}
+                  // style={{
+                  //   maxWidth: "12rem",
+                  // }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
@@ -1164,9 +1013,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         options={satuan}
                         onChange={(u) => {
                           console.log(e.value);
-                          let temp = [...so.sjasa];
+                          let temp = [...Do.djasa];
                           temp[e.index].unit_id = u.value.id;
-                          updateSo({ ...so, sjasa: temp });
+                          updateDO({ ...Do, djasa: temp });
                         }}
                         optionLabel="name"
                         placeholder="Pilih Satuan"
@@ -1193,13 +1042,13 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        value={e.qty && e.qty}
+                        value={e.order && e.order}
                         onChange={(u) => {
-                          let temp = [...so.sjasa];
-                          temp[e.index].qty = u.target.value;
+                          let temp = [...Do.djasa];
+                          temp[e.index].order = u.target.value;
                           temp[e.index].total =
-                            temp[e.index].qty * temp[e.index].price;
-                          updateSo({ ...so, sjasa: temp });
+                            temp[e.index].order * temp[e.index].price;
+                          updateDO({ ...Do, djasa: temp });
                           console.log(temp);
                         }}
                         placeholder="0"
@@ -1221,11 +1070,11 @@ const InputSO = ({ onCancel, onSuccess }) => {
                       <InputText
                         value={e.price && e.price}
                         onChange={(u) => {
-                          let temp = [...so.sjasa];
+                          let temp = [...Do.djasa];
                           temp[e.index].price = u.target.value;
                           temp[e.index].total =
-                            temp[e.index].qty * temp[e.index].price;
-                          updateSo({ ...so, sjasa: temp });
+                            temp[e.index].order * temp[e.index].price;
+                          updateDO({ ...Do, djasa: temp });
                           console.log(temp);
                         }}
                         placeholder="0"
@@ -1247,9 +1096,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
                       <InputText
                         value={e.disc && e.disc}
                         onChange={(u) => {
-                          let temp = [...so.sjasa];
+                          let temp = [...Do.djasa];
                           temp[e.index].disc = u.target.value;
-                          updateSo({ ...so, sjasa: temp });
+                          updateDO({ ...Do, djasa: temp });
                           console.log(temp);
                         }}
                         placeholder="0"
@@ -1285,19 +1134,19 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   // }}
                   field={""}
                   body={(e) =>
-                    e.index === so.sjasa?.length - 1 ? (
+                    e.index === Do.djasa?.length - 1 ? (
                       <Link
                         onClick={() => {
-                          updateSo({
-                            ...so,
-                            sjasa: [
-                              ...so.sjasa,
+                          updateDO({
+                            ...Do,
+                            djasa: [
+                              ...Do.djasa,
                               {
                                 id: 0,
                                 jasa_id: null,
                                 sup_id: null,
                                 unit_id: null,
-                                qty: null,
+                                order: null,
                                 price: null,
                                 disc: null,
                                 total: null,
@@ -1312,9 +1161,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
                     ) : (
                       <Link
                         onClick={() => {
-                          let temp = [...so.sjasa];
+                          let temp = [...Do.djasa];
                           temp.splice(e.index, 1);
-                          updateSo({ ...so, sjasa: temp });
+                          updateDO({ ...Do, djasa: temp });
                         }}
                         className="btn btn-danger shadow btn-xs sharp"
                       >
@@ -1331,22 +1180,22 @@ const InputSO = ({ onCancel, onSuccess }) => {
         <div className="row ml-0 mr-0 mb-0 mt-6 justify-content-between">
           <div>
             <div className="row ml-1">
-              {so?.sjasa?.length > 0 && so?.sprod?.length > 0 && (
+              {Do.djasa.length > 0 && Do.dprod.length > 0 && (
                 <div className="d-flex col-12 align-items-center">
                   <label className="mt-1">{"Pisah Faktur"}</label>
                   <InputSwitch
                     className="ml-4"
-                    checked={so?.split_inv}
+                    checked={Do.split_inv}
                     onChange={(e) => {
                       if (e.value) {
-                        updateSo({
-                          ...so,
+                        updateDO({
+                          ...Do,
                           split_inv: e.value,
                           total_disc: null,
                         });
                       } else {
-                        updateSo({
-                          ...so,
+                        updateDO({
+                          ...Do,
                           split_inv: e.value,
                           prod_disc: null,
                           jasa_disc: null,
@@ -1362,27 +1211,13 @@ const InputSO = ({ onCancel, onSuccess }) => {
           <div className="row justify-content-right col-6">
             <div className="col-6">
               <label className="text-label">
-                {so?.split_inv ? "Sub Total Barang" : "Sub Total"}
+                {Do.split_inv ? "Sub Total Barang" : "Sub Total"}
               </label>
             </div>
 
             <div className="col-6">
               <label className="text-label">
-                {so?.split_inv ? (
-                  <b>Rp. {formatIdr(getSubTotalBarang())}</b>
-                ) : (
-                  <b>
-                    Rp. {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
-                  </b>
-                )}
-              </label>
-            </div>
-
-            <div className="col-6">{so?.split_inv ? "DPP Barang" : "DPP"}</div>
-
-            <div className="col-6">
-              <label className="text-label">
-                {so.split_inv ? (
+                {Do.split_inv ? (
                   <b>Rp. {formatIdr(getSubTotalBarang())}</b>
                 ) : (
                   <b>
@@ -1394,13 +1229,31 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
             <div className="col-6">
               <label className="text-label">
-                {so.split_inv ? "Pajak Atas Barang (11%)" : "Pajak (11%)"}
+                {Do.split_inv ? "DPP Barang" : "DPP"}
               </label>
             </div>
 
             <div className="col-6">
               <label className="text-label">
-                {so?.split_inv ? (
+                {Do.split_inv ? (
+                  <b>Rp. {formatIdr(getSubTotalBarang())}</b>
+                ) : (
+                  <b>
+                    Rp. {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
+                  </b>
+                )}
+              </label>
+            </div>
+
+            <div className="col-6">
+              <label className="text-label">
+                {Do.split_inv ? "Pajak Atas Barang (11%)" : "Pajak (11%)"}
+              </label>
+            </div>
+
+            <div className="col-6">
+              <label className="text-label">
+                {Do.split_inv ? (
                   <b>Rp. {formatIdr((getSubTotalBarang() * 11) / 100)}</b>
                 ) : (
                   <b>
@@ -1414,7 +1267,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
             </div>
 
             <div className="col-6 mt-3">
-              <label className="text-black fs-14">Diskon Tambahan</label>
+              <label className="text-label">Diskon Tambahan</label>
             </div>
 
             <div className="col-6">
@@ -1426,28 +1279,28 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 />
                 <InputText
                   value={
-                    so.split_inv
+                    Do.split_inv
                       ? isRp
-                        ? (getSubTotalBarang() * so.prod_disc) / 100
-                        : so.prod_disc
+                        ? (getSubTotalBarang() * Do.prod_disc) / 100
+                        : Do.prod_disc
                       : isRp
                       ? ((getSubTotalBarang() + getSubTotalJasa()) *
-                          so.total_disc) /
+                          Do.total_disc) /
                         100
-                      : so.total_disc
+                      : Do.total_disc
                   }
                   placeholder="Diskon"
                   type="number"
                   min={0}
                   onChange={(e) => {
-                    if (so.split_inv) {
+                    if (Do.split_inv) {
                       let disc = 0;
                       if (isRp) {
                         disc = (e.target.value / getSubTotalBarang()) * 100;
                       } else {
                         disc = e.target.value;
                       }
-                      updateSo({ ...so, prod_disc: disc });
+                      updateDO({ ...Do, prod_disc: disc });
                     } else {
                       let disc = 0;
                       if (isRp) {
@@ -1458,7 +1311,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                       } else {
                         disc = e.target.value;
                       }
-                      updateSo({ ...so, total_disc: disc });
+                      updateDO({ ...Do, total_disc: disc });
                     }
                   }}
                 />
@@ -1477,14 +1330,14 @@ const InputSO = ({ onCancel, onSuccess }) => {
             </div>
 
             <div className="col-6">
-              <label className="text-black fs-15">
+              <label className="text-label">
                 <b>Total Pembayaran</b>
               </label>
             </div>
 
             <div className="col-6">
               <label className="text-label fs-16">
-                {so?.split_inv ? (
+                {Do.split_inv ? (
                   <b>
                     Rp.{" "}
                     {formatIdr(
@@ -1508,43 +1361,41 @@ const InputSO = ({ onCancel, onSuccess }) => {
               <Divider className="ml-12"></Divider>
             </div>
 
-            {so?.split_inv ? (
+            {Do.split_inv ? (
               <>
                 {/* <div className="row justify-content-right col-12 mt-4"> */}
                 <div className="col-6 mt-4">
-                  <label className="text-black fs-14">Sub Total Jasa</label>
+                  <label className="text-label">Sub Total Jasa</label>
                 </div>
 
                 <div className="col-6 mt-4">
-                  <label className="text-black fs-14">
+                  <label className="text-label">
                     <b>Rp. {formatIdr(getSubTotalJasa())}</b>
                   </label>
                 </div>
 
                 <div className="col-6">
-                  <label className="text-black fs-14">DPP Jasa</label>
+                  <label className="text-label">DPP Jasa</label>
                 </div>
 
                 <div className="col-6">
-                  <label className="text-black fs-14">
+                  <label className="text-label">
                     <b>Rp. {formatIdr(getSubTotalJasa())}</b>
                   </label>
                 </div>
 
                 <div className="col-6">
-                  <label className="text-black fs-14">
-                    Pajak Atas Jasa (2%)
-                  </label>
+                  <label className="text-label">Pajak Atas Jasa (2%)</label>
                 </div>
 
                 <div className="col-6">
-                  <label className="text-black fs-14">
+                  <label className="text-label">
                     <b>Rp. {formatIdr((getSubTotalJasa() * 2) / 100)}</b>
                   </label>
                 </div>
 
                 <div className="col-6 mt-3">
-                  <label className="text-black fs-14">Diskon Tambahan</label>
+                  <label className="text-label">Diskon Tambahan</label>
                 </div>
 
                 <div className="col-6">
@@ -1557,8 +1408,8 @@ const InputSO = ({ onCancel, onSuccess }) => {
                     <InputText
                       value={
                         isRpJasa
-                          ? (getSubTotalJasa() * so.jasa_disc) / 100
-                          : so.jasa_disc
+                          ? (getSubTotalJasa() * Do.jasa_disc) / 100
+                          : Do.jasa_disc
                       }
                       placeholder="Diskon"
                       type="number"
@@ -1570,7 +1421,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         } else {
                           disc = e.target.value;
                         }
-                        updateSo({ ...so, jasa_disc: disc });
+                        updateDO({ ...Do, jasa_disc: disc });
                       }}
                     />
                     <PButton
@@ -1588,13 +1439,13 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 </div>
 
                 <div className="col-6">
-                  <label className="text-black fs-15">
+                  <label className="text-label">
                     <b>Total Pembayaran</b>
                   </label>
                 </div>
 
                 <div className="col-6">
-                  <label className="text-black fs-15">
+                  <label className="text-label fs-16">
                     <b>
                       Rp.{" "}
                       {formatIdr(
@@ -1660,7 +1511,35 @@ const InputSO = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowRulesPay(false);
-            updateSo({ ...so, top: e.data.id });
+            updateDO({ ...Do, top: e.data.id });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataPusatBiaya
+        data={dept}
+        loading={false}
+        popUp={true}
+        show={showDept}
+        onHide={() => {
+          setShowDept(false);
+        }}
+        onInput={(e) => {
+          setShowDept(!e);
+        }}
+        onSuccessInput={(e) => {
+          getDept();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowDept(false);
+            updateDO({ ...Do, dep_id: e.data.id });
           }
 
           setDoubleClick(true);
@@ -1688,7 +1567,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowSupplier(false);
-            updateSo({ ...so, sjasa: e.data.id });
+            updateDO({ ...Do, sup_id: e.data.id });
           }
 
           setDoubleClick(true);
@@ -1711,12 +1590,12 @@ const InputSO = ({ onCancel, onSuccess }) => {
           setShowProduk(!e);
         }}
         onSuccessInput={(e) => {
-          getProduk();
+          getProduct();
         }}
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowProduk(false);
-            updateSo({ ...so, sprod: e.data.id });
+            updateDO({ ...Do, sup_id: e.data.id });
           }
 
           setDoubleClick(true);
@@ -1744,35 +1623,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowJasa(false);
-            updateSo({ ...so, sjasa: e.data.id });
-          }
-
-          setDoubleClick(true);
-
-          setTimeout(() => {
-            setDoubleClick(false);
-          }, 2000);
-        }}
-      />
-
-      <DataPajak
-        data={ppn}
-        loading={false}
-        popUp={true}
-        show={showPpn}
-        onHide={() => {
-          setShowPpn(false);
-        }}
-        onInput={(e) => {
-          setShowPpn(!e);
-        }}
-        onSuccessInput={(e) => {
-          getPpn();
-        }}
-        onRowSelect={(e) => {
-          if (doubleClick) {
-            setShowPpn(false);
-            updateSo({ ...so, ppn_type: e.data.id });
+            updateDO({ ...Do, sup_id: e.data.id });
           }
 
           setDoubleClick(true);
@@ -1800,35 +1651,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowSatuan(false);
-            updateSo({ ...so, sprod: e.data.unit.id });
-          }
-
-          setDoubleClick(true);
-
-          setTimeout(() => {
-            setDoubleClick(false);
-          }, 2000);
-        }}
-      />
-
-      <DataCustomer
-        data={customer}
-        loading={false}
-        popUp={true}
-        show={showCustomer}
-        onHide={() => {
-          setShowCustomer(false);
-        }}
-        onInput={(e) => {
-          setShowCustomer(!e);
-        }}
-        onSuccessInput={(e) => {
-          getCustomer();
-        }}
-        onRowSelect={(e) => {
-          if (doubleClick) {
-            setShowCustomer(false);
-            updateSo({ ...so, pel_id: e.data.id });
+            updateDO({ ...Do, sup_id: e.data.id });
           }
 
           setDoubleClick(true);
@@ -1842,4 +1665,4 @@ const InputSO = ({ onCancel, onSuccess }) => {
   );
 };
 
-export default InputSO;
+export default InputDO;

@@ -684,6 +684,32 @@ const endpoints = {
     method: "DELETE",
     data: {},
   },
+
+
+  /// DP
+  do: {
+    endpoint: "/v1/api/do",
+    method: "GET",
+    data: {},
+  },
+
+  addDO: {
+    endpoint: "/v1/api/do",
+    method: "POST",
+    data: {},
+  },
+
+  editDO: {
+    endpoint: "/v1/api/do/",
+    method: "PUT",
+    data: {},
+  },
+
+  delDO: {
+    endpoint: "/v1/api/do/",
+    method: "DELETE",
+    data: {},
+  },
 };
 
 export default endpoints;

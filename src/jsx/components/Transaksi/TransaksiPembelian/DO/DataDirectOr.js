@@ -15,18 +15,29 @@ import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { InputNumber } from "primereact/inputnumber";
 import { Divider } from "@material-ui/core";
+import { useDispatch, useSelector } from "react-redux";
+import { SET_CURRENT_DO, SET_DO, SET_EDIT_DO } from "src/redux/actions";
 
 const data = {
- 
+  id: null,
+  do_code: null,
+  do_date: null,
+  dep_id: null,
+  sup_id: null,
+  top: null,
+  due_date: false,
+  split_inv: null,
+  prod_disc: null,
+  jasa_disc: null,
+  total_disc: null,
+  dprod: [],
+  djasa: [],
 };
 
-const PembelianLangsung = () => {
-  const [langsung, setLangsung] = useState(null);
+const DataDO = ({ onAdd, onEdit }) => {
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
-  const [displayData, setDisplayData] = useState(false);
   const [displayDel, setDisplayDel] = useState(false);
-  const [position, setPosition] = useState("center");
   const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
   const [filters1, setFilters1] = useState(null);
@@ -34,18 +45,20 @@ const PembelianLangsung = () => {
   const [isEdit, setEdit] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+  const dispatch = useDispatch();
+  const direcOrder = useSelector((state) => state.Do.Do);
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getLangsung();
+    getDO();
     initFilters1();
   }, []);
 
-  const getLangsung = async (isUpdate = false) => {
+  const getDO = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.noStock,
+      ...endpoints.do,
       data: {},
     };
     console.log(config.data);
@@ -56,7 +69,7 @@ const PembelianLangsung = () => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        setLangsung(data);
+        dispatch({type: SET_DO, payload: data})
       }
     } catch (error) {}
     if (isUpdate) {
@@ -64,97 +77,7 @@ const PembelianLangsung = () => {
     } else {
       setTimeout(() => {
         setLoading(false);
-      }, 1500);
-    }
-  };
-
-  const editPlangsung = async () => {
-    const config = {
-      ...endpoints.editPlangsung,
-      endpoint: endpoints.editPlangsung.endpoint + currentItem.id,
-      data: {
-        cus_code: currentItem.customer.cus_code,
-      },
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        setTimeout(() => {
-          setUpdate(false);
-          setDisplayData(false);
-          getLangsung(true);
-          toast.current.show({
-            severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
-            life: 3000,
-          });
-        }, 500);
-      }
-    } catch (error) {
-      setTimeout(() => {
-        setUpdate(false);
-        toast.current.show({
-          severity: "error",
-          summary: "Gagal",
-          detail: "Gagal Memperbarui Data",
-          life: 3000,
-        });
       }, 500);
-    }
-  };
-
-  const addPlangsung = async () => {
-    const config = {
-      ...endpoints.addPlangsung,
-      data: {
-        cus_code: currentItem.customer.cus_code,
-      },
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        setTimeout(() => {
-          setUpdate(false);
-          setDisplayData(false);
-          getLangsung(true);
-          toast.current.show({
-            severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
-            life: 3000,
-          });
-        }, 500);
-      }
-    } catch (error) {
-      console.log(error);
-      if (error.status === 400) {
-        setTimeout(() => {
-          setUpdate(false);
-          toast.current.show({
-            severity: "error",
-            summary: "Gagal",
-            detail: `Kode ${currentItem.customer.cus_code} Sudah Digunakan`,
-            life: 3000,
-          });
-        }, 500);
-      } else {
-        setTimeout(() => {
-          setUpdate(false);
-          toast.current.show({
-            severity: "error",
-            summary: "Gagal",
-            detail: "Gagal Memperbarui Data",
-            life: 3000,
-          });
-        }, 500);
-      }
     }
   };
 
@@ -172,7 +95,7 @@ const PembelianLangsung = () => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayDel(false);
-          getLangsung(true);
+          getDO(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -202,9 +125,62 @@ const PembelianLangsung = () => {
       <div className="d-flex">
         <Link
           onClick={() => {
-            setEdit(true);
-            onClick("displayData", data);
-            setCurrentItem(data);
+            onEdit(data);
+            let dprod = data.dprod;
+            dispatch({
+              type: SET_EDIT_DO,
+              payload: true,
+            });
+            dprod.forEach((el) => {
+              el.prod_id = el.prod_id.id;
+              el.unit_id = el.unit_id.id;
+            });
+            let djasa = data.djasa;
+            djasa.forEach((el) => {
+              el.jasa_id = el.jasa_id.id;
+              el.unit_id = el.unit_id.id;
+            });
+            dispatch({
+              type: SET_CURRENT_DO,
+              payload: {
+                ...data,
+                dep_id: data?.dep_id?.id ?? null,
+                sup_id: data?.sup_id?.id ?? null,
+                top: data?.top?.id ?? null,
+                dprod:
+                  dprod.length > 0
+                    ? dprod
+                    : [
+                        {
+                          id: 0,
+                          do_id: null,
+                          prod_id: null,
+                          unit_id: null,
+                          order: null,
+                          price: null,
+                          disc: null,
+                          nett_price: null,
+                          total: null,
+                        },
+                      ],
+                djasa:
+                  djasa.length > 0
+                    ? djasa
+                    : [
+                        {
+                          id: 0,
+                          do_id: null,
+                          jasa_id: null,
+                          sup_id: null,
+                          unit_id: null,
+                          order: null,
+                          price: null,
+                          disc: null,
+                          total: null,
+                        },
+                      ],
+              },
+            });
           }}
           className="btn btn-primary shadow btn-xs sharp ml-1"
         >
@@ -223,44 +199,6 @@ const PembelianLangsung = () => {
         </Link>
       </div>
       // </React.Fragment>
-    );
-  };
-
-  const onClick = () => {
-    setDisplayData(true);
-    setCurrentItem();
-
-    if (position) {
-      setPosition(position);
-    }
-  };
-
-  const onSubmit = () => {
-    if (isEdit) {
-      setUpdate(true);
-      editPlangsung();
-    } else {
-      setUpdate(true);
-      addPlangsung();
-    }
-  };
-
-  const renderFooter = () => {
-    return (
-      <div>
-        <PButton
-          label="Batal"
-          onClick={() => setDisplayData(false)}
-          className="p-button-text btn-primary"
-        />
-        <PButton
-          label="Simpan"
-          icon="pi pi-check"
-          onClick={() => onSubmit()}
-          autoFocus
-          loading={update}
-        />
-      </div>
     );
   };
 
@@ -314,9 +252,43 @@ const PembelianLangsung = () => {
         <Button
           variant="primary"
           onClick={() => {
-            setEdit(false);
-            setCurrentItem(data);
-            setDisplayData(true);
+            onAdd();
+            dispatch({
+                type: SET_EDIT_DO,
+                payload: false,
+              });
+              dispatch({
+                type: SET_CURRENT_DO,
+                payload: {
+                  ...data,
+                  dprod: [
+                    {
+                      id: 0,
+                      do_id: null,
+                      prod_id: null,
+                      unit_id: null,
+                      order: null,
+                      price: null,
+                      disc: null,
+                      nett_price: null,
+                      total: null,
+                    },
+                  ],
+                  djasa: [
+                    {
+                      id: 0,
+                      do_id: null,
+                      jasa_id: null,
+                      sup_id: null,
+                      unit_id: null,
+                      order: null,
+                      price: null,
+                      disc: null,
+                      total: null,
+                    },
+                  ],
+                },
+              });
           }}
         >
           Tambah{" "}
@@ -374,6 +346,18 @@ const PembelianLangsung = () => {
     setRows2(event.rows);
   };
 
+  const formatDate = (date) => {
+    var d = new Date(`${date}Z`),
+      month = "" + (d.getMonth() + 1),
+      day = "" + d.getDate(),
+      year = d.getFullYear();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+
+    return [year, month, day].join("-");
+  };
+
   return (
     <>
       <Toast ref={toast} />
@@ -383,17 +367,14 @@ const PembelianLangsung = () => {
             <Card.Body>
               <DataTable
                 responsiveLayout="scroll"
-                value={loading ? dummy : langsung}
+                value={loading ? dummy : direcOrder}
                 className="display w-150 datatable-wrapper"
                 showGridlines
                 dataKey="id"
                 rowHover
                 header={renderHeader}
                 filters={filters1}
-                globalFilterFields={[
-                  "customer.cus_code",
-                  
-                ]}
+                globalFilterFields={["Do.do_code"]}
                 emptyMessage="Tidak ada data"
                 paginator
                 paginatorTemplate={template2}
@@ -403,28 +384,22 @@ const PembelianLangsung = () => {
                 paginatorClassName="justify-content-end mt-3"
               >
                 <Column
-                  header="Tanggal"
+                  header="Tanggal Pembelian"
                   style={{
                     minWidth: "8rem",
                   }}
-                  field={(e) => e.customer.cus_code}
+                  field={(e) => formatDate(e.do_date)}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Nomor Pesanan"
-                  field={(e) => e.customer.cus_name}
+                  header="Kode Pembelian"
+                  field={(e) => e.do_code}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Nomor Pesanan"
-                  field={(e) => e.customer.cus_address}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Status"
-                  field={(e) => e.customer.cus_limit}
+                  header="Departemen"
+                  field={(e) => e.dep_id.ccost_name}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
@@ -440,19 +415,6 @@ const PembelianLangsung = () => {
           </Card>
         </Col>
       </Row>
-
-      <Dialog
-        header={isEdit ? "Edit Permintaan Langsung" : "Tambah Permintaan Langsung"}
-        visible={displayData}
-        style={{ width: "50vw" }}
-        footer={renderFooter("displayData")}
-        onHide={() => {
-          setEdit(false);
-          setDisplayData(false);
-        }}
-      >
-       
-      </Dialog>
 
       <Dialog
         header={"Hapus Data"}
@@ -475,4 +437,4 @@ const PembelianLangsung = () => {
   );
 };
 
-export default PembelianLangsung;
+export default DataDO;

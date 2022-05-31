@@ -60,6 +60,7 @@ const InputDO = ({ onCancel, onSuccess }) => {
     getProduct();
     getJasa();
     getSatuan();
+    getPjk();
   }, []);
 
   const editDO = async () => {
@@ -227,6 +228,22 @@ const InputDO = ({ onCancel, onSuccess }) => {
       if (response.status) {
         const { data } = response;
         setSatuan(data);
+      }
+    } catch (error) {}
+  };
+
+  const getPjk = async () => {
+    const config = {
+      ...endpoints.pajak,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setPajak(data);
       }
     } catch (error) {}
   };
@@ -580,7 +597,7 @@ const InputDO = ({ onCancel, onSuccess }) => {
               <InputText
                 value={
                   Do.sup_id !== null
-                    ? checkpjk(checkSupp(Do.sup_id)?.sup_ppn).name
+                    ? checkpjk(checkSupp(Do.sup_id)?.supplier?.sup_ppn).name
                     : null
                 }
                 placeholder="Jenis Pajak"

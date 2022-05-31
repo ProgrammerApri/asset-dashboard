@@ -2,7 +2,6 @@ import React, { useState, useRef } from "react";
 import { Button, Card, Col, Row } from "react-bootstrap";
 import { Toast } from "primereact/toast";
 import ReturBeliList from "./ReturBeliList";
-import InputPO from "../PO/InputPO";
 import ReturBeliInput from "./ReturBeliInput";
 
 const ReturBeli = () => {

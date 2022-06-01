@@ -11,21 +11,21 @@ import { Calendar } from "primereact/calendar";
 import { InputSwitch } from "primereact/inputswitch";
 import CustomAccordion from "../../../Accordion/Accordion";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_PR } from "src/redux/actions";
-import DataSupplier from "../../../Mitra/Pemasok/DataPemasok";
+import { SET_CURRENT_SR } from "src/redux/actions";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
+import DataCustomer from "src/jsx/components/Mitra/Pelanggan/DataCustomer";
 
-const ReturBeliInput = ({ onCancel, onSuccess }) => {
+const ReturJualInput = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
   const [doubleClick, setDoubleClick] = useState(false);
-  const pr = useSelector((state) => state.pr.current);
-  const isEdit = useSelector((state) => state.po.editpo);
+  const sr = useSelector((state) => state.sr.current);
+  const isEdit = useSelector((state) => state.sr.editSr);
   const dispatch = useDispatch();
   const [isRp, setRp] = useState(true);
-  const [supplier, setSupplier] = useState(null);
+  const [customer, setCustomer] = useState(null);
   const [ppn, setPpn] = useState(null);
   const [rp, setRequest] = useState(null);
   const [showSupplier, setShowSupplier] = useState(false);
@@ -43,16 +43,16 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
       left: 0,
       behavior: "smooth",
     });
-    getSupplier();
+    getCustomer();
     getPpn();
     getRp();
     getProduct();
     getSatuan();
   }, []);
 
-  const getSupplier = async () => {
+  const getCustomer = async () => {
     const config = {
-      ...endpoints.supplier,
+      ...endpoints.customer,
       data: {},
     };
     let response = null;
@@ -61,7 +61,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        setSupplier(data);
+        setCustomer(data);
       }
     } catch (error) {}
   };
@@ -167,8 +167,8 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
   const editPO = async () => {
     const config = {
       ...endpoints.editPO,
-      endpoint: endpoints.editPO.endpoint + pr.id,
-      data: pr,
+      endpoint: endpoints.editPO.endpoint + sr.id,
+      data: sr,
     };
     console.log(config.data);
     let response = null;
@@ -194,7 +194,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
   const addPO = async () => {
     const config = {
       ...endpoints.addPO,
-      data: pr,
+      data: sr,
     };
     console.log(config.data);
     let response = null;
@@ -212,7 +212,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${pr.po_code} Sudah Digunakan`,
+            detail: `Kode ${sr.po_code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -241,7 +241,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
-  const pjk = (value) => {
+  const checkPjk = (value) => {
     let selected = {};
     ppn?.forEach((element) => {
       if (value === element.id) {
@@ -252,10 +252,10 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
-  const supp = (value) => {
+  const checkCus = (value) => {
     let selected = {};
-    supplier?.forEach((element) => {
-      if (value === element.supplier.id) {
+    customer?.forEach((element) => {
+      if (value === element.customer.id) {
         selected = element;
       }
     });
@@ -333,22 +333,22 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
     return <span>{props.placeholder}</span>;
   };
 
-  const suppTemp = (option) => {
+  const cusTemp = (option) => {
     return (
       <div>
         {option !== null
-          ? `${option.supplier.sup_code} (${option.supplier.sup_name})`
+          ? `${option.customer.cus_code} (${option.customer.cus_name})`
           : ""}
       </div>
     );
   };
 
-  const valueSupTemp = (option, props) => {
+  const valueCusTemp = (option, props) => {
     if (option) {
       return (
         <div>
           {option !== null
-            ? `${option.supplier.sup_code} (${option.supplier.sup_name})`
+            ? `${option.customer.cus_code} (${option.customer.cus_name})`
             : ""}
         </div>
       );
@@ -373,9 +373,9 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
     return <span>{props.placeholder}</span>;
   };
 
-  const updatePr = (e) => {
+  const updateSr = (e) => {
     dispatch({
-      type: SET_CURRENT_PR,
+      type: SET_CURRENT_SR,
       payload: e,
     });
   };
@@ -383,7 +383,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
   const header = () => {
     return (
       <h4 className="mb-5">
-        <b>Retur Pembelian</b>
+        <b>Retur Penjualan</b>
       </h4>
     );
   };
@@ -399,9 +399,9 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
             <label className="text-label">Tanggal</label>
             <div className="p-inputgroup">
               <Calendar
-                value={new Date(`${pr.po_date}Z`)}
+                value={new Date(`${sr.po_date}Z`)}
                 onChange={(e) => {
-                  updatePr({ ...pr, po_date: e.value });
+                  updateSr({ ...sr, po_date: e.value });
                 }}
                 placeholder="Pilih Tanggal"
                 showIcon
@@ -414,29 +414,29 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
             <label className="text-label">Kode Referensi</label>
             <div className="p-inputgroup">
               <InputText
-                value={pr.po_code}
-                onChange={(e) => updatePr({ ...pr, po_code: e.target.value })}
+                value={sr.po_code}
+                onChange={(e) => updateSr({ ...sr, po_code: e.target.value })}
                 placeholder="Masukan Kode Referensi"
               />
             </div>
           </div>
 
           <div className="col-4">
-            <label className="text-label">No. Faktur Pembelian</label>
+            <label className="text-label">No. Faktur Penjualan</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={pr.preq_id && req_pur(pr.preq_id)}
+                value={sr.preq_id && req_pur(sr.preq_id)}
                 options={rp}
                 onChange={(e) => {
                   console.log(e.value.dprod);
                   let result = null;
-                  if (pr.top) {
+                  if (sr.top) {
                     result = new Date(`${req_pur(e.value.id).req_date}Z`);
-                    // result.setDate(result.getDate() + rulPay(pr?.top)?.day);
+                    // result.setDate(result.getDate() + rulPay(sr?.top)?.day);
                     console.log(result);
                   }
-                  updatePr({
-                    ...pr,
+                  updateSr({
+                    ...sr,
                     preq_id: e.value.id,
                     due_date: result,
                     sup_id: e.value?.ref_sup?.id ?? null,
@@ -456,20 +456,20 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
             {/* kode suplier otomatis keluar, karena sudah melekat di faktur pembelian  */}
             
           <div className="col-3">
-            <label className="text-label">Supplier</label>
+            <label className="text-label">Pelanggan</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={pr.sup_id !== null ? supp(pr.sup_id) : null}
-                options={supplier}
+                value={sr.pel_id !== null ? checkCus(sr.pel_id) : null}
+                options={customer}
                 onChange={(e) => {
-                  updatePr({ ...pr, sup_id: e.value.supplier.id });
+                  updateSr({ ...sr, pel_id: e.value.customer.id });
                 }}
-                optionLabel="supplier.sup_name"
-                placeholder="Pilih Supplier"
+                optionLabel="customer.cus_name"
+                placeholder="Pilih Pelanggan"
                 filter
-                filterBy="supplier.sup_name"
-                itemTemplate={suppTemp}
-                valueTemplate={valueSupTemp}
+                filterBy="customer.cus_name"
+                itemTemplate={cusTemp}
+                valueTemplate={valueCusTemp}
               />
               <PButton
                 onClick={() => {
@@ -486,11 +486,11 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
             <div className="p-inputgroup mt-2">
               <InputText
                 value={
-                  pr.sup_id !== null
-                    ? supp(pr.sup_id)?.supplier?.sup_address
+                  sr.sup_id !== null
+                    ? checkCus(sr.pel_id)?.customer?.cus_address
                     : ""
                 }
-                placeholder="Alamat Supplier"
+                placeholder="Alamat Pelanggan"
                 disabled
               />
             </div>
@@ -501,7 +501,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
             <div className="p-inputgroup mt-2">
               <InputText
                 value={
-                  pr.sup_id !== null ? supp(pr.sup_id)?.supplier?.sup_telp1 : ""
+                  sr.pel_id !== null ? checkCus(sr.pel_id)?.customer?.cus_telp1 : ""
                 }
                 placeholder="Kontak Person"
                 disabled
@@ -514,9 +514,9 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
             <div className="p-inputgroup">
               <InputText
                 value={
-                  pr.sup_id !== null ? pjk(supp(pr.sup_id)?.supplier?.id) : null
+                  sr.pel_id !== null ? checkPjk(checkCus(sr.pel_id)?.customer?.id) : null
                 }
-                placeholder="Jenis Pajak"
+                placeholder="Pilih Jenis Pajak"
                 disabled
               />
             </div>
@@ -538,7 +538,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
             <>
               <DataTable
                 responsiveLayout="none"
-                value={pr.dprod?.map((v, i) => {
+                value={sr.dprod?.map((v, i) => {
                   return {
                     ...v,
                     index: i,
@@ -561,8 +561,8 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                     <div className="p-inputgroup">
                       <Dropdown
                         value={
-                          pr.dprod[e.index].prod_id &&
-                          checkProd(pr.dprod[e.index].prod_id)
+                          sr.dprod[e.index].prod_id &&
+                          checkProd(sr.dprod[e.index].prod_id)
                         }
                         options={product}
                         onChange={(e) => {
@@ -589,13 +589,13 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                     <div className="p-inputgroup">
                       <Dropdown
                         value={
-                          pr.dprod[e.index].unit_id &&
-                          checkUnit(pr.dprod[e.index].unit_id)
+                          sr.dprod[e.index].unit_id &&
+                          checkUnit(sr.dprod[e.index].unit_id)
                         }
                         onChange={(e) => {
-                          let temp = [...pr.dprod];
+                          let temp = [...sr.dprod];
                           temp[e.index].unit_id = e.value.id;
-                          updatePr({ ...pr, dprod: temp });
+                          updateSr({ ...sr, dprod: temp });
                         }}
                         options={satuan}
                         optionLabel="name"
@@ -617,16 +617,16 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                     <div className="p-inputgroup">
                       <InputText
                         value={
-                          pr.dprod[e.index].order
-                            ? pr.dprod[e.index].order
+                          sr.dprod[e.index].order
+                            ? sr.dprod[e.index].order
                             : null
                         }
                         onChange={(a) => {
-                          let temp = [...pr.dprod];
+                          let temp = [...sr.dprod];
                           let result = temp[e.index]?.request - a.target.value;
                           temp[e.index].remain = result
                           temp[e.index].order = a.target.value
-                          updatePr({ ...pr, dprod: temp });
+                          updateSr({ ...sr, dprod: temp });
                         }}
                         placeholder="0"
                         type="number"
@@ -645,14 +645,14 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                     <div className="p-inputgroup">
                       <InputText
                         value={
-                          pr.dprod[e.index].price
-                            ? pr.dprod[e.index].price
+                          sr.dprod[e.index].price
+                            ? sr.dprod[e.index].price
                             : null
                         }
                         onChange={(e) => {
-                          let temp = [...pr.dprod];
+                          let temp = [...sr.dprod];
                           temp[e.index].price = e.target.value;
-                          updatePr({ ...pr, dprod: temp });
+                          updateSr({ ...sr, dprod: temp });
                           console.log(temp);
                         }}
                         placeholder="0"
@@ -672,12 +672,12 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                     <div className="p-inputgroup">
                       <InputText
                         value={
-                          pr.dprod[e.index].disc ? pr.dprod[e.index].disc : null
+                          sr.dprod[e.index].disc ? sr.dprod[e.index].disc : null
                         }
                         onChange={(e) => {
-                          let temp = [...pr.dprod];
+                          let temp = [...sr.dprod];
                           temp[e.index].disc = e.target.value;
-                          updatePr({ ...pr, dprod: temp });
+                          updateSr({ ...sr, dprod: temp });
                           console.log(temp);
                         }}
                         placeholder="0"
@@ -697,14 +697,14 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                     <div className="p-inputgroup">
                       <InputText
                         value={
-                          pr.dprod[e.index].nett_price
-                            ? pr.dprod[e.index].nett_price
+                          sr.dprod[e.index].nett_price
+                            ? sr.dprod[e.index].nett_price
                             : null
                         }
                         onChange={(e) => {
-                          let temp = [...pr.dprod];
+                          let temp = [...sr.dprod];
                           temp[e.index].nett_price = e.target.value;
-                          updatePr({ ...pr, dprod: temp });
+                          updateSr({ ...sr, dprod: temp });
                           console.log(temp);
                         }}
                         placeholder="Masukan Harga Nett"
@@ -723,8 +723,8 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                   body={(e) => (
                     <label className="text-nowrap">
                       <b>{`Rp. ${
-                        pr.dprod[e.index].order * pr.dprod[e.index].price -
-                        pr.dprod[e.index].disc
+                        sr.dprod[e.index].order * sr.dprod[e.index].price -
+                        sr.dprod[e.index].disc
                       }`}</b>
                     </label>
                   )}
@@ -732,13 +732,13 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
 
                 <Column
                   body={(e) =>
-                    e.index === pr.dprod.length - 1 ? (
+                    e.index === sr.dprod.length - 1 ? (
                       <Link
                         onClick={() => {
-                          updatePr({
-                            ...pr,
+                          updateSr({
+                            ...sr,
                             dprod: [
-                              ...pr.dprod,
+                              ...sr.dprod,
                               {
                                 id: 0,
                                 prod_id: null,
@@ -755,10 +755,10 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                     ) : (
                       <Link
                         onClick={() => {
-                          let temp = [...pr.dprod];
+                          let temp = [...sr.dprod];
                           temp.splice(e.index, 1);
-                          updatePr({
-                            ...pr,
+                          updateSr({
+                            ...sr,
                             dprod: temp,
                           });
                         }}
@@ -976,9 +976,8 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
       {body()}
       {footer()}
 
-
-      <DataSupplier
-        data={supplier}
+      <DataCustomer
+        data={customer}
         loading={false}
         popUp={true}
         show={showSupplier}
@@ -989,12 +988,12 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
           setShowSupplier(!e);
         }}
         onSuccessInput={(e) => {
-          getSupplier();
+          getCustomer();
         }}
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowSupplier(false);
-            updatePr({ ...rp, req_dep: e.data.id });
+            updateSr({ ...rp, req_dep: e.data.id });
           }
 
           setDoubleClick(true);
@@ -1008,4 +1007,4 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
   );
 };
 
-export default ReturBeliInput;
+export default ReturJualInput;

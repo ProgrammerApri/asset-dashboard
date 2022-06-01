@@ -258,7 +258,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
         let filt = [];
         data.forEach((elem) => {
           if (elem.customer.sub_cus === false) {
-            filt.push(elem.customer);
+            filt.push(elem);
           }
         });
         console.log(data);
@@ -360,8 +360,8 @@ const InputSO = ({ onCancel, onSuccess }) => {
   const checkCus = (value) => {
     let selected = {};
     customer?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
+      if (value === element.customer.id) {
+        selected = element.customer;
       }
     });
 
@@ -370,7 +370,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
   const checkSubCus = (value) => {
     let selected = {};
-    customer?.forEach((element) => {
+    subCus?.forEach((element) => {
       if (value === element.id) {
         selected = element;
       }
@@ -589,8 +589,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
             <div className="p-inputgroup">
               <Dropdown
                 value={so.pel_id !== null ? checkCus(so.pel_id) : null}
-                options={customer}
+                options={customer?.map((v) => v.customer)}
                 onChange={(e) => {
+                  console.log(e.value);
                   updateSo({
                     ...so,
                     pel_id: e.value.id,
@@ -598,6 +599,8 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 }}
                 optionLabel="cus_name"
                 placeholder="Pilih Pelanggan"
+                filter
+                filterBy="cus_name"
                 itemTemplate={cusTemp}
                 valueTemplate={valueCusTemp}
               />
@@ -639,7 +642,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
             <label className="text-black fs-14">Ppn</label>
             <div className="p-inputgroup">
               <InputText
-                value={so.pel_id !== null ? checkCus(so.pel_id)?.cus_pjk : ""}
+                value={so.pel_id !== null ? checkPpn(checkCus(so.pel_id)?.cus_pjk).name : null}
                 onChange={(e) => {}}
                 placeholder="Jenis Ppn"
                 disabled
@@ -677,6 +680,8 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 }}
                 optionLabel="name"
                 placeholder="Pilih Jangka Waktu"
+                filter
+                filterBy="name"
                 itemTemplate={rulTemp}
                 valueTemplate={valueRulTemp}
               />
@@ -729,6 +734,8 @@ const InputSO = ({ onCancel, onSuccess }) => {
                     }}
                     optionLabel="cus_name"
                     placeholder="Pilih Sub Pelanggan"
+                    filter
+                    filterBy="cus_name"
                     itemTemplate={SubcusTemp}
                     valueTemplate={valueSubCusTemp}
                     disabled={so && !so.sub_addr}
@@ -1093,6 +1100,8 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         }}
                         optionLabel="supplier.sup_name"
                         placeholder="Pilih Supplier"
+                        filter
+                        filterBy="supplier.sup_name"
                         itemTemplate={suppTemp}
                         valueTemplate={valueSupTemp}
                       />
@@ -1126,6 +1135,8 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         }}
                         optionLabel="jasa.name"
                         placeholder="Pilih Jasa"
+                        filter
+                        filterBy="jasa.name"
                         itemTemplate={jasTemp}
                         valueTemplate={valueJasTemp}
                       />
@@ -1159,6 +1170,8 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         }}
                         optionLabel="name"
                         placeholder="Pilih Satuan"
+                        filter
+                        filterBy="name"
                       />
                       <PButton
                         onClick={() => {

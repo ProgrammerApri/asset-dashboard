@@ -614,7 +614,7 @@ const DataPajak = ({
                   </div>
                 </div>
 
-                <div className="col-">
+                <div className="col-6">
                   <label className="text-label">Nilai</label>
                   <div className="p-inputgroup">
                     <InputNumber
@@ -730,7 +730,7 @@ const DataPajak = ({
                 <div className="col-6">
                   <label className="text-label">Penggabungan Dari</label>
                   <div className="p-inputgroup">
-                    <MultiSelect
+                    <Dropdown
                       value={currentItem !== null ? currentItem.pajak : null}
                       options={pajak}
                       onChange={(e) => {

@@ -712,6 +712,8 @@ const InputPO = ({ onCancel, onSuccess }) => {
                 }}
                 optionLabel="supplier.sup_name"
                 placeholder="Pilih Supplier"
+                filter
+                filterBy="supplier.sup_name"
                 itemTemplate={suppTemp}
                 valueTemplate={valueSupTemp}
               />
@@ -756,13 +758,11 @@ const InputPO = ({ onCancel, onSuccess }) => {
           <div className="col-4">
             <label className="text-label">Ppn</label>
             <div className="p-inputgroup mt-2">
-              <Dropdown
+              <InputText
                 value={
                   po.sup_id !== null ? pjk(supp(po.sup_id)?.supplier?.id) : null
                 }
-                options={ppn}
-                optionLabel="name"
-                placeholder="Pilih Jenis Pajak"
+                placeholder="Jenis Pajak"
                 disabled
               />
             </div>
@@ -771,17 +771,13 @@ const InputPO = ({ onCancel, onSuccess }) => {
           <div className="col-4">
             <label className="text-label">Departemen</label>
             <div className="p-inputgroup mt-2">
-              <Dropdown
+              <InputText
                 value={
                   po.preq_id !== null
                     ? dept(req_pur(po.preq_id)?.req_dep?.id)
                     : null
                 }
-                options={pusatBiaya}
-                optionLabel="ccost_name"
-                placeholder="Pilih Departemen"
-                itemTemplate={deptTemp}
-                valueTemplate={valueDeptTemp}
+                placeholder="Departemen"
                 disabled
               />
             </div>
@@ -802,6 +798,8 @@ const InputPO = ({ onCancel, onSuccess }) => {
                 }}
                 optionLabel="name"
                 placeholder="Pilih Syarat Pembayaran"
+                filter
+                filterBy="name"
                 itemTemplate={rulTemp}
                 valueTemplate={valueRulTemp}
               />
@@ -1188,6 +1186,8 @@ const InputPO = ({ onCancel, onSuccess }) => {
                           }}
                           optionLabel="supplier.sup_name"
                           placeholder="Pilih Supplier"
+                          filter
+                          filterBy="supplier.sup_name"
                           itemTemplate={suppTemp}
                           valueTemplate={valueSupTemp}
                         />
@@ -1220,6 +1220,8 @@ const InputPO = ({ onCancel, onSuccess }) => {
                           options={jasa}
                           optionLabel="jasa.name"
                           placeholder="Pilih Kode Jasa"
+                          filter
+                          filterBy="jasa.name"
                           itemTemplate={jasTemp}
                           valueTemplate={valueJasTemp}
                           disabled={e.id !== 0}
@@ -1243,6 +1245,8 @@ const InputPO = ({ onCancel, onSuccess }) => {
                           options={satuan}
                           optionLabel="name"
                           placeholder="Pilih Satuan"
+                          filter
+                          filterBy="name"
                           disabled={e.id !== 0}
                         />
                       </div>

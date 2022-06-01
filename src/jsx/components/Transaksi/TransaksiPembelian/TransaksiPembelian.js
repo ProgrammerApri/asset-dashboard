@@ -1,12 +1,10 @@
 import React from "react";
 import { TabView, TabPanel } from 'primereact/tabview';
-import PermintaanPembelian from "./RequestPurchase/PermintaanPembelian";
-import PesananPO from "./PO/PesananPembelian";
-import PembelianLangsung from "./PembelianLangsung";
-import Faktur from "./Faktur";
 import RequestPurchase from "./RequestPurchase";
 import PermintaanPO from "./PO";
 import ReturBeli from "./ReturBeli";
+import DataDirectOr from "./DO";
+import FakturPembelian from "./FakturPembelian";
 
 
 const TransaksiPembelian = () => {
@@ -19,10 +17,10 @@ const TransaksiPembelian = () => {
         <PermintaanPO/>
       </TabPanel>
       <TabPanel header="Pembelian Langsung">
-        <PembelianLangsung/>
+        <DataDirectOr/>
       </TabPanel>
       <TabPanel header="Faktur">
-        <Faktur/>
+        <FakturPembelian/>
       </TabPanel>
       <TabPanel header="Retur Pembelian">
         <ReturBeli/>

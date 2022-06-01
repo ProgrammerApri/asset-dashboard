@@ -1,20 +1,22 @@
 import React, { useState, useRef } from "react";
+import { Button, Card, Col, Row } from "react-bootstrap";
 import { Toast } from "primereact/toast";
-import { Row, Col, Card } from "react-bootstrap";
-import ReturJualList from "./RetuJualList";
-import ReturJualInput from "./ReturJualInput";
+import DataFaktur from "./DataFaktur";
+import BuatFaktur from "./BuatFaktur";
 
-const ReturJual = () => {
+const FakturPembelian = () => {
   const [active, setActive] = useState(0);
   const toast = useRef(null);
   const [view, setView] = useState([
-    <ReturJualList
+    <DataFaktur
       onAdd={() => {
         setActive(1);
       }}
+      onEdit={() => {
+        setActive(1);
+      }}
     />,
-    
-    <ReturJualInput
+    <BuatFaktur
       onCancel={() => setActive(0)}
       onSuccess={() => {
         setTimeout(() => {
@@ -44,4 +46,4 @@ const ReturJual = () => {
   );
 };
 
-export default ReturJual;
+export default FakturPembelian;

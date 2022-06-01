@@ -1,0 +1,5 @@
+export const SET_CURRENT_SR = "sr.SET_CURRENT_SR"
+export const SET_SR = "sr.SET_SR"
+export const RESET_CURRENT_SR = "sr.RESET_CURRENT_SR"
+export const UPDATE_CURRENT_SR = "sr.UPDATE_CURRENT_SR"
+export const SET_EDIT_SR = "sr.SET_EDIT_SR"

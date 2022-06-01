@@ -1,7 +1,6 @@
 import { TabView, TabPanel } from "primereact/tabview";
 import React from "react";
 import KoreksiStok from "./KoreksiPersediaan";
-import X from "./KoreksiPersediaan";
 import MutasiLokasi from "./MutasiAntarLokasi";
 
 const Persediaan = () => {

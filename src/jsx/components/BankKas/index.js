@@ -1,20 +1,21 @@
 import React, { useState } from "react";
 import { Button, Col, Row } from "react-bootstrap";
-import Keluar from "./Keluar/Keluar";
+import Keluar from "./Keluar/KasBankKeluar";
 import Masuk from "./Masuk/Masuk";
+import KasKeluar from "./Keluar/KasBankKeluar";
 
 const BankKas = () => {
   const [active, setActive] = useState(0);
   const [subMenu, setSubMenu] = useState([
     {
-      tittle: "Transaksi Masuk",
+      tittle: "Kas / Bank Keluar",
       icon: "bx-receipt",
-      component: <Masuk />,
+      component: <Keluar />,
     },
     {
-      tittle: "Transaksi Keluar",
+      tittle: "Kas / Bank Masuk",
       icon: "bx-receipt",
-      component: <Keluar/>,
+      component: <Masuk/>,
     },
   ]);
 

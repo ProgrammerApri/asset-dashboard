@@ -20,6 +20,7 @@ import DataPusatBiaya from "src/jsx/components/MasterLainnya/PusatBiaya/DataPusa
 import DataProduk from "src/jsx/components/Master/Produk/DataProduk";
 import DataJasa from "src/jsx/components/Master/Jasa/DataJasa";
 import DataSatuan from "src/jsx/components/MasterLainnya/Satuan/DataSatuan";
+import { SelectButton } from "primereact/selectbutton";
 
 const InputDO = ({ onCancel, onSuccess }) => {
   const Do = useSelector((state) => state.Do.current);
@@ -47,6 +48,11 @@ const InputDO = ({ onCancel, onSuccess }) => {
     produk: true,
     jasa: false,
   });
+
+  const type = [
+    { name: "Faktur", code: 1 },
+    { name: "Non Faktur", code: 2 },
+  ];
 
   useEffect(() => {
     window.scrollTo({
@@ -471,7 +477,7 @@ const InputDO = ({ onCancel, onSuccess }) => {
   const header = () => {
     return (
       <h4 className="mb-5">
-        <b>{isEdit ? "Edit" : "Buat"} Pembelian Langsung</b>
+        <b>{isEdit ? "Edit" : "Buat"} Pembelian</b>
       </h4>
     );
   };
@@ -483,7 +489,7 @@ const InputDO = ({ onCancel, onSuccess }) => {
         <Toast ref={toast} />
 
         <Row className="mb-4">
-          <div className="col-4">
+          <div className="col-12">
             <label className="text-label">Tanggal</label>
             <div className="p-inputgroup">
               <Calendar
@@ -498,7 +504,27 @@ const InputDO = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-4">
+          <div className="col-12 mb-3">
+            <label className="text-label"></label>
+            <div className="p-inputgroup">
+              <SelectButton
+                value={
+                  Do.type !== null && Do.type !== ""
+                    ? Do.type === 1
+                      ? { name: "Faktur", code: 1 }
+                      : { name: "Non Faktur", code: 2 }
+                    : null
+                }
+                options={type}
+                onChange={(e) => {
+                  updateDO({ ...Do, type: e.target.value });
+                }}
+                optionLabel="name"
+              />
+            </div>
+          </div>
+
+          <div className="col-6">
             <label className="text-label">Kode Pembelian</label>
             <div className="p-inputgroup">
               <InputText
@@ -509,7 +535,7 @@ const InputDO = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-4">
+          <div className="col-6">
             <label className="text-label">Departemen</label>
             <div className="p-inputgroup">
               <Dropdown

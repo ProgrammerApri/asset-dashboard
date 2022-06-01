@@ -16,7 +16,7 @@ const TransaksiPembelian = () => {
       <TabPanel header="Pesanan Pembelian (PO)">
         <PermintaanPO/>
       </TabPanel>
-      <TabPanel header="Pembelian Langsung">
+      <TabPanel header="Pembelian">
         <DataDirectOr/>
       </TabPanel>
       <TabPanel header="Faktur">

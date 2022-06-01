@@ -15,10 +15,14 @@ import { Calendar } from "primereact/calendar";
 import CustomAccordion from "src/jsx/components/Accordion/Accordion";
 import { InputSwitch } from "primereact/inputswitch";
 import { SET_CURRENT_INV } from "src/redux/actions";
+import { SelectButton } from "primereact/selectbutton";
 
 const data = {};
 
-const BuatFaktur = ({onCancel}) => {
+
+
+
+const BuatFaktur = ({ onCancel }) => {
   const inv = useSelector((state) => state.inv.current);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
@@ -162,10 +166,10 @@ const BuatFaktur = ({onCancel}) => {
             <label className="text-label">Tanggal</label>
             <div className="p-inputgroup">
               <Calendar
-                // value={new Date(`${Do.do_date}Z`)}
-                // onChange={(e) => {
-                //   updateINV({ ...Do, do_date: e.value });
-                // }}
+                value={new Date(`${inv.do_date}Z`)}
+                onChange={(e) => {
+                  updateINV({ ...inv, do_date: e.value });
+                }}
                 placeholder="Pilih Tanggal"
                 showIcon
                 dateFormat="dd/mm/yy"
@@ -177,8 +181,8 @@ const BuatFaktur = ({onCancel}) => {
             <label className="text-label">No. Faktur Pembelian</label>
             <div className="p-inputgroup">
               <InputText
-                // value={Do.do_code}
-                // onChange={(e) => updateINV({ ...Do, do_code: e.target.value })}
+                value={inv.do_code}
+                onChange={(e) => updateINV({ ...inv, do_code: e.target.value })}
                 placeholder="Masukan No. Faktur"
               />
             </div>
@@ -188,7 +192,7 @@ const BuatFaktur = ({onCancel}) => {
             <label className="text-label">No. Pembelian</label>
             <div className="p-inputgroup">
               <Dropdown
-                // value={Do.dep_id !== null ? checkDept(Do.dep_id) : null}
+                // value={inv.dep_id !== null ? checkDept(Do.dep_id) : null}
                 // options={dept}
                 // onChange={(e) => {
                 //   updateINV({ ...Do, dep_id: e.value.id });
@@ -720,8 +724,7 @@ const BuatFaktur = ({onCancel}) => {
                     <div className="p-inputgroup">
                       <InputText
                         value={e.price && e.price}
-                        onChange={(u) => {
-                        }}
+                        onChange={(u) => {}}
                         placeholder="0"
                         type="number"
                         min={0}
@@ -818,12 +821,13 @@ const BuatFaktur = ({onCancel}) => {
             <div className="col-6">
               <label className="text-label">
                 {inv.split_inv ? (
-                  <b>Rp. 
+                  <b>
+                    Rp.
                     {/* {formatIdr(getSubTotalBarang())} */}
-                    </b>
+                  </b>
                 ) : (
                   <b>
-                    Rp. 
+                    Rp.
                     {/* {formatIdr(getSubTotalBarang() + getSubTotalJasa())} */}
                   </b>
                 )}
@@ -839,12 +843,13 @@ const BuatFaktur = ({onCancel}) => {
             <div className="col-6">
               <label className="text-label">
                 {inv.split_inv ? (
-                  <b>Rp. 
+                  <b>
+                    Rp.
                     {/* {formatIdr(getSubTotalBarang())} */}
-                    </b>
+                  </b>
                 ) : (
                   <b>
-                    Rp. 
+                    Rp.
                     {/* {formatIdr(getSubTotalBarang() + getSubTotalJasa())} */}
                   </b>
                 )}
@@ -860,9 +865,10 @@ const BuatFaktur = ({onCancel}) => {
             <div className="col-6">
               <label className="text-label">
                 {inv.split_inv ? (
-                  <b>Rp. 
+                  <b>
+                    Rp.
                     {/* {formatIdr((getSubTotalBarang() * 11) / 100)} */}
-                    </b>
+                  </b>
                 ) : (
                   <b>
                     Rp.{" "}
@@ -978,9 +984,10 @@ const BuatFaktur = ({onCancel}) => {
 
                 <div className="col-6 mt-4">
                   <label className="text-label">
-                    <b>Rp. 
+                    <b>
+                      Rp.
                       {/* {formatIdr(getSubTotalJasa())} */}
-                      </b>
+                    </b>
                   </label>
                 </div>
 
@@ -990,9 +997,10 @@ const BuatFaktur = ({onCancel}) => {
 
                 <div className="col-6">
                   <label className="text-label">
-                    <b>Rp. 
+                    <b>
+                      Rp.
                       {/* {formatIdr(getSubTotalJasa())} */}
-                      </b>
+                    </b>
                   </label>
                 </div>
 
@@ -1002,9 +1010,10 @@ const BuatFaktur = ({onCancel}) => {
 
                 <div className="col-6">
                   <label className="text-label">
-                    <b>Rp. 
+                    <b>
+                      Rp.
                       {/* {formatIdr((getSubTotalJasa() * 2) / 100)} */}
-                      </b>
+                    </b>
                   </label>
                 </div>
 

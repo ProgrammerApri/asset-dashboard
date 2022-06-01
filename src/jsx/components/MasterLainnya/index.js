@@ -6,10 +6,11 @@ import Currency from "../Master/Currency";
 import Divisi from "../Master/Divisi";
 import JenisPelanggan from "../Master/JenisPelanggan";
 import JenisPemasok from "../Master/JenisPemasok";
-import Project from "../Master/Project";
+import Project from "./Project";
 import Satuan from "./Satuan";
 import PusatBiaya from "./PusatBiaya";
 import RulesPay from "./RulesPay";
+import Lokasi from "./Lokasi";
 
 const MasterLainnya = () => {
   const [active, setActive] = useState(0);
@@ -58,6 +59,11 @@ const MasterLainnya = () => {
       tittle: "jenis pemasok",
       icon: "bx-user-voice",
       component: <JenisPemasok />,
+    },
+    {
+      tittle: "Lokasi",
+      icon: "bx-map",
+      component: <Lokasi />,
     },
   ]);
 

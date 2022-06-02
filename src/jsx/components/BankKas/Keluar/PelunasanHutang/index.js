@@ -1,20 +1,22 @@
 import React, { useState, useRef } from "react";
 import { Toast } from "primereact/toast";
 import { Row, Col, Card } from "react-bootstrap";
-import ReturJualList from "./RetuJualList";
-import ReturJualInput from "./ReturJualInput";
+import KasBankOutList from "./KasBankKeluarList";
+import KasBankOutInput from "./KasBankKeluarInput";
 
-const ReturJual = () => {
+
+
+const PelunasanHutang = () => {
   const [active, setActive] = useState(0);
   const toast = useRef(null);
   const [view, setView] = useState([
-    <ReturJualList
+    <KasBankOutList
       onAdd={() => {
         setActive(1);
       }}
     />,
     
-    <ReturJualInput
+    <KasBankOutInput
       onCancel={() => setActive(0)}
       onSuccess={() => {
         setTimeout(() => {
@@ -44,4 +46,4 @@ const ReturJual = () => {
   );
 };
 
-export default ReturJual;
+export default PelunasanHutang;

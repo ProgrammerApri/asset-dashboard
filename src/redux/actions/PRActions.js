@@ -1,0 +1,5 @@
+export const SET_CURRENT_PR = "pr.SET_CURRENT_PR"
+export const SET_PR = "pr.SET_PR"
+export const RESET_CURRENT_PR = "pr.RESET_CURRENT_PR"
+export const UPDATE_CURRENT_PR = "pr.UPDATE_CURRENT_PR"
+export const SET_EDIT_PR = "pr.SET_EDIT_PR"

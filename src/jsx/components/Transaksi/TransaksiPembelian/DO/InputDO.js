@@ -20,6 +20,7 @@ import DataPusatBiaya from "src/jsx/components/MasterLainnya/PusatBiaya/DataPusa
 import DataProduk from "src/jsx/components/Master/Produk/DataProduk";
 import DataJasa from "src/jsx/components/Master/Jasa/DataJasa";
 import DataSatuan from "src/jsx/components/MasterLainnya/Satuan/DataSatuan";
+import { SelectButton } from "primereact/selectbutton";
 
 const InputDO = ({ onCancel, onSuccess }) => {
   const Do = useSelector((state) => state.Do.current);
@@ -48,6 +49,11 @@ const InputDO = ({ onCancel, onSuccess }) => {
     jasa: false,
   });
 
+  const type = [
+    { name: "Faktur", code: 1 },
+    { name: "Non Faktur", code: 2 },
+  ];
+
   useEffect(() => {
     window.scrollTo({
       top: 0,
@@ -60,6 +66,7 @@ const InputDO = ({ onCancel, onSuccess }) => {
     getProduct();
     getJasa();
     getSatuan();
+    getPjk();
   }, []);
 
   const editDO = async () => {
@@ -227,6 +234,22 @@ const InputDO = ({ onCancel, onSuccess }) => {
       if (response.status) {
         const { data } = response;
         setSatuan(data);
+      }
+    } catch (error) {}
+  };
+
+  const getPjk = async () => {
+    const config = {
+      ...endpoints.pajak,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setPajak(data);
       }
     } catch (error) {}
   };
@@ -454,7 +477,7 @@ const InputDO = ({ onCancel, onSuccess }) => {
   const header = () => {
     return (
       <h4 className="mb-5">
-        <b>{isEdit ? "Edit" : "Buat"} Pembelian Langsung</b>
+        <b>{isEdit ? "Edit" : "Buat"} Pembelian</b>
       </h4>
     );
   };
@@ -466,7 +489,7 @@ const InputDO = ({ onCancel, onSuccess }) => {
         <Toast ref={toast} />
 
         <Row className="mb-4">
-          <div className="col-4">
+          <div className="col-12">
             <label className="text-label">Tanggal</label>
             <div className="p-inputgroup">
               <Calendar
@@ -481,7 +504,27 @@ const InputDO = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-4">
+          <div className="col-12 mb-3">
+            <label className="text-label"></label>
+            <div className="p-inputgroup">
+              <SelectButton
+                value={
+                  Do.type !== null && Do.type !== ""
+                    ? Do.type === 1
+                      ? { name: "Faktur", code: 1 }
+                      : { name: "Non Faktur", code: 2 }
+                    : null
+                }
+                options={type}
+                onChange={(e) => {
+                  updateDO({ ...Do, type: e.target.value });
+                }}
+                optionLabel="name"
+              />
+            </div>
+          </div>
+
+          <div className="col-6">
             <label className="text-label">Kode Pembelian</label>
             <div className="p-inputgroup">
               <InputText
@@ -492,7 +535,7 @@ const InputDO = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-4">
+          <div className="col-6">
             <label className="text-label">Departemen</label>
             <div className="p-inputgroup">
               <Dropdown
@@ -580,7 +623,7 @@ const InputDO = ({ onCancel, onSuccess }) => {
               <InputText
                 value={
                   Do.sup_id !== null
-                    ? checkpjk(checkSupp(Do.sup_id)?.sup_ppn).name
+                    ? checkpjk(checkSupp(Do.sup_id)?.supplier?.sup_ppn).name
                     : null
                 }
                 placeholder="Jenis Pajak"

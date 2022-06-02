@@ -15,73 +15,48 @@ import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { classNames } from "primereact/utils";
 
-const data = {
-    id: 1,
-    code: "",
-    name: "",
-    address: "",
-    desc: "",
+const def = {
+  id: 1,
+  proj_code: "",
+  proj_name: "",
+  proj_ket: "",
 };
 
-
-const Lokasi = () => {
-  const [lokasi, setLokasi] = useState(null);
+const DataProject = ({
+  data,
+  load,
+  popUp = false,
+  show = false,
+  onHide = () => {},
+  onInput = () => {},
+  onRowSelect,
+  onSuccessInput,
+}) => {
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
-  const [displayData, setDisplayData] = useState(false);
-  const [displayDel, setDisplayDel] = useState(false);
-  const [position, setPosition] = useState("center");
-  const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
-  const [isEdit, setEdit] = useState(false);
+  const [currentItem, setCurrentItem] = useState(def);
+  const [isEdit, setEdit] = useState(def);
+  const [showInput, setShowInput] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
 
-  const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getLokasi();
     initFilters1();
   }, []);
 
-
-  const getLokasi = async (isUpdate = false) => {
-    setLoading(true);
+  const editProject = async () => {
     const config = {
-      ...endpoints.lokasi,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setLokasi(data);
-      }
-    } catch (error) {}
-    if (isUpdate) {
-      setLoading(false);
-    } else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1500);
-    }
-  };
-
-  const editLokasi = async () => {
-    const config = {
-      ...endpoints.editLokasi,
-      endpoint: endpoints.editLokasi.endpoint + currentItem.id,
+      ...endpoints.editProject,
+      endpoint: endpoints.editProject.endpoint + currentItem.id,
       data: {
-        code: currentItem.code,
-        name: currentItem.name,
-        address: currentItem.address,
-        desc: currentItem.desc,
+        proj_code: currentItem.proj_code,
+        proj_name: currentItem.proj_name,
+        proj_ket: currentItem.proj_ket,
       },
     };
     console.log(config.data);
@@ -91,9 +66,10 @@ const Lokasi = () => {
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setUpdate(false);
-          setDisplayData(false);
-          getLokasi(true);
+          onSuccessInput();
+          setLoading(false);
+          onHideInput();
+          onInput(false);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -115,14 +91,13 @@ const Lokasi = () => {
     }
   };
 
-  const addLokasi = async () => {
+  const addProject = async () => {
     const config = {
-      ...endpoints.addLokasi,
+      ...endpoints.addProject,
       data: {
-        code: currentItem.code,
-        name: currentItem.name,
-        address: currentItem.address,
-        desc: currentItem.desc,
+        proj_code: currentItem.proj_code,
+        proj_name: currentItem.proj_name,
+        proj_ket: currentItem.proj_ket,
       },
     };
     console.log(config.data);
@@ -132,9 +107,10 @@ const Lokasi = () => {
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setUpdate(false);
-          setDisplayData(false);
-          getLokasi(true);
+          onSuccessInput();
+          setLoading(false);
+          onHideInput();
+          onInput(false);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -151,7 +127,7 @@ const Lokasi = () => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${currentItem.code} Sudah Digunakan`,
+            detail: `Kode Project ${currentItem.proj_code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -181,9 +157,10 @@ const Lokasi = () => {
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setUpdate(false);
-          setDisplayDel(false);
-          getLokasi(true);
+          setLoading(false);
+          setShowDelete(false);
+          onSuccessInput();
+          onInput(false);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -195,8 +172,9 @@ const Lokasi = () => {
     } catch (error) {
       console.log(error);
       setTimeout(() => {
-        setUpdate(false);
-        setDisplayDel(false);
+        setLoading(false);
+        setShowDelete(false);
+        onInput(false);
         toast.current.show({
           severity: "error",
           summary: "Gagal",
@@ -214,8 +192,9 @@ const Lokasi = () => {
         <Link
           onClick={() => {
             setEdit(true);
-            onClick("displayData", data);
             setCurrentItem(data);
+            setShowInput(true);
+            onInput(true);
           }}
           className="btn btn-primary shadow btn-xs sharp ml-1"
         >
@@ -224,9 +203,9 @@ const Lokasi = () => {
 
         <Link
           onClick={() => {
-            setEdit(true);
-            setDisplayDel(true);
             setCurrentItem(data);
+            setShowDelete(true);
+            onInput(true);
           }}
           className="btn btn-danger shadow btn-xs sharp ml-1"
         >
@@ -237,22 +216,13 @@ const Lokasi = () => {
     );
   };
 
-  const onClick = () => {
-    setDisplayData(true);
-    setCurrentItem();
-
-    if (position) {
-      setPosition(position);
-    }
-  };
-
   const onSubmit = () => {
     if (isEdit) {
       setUpdate(true);
-      editLokasi();
+      editProject();
     } else {
       setUpdate(true);
-      addLokasi();
+      addProject();
     }
   };
 
@@ -261,7 +231,10 @@ const Lokasi = () => {
       <div>
         <PButton
           label="Batal"
-          onClick={() => setDisplayData(false)}
+          onClick={() => {
+            onHideInput();
+            onInput(false);
+          }}
           className="p-button-text btn-primary"
         />
         <PButton
@@ -269,7 +242,7 @@ const Lokasi = () => {
           icon="pi pi-check"
           onClick={() => onSubmit()}
           autoFocus
-          loading={update}
+          loading={loading}
         />
       </div>
     );
@@ -280,7 +253,11 @@ const Lokasi = () => {
       <div>
         <PButton
           label="Batal"
-          onClick={() => setDisplayDel(false)}
+          onClick={() => {
+            setShowDelete(false);
+            setLoading(false);
+            onInput(false);
+          }}
           className="p-button-text btn-primary"
         />
         <PButton
@@ -325,9 +302,11 @@ const Lokasi = () => {
         <Button
           variant="primary"
           onClick={() => {
+            setShowInput(true);
             setEdit(false);
-            setCurrentItem(data);
-            setDisplayData(true);
+            setLoading(false);
+            setCurrentItem(def);
+            onInput(true);
           }}
         >
           Tambah{" "}
@@ -338,7 +317,6 @@ const Lokasi = () => {
       </div>
     );
   };
-
 
   const template2 = {
     layout: "RowsPerPageDropdown CurrentPageReport PrevPageLink NextPageLink",
@@ -386,166 +364,185 @@ const Lokasi = () => {
     setRows2(event.rows);
   };
 
-  return (
-    <>
-      <Toast ref={toast} />
-      <Row>
-        <Col>
-          <Card>
-            <Card.Body>
-              <DataTable
-                responsiveLayout="scroll"
-                value={loading ? dummy : lokasi}
-                className="display w-150 datatable-wrapper"
-                showGridlines
-                dataKey="id"
-                rowHover
-                header={renderHeader}
-                filters={filters1}
-                globalFilterFields={[
-                  "lokasi.code",
-                  "lokasi.name",
-                  "lokasi.address",
-                  "lokasi.desc",
-                ]}
-                emptyMessage="Tidak ada data"
-                paginator
-                paginatorTemplate={template2}
-                first={first2}
-                rows={rows2}
-                onPage={onCustomPage2}
-                paginatorClassName="justify-content-end mt-3"
-              >
-                <Column
-                  header="Kode Lokasi"
-                  style={{
-                    minWidth: "8rem",
-                  }}
-                  field={(e) => e.code}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Nama Lokasi"
-                  field={(e) => e.name}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Alamat"
-                  field={(e) => e.address}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Keterangan"
-                  field={(e) => e.desc}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Action"
-                  dataType="boolean"
-                  bodyClassName="text-center"
-                  style={{ minWidth: "2rem" }}
-                  body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
-                />
-              </DataTable>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-
-      <Dialog
-        header={isEdit ? "Edit Lokasi" : "Tambah Lokasi"}
-        visible={displayData}
-        style={{ width: "40vw" }}
-        footer={renderFooter("displayData")}
-        onHide={() => {
-          setEdit(false);
-          setDisplayData(false);
-        }}
-      >
-        <div className="col-12">
-          <label className="text-label">Kode Lokasi</label>
-          <div className="p-inputgroup">
-            <InputText
-              value={
-                currentItem !== null ? `${currentItem.code}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({...currentItem, code: e.target.value})
-              }
-              placeholder="Masukan Kode Lokasi"
-            
-            />
-          </div>
-        </div>
-
-        <div className="col-12">
-          <label className="text-label">Nama Lokasi</label>
-          <div className="p-inputgroup">
-            <InputText
-              value={
-                currentItem !== null ? `${currentItem.name}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({...currentItem, name: e.target.value})
-              }
-              placeholder="Masukan Nama Lokasi"
-            />
-          </div>
-        </div>
-
-        <div className="col-12">
-          <label className="text-label">Alamat</label>
-          <div className="p-inputgroup">
-            <InputTextarea
-              value={
-                currentItem !== null ? `${currentItem.address}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({...currentItem, address: e.target.value})
-              }
-              placeholder="Masukan Alamat"
-            />
-          </div>
-        </div>
-
-        <div className="col-12">
-          <label className="text-label">Keterangan</label>
-          <div className="p-inputgroup">
-            <InputTextarea
-              value={
-                currentItem !== null ? `${currentItem.desc}` : ""
-              }
-              onChange={(e) =>
-                setCurrentItem({...currentItem, desc: e.target.value})
-              }
-              placeholder="Masukan Keterangan"
-            />
-          </div>
-        </div>
-      </Dialog>
-
-      <Dialog
-        header={"Hapus Data"}
-        visible={displayDel}
-        style={{ width: "30vw" }}
-        footer={renderFooterDel("displayDel")}
-        onHide={() => {
-          setDisplayDel(false);
-        }}
-      >
-        <div className="ml-3 mr-3">
-          <i
-            className="pi pi-exclamation-triangle mr-3 align-middle"
-            style={{ fontSize: "2rem" }}
+  const renderBody = () => {
+    return (
+      <>
+        <Toast ref={toast} />
+        <DataTable
+          responsiveLayout="scroll"
+          value={data}
+          className="display w-150 datatable-wrapper"
+          showGridlines
+          dataKey="id"
+          rowHover
+          header={renderHeader}
+          filters={filters1}
+          globalFilterFields={[
+            "project.proj_code",
+            "project.proj_name",
+            "project.proj_ket",
+          ]}
+          emptyMessage="Tidak ada data"
+          paginator
+          paginatorTemplate={template2}
+          first={first2}
+          rows={rows2}
+          onPage={onCustomPage2}
+          paginatorClassName="justify-content-end mt-3"
+          selectionMode="single"
+          onRowSelect={onRowSelect}
+        >
+          <Column
+            header="Kode"
+            style={{
+              minWidth: "8rem",
+            }}
+            field={(e) => e.proj_code}
+            body={load && <Skeleton />}
           />
-          <span>Apakah anda yakin ingin menghapus data ?</span>
-        </div>
-      </Dialog>
-    </>
-  );
+          <Column
+            header="Nama"
+            field={(e) => e.proj_name}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Keterangan"
+            field={(e) => e.proj_ket}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Action"
+            dataType="boolean"
+            bodyClassName="text-center"
+            style={{ minWidth: "2rem" }}
+            body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
+          />
+        </DataTable>
+      </>
+    );
+  };
+
+  const renderDialog = () => {
+    return (
+      <>
+        <Toast ref={toast} />
+        <Dialog
+          header={isEdit ? "Edit Project" : "Tambah Project"}
+          visible={showInput}
+          style={{ width: "40vw" }}
+          footer={renderFooter()}
+          onHide={() => {
+            onHideInput();
+            onInput(false);
+          }}
+        >
+          <div className="row ml-0 mt-0">
+            <div className="col-6">
+              <label className="text-label">Kode</label>
+              <div className="p-inputgroup">
+                <InputText
+                  value={currentItem !== null ? `${currentItem.proj_code}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({
+                      ...currentItem,
+                      proj_code: e.target.value,
+                    })
+                  }
+                  placeholder="Masukan Kode"
+                />
+              </div>
+            </div>
+
+            <div className="col-6">
+              <label className="text-label">Nama</label>
+              <div className="p-inputgroup">
+                <InputText
+                  value={currentItem !== null ? `${currentItem.proj_name}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({
+                      ...currentItem,
+                      proj_name: e.target.value,
+                    })
+                  }
+                  placeholder="Masukan Nama Project"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="row ml-0 mt-0">
+            <div className="col-12">
+              <label className="text-label">Keterangan</label>
+              <div className="p-inputgroup">
+                <InputTextarea
+                  value={currentItem !== null ? `${currentItem.proj_ket}` : ""}
+                  onChange={(e) =>
+                    setCurrentItem({ ...currentItem, proj_ket: e.target.value })
+                  }
+                  placeholder="Masukan Keterangan"
+                />
+              </div>
+            </div>
+          </div>
+        </Dialog>
+
+        <Dialog
+          header={"Hapus Data"}
+          visible={showDelete}
+          style={{ width: "30vw" }}
+          footer={renderFooterDel("displayDel")}
+          onHide={() => {
+            setLoading(false);
+            setShowDelete(false);
+            onInput(false);
+          }}
+        >
+          <div className="ml-3 mr-3">
+            <i
+              className="pi pi-exclamation-triangle mr-3 align-middle"
+              style={{ fontSize: "2rem" }}
+            />
+            <span>Apakah anda yakin ingin menghapus data ?</span>
+          </div>
+        </Dialog>
+      </>
+    );
+  };
+
+  const onHideInput = () => {
+    setLoading(false);
+    setCurrentItem(def);
+    setEdit(false);
+    setShowInput(false);
+  };
+
+  if (popUp) {
+    return (
+      <>
+        <Dialog
+          header={"Data Project"}
+          visible={show}
+          footer={() => <div></div>}
+          style={{ width: "60vw" }}
+          onHide={onHide}
+        >
+          <Row className="ml-0 mr-0">
+            <Col>{renderBody()}</Col>
+          </Row>
+        </Dialog>
+        {renderDialog()}
+      </>
+    );
+  } else {
+    return (
+      <>
+        {renderBody()}
+        {renderDialog()}
+      </>
+    );
+  }
 };
 
-export default Lokasi;
+export default DataProject;

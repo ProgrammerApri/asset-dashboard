@@ -12,7 +12,8 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_DO, SET_DO, SET_EDIT_DO } from "src/redux/actions";
+import { SET_CURRENT_INV, SET_EDIT_INV, SET_INV } from "src/redux/actions";
+import { Badge } from "primereact/badge";
 
 const data = {
   id: null,
@@ -30,7 +31,7 @@ const data = {
   djasa: [],
 };
 
-const DataDO = ({ onAdd, onEdit }) => {
+const DataFaktur = ({ onAdd, onEdit }) => {
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayDel, setDisplayDel] = useState(false);
@@ -42,7 +43,7 @@ const DataDO = ({ onAdd, onEdit }) => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const dispatch = useDispatch();
-  const direcOrder = useSelector((state) => state.Do.Do);
+//   const pinv = useSelector((state) => state.pinv.pinv);
 
   const dummy = Array.from({ length: 10 });
 
@@ -65,7 +66,7 @@ const DataDO = ({ onAdd, onEdit }) => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        dispatch({ type: SET_DO, payload: data });
+        dispatch({ type: SET_INV, payload: data });
       }
     } catch (error) {}
     if (isUpdate) {
@@ -80,7 +81,7 @@ const DataDO = ({ onAdd, onEdit }) => {
   const delDO = async (id) => {
     const config = {
       ...endpoints.delDO,
-      endpoint: endpoints.delDO.endpoint + direcOrder.id,
+    //   endpoint: endpoints.delDO.endpoint + pinv.id,
     };
     console.log(config.data);
     let response = null;
@@ -115,88 +116,88 @@ const DataDO = ({ onAdd, onEdit }) => {
     }
   };
 
-  const actionBodyTemplate = (data) => {
-    return (
-      // <React.Fragment>
-      <div className="d-flex">
-        <Link
-          onClick={() => {
-            onEdit(data);
-            let dprod = data.dprod;
-            dispatch({
-              type: SET_EDIT_DO,
-              payload: true,
-            });
-            dprod.forEach((el) => {
-              el.prod_id = el.prod_id.id;
-              el.unit_id = el.unit_id.id;
-            });
-            let djasa = data.djasa;
-            djasa.forEach((el) => {
-              el.jasa_id = el.jasa_id.id;
-              el.unit_id = el.unit_id.id;
-            });
-            dispatch({
-              type: SET_CURRENT_DO,
-              payload: {
-                ...data,
-                dep_id: data?.dep_id?.id ?? null,
-                sup_id: data?.sup_id?.id ?? null,
-                top: data?.top?.id ?? null,
-                dprod:
-                  dprod.length > 0
-                    ? dprod
-                    : [
-                        {
-                          id: 0,
-                          do_id: null,
-                          prod_id: null,
-                          unit_id: null,
-                          order: null,
-                          price: null,
-                          disc: null,
-                          nett_price: null,
-                          total: null,
-                        },
-                      ],
-                djasa:
-                  djasa.length > 0
-                    ? djasa
-                    : [
-                        {
-                          id: 0,
-                          do_id: null,
-                          jasa_id: null,
-                          sup_id: null,
-                          unit_id: null,
-                          order: null,
-                          price: null,
-                          disc: null,
-                          total: null,
-                        },
-                      ],
-              },
-            });
-          }}
-          className="btn btn-primary shadow btn-xs sharp ml-1"
-        >
-          <i className="fa fa-pencil"></i>
-        </Link>
+  // const actionBodyTemplate = (data) => {
+  //   return (
+  //     // <React.Fragment>
+  //     <div className="d-flex">
+  //       <Link
+  //         onClick={() => {
+  //           onEdit(data);
+  //           let dprod = data.dprod;
+  //           dispatch({
+  //             type: SET_EDIT_DO,
+  //             payload: true,
+  //           });
+  //           dprod.forEach((el) => {
+  //             el.prod_id = el.prod_id.id;
+  //             el.unit_id = el.unit_id.id;
+  //           });
+  //           let djasa = data.djasa;
+  //           djasa.forEach((el) => {
+  //             el.jasa_id = el.jasa_id.id;
+  //             el.unit_id = el.unit_id.id;
+  //           });
+  //           dispatch({
+  //             type: SET_CURRENT_DO,
+  //             payload: {
+  //               ...data,
+  //               dep_id: data?.dep_id?.id ?? null,
+  //               sup_id: data?.sup_id?.id ?? null,
+  //               top: data?.top?.id ?? null,
+  //               dprod:
+  //                 dprod.length > 0
+  //                   ? dprod
+  //                   : [
+  //                       {
+  //                         id: 0,
+  //                         do_id: null,
+  //                         prod_id: null,
+  //                         unit_id: null,
+  //                         order: null,
+  //                         price: null,
+  //                         disc: null,
+  //                         nett_price: null,
+  //                         total: null,
+  //                       },
+  //                     ],
+  //               djasa:
+  //                 djasa.length > 0
+  //                   ? djasa
+  //                   : [
+  //                       {
+  //                         id: 0,
+  //                         do_id: null,
+  //                         jasa_id: null,
+  //                         sup_id: null,
+  //                         unit_id: null,
+  //                         order: null,
+  //                         price: null,
+  //                         disc: null,
+  //                         total: null,
+  //                       },
+  //                     ],
+  //             },
+  //           });
+  //         }}
+  //         className="btn btn-primary shadow btn-xs sharp ml-1"
+  //       >
+  //         <i className="fa fa-pencil"></i>
+  //       </Link>
 
-        <Link
-          onClick={() => {
-            setEdit(true);
-            setDisplayDel(true);
-            setCurrentItem(data);
-          }}
-          className="btn btn-danger shadow btn-xs sharp ml-1"
-        >
-          <i className="fa fa-trash"></i>
-        </Link>
-      </div>
-      // </React.Fragment>
-    );
-  };
+  //       <Link
+  //         onClick={() => {
+  //           setEdit(true);
+  //           setDisplayDel(true);
+  //           setCurrentItem(data);
+  //         }}
+  //         className="btn btn-danger shadow btn-xs sharp ml-1"
+  //       >
+  //         <i className="fa fa-trash"></i>
+  //       </Link>
+  //     </div>
+  //     // </React.Fragment>
+  //   );
+  // };
 
   const renderFooterDel = () => {
     return (
@@ -250,11 +251,11 @@ const DataDO = ({ onAdd, onEdit }) => {
           onClick={() => {
             onAdd();
             dispatch({
-              type: SET_EDIT_DO,
+              type: SET_EDIT_INV,
               payload: false,
             });
             dispatch({
-              type: SET_CURRENT_DO,
+              type: SET_CURRENT_INV,
               payload: {
                 ...data,
                 dprod: [
@@ -359,14 +360,14 @@ const DataDO = ({ onAdd, onEdit }) => {
       <Toast ref={toast} />
       <DataTable
         responsiveLayout="scroll"
-        value={loading ? dummy : direcOrder}
+        // value={loading ? dummy : pinv}
         className="display w-150 datatable-wrapper"
         showGridlines
         dataKey="id"
         rowHover
         header={renderHeader}
         filters={filters1}
-        globalFilterFields={["Do.do_code"]}
+        globalFilterFields={["customer.cus_code"]}
         emptyMessage="Tidak ada data"
         paginator
         paginatorTemplate={template2}
@@ -376,31 +377,64 @@ const DataDO = ({ onAdd, onEdit }) => {
         paginatorClassName="justify-content-end mt-3"
       >
         <Column
-          header="Tanggal Pembelian"
+          header="Tanggal"
           style={{
             minWidth: "8rem",
           }}
-          field={(e) => formatDate(e.do_date)}
+          field={(e) => e.customer.cus_code}
           body={loading && <Skeleton />}
         />
         <Column
-          header="Kode Pembelian"
-          field={(e) => e.do_code}
+          header="Nomor Pembelian"
+          field={(e) => e.customer.cus_name}
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
         />
         <Column
-          header="Departemen"
-          field={(e) => e.dep_id.ccost_name}
+          header="Nomor Pesanan"
+          field={(e) => e.customer.cus_address}
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
         />
         <Column
-          header="Action"
-          dataType="boolean"
-          bodyClassName="text-center"
-          style={{ minWidth: "2rem" }}
-          body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
+          header="Nama Supplier"
+          field={(e) => e.customer.cus_name}
+          style={{ minWidth: "8rem" }}
+          body={loading && <Skeleton />}
+        />
+        <Column
+          header="J/T"
+          field={(e) => e.customer.cus_name}
+          style={{ minWidth: "4rem" }}
+          body={loading && <Skeleton />}
+        />
+        <Column
+          header="Pembayaran"
+          field={(e) => e.account.dou_type}
+          style={{ minWidth: "8rem" }}
+          body={(e) =>
+            loading ? (
+              <Skeleton />
+            ) : (
+              <div>
+                {e.account.dou_type === "P" ? (
+                  <Badge variant="success light">
+                    <i className="bx bxs-circle text-success mr-1"></i> Paid
+                  </Badge>
+                ) : (
+                  <Badge variant="info light">
+                    <i className="bx bxs-circle text-info mr-1"></i> Unpaid
+                  </Badge>
+                )}
+              </div>
+            )
+          }
+        />
+        <Column
+          header="Status"
+          field={(e) => e.cus_telp}
+          style={{ minWidth: "6rem" }}
+          body={loading && <Skeleton />}
         />
       </DataTable>
 
@@ -425,4 +459,4 @@ const DataDO = ({ onAdd, onEdit }) => {
   );
 };
 
-export default DataDO;
+export default DataFaktur;

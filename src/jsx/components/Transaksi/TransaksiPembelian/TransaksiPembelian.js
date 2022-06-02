@@ -3,8 +3,8 @@ import { TabView, TabPanel } from 'primereact/tabview';
 import RequestPurchase from "./RequestPurchase";
 import PermintaanPO from "./PO";
 import ReturBeli from "./ReturBeli";
-import DataDirectOr from "./DO";
 import FakturPembelian from "./FakturPembelian";
+import Order from "./Order";
 
 
 const TransaksiPembelian = () => {
@@ -17,7 +17,7 @@ const TransaksiPembelian = () => {
         <PermintaanPO/>
       </TabPanel>
       <TabPanel header="Pembelian">
-        <DataDirectOr/>
+        <Order/>
       </TabPanel>
       <TabPanel header="Faktur">
         <FakturPembelian/>

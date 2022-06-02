@@ -13,7 +13,7 @@ import { InputSwitch } from "primereact/inputswitch";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import CustomAccordion from "../../../Accordion/Accordion";
-import { SET_CURRENT_DO } from "src/redux/actions";
+import { SET_CURRENT_ODR } from "src/redux/actions";
 import DataSupplier from "src/jsx/components/Mitra/Pemasok/DataPemasok";
 import DataRulesPay from "src/jsx/components/MasterLainnya/RulesPay/DataRulesPay";
 import DataPusatBiaya from "src/jsx/components/MasterLainnya/PusatBiaya/DataPusatBiaya";
@@ -21,10 +21,12 @@ import DataProduk from "src/jsx/components/Master/Produk/DataProduk";
 import DataJasa from "src/jsx/components/Master/Jasa/DataJasa";
 import DataSatuan from "src/jsx/components/MasterLainnya/Satuan/DataSatuan";
 import { SelectButton } from "primereact/selectbutton";
+import { el } from "date-fns/locale";
 
-const InputDO = ({ onCancel, onSuccess }) => {
-  const Do = useSelector((state) => state.Do.current);
+const InputOrder = ({ onCancel, onSuccess }) => {
+  const order = useSelector((state) => state.order.current);
   const [dept, setDept] = useState(null);
+  const [po, setPO] = useState(null);
   const [supplier, setSupplier] = useState(null);
   const [rulesPay, setRulesPay] = useState(null);
   const [pajak, setPajak] = useState(null);
@@ -37,7 +39,7 @@ const InputDO = ({ onCancel, onSuccess }) => {
   const [showProduk, setShowProduk] = useState(false);
   const [showJasa, setShowJasa] = useState(false);
   const [showSatuan, setShowSatuan] = useState(false);
-  const isEdit = useSelector((state) => state.Do.editDo);
+  const isEdit = useSelector((state) => state.order.editOdr);
   const [update, setUpdate] = useState(false);
   const toast = useRef(null);
   const [doubleClick, setDoubleClick] = useState(false);
@@ -49,9 +51,9 @@ const InputDO = ({ onCancel, onSuccess }) => {
     jasa: false,
   });
 
-  const type = [
-    { name: "Faktur", code: 1 },
-    { name: "Non Faktur", code: 2 },
+  const faktur = [
+    { name: "Faktur", sts: true },
+    { name: "Non Faktur", sts: false },
   ];
 
   useEffect(() => {
@@ -67,13 +69,14 @@ const InputDO = ({ onCancel, onSuccess }) => {
     getJasa();
     getSatuan();
     getPjk();
+    getPO();
   }, []);
 
-  const editDO = async () => {
+  const editODR = async () => {
     const config = {
-      ...endpoints.editDO,
-      endpoint: endpoints.editDO.endpoint + Do.id,
-      data: Do,
+      ...endpoints.editODR,
+      endpoint: endpoints.editODR.endpoint + order.id,
+      data: order,
     };
     console.log(config.data);
     let response = null;
@@ -96,10 +99,10 @@ const InputDO = ({ onCancel, onSuccess }) => {
     }
   };
 
-  const addDO = async () => {
+  const addODR = async () => {
     const config = {
-      ...endpoints.addDO,
-      data: Do,
+      ...endpoints.addODR,
+      data: order,
     };
     console.log(config.data);
     let response = null;
@@ -117,7 +120,7 @@ const InputDO = ({ onCancel, onSuccess }) => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${Do.do_code} Sudah Digunakan`,
+            detail: `Kode ${order.ord_code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -133,6 +136,63 @@ const InputDO = ({ onCancel, onSuccess }) => {
         }, 500);
       }
     }
+  };
+
+  const getPO = async () => {
+    const config = {
+      ...endpoints.po,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        let filt = [];
+        data.forEach((elem) => {
+          let prod = [];
+          elem.pprod.forEach((el) => {
+            el.prod_id = el.prod_id.id;
+            el.unit_id = el.unit_id.id;
+            prod.push({
+              ...el,
+              r_order: el.order,
+            });
+
+            let temp = [...order.dprod];
+            order.dprod.forEach((e, i) => {
+              if (el.id == e.pprod_id) {
+                temp[i].order = el.order;
+                updateORD({ ...order, dprod: temp });
+              }
+            });
+          });
+          elem.pprod = prod;
+
+          let jasa = [];
+          elem.pjasa.forEach((element) => {
+            element.jasa_id = element.jasa_id.id;
+            element.unit_id = element.unit_id.id;
+            jasa.push({
+              ...element,
+              r_order: element.order,
+            });
+
+            let temp = [...order.djasa];
+            order.djasa.forEach((e, i) => {
+              if (el.id == e.pjasa_id) {
+                temp[i].order = el.order;
+                updateORD({ ...order, djasa: temp });
+              }
+            });
+          });
+          elem.pjasa = jasa;
+          filt.push(elem);
+        });
+        setPO(filt);
+      }
+    } catch (error) {}
   };
 
   const getSupplier = async () => {
@@ -298,6 +358,17 @@ const InputDO = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
+  const checkPO = (value) => {
+    let selected = {};
+    po?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
   const checkDept = (value) => {
     let selected = {};
     dept?.forEach((element) => {
@@ -344,6 +415,30 @@ const InputDO = ({ onCancel, onSuccess }) => {
       return (
         <div>
           {option !== null ? `${option.ccost_code} (${option.ccost_name})` : ""}
+        </div>
+      );
+    }
+
+    return <span>{props.placeholder}</span>;
+  };
+
+  const poTemp = (option) => {
+    return (
+      <div>
+        {option !== null
+          ? `${option.po_code} (${option.preq_id.req_dep.ccost_name})`
+          : ""}
+      </div>
+    );
+  };
+
+  const valuePOTemp = (option, props) => {
+    if (option) {
+      return (
+        <div>
+          {option !== null
+            ? `${option.po_code} (${option.preq_id.req_dep.ccost_name})`
+            : ""}
         </div>
       );
     }
@@ -432,23 +527,23 @@ const InputDO = ({ onCancel, onSuccess }) => {
   const onSubmit = () => {
     if (isEdit) {
       setUpdate(true);
-      editDO();
+      editODR();
     } else {
       setUpdate(true);
-      addDO();
+      addODR();
     }
   };
 
-  const updateDO = (e) => {
+  const updateORD = (e) => {
     dispatch({
-      type: SET_CURRENT_DO,
+      type: SET_CURRENT_ODR,
       payload: e,
     });
   };
 
   const getSubTotalBarang = () => {
     let total = 0;
-    Do?.dprod?.forEach((el) => {
+    order?.dprod?.forEach((el) => {
       if (el.nett_price && el.nett_price > 0) {
         total += parseInt(el.nett_price);
       } else {
@@ -461,7 +556,7 @@ const InputDO = ({ onCancel, onSuccess }) => {
 
   const getSubTotalJasa = () => {
     let total = 0;
-    Do?.djasa?.forEach((el) => {
+    order?.djasa?.forEach((el) => {
       total += el.total - (el.total * el.disc) / 100;
     });
 
@@ -472,6 +567,18 @@ const InputDO = ({ onCancel, onSuccess }) => {
     return `${value}`
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
+  const formatDate = (date) => {
+    var d = new Date(`${date}Z`),
+      month = "" + (d.getMonth() + 1),
+      day = "" + d.getDate(),
+      year = d.getFullYear();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+
+    return [year, month, day].join("-");
   };
 
   const header = () => {
@@ -489,13 +596,13 @@ const InputDO = ({ onCancel, onSuccess }) => {
         <Toast ref={toast} />
 
         <Row className="mb-4">
-          <div className="col-12">
+          <div className="col-6">
             <label className="text-label">Tanggal</label>
             <div className="p-inputgroup">
               <Calendar
-                value={new Date(`${Do.do_date}Z`)}
+                value={new Date(`${order.ord_date}Z`)}
                 onChange={(e) => {
-                  updateDO({ ...Do, do_date: e.value });
+                  updateORD({ ...order, ord_date: e.value });
                 }}
                 placeholder="Pilih Tanggal"
                 showIcon
@@ -504,33 +611,43 @@ const InputDO = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-12 mb-3">
-            <label className="text-label"></label>
+          <div className="col-6">
+            <label className="text-label">Kode Pembelian</label>
             <div className="p-inputgroup">
-              <SelectButton
-                value={
-                  Do.type !== null && Do.type !== ""
-                    ? Do.type === 1
-                      ? { name: "Faktur", code: 1 }
-                      : { name: "Non Faktur", code: 2 }
-                    : null
+              <InputText
+                value={order.ord_code}
+                onChange={(e) =>
+                  updateORD({ ...order, ord_code: e.target.value })
                 }
-                options={type}
-                onChange={(e) => {
-                  updateDO({ ...Do, type: e.target.value });
-                }}
-                optionLabel="name"
+                placeholder="Masukan Kode Pembelian"
               />
             </div>
           </div>
 
           <div className="col-6">
-            <label className="text-label">Kode Pembelian</label>
+            <label className="text-label">No. Pesanan Pembelian</label>
             <div className="p-inputgroup">
-              <InputText
-                value={Do.do_code}
-                onChange={(e) => updateDO({ ...Do, do_code: e.target.value })}
-                placeholder="Masukan Kode Pembelian"
+              <Dropdown
+                value={order.po_id !== null ? checkPO(order.po_id) : null}
+                options={po}
+                onChange={(e) => {
+                  console.log(e.value.preq_id.req_dep.id);
+                  updateORD({
+                    ...order,
+                    po_id: e.value.id,
+                    top: e.value?.top.id ?? null,
+                    sup_id: e.value?.id ?? null,
+                    dep_id: e.value?.preq_id?.req_dep?.id ?? null,
+                    dprod: e.value.pprod,
+                    djasa: e.value.pjasa,
+                  });
+                }}
+                placeholder="Pilih No. Pesanan Pembelian"
+                optionLabel="po_code"
+                filter
+                filterBy="po_code"
+                valueTemplate={valuePOTemp}
+                itemTemplate={poTemp}
               />
             </div>
           </div>
@@ -539,10 +656,10 @@ const InputDO = ({ onCancel, onSuccess }) => {
             <label className="text-label">Departemen</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={Do.dep_id !== null ? checkDept(Do.dep_id) : null}
+                value={order.dep_id !== null ? checkDept(order.dep_id) : null}
                 options={dept}
                 onChange={(e) => {
-                  updateDO({ ...Do, dep_id: e.value.id });
+                  updateORD({ ...order, dep_id: e.value.id });
                 }}
                 placeholder="Departemen"
                 optionLabel="ccost_name"
@@ -550,11 +667,13 @@ const InputDO = ({ onCancel, onSuccess }) => {
                 filterBy="ccost_name"
                 valueTemplate={valueDeptTemp}
                 itemTemplate={deptTemp}
+                disabled={order && order.po_id !== null}
               />
               <PButton
                 onClick={() => {
                   setShowDept(true);
                 }}
+                disabled={order && order.po_id !== null}
               >
                 <i class="bx bx-food-menu"></i>
               </PButton>
@@ -565,10 +684,10 @@ const InputDO = ({ onCancel, onSuccess }) => {
             <label className="text-label">Supplier</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={Do.sup_id !== null ? checkSupp(Do.sup_id) : null}
+                value={order.sup_id !== null ? checkSupp(order.sup_id) : null}
                 options={supplier}
                 onChange={(e) => {
-                  updateDO({ ...Do, sup_id: e.value.supplier.id });
+                  updateORD({ ...order, sup_id: e.value.supplier.id });
                 }}
                 optionLabel="supplier.sup_name"
                 placeholder="Pilih Supplier"
@@ -576,11 +695,13 @@ const InputDO = ({ onCancel, onSuccess }) => {
                 filterBy="supplier.sup_name"
                 itemTemplate={suppTemp}
                 valueTemplate={valueSupTemp}
+                disabled={order && order.po_id !== null}
               />
               <PButton
                 onClick={() => {
                   setShowSupplier(true);
                 }}
+                disabled={order && order.po_id !== null}
               >
                 <i class="bx bx-food-menu"></i>
               </PButton>
@@ -592,8 +713,8 @@ const InputDO = ({ onCancel, onSuccess }) => {
             <div className="p-inputgroup mt-2">
               <InputText
                 value={
-                  Do.sup_id !== null
-                    ? checkSupp(Do.sup_id)?.supplier?.sup_address
+                  order.sup_id !== null
+                    ? checkSupp(order.sup_id)?.supplier?.sup_address
                     : ""
                 }
                 placeholder="Alamat Supplier"
@@ -607,8 +728,8 @@ const InputDO = ({ onCancel, onSuccess }) => {
             <div className="p-inputgroup mt-2">
               <InputText
                 value={
-                  Do.sup_id !== null
-                    ? checkSupp(Do.sup_id)?.supplier?.sup_telp1
+                  order.sup_id !== null
+                    ? checkSupp(order.sup_id)?.supplier?.sup_telp1
                     : ""
                 }
                 placeholder="Kontak Person"
@@ -622,8 +743,8 @@ const InputDO = ({ onCancel, onSuccess }) => {
             <div className="p-inputgroup mt-2">
               <InputText
                 value={
-                  Do.sup_id !== null
-                    ? checkpjk(checkSupp(Do.sup_id)?.supplier?.sup_ppn).name
+                  order.sup_id !== null
+                    ? checkpjk(checkSupp(order.sup_id)?.supplier?.sup_ppn).name
                     : null
                 }
                 placeholder="Jenis Pajak"
@@ -632,18 +753,23 @@ const InputDO = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-6">
+          <div className="col-4">
             <label className="text-label">Syarat Pembayaran</label>
             <div className="p-inputgroup mt-2">
               <Dropdown
-                value={Do.top !== null ? checRulPay(Do.top) : null}
+                value={
+                  order.top !== null ? checRulPay(order.top) : null
+                  // order.top !== null
+                  //   ? checRulPay(checkPO(order.po_id)?.top?.id)
+                  //   : null
+                }
                 options={rulesPay}
                 onChange={(e) => {
-                  let result = new Date(`${Do.do_date}Z`);
+                  let result = new Date(`${order.due_date}Z`);
                   result.setDate(result.getDate() + e.value.day);
                   console.log(result);
 
-                  updateDO({ ...Do, top: e.value.id, due_date: result });
+                  updateORD({ ...order, top: e.value.id, due_date: result });
                 }}
                 optionLabel="name"
                 placeholder="Pilih Syarat Pembayaran"
@@ -651,22 +777,24 @@ const InputDO = ({ onCancel, onSuccess }) => {
                 filterBy="name"
                 itemTemplate={rulTemp}
                 valueTemplate={valueRulTemp}
+                disabled={order && order.po_id !== null}
               />
               <PButton
                 onClick={() => {
                   setShowRulesPay(true);
                 }}
+                disabled={order && order.po_id !== null}
               >
                 <i class="bx bx-food-menu"></i>
               </PButton>
             </div>
           </div>
 
-          <div className="col-6">
+          <div className="col-4">
             <label className="text-label">Tanggal Jatuh Tempo</label>
             <div className="p-inputgroup mt-2">
               <Calendar
-                value={new Date(`${Do?.due_date}Z`)}
+                value={new Date(`${checkPO(order.po_id).due_date}Z`)}
                 onChange={(e) => {}}
                 placeholder="Tanggal Jatuh Tempo"
                 disabled
@@ -674,10 +802,34 @@ const InputDO = ({ onCancel, onSuccess }) => {
               />
             </div>
           </div>
+
+          <div className="col-4 mt-3">
+            <label className="text-label"></label>
+            <div className="p-inputgroup">
+              <SelectButton
+                value={
+                  order.faktur !== null && order.faktur !== ""
+                    ? order.faktur === true
+                      ? { name: "Faktur", sts: true }
+                      : { name: "Non Faktur", sts: false }
+                    : null
+                }
+                options={faktur}
+                onChange={(e) => {
+                  console.log(e.value);
+                  updateORD({
+                    ...order,
+                    faktur: e.value.sts,
+                  });
+                }}
+                optionLabel="name"
+              />
+            </div>
+          </div>
         </Row>
 
         <CustomAccordion
-          tittle={"Pesanan Produk"}
+          tittle={"Pembelian Produk"}
           defaultActive={true}
           active={accor.produk}
           onClick={() => {
@@ -691,7 +843,7 @@ const InputDO = ({ onCancel, onSuccess }) => {
             <>
               <DataTable
                 responsiveLayout="none"
-                value={Do.dprod?.map((v, i) => {
+                value={order.dprod?.map((v, i) => {
                   return {
                     ...v,
                     index: i,
@@ -717,10 +869,10 @@ const InputDO = ({ onCancel, onSuccess }) => {
                         options={product}
                         onChange={(u) => {
                           console.log(e.value);
-                          let temp = [...Do.dprod];
+                          let temp = [...order.dprod];
                           temp[e.index].prod_id = u.value.id;
                           temp[e.index].unit_id = u.value.unit?.id;
-                          updateDO({ ...Do, dprod: temp });
+                          updateORD({ ...order, dprod: temp });
                         }}
                         placeholder="Pilih Produk"
                         optionLabel="name"
@@ -728,11 +880,13 @@ const InputDO = ({ onCancel, onSuccess }) => {
                         filterBy="name"
                         valueTemplate={valueProd}
                         itemTemplate={prodTemp}
+                        disabled={order && order.po_id !== null}
                       />
                       <PButton
                         onClick={() => {
                           setShowProduk(true);
                         }}
+                        disabled={order && order.po_id !== null}
                       >
                         <i class="bx bx-food-menu"></i>
                       </PButton>
@@ -752,20 +906,22 @@ const InputDO = ({ onCancel, onSuccess }) => {
                       <Dropdown
                         value={e.unit_id && checkUnit(e.unit_id)}
                         onChange={(u) => {
-                          let temp = [...Do.dprod];
+                          let temp = [...order.dprod];
                           temp[e.index].unit_id = u.value.id;
-                          updateDO({ ...Do, dprod: temp });
+                          updateORD({ ...order, dprod: temp });
                         }}
                         options={satuan}
                         optionLabel="name"
                         filter
                         filterBy="name"
                         placeholder="Pilih Satuan"
+                        disabled={order && order.po_id !== null}
                       />
                       <PButton
                         onClick={() => {
                           setShowSatuan(true);
                         }}
+                        disabled={order && order.po_id !== null}
                       >
                         <i class="bx bx-food-menu"></i>
                       </PButton>
@@ -784,16 +940,17 @@ const InputDO = ({ onCancel, onSuccess }) => {
                       <InputText
                         value={e.order && e.order}
                         onChange={(u) => {
-                          let temp = [...Do.dprod];
+                          let temp = [...order.dprod];
                           temp[e.index].order = u.target.value;
                           temp[e.index].total =
                             temp[e.index].order * temp[e.index].price;
-                          updateDO({ ...Do, dprod: temp });
+                          updateORD({ ...order, dprod: temp });
                           console.log(temp);
                         }}
                         placeholder="0"
                         type="number"
                         min={0}
+                        disabled={order && order.po_id !== null}
                       />
                     </div>
                   )}
@@ -810,16 +967,17 @@ const InputDO = ({ onCancel, onSuccess }) => {
                       <InputText
                         value={e.price && e.price}
                         onChange={(u) => {
-                          let temp = [...Do.dprod];
+                          let temp = [...order.dprod];
                           temp[e.index].price = u.target.value;
                           temp[e.index].total =
                             temp[e.index].order * temp[e.index].price;
-                          updateDO({ ...Do, dprod: temp });
+                          updateORD({ ...order, dprod: temp });
                           console.log(temp);
                         }}
                         placeholder="0"
                         type="number"
                         min={0}
+                        disabled={order && order.po_id !== null}
                       />
                     </div>
                   )}
@@ -836,14 +994,15 @@ const InputDO = ({ onCancel, onSuccess }) => {
                       <InputText
                         value={e.disc && e.disc}
                         onChange={(u) => {
-                          let temp = [...Do.dprod];
+                          let temp = [...order.dprod];
                           temp[e.index].disc = u.target.value;
-                          updateDO({ ...Do, dprod: temp });
+                          updateORD({ ...order, dprod: temp });
                           console.log(temp);
                         }}
                         placeholder="0"
                         type="number"
                         min={0}
+                        disabled={order && order.po_id !== null}
                       />
                       <span className="p-inputgroup-addon">%</span>
                     </div>
@@ -861,14 +1020,15 @@ const InputDO = ({ onCancel, onSuccess }) => {
                       <InputText
                         value={e.nett_price && e.nett_price}
                         onChange={(u) => {
-                          let temp = [...Do.dprod];
+                          let temp = [...order.dprod];
                           temp[e.index].nett_price = u.target.value;
-                          updateDO({ ...Do, dprod: temp });
+                          updateORD({ ...order, dprod: temp });
                           console.log(temp);
                         }}
                         placeholder="0"
                         type="number"
                         min={0}
+                        disabled={order && order.po_id !== null}
                       />
                     </div>
                   )}
@@ -900,13 +1060,13 @@ const InputDO = ({ onCancel, onSuccess }) => {
                   // }}
                   field={""}
                   body={(e) =>
-                    e.index === Do.dprod.length - 1 ? (
+                    e.index === order.dprod.length - 1 ? (
                       <Link
                         onClick={() => {
-                          updateDO({
-                            ...Do,
+                          updateORD({
+                            ...order,
                             dprod: [
-                              ...Do.dprod,
+                              ...order.dprod,
                               {
                                 id: 0,
                                 prod_id: null,
@@ -923,15 +1083,16 @@ const InputDO = ({ onCancel, onSuccess }) => {
                           });
                         }}
                         className="btn btn-primary shadow btn-xs sharp"
+                        disabled={order && order.po_id !== null}
                       >
                         <i className="fa fa-plus"></i>
                       </Link>
                     ) : (
                       <Link
                         onClick={() => {
-                          let temp = [...Do.dprod];
+                          let temp = [...order.dprod];
                           temp.splice(e.index, 1);
-                          updateDO({ ...Do, dprod: temp });
+                          updateORD({ ...order, dprod: temp });
                         }}
                         className="btn btn-danger shadow btn-xs sharp"
                       >
@@ -946,7 +1107,7 @@ const InputDO = ({ onCancel, onSuccess }) => {
         />
 
         <CustomAccordion
-          tittle={"Pesanan Jasa"}
+          tittle={"Pembelian Jasa"}
           defaultActive={false}
           active={accor.jasa}
           onClick={() => {
@@ -960,7 +1121,7 @@ const InputDO = ({ onCancel, onSuccess }) => {
             <>
               <DataTable
                 responsiveLayout="scroll"
-                value={Do.djasa?.map((v, i) => {
+                value={order.djasa?.map((v, i) => {
                   return {
                     ...v,
                     index: i,
@@ -975,9 +1136,9 @@ const InputDO = ({ onCancel, onSuccess }) => {
               >
                 <Column
                   header="Supplier"
-                  style={{
-                    width: "15rem",
-                  }}
+                  // style={{
+                  //   width: "15rem",
+                  // }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
@@ -986,9 +1147,9 @@ const InputDO = ({ onCancel, onSuccess }) => {
                         options={supplier}
                         onChange={(u) => {
                           console.log(e.value);
-                          let temp = [...Do.djasa];
+                          let temp = [...order.djasa];
                           temp[e.index].sup_id = u.value.supplier.id;
-                          updateDO({ ...Do, djasa: temp });
+                          updateORD({ ...order, djasa: temp });
                         }}
                         optionLabel="supplier.sup_name"
                         placeholder="Pilih Supplier"
@@ -996,11 +1157,13 @@ const InputDO = ({ onCancel, onSuccess }) => {
                         filterBy="supplier.sup_name"
                         itemTemplate={suppTemp}
                         valueTemplate={valueSupTemp}
+                        disabled={order && order.po_id !== null}
                       />
                       <PButton
                         onClick={() => {
                           setShowSupplier(true);
                         }}
+                        disabled={order && order.po_id !== null}
                       >
                         <i class="bx bx-food-menu"></i>
                       </PButton>
@@ -1021,9 +1184,9 @@ const InputDO = ({ onCancel, onSuccess }) => {
                         options={jasa}
                         onChange={(u) => {
                           console.log(e.value);
-                          let temp = [...Do.djasa];
+                          let temp = [...order.djasa];
                           temp[e.index].jasa_id = u.value.jasa.id;
-                          updateDO({ ...Do, djasa: temp });
+                          updateORD({ ...order, djasa: temp });
                         }}
                         optionLabel="jasa.name"
                         placeholder="Pilih Jasa"
@@ -1031,11 +1194,13 @@ const InputDO = ({ onCancel, onSuccess }) => {
                         filterBy="jasa.name"
                         itemTemplate={jasTemp}
                         valueTemplate={valueJasTemp}
+                        disabled={order && order.po_id !== null}
                       />
                       <PButton
                         onClick={() => {
                           setShowJasa(true);
                         }}
+                        disabled={order && order.po_id !== null}
                       >
                         <i class="bx bx-food-menu"></i>
                       </PButton>
@@ -1056,19 +1221,21 @@ const InputDO = ({ onCancel, onSuccess }) => {
                         options={satuan}
                         onChange={(u) => {
                           console.log(e.value);
-                          let temp = [...Do.djasa];
+                          let temp = [...order.djasa];
                           temp[e.index].unit_id = u.value.id;
-                          updateDO({ ...Do, djasa: temp });
+                          updateORD({ ...order, djasa: temp });
                         }}
                         optionLabel="name"
                         placeholder="Pilih Satuan"
                         filter
                         filterBy="name"
+                        disabled={order && order.po_id !== null}
                       />
                       <PButton
                         onClick={() => {
                           setShowSatuan(true);
                         }}
+                        disabled={order && order.po_id !== null}
                       >
                         <i class="bx bx-food-menu"></i>
                       </PButton>
@@ -1087,16 +1254,17 @@ const InputDO = ({ onCancel, onSuccess }) => {
                       <InputText
                         value={e.order && e.order}
                         onChange={(u) => {
-                          let temp = [...Do.djasa];
+                          let temp = [...order.djasa];
                           temp[e.index].order = u.target.value;
                           temp[e.index].total =
                             temp[e.index].order * temp[e.index].price;
-                          updateDO({ ...Do, djasa: temp });
+                          updateORD({ ...order, djasa: temp });
                           console.log(temp);
                         }}
                         placeholder="0"
                         type="number"
                         min={0}
+                        disabled={order && order.po_id !== null}
                       />
                     </div>
                   )}
@@ -1104,25 +1272,26 @@ const InputDO = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Harga Satuan"
-                  style={{
-                    width: "25rem",
-                  }}
+                  // style={{
+                  //   width: "25rem",
+                  // }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
                         value={e.price && e.price}
                         onChange={(u) => {
-                          let temp = [...Do.djasa];
+                          let temp = [...order.djasa];
                           temp[e.index].price = u.target.value;
                           temp[e.index].total =
                             temp[e.index].order * temp[e.index].price;
-                          updateDO({ ...Do, djasa: temp });
+                          updateORD({ ...order, djasa: temp });
                           console.log(temp);
                         }}
                         placeholder="0"
                         type="number"
                         min={0}
+                        disabled={order && order.po_id !== null}
                       />
                     </div>
                   )}
@@ -1130,23 +1299,24 @@ const InputDO = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Diskon"
-                  style={{
-                    width: "25rem",
-                  }}
+                  // style={{
+                  //   width: "25rem",
+                  // }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
                         value={e.disc && e.disc}
                         onChange={(u) => {
-                          let temp = [...Do.djasa];
+                          let temp = [...order.djasa];
                           temp[e.index].disc = u.target.value;
-                          updateDO({ ...Do, djasa: temp });
+                          updateORD({ ...order, djasa: temp });
                           console.log(temp);
                         }}
                         placeholder="0"
                         type="number"
                         min={0}
+                        disabled={order && order.po_id !== null}
                       />
                       <span className="p-inputgroup-addon">%</span>
                     </div>
@@ -1177,13 +1347,13 @@ const InputDO = ({ onCancel, onSuccess }) => {
                   // }}
                   field={""}
                   body={(e) =>
-                    e.index === Do.djasa?.length - 1 ? (
+                    e.index === order.djasa?.length - 1 ? (
                       <Link
                         onClick={() => {
-                          updateDO({
-                            ...Do,
+                          updateORD({
+                            ...order,
                             djasa: [
-                              ...Do.djasa,
+                              ...order.djasa,
                               {
                                 id: 0,
                                 jasa_id: null,
@@ -1198,15 +1368,16 @@ const InputDO = ({ onCancel, onSuccess }) => {
                           });
                         }}
                         className="btn btn-primary shadow btn-xs sharp"
+                        disabled={order && order.po_id !== null}
                       >
                         <i className="fa fa-plus"></i>
                       </Link>
                     ) : (
                       <Link
                         onClick={() => {
-                          let temp = [...Do.djasa];
+                          let temp = [...order.djasa];
                           temp.splice(e.index, 1);
-                          updateDO({ ...Do, djasa: temp });
+                          updateORD({ ...order, djasa: temp });
                         }}
                         className="btn btn-danger shadow btn-xs sharp"
                       >
@@ -1223,22 +1394,22 @@ const InputDO = ({ onCancel, onSuccess }) => {
         <div className="row ml-0 mr-0 mb-0 mt-6 justify-content-between">
           <div>
             <div className="row ml-1">
-              {Do.djasa.length > 0 && Do.dprod.length > 0 && (
+              {order.djasa.length > 0 && order.dprod.length > 0 && (
                 <div className="d-flex col-12 align-items-center">
                   <label className="mt-1">{"Pisah Faktur"}</label>
                   <InputSwitch
                     className="ml-4"
-                    checked={Do.split_inv}
+                    checked={order.split_inv}
                     onChange={(e) => {
                       if (e.value) {
-                        updateDO({
-                          ...Do,
+                        updateORD({
+                          ...order,
                           split_inv: e.value,
                           total_disc: null,
                         });
                       } else {
-                        updateDO({
-                          ...Do,
+                        updateORD({
+                          ...order,
                           split_inv: e.value,
                           prod_disc: null,
                           jasa_disc: null,
@@ -1254,13 +1425,13 @@ const InputDO = ({ onCancel, onSuccess }) => {
           <div className="row justify-content-right col-6">
             <div className="col-6">
               <label className="text-label">
-                {Do.split_inv ? "Sub Total Barang" : "Sub Total"}
+                {order.split_inv ? "Sub Total Barang" : "Sub Total"}
               </label>
             </div>
 
             <div className="col-6">
               <label className="text-label">
-                {Do.split_inv ? (
+                {order.split_inv ? (
                   <b>Rp. {formatIdr(getSubTotalBarang())}</b>
                 ) : (
                   <b>
@@ -1272,13 +1443,13 @@ const InputDO = ({ onCancel, onSuccess }) => {
 
             <div className="col-6">
               <label className="text-label">
-                {Do.split_inv ? "DPP Barang" : "DPP"}
+                {order.split_inv ? "DPP Barang" : "DPP"}
               </label>
             </div>
 
             <div className="col-6">
               <label className="text-label">
-                {Do.split_inv ? (
+                {order.split_inv ? (
                   <b>Rp. {formatIdr(getSubTotalBarang())}</b>
                 ) : (
                   <b>
@@ -1290,13 +1461,13 @@ const InputDO = ({ onCancel, onSuccess }) => {
 
             <div className="col-6">
               <label className="text-label">
-                {Do.split_inv ? "Pajak Atas Barang (11%)" : "Pajak (11%)"}
+                {order.split_inv ? "Pajak Atas Barang (11%)" : "Pajak (11%)"}
               </label>
             </div>
 
             <div className="col-6">
               <label className="text-label">
-                {Do.split_inv ? (
+                {order.split_inv ? (
                   <b>Rp. {formatIdr((getSubTotalBarang() * 11) / 100)}</b>
                 ) : (
                   <b>
@@ -1322,28 +1493,28 @@ const InputDO = ({ onCancel, onSuccess }) => {
                 />
                 <InputText
                   value={
-                    Do.split_inv
+                    order.split_inv
                       ? isRp
-                        ? (getSubTotalBarang() * Do.prod_disc) / 100
-                        : Do.prod_disc
+                        ? (getSubTotalBarang() * order.prod_disc) / 100
+                        : order.prod_disc
                       : isRp
                       ? ((getSubTotalBarang() + getSubTotalJasa()) *
-                          Do.total_disc) /
+                          order.total_disc) /
                         100
-                      : Do.total_disc
+                      : order.total_disc
                   }
                   placeholder="Diskon"
                   type="number"
                   min={0}
                   onChange={(e) => {
-                    if (Do.split_inv) {
+                    if (order.split_inv) {
                       let disc = 0;
                       if (isRp) {
                         disc = (e.target.value / getSubTotalBarang()) * 100;
                       } else {
                         disc = e.target.value;
                       }
-                      updateDO({ ...Do, prod_disc: disc });
+                      updateORD({ ...order, prod_disc: disc });
                     } else {
                       let disc = 0;
                       if (isRp) {
@@ -1354,7 +1525,7 @@ const InputDO = ({ onCancel, onSuccess }) => {
                       } else {
                         disc = e.target.value;
                       }
-                      updateDO({ ...Do, total_disc: disc });
+                      updateORD({ ...order, total_disc: disc });
                     }
                   }}
                 />
@@ -1380,7 +1551,7 @@ const InputDO = ({ onCancel, onSuccess }) => {
 
             <div className="col-6">
               <label className="text-label fs-16">
-                {Do.split_inv ? (
+                {order.split_inv ? (
                   <b>
                     Rp.{" "}
                     {formatIdr(
@@ -1404,7 +1575,7 @@ const InputDO = ({ onCancel, onSuccess }) => {
               <Divider className="ml-12"></Divider>
             </div>
 
-            {Do.split_inv ? (
+            {order.split_inv ? (
               <>
                 {/* <div className="row justify-content-right col-12 mt-4"> */}
                 <div className="col-6 mt-4">
@@ -1451,8 +1622,8 @@ const InputDO = ({ onCancel, onSuccess }) => {
                     <InputText
                       value={
                         isRpJasa
-                          ? (getSubTotalJasa() * Do.jasa_disc) / 100
-                          : Do.jasa_disc
+                          ? (getSubTotalJasa() * order.jasa_disc) / 100
+                          : order.jasa_disc
                       }
                       placeholder="Diskon"
                       type="number"
@@ -1464,7 +1635,7 @@ const InputDO = ({ onCancel, onSuccess }) => {
                         } else {
                           disc = e.target.value;
                         }
-                        updateDO({ ...Do, jasa_disc: disc });
+                        updateORD({ ...order, jasa_disc: disc });
                       }}
                     />
                     <PButton
@@ -1554,7 +1725,7 @@ const InputDO = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowRulesPay(false);
-            updateDO({ ...Do, top: e.data.id });
+            updateORD({ ...order, top: e.data.id });
           }
 
           setDoubleClick(true);
@@ -1582,7 +1753,7 @@ const InputDO = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowDept(false);
-            updateDO({ ...Do, dep_id: e.data.id });
+            updateORD({ ...order, dep_id: e.data.id });
           }
 
           setDoubleClick(true);
@@ -1610,7 +1781,7 @@ const InputDO = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowSupplier(false);
-            updateDO({ ...Do, sup_id: e.data.id });
+            updateORD({ ...order, sup_id: e.data.id });
           }
 
           setDoubleClick(true);
@@ -1638,7 +1809,7 @@ const InputDO = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowProduk(false);
-            updateDO({ ...Do, sup_id: e.data.id });
+            updateORD({ ...order, dprod: e.data.id });
           }
 
           setDoubleClick(true);
@@ -1666,7 +1837,7 @@ const InputDO = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowJasa(false);
-            updateDO({ ...Do, sup_id: e.data.id });
+            updateORD({ ...order, djasa: e.data.id });
           }
 
           setDoubleClick(true);
@@ -1694,7 +1865,7 @@ const InputDO = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowSatuan(false);
-            updateDO({ ...Do, sup_id: e.data.id });
+            updateORD({ ...order, sup_id: e.data.id });
           }
 
           setDoubleClick(true);
@@ -1708,4 +1879,4 @@ const InputDO = ({ onCancel, onSuccess }) => {
   );
 };
 
-export default InputDO;
+export default InputOrder;

@@ -1,14 +1,14 @@
 import React, { useState, useRef } from "react";
 import { Button, Card, Col, Row } from "react-bootstrap";
 import { Toast } from "primereact/toast";
-import InputDO from "./InputDO";
-import DataDO from "./DataDirectOr";
+import DataOrder from "./DataOrder";
+import InputOrder from "./InputOrder";
 
-const DataDirectOr = () => {
+const Order = () => {
   const [active, setActive] = useState(0);
   const toast = useRef(null);
   const [view, setView] = useState([
-    <DataDO
+    <DataOrder
       onAdd={() => {
         setActive(1);
       }}
@@ -16,7 +16,7 @@ const DataDirectOr = () => {
         setActive(1);
       }}
     />,
-    <InputDO
+    <InputOrder
       onCancel={() => setActive(0)}
       onSuccess={() => {
         setTimeout(() => {
@@ -46,4 +46,4 @@ const DataDirectOr = () => {
   );
 };
 
-export default DataDirectOr;
+export default Order;

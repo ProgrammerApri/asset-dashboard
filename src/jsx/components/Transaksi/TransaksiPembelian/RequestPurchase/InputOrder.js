@@ -18,7 +18,8 @@ import DataJasa from "../../../Master/Jasa/DataJasa";
 import DataSatuan from "../../../MasterLainnya/Satuan/DataSatuan";
 import DataSupplier from "../../../Mitra/Pemasok/DataPemasok";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_RP, UPDATE_CURRENT_RP } from "src/redux/actions";
+import { SET_CURRENT_RP, SET_PRODUCT, UPDATE_CURRENT_RP } from "src/redux/actions";
+import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 
 const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
   const [update, setUpdate] = useState(false);
@@ -31,7 +32,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
   const [showJasa, setShowJasa] = useState(false);
   const [showSatuan, setShowSatuan] = useState(false);
   const [showSupplier, setShowSupplier] = useState(false);
-  const [product, setProduk] = useState(null);
+  const product = useSelector((state) => state.product.product)
   const [satuan, setSatuan] = useState(null);
   const [supplier, setSupplier] = useState(null);
   const [doubleClick, setDoubleClick] = useState(false);
@@ -133,7 +134,11 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        setProduk(data);
+        dispatch({
+          type: SET_PRODUCT,
+          payload: data
+        })
+        console.log(product);
       }
     } catch (error) {}
   };
@@ -436,7 +441,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                 return (
                   <div className="row col-12 mr-0 ml-0 mt-0">
                     <div className="col-4">
-                      <div className="p-inputgroup">
+                      {/* <div className="p-inputgroup">
                         <Dropdown
                           value={v.prod_id && checkProd(v.prod_id)}
                           options={product}
@@ -461,7 +466,11 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                         >
                           <i class="bx bx-food-menu"></i>
                         </PButton>
-                      </div>
+                      </div> */}
+                      <div className="p-inputgroup"></div>
+                      <CustomDropdown 
+                        option={product}
+                      />
                     </div>
 
                     <div className="col-3">

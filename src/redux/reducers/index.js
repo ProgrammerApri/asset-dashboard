@@ -1,6 +1,7 @@
 import { combineReducers } from "redux";
 import INVReducer from "./INVReducer";
 import POReducer from "./POReducer";
+import ProductReducer from "./ProductReducer";
 import PRReducer from "./PRReducer";
 import RpReducer from "./RpReducer";
 import SOReducer from "./SOReducer";
@@ -13,6 +14,7 @@ const rootReducer = combineReducers({
   po: POReducer,
   so: SOReducer,
   order: ODRReducer,
+  product: ProductReducer,
   pr: PRReducer,
   sr: SRReducer,
   inv: INVReducer,

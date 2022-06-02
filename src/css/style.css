@@ -173,6 +173,10 @@ textarea.p-inputtext {
   border-color: var(--primary-button);
 }
 
+.center-icon .p-button-label {
+  flex: none;
+}
+
 .p-inputgroup-addon {
   border-top: 0px solid var(--border-color) !important;
   border-left: 0px solid var(--border-color) !important;

@@ -1,3 +1,4 @@
+import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -20,9 +21,18 @@ function useOutsideAlerter(ref, panel, callback = () => {}) {
 }
 
 // option must array object
-const CustomDropdown = ({ option }) => {
+const CustomDropdown = ({
+  option,
+  detail = false,
+  onDetail = () => {},
+  label,
+  placeholder,
+  value,
+  onChange = () => {},
+}) => {
   const [active, setActive] = useState(true);
   const [filter, setFilter] = useState("");
+  const [selected, setSelected] = useState(null);
   const panel = useRef(null);
   const list = useRef(null);
   const drop = useRef(null);
@@ -34,7 +44,7 @@ const CustomDropdown = ({ option }) => {
     defaultOptions.push(`advice ${i}`);
   }
 
-  const [matches, setMatches] = useState(option);
+  const [matches, setMatches] = useState(null);
 
   const triggerPanel = (active) => {
     setActive(!active);
@@ -61,10 +71,19 @@ const CustomDropdown = ({ option }) => {
     triggerPanel(false);
   });
 
-  useEffect(() => {
-    setMatches(option)
-  }, [matches])
-
+  const getLabel = (value) => {
+    let key = label.match(/(?<=\[)[^\][]*(?=])/g);
+    let final = label;
+    key.forEach((e) => {
+      final = final.replace(e, value[`${e}`]);
+    });
+    final = final.replaceAll("[", "").replaceAll("]", "");
+    console.log(final);
+    return final;
+  };
+  // useEffect(() => {
+  //   setMatches(option);
+  // }, [matches]);
 
   return (
     <>
@@ -76,9 +95,15 @@ const CustomDropdown = ({ option }) => {
             triggerPanel(active);
           }}
         >
-          <span className="p-dropdown-label p-inputtext p-placeholder">
-            Placeholder
-          </span>
+          {value ? (
+            <span className="p-dropdown-label p-inputtext">
+              {getLabel(selected)}
+            </span>
+          ) : (
+            <span className="p-dropdown-label p-inputtext p-placeholder">
+              {placeholder}
+            </span>
+          )}
           <div
             class="p-dropdown-trigger"
             role="button"
@@ -98,8 +123,12 @@ const CustomDropdown = ({ option }) => {
                 setFilter(e.target.value);
                 let match = option?.filter((v) => {
                   for (var k of Object.keys(v)) {
-                    if (v[k]) {
-                      if (`${v[`${k}`]}`.toLowerCase().includes(e.target.value.toLowerCase())) {
+                    if (v[`${k}`]) {
+                      if (
+                        `${v[`${k}`]}`
+                          .toLowerCase()
+                          .includes(e.target.value.toLowerCase())
+                      ) {
                         return v;
                       }
                     }
@@ -113,22 +142,41 @@ const CustomDropdown = ({ option }) => {
           </span>
         </div>
         <ul ref={list} className="list-group">
-          {option?.map((v, index) => {
-            return (
-              <button
-                type="button"
-                key={index}
-                onClick={() => {
-                  console.log(v.code);
-                  triggerPanel(false);
-                }}
-                className="list-group-item list-group-item-action"
-              >
-                {v.code}
-              </button>
-            );
-          })}
-          {option?.length === 0 && (
+          {/* {renderItem()} */}
+          {matches !== null
+            ? matches?.map((v, index) => {
+                return (
+                  <button
+                    type="button"
+                    key={index}
+                    onClick={() => {
+                      setSelected(v);
+                      onChange(v);
+                      triggerPanel(false);
+                    }}
+                    className="list-group-item list-group-item-action"
+                  >
+                    {getLabel(v)}
+                  </button>
+                );
+              })
+            : option?.map((v, index) => {
+                return (
+                  <button
+                    type="button"
+                    key={index}
+                    onClick={() => {
+                      setSelected(v);
+                      onChange(v);
+                      triggerPanel(false);
+                    }}
+                    className="list-group-item list-group-item-action"
+                  >
+                    {getLabel(v)}
+                  </button>
+                );
+              })}
+          {matches?.length === 0 && (
             <span className="list-group text-center p-4">
               Data tidak ditemukan
             </span>
@@ -137,6 +185,17 @@ const CustomDropdown = ({ option }) => {
             <span className="list-group text-center p-4">Tidak ada data</span>
           )}
         </ul>
+        {detail && (
+          <Button
+            label="Tampilkan Detail"
+            icon="pi pi-eye"
+            onClick={() => {
+              onDetail();
+              triggerPanel(false);
+            }}
+            className="p-button-sm p-button-text btn-primary text-center vw-100 m-2 center-icon justify-content-center"
+          />
+        )}
       </div>
     </>
   );

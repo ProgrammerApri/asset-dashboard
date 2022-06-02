@@ -18,7 +18,11 @@ import DataJasa from "../../../Master/Jasa/DataJasa";
 import DataSatuan from "../../../MasterLainnya/Satuan/DataSatuan";
 import DataSupplier from "../../../Mitra/Pemasok/DataPemasok";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_RP, SET_PRODUCT, UPDATE_CURRENT_RP } from "src/redux/actions";
+import {
+  SET_CURRENT_RP,
+  SET_PRODUCT,
+  UPDATE_CURRENT_RP,
+} from "src/redux/actions";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 
 const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
@@ -32,7 +36,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
   const [showJasa, setShowJasa] = useState(false);
   const [showSatuan, setShowSatuan] = useState(false);
   const [showSupplier, setShowSupplier] = useState(false);
-  const product = useSelector((state) => state.product.product)
+  const product = useSelector((state) => state.product.product);
   const [satuan, setSatuan] = useState(null);
   const [supplier, setSupplier] = useState(null);
   const [doubleClick, setDoubleClick] = useState(false);
@@ -79,7 +83,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
     const config = {
       ...endpoints.editRp,
       endpoint: endpoints.editRp.endpoint + rp.id,
-      data: rp
+      data: rp,
     };
     console.log(config.data);
     let response = null;
@@ -90,14 +94,14 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
         onSuccess();
       }
     } catch (error) {
-      onFail()
+      onFail();
     }
   };
 
   const addRp = async () => {
     const config = {
       ...endpoints.addRp,
-      data: rp
+      data: rp,
     };
     console.log(config.data);
     let response = null;
@@ -136,8 +140,8 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
         const { data } = response;
         dispatch({
           type: SET_PRODUCT,
-          payload: data
-        })
+          payload: data,
+        });
         console.log(product);
       }
     } catch (error) {}
@@ -468,8 +472,19 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                         </PButton>
                       </div> */}
                       <div className="p-inputgroup"></div>
-                      <CustomDropdown 
+                      <CustomDropdown
+                        value={v.prod_id && checkProd(v.prod_id)}
                         option={product}
+                        detail
+                        onDetail={() => setShowProduk(true)}
+                        onChange={(e) => {
+                          let temp = [...rp.rprod];
+                          temp[i].prod_id = e.id;
+                          temp[i].unit_id = e.unit?.id;
+                          updateRp({ ...rp, rprod: temp });
+                        }}
+                        label={"[name] ([code])"}
+                        placeholder="Pilih Produk"
                       />
                     </div>
 

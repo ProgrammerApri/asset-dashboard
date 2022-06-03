@@ -132,6 +132,7 @@ const DataOrder = ({ onAdd, onEdit }) => {
             dprod.forEach((el) => {
               el.prod_id = el.prod_id.id;
               el.unit_id = el.unit_id.id;
+              el.location = el.location.id;
             });
             let djasa = data.djasa;
             djasa.forEach((el) => {
@@ -154,6 +155,7 @@ const DataOrder = ({ onAdd, onEdit }) => {
                           do_id: null,
                           prod_id: null,
                           unit_id: null,
+                          location: null,
                           order: null,
                           price: null,
                           disc: null,
@@ -267,6 +269,7 @@ const DataOrder = ({ onAdd, onEdit }) => {
                     // pprod_id: null,
                     prod_id: null,
                     unit_id: null,
+                    location: null,
                     order: null,
                     price: null,
                     disc: null,

@@ -17,18 +17,14 @@ import { Badge } from "primereact/badge";
 
 const data = {
   id: null,
-  do_code: null,
-  do_date: null,
-  dep_id: null,
-  sup_id: null,
-  top: null,
-  due_date: false,
-  split_inv: null,
-  prod_disc: null,
-  jasa_disc: null,
-  total_disc: null,
-  dprod: [],
-  djasa: [],
+  fk_code: null,
+  fk_date: null,
+  fk_tax: null,
+  fk_ppn: null,
+  fk_lunas: null,
+  ord_id: null,
+  product: [],
+  jasa: [],
 };
 
 const DataFaktur = ({ onAdd, onEdit }) => {
@@ -43,7 +39,7 @@ const DataFaktur = ({ onAdd, onEdit }) => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const dispatch = useDispatch();
-//   const pinv = useSelector((state) => state.pinv.pinv);
+  //   const pinv = useSelector((state) => state.pinv.pinv);
 
   const dummy = Array.from({ length: 10 });
 
@@ -81,7 +77,7 @@ const DataFaktur = ({ onAdd, onEdit }) => {
   const delDO = async (id) => {
     const config = {
       ...endpoints.delDO,
-    //   endpoint: endpoints.delDO.endpoint + pinv.id,
+      //   endpoint: endpoints.delDO.endpoint + pinv.id,
     };
     console.log(config.data);
     let response = null;
@@ -258,23 +254,24 @@ const DataFaktur = ({ onAdd, onEdit }) => {
               type: SET_CURRENT_INV,
               payload: {
                 ...data,
-                dprod: [
+                product: [
                   {
                     id: 0,
-                    do_id: null,
+                    ord_id: null,
                     prod_id: null,
                     unit_id: null,
                     order: null,
+                    location: null,
                     price: null,
                     disc: null,
                     nett_price: null,
                     total: null,
                   },
                 ],
-                djasa: [
+                jasa: [
                   {
                     id: 0,
-                    do_id: null,
+                    ord_id: null,
                     jasa_id: null,
                     sup_id: null,
                     unit_id: null,

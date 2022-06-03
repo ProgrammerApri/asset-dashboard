@@ -708,6 +708,37 @@ const endpoints = {
     method: "DELETE",
     data: {},
   },
+
+  /// Faktur
+  faktur: {
+    endpoint: "/v1/api/faktur",
+    method: "GET",
+    data: {},
+  },
+
+  editFK: {
+    endpoint: "/v1/api/faktur/",
+    method: "PUT",
+    data: {},
+  },
+
+  addFK: {
+    endpoint: "/v1/api/faktur",
+    method: "POST",
+    data: {},
+  },
+
+  fakturCode: {
+    endpoint: "/v1/api/faktur/code/",
+    method: "GET",
+    data: {},
+  },
+
+  delFK: {
+    endpoint: "/v1/api/faktur/",
+    method: "DELETE",
+    data: {},
+  },
 };
 
 export default endpoints;

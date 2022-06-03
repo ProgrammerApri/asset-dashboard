@@ -97,7 +97,7 @@ const CustomDropdown = ({
         >
           {value ? (
             <span className="p-dropdown-label p-inputtext">
-              {getLabel(selected)}
+              {getLabel(value)}
             </span>
           ) : (
             <span className="p-dropdown-label p-inputtext p-placeholder">

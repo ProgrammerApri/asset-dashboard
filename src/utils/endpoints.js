@@ -659,7 +659,6 @@ const endpoints = {
     data: {},
   },
 
-
   /// SO
   so: {
     endpoint: "/v1/api/so",
@@ -685,28 +684,27 @@ const endpoints = {
     data: {},
   },
 
-
   /// DP
-  do: {
-    endpoint: "/v1/api/do",
+  order: {
+    endpoint: "/v1/api/order",
     method: "GET",
     data: {},
   },
 
-  addDO: {
-    endpoint: "/v1/api/do",
+  addODR: {
+    endpoint: "/v1/api/order",
     method: "POST",
     data: {},
   },
 
-  editDO: {
-    endpoint: "/v1/api/do/",
+  editODR: {
+    endpoint: "/v1/api/order/",
     method: "PUT",
     data: {},
   },
 
-  delDO: {
-    endpoint: "/v1/api/do/",
+  delODR: {
+    endpoint: "/v1/api/order/",
     method: "DELETE",
     data: {},
   },

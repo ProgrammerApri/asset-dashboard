@@ -173,6 +173,10 @@ textarea.p-inputtext {
   border-color: var(--primary-button);
 }
 
+.center-icon .p-button-label {
+  flex: none;
+}
+
 .p-inputgroup-addon {
   border-top: 0px solid var(--border-color) !important;
   border-left: 0px solid var(--border-color) !important;
@@ -47694,4 +47698,39 @@ a .sidebar-logo .logo{
 
 .sub-menu-item {
   white-space: nowrap;
+}
+
+.c-dropdown-header {
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid #dee2e6;
+  color: #343a40;
+  background: #f8f9fa;
+  margin: 0;
+  border-top-right-radius: 6px;
+  border-top-left-radius: 6px;
+  width: 100%;
+}
+
+.c-dropdown-wrapper {
+  border-radius: 6px;
+  box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+  position: absolute;
+  z-index: 99999;
+  background: var(--card-bg);
+  display: none;
+  width: 92%;
+}
+
+.c-dropdown-wrapper .list-group {
+  max-height: 15rem;
+  overflow: auto;
+  width: 100%;
+}
+
+.list-group span {
+  width: 100%;
+}
+
+.list-group button {
+  width: 100%;
 }

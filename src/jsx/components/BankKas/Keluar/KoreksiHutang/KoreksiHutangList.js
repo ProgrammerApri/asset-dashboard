@@ -128,13 +128,25 @@ const KoreksiAPList = ({onAdd}) => {
                   //  body={loading && <Skeleton />}
                   />
                   <Column
-                    header="Cara Pengeluaran"
+                    header="Pemasok"
                    // field={(e) => e.customer.cus_name}
                     style={{ minWidth: "8rem" }}
                   //  body={loading && <Skeleton />}
                   />
                   <Column
-                    header="Pemasok"
+                    header="Akun"
+                   // field={(e) => e.customer.cus_address}
+                    style={{ minWidth: "8rem" }}
+                    // body={loading && <Skeleton />}
+                  />
+                  <Column
+                    header="Akun Lawan"
+                   // field={(e) => e.customer.cus_address}
+                    style={{ minWidth: "8rem" }}
+                    // body={loading && <Skeleton />}
+                  />
+                  <Column
+                    header="Type"
                    // field={(e) => e.customer.cus_address}
                     style={{ minWidth: "8rem" }}
                     // body={loading && <Skeleton />}

@@ -18,7 +18,6 @@ import DataRulesPay from "src/jsx/components/MasterLainnya/RulesPay/DataRulesPay
 import DataPajak from "src/jsx/components/Master/Pajak/DataPajak";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { SelectButton } from "primereact/selectbutton";
 
 const KoreksiAPInput = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
@@ -46,8 +45,10 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
     jasa: false,
   });
 
-  const [type, setType] = useState({ kode: 1, typePengeluaran: "Pelunasan" });
-  const [typeB, setTypeB] = useState({ kode: 1, jenisPengeluaran: "Kas" });
+  const type = [
+    { name: "%", code: "P" },
+    { name: "Rp", code: "R" },
+  ];
 
   useEffect(() => {
     window.scrollTo({
@@ -541,7 +542,7 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
   const header = () => {
     return (
       <h4 className="mb-5">
-        <b>Pembayaran</b>
+        <b>Koreksi Hutang</b>
       </h4>
     );
   };
@@ -561,7 +562,7 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
                 onChange={(e) => {
                   updatePo({ ...po, po_date: e.value });
                 }}
-                placeholder="Pilih Tanggal"
+                placeholder="Tanggal Pencairan"
                 showIcon
                 dateFormat="dd/mm/yy"
               />
@@ -569,720 +570,156 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-4">
-            <label className="text-label">Kode Referensi</label>
+            <label className="text-label">Nomer Referensi Koreksi</label>
             <div className="p-inputgroup">
               <InputText
                 value={po.po_code}
                 onChange={(e) => updatePo({ ...po, po_code: e.target.value })}
-                placeholder="Masukan Kode Referensi"
+                placeholder="Nomer Giro"
               />
             </div>
           </div>
 
-          <div className="col-4 mb-2">
-            <label className="text-label">Jenis Pengeluaran</label>
+
+          <div className="col-4">
+            <label className="text-label">Tanggal J/T</label>
             <div className="p-inputgroup">
-              <SelectButton
-                value={type}
-                options={[
-                  { kode: 1, typePengeluaran: "Pelunasan" },
-                  { kode: 2, typePengeluaran: "Pengeluaran Kas / Bank" },
-                ]}
+              <Calendar
+                value={new Date(`${po.po_date}Z`)}
                 onChange={(e) => {
-                  console.log(e.value);
-                  setType(e.value);
+                  updatePo({ ...po, po_date: e.value });
                 }}
-                optionLabel="typePengeluaran"
+                placeholder="Tanggal Jatuh Tempo"
+                showIcon
+                dateFormat="dd/mm/yy"
               />
             </div>
           </div>
 
-          {type.kode === 1 ? (
-            <>
-              <div className="col-4">
-                <label className="text-label">Kode Pemasok</label>
-                <div className="p-inputgroup">
-                  <Dropdown
-                    value={po.preq_id && req_pur(po.preq_id)}
-                    options={rp}
-                    onChange={(e) => {
-                      console.log(e.value.rprod);
-                      let result = null;
-                      if (po.top) {
-                        result = new Date(`${req_pur(e.value.id).req_date}Z`);
-                        result.setDate(result.getDate() + rulPay(po?.top)?.day);
-                        console.log(result);
-                      }
-                      updatePo({
-                        ...po,
-                        preq_id: e.value.id,
-                        due_date: result,
-                        sup_id: e.value?.ref_sup?.id ?? null,
-                        rprod: e.value.rprod,
-                        rjasa: e.value.rjasa,
-                      });
-                    }}
-                    optionLabel="req_code"
-                    placeholder="Pilih Kode Pemasok"
-                    itemTemplate={reqTemp}
-                    valueTemplate={valueReqTemp}
-                  />
-                </div>
-              </div>
-
-              {/* Jenis pengeluaran 
-                    Kas --> harus ambil akun yang type kas 
-                    Bank --> ambil dari master bank 
-                    Giro --> entry kode bank dan nomer Giro */}
-
-              <div className="col-8 mb-2">
-                <label className="text-label">Jenis Pengeluaran</label>
-                <div className="p-inputgroup">
-                  <SelectButton
-                    value={typeB}
-                    options={[
-                      { kode: 1, jenisPengeluaran: "Kas" },
-                      { kode: 2, jenisPengeluaran: "Bank" },
-                      { kode: 3, jenisPengeluaran: "Giro" },
-                    ]}
-                    onChange={(e) => {
-                      console.log(e.value);
-                      setTypeB(e.value);
-                    }}
-                    optionLabel="jenisPengeluaran"
-                  />
-                </div>
-              </div>
-
-              {/* kode pembayaran cash  */}
-              {typeB.kode === 1 ? (
-                <>
-                  <div className="col-4">
-                    <label className="text-label">Kode Akun</label>
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={po.preq_id && req_pur(po.preq_id)}
-                        options={rp}
-                        onChange={(e) => {
-                          console.log(e.value.rprod);
-                          let result = null;
-                          if (po.top) {
-                            result = new Date(
-                              `${req_pur(e.value.id).req_date}Z`
-                            );
-                            result.setDate(
-                              result.getDate() + rulPay(po?.top)?.day
-                            );
-                            console.log(result);
-                          }
-                          updatePo({
-                            ...po,
-                            preq_id: e.value.id,
-                            due_date: result,
-                            sup_id: e.value?.ref_sup?.id ?? null,
-                            rprod: e.value.rprod,
-                            rjasa: e.value.rjasa,
-                          });
-                        }}
-                        optionLabel="req_code"
-                        placeholder="Pilih Kode Akun"
-                        itemTemplate={reqTemp}
-                        valueTemplate={valueReqTemp}
-                      />
-                    </div>
-                  </div>
-                </>
-              ) : // pembayaran bank
-              typeB.kode === 2 ? (
-                <>
-                  <div className="col-4">
-                    <label className="text-label">Kode Bank</label>
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={po.preq_id && req_pur(po.preq_id)}
-                        options={rp}
-                        onChange={(e) => {
-                          console.log(e.value.rprod);
-                          let result = null;
-                          if (po.top) {
-                            result = new Date(
-                              `${req_pur(e.value.id).req_date}Z`
-                            );
-                            result.setDate(
-                              result.getDate() + rulPay(po?.top)?.day
-                            );
-                            console.log(result);
-                          }
-                          updatePo({
-                            ...po,
-                            preq_id: e.value.id,
-                            due_date: result,
-                            sup_id: e.value?.ref_sup?.id ?? null,
-                            rprod: e.value.rprod,
-                            rjasa: e.value.rjasa,
-                          });
-                        }}
-                        optionLabel="req_code"
-                        placeholder="Pilih Kode Bank"
-                        itemTemplate={reqTemp}
-                        valueTemplate={valueReqTemp}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="col-4">
-                    <label className="text-label">Kode Referensi Bank</label>
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={po.po_code}
-                        onChange={(e) =>
-                          updatePo({ ...po, po_code: e.target.value })
-                        }
-                        placeholder="Masukan Kode Bank"
-                      />
-                    </div>
-                  </div>
-                </>
-              ) : (
-                // pembayran giro
-                <>
-                  <div className="col-4">
-                    <label className="text-label">Nomer Giro</label>
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={po.po_code}
-                        onChange={(e) =>
-                          updatePo({ ...po, po_code: e.target.value })
-                        }
-                        placeholder="Nomer Giro"
-                      />
-                    </div>
-                  </div>
-                  <div className="col-4">
-                    <label className="text-label">Tanggal Cair</label>
-                    <div className="p-inputgroup">
-                      <Calendar
-                        value={new Date(`${po.po_date}Z`)}
-                        onChange={(e) => {
-                          updatePo({ ...po, po_date: e.value });
-                        }}
-                        placeholder="Pilih Tanggal"
-                        showIcon
-                        dateFormat="dd/mm/yy"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="col-4">
-                    <label className="text-label">Kode Bank</label>
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={po.preq_id && req_pur(po.preq_id)}
-                        options={rp}
-                        onChange={(e) => {
-                          console.log(e.value.rprod);
-                          let result = null;
-                          if (po.top) {
-                            result = new Date(
-                              `${req_pur(e.value.id).req_date}Z`
-                            );
-                            result.setDate(
-                              result.getDate() + rulPay(po?.top)?.day
-                            );
-                            console.log(result);
-                          }
-                          updatePo({
-                            ...po,
-                            preq_id: e.value.id,
-                            due_date: result,
-                            sup_id: e.value?.ref_sup?.id ?? null,
-                            rprod: e.value.rprod,
-                            rjasa: e.value.rjasa,
-                          });
-                        }}
-                        optionLabel="req_code"
-                        placeholder="Pilih Kode Bank"
-                        itemTemplate={reqTemp}
-                        valueTemplate={valueReqTemp}
-                      />
-                    </div>
-                  </div>
-                </>
-              )}
-
-              <CustomAccordion
-                tittle={"Data Pembayaran"}
-                defaultActive={true}
-                active={accor.produk}
-                onClick={() => {
-                  setAccor({
-                    ...accor,
-                    produk: !accor.produk,
+          <div className="col-4">
+            <label className="text-label">Pemasok</label>
+            <div className="p-inputgroup">
+              <Dropdown
+                value={po.preq_id && req_pur(po.preq_id)}
+                options={rp}
+                onChange={(e) => {
+                  console.log(e.value.rprod);
+                  let result = null;
+                  if (po.top) {
+                    result = new Date(`${req_pur(e.value.id).req_date}Z`);
+                    result.setDate(result.getDate() + rulPay(po?.top)?.day);
+                    console.log(result);
+                  }
+                  updatePo({
+                    ...po,
+                    preq_id: e.value.id,
+                    due_date: result,
+                    sup_id: e.value?.ref_sup?.id ?? null,
+                    rprod: e.value.rprod,
+                    rjasa: e.value.rjasa,
                   });
                 }}
-                key={1}
-                body={
-                  <>
-                    <DataTable
-                      responsiveLayout="none"
-                      value={null}
-                      className="display w-150 datatable-wrapper header-white no-border"
-                      showGridlines={false}
-                      emptyMessage={() => <div></div>}
-                    >
-                      <Column
-                        header="Kode Faktur"
-                        style={{
-                          maxWidth: "15rem",
-                        }}
-                        field={""}
-                        body={(e) => (
-                          <div className="p-inputgroup">
-                            <Dropdown
-                              value={
-                                po.rprod[e.index].prod_id &&
-                                checkProd(po.rprod[e.index].prod_id)
-                              }
-                              options={product}
-                              onChange={(e) => {
-                                console.log(e.value);
-                              }}
-                              placeholder="Pilih Kode Produk"
-                              optionLabel="name"
-                              filter
-                              filterBy="name"
-                              valueTemplate={valueProd}
-                              itemTemplate={prodTemp}
-                            />
-                          </div>
-                        )}
-                      />
-
-                      <Column
-                        header="Tanggal J/T tempo"
-                        style={{
-                          maxWidth: "15rem",
-                        }}
-                        field={""}
-                        body={(e) => (
-                          <div className="p-inputgroup">
-                            <Dropdown
-                              value={
-                                po.rprod[e.index].unit_id &&
-                                checkUnit(po.rprod[e.index].unit_id)
-                              }
-                              onChange={(e) => {
-                                let temp = [...po.rprod];
-                                temp[e.index].unit_id = e.value.id;
-                                updatePo({ ...po, rprod: temp });
-                              }}
-                              options={satuan}
-                              optionLabel="name"
-                              placeholder="Pilih Satuan"
-                              filter
-                              filterBy="name"
-                            />
-                          </div>
-                        )}
-                      />
-
-                      <Column
-                        header="Type"
-                        style={{
-                          width: "10rem",
-                        }}
-                        field={""}
-                        body={(e) => (
-                          <div className="p-inputgroup">
-                            <InputText
-                              value={
-                                po.rprod[e.index].order
-                                  ? po.rprod[e.index].order
-                                  : null
-                              }
-                              onChange={(a) => {
-                                let temp = [...po.rprod];
-                                let result =
-                                  temp[e.index]?.request - a.target.value;
-                                temp[e.index].remain = result;
-                                temp[e.index].order = a.target.value;
-                                updatePo({ ...po, rprod: temp });
-                              }}
-                              placeholder="D"
-                              // type="number"
-                            />
-                          </div>
-                        )}
-                      />
-
-                      <Column
-                        header="Nilai"
-                        style={{
-                          maxWidth: "15rem",
-                        }}
-                        field={""}
-                        body={(e) => (
-                          <div className="p-inputgroup">
-                            <InputText
-                              value={
-                                po.rprod[e.index].price
-                                  ? po.rprod[e.index].price
-                                  : null
-                              }
-                              onChange={(e) => {
-                                let temp = [...po.rprod];
-                                temp[e.index].price = e.target.value;
-                                updatePo({ ...po, rprod: temp });
-                                console.log(temp);
-                              }}
-                              placeholder="0"
-                            />
-                          </div>
-                        )}
-                      />
-
-                      <Column
-                        header="Nilai Pembayaran"
-                        style={{
-                          maxWidth: "10rem",
-                        }}
-                        field={""}
-                        body={(e) => (
-                          <div className="p-inputgroup">
-                            <InputText
-                              value={
-                                po.rprod[e.index].disc
-                                  ? po.rprod[e.index].disc
-                                  : null
-                              }
-                              onChange={(e) => {
-                                let temp = [...po.rprod];
-                                temp[e.index].disc = e.target.value;
-                                updatePo({ ...po, rprod: temp });
-                                console.log(temp);
-                              }}
-                              placeholder="0"
-                              type="number"
-                            />
-                          </div>
-                        )}
-                      />
-
-                      <Column
-                        body={(e) =>
-                          e.index === po.rprod.length - 1 ? (
-                            <Link
-                              onClick={() => {
-                                updatePo({
-                                  ...po,
-                                  rprod: [
-                                    ...po.rprod,
-                                    {
-                                      id: 0,
-                                      prod_id: null,
-                                      unit_id: null,
-                                      request: null,
-                                    },
-                                  ],
-                                });
-                              }}
-                              className="btn btn-primary shadow btn-xs sharp ml-1"
-                            >
-                              <i className="fa fa-plus"></i>
-                            </Link>
-                          ) : (
-                            <Link
-                              onClick={() => {
-                                let temp = [...po.rprod];
-                                temp.splice(e.index, 1);
-                                updatePo({
-                                  ...po,
-                                  rprod: temp,
-                                });
-                              }}
-                              className="btn btn-danger shadow btn-xs sharp ml-1"
-                            >
-                              <i className="fa fa-trash"></i>
-                            </Link>
-                          )
-                        }
-                      />
-                    </DataTable>
-                  </>
-                }
+                optionLabel="req_code"
+                placeholder="Pilih Kode Bank"
+                itemTemplate={reqTemp}
+                valueTemplate={valueReqTemp}
               />
-            </>
-          ) : (
-            <>
-              {" "}
-              <div className="col-4">
-                <label className="text-label">Kode Akun</label>
-                <div className="p-inputgroup">
-                  <Dropdown
-                    value={po.preq_id && req_pur(po.preq_id)}
-                    options={rp}
-                    onChange={(e) => {
-                      console.log(e.value.rprod);
-                      let result = null;
-                      if (po.top) {
-                        result = new Date(`${req_pur(e.value.id).req_date}Z`);
-                        result.setDate(result.getDate() + rulPay(po?.top)?.day);
-                        console.log(result);
-                      }
-                      updatePo({
-                        ...po,
-                        preq_id: e.value.id,
-                        due_date: result,
-                        sup_id: e.value?.ref_sup?.id ?? null,
-                        rprod: e.value.rprod,
-                        rjasa: e.value.rjasa,
-                      });
-                    }}
-                    optionLabel="req_code"
-                    placeholder="Pilih Kode Akun"
-                    itemTemplate={reqTemp}
-                    valueTemplate={valueReqTemp}
-                  />
-                </div>
-              </div>
-              <div className="col-4">
-                <label className="text-label">Kode Departemen</label>
-                <div className="p-inputgroup">
-                  <Dropdown
-                    value={po.preq_id && req_pur(po.preq_id)}
-                    options={rp}
-                    onChange={(e) => {
-                      console.log(e.value.rprod);
-                      let result = null;
-                      if (po.top) {
-                        result = new Date(`${req_pur(e.value.id).req_date}Z`);
-                        result.setDate(result.getDate() + rulPay(po?.top)?.day);
-                        console.log(result);
-                      }
-                      updatePo({
-                        ...po,
-                        preq_id: e.value.id,
-                        due_date: result,
-                        sup_id: e.value?.ref_sup?.id ?? null,
-                        rprod: e.value.rprod,
-                        rjasa: e.value.rjasa,
-                      });
-                    }}
-                    optionLabel="req_code"
-                    placeholder="Pilih Kode Departemen"
-                    itemTemplate={reqTemp}
-                    valueTemplate={valueReqTemp}
-                  />
-                </div>
-              </div>
-              <div className="col-4">
-                <label className="text-label">Kode Project</label>
-                <div className="p-inputgroup">
-                  <Dropdown
-                    value={po.preq_id && req_pur(po.preq_id)}
-                    options={rp}
-                    onChange={(e) => {
-                      console.log(e.value.rprod);
-                      let result = null;
-                      if (po.top) {
-                        result = new Date(`${req_pur(e.value.id).req_date}Z`);
-                        result.setDate(result.getDate() + rulPay(po?.top)?.day);
-                        console.log(result);
-                      }
-                      updatePo({
-                        ...po,
-                        preq_id: e.value.id,
-                        due_date: result,
-                        sup_id: e.value?.ref_sup?.id ?? null,
-                        rprod: e.value.rprod,
-                        rjasa: e.value.rjasa,
-                      });
-                    }}
-                    optionLabel="req_code"
-                    placeholder="Pilih Kode Project"
-                    itemTemplate={reqTemp}
-                    valueTemplate={valueReqTemp}
-                  />
-                </div>
-              </div>
-            </>
-          )}
+            </div>
+          </div>
 
-          <CustomAccordion
-            tittle={"Pengeluaran Kas / Bank"}
-            defaultActive={true}
-            active={accor.produk}
-            onClick={() => {
-              setAccor({
-                ...accor,
-                produk: !accor.produk,
-              });
-            }}
-            key={1}
-            body={
-              <>
-                <DataTable
-                  responsiveLayout="none"
-                  value={null}
-                  className="display w-150 datatable-wrapper header-white no-border"
-                  showGridlines={false}
-                  emptyMessage={() => <div></div>}
-                >
-                  <Column
-                    header="Kode Akun"
-                    style={{
-                      maxWidth: "15rem",
-                    }}
-                    field={""}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <Dropdown
-                          value={
-                            po.rprod[e.index].prod_id &&
-                            checkProd(po.rprod[e.index].prod_id)
-                          }
-                          options={product}
-                          onChange={(e) => {
-                            console.log(e.value);
-                          }}
-                          placeholder="Pilih Kode Produk"
-                          optionLabel="name"
-                          filter
-                          filterBy="name"
-                          valueTemplate={valueProd}
-                          itemTemplate={prodTemp}
-                        />
-                      </div>
-                    )}
-                  />
+          
 
-                  <Column
-                    header="D/K"
-                    style={{
-                      maxWidth: "15rem",
-                    }}
-                    field={""}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <Dropdown
-                          value={
-                            po.rprod[e.index].unit_id &&
-                            checkUnit(po.rprod[e.index].unit_id)
-                          }
-                          onChange={(e) => {
-                            let temp = [...po.rprod];
-                            temp[e.index].unit_id = e.value.id;
-                            updatePo({ ...po, rprod: temp });
-                          }}
-                          options={satuan}
-                          optionLabel="name"
-                          placeholder="Pilih Satuan"
-                          filter
-                          filterBy="name"
-                        />
-                      </div>
-                    )}
-                  />
-
-                  <Column
-                    header="Nilai"
-                    style={{
-                      maxWidth: "15rem",
-                    }}
-                    field={""}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={
-                            po.rprod[e.index].price
-                              ? po.rprod[e.index].price
-                              : null
-                          }
-                          onChange={(e) => {
-                            let temp = [...po.rprod];
-                            temp[e.index].price = e.target.value;
-                            updatePo({ ...po, rprod: temp });
-                            console.log(temp);
-                          }}
-                          placeholder="0"
-                        />
-                      </div>
-                    )}
-                  />
-
-                  <Column
-                    header="Keterangan"
-                    style={{
-                      maxWidth: "10rem",
-                    }}
-                    field={""}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={
-                            po.rprod[e.index].disc
-                              ? po.rprod[e.index].disc
-                              : null
-                          }
-                          onChange={(e) => {
-                            let temp = [...po.rprod];
-                            temp[e.index].disc = e.target.value;
-                            updatePo({ ...po, rprod: temp });
-                            console.log(temp);
-                          }}
-                          placeholder="0"
-                          type="number"
-                        />
-                      </div>
-                    )}
-                  />
-
-                  <Column
-                    body={(e) =>
-                      e.index === po.rprod.length - 1 ? (
-                        <Link
-                          onClick={() => {
-                            updatePo({
-                              ...po,
-                              rprod: [
-                                ...po.rprod,
-                                {
-                                  id: 0,
-                                  prod_id: null,
-                                  unit_id: null,
-                                  request: null,
-                                },
-                              ],
-                            });
-                          }}
-                          className="btn btn-primary shadow btn-xs sharp ml-1"
-                        >
-                          <i className="fa fa-plus"></i>
-                        </Link>
-                      ) : (
-                        <Link
-                          onClick={() => {
-                            let temp = [...po.rprod];
-                            temp.splice(e.index, 1);
-                            updatePo({
-                              ...po,
-                              rprod: temp,
-                            });
-                          }}
-                          className="btn btn-danger shadow btn-xs sharp ml-1"
-                        >
-                          <i className="fa fa-trash"></i>
-                        </Link>
-                      )
-                    }
-                  />
-                </DataTable>
-              </>
-            }
-          />
-
-          {/* kode suplier otomatis keluar, karena sudah melekat di faktur pembelian  */}
+          <div className="col-4">
+            <label className="text-label">Type Koreksi</label>
+            <div className="p-inputgroup">
+              <Dropdown
+                value={po.preq_id && req_pur(po.preq_id)}
+                options={rp}
+                onChange={(e) => {
+                  console.log(e.value.rprod);
+                  let result = null;
+                  if (po.top) {
+                    result = new Date(`${req_pur(e.value.id).req_date}Z`);
+                    result.setDate(result.getDate() + rulPay(po?.top)?.day);
+                    console.log(result);
+                  }
+                  updatePo({
+                    ...po,
+                    preq_id: e.value.id,
+                    due_date: result,
+                    sup_id: e.value?.ref_sup?.id ?? null,
+                    rprod: e.value.rprod,
+                    rjasa: e.value.rjasa,
+                  });
+                }}
+                optionLabel="req_code"
+                placeholder="Pilih Type"
+                itemTemplate={reqTemp}
+                valueTemplate={valueReqTemp}
+              />
+            </div>
+          </div>
+          
+          <div className="col-4">
+            <label className="text-label">Akun Lawan</label>
+            <div className="p-inputgroup">
+              <Dropdown
+                value={po.preq_id && req_pur(po.preq_id)}
+                options={rp}
+                onChange={(e) => {
+                  console.log(e.value.rprod);
+                  let result = null;
+                  if (po.top) {
+                    result = new Date(`${req_pur(e.value.id).req_date}Z`);
+                    result.setDate(result.getDate() + rulPay(po?.top)?.day);
+                    console.log(result);
+                  }
+                  updatePo({
+                    ...po,
+                    preq_id: e.value.id,
+                    due_date: result,
+                    sup_id: e.value?.ref_sup?.id ?? null,
+                    rprod: e.value.rprod,
+                    rjasa: e.value.rjasa,
+                  });
+                }}
+                optionLabel="req_code"
+                placeholder="Akun Lawan"
+                itemTemplate={reqTemp}
+                valueTemplate={valueReqTemp}
+              />
+            </div>
+          </div>
+          
+          <div className="col-4">
+            <label className="text-label">Nilai </label>
+            <div className="p-inputgroup">
+              <InputText
+                value={po.po_code}
+                onChange={(e) => updatePo({ ...po, po_code: e.target.value })}
+                placeholder="Nilai"
+              />
+            </div>
+          </div>
+          
+          <div className="col-4">
+            <label className="text-label">Keterangan </label>
+            <div className="p-inputgroup">
+              <InputText
+                value={po.po_code}
+                onChange={(e) => updatePo({ ...po, po_code: e.target.value })}
+                placeholder="Keterangan"
+              />
+            </div>
+          </div>
+            {/* kode suplier otomatis keluar, karena sudah melekat di faktur pembelian  */}
+            
+          
         </Row>
+
+       
+
+      
       </>
     );
   };

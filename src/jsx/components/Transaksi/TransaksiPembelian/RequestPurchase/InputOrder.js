@@ -478,6 +478,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                         detail
                         onDetail={() => setShowProduk(true)}
                         onChange={(e) => {
+                          console.log(e);
                           let temp = [...rp.rprod];
                           temp[i].prod_id = e.id;
                           temp[i].unit_id = e.unit?.id;
@@ -505,7 +506,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                     </div>
 
                     <div className="col-4">
-                      <div className="p-inputgroup">
+                      {/* <div className="p-inputgroup">
                         <Dropdown
                           value={v.unit_id && checkUnit(v.unit_id)}
                           onChange={(e) => {
@@ -526,7 +527,20 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                         >
                           <i class="bx bx-food-menu"></i>
                         </PButton>
-                      </div>
+                      </div> */}
+                      <CustomDropdown
+                        value={v.unit_id && checkUnit(v.unit_id)}
+                        option={satuan}
+                        detail
+                        onDetail={() => setShowSatuan(true)}
+                        onChange={(e) => {
+                          let temp = [...rp.rprod];
+                          temp[i].unit_id = e.id;
+                          updateRp({ ...rp, rprod: temp });
+                        }}
+                        label={"[name]"}
+                        placeholder="Pilih Satuan"
+                      />
                     </div>
 
                     <div className="col-1 d-flex ml-0 mr-0">

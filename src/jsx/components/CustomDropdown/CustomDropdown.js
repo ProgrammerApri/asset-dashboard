@@ -58,13 +58,13 @@ const CustomDropdown = ({
       setTimeout(() => {
         panel.current.style.display = "none";
         setFilter("");
-        setMatches(option);
       }, 45);
       panel.current.style.height = "0";
       panel.current.style.transition = "height 55ms linear";
       list.current.style.maxHeight = "0";
       list.current.style.transition = "max-height 50ms linear";
     }
+    setMatches(option);
   };
 
   useOutsideAlerter(drop, panel, () => {
@@ -152,7 +152,7 @@ const CustomDropdown = ({
                     onClick={() => {
                       setSelected(v);
                       onChange(v);
-                      triggerPanel(false);
+                      triggerPanel(active);
                     }}
                     className="list-group-item list-group-item-action"
                   >
@@ -168,7 +168,7 @@ const CustomDropdown = ({
                     onClick={() => {
                       setSelected(v);
                       onChange(v);
-                      triggerPanel(false);
+                      triggerPanel(active);
                     }}
                     className="list-group-item list-group-item-action"
                   >
@@ -190,8 +190,8 @@ const CustomDropdown = ({
             label="Tampilkan Detail"
             icon="pi pi-eye"
             onClick={() => {
+              triggerPanel(active);
               onDetail();
-              triggerPanel(false);
             }}
             className="p-button-sm p-button-text btn-primary text-center vw-100 m-2 center-icon justify-content-center"
           />

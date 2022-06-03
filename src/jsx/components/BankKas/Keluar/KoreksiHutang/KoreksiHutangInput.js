@@ -20,7 +20,7 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { SelectButton } from "primereact/selectbutton";
 
-const KasBankOutInput = ({ onCancel, onSuccess }) => {
+const KoreksiAPInput = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
@@ -1429,4 +1429,4 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
   );
 };
 
-export default KasBankOutInput;
+export default KoreksiAPInput;

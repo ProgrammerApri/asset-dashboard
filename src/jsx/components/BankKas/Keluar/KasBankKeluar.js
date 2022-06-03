@@ -1,7 +1,9 @@
 import { TabView, TabPanel } from "primereact/tabview";
 import React from "react";
+import KoreksiHutangAP from "./KoreksiHutang";
 import PelunasanHutang from "./PelunasanHutang";
 import KasBankOutList from "./PelunasanHutang/KasBankKeluarList";
+import PencairanGiroMundur from "./PencairanGiro";
 
 const KasBankKeluar = () => {
   return (
@@ -9,12 +11,12 @@ const KasBankKeluar = () => {
       <TabPanel header="Pengeluaran">
           <PelunasanHutang/>
       </TabPanel>
-      {/* <TabPanel header="Pencairan Giro">
-          <Y/>
+      <TabPanel header="Pencairan Giro">
+          <PencairanGiroMundur/>
       </TabPanel>
       <TabPanel header="Koreksi Hutang">
-          <Y/>
-      </TabPanel> */}
+          <KoreksiHutangAP/>
+      </TabPanel>
     </TabView>
   );
 };

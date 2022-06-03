@@ -759,6 +759,21 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                     </div>
                   </div>
                   <div className="col-4">
+                    <label className="text-label">Tanggal Cair</label>
+                    <div className="p-inputgroup">
+                      <Calendar
+                        value={new Date(`${po.po_date}Z`)}
+                        onChange={(e) => {
+                          updatePo({ ...po, po_date: e.value });
+                        }}
+                        placeholder="Pilih Tanggal"
+                        showIcon
+                        dateFormat="dd/mm/yy"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="col-4">
                     <label className="text-label">Kode Bank</label>
                     <div className="p-inputgroup">
                       <Dropdown
@@ -1093,179 +1108,178 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
             </>
           )}
 
-<CustomAccordion
-                tittle={"Pengeluaran Kas / Bank"}
-                defaultActive={true}
-                active={accor.produk}
-                onClick={() => {
-                  setAccor({
-                    ...accor,
-                    produk: !accor.produk,
-                  });
-                }}
-                key={1}
-                body={
-                  <>
-                    <DataTable
-                      responsiveLayout="none"
-                      value={null}
-                      className="display w-150 datatable-wrapper header-white no-border"
-                      showGridlines={false}
-                      emptyMessage={() => <div></div>}
-                    >
-                      <Column
-                        header="Kode Akun"
-                        style={{
-                          maxWidth: "15rem",
-                        }}
-                        field={""}
-                        body={(e) => (
-                          <div className="p-inputgroup">
-                            <Dropdown
-                              value={
-                                po.rprod[e.index].prod_id &&
-                                checkProd(po.rprod[e.index].prod_id)
-                              }
-                              options={product}
-                              onChange={(e) => {
-                                console.log(e.value);
-                              }}
-                              placeholder="Pilih Kode Produk"
-                              optionLabel="name"
-                              filter
-                              filterBy="name"
-                              valueTemplate={valueProd}
-                              itemTemplate={prodTemp}
-                            />
-                          </div>
-                        )}
-                      />
+          <CustomAccordion
+            tittle={"Pengeluaran Kas / Bank"}
+            defaultActive={true}
+            active={accor.produk}
+            onClick={() => {
+              setAccor({
+                ...accor,
+                produk: !accor.produk,
+              });
+            }}
+            key={1}
+            body={
+              <>
+                <DataTable
+                  responsiveLayout="none"
+                  value={null}
+                  className="display w-150 datatable-wrapper header-white no-border"
+                  showGridlines={false}
+                  emptyMessage={() => <div></div>}
+                >
+                  <Column
+                    header="Kode Akun"
+                    style={{
+                      maxWidth: "15rem",
+                    }}
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <Dropdown
+                          value={
+                            po.rprod[e.index].prod_id &&
+                            checkProd(po.rprod[e.index].prod_id)
+                          }
+                          options={product}
+                          onChange={(e) => {
+                            console.log(e.value);
+                          }}
+                          placeholder="Pilih Kode Produk"
+                          optionLabel="name"
+                          filter
+                          filterBy="name"
+                          valueTemplate={valueProd}
+                          itemTemplate={prodTemp}
+                        />
+                      </div>
+                    )}
+                  />
 
-                      <Column
-                        header="D/K"
-                        style={{
-                          maxWidth: "15rem",
-                        }}
-                        field={""}
-                        body={(e) => (
-                          <div className="p-inputgroup">
-                            <Dropdown
-                              value={
-                                po.rprod[e.index].unit_id &&
-                                checkUnit(po.rprod[e.index].unit_id)
-                              }
-                              onChange={(e) => {
-                                let temp = [...po.rprod];
-                                temp[e.index].unit_id = e.value.id;
-                                updatePo({ ...po, rprod: temp });
-                              }}
-                              options={satuan}
-                              optionLabel="name"
-                              placeholder="Pilih Satuan"
-                              filter
-                              filterBy="name"
-                            />
-                          </div>
-                        )}
-                      />
+                  <Column
+                    header="D/K"
+                    style={{
+                      maxWidth: "15rem",
+                    }}
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <Dropdown
+                          value={
+                            po.rprod[e.index].unit_id &&
+                            checkUnit(po.rprod[e.index].unit_id)
+                          }
+                          onChange={(e) => {
+                            let temp = [...po.rprod];
+                            temp[e.index].unit_id = e.value.id;
+                            updatePo({ ...po, rprod: temp });
+                          }}
+                          options={satuan}
+                          optionLabel="name"
+                          placeholder="Pilih Satuan"
+                          filter
+                          filterBy="name"
+                        />
+                      </div>
+                    )}
+                  />
 
-                     
-                      <Column
-                        header="Nilai"
-                        style={{
-                          maxWidth: "15rem",
-                        }}
-                        field={""}
-                        body={(e) => (
-                          <div className="p-inputgroup">
-                            <InputText
-                              value={
-                                po.rprod[e.index].price
-                                  ? po.rprod[e.index].price
-                                  : null
-                              }
-                              onChange={(e) => {
-                                let temp = [...po.rprod];
-                                temp[e.index].price = e.target.value;
-                                updatePo({ ...po, rprod: temp });
-                                console.log(temp);
-                              }}
-                              placeholder="0"
-                            />
-                          </div>
-                        )}
-                      />
+                  <Column
+                    header="Nilai"
+                    style={{
+                      maxWidth: "15rem",
+                    }}
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={
+                            po.rprod[e.index].price
+                              ? po.rprod[e.index].price
+                              : null
+                          }
+                          onChange={(e) => {
+                            let temp = [...po.rprod];
+                            temp[e.index].price = e.target.value;
+                            updatePo({ ...po, rprod: temp });
+                            console.log(temp);
+                          }}
+                          placeholder="0"
+                        />
+                      </div>
+                    )}
+                  />
 
-                      <Column
-                        header="Keterangan"
-                        style={{
-                          maxWidth: "10rem",
-                        }}
-                        field={""}
-                        body={(e) => (
-                          <div className="p-inputgroup">
-                            <InputText
-                              value={
-                                po.rprod[e.index].disc
-                                  ? po.rprod[e.index].disc
-                                  : null
-                              }
-                              onChange={(e) => {
-                                let temp = [...po.rprod];
-                                temp[e.index].disc = e.target.value;
-                                updatePo({ ...po, rprod: temp });
-                                console.log(temp);
-                              }}
-                              placeholder="0"
-                              type="number"
-                            />
-                          </div>
-                        )}
-                      />
+                  <Column
+                    header="Keterangan"
+                    style={{
+                      maxWidth: "10rem",
+                    }}
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={
+                            po.rprod[e.index].disc
+                              ? po.rprod[e.index].disc
+                              : null
+                          }
+                          onChange={(e) => {
+                            let temp = [...po.rprod];
+                            temp[e.index].disc = e.target.value;
+                            updatePo({ ...po, rprod: temp });
+                            console.log(temp);
+                          }}
+                          placeholder="0"
+                          type="number"
+                        />
+                      </div>
+                    )}
+                  />
 
-                      <Column
-                        body={(e) =>
-                          e.index === po.rprod.length - 1 ? (
-                            <Link
-                              onClick={() => {
-                                updatePo({
-                                  ...po,
-                                  rprod: [
-                                    ...po.rprod,
-                                    {
-                                      id: 0,
-                                      prod_id: null,
-                                      unit_id: null,
-                                      request: null,
-                                    },
-                                  ],
-                                });
-                              }}
-                              className="btn btn-primary shadow btn-xs sharp ml-1"
-                            >
-                              <i className="fa fa-plus"></i>
-                            </Link>
-                          ) : (
-                            <Link
-                              onClick={() => {
-                                let temp = [...po.rprod];
-                                temp.splice(e.index, 1);
-                                updatePo({
-                                  ...po,
-                                  rprod: temp,
-                                });
-                              }}
-                              className="btn btn-danger shadow btn-xs sharp ml-1"
-                            >
-                              <i className="fa fa-trash"></i>
-                            </Link>
-                          )
-                        }
-                      />
-                    </DataTable>
-                  </>
-                }
-              />
+                  <Column
+                    body={(e) =>
+                      e.index === po.rprod.length - 1 ? (
+                        <Link
+                          onClick={() => {
+                            updatePo({
+                              ...po,
+                              rprod: [
+                                ...po.rprod,
+                                {
+                                  id: 0,
+                                  prod_id: null,
+                                  unit_id: null,
+                                  request: null,
+                                },
+                              ],
+                            });
+                          }}
+                          className="btn btn-primary shadow btn-xs sharp ml-1"
+                        >
+                          <i className="fa fa-plus"></i>
+                        </Link>
+                      ) : (
+                        <Link
+                          onClick={() => {
+                            let temp = [...po.rprod];
+                            temp.splice(e.index, 1);
+                            updatePo({
+                              ...po,
+                              rprod: temp,
+                            });
+                          }}
+                          className="btn btn-danger shadow btn-xs sharp ml-1"
+                        >
+                          <i className="fa fa-trash"></i>
+                        </Link>
+                      )
+                    }
+                  />
+                </DataTable>
+              </>
+            }
+          />
 
           {/* kode suplier otomatis keluar, karena sudah melekat di faktur pembelian  */}
         </Row>

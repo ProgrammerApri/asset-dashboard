@@ -3,7 +3,7 @@ import { request, endpoints } from "src/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Button } from "react-bootstrap";
+import { Badge, Button } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { Dialog } from "primereact/dialog";
@@ -12,16 +12,18 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_DO, SET_DO, SET_EDIT_DO } from "src/redux/actions";
+import { SET_CURRENT_ODR, SET_EDIT_ODR, SET_ODR } from "src/redux/actions";
 
 const data = {
   id: null,
-  do_code: null,
-  do_date: null,
+  ord_code: null,
+  ord_date: null,
+  faktur: true,
+  po_id: null,
   dep_id: null,
   sup_id: null,
   top: null,
-  due_date: false,
+  due_date: null,
   split_inv: null,
   prod_disc: null,
   jasa_disc: null,
@@ -30,7 +32,7 @@ const data = {
   djasa: [],
 };
 
-const DataDO = ({ onAdd, onEdit }) => {
+const DataOrder = ({ onAdd, onEdit }) => {
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayDel, setDisplayDel] = useState(false);
@@ -42,19 +44,19 @@ const DataDO = ({ onAdd, onEdit }) => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const dispatch = useDispatch();
-  const direcOrder = useSelector((state) => state.Do.Do);
+  const order = useSelector((state) => state.order.order);
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getDO();
+    getOrder();
     initFilters1();
   }, []);
 
-  const getDO = async (isUpdate = false) => {
+  const getOrder = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.do,
+      ...endpoints.order,
       data: {},
     };
     console.log(config.data);
@@ -65,7 +67,7 @@ const DataDO = ({ onAdd, onEdit }) => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        dispatch({ type: SET_DO, payload: data });
+        dispatch({ type: SET_ODR, payload: data });
       }
     } catch (error) {}
     if (isUpdate) {
@@ -77,10 +79,10 @@ const DataDO = ({ onAdd, onEdit }) => {
     }
   };
 
-  const delDO = async (id) => {
+  const delODR = async (id) => {
     const config = {
-      ...endpoints.delDO,
-      endpoint: endpoints.delDO.endpoint + direcOrder.id,
+      ...endpoints.delODR,
+      endpoint: endpoints.delODR.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -91,7 +93,7 @@ const DataDO = ({ onAdd, onEdit }) => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayDel(false);
-          getDO(true);
+          getOrder(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -124,7 +126,7 @@ const DataDO = ({ onAdd, onEdit }) => {
             onEdit(data);
             let dprod = data.dprod;
             dispatch({
-              type: SET_EDIT_DO,
+              type: SET_EDIT_ODR,
               payload: true,
             });
             dprod.forEach((el) => {
@@ -137,7 +139,7 @@ const DataDO = ({ onAdd, onEdit }) => {
               el.unit_id = el.unit_id.id;
             });
             dispatch({
-              type: SET_CURRENT_DO,
+              type: SET_CURRENT_ODR,
               payload: {
                 ...data,
                 dep_id: data?.dep_id?.id ?? null,
@@ -210,10 +212,10 @@ const DataDO = ({ onAdd, onEdit }) => {
           label="Hapus"
           icon="pi pi-trash"
           onClick={() => {
-            delDO();
+            delODR();
           }}
           autoFocus
-          loading={update}
+          loading={loading}
         />
       </div>
     );
@@ -250,17 +252,19 @@ const DataDO = ({ onAdd, onEdit }) => {
           onClick={() => {
             onAdd();
             dispatch({
-              type: SET_EDIT_DO,
+              type: SET_EDIT_ODR,
               payload: false,
             });
             dispatch({
-              type: SET_CURRENT_DO,
+              type: SET_CURRENT_ODR,
               payload: {
                 ...data,
                 dprod: [
                   {
                     id: 0,
                     do_id: null,
+                    // preq_id: null,
+                    // pprod_id: null,
                     prod_id: null,
                     unit_id: null,
                     order: null,
@@ -359,7 +363,7 @@ const DataDO = ({ onAdd, onEdit }) => {
       <Toast ref={toast} />
       <DataTable
         responsiveLayout="scroll"
-        value={loading ? dummy : direcOrder}
+        value={loading ? dummy : order}
         className="display w-150 datatable-wrapper"
         showGridlines
         dataKey="id"
@@ -380,20 +384,48 @@ const DataDO = ({ onAdd, onEdit }) => {
           style={{
             minWidth: "8rem",
           }}
-          field={(e) => formatDate(e.do_date)}
+          field={(e) => formatDate(e.ord_date)}
           body={loading && <Skeleton />}
         />
         <Column
-          header="Kode Pembelian"
-          field={(e) => e.do_code}
+          header="No. Pembelian"
+          field={(e) => e.ord_code}
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
         />
+        {/* <Column
+          header="No. Pesanan Pembelian"
+          field={(e) => e.po_id}
+          style={{ minWidth: "8rem" }}
+          body={loading && <Skeleton />}
+        /> */}
         <Column
           header="Departemen"
           field={(e) => e.dep_id.ccost_name}
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
+        />
+        <Column
+          header="Faktur"
+          field={(e) => e.faktur}
+          style={{ minWidth: "8rem" }}
+          body={(e) =>
+            loading ? (
+              <Skeleton />
+            ) : (
+              <div>
+                {e.faktur === true ? (
+                  <Badge variant="info light">
+                    <i className="bx bxs-circle text-info mr-1"></i> Faktur
+                  </Badge>
+                ) : (
+                  <Badge variant="warning light">
+                    <i className="bx bxs-circle text-warning mr-1"></i> Non Faktur
+                  </Badge>
+                )}
+              </div>
+            )
+          }
         />
         <Column
           header="Action"
@@ -425,4 +457,4 @@ const DataDO = ({ onAdd, onEdit }) => {
   );
 };
 
-export default DataDO;
+export default DataOrder;

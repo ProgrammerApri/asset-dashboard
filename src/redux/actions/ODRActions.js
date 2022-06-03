@@ -1,0 +1,5 @@
+export const SET_CURRENT_ODR = "order.SET_CURRENT_ODR"
+export const SET_ODR = "order.SET_ODR"
+export const RESET_CURRENT_ODR = "order.RESET_CURRENT_ODR"
+export const UPDATE_CURRENT_ODR = "order.UPDATE_CURRENT_ODR"
+export const SET_EDIT_ODR = "order.SET_EDIT_ODR"

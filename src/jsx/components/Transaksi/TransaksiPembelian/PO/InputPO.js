@@ -728,8 +728,8 @@ const InputPO = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-4">
-            <label className="text-label"></label>
-            <div className="p-inputgroup mt-2">
+            <label className="text-label">Alamat Supplier</label>
+            <div className="p-inputgroup">
               <InputText
                 value={
                   po.sup_id !== null
@@ -743,8 +743,8 @@ const InputPO = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-4">
-            <label className="text-label"></label>
-            <div className="p-inputgroup mt-2">
+            <label className="text-label">Kontak Person</label>
+            <div className="p-inputgroup">
               <InputText
                 value={
                   po.sup_id !== null ? supp(po.sup_id)?.supplier?.sup_telp1 : ""

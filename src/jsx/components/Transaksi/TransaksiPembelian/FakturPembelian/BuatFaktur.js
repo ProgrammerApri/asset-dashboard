@@ -4,36 +4,34 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Row } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
-import { Link } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
-import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Divider } from "@material-ui/core";
 import { useDispatch, useSelector } from "react-redux";
 import { Calendar } from "primereact/calendar";
 import CustomAccordion from "src/jsx/components/Accordion/Accordion";
-import { InputSwitch } from "primereact/inputswitch";
 import { SET_CURRENT_INV } from "src/redux/actions";
-import { SelectButton } from "primereact/selectbutton";
-
-const data = {};
-
-
+import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
+import { el } from "date-fns/locale";
 
 
 const BuatFaktur = ({ onCancel }) => {
   const inv = useSelector((state) => state.inv.current);
+  const [order, setOrder] = useState(null);
+  const [supplier, setSupplier] = useState(null);
+  const [pajak, setPajak] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
-  const [isEdit, setEdit] = useState(false);
+  const isEdit = useSelector((state) => state.inv.editinv);
   const [isRp, setRp] = useState(false);
   const [isRpJasa, setRpJasa] = useState(false);
   const dispatch = useDispatch();
   const [accor, setAccor] = useState({
     produk: true,
+    jasa: false,
   });
 
   useEffect(() => {
@@ -42,7 +40,143 @@ const BuatFaktur = ({ onCancel }) => {
       left: 0,
       behavior: "smooth",
     });
+    getORD();
+    getSupplier()
+    getPpn()
   }, []);
+
+  const getORD = async () => {
+    const config = {
+      ...endpoints.order,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        let filt = [];
+        data.forEach((elem) => {
+          if(isEdit){
+          let prod = [];
+          elem.fprod.forEach((el) => {
+            el.prod_id = el.prod_id.id;
+            el.unit_id = el.unit_id.id;
+            prod.push({
+              ...el,
+              r_order: el.order,
+            });
+
+            let temp = [...inv.fprod];
+            inv.fprod.forEach((e, i) => {
+              if (el.id === e.dprod_id) {
+                temp[i].order = el.order;
+                updateINV({ ...inv, fprod: temp });
+              }
+            });
+          });
+          elem.dprod = prod;
+
+          let jasa = [];
+          elem.djasa.forEach((element) => {
+            element.jasa_id = element.jasa_id.id;
+            element.unit_id = element.unit_id.id;
+            jasa.push({
+              ...element,
+              r_order: element.order,
+            });
+
+            let temp = [...inv.fjasa];
+            inv.fjasa.forEach((e, i) => {
+              if (el.id === e.fjasa_id) {
+                temp[i].order = el.order;
+                updateINV({ ...inv, fjasa: temp });
+              }
+            });
+          });
+          elem.djasa = jasa;
+          filt.push(elem);
+
+        } else {
+          if (elem.faktur === false) {
+            let prod = [];
+            elem.dprod.forEach((el) => {
+              if (el.remain > 0) {
+                el.prod_id = el.prod_id.id;
+                el.unit_id = el.unit_id.id;
+                prod.push({
+                  ...el,
+                  r_remain: el.remain,
+                  order: 0,
+                  price: 0,
+                  disc: 0,
+                  nett_price: 0,
+                  total: 0,
+                });
+              }
+            });
+            elem.dprod = prod;
+            let jasa = [];
+            elem.djasa.forEach((element) => {
+              if (element.remain > 0) {
+                element.jasa_id = element.jasa_id.id;
+                element.unit_id = element.unit_id.id;
+                jasa.push({
+                  ...element,
+                  sup_id: null,
+                  r_remain: element.remain,
+                  order: 0,
+                  price: 0,
+                  disc: 0,
+                  nett_price: 0,
+                  total: 0,
+                });
+              }
+            });
+            elem.djasa = jasa;
+            filt.push(elem);
+          }
+        }
+        });
+        setOrder(filt);
+      }
+    } catch (error) {}
+  }; 
+  
+  const getSupplier = async () => {
+    const config = {
+      ...endpoints.supplier,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setSupplier(data);
+      }
+    } catch (error) {}
+  }; 
+  
+  const getPpn = async () => {
+    const config = {
+      ...endpoints.pajak,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setPajak(data);
+      }
+    } catch (error) {}
+  };
 
   const editinv = async () => {
     const config = {
@@ -140,6 +274,39 @@ const BuatFaktur = ({ onCancel }) => {
     }
   };
 
+  const checkOrd = (value) => {
+    let selected = {};
+    order?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+  
+  const checkSupp = (value) => {
+    let selected = {};
+    supplier?.forEach((element) => {
+      if (value === element.supplier.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkPjk = (value) => {
+    let selected = {};
+    pajak?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
   const updateINV = (e) => {
     dispatch({
       type: SET_CURRENT_INV,
@@ -166,9 +333,9 @@ const BuatFaktur = ({ onCancel }) => {
             <label className="text-label">Tanggal</label>
             <div className="p-inputgroup">
               <Calendar
-                value={new Date(`${inv.do_date}Z`)}
+                value={new Date(`${inv.fk_date}Z`)}
                 onChange={(e) => {
-                  updateINV({ ...inv, do_date: e.value });
+                  updateINV({ ...inv, fk_date: e.value });
                 }}
                 placeholder="Pilih Tanggal"
                 showIcon
@@ -181,8 +348,8 @@ const BuatFaktur = ({ onCancel }) => {
             <label className="text-label">No. Faktur Pembelian</label>
             <div className="p-inputgroup">
               <InputText
-                value={inv.do_code}
-                onChange={(e) => updateINV({ ...inv, do_code: e.target.value })}
+                value={inv.fk_code}
+                onChange={(e) => updateINV({ ...inv, fk_code: e.target.value })}
                 placeholder="Masukan No. Faktur"
               />
             </div>
@@ -190,65 +357,50 @@ const BuatFaktur = ({ onCancel }) => {
 
           <div className="col-4">
             <label className="text-label">No. Pembelian</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                // value={inv.dep_id !== null ? checkDept(Do.dep_id) : null}
-                // options={dept}
-                // onChange={(e) => {
-                //   updateINV({ ...Do, dep_id: e.value.id });
-                // }}
-                placeholder="No. Pembelian"
-                optionLabel="ccost_name"
-                filter
-                filterBy="ccost_name"
-                // valueTemplate={valueDeptTemp}
-                // itemTemplate={deptTemp}
-              />
-              <PButton
-                onClick={() => {
-                  //   setShowDept(true);
-                }}
-              >
-                <i class="bx bx-food-menu"></i>
-              </PButton>
-            </div>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
+              value={inv.ord_id && checkOrd(inv.ord_id)}
+              onChange={(e) => {
+                updateINV({
+                  ...inv,
+                  ord_id: e?.id ?? null,
+                  product: e?.dprod ?? null,
+                  jasa: e?.djasa ?? null,
+                });
+              }}
+              option={order}
+              detail
+              // onDetail={() => SetShowOrder()}
+              label={"[ord_code]"}
+              placeholder="No. Pembelian"
+            />
           </div>
 
           <div className="col-3">
             <label className="text-label">Supplier</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                // value={Do.sup_id !== null ? checkSupp(Do.sup_id) : null}
-                // options={supplier}
-                // onChange={(e) => {
-                //   updateINV({ ...Do, sup_id: e.value.supplier.id });
-                // }}
-                optionLabel="supplier.sup_name"
-                placeholder="Pilih Supplier"
-                filter
-                filterBy="supplier.sup_name"
-                // itemTemplate={suppTemp}
-                // valueTemplate={valueSupTemp}
-              />
-              <PButton
-                onClick={() => {
-                  //   setShowSupplier(true);
-                }}
-              >
-                <i class="bx bx-food-menu"></i>
-              </PButton>
-            </div>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
+              value={inv.ord_id !== null ? checkSupp(checkOrd(inv.ord_id)?.sup_id?.id) : null}
+              // onChange={(e) => {
+              //   updateINV({ ...Do, sup_id: e.value.supplier.id });
+              // }}
+              // option={supplier}
+              detail
+              // onDetail={() => SetShowOrder()}
+              label={"[sup_code]"}
+              placeholder="Pilih Supplier"
+            />
           </div>
 
           <div className="col-3">
-            <label className="text-label"></label>
-            <div className="p-inputgroup mt-2">
+            <label className="text-label">Alamat Supplier</label>
+            <div className="p-inputgroup">
               <InputText
-                // value={
-                //   Do.sup_id !== null
-                //     ? checkSupp(Do.sup_id)?.supplier?.sup_address
-                //     : ""
-                // }
+                value={
+                  inv.ord_id !== null
+                  ? checkSupp(checkOrd(inv.ord_id)?.sup_id?.sup_address)
+                  : ""
+                }
                 placeholder="Alamat Supplier"
                 disabled
               />
@@ -256,14 +408,14 @@ const BuatFaktur = ({ onCancel }) => {
           </div>
 
           <div className="col-3">
-            <label className="text-label"></label>
-            <div className="p-inputgroup mt-2">
+            <label className="text-label">Kontak Person</label>
+            <div className="p-inputgroup">
               <InputText
-                // value={
-                //   Do.sup_id !== null
-                //     ? checkSupp(Do.sup_id)?.supplier?.sup_telp1
-                //     : ""
-                // }
+                value={
+                  inv.ord_id !== null
+                  ? checkSupp(checkOrd(inv.ord_id)?.sup_id?.sup_telp1)
+                  : ""
+                }
                 placeholder="Kontak Person"
                 disabled
               />
@@ -271,30 +423,16 @@ const BuatFaktur = ({ onCancel }) => {
           </div>
 
           <div className="col-3">
-            <label className="text-label"></label>
-            <div className="p-inputgroup mt-2">
+            <label className="text-label">Jenis Pajak</label>
+            <div className="p-inputgroup">
               <InputText
-                // value={
-                //   Do.sup_id !== null
-                //     ? checkpjk(checkSupp(Do.sup_id)?.supplier?.sup_ppn).name
-                //     : null
-                // }
+                value={
+                  inv.ord_id !== null
+                    ? checkPjk(checkSupp(inv.ord_id)?.sup_id?.sup_ppn).name
+                    : null
+                }
                 placeholder="Jenis Pajak"
                 disabled
-              />
-            </div>
-          </div>
-
-          <div className="col-12">
-            <label className="text-label">Keterangan</label>
-            <div className="p-inputgroup mt-2">
-              <InputTextarea
-                // value={
-                //   Do.sup_id !== null
-                //     ? checkpjk(checkSupp(Do.sup_id)?.supplier?.sup_ppn).name
-                //     : null
-                // }
-                placeholder="Masukan Keterangan"
               />
             </div>
           </div>
@@ -327,10 +465,24 @@ const BuatFaktur = ({ onCancel }) => {
               />
             </div>
           </div>
+
+          <div className="col-12">
+            <label className="text-label">Keterangan</label>
+            <div className="p-inputgroup mt-2">
+              <InputTextarea
+                // value={
+                //   Do.sup_id !== null
+                //     ? checkpjk(checkSupp(Do.sup_id)?.supplier?.sup_ppn).name
+                //     : null
+                // }
+                placeholder="Masukan Keterangan"
+              />
+            </div>
+          </div>
         </Row>
 
         <CustomAccordion
-          tittle={"Detail Pesanan Produk"}
+          tittle={"Detail Pembelian Produk"}
           defaultActive={true}
           active={accor.produk}
           onClick={() => {
@@ -465,6 +617,7 @@ const BuatFaktur = ({ onCancel }) => {
                         placeholder="0"
                         type="number"
                         min={0}
+                        disabled
                       />
                     </div>
                   )}
@@ -510,37 +663,28 @@ const BuatFaktur = ({ onCancel }) => {
 
                 <Column
                   header="Lokasi"
-                  // style={{
-                  //   maxWidth: "15rem",
-                  // }}
+                  style={{
+                    maxWidth: "10rem",
+                  }}
                   field={""}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        // value={e.prod_id && checkProd(e.prod_id)}
-                        // options={product}
-                        // onChange={(u) => {
-                        //   console.log(e.value);
-                        //   let temp = [...Do.dprod];
-                        //   temp[e.index].prod_id = u.value.id;
-                        //   temp[e.index].unit_id = u.value.unit?.id;
-                        //   updateINV({ ...Do, dprod: temp });
-                        // }}
-                        placeholder="Pilih Lokasi"
-                        optionLabel="name"
-                        filter
-                        filterBy="name"
-                        // valueTemplate={valueProd}
-                        // itemTemplate={prodTemp}
-                      />
-                      <PButton
-                        onClick={() => {
-                          //   setShowProduk(true);
-                        }}
-                      >
-                        <i class="bx bx-food-menu"></i>
-                      </PButton>
-                    </div>
+                    // <div className="p-inputgroup" maxWidth="5rem">
+                    <CustomDropdown
+                      // value={e.prod_id && checkProd(e.prod_id)}
+                      // onChange={(u) => {
+                      //   console.log(e.value);
+                      //   let temp = [...Do.dprod];
+                      //   temp[e.index].prod_id = u.value.id;
+                      //   temp[e.index].unit_id = u.value.unit?.id;
+                      //   updateINV({ ...Do, dprod: temp });
+                      // }}
+                      // option={lokasi}
+                      detail
+                      // onDetail={() => setShowProduk(true)}
+                      placeholder="Pilih Lokasi"
+                      label="[name]"
+                    />
+                    // </div>
                   )}
                 />
 
@@ -563,6 +707,7 @@ const BuatFaktur = ({ onCancel }) => {
                         placeholder="0"
                         type="number"
                         min={0}
+                        disabled
                       />
                       <span className="p-inputgroup-addon">%</span>
                     </div>
@@ -588,6 +733,7 @@ const BuatFaktur = ({ onCancel }) => {
                         placeholder="0"
                         type="number"
                         min={0}
+                        disabled
                       />
                     </div>
                   )}
@@ -617,7 +763,7 @@ const BuatFaktur = ({ onCancel }) => {
         />
 
         <CustomAccordion
-          tittle={"Detail Pesanan Jasa"}
+          tittle={"Detail Pembelian Jasa"}
           defaultActive={false}
           active={accor.jasa}
           onClick={() => {
@@ -753,6 +899,7 @@ const BuatFaktur = ({ onCancel }) => {
                         placeholder="0"
                         type="number"
                         min={0}
+                        disabled
                       />
                       <span className="p-inputgroup-addon">%</span>
                     </div>
@@ -783,10 +930,10 @@ const BuatFaktur = ({ onCancel }) => {
         <div className="row ml-0 mr-0 mb-0 mt-6 justify-content-between">
           <div>
             <div className="row ml-1">
-              {inv.djasa.length > 0 && inv.dprod.length > 0 && (
-                <div className="d-flex col-12 align-items-center">
-                  <label className="mt-1">{"Pisah Faktur"}</label>
-                  <InputSwitch
+              {/* {inv.djasa.length > 0 && inv.dprod.length > 0 && ( */}
+              <div className="d-flex col-12 align-items-center">
+                <label className="mt-1"></label>
+                {/* <InputSwitch
                     className="ml-4"
                     checked={inv.split_inv}
                     onChange={(e) => {
@@ -805,9 +952,10 @@ const BuatFaktur = ({ onCancel }) => {
                       //   });
                       // }
                     }}
-                  />
-                </div>
-              )}
+                    
+                  /> */}
+              </div>
+              {/* )} */}
             </div>
           </div>
 
@@ -890,6 +1038,7 @@ const BuatFaktur = ({ onCancel }) => {
                   label="Rp."
                   className={`${isRp ? "" : "p-button-outlined"}`}
                   onClick={() => setRp(true)}
+                  disabled
                 />
                 <InputText
                   // value={
@@ -906,6 +1055,7 @@ const BuatFaktur = ({ onCancel }) => {
                   placeholder="Diskon"
                   type="number"
                   min={0}
+                  disabled
                   onChange={(e) => {
                     // if (Do.split_inv) {
                     //   let disc = 0;
@@ -932,6 +1082,7 @@ const BuatFaktur = ({ onCancel }) => {
                 <PButton
                   className={`${isRp ? "p-button-outlined" : ""}`}
                   onClick={() => setRp(false)}
+                  disabled
                 >
                   {" "}
                   <b>%</b>{" "}
@@ -1027,6 +1178,7 @@ const BuatFaktur = ({ onCancel }) => {
                       label="Rp."
                       className={`${isRpJasa ? "" : "p-button-outlined"}`}
                       onClick={() => setRpJasa(true)}
+                      disabled
                     />
                     <InputText
                       // value={
@@ -1037,6 +1189,7 @@ const BuatFaktur = ({ onCancel }) => {
                       placeholder="Diskon"
                       type="number"
                       min={0}
+                      disabled
                       onChange={(e) => {
                         // let disc = 0;
                         // if (isRpJasa) {
@@ -1050,6 +1203,7 @@ const BuatFaktur = ({ onCancel }) => {
                     <PButton
                       className={`${isRpJasa ? "p-button-outlined" : ""}`}
                       onClick={() => setRpJasa(false)}
+                      disabled
                     >
                       {" "}
                       <b>%</b>{" "}

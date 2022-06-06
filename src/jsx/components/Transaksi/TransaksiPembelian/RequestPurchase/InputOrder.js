@@ -227,7 +227,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
     );
   };
 
-  const valueTemp = (option, props) => {
+  const valueJasTemp = (option, props) => {
     if (option) {
       return (
         <div>
@@ -370,26 +370,18 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
 
           <div className="col-4">
             <label className="text-label">Departemen</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={rp.req_dep !== null ? dept(rp.req_dep) : null}
-                options={pusatBiaya}
-                onChange={(e) => {
-                  updateRp({ ...rp, req_dep: e.value.id });
-                }}
-                optionLabel="ccost_name"
-                filter
-                filterBy="ccost_name"
-                placeholder="Pilih Departemen"
-              />
-              <PButton
-                onClick={() => {
-                  setShowDepartemen(true);
-                }}
-              >
-                <i class="bx bx-food-menu"></i>
-              </PButton>
-            </div>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
+              value={rp.req_dep !== null ? dept(rp.req_dep) : null}
+              onChange={(e) => {
+                updateRp({ ...rp, req_dep: e.value.id });
+              }}
+              option={pusatBiaya}
+              detail
+              onDetail={() => setShowDepartemen(true)}
+              label={"[name] ([code])"}
+              placeholder="Pilih Departemen"
+            />
           </div>
 
           <div className="col-12">
@@ -445,32 +437,6 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                 return (
                   <div className="row col-12 mr-0 ml-0 mt-0">
                     <div className="col-4">
-                      {/* <div className="p-inputgroup">
-                        <Dropdown
-                          value={v.prod_id && checkProd(v.prod_id)}
-                          options={product}
-                          onChange={(e) => {
-                            console.log(e.value);
-                            let temp = [...rp.rprod];
-                            temp[i].prod_id = e.value.id;
-                            temp[i].unit_id = e.value.unit?.id;
-                            updateRp({ ...rp, rprod: temp });
-                          }}
-                          optionLabel="name"
-                          filter
-                          filterBy="name"
-                          placeholder="Pilih Produk"
-                          valueTemplate={clear}
-                          itemTemplate={prodTemp}
-                        />
-                        <PButton
-                          onClick={() => {
-                            setShowProduk(true);
-                          }}
-                        >
-                          <i class="bx bx-food-menu"></i>
-                        </PButton>
-                      </div> */}
                       <div className="p-inputgroup"></div>
                       <CustomDropdown
                         value={v.prod_id && checkProd(v.prod_id)}
@@ -506,28 +472,6 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                     </div>
 
                     <div className="col-4">
-                      {/* <div className="p-inputgroup">
-                        <Dropdown
-                          value={v.unit_id && checkUnit(v.unit_id)}
-                          onChange={(e) => {
-                            let temp = [...rp.rprod];
-                            temp[i].unit_id = e.value.id;
-                            updateRp({ ...rp, rprod: temp });
-                          }}
-                          options={satuan}
-                          optionLabel="name"
-                          filter
-                          filterBy="name"
-                          placeholder="Pilih Satuan"
-                        />
-                        <PButton
-                          onClick={() => {
-                            setShowSatuan(true);
-                          }}
-                        >
-                          <i class="bx bx-food-menu"></i>
-                        </PButton>
-                      </div> */}
                       <CustomDropdown
                         value={v.unit_id && checkUnit(v.unit_id)}
                         option={satuan}
@@ -624,30 +568,20 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                 return (
                   <div className="row col-12 mr-0 ml-0 mb-0">
                     <div className="col-4">
-                      <div className="p-inputgroup">
-                        <Dropdown
-                          value={v.jasa_id && jas(v.jasa_id)}
-                          options={jasa}
-                          onChange={(e) => {
-                            let temp = [...rp.rjasa];
-                            temp[i].jasa_id = e.value.jasa.id;
-                            updateRp({ ...rp, rjasa: temp });
-                          }}
-                          optionLabel="jasa.name"
-                          filter
-                          filterBy="jasa.name"
-                          placeholder="Pilih Jasa"
-                          valueTemplate={valueTemp}
-                          itemTemplate={jasTemp}
-                        />
-                        <PButton
-                          onClick={() => {
-                            setShowJasa(true);
-                          }}
-                        >
-                          <i class="bx bx-food-menu"></i>
-                        </PButton>
-                      </div>
+                      <div className="p-inputgroup"></div>
+                      <CustomDropdown
+                        value={v.jasa_id && jas(v.jasa_id)}
+                        option={jasa}
+                        detail
+                        onDetail={() => setShowJasa(true)}
+                        onChange={(e) => {
+                          let temp = [...rp.rjasa];
+                          temp[i].jasa_id = e.jasa.id;
+                          updateRp({ ...rp, rjasa: temp });
+                        }}
+                        label={"[jasa.name] ([jasa.code])"}
+                        placeholder="Pilih Jasa"
+                      />
                     </div>
 
                     <div className="col-3">
@@ -666,28 +600,20 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                     </div>
 
                     <div className="col-4">
-                      <div className="p-inputgroup">
-                        <Dropdown
-                          value={v.unit_id && checkUnit(v.unit_id)}
-                          onChange={(e) => {
-                            let temp = [...rp.rjasa];
-                            temp[i].unit_id = e.value.id;
-                            updateRp({ ...rp, rjasa: temp });
-                          }}
-                          options={satuan}
-                          optionLabel="name"
-                          filter
-                          filterBy="name"
-                          placeholder="Pilih Jasa"
-                        />
-                        <PButton
-                          onClick={() => {
-                            setShowSatuan(true);
-                          }}
-                        >
-                          <i class="bx bx-food-menu"></i>
-                        </PButton>
-                      </div>
+                      <div className="p-inputgroup"></div>
+                      <CustomDropdown
+                        value={v.unit_id && checkUnit(v.unit_id)}
+                        onChange={(e) => {
+                          let temp = [...rp.rjasa];
+                          temp[i].unit_id = e.id;
+                          updateRp({ ...rp, rjasa: temp });
+                        }}
+                        option={satuan}
+                        detail
+                        onDetail={() => setShowSatuan(true)}
+                        label={"[name]"}
+                        placeholder="Pilih Satuan"
+                      />
                     </div>
 
                     <div className="col-1 d-flex ml-0">
@@ -747,30 +673,19 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
 
           <div className="col-6">
             <label className="text-label">Kode Supplier</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={rp.ref_sup !== null ? supp(rp.ref_sup) : null}
-                options={supplier}
-                onChange={(e) => {
-                  updateRp({ ...rp, ref_sup: e.value.supplier.id });
-                }}
-                optionLabel="ref_sup.sup_name"
-                filter
-                filterBy="ref_sup.sup_name"
-                placeholder="Pilih Supplier"
-                itemTemplate={suppTemp}
-                valueTemplate={valueSupTemp}
-                disabled={rp && !rp.refrence}
-              />
-              <PButton
-                onClick={() => {
-                  setShowSupplier(true);
-                }}
-                disabled={currentItem && !currentItem.refrence}
-              >
-                <i class="bx bx-food-menu"></i>
-              </PButton>
-            </div>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
+              value={rp.ref_sup !== null ? supp(rp.ref_sup) : null}
+              onChange={(e) => {
+                updateRp({ ...rp, ref_sup: e.value.supplier.id });
+              }}
+              option={supplier}
+              detail
+              onDetail={() => setShowSupplier(true)}
+              label={"[name]"}
+              placeholder="Pilih Supplier"
+              disabled={rp && !rp.refrence}
+            />
           </div>
 
           <div className="col-6">

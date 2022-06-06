@@ -33,6 +33,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
   const [product, setProduct] = useState(null);
   const [jasa, setJasa] = useState(null);
   const [satuan, setSatuan] = useState(null);
+  const [lokasi, setLokasi] = useState(null);
   const [showSupplier, setShowSupplier] = useState(false);
   const [showRulesPay, setShowRulesPay] = useState(false);
   const [showDept, setShowDept] = useState(false);
@@ -70,6 +71,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     getSatuan();
     getPjk();
     getPO();
+    getLoc();
   }, []);
 
   const editODR = async () => {
@@ -314,6 +316,22 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
+  const getLoc= async () => {
+    const config = {
+      ...endpoints.lokasi,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setLokasi(data);
+      }
+    } catch (error) {}
+  };
+
   const checkUnit = (value) => {
     let selected = {};
     satuan?.forEach((element) => {
@@ -383,6 +401,17 @@ const InputOrder = ({ onCancel, onSuccess }) => {
   const checkpjk = (value) => {
     let selected = {};
     pajak?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkLoc = (value) => {
+    let selected = {};
+    lokasi?.forEach((element) => {
       if (value === element.id) {
         selected = element;
       }
@@ -709,8 +738,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-3">
-            <label className="text-label"></label>
-            <div className="p-inputgroup mt-2">
+            <label className="text-label">Alamat Supplier</label>
+            <div className="p-inputgroup">
               <InputText
                 value={
                   order.sup_id !== null
@@ -724,8 +753,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-3">
-            <label className="text-label"></label>
-            <div className="p-inputgroup mt-2">
+            <label className="text-label">Kontak Person</label>
+            <div className="p-inputgroup">
               <InputText
                 value={
                   order.sup_id !== null
@@ -739,8 +768,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-3">
-            <label className="text-label"></label>
-            <div className="p-inputgroup mt-2">
+            <label className="text-label">Jenis Pajak</label>
+            <div className="p-inputgroup">
               <InputText
                 value={
                   order.sup_id !== null
@@ -842,7 +871,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
           body={
             <>
               <DataTable
-                responsiveLayout="none"
+                responsiveLayout="scroll"
                 value={order.dprod?.map((v, i) => {
                   return {
                     ...v,
@@ -951,6 +980,29 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                         type="number"
                         min={0}
                         disabled={order && order.po_id !== null}
+                      />
+                    </div>
+                  )}
+                />
+
+                <Column
+                  header="Lokasi"
+                  // style={{
+                  //   maxWidth: "10rem",
+                  // }}
+                  field={""}
+                  body={(e) => (
+                    <div className="p-inputgroup">
+                      <Dropdown
+                        value={e.location && checkLoc(e.location)}
+                        onChange={(u) => {
+                          let temp = [...order.dprod];
+                          temp[e.index].location = u.value.id;
+                          updateORD({ ...order, dprod: temp });
+                        }}
+                        options={lokasi}
+                        optionLabel="name"
+                        placeholder="Lokasi"
                       />
                     </div>
                   )}

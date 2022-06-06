@@ -374,12 +374,12 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
             <CustomDropdown
               value={rp.req_dep !== null ? dept(rp.req_dep) : null}
               onChange={(e) => {
-                updateRp({ ...rp, req_dep: e.value.id });
+                updateRp({ ...rp, req_dep: e.id });
               }}
               option={pusatBiaya}
               detail
               onDetail={() => setShowDepartemen(true)}
-              label={"[name] ([code])"}
+              label={"[ccost_name] ([ccost_code])"}
               placeholder="Pilih Departemen"
             />
           </div>
@@ -677,12 +677,12 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
             <CustomDropdown
               value={rp.ref_sup !== null ? supp(rp.ref_sup) : null}
               onChange={(e) => {
-                updateRp({ ...rp, ref_sup: e.value.supplier.id });
+                updateRp({ ...rp, ref_sup: e.supplier.id });
               }}
               option={supplier}
               detail
               onDetail={() => setShowSupplier(true)}
-              label={"[name]"}
+              label={"[supplier.sup_name]"}
               placeholder="Pilih Supplier"
               disabled={rp && !rp.refrence}
             />

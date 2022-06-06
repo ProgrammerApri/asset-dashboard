@@ -75,15 +75,23 @@ const CustomDropdown = ({
     let key = label.match(/(?<=\[)[^\][]*(?=])/g);
     let final = label;
     key.forEach((e) => {
-      final = final.replace(e, value[`${e}`]);
+      if (e.includes(".")){
+        let subkey = e.split(".");
+        let subValue = value
+        subkey.forEach(key => {
+          subValue = subValue[`${key}`]
+        });
+        console.log(subValue);
+        final = final.replace(e, subValue);
+      } else {
+        final = final.replace(e, value[`${e}`]);
+      }
+      
     });
     final = final.replaceAll("[", "").replaceAll("]", "");
-    console.log(final);
     return final;
   };
-  // useEffect(() => {
-  //   setMatches(option);
-  // }, [matches]);
+
 
   return (
     <>

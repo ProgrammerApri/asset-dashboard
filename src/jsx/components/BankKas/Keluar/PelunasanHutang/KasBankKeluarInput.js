@@ -811,6 +811,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
               )}
 
               <CustomAccordion
+              className="col-12"
                 tittle={"Data Pembayaran"}
                 defaultActive={true}
                 active={accor.produk}
@@ -1109,6 +1110,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
           )}
 
           <CustomAccordion
+          className="col-12"
             tittle={"Pengeluaran Kas / Bank"}
             defaultActive={true}
             active={accor.produk}

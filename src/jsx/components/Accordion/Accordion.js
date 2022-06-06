@@ -8,11 +8,12 @@ const CustomAccordion = ({
   active,
   defaultActive,
   key,
+  className,
 }) => {
 
   return (
     <Accordion
-      className="accordion"
+      className={`accordion ${className}`}
       defaultActiveKey={`${defaultActive ? "0" : "1"}`}
     >
       <div className="accordion__item" key={key}>

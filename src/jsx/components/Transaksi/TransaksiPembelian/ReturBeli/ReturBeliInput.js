@@ -15,6 +15,7 @@ import { SET_CURRENT_PR } from "src/redux/actions";
 import DataSupplier from "../../../Mitra/Pemasok/DataPemasok";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
+import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 
 const ReturBeliInput = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
@@ -424,7 +425,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
           <div className="col-4">
             <label className="text-label">No. Faktur Pembelian</label>
             <div className="p-inputgroup">
-              <Dropdown
+              <CustomDropdown
                 value={pr.preq_id && req_pur(pr.preq_id)}
                 options={rp}
                 onChange={(e) => {
@@ -437,11 +438,11 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                   }
                   updatePr({
                     ...pr,
-                    preq_id: e.value.id,
+                    preq_id: e.id,
                     due_date: result,
-                    sup_id: e.value?.ref_sup?.id ?? null,
-                    dprod: e.value.dprod,
-                    rjasa: e.value.rjasa,
+                    sup_id: e.ref_sup?.id ?? null,
+                    dprod: e.dprod,
+                    rjasa: e.rjasa,
                   });
                 }}
                 optionLabel="req_code"
@@ -458,32 +459,17 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
           <div className="col-3">
             <label className="text-label">Supplier</label>
             <div className="p-inputgroup">
-              <Dropdown
+              <InputText
                 value={pr.sup_id !== null ? supp(pr.sup_id) : null}
-                options={supplier}
-                onChange={(e) => {
-                  updatePr({ ...pr, sup_id: e.value.supplier.id });
-                }}
-                optionLabel="supplier.sup_name"
                 placeholder="Pilih Supplier"
-                filter
-                filterBy="supplier.sup_name"
-                itemTemplate={suppTemp}
-                valueTemplate={valueSupTemp}
+                disabled
               />
-              <PButton
-                onClick={() => {
-                  setShowSupplier(true);
-                }}
-              >
-                <i class="bx bx-food-menu"></i>
-              </PButton>
             </div>
           </div>
 
           <div className="col-3">
-            <label className="text-label"></label>
-            <div className="p-inputgroup mt-2">
+            <label className="text-label">Alamat Supplier</label>
+            <div className="p-inputgroup">
               <InputText
                 value={
                   pr.sup_id !== null
@@ -497,8 +483,8 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-3">
-            <label className="text-label"></label>
-            <div className="p-inputgroup mt-2">
+            <label className="text-label">Kontak Person</label>
+            <div className="p-inputgroup">
               <InputText
                 value={
                   pr.sup_id !== null ? supp(pr.sup_id)?.supplier?.sup_telp1 : ""

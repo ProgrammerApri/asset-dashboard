@@ -10,7 +10,7 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_PR, SET_EDIT_PR } from "src/redux/actions";
+import { SET_CURRENT_RB, SET_EDIT_RB, SET_RB } from "src/redux/actions";
 
 const data = {
   id: null,
@@ -30,12 +30,46 @@ const data = {
 
 const ReturBeliList = ({ onAdd }) => {
   const [loading, setLoading] = useState(true);
+  const [filters1, setFilters1] = useState(null);
+  const [globalFilterValue1, setGlobalFilterValue1] = useState("");
+  const [isEdit, setEdit] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const dispatch = useDispatch();
-  const pr = useSelector((state) => state.pr.pr);
+  const rb = useSelector((state) => state.rb.rb);
 
   const dummy = Array.from({ length: 10 });
+
+  useEffect(() => {
+    getRB();
+    initFilters1();
+  }, []);
+
+  const getRB = async (isUpdate = false) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.faktur,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        dispatch({ type: SET_RB, payload: data });
+      }
+    } catch (error) {}
+    if (isUpdate) {
+      setLoading(false);
+    } else {
+      setTimeout(() => {
+        setLoading(false);
+      }, 500);
+    }
+  };
 
   const renderHeader = () => {
     return (
@@ -43,8 +77,8 @@ const ReturBeliList = ({ onAdd }) => {
         <span className="p-input-icon-left">
           <i className="pi pi-search" />
           <InputText
-            // value={globalFilterValue1}
-            // onChange={onGlobalFilterChange1}
+            value={globalFilterValue1}
+            onChange={onGlobalFilterChange1}
             placeholder="Cari disini"
           />
         </span>
@@ -53,11 +87,11 @@ const ReturBeliList = ({ onAdd }) => {
           onClick={() => {
             onAdd();
             dispatch({
-              type: SET_EDIT_PR,
+              type: SET_EDIT_RB,
               payload: false,
             });
             dispatch({
-              type: SET_CURRENT_PR,
+              type: SET_CURRENT_RB,
               payload: {
                 ...data,
                 dprod: [
@@ -127,6 +161,21 @@ const ReturBeliList = ({ onAdd }) => {
     },
   };
 
+  const onGlobalFilterChange1 = (e) => {
+    const value = e.target.value;
+    let _filters1 = { ...filters1 };
+    _filters1["global"].value = value;
+
+    setFilters1(_filters1);
+    setGlobalFilterValue1(value);
+  };
+
+  const initFilters1 = () => {
+    setFilters1({
+      global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    });
+  };
+
   const onCustomPage2 = (event) => {
     setFirst2(event.first);
     setRows2(event.rows);
@@ -136,7 +185,7 @@ const ReturBeliList = ({ onAdd }) => {
     <>
       <DataTable
         responsiveLayout="scroll"
-        // value={loading ? dummy : pr}
+        value={loading ? dummy : rb}
         className="display w-150 datatable-wrapper"
         showGridlines
         dataKey="id"

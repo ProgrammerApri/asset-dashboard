@@ -7,6 +7,7 @@ import RpReducer from "./RpReducer";
 import SOReducer from "./SOReducer";
 import SRReducer from "./SRReducer";
 import ODRReducer from "./ODRReducer";
+import RBReducer from "./RBReducer";
 
 
 const rootReducer = combineReducers({
@@ -18,6 +19,7 @@ const rootReducer = combineReducers({
   pr: PRReducer,
   sr: SRReducer,
   inv: INVReducer,
+  rb: RBReducer,
 });
 
 export default rootReducer;

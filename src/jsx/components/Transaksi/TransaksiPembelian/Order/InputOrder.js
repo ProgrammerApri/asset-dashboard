@@ -22,6 +22,8 @@ import DataJasa from "src/jsx/components/Master/Jasa/DataJasa";
 import DataSatuan from "src/jsx/components/MasterLainnya/Satuan/DataSatuan";
 import { SelectButton } from "primereact/selectbutton";
 import { el } from "date-fns/locale";
+import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
+import PesananPO from "../PO/PesananPembelian";
 
 const InputOrder = ({ onCancel, onSuccess }) => {
   const order = useSelector((state) => state.order.current);
@@ -40,6 +42,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
   const [showProduk, setShowProduk] = useState(false);
   const [showJasa, setShowJasa] = useState(false);
   const [showSatuan, setShowSatuan] = useState(false);
+  const [showPO, setShowPO] = useState(false);
   const isEdit = useSelector((state) => state.order.editOdr);
   const [update, setUpdate] = useState(false);
   const toast = useRef(null);
@@ -316,7 +319,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
-  const getLoc= async () => {
+  const getLoc = async () => {
     const config = {
       ...endpoints.lokasi,
       data: {},
@@ -655,86 +658,69 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
           <div className="col-6">
             <label className="text-label">No. Pesanan Pembelian</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={order.po_id !== null ? checkPO(order.po_id) : null}
-                options={po}
-                onChange={(e) => {
-                  console.log(e.value.preq_id.req_dep.id);
-                  updateORD({
-                    ...order,
-                    po_id: e.value.id,
-                    top: e.value?.top.id ?? null,
-                    sup_id: e.value?.id ?? null,
-                    dep_id: e.value?.preq_id?.req_dep?.id ?? null,
-                    dprod: e.value.pprod,
-                    djasa: e.value.pjasa,
-                  });
-                }}
-                placeholder="Pilih No. Pesanan Pembelian"
-                optionLabel="po_code"
-                filter
-                filterBy="po_code"
-                valueTemplate={valuePOTemp}
-                itemTemplate={poTemp}
-              />
-            </div>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
+              value={order.po_id !== null ? checkPO(order.po_id) : null}
+              onChange={(e) => {
+                let result = null;
+                if (order.top) {
+                  result = new Date(`${order.ord_date}Z`);
+                  result.setDate(
+                    result.getDate() + checRulPay(order?.top)?.day
+                  );
+                  console.log(result);
+                }
+                updateORD({
+                  ...order,
+                  po_id: e.id,
+                  top: e.top.id ?? null,
+                  due_date: result,
+                  sup_id: e.id ?? null,
+                  dep_id: e.preq_id?.req_dep?.id ?? null,
+                  dprod: e.pprod,
+                  djasa: e.pjasa,
+                });
+              }}
+              placeholder="Pilih No. Pesanan Pembelian"
+              option={po}
+              detail
+              onDetail={() => setShowPO(true)}
+              label={"[po_code] ([preq_id.req_dep.ccost_name])"}
+            />
           </div>
 
           <div className="col-6">
             <label className="text-label">Departemen</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={order.dep_id !== null ? checkDept(order.dep_id) : null}
-                options={dept}
-                onChange={(e) => {
-                  updateORD({ ...order, dep_id: e.value.id });
-                }}
-                placeholder="Departemen"
-                optionLabel="ccost_name"
-                filter
-                filterBy="ccost_name"
-                valueTemplate={valueDeptTemp}
-                itemTemplate={deptTemp}
-                disabled={order && order.po_id !== null}
-              />
-              <PButton
-                onClick={() => {
-                  setShowDept(true);
-                }}
-                disabled={order && order.po_id !== null}
-              >
-                <i class="bx bx-food-menu"></i>
-              </PButton>
-            </div>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
+              value={order.dep_id !== null ? checkDept(order.dep_id) : null}
+              option={dept}
+              onChange={(e) => {
+                updateORD({ ...order, dep_id: e.id });
+              }}
+              placeholder="Departemen"
+              detail
+              onDetail={() => setShowDept(true)}
+              label={"[ccost_code] ([ccost_name])"}
+              disabled={order && order.po_id !== null}
+            />
           </div>
 
           <div className="col-3">
             <label className="text-label">Supplier</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={order.sup_id !== null ? checkSupp(order.sup_id) : null}
-                options={supplier}
-                onChange={(e) => {
-                  updateORD({ ...order, sup_id: e.value.supplier.id });
-                }}
-                optionLabel="supplier.sup_name"
-                placeholder="Pilih Supplier"
-                filter
-                filterBy="supplier.sup_name"
-                itemTemplate={suppTemp}
-                valueTemplate={valueSupTemp}
-                disabled={order && order.po_id !== null}
-              />
-              <PButton
-                onClick={() => {
-                  setShowSupplier(true);
-                }}
-                disabled={order && order.po_id !== null}
-              >
-                <i class="bx bx-food-menu"></i>
-              </PButton>
-            </div>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
+              value={order.sup_id !== null ? checkSupp(order.sup_id) : null}
+              option={supplier}
+              onChange={(e) => {
+                updateORD({ ...order, sup_id: e.supplier.id });
+              }}
+              placeholder="Pilih Supplier"
+              detail
+              onDetail={() => setShowSupplier(true)}
+              label={"[supplier.sup_code] ([supplier.sup_name])"}
+              disabled={order && order.po_id !== null}
+            />
           </div>
 
           <div className="col-3">
@@ -784,46 +770,30 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
           <div className="col-4">
             <label className="text-label">Syarat Pembayaran</label>
-            <div className="p-inputgroup mt-2">
-              <Dropdown
-                value={
-                  order.top !== null ? checRulPay(order.top) : null
-                  // order.top !== null
-                  //   ? checRulPay(checkPO(order.po_id)?.top?.id)
-                  //   : null
-                }
-                options={rulesPay}
-                onChange={(e) => {
-                  let result = new Date(`${order.due_date}Z`);
-                  result.setDate(result.getDate() + e.value.day);
-                  console.log(result);
+            <div className="p-inputgroup mt-2"></div>
+            <CustomDropdown
+              value={order.top !== null ? checRulPay(order.top) : null}
+              option={rulesPay}
+              onChange={(e) => {
+                let result = new Date(`${order.ord_date}Z`);
+                result.setDate(result.getDate() + e.value.day);
+                console.log(result);
 
-                  updateORD({ ...order, top: e.value.id, due_date: result });
-                }}
-                optionLabel="name"
-                placeholder="Pilih Syarat Pembayaran"
-                filter
-                filterBy="name"
-                itemTemplate={rulTemp}
-                valueTemplate={valueRulTemp}
-                disabled={order && order.po_id !== null}
-              />
-              <PButton
-                onClick={() => {
-                  setShowRulesPay(true);
-                }}
-                disabled={order && order.po_id !== null}
-              >
-                <i class="bx bx-food-menu"></i>
-              </PButton>
-            </div>
+                updateORD({ ...order, top: e.value.id, due_date: result });
+              }}
+              placeholder="Pilih Syarat Pembayaran"
+              detail
+              onDetail={() => setShowRulesPay(true)}
+              label={"[name] ([day] Hari)"}
+              disabled={order && order.po_id !== null}
+            />
           </div>
 
           <div className="col-4">
             <label className="text-label">Tanggal Jatuh Tempo</label>
             <div className="p-inputgroup mt-2">
               <Calendar
-                value={new Date(`${checkPO(order.po_id).due_date}Z`)}
+                value={new Date(`${order.due_date}Z`)}
                 onChange={(e) => {}}
                 placeholder="Tanggal Jatuh Tempo"
                 disabled
@@ -1003,6 +973,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                         options={lokasi}
                         optionLabel="name"
                         placeholder="Lokasi"
+                        filter
+                        filterBy="name"
                       />
                     </div>
                   )}
@@ -1927,6 +1899,34 @@ const InputOrder = ({ onCancel, onSuccess }) => {
           }, 2000);
         }}
       />
+
+      {/* <PesananPO
+        data={po}
+        loading={false}
+        popUp={true}
+        show={showPO}
+        onHide={() => {
+          setShowPO(false);
+        }}
+        onInput={(e) => {
+          setShowPO(!e);
+        }}
+        onSuccessInput={(e) => {
+          getPO();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowPO(false);
+            updateORD({ ...order, po_id: e.data.id });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      /> */}
     </>
   );
 };

@@ -677,7 +677,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   console.log(e.value.rprod);
                   let result = null;
                   if (po.top) {
-                    result = new Date(`${req_pur(e.value.id).req_date}Z`);
+                    result = new Date(`${po.po_date}Z`);
                     result.setDate(result.getDate() + rulPay(po?.top)?.day);
                     console.log(result);
                   }
@@ -686,6 +686,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     preq_id: e.value.id,
                     due_date: result,
                     sup_id: e.value?.ref_sup?.id ?? null,
+                    dep_id: e.value?.req_dep?.id ?? null,
                     pprod: e.value.rprod,
                     pjasa: e.value.rjasa,
                   });
@@ -760,7 +761,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
             <div className="p-inputgroup mt-2">
               <InputText
                 value={
-                  po.sup_id !== null ? pjk(supp(po.sup_id)?.supplier?.id) : null
+                  po.sup_id !== null
+                    ? pjk(supp(po.sup_id)?.supplier?.id).name
+                    : null
                 }
                 placeholder="Jenis Pajak"
                 disabled
@@ -774,7 +777,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
               <InputText
                 value={
                   po.preq_id !== null
-                    ? dept(req_pur(po.preq_id)?.req_dep?.id)
+                    ? `${dept(req_pur(po.preq_id)?.req_dep.id).ccost_code} (${
+                        dept(req_pur(po.preq_id)?.req_dep.id).ccost_name
+                      })`
                     : null
                 }
                 placeholder="Departemen"
@@ -790,7 +795,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                 value={po.top !== null ? rulPay(po.top) : null}
                 options={rulesPay}
                 onChange={(e) => {
-                  let result = new Date(`${req_pur(po.preq_id).req_date}Z`);
+                  let result = new Date(`${po.po_date}Z`);
                   result.setDate(result.getDate() + e.value.day);
                   console.log(result);
 
@@ -872,7 +877,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     header="Produk"
                     field={""}
                     style={{
-                      width: "12rem"
+                      width: "12rem",
                     }}
                     body={(e) => (
                       <div className="p-inputgroup">
@@ -899,7 +904,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     header="Satuan"
                     field={""}
                     style={{
-                      width: "8rem"
+                      width: "8rem",
                     }}
                     body={(e) => (
                       <div className="p-inputgroup">
@@ -924,7 +929,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     header="Permintaan"
                     field={""}
                     style={{
-                      width: "5rem"
+                      width: "5rem",
                     }}
                     body={(e) => (
                       <div className="p-inputgroup">
@@ -947,7 +952,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     header="Pesanan"
                     field={""}
                     style={{
-                      minWidth: "7rem"
+                      minWidth: "7rem",
                     }}
                     body={(e) => (
                       <div className="p-inputgroup">
@@ -980,7 +985,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     header="Sisa"
                     field={""}
                     style={{
-                      minWidth: "7rem"
+                      minWidth: "7rem",
                     }}
                     body={(e) => (
                       <div className="p-inputgroup">
@@ -998,7 +1003,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     header="Harga Satuan"
                     field={""}
                     style={{
-                      minWidth: "10rem"
+                      minWidth: "10rem",
                     }}
                     body={(e) => (
                       <div className="p-inputgroup">
@@ -1023,7 +1028,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     header="Diskon"
                     field={""}
                     style={{
-                      minWidth: "10rem"
+                      minWidth: "10rem",
                     }}
                     body={(e) => (
                       <div className="p-inputgroup">
@@ -1051,7 +1056,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     header="Harga Nett"
                     field={""}
                     style={{
-                      minWidth: "10rem"
+                      minWidth: "10rem",
                     }}
                     body={(e) => (
                       <div className="p-inputgroup">
@@ -1171,7 +1176,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     header="Supplier"
                     field={""}
                     style={{
-                      maxWidth: "15rem"
+                      maxWidth: "15rem",
                     }}
                     body={(e) => (
                       <div className="p-inputgroup">
@@ -1206,7 +1211,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     header="Jasa"
                     field={""}
                     style={{
-                      maxWidth: "15rem"
+                      maxWidth: "15rem",
                     }}
                     body={(e) => (
                       <div className="p-inputgroup">
@@ -1257,7 +1262,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     header="Permintaan"
                     field={""}
                     style={{
-                      minWidth: "7rem"
+                      minWidth: "7rem",
                     }}
                     body={(e) => (
                       <div className="p-inputgroup">
@@ -1281,7 +1286,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     header="Pesanan"
                     field={""}
                     style={{
-                      minWidth: "7rem"
+                      minWidth: "7rem",
                     }}
                     body={(e) => (
                       <div className="p-inputgroup">
@@ -1314,7 +1319,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     header="Sisa"
                     field={""}
                     style={{
-                      minWidth: "7rem"
+                      minWidth: "7rem",
                     }}
                     body={(e) => (
                       <div className="p-inputgroup">
@@ -1332,7 +1337,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     header="Harga Satuan"
                     field={""}
                     style={{
-                      minWidth: "10rem"
+                      minWidth: "10rem",
                     }}
                     body={(e) => (
                       <div className="p-inputgroup">
@@ -1358,7 +1363,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     header="Diskon"
                     field={""}
                     style={{
-                      minWidth: "10rem"
+                      minWidth: "10rem",
                     }}
                     body={(e) => (
                       <div className="p-inputgroup">
@@ -1418,7 +1423,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                         >
                           <i className="fa fa-plus"></i>
                         </Link>
-                      ) :  (
+                      ) : (
                         <Link
                           onClick={() => {
                             let temp = [...po.pjasa];
@@ -1432,7 +1437,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                         >
                           <i className="fa fa-trash"></i>
                         </Link>
-                      ) 
+                      )
                     }
                   />
                 </DataTable>

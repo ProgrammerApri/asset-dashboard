@@ -14,13 +14,18 @@ import CustomAccordion from "src/jsx/components/Accordion/Accordion";
 import { SET_CURRENT_INV } from "src/redux/actions";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import { el } from "date-fns/locale";
+import { InputSwitch } from "primereact/inputswitch";
 
-
-const BuatFaktur = ({ onCancel }) => {
+const BuatFaktur = ({ onCancel, onSuccess }) => {
   const inv = useSelector((state) => state.inv.current);
   const [order, setOrder] = useState(null);
   const [supplier, setSupplier] = useState(null);
   const [pajak, setPajak] = useState(null);
+  const [product, setProduct] = useState(null);
+  const [jasa, setJasa] = useState(null);
+  const [satuan, setSatuan] = useState(null);
+  const [lokasi, setLokasi] = useState(null);
+  const [fkCode, setFkCode] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
@@ -41,9 +46,29 @@ const BuatFaktur = ({ onCancel }) => {
       behavior: "smooth",
     });
     getORD();
-    getSupplier()
-    getPpn()
+    getSupplier();
+    getPpn();
+    getProduct();
+    getJasa();
+    getSatuan();
+    getLoct();
   }, []);
+
+  const getFkCode = async () => {
+    const config = {
+      ...endpoints.fakturCode,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setFkCode(data);
+      }
+    } catch (error) {}
+  };
 
   const getORD = async () => {
     const config = {
@@ -58,92 +83,34 @@ const BuatFaktur = ({ onCancel }) => {
         const { data } = response;
         let filt = [];
         data.forEach((elem) => {
-          if(isEdit){
-          let prod = [];
-          elem.fprod.forEach((el) => {
-            el.prod_id = el.prod_id.id;
-            el.unit_id = el.unit_id.id;
-            prod.push({
-              ...el,
-              r_order: el.order,
-            });
-
-            let temp = [...inv.fprod];
-            inv.fprod.forEach((e, i) => {
-              if (el.id === e.dprod_id) {
-                temp[i].order = el.order;
-                updateINV({ ...inv, fprod: temp });
-              }
-            });
-          });
-          elem.dprod = prod;
-
-          let jasa = [];
-          elem.djasa.forEach((element) => {
-            element.jasa_id = element.jasa_id.id;
-            element.unit_id = element.unit_id.id;
-            jasa.push({
-              ...element,
-              r_order: element.order,
-            });
-
-            let temp = [...inv.fjasa];
-            inv.fjasa.forEach((e, i) => {
-              if (el.id === e.fjasa_id) {
-                temp[i].order = el.order;
-                updateINV({ ...inv, fjasa: temp });
-              }
-            });
-          });
-          elem.djasa = jasa;
-          filt.push(elem);
-
-        } else {
-          if (elem.faktur === false) {
+          if (!elem.faktur) {
             let prod = [];
             elem.dprod.forEach((el) => {
-              if (el.remain > 0) {
-                el.prod_id = el.prod_id.id;
-                el.unit_id = el.unit_id.id;
-                prod.push({
-                  ...el,
-                  r_remain: el.remain,
-                  order: 0,
-                  price: 0,
-                  disc: 0,
-                  nett_price: 0,
-                  total: 0,
-                });
-              }
+              el.prod_id = el.prod_id.id;
+              el.unit_id = el.unit_id.id;
+              el.location = el.location?.id;
+              prod.push(el);
             });
+            console.log(prod);
             elem.dprod = prod;
             let jasa = [];
             elem.djasa.forEach((element) => {
-              if (element.remain > 0) {
-                element.jasa_id = element.jasa_id.id;
-                element.unit_id = element.unit_id.id;
-                jasa.push({
-                  ...element,
-                  sup_id: null,
-                  r_remain: element.remain,
-                  order: 0,
-                  price: 0,
-                  disc: 0,
-                  nett_price: 0,
-                  total: 0,
-                });
-              }
+              element.jasa_id = element.jasa_id.jasa.id;
+              element.unit_id = element.unit_id.id;
+              jasa.push(element);
             });
             elem.djasa = jasa;
             filt.push(elem);
           }
-        }
         });
         setOrder(filt);
       }
-    } catch (error) {}
-  }; 
-  
+    } catch (error) {
+      console.log("------");
+      console.log(error);
+    }
+  };
+
   const getSupplier = async () => {
     const config = {
       ...endpoints.supplier,
@@ -158,8 +125,8 @@ const BuatFaktur = ({ onCancel }) => {
         setSupplier(data);
       }
     } catch (error) {}
-  }; 
-  
+  };
+
   const getPpn = async () => {
     const config = {
       ...endpoints.pajak,
@@ -174,6 +141,78 @@ const BuatFaktur = ({ onCancel }) => {
         const { data } = response;
         console.log(data);
         setPajak(data);
+      }
+    } catch (error) {}
+  };
+
+  const getProduct = async () => {
+    const config = {
+      ...endpoints.product,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setProduct(data);
+      }
+    } catch (error) {}
+  };
+
+  const getJasa = async () => {
+    const config = {
+      ...endpoints.jasa,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setJasa(data);
+      }
+    } catch (error) {}
+  };
+
+  const getSatuan = async () => {
+    const config = {
+      ...endpoints.getSatuan,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setSatuan(data);
+      }
+    } catch (error) {}
+  };
+
+  const getLoct = async () => {
+    const config = {
+      ...endpoints.lokasi,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setLokasi(data);
       }
     } catch (error) {}
   };
@@ -217,10 +256,8 @@ const BuatFaktur = ({ onCancel }) => {
 
   const addinv = async () => {
     const config = {
-      ...endpoints.addinvtur,
-      data: {
-        cus_code: currentItem.customer.cus_code,
-      },
+      ...endpoints.addFK,
+      data: inv,
     };
     console.log(config.data);
     let response = null;
@@ -228,15 +265,7 @@ const BuatFaktur = ({ onCancel }) => {
       response = await request(null, config);
       console.log(response);
       if (response.status) {
-        setTimeout(() => {
-          setUpdate(false);
-          toast.current.show({
-            severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
-            life: 3000,
-          });
-        }, 500);
+        onSuccess();
       }
     } catch (error) {
       console.log(error);
@@ -246,7 +275,7 @@ const BuatFaktur = ({ onCancel }) => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${currentItem.customer.cus_code} Sudah Digunakan`,
+            detail: `Kode ${inv.fk_code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -284,7 +313,7 @@ const BuatFaktur = ({ onCancel }) => {
 
     return selected;
   };
-  
+
   const checkSupp = (value) => {
     let selected = {};
     supplier?.forEach((element) => {
@@ -307,11 +336,94 @@ const BuatFaktur = ({ onCancel }) => {
     return selected;
   };
 
+  const checkUnit = (value) => {
+    let selected = {};
+    satuan?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkLoc = (value) => {
+    let selected = {};
+    lokasi?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkProd = (value) => {
+    let selected = {};
+    product?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkJasa = (value) => {
+    let selected = {};
+    jasa?.forEach((element) => {
+      if (value === element.jasa.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const FKCode = (value) => {
+    let selected = null;
+    fkCode?.forEach((element) => {
+      if (element.faktur.fk_code === value) {
+        selected = element;
+      }
+    });
+    console.log(selected);
+    return selected;
+  };
+
   const updateINV = (e) => {
     dispatch({
       type: SET_CURRENT_INV,
       payload: e,
     });
+  };
+
+  const getSubTotalBarang = () => {
+    let total = 0;
+    inv?.product?.forEach((el) => {
+      if (el.nett_price && el.nett_price > 0) {
+        total += parseInt(el.nett_price);
+      } else {
+        total += el.total - (el.total * el.disc) / 100;
+      }
+    });
+
+    return total;
+  };
+
+  const getSubTotalJasa = () => {
+    let total = 0;
+    inv?.jasa?.forEach((el) => {
+      total += el.total - (el.total * el.disc) / 100;
+    });
+
+    return total;
+  };
+
+  const formatIdr = (value) => {
+    return `${value}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
 
   const header = () => {
@@ -349,8 +461,9 @@ const BuatFaktur = ({ onCancel }) => {
             <div className="p-inputgroup">
               <InputText
                 value={inv.fk_code}
-                onChange={(e) => updateINV({ ...inv, fk_code: e.target.value })}
+                // onChange={(e) => updateINV({ ...inv, fk_code: e.target.value })}
                 placeholder="Masukan No. Faktur"
+                disabled
               />
             </div>
           </div>
@@ -361,6 +474,7 @@ const BuatFaktur = ({ onCancel }) => {
             <CustomDropdown
               value={inv.ord_id && checkOrd(inv.ord_id)}
               onChange={(e) => {
+                console.log(e);
                 updateINV({
                   ...inv,
                   ord_id: e?.id ?? null,
@@ -379,15 +493,18 @@ const BuatFaktur = ({ onCancel }) => {
           <div className="col-3">
             <label className="text-label">Supplier</label>
             <div className="p-inputgroup"></div>
-            <CustomDropdown
-              value={inv.ord_id !== null ? checkSupp(checkOrd(inv.ord_id)?.sup_id?.id) : null}
-              // onChange={(e) => {
-              //   updateINV({ ...Do, sup_id: e.value.supplier.id });
-              // }}
-              // option={supplier}
-              detail
-              // onDetail={() => SetShowOrder()}
-              label={"[sup_code]"}
+            <InputText
+              value={
+                inv.ord_id !== null
+                  ? `${
+                      checkSupp(checkOrd(inv.ord_id)?.sup_id?.id).supplier
+                        .sup_name
+                    } (${
+                      checkSupp(checkOrd(inv.ord_id)?.sup_id?.id).supplier
+                        .sup_code
+                    })`
+                  : null
+              }
               placeholder="Pilih Supplier"
             />
           </div>
@@ -398,8 +515,9 @@ const BuatFaktur = ({ onCancel }) => {
               <InputText
                 value={
                   inv.ord_id !== null
-                  ? checkSupp(checkOrd(inv.ord_id)?.sup_id?.sup_address)
-                  : ""
+                    ? checkSupp(checkOrd(inv.ord_id)?.sup_id?.id).supplier
+                        .sup_address
+                    : ""
                 }
                 placeholder="Alamat Supplier"
                 disabled
@@ -413,8 +531,9 @@ const BuatFaktur = ({ onCancel }) => {
               <InputText
                 value={
                   inv.ord_id !== null
-                  ? checkSupp(checkOrd(inv.ord_id)?.sup_id?.sup_telp1)
-                  : ""
+                    ? checkSupp(checkOrd(inv.ord_id)?.sup_id?.id).supplier
+                        .sup_telp1
+                    : ""
                 }
                 placeholder="Kontak Person"
                 disabled
@@ -428,7 +547,7 @@ const BuatFaktur = ({ onCancel }) => {
               <InputText
                 value={
                   inv.ord_id !== null
-                    ? checkPjk(checkSupp(inv.ord_id)?.sup_id?.sup_ppn).name
+                    ? checkPjk(checkOrd(inv.ord_id)?.sup_id?.id).name
                     : null
                 }
                 placeholder="Jenis Pajak"
@@ -441,11 +560,11 @@ const BuatFaktur = ({ onCancel }) => {
             <label className="text-label">Ppn (%)</label>
             <div className="p-inputgroup mt-2">
               <InputText
-                // value={
-                //   Do.sup_id !== null
-                //     ? checkpjk(checkSupp(Do.sup_id)?.supplier?.sup_ppn).name
-                //     : null
-                // }
+                value={
+                  inv.ord_id !== null
+                    ? checkPjk(checkOrd(inv.ord_id)?.sup_id?.id).nilai
+                    : null
+                }
                 placeholder="Nilai Ppn(%)"
                 disabled
               />
@@ -496,7 +615,7 @@ const BuatFaktur = ({ onCancel }) => {
             <>
               <DataTable
                 responsiveLayout="scroll"
-                value={inv.dprod?.map((v, i) => {
+                value={inv.product?.map((v, i) => {
                   return {
                     ...v,
                     index: i,
@@ -511,22 +630,11 @@ const BuatFaktur = ({ onCancel }) => {
               >
                 <Column
                   header="Barcode"
-                  // style={{
-                  //   maxWidth: "15rem",
-                  // }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        // value={e.prod_id && checkProd(e.prod_id)}
-                        // options={product}
-                        // onChange={(u) => {
-                        //   console.log(e.value);
-                        //   let temp = [...Do.dprod];
-                        //   temp[e.index].prod_id = u.value.id;
-                        //   temp[e.index].unit_id = u.value.unit?.id;
-                        //   updateINV({ ...Do, dprod: temp });
-                        // }}
+                        value={e.prod_id && checkProd(e.prod_id).barcode}
                         placeholder="Barcode Produk"
                         disabled
                       />
@@ -536,22 +644,16 @@ const BuatFaktur = ({ onCancel }) => {
 
                 <Column
                   header="Produk"
-                  // style={{
-                  //   maxWidth: "15rem",
-                  // }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        // value={e.prod_id && checkProd(e.prod_id)}
-                        // options={product}
-                        // onChange={(u) => {
-                        //   console.log(e.value);
-                        //   let temp = [...Do.dprod];
-                        //   temp[e.index].prod_id = u.value.id;
-                        //   temp[e.index].unit_id = u.value.unit?.id;
-                        //   updateINV({ ...Do, dprod: temp });
-                        // }}
+                        value={
+                          e.prod_id &&
+                          `${checkProd(e.prod_id).name} (${
+                            checkProd(e.prod_id).code
+                          })`
+                        }
                         placeholder="Produk"
                         disabled
                       />
@@ -561,35 +663,12 @@ const BuatFaktur = ({ onCancel }) => {
 
                 <Column
                   header="Satuan"
-                  // style={{
-                  //   minWidth: "10rem",
-                  //   maxWidth: "15rem",
-                  // }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        // value={e.unit_id && checkUnit(e.unit_id)}
+                        value={e.unit_id && checkUnit(e.unit_id).name}
                         placeholder="Satuan Produk"
-                        disabled
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header="Pesanan"
-                  style={{
-                    width: "5rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        // value={e.order && e.order}
-                        placeholder="0"
-                        type="number"
-                        min={0}
                         disabled
                       />
                     </div>
@@ -605,34 +684,7 @@ const BuatFaktur = ({ onCancel }) => {
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        // value={e.order && e.order}
-                        // onChange={(u) => {
-                        //   let temp = [...Do.dprod];
-                        //   temp[e.index].order = u.target.value;
-                        //   temp[e.index].total =
-                        //     temp[e.index].order * temp[e.index].price;
-                        //   updateINV({ ...Do, dprod: temp });
-                        //   console.log(temp);
-                        // }}
-                        placeholder="0"
-                        type="number"
-                        min={0}
-                        disabled
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header="Sisa"
-                  style={{
-                    width: "5rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        // value={e.order && e.order}
+                        value={e.order && e.order}
                         placeholder="0"
                         type="number"
                         min={0}
@@ -644,14 +696,11 @@ const BuatFaktur = ({ onCancel }) => {
 
                 <Column
                   header="Harga Satuan"
-                  // style={{
-                  //   minWidth: "10rem",
-                  // }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        // value={e.price && e.price}
+                        value={e.price && e.price}
                         placeholder="0"
                         type="number"
                         min={0}
@@ -663,47 +712,25 @@ const BuatFaktur = ({ onCancel }) => {
 
                 <Column
                   header="Lokasi"
-                  style={{
-                    maxWidth: "10rem",
-                  }}
                   field={""}
                   body={(e) => (
-                    // <div className="p-inputgroup" maxWidth="5rem">
-                    <CustomDropdown
-                      // value={e.prod_id && checkProd(e.prod_id)}
-                      // onChange={(u) => {
-                      //   console.log(e.value);
-                      //   let temp = [...Do.dprod];
-                      //   temp[e.index].prod_id = u.value.id;
-                      //   temp[e.index].unit_id = u.value.unit?.id;
-                      //   updateINV({ ...Do, dprod: temp });
-                      // }}
-                      // option={lokasi}
-                      detail
-                      // onDetail={() => setShowProduk(true)}
-                      placeholder="Pilih Lokasi"
-                      label="[name]"
-                    />
-                    // </div>
+                    <div className="p-inputgroup">
+                      <InputText
+                        value={e.location && checkLoc(e.location).name}
+                        placeholder="Lokasi"
+                        disabled
+                      />
+                    </div>
                   )}
                 />
 
                 <Column
                   header="Diskon"
-                  // style={{
-                  //   maxWidth: "10rem",
-                  // }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        // value={e.disc && e.disc}
-                        // onChange={(u) => {
-                        //   let temp = [...Do.dprod];
-                        //   temp[e.index].disc = u.target.value;
-                        //   updateINV({ ...Do, dprod: temp });
-                        //   console.log(temp);
-                        // }}
+                        value={e.disc && e.disc}
                         placeholder="0"
                         type="number"
                         min={0}
@@ -716,20 +743,11 @@ const BuatFaktur = ({ onCancel }) => {
 
                 <Column
                   header="Harga Nett"
-                  // style={{
-                  //   minWidth: "10rem",
-                  // }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        // value={e.nett_price && e.nett_price}
-                        // onChange={(u) => {
-                        //   let temp = [...Do.dprod];
-                        //   temp[e.index].nett_price = u.target.value;
-                        //   updateINV({ ...Do, dprod: temp });
-                        //   console.log(temp);
-                        // }}
+                        value={e.nett_price && e.nett_price}
                         placeholder="0"
                         type="number"
                         min={0}
@@ -777,7 +795,7 @@ const BuatFaktur = ({ onCancel }) => {
             <>
               <DataTable
                 responsiveLayout="scroll"
-                value={inv.djasa?.map((v, i) => {
+                value={inv.jasa?.map((v, i) => {
                   return {
                     ...v,
                     index: i,
@@ -792,14 +810,11 @@ const BuatFaktur = ({ onCancel }) => {
               >
                 <Column
                   header="Supplier"
-                  // style={{
-                  //   width: "15rem",
-                  // }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        // value={e.sup_id && checkSupp(e.sup_id)}
+                        value={e.jasa_id && checkJasa(e.sup_id)}
                         placeholder="Supplier"
                         disabled
                       />
@@ -809,14 +824,16 @@ const BuatFaktur = ({ onCancel }) => {
 
                 <Column
                   header="Jasa"
-                  // style={{
-                  //   width: "15rem",
-                  // }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        // value={e.jasa_id && checkJasa(e.jasa_id)}
+                        value={
+                          e.jasa_id &&
+                          `${checkJasa(e.jasa_id).name} (${
+                            checkJasa(e.jasa_id).code
+                          })`
+                        }
                         placeholder="Jasa"
                         disabled
                       />
@@ -826,14 +843,11 @@ const BuatFaktur = ({ onCancel }) => {
 
                 <Column
                   header="Satuan"
-                  // style={{
-                  //   maxWidth: "12rem",
-                  // }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        // value={e.unit_id && checkUnit(e.unit_id)}
+                        value={e.unit_id && checkUnit(e.unit_id).name}
                         placeholder="Satuan"
                         disabled
                       />
@@ -843,9 +857,6 @@ const BuatFaktur = ({ onCancel }) => {
 
                 <Column
                   header="Pesanan"
-                  // style={{
-                  //   maxWidth: "15rem",
-                  // }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
@@ -862,9 +873,6 @@ const BuatFaktur = ({ onCancel }) => {
 
                 <Column
                   header="Harga Satuan"
-                  // style={{
-                  //   width: "25rem",
-                  // }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
@@ -882,20 +890,11 @@ const BuatFaktur = ({ onCancel }) => {
 
                 <Column
                   header="Diskon"
-                  // style={{
-                  //   width: "25rem",
-                  // }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        // value={e.disc && e.disc}
-                        // onChange={(u) => {
-                        //   let temp = [...Do.djasa];
-                        //   temp[e.index].disc = u.target.value;
-                        //   updateINV({ ...Do, djasa: temp });
-                        //   console.log(temp);
-                        // }}
+                        value={e.disc && e.disc}
                         placeholder="0"
                         type="number"
                         min={0}
@@ -930,32 +929,16 @@ const BuatFaktur = ({ onCancel }) => {
         <div className="row ml-0 mr-0 mb-0 mt-6 justify-content-between">
           <div>
             <div className="row ml-1">
-              {/* {inv.djasa.length > 0 && inv.dprod.length > 0 && ( */}
-              <div className="d-flex col-12 align-items-center">
-                <label className="mt-1"></label>
-                {/* <InputSwitch
+              {inv.jasa.length > 0 && inv.product.length > 0 && (
+                <div className="d-flex col-12 align-items-center">
+                  <label className="mt-1"></label>
+                  <InputSwitch
                     className="ml-4"
                     checked={inv.split_inv}
-                    onChange={(e) => {
-                      // if (e.value) {
-                      //   updateINV({
-                      //     ...Do,
-                      //     split_inv: e.value,
-                      //     total_disc: null,
-                      //   });
-                      // } else {
-                      //   updateINV({
-                      //     ...Do,
-                      //     split_inv: e.value,
-                      //     prod_disc: null,
-                      //     jasa_disc: null,
-                      //   });
-                      // }
-                    }}
-                    
-                  /> */}
-              </div>
-              {/* )} */}
+                    disabled
+                  />
+                </div>
+              )}
             </div>
           </div>
 
@@ -971,12 +954,12 @@ const BuatFaktur = ({ onCancel }) => {
                 {inv.split_inv ? (
                   <b>
                     Rp.
-                    {/* {formatIdr(getSubTotalBarang())} */}
+                    {formatIdr(getSubTotalBarang())}
                   </b>
                 ) : (
                   <b>
                     Rp.
-                    {/* {formatIdr(getSubTotalBarang() + getSubTotalJasa())} */}
+                    {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
                   </b>
                 )}
               </label>
@@ -993,12 +976,12 @@ const BuatFaktur = ({ onCancel }) => {
                 {inv.split_inv ? (
                   <b>
                     Rp.
-                    {/* {formatIdr(getSubTotalBarang())} */}
+                    {formatIdr(getSubTotalBarang())}
                   </b>
                 ) : (
                   <b>
                     Rp.
-                    {/* {formatIdr(getSubTotalBarang() + getSubTotalJasa())} */}
+                    {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
                   </b>
                 )}
               </label>
@@ -1015,14 +998,14 @@ const BuatFaktur = ({ onCancel }) => {
                 {inv.split_inv ? (
                   <b>
                     Rp.
-                    {/* {formatIdr((getSubTotalBarang() * 11) / 100)} */}
+                    {formatIdr((getSubTotalBarang() * 11) / 100)}
                   </b>
                 ) : (
                   <b>
                     Rp.{" "}
-                    {/* {formatIdr(
+                    {formatIdr(
                       ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
-                    )} */}
+                    )}
                   </b>
                 )}
               </label>
@@ -1105,18 +1088,18 @@ const BuatFaktur = ({ onCancel }) => {
                 {inv.split_inv ? (
                   <b>
                     Rp.{" "}
-                    {/* {formatIdr(
+                    {formatIdr(
                       getSubTotalBarang() + (getSubTotalBarang() * 11) / 100
-                    )} */}
+                    )}
                   </b>
                 ) : (
                   <b>
                     Rp.{" "}
-                    {/* {formatIdr(
+                    {formatIdr(
                       getSubTotalBarang() +
                         getSubTotalJasa() +
                         ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
-                    )} */}
+                    )}
                   </b>
                 )}
               </label>
@@ -1128,114 +1111,114 @@ const BuatFaktur = ({ onCancel }) => {
 
             {inv.split_inv ? (
               <>
-                {/* <div className="row justify-content-right col-12 mt-4"> */}
-                <div className="col-6 mt-4">
-                  <label className="text-label">Sub Total Jasa</label>
-                </div>
+                <div className="row justify-content-right col-12 mt-4">
+                  <div className="col-6 mt-4">
+                    <label className="text-label">Sub Total Jasa</label>
+                  </div>
 
-                <div className="col-6 mt-4">
-                  <label className="text-label">
-                    <b>
-                      Rp.
-                      {/* {formatIdr(getSubTotalJasa())} */}
-                    </b>
-                  </label>
-                </div>
+                  <div className="col-6 mt-4">
+                    <label className="text-label">
+                      <b>
+                        Rp.
+                        {formatIdr(getSubTotalJasa())}
+                      </b>
+                    </label>
+                  </div>
 
-                <div className="col-6">
-                  <label className="text-label">DPP Jasa</label>
-                </div>
+                  <div className="col-6">
+                    <label className="text-label">DPP Jasa</label>
+                  </div>
 
-                <div className="col-6">
-                  <label className="text-label">
-                    <b>
-                      Rp.
-                      {/* {formatIdr(getSubTotalJasa())} */}
-                    </b>
-                  </label>
-                </div>
+                  <div className="col-6">
+                    <label className="text-label">
+                      <b>
+                        Rp.
+                        {formatIdr(getSubTotalJasa())}
+                      </b>
+                    </label>
+                  </div>
 
-                <div className="col-6">
-                  <label className="text-label">Pajak Atas Jasa (2%)</label>
-                </div>
+                  <div className="col-6">
+                    <label className="text-label">Pajak Atas Jasa (2%)</label>
+                  </div>
 
-                <div className="col-6">
-                  <label className="text-label">
-                    <b>
-                      Rp.
-                      {/* {formatIdr((getSubTotalJasa() * 2) / 100)} */}
-                    </b>
-                  </label>
-                </div>
+                  <div className="col-6">
+                    <label className="text-label">
+                      <b>
+                        Rp.
+                        {formatIdr((getSubTotalJasa() * 2) / 100)}
+                      </b>
+                    </label>
+                  </div>
 
-                <div className="col-6 mt-3">
-                  <label className="text-label">Diskon Tambahan</label>
-                </div>
+                  <div className="col-6 mt-3">
+                    <label className="text-label">Diskon Tambahan</label>
+                  </div>
 
-                <div className="col-6">
-                  <div className="p-inputgroup">
-                    <PButton
-                      label="Rp."
-                      className={`${isRpJasa ? "" : "p-button-outlined"}`}
-                      onClick={() => setRpJasa(true)}
-                      disabled
-                    />
-                    <InputText
-                      // value={
-                      //   isRpJasa
-                      //     ? (getSubTotalJasa() * Do.jasa_disc) / 100
-                      //     : Do.jasa_disc
-                      // }
-                      placeholder="Diskon"
-                      type="number"
-                      min={0}
-                      disabled
-                      onChange={(e) => {
-                        // let disc = 0;
-                        // if (isRpJasa) {
-                        //   disc = (e.target.value / getSubTotalJasa()) * 100;
-                        // } else {
-                        //   disc = e.target.value;
-                        // }
-                        // updateINV({ ...Do, jasa_disc: disc });
-                      }}
-                    />
-                    <PButton
-                      className={`${isRpJasa ? "p-button-outlined" : ""}`}
-                      onClick={() => setRpJasa(false)}
-                      disabled
-                    >
-                      {" "}
-                      <b>%</b>{" "}
-                    </PButton>
+                  <div className="col-6">
+                    <div className="p-inputgroup">
+                      <PButton
+                        label="Rp."
+                        className={`${isRpJasa ? "" : "p-button-outlined"}`}
+                        onClick={() => setRpJasa(true)}
+                        disabled
+                      />
+                      <InputText
+                        value={
+                          isRpJasa
+                            ? (getSubTotalJasa() * inv.jasa_disc) / 100
+                            : inv.jasa_disc
+                        }
+                        placeholder="Diskon"
+                        type="number"
+                        min={0}
+                        disabled
+                        onChange={(e) => {
+                          // let disc = 0;
+                          // if (isRpJasa) {
+                          //   disc = (e.target.value / getSubTotalJasa()) * 100;
+                          // } else {
+                          //   disc = e.target.value;
+                          // }
+                          // updateINV({ ...Do, jasa_disc: disc });
+                        }}
+                      />
+                      <PButton
+                        className={`${isRpJasa ? "p-button-outlined" : ""}`}
+                        onClick={() => setRpJasa(false)}
+                        disabled
+                      >
+                        {" "}
+                        <b>%</b>{" "}
+                      </PButton>
+                    </div>
+                  </div>
+
+                  <div className="col-12">
+                    <Divider className="ml-12"></Divider>
+                  </div>
+
+                  <div className="col-6">
+                    <label className="text-label">
+                      <b>Total Pembayaran</b>
+                    </label>
+                  </div>
+
+                  <div className="col-6">
+                    <label className="text-label fs-16">
+                      <b>
+                        Rp.{" "}
+                        {formatIdr(
+                          getSubTotalJasa() + (getSubTotalJasa() * 2) / 100
+                        )}
+                      </b>
+                    </label>
+                  </div>
+
+                  <div className="col-12">
+                    <Divider className="ml-12"></Divider>
                   </div>
                 </div>
-
-                <div className="col-12">
-                  <Divider className="ml-12"></Divider>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label">
-                    <b>Total Pembayaran</b>
-                  </label>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label fs-16">
-                    <b>
-                      Rp.{" "}
-                      {/* {formatIdr(
-                        getSubTotalJasa() + (getSubTotalJasa() * 2) / 100
-                      )} */}
-                    </b>
-                  </label>
-                </div>
-
-                <div className="col-12">
-                  <Divider className="ml-12"></Divider>
-                </div>
-                {/* </div> */}
               </>
             ) : null}
           </div>

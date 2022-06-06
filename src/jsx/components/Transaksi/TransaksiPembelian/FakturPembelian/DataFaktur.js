@@ -31,7 +31,7 @@ const DataFaktur = ({ onAdd, onEdit }) => {
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayDel, setDisplayDel] = useState(false);
-  const [currentItem, setCurrentItem] = useState(null);
+  const [fkCode, setFkCode] = useState(null);
   const toast = useRef(null);
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
@@ -39,19 +39,20 @@ const DataFaktur = ({ onAdd, onEdit }) => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const dispatch = useDispatch();
-  //   const pinv = useSelector((state) => state.pinv.pinv);
+    const inv = useSelector((state) => state.inv.inv);
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getDO();
+    getFK();
+    getFkCode();
     initFilters1();
   }, []);
 
-  const getDO = async (isUpdate = false) => {
+  const getFK = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.do,
+      ...endpoints.faktur,
       data: {},
     };
     console.log(config.data);
@@ -74,9 +75,25 @@ const DataFaktur = ({ onAdd, onEdit }) => {
     }
   };
 
-  const delDO = async (id) => {
+  const getFkCode = async () => {
     const config = {
-      ...endpoints.delDO,
+      ...endpoints.fakturCode,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setFkCode(data);
+      }
+    } catch (error) {}
+  };
+
+  const delFK = async (id) => {
+    const config = {
+      ...endpoints.delFK,
       //   endpoint: endpoints.delDO.endpoint + pinv.id,
     };
     console.log(config.data);
@@ -88,7 +105,7 @@ const DataFaktur = ({ onAdd, onEdit }) => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayDel(false);
-          getDO(true);
+          getFK(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -111,6 +128,17 @@ const DataFaktur = ({ onAdd, onEdit }) => {
       }, 500);
     }
   };
+
+  // const FKCode = (value) => {
+  //   let selected = null;
+  //   fkCode?.forEach((element) => {
+  //     if (element.faktur.fk_code === value) {
+  //       selected = element;
+  //     }
+  //   });
+  //   console.log(selected);
+  //   return selected;
+  // };
 
   // const actionBodyTemplate = (data) => {
   //   return (
@@ -207,7 +235,7 @@ const DataFaktur = ({ onAdd, onEdit }) => {
           label="Hapus"
           icon="pi pi-trash"
           onClick={() => {
-            delDO();
+            delFK();
           }}
           autoFocus
           loading={update}
@@ -254,6 +282,7 @@ const DataFaktur = ({ onAdd, onEdit }) => {
               type: SET_CURRENT_INV,
               payload: {
                 ...data,
+                fk_code: fkCode,
                 product: [
                   {
                     id: 0,
@@ -261,9 +290,9 @@ const DataFaktur = ({ onAdd, onEdit }) => {
                     prod_id: null,
                     unit_id: null,
                     order: null,
-                    location: null,
                     price: null,
                     disc: null,
+                    location: null,
                     nett_price: null,
                     total: null,
                   },
@@ -357,14 +386,14 @@ const DataFaktur = ({ onAdd, onEdit }) => {
       <Toast ref={toast} />
       <DataTable
         responsiveLayout="scroll"
-        // value={loading ? dummy : pinv}
+        value={loading ? dummy : inv}
         className="display w-150 datatable-wrapper"
         showGridlines
         dataKey="id"
         rowHover
         header={renderHeader}
         filters={filters1}
-        globalFilterFields={["customer.cus_code"]}
+        globalFilterFields={["e.fk_code"]}
         emptyMessage="Tidak ada data"
         paginator
         paginatorTemplate={template2}
@@ -378,22 +407,22 @@ const DataFaktur = ({ onAdd, onEdit }) => {
           style={{
             minWidth: "8rem",
           }}
-          field={(e) => e.customer.cus_code}
+          field={(e) => formatDate(e.fk_date)}
+          body={loading && <Skeleton />}
+        />
+        <Column
+          header="Nomor Faktur"
+          field={(e) => e.fk_code}
+          style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
         />
         <Column
           header="Nomor Pembelian"
-          field={(e) => e.customer.cus_name}
+          field={(e) => e.ord_id.ord_code}
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
         />
-        <Column
-          header="Nomor Pesanan"
-          field={(e) => e.customer.cus_address}
-          style={{ minWidth: "8rem" }}
-          body={loading && <Skeleton />}
-        />
-        <Column
+        {/* <Column
           header="Nama Supplier"
           field={(e) => e.customer.cus_name}
           style={{ minWidth: "8rem" }}
@@ -432,7 +461,7 @@ const DataFaktur = ({ onAdd, onEdit }) => {
           field={(e) => e.cus_telp}
           style={{ minWidth: "6rem" }}
           body={loading && <Skeleton />}
-        />
+        /> */}
       </DataTable>
 
       <Dialog

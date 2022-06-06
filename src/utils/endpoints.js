@@ -729,7 +729,7 @@ const endpoints = {
   },
 
   fakturCode: {
-    endpoint: "/v1/api/faktur/code/",
+    endpoint: "/v1/api/faktur/code",
     method: "GET",
     data: {},
   },

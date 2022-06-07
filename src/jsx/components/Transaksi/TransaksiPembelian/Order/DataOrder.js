@@ -130,9 +130,9 @@ const DataOrder = ({ onAdd, onEdit }) => {
               payload: true,
             });
             dprod.forEach((el) => {
-              el.prod_id = el.prod_id.id;
-              el.unit_id = el.unit_id.id;
-              el.location = el.location.id;
+              el.prod_id = el.prod_id?.id;
+              el.unit_id = el.unit_id?.id;
+              el.location = el.location?.id;
             });
             let djasa = data.djasa;
             djasa.forEach((el) => {
@@ -143,6 +143,7 @@ const DataOrder = ({ onAdd, onEdit }) => {
               type: SET_CURRENT_ODR,
               payload: {
                 ...data,
+                po_id: data?.po_id?.id ?? null,
                 dep_id: data?.dep_id?.id ?? null,
                 sup_id: data?.sup_id?.id ?? null,
                 top: data?.top?.id ?? null,

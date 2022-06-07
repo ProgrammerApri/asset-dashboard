@@ -167,7 +167,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
             let temp = [...order.dprod];
             order.dprod.forEach((e, i) => {
-              if (el.id == e.pprod_id) {
+              if (el.id === e.pprod_id) {
                 temp[i].order = el.order;
                 updateORD({ ...order, dprod: temp });
               }
@@ -675,7 +675,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                   po_id: e.id,
                   top: e.top.id ?? null,
                   due_date: result,
-                  sup_id: e.id ?? null,
+                  sup_id: e.sup_id.id ?? null,
                   dep_id: e.preq_id?.req_dep?.id ?? null,
                   dprod: e.pprod,
                   djasa: e.pjasa,
@@ -685,7 +685,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
               option={po}
               detail
               onDetail={() => setShowPO(true)}
-              label={"[po_code] ([preq_id.req_dep.ccost_name])"}
+              label={"[po_code]"}
             />
           </div>
 
@@ -857,9 +857,9 @@ const InputOrder = ({ onCancel, onSuccess }) => {
               >
                 <Column
                   header="Produk"
-                  style={{
-                    width: "15rem",
-                  }}
+                  // style={{
+                  //   width: "15rem",
+                  // }}
                   field={""}
                   body={(e) => (
                     // <div className="p-inputgroup">
@@ -909,35 +909,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Satuan"
-                  style={{
-                    width: "10rem",
-                  }}
                   field={""}
                   body={(e) => (
-                    // <div className="p-inputgroup">
-                    //   <Dropdown
-                    //     value={e.unit_id && checkUnit(e.unit_id)}
-                    //     onChange={(u) => {
-                    //       let temp = [...order.dprod];
-                    //       temp[e.index].unit_id = u.value.id;
-                    //       updateORD({ ...order, dprod: temp });
-                    //     }}
-                    //     options={satuan}
-                    //     optionLabel="name"
-                    //     filter
-                    //     filterBy="name"
-                    //     placeholder="Pilih Satuan"
-                    //     disabled={order && order.po_id !== null}
-                    //   />
-                    //   <PButton
-                    //     onClick={() => {
-                    //       setShowSatuan(true);
-                    //     }}
-                    //     disabled={order && order.po_id !== null}
-                    //   >
-                    //     <i class="bx bx-food-menu"></i>
-                    //   </PButton>
-                    // </div>
                     <CustomDropdown
                       value={e.unit_id && checkUnit(e.unit_id)}
                       onChange={(u) => {
@@ -1446,7 +1419,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
         <div className="row ml-0 mr-0 mb-0 mt-6 justify-content-between">
           <div>
             <div className="row ml-1">
-              {order.djasa.length > 0 && order.dprod.length > 0 && (
+              {order.djasa?.length > 0 && order.dprod?.length > 0 && (
                 <div className="d-flex col-12 align-items-center">
                   <label className="mt-1">{"Pisah Faktur"}</label>
                   <InputSwitch

@@ -857,74 +857,102 @@ const InputOrder = ({ onCancel, onSuccess }) => {
               >
                 <Column
                   header="Produk"
-                  // style={{
-                  //   maxWidth: "15rem",
-                  // }}
+                  style={{
+                    width: "15rem",
+                  }}
                   field={""}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={e.prod_id && checkProd(e.prod_id)}
-                        options={product}
-                        onChange={(u) => {
-                          console.log(e.value);
-                          let temp = [...order.dprod];
-                          temp[e.index].prod_id = u.value.id;
-                          temp[e.index].unit_id = u.value.unit?.id;
-                          updateORD({ ...order, dprod: temp });
-                        }}
-                        placeholder="Pilih Produk"
-                        optionLabel="name"
-                        filter
-                        filterBy="name"
-                        valueTemplate={valueProd}
-                        itemTemplate={prodTemp}
-                        disabled={order && order.po_id !== null}
-                      />
-                      <PButton
-                        onClick={() => {
-                          setShowProduk(true);
-                        }}
-                        disabled={order && order.po_id !== null}
-                      >
-                        <i class="bx bx-food-menu"></i>
-                      </PButton>
-                    </div>
+                    // <div className="p-inputgroup">
+                    //   <Dropdown
+                    //     value={e.prod_id && checkProd(e.prod_id)}
+                    //     options={product}
+                    //     onChange={(u) => {
+                    //       console.log(e.value);
+                    //       let temp = [...order.dprod];
+                    //       temp[e.index].prod_id = u.value.id;
+                    //       temp[e.index].unit_id = u.value.unit?.id;
+                    //       updateORD({ ...order, dprod: temp });
+                    //     }}
+                    //     placeholder="Pilih Produk"
+                    //     optionLabel="name"
+                    //     filter
+                    //     filterBy="name"
+                    //     valueTemplate={valueProd}
+                    //     itemTemplate={prodTemp}
+                    //     disabled={order && order.po_id !== null}
+                    //   />
+                    //   <PButton
+                    //     onClick={() => {
+                    //       setShowProduk(true);
+                    //     }}
+                    //     disabled={order && order.po_id !== null}
+                    //   >
+                    //     <i class="bx bx-food-menu"></i>
+                    //   </PButton>
+                    // </div>
+                    <CustomDropdown
+                      value={e.prod_id && checkProd(e.prod_id)}
+                      option={product}
+                      onChange={(u) => {
+                        console.log(e.value);
+                        let temp = [...order.dprod];
+                        temp[e.index].prod_id = u.value.id;
+                        temp[e.index].unit_id = u.value.unit?.id;
+                        updateORD({ ...order, dprod: temp });
+                      }}
+                      detail
+                      label={"[name]"}
+                      placeholder="Pilih Produk"
+                    />
                   )}
                 />
 
                 <Column
                   header="Satuan"
-                  // style={{
-                  //   minWidth: "10rem",
-                  //   maxWidth: "15rem",
-                  // }}
+                  style={{
+                    width: "10rem",
+                  }}
                   field={""}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={e.unit_id && checkUnit(e.unit_id)}
-                        onChange={(u) => {
-                          let temp = [...order.dprod];
-                          temp[e.index].unit_id = u.value.id;
-                          updateORD({ ...order, dprod: temp });
-                        }}
-                        options={satuan}
-                        optionLabel="name"
-                        filter
-                        filterBy="name"
-                        placeholder="Pilih Satuan"
-                        disabled={order && order.po_id !== null}
-                      />
-                      <PButton
-                        onClick={() => {
-                          setShowSatuan(true);
-                        }}
-                        disabled={order && order.po_id !== null}
-                      >
-                        <i class="bx bx-food-menu"></i>
-                      </PButton>
-                    </div>
+                    // <div className="p-inputgroup">
+                    //   <Dropdown
+                    //     value={e.unit_id && checkUnit(e.unit_id)}
+                    //     onChange={(u) => {
+                    //       let temp = [...order.dprod];
+                    //       temp[e.index].unit_id = u.value.id;
+                    //       updateORD({ ...order, dprod: temp });
+                    //     }}
+                    //     options={satuan}
+                    //     optionLabel="name"
+                    //     filter
+                    //     filterBy="name"
+                    //     placeholder="Pilih Satuan"
+                    //     disabled={order && order.po_id !== null}
+                    //   />
+                    //   <PButton
+                    //     onClick={() => {
+                    //       setShowSatuan(true);
+                    //     }}
+                    //     disabled={order && order.po_id !== null}
+                    //   >
+                    //     <i class="bx bx-food-menu"></i>
+                    //   </PButton>
+                    // </div>
+                    <CustomDropdown
+                      value={e.unit_id && checkUnit(e.unit_id)}
+                      onChange={(u) => {
+                        let temp = [...order.dprod];
+                        temp[e.index].unit_id = u.value.id;
+                        updateORD({ ...order, dprod: temp });
+                      }}
+                      option={satuan}
+                      detail
+                      onDetail={() => {
+                        setShowSatuan(true);
+                      }}
+                      label={"[name]"}
+                      placeholder="Pilih Satuan"
+                    />
                   )}
                 />
 

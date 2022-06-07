@@ -47718,7 +47718,6 @@ a .sidebar-logo .logo{
   z-index: 99999;
   background: var(--card-bg);
   display: none;
-  width: 92%;
 }
 
 .c-dropdown-wrapper .list-group {

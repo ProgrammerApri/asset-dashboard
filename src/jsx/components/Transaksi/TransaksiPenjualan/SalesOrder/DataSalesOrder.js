@@ -12,7 +12,7 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_SO, SET_EDIT_SO } from "src/redux/actions";
+import { SET_CURRENT_SO, SET_EDIT_SO, SET_SO } from "src/redux/actions";
 
 const data = {
   id: null,
@@ -46,7 +46,7 @@ const DataSalesOrder = ({ onAdd, onEdit }) => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const dispatch = useDispatch();
-  const So = useSelector((state) => state.so);
+  const So = useSelector((state) => state.so.so);
 
   const dummy = Array.from({ length: 10 });
 
@@ -69,7 +69,7 @@ const DataSalesOrder = ({ onAdd, onEdit }) => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        setSO(data);
+        dispatch({ type: SET_SO, payload: data });
       }
     } catch (error) {}
     if (isUpdate) {
@@ -134,6 +134,7 @@ const DataSalesOrder = ({ onAdd, onEdit }) => {
             sprod.forEach((el) => {
               el.prod_id = el.prod_id.id;
               el.unit_id = el.unit_id.id;
+              el.location = el.location.id;
             });
             let sjasa = data.sjasa;
             sjasa.forEach((el) => {
@@ -145,6 +146,7 @@ const DataSalesOrder = ({ onAdd, onEdit }) => {
               payload: {
                 ...data,
                 pel_id: data?.pel_id?.id ?? null,
+                sub_id: data?.sub_id?.id ?? null,
                 top: data?.top?.id ?? null,
                 sprod:
                   sprod.length > 0
@@ -154,6 +156,7 @@ const DataSalesOrder = ({ onAdd, onEdit }) => {
                           id: 0,
                           prod_id: null,
                           unit_id: null,
+                          location: null,
                           request: null,
                           order: null,
                           remain: null,
@@ -265,6 +268,7 @@ const DataSalesOrder = ({ onAdd, onEdit }) => {
                     id: 0,
                     prod_id: null,
                     unit_id: null,
+                    location: null,
                     request: null,
                     order: null,
                     remain: null,
@@ -362,7 +366,7 @@ const DataSalesOrder = ({ onAdd, onEdit }) => {
       <Toast ref={toast} />
       <DataTable
         responsiveLayout="scroll"
-        value={loading ? dummy : so}
+        value={loading ? dummy : So}
         className="display w-150 datatable-wrapper"
         showGridlines
         dataKey="id"

@@ -739,6 +739,31 @@ const endpoints = {
     method: "DELETE",
     data: {},
   },
+
+   /// Penjualan
+   sale: {
+    endpoint: "/v1/api/sales",
+    method: "GET",
+    data: {},
+  },
+
+  addSale: {
+    endpoint: "/v1/api/sales",
+    method: "POST",
+    data: {},
+  },
+
+  editSales: {
+    endpoint: "/v1/api/sales/",
+    method: "PUT",
+    data: {},
+  },
+
+  delSales: {
+    endpoint: "/v1/api/sales/",
+    method: "DELETE",
+    data: {},
+  },
 };
 
 export default endpoints;

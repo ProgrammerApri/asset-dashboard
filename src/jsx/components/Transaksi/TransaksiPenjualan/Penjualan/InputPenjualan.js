@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_SO } from "src/redux/actions";
 import { request, endpoints } from "src/utils";
 import { Row } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
@@ -12,41 +10,42 @@ import { Divider } from "@material-ui/core";
 import { Calendar } from "primereact/calendar";
 import { InputSwitch } from "primereact/inputswitch";
 import CustomAccordion from "../../../Accordion/Accordion";
+import { useDispatch, useSelector } from "react-redux";
+import { SET_CURRENT_SL } from "src/redux/actions";
+import DataPusatBiaya from "../../../MasterLainnya/PusatBiaya/DataPusatBiaya";
+import DataSupplier from "../../../Mitra/Pemasok/DataPemasok";
+import DataRulesPay from "src/jsx/components/MasterLainnya/RulesPay/DataRulesPay";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import DataRulesPay from "src/jsx/components/MasterLainnya/RulesPay/DataRulesPay";
-import DataSupplier from "src/jsx/components/Mitra/Pemasok/DataPemasok";
-import DataPajak from "src/jsx/components/Master/Pajak/DataPajak";
-import DataSatuan from "src/jsx/components/MasterLainnya/Satuan/DataSatuan";
-import DataProduk from "src/jsx/components/Master/Produk/DataProduk";
-import DataJasa from "src/jsx/components/Master/Jasa/DataJasa";
+import { el } from "date-fns/locale";
+import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import DataCustomer from "src/jsx/components/Mitra/Pelanggan/DataCustomer";
 
-const InputSO = ({ onCancel, onSuccess }) => {
+const InputPenjualan = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
-  const dispatch = useDispatch();
   const toast = useRef(null);
   const [doubleClick, setDoubleClick] = useState(false);
-  const so = useSelector((state) => state.so.current);
-  const isEdit = useSelector((state) => state.so.editso);
+  const sale = useSelector((state) => state.sl.current);
+  const isEdit = useSelector((state) => state.sl.editSL);
+  const dispatch = useDispatch();
   const [isRp, setRp] = useState(true);
-  const [isRpJasa, setRpJasa] = useState(true);
-  const [jasa, setJasa] = useState(null);
-  const [showProduk, setShowProduk] = useState(false);
-  const [showJasa, setShowJasa] = useState(false);
-  const [showSatuan, setShowSatuan] = useState(false);
-  const [showSupplier, setShowSupplier] = useState(false);
-  const [showCustomer, setShowCustomer] = useState(false);
-  const [showPpn, setShowPpn] = useState(false);
-  const [showRulesPay, setShowRulesPay] = useState(false);
-  const [product, setProduk] = useState(null);
-  const [satuan, setSatuan] = useState(null);
-  const [lokasi, setLokasi] = useState(null);
+  const [isRjjasa, setRjjasa] = useState(true);
+  const [pusatBiaya, setPusatBiaya] = useState(null);
+  const [customer, setCustomer] = useState(null);
+  const [subCus, setSubCus] = useState(null);
   const [supplier, setSupplier] = useState(null);
   const [rulesPay, setRulesPay] = useState(null);
   const [ppn, setPpn] = useState(null);
-  const [customer, setCustomer] = useState(null);
-  const [subCus, setSubCus] = useState(null);
+  const [so, setSO] = useState(null);
+  const [showSupplier, setShowSupplier] = useState(false);
+  const [showCustomer, setShowCustomer] = useState(false);
+  const [showSubCus, setShowSub] = useState(false);
+  const [showDepartemen, setShowDept] = useState(false);
+  const [showRulesPay, setShowRulesPay] = useState(false);
+  const [product, setProduct] = useState(null);
+  const [jasa, setJasa] = useState(null);
+  const [satuan, setSatuan] = useState(null);
+  const [lokasi, setLoc] = useState(null);
   const [accor, setAccor] = useState({
     produk: true,
     jasa: false,
@@ -58,210 +57,18 @@ const InputSO = ({ onCancel, onSuccess }) => {
       left: 0,
       behavior: "smooth",
     });
-    getJasa();
-    getProduk();
-    getSupplier();
-    getSatuan();
-    getRulesPay();
-    getPpn();
+    getPusatBiaya();
     getCustomer();
     getSubCus();
-    getloct();
+    getSupplier();
+    getRulesPay();
+    getPpn();
+    getSO();
+    getProduct();
+    getJasa();
+    getSatuan();
+    getLoct();
   }, []);
-
-  const editSO = async () => {
-    const config = {
-      ...endpoints.editSO,
-      endpoint: endpoints.editSO.endpoint + so.id,
-      data: so,
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        onSuccess();
-      }
-    } catch (error) {
-      setTimeout(() => {
-        setUpdate(false);
-        toast.current.show({
-          severity: "error",
-          summary: "Gagal",
-          detail: "Gagal Memperbarui Data",
-          life: 3000,
-        });
-      }, 500);
-    }
-  };
-
-  const addSO = async () => {
-    const config = {
-      ...endpoints.addSO,
-      data: so,
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        onSuccess();
-      }
-    } catch (error) {
-      console.log(error);
-      if (error.status === 400) {
-        setTimeout(() => {
-          setUpdate(false);
-          toast.current.show({
-            severity: "error",
-            summary: "Gagal",
-            detail: `Kode ${so.so_code} Sudah Digunakan`,
-            life: 3000,
-          });
-        }, 500);
-      } else {
-        setTimeout(() => {
-          setUpdate(false);
-          toast.current.show({
-            severity: "error",
-            summary: "Gagal",
-            detail: "Gagal Memperbarui Data",
-            life: 3000,
-          });
-        }, 500);
-      }
-    }
-  };
-
-  const onSubmit = () => {
-    if (isEdit) {
-      setUpdate(true);
-      editSO();
-    } else {
-      setUpdate(true);
-      addSO();
-    }
-  };
-
-  const getProduk = async () => {
-    const config = {
-      ...endpoints.product,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setProduk(data);
-      }
-    } catch (error) {}
-  };
-
-  const getJasa = async () => {
-    const config = {
-      ...endpoints.jasa,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setJasa(data);
-      }
-    } catch (error) {}
-  };
-
-  const getSatuan = async () => {
-    const config = {
-      ...endpoints.getSatuan,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setSatuan(data);
-      }
-    } catch (error) {}
-  };
-
-  const getSupplier = async () => {
-    const config = {
-      ...endpoints.supplier,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setSupplier(data);
-      }
-    } catch (error) {}
-  };
-
-  const getRulesPay = async () => {
-    const config = {
-      ...endpoints.rules_pay,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setRulesPay(data);
-      }
-    } catch (error) {}
-  };
-
-  const getPpn = async () => {
-    const config = {
-      ...endpoints.pajak,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setPpn(data);
-      }
-    } catch (error) {}
-  };
-
-  const getloct = async () => {
-    const config = {
-      ...endpoints.lokasi,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setLokasi(data);
-      }
-    } catch (error) {}
-  };
 
   const getCustomer = async () => {
     const config = {
@@ -302,7 +109,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
         let filt = [];
         data.forEach((elem) => {
           if (elem.customer.sub_cus === true) {
-            filt.push(elem.customer);
+            filt.push(elem);
           }
         });
         console.log(data);
@@ -311,54 +118,269 @@ const InputSO = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
-  const checkUnit = (value) => {
+  const getSupplier = async () => {
+    const config = {
+      ...endpoints.supplier,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setSupplier(data);
+      }
+    } catch (error) {}
+  };
+
+  const getPusatBiaya = async () => {
+    const config = {
+      ...endpoints.pusatBiaya,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setPusatBiaya(data);
+      }
+    } catch (error) {}
+  };
+
+  const getRulesPay = async () => {
+    const config = {
+      ...endpoints.rules_pay,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setRulesPay(data);
+      }
+    } catch (error) {}
+  };
+
+  const getPpn = async () => {
+    const config = {
+      ...endpoints.pajak,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setPpn(data);
+      }
+    } catch (error) {}
+  };
+
+  const getSO = async () => {
+    const config = {
+      ...endpoints.so,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        let filt = [];
+        data.forEach((elem) => {
+          let prod = [];
+          elem.sprod.forEach((el) => {
+            el.prod_id = el.prod_id.id;
+            el.unit_id = el.unit_id.id;
+            prod.push({
+              ...el,
+              r_order: el.order,
+            });
+
+            let temp = [...sale.jprod];
+            sale.jprod.forEach((e, i) => {
+              if (el.id === e.sprod_id) {
+                temp[i].order = el.order;
+                updateSL({ ...sale, jprod: temp });
+              }
+            });
+          });
+          elem.sprod = prod;
+
+          let jasa = [];
+          elem.sjasa.forEach((element) => {
+            element.jasa_id = element.jasa_id.id;
+            element.unit_id = element.unit_id.id;
+            jasa.push({
+              ...element,
+              r_order: element.order,
+            });
+
+            let temp = [...sale.jjasa];
+            sale.jjasa.forEach((e, i) => {
+              if (el.id === e.sjasa_id) {
+                temp[i].order = el.order;
+                updateSL({ ...sale, jjasa: temp });
+              }
+            });
+          });
+          elem.sjasa = jasa;
+          filt.push(elem);
+        });
+        setSO(filt);
+      }
+    } catch (error) {}
+  };
+
+  const getProduct = async () => {
+    const config = {
+      ...endpoints.product,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+
+      if (response.status) {
+        const { data } = response;
+        setProduct(data);
+        console.log("jsdj");
+        console.log(data);
+      }
+    } catch (error) {}
+  };
+
+  const getJasa = async () => {
+    const config = {
+      ...endpoints.jasa,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setJasa(data);
+      }
+    } catch (error) {}
+  };
+
+  const getSatuan = async () => {
+    const config = {
+      ...endpoints.getSatuan,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setSatuan(data);
+      }
+    } catch (error) {}
+  };
+
+  const getLoct = async () => {
+    const config = {
+      ...endpoints.lokasi,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setLoc(data);
+      }
+    } catch (error) {}
+  };
+
+  const editSale = async () => {
+    const config = {
+      ...endpoints.editSales,
+      endpoint: endpoints.editSales.endpoint + sale.id,
+      data: sale,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        onSuccess();
+      }
+    } catch (error) {
+      setTimeout(() => {
+        setUpdate(false);
+        toast.current.show({
+          severity: "error",
+          summary: "Gagal",
+          detail: "Gagal Memperbarui Data",
+          life: 3000,
+        });
+      }, 500);
+    }
+  };
+
+  const addSale = async () => {
+    const config = {
+      ...endpoints.addSale,
+      data: sale,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        onSuccess();
+      }
+    } catch (error) {
+      console.log(error);
+      if (error.status === 400) {
+        setTimeout(() => {
+          setUpdate(false);
+          toast.current.show({
+            severity: "error",
+            summary: "Gagal",
+            detail: `Kode ${sale.ord_code} Sudah Digunakan`,
+            life: 3000,
+          });
+        }, 500);
+      } else {
+        setTimeout(() => {
+          setUpdate(false);
+          toast.current.show({
+            severity: "error",
+            summary: "Gagal",
+            detail: "Gagal Memperbarui Data",
+            life: 3000,
+          });
+        }, 500);
+      }
+    }
+  };
+
+  const checkSO = (value) => {
     let selected = {};
-    satuan?.forEach((element) => {
+    so?.forEach((element) => {
       if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const checkProd = (value) => {
-    let selected = {};
-    product?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const checkJasa = (value) => {
-    let selected = {};
-    jasa?.forEach((element) => {
-      if (value === element.jasa.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const checkRules = (value) => {
-    let selected = {};
-    rulesPay?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const checkSupp = (value) => {
-    let selected = {};
-    supplier?.forEach((element) => {
-      if (value === element.supplier.id) {
         selected = element;
       }
     });
@@ -377,6 +399,84 @@ const InputSO = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
+  const checkCus = (value) => {
+    let selected = {};
+    customer?.forEach((element) => {
+      if (value === element.customer.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkSubCus = (value) => {
+    let selected = {};
+    subCus?.forEach((element) => {
+      if (value === element.customer.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkSupp = (value) => {
+    let selected = {};
+    supplier?.forEach((element) => {
+      if (value === element.supplier.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkRulesP = (value) => {
+    let selected = {};
+    rulesPay?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkProd = (value) => {
+    let selected = {};
+    product?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+        console.log(selected);
+      }
+    });
+
+    return selected;
+  };
+
+  const checkUnit = (value) => {
+    let selected = {};
+    satuan?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkjasa = (value) => {
+    let selected = {};
+    jasa?.forEach((element) => {
+      if (value === element.jasa.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
   const checkLoc = (value) => {
     let selected = {};
     lokasi?.forEach((element) => {
@@ -388,144 +488,14 @@ const InputSO = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
-  const checkCus = (value) => {
-    let selected = {};
-    customer?.forEach((element) => {
-      if (value === element.customer.id) {
-        selected = element.customer;
-      }
-    });
-
-    return selected;
-  };
-
-  const checkSubCus = (value) => {
-    let selected = {};
-    subCus?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const suppTemp = (option) => {
-    return (
-      <div>
-        {option !== null
-          ? `${option.supplier.sup_code} (${option.supplier.sup_name})`
-          : ""}
-      </div>
-    );
-  };
-
-  const valueSupTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null
-            ? `${option.supplier.sup_code} (${option.supplier.sup_name})`
-            : ""}
-        </div>
-      );
+  const onSubmit = () => {
+    if (isEdit) {
+      setUpdate(true);
+      editSale();
+    } else {
+      setUpdate(true);
+      addSale();
     }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const rulTemp = (option) => {
-    return (
-      <div>{option !== null ? `${option.name} (${option.day} Hari)` : ""}</div>
-    );
-  };
-
-  const valueRulTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null ? `${option.name} (${option.day} Hari)` : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const prodTemp = (option) => {
-    return (
-      <div>{option !== null ? `${option.name} (${option.code})` : ""}</div>
-    );
-  };
-
-  const valueProd = (option, props) => {
-    if (option) {
-      return (
-        <div>{option !== null ? `${option.name} (${option.code})` : ""}</div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const jasTemp = (option) => {
-    return (
-      <div>
-        {option !== null ? `${option.jasa.name} (${option.jasa.code})` : ""}
-      </div>
-    );
-  };
-
-  const valueJasTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null ? `${option.jasa.name} (${option.jasa.code})` : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const cusTemp = (option) => {
-    return (
-      <div>
-        {option !== null ? `${option.cus_name} (${option.cus_code})` : ""}
-      </div>
-    );
-  };
-
-  const valueCusTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null ? `${option.cus_name} (${option.cus_code})` : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const SubcusTemp = (option) => {
-    return (
-      <div>
-        {option !== null ? `${option.cus_name} (${option.cus_code})` : ""}
-      </div>
-    );
-  };
-
-  const valueSubCusTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null ? `${option.cus_name} (${option.cus_code})` : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
   };
 
   const formatDate = (date) => {
@@ -540,9 +510,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
     return [year, month, day].join("-");
   };
 
-  const updateSo = (e) => {
+  const updateSL = (e) => {
     dispatch({
-      type: SET_CURRENT_SO,
+      type: SET_CURRENT_SL,
       payload: e,
     });
   };
@@ -550,14 +520,14 @@ const InputSO = ({ onCancel, onSuccess }) => {
   const header = () => {
     return (
       <h4 className="mb-5">
-        <b>Sales Order</b>
+        <b>{isEdit ? "Edit" : "Buat"} Penjualan</b>
       </h4>
     );
   };
 
   const getSubTotalBarang = () => {
     let total = 0;
-    so?.sprod?.forEach((el) => {
+    sale?.jprod?.forEach((el) => {
       if (el.nett_price && el.nett_price > 0) {
         total += parseInt(el.nett_price);
       } else {
@@ -570,7 +540,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
   const getSubTotalJasa = () => {
     let total = 0;
-    so?.sjasa?.forEach((el) => {
+    sale?.jjasa?.forEach((el) => {
       total += el.total - (el.total * el.disc) / 100;
     });
 
@@ -586,16 +556,17 @@ const InputSO = ({ onCancel, onSuccess }) => {
   const body = () => {
     return (
       <>
-        <Toast ref={toast} />
         {/* Put content body here */}
-        <Row className="mb-6">
-          <div className="col-6">
-            <label className="text-black fs-15">Tanggal</label>
+        <Toast ref={toast} />
+
+        <Row className="mb-4">
+          <div className="col-4">
+            <label className="text-label">Tanggal</label>
             <div className="p-inputgroup">
               <Calendar
-                value={new Date(`${so.so_date}Z`)}
+                value={new Date(`${sale.ord_date}Z`)}
                 onChange={(e) => {
-                  updateSo({ ...so, so_date: e.value });
+                  updateSL({ ...sale, ord_date: e.value });
                 }}
                 placeholder="Pilih Tanggal"
                 showIcon
@@ -604,65 +575,93 @@ const InputSO = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-6">
-            <label className="text-black fs-14">Kode Referensi</label>
+          <div className="col-4">
+            <label className="text-label">No. Penjualan</label>
             <div className="p-inputgroup">
               <InputText
-                value={so.so_code}
-                onChange={(e) => updateSo({ ...so, so_code: e.target.value })}
-                placeholder="Masukan Kode Referensi"
+                value={sale.ord_code}
+                onChange={(e) =>
+                  updateSL({ ...sale, ord_code: e.target.value })
+                }
+                placeholder="Masukan No. Penjualan"
               />
             </div>
           </div>
 
+          <div className="col-4">
+            <label className="text-label">No. Pesanan Penjualan</label>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
+              value={sale.so_id && checkSO(sale.so_id)}
+              option={so}
+              onChange={(e) => {
+                let result = null;
+                if (sale.top) {
+                  result = new Date(`${sale.ord_date}Z`);
+                  result.setDate(
+                    result.getDate() + checkRulesP(sale?.top)?.day
+                  );
+                  console.log(result);
+                }
+                updateSL({
+                  ...sale,
+                  so_id: e.id,
+                  due_date: result,
+                  top: e.top.id ?? null,
+                  pel_id: e.pel_id?.id ?? null,
+                  sub_id: e.sub_id?.id ?? null,
+                  jprod: e.sprod,
+                  jjasa: e.sjasa,
+                });
+              }}
+              label={"[so_code] ([pel_id.cus_name])"}
+              placeholder="Pilih No. Pesanan"
+              detail
+              //   onDetail={() => setShowr(true)}
+            />
+          </div>
+
           <div className="col-3">
-            <label className="text-black fs-14">Pelanggan</label>
+            <label className="text-label">Pelanggan</label>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
+              value={sale.pel_id !== null ? checkCus(sale.pel_id) : null}
+              option={customer}
+              onChange={(e) => {
+                updateSL({ ...sale, pel_id: e.customer.id });
+              }}
+              placeholder="Pilih Pelanggan"
+              label={"[customer.cus_code] ([customer.cus_name])"}
+              detail
+              onDetail={() => setShowCustomer(true)}
+              disabled={sale && sale.so_id !== null}
+            />
+          </div>
+
+          <div className="col-3">
+            <label className="text-label">Alamat Pelanggan</label>
             <div className="p-inputgroup">
-              <Dropdown
-                value={so.pel_id !== null ? checkCus(so.pel_id) : null}
-                options={customer?.map((v) => v.customer)}
-                onChange={(e) => {
-                  console.log(e.value);
-                  updateSo({
-                    ...so,
-                    pel_id: e.value.id,
-                  });
-                }}
-                optionLabel="cus_name"
-                placeholder="Pilih Pelanggan"
-                filter
-                filterBy="cus_name"
-                itemTemplate={cusTemp}
-                valueTemplate={valueCusTemp}
-              />
-              <PButton
-                onClick={() => {
-                  setShowCustomer(true);
-                }}
-              >
-                <i class="bx bx-food-menu"></i>
-              </PButton>
-            </div>
-          </div>
-
-          <div className="col-3">
-            <label className="text-black fs-14"></label>
-            <div className="p-inputgroup mt-2">
               <InputText
                 value={
-                  so.pel_id !== null ? checkCus(so.pel_id)?.cus_address : ""
+                  sale.pel_id !== null
+                    ? checkCus(sale.pel_id)?.customer?.cus_address
+                    : ""
                 }
-                placeholder="Alamat Pelanggan"
+                placeholder="Alamat Supplier"
                 disabled
               />
             </div>
           </div>
 
           <div className="col-3">
-            <label className="text-black fs-14"></label>
-            <div className="p-inputgroup mt-2">
+            <label className="text-label">Kontak Person</label>
+            <div className="p-inputgroup">
               <InputText
-                value={so.pel_id !== null ? checkCus(so.pel_id)?.cus_telp1 : ""}
+                value={
+                  sale.pel_id !== null
+                    ? checkCus(sale.pel_id)?.customer?.cus_telp1
+                    : ""
+                }
                 placeholder="Kontak Person"
                 disabled
               />
@@ -670,71 +669,60 @@ const InputSO = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-3">
-            <label className="text-black fs-14">Ppn</label>
+            <label className="text-label">Ppn</label>
             <div className="p-inputgroup">
               <InputText
                 value={
-                  so.pel_id !== null
-                    ? checkPpn(checkCus(so.pel_id)?.cus_pjk).name
+                  sale.pel_id !== null
+                    ? checkPpn(checkCus(sale.pel_id)?.pajak?.id).name
                     : null
                 }
-                onChange={(e) => {}}
-                placeholder="Jenis Ppn"
+                placeholder="Jenis Pajak"
                 disabled
               />
             </div>
           </div>
 
           <div className="col-4">
-            <label className="text-black fs-14">Tanggal Permintaan</label>
+            <label className="text-label">Tanggal Pesanan</label>
             <div className="p-inputgroup mt-2">
               <Calendar
-                value={new Date(`${so.req_date}Z`)}
-                onChange={(e) => {
-                  updateSo({ ...so, req_date: e.value });
-                }}
-                placeholder="Pilih Tanggal Pemintaan"
-                showIcon
+                value={new Date(`${checkSO(sale.so_id)?.so_date}Z`)}
+                placeholder="Tanggal Permintaan"
+                disabled={sale && sale.so_id !== null}
                 dateFormat="dd/mm/yy"
+                showIcon
               />
+
             </div>
           </div>
 
           <div className="col-4">
-            <label className="text-black fs-14">Jangka Pembayaran</label>
-            <div className="p-inputgroup mt-2">
-              <Dropdown
-                value={so.top !== null ? checkRules(so.top) : null}
-                options={rulesPay}
-                onChange={(e) => {
-                  let result = new Date(`${so.req_date}Z`);
-                  result.setDate(result.getDate() + e.value.day);
-                  console.log(result);
+            <label className="text-label">Syarat Pembayaran</label>
+            <div className="p-inputgroup mt-2"></div>
+            <CustomDropdown
+              value={sale.top !== null ? checkRulesP(sale.top) : null}
+              option={rulesPay}
+              onChange={(e) => {
+                let result = new Date(`${sale.ord_date}Z`);
+                result.setDate(result.getDate() + e.day);
+                console.log(result);
 
-                  updateSo({ ...so, top: e.value.id, due_date: result });
-                }}
-                optionLabel="name"
-                placeholder="Pilih Jangka Waktu"
-                filter
-                filterBy="name"
-                itemTemplate={rulTemp}
-                valueTemplate={valueRulTemp}
-              />
-              <PButton
-                onClick={() => {
-                  setShowRulesPay(true);
-                }}
-              >
-                <i class="bx bx-food-menu"></i>
-              </PButton>
-            </div>
+                updateSL({ ...sale, top: e.id, due_date: result });
+              }}
+              placeholder="Pilih Syarat Pembayaran"
+              detail
+              onDetail={() => setShowRulesPay(true)}
+              label={"[name] ([day] Hari)"}
+              disabled={sale && sale.so_id !== null}
+            />
           </div>
 
           <div className="col-4">
-            <label className="text-black fs-14">Tanggal Jatuh Tempo</label>
+            <label className="text-label">Tanggal Jatuh Tempo</label>
             <div className="p-inputgroup mt-2">
               <Calendar
-                value={new Date(`${so?.due_date}Z`)}
+                value={new Date(`${sale?.due_date}Z`)}
                 onChange={(e) => {}}
                 placeholder="Tanggal Jatuh Tempo"
                 disabled
@@ -749,50 +737,40 @@ const InputSO = ({ onCancel, onSuccess }) => {
             </label>
             <InputSwitch
               className="ml-4"
-              checked={so && so.sub_addr}
+              checked={sale && sale.sub_addr}
               onChange={(e) => {
-                updateSo({ ...so, sub_addr: e.target.value });
+                updateSL({ ...sale, sub_addr: e.target.value });
               }}
+              //   disabled={sale && sale.so_id !== null}
             />
           </div>
 
-          {so && so.sub_addr === true && (
+          {sale && sale.sub_addr === true && (
             <>
               <div className="col-4">
                 <label className="text-black fs-14">Sub Pelanggan</label>
-                <div className="p-inputgroup">
-                  <Dropdown
-                    value={so.sub_id ? checkSubCus(so.sub_id) : null}
-                    options={subCus}
-                    onChange={(e) => {
-                      updateSo({ ...so, sub_id: e.value.id });
-                    }}
-                    optionLabel="cus_name"
-                    placeholder="Pilih Sub Pelanggan"
-                    filter
-                    filterBy="cus_name"
-                    itemTemplate={SubcusTemp}
-                    valueTemplate={valueSubCusTemp}
-                    disabled={so && !so.sub_addr}
-                  />
-                  <PButton
-                    onClick={() => {
-                      setShowCustomer(true);
-                    }}
-                    disabled={so && !so.sub_addr}
-                  >
-                    <i class="bx bx-food-menu"></i>
-                  </PButton>
-                </div>
+                <div className="p-inputgroup"></div>
+                <CustomDropdown
+                  value={sale.sub_id ? checkSubCus(sale.sub_id) : null}
+                  option={subCus}
+                  onChange={(e) => {
+                    updateSL({ ...sale, sub_id: e.customer.id });
+                  }}
+                  placeholder="Pilih Sub Pelanggan"
+                  label={"[customer.cus_code] ([customer.cus_name])"}
+                  detail
+                  onDetail={() => setShowSub(true)}
+                  disabled={sale && sale.so_id !== null}
+                />
               </div>
 
               <div className="col-4">
-                <label className="text-black fs-14"></label>
+                <label className="text-black fs-14">Alamat Sub Pelanggan</label>
                 <div className="p-inputgroup mt-1">
                   <InputText
                     value={
-                      so.sub_id !== null
-                        ? checkSubCus(so.sub_id)?.cus_address
+                      sale.sub_id !== null
+                        ? checkCus(sale.sub_id).cus_address
                         : ""
                     }
                     placeholder="Alamat Sub Pelanggan"
@@ -802,12 +780,12 @@ const InputSO = ({ onCancel, onSuccess }) => {
               </div>
 
               <div className="col-4">
-                <label className="text-black fs-14"></label>
+                <label className="text-black fs-14">Kontak Person</label>
                 <div className="p-inputgroup mt-1">
                   <InputText
                     value={
-                      so.sub_id !== null
-                        ? checkSubCus(so.sub_id)?.cus_telp1
+                      sale.sub_id !== null
+                        ? checkSubCus(sale.sub_id).cus_telp1
                         : ""
                     }
                     placeholder="Kontak Person"
@@ -834,7 +812,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
             <>
               <DataTable
                 responsiveLayout="none"
-                value={so.sprod?.map((v, i) => {
+                value={sale?.jprod.map((v, i) => {
                   return {
                     ...v,
                     index: i,
@@ -849,69 +827,46 @@ const InputSO = ({ onCancel, onSuccess }) => {
               >
                 <Column
                   header="Produk"
-                  // style={{
-                  //   maxWidth: "15rem",
-                  // }}
                   field={""}
+                  style={{ maxWidth: "15em" }}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={e.prod_id && checkProd(e.prod_id)}
-                        options={product}
-                        onChange={(u) => {
-                          console.log(e.value);
-                          let temp = [...so.sprod];
-                          temp[e.index].prod_id = u.value.id;
-                          temp[e.index].unit_id = u.value.unit?.id;
-                          updateSo({ ...so, sprod: temp });
-                        }}
-                        placeholder="Pilih Produk"
-                        optionLabel="name"
-                        filter
-                        filterBy="name"
-                        valueTemplate={valueProd}
-                        itemTemplate={prodTemp}
-                      />
-                      <PButton
-                        onClick={() => {
-                          setShowProduk(true);
-                        }}
-                      >
-                        <i class="bx bx-food-menu"></i>
-                      </PButton>
-                    </div>
+                    <CustomDropdown
+                      value={e.prod_id && checkProd(e.prod_id)}
+                      option={product}
+                      onChange={(u) => {
+                        console.log(e.value);
+                        let temp = [...sale.jprod];
+                        temp[e.index].prod_id = u.value.id;
+                        temp[e.index].unit_id = u.value.unit?.id;
+                        updateSL({ ...sale, jprod: temp });
+                      }}
+                      placeholder="Pilih Kode Produk"
+                      label={"[name]"}
+                      detail
+                      disabled={sale && sale.so_id !== null}
+                    />
                   )}
                 />
 
                 <Column
                   header="Satuan"
-                  // style={{
-                  //   minWidth: "10rem",
-                  //   maxWidth: "15rem",
-                  // }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <Dropdown
                         value={e.unit_id && checkUnit(e.unit_id)}
-                        onChange={(u) => {
-                          let temp = [...so.sprod];
-                          temp[e.index].unit_id = u.value.id;
-                          updateSo({ ...so, sprod: temp });
+                        onChange={(t) => {
+                          let temp = [...sale.jprod];
+                          temp[e.index].unit_id = t.value.id;
+                          updateSL({ ...sale, jprod: temp });
                         }}
                         options={satuan}
                         optionLabel="name"
+                        placeholder="Pilih Satuan"
                         filter
                         filterBy="name"
-                        placeholder="Pilih Satuan"
+                        disabled={sale && sale.so_id !== null}
                       />
-                      <PButton
-                        onClick={() => {
-                          setShowSatuan(true);
-                        }}
-                      >
-                        <i class="bx bx-food-menu"></i>
-                      </PButton>
                     </div>
                   )}
                 />
@@ -924,9 +879,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
                       <Dropdown
                         value={e.location && checkLoc(e.location)}
                         onChange={(u) => {
-                          let temp = [...so.sprod];
+                          let temp = [...sale.jprod];
                           temp[e.index].location = u.value.id;
-                          updateSo({ ...so, sprod: temp });
+                          updateSL({ ...sale, jprod: temp });
                         }}
                         options={lokasi}
                         optionLabel="name"
@@ -949,16 +904,17 @@ const InputSO = ({ onCancel, onSuccess }) => {
                       <InputText
                         value={e.order && e.order}
                         onChange={(u) => {
-                          let temp = [...so.sprod];
+                          let temp = [...sale.jprod];
                           temp[e.index].order = u.target.value;
                           temp[e.index].total =
                             temp[e.index].order * temp[e.index].price;
-                          updateSo({ ...so, sprod: temp });
+                          updateSL({ ...sale, jprod: temp });
                           console.log(temp);
                         }}
                         placeholder="0"
                         type="number"
                         min={0}
+                        disabled={sale && sale.so_id !== null}
                       />
                     </div>
                   )}
@@ -966,25 +922,26 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Harga Satuan"
-                  style={{
-                    width: "25rem",
-                  }}
+                  // style={{
+                  //   minWidth: "10rem",
+                  // }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
                         value={e.price && e.price}
                         onChange={(u) => {
-                          let temp = [...so.sprod];
+                          let temp = [...sale.jprod];
                           temp[e.index].price = u.target.value;
                           temp[e.index].total =
                             temp[e.index].order * temp[e.index].price;
-                          updateSo({ ...so, sprod: temp });
+                          updateSL({ ...sale, jprod: temp });
                           console.log(temp);
                         }}
                         placeholder="0"
                         type="number"
                         min={0}
+                        // disabled={sale && sale.so_id !== null}
                       />
                     </div>
                   )}
@@ -992,23 +949,24 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Diskon"
-                  // style={{
-                  //   maxWidth: "10rem",
-                  // }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        value={e.disc && e.disc}
-                        onChange={(u) => {
-                          let temp = [...so.sprod];
-                          temp[e.index].disc = u.target.value;
-                          updateSo({ ...so, sprod: temp });
+                        value={e.disc ? e.disc : 0}
+                        onChange={(t) => {
+                          let temp = [...sale.jprod];
+                          temp[e.index].disc = t.target.value;
+                          // let disc = temp[e.index].total * temp[e.index].disc / 100
+                          // console.log(disc);
+                          // temp[e.index].total -= disc;
+                          updateSL({ ...sale, jprod: temp });
                           console.log(temp);
                         }}
                         placeholder="0"
                         type="number"
                         min={0}
+                        disabled={sale && sale.so_id !== null}
                       />
                       <span className="p-inputgroup-addon">%</span>
                     </div>
@@ -1017,23 +975,20 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Harga Nett"
-                  // style={{
-                  //   minWidth: "10rem",
-                  // }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        value={e.nett_price && e.nett_price}
-                        onChange={(u) => {
-                          let temp = [...so.sprod];
-                          temp[e.index].nett_price = u.target.value;
-                          updateSo({ ...so, sprod: temp });
+                        value={e.nett_price ? e.nett_price : 0}
+                        onChange={(t) => {
+                          let temp = [...sale.jprod];
+                          temp[e.index].nett_price = t.target.value;
+                          updateSL({ ...sale, jprod: temp });
                           console.log(temp);
                         }}
                         placeholder="0"
                         type="number"
-                        min={0}
+                        disabled={sale && sale.so_id !== null}
                       />
                     </div>
                   )}
@@ -1041,44 +996,35 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Total"
-                  // style={{
-                  //   minWidth: "12rem",
-                  // }}
                   body={(e) => (
                     <label className="text-nowrap">
                       <b>
                         Rp.{" "}
-                        {`${
-                          e.nett_price && e.nett_price !== 0
+                        {formatIdr(
+                          e.nett_price && e.nett_price != 0
                             ? e.nett_price
                             : e.total - (e.total * e.disc) / 100
-                        }`.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.")}
+                        )}
                       </b>
                     </label>
                   )}
                 />
 
                 <Column
-                  header=""
-                  // style={{
-                  //   maxWidth: "10rem",
-                  // }}
-                  field={""}
                   body={(e) =>
-                    e.index === so.sprod.length - 1 ? (
+                    e.index === sale.jprod.length - 1 ? (
                       <Link
                         onClick={() => {
-                          updateSo({
-                            ...so,
-                            sprod: [
-                              ...so.sprod,
+                          updateSL({
+                            ...sale,
+                            jprod: [
+                              ...sale.jprod,
                               {
                                 id: 0,
                                 prod_id: null,
                                 unit_id: null,
-                                request: null,
+                                location: null,
                                 order: null,
-                                remain: null,
                                 price: null,
                                 disc: null,
                                 nett_price: null,
@@ -1087,18 +1033,21 @@ const InputSO = ({ onCancel, onSuccess }) => {
                             ],
                           });
                         }}
-                        className="btn btn-primary shadow btn-xs sharp"
+                        className="btn btn-primary shadow btn-xs sharp ml-1"
                       >
                         <i className="fa fa-plus"></i>
                       </Link>
                     ) : (
                       <Link
                         onClick={() => {
-                          let temp = [...so.sprod];
+                          let temp = [...sale.jprod];
                           temp.splice(e.index, 1);
-                          updateSo({ ...so, sprod: temp });
+                          updateSL({
+                            ...sale,
+                            jprod: temp,
+                          });
                         }}
-                        className="btn btn-danger shadow btn-xs sharp"
+                        className="btn btn-danger shadow btn-xs sharp ml-1"
                       >
                         <i className="fa fa-trash"></i>
                       </Link>
@@ -1111,7 +1060,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
         />
 
         <CustomAccordion
-          tittle={"Pesanan Jasa"}
+          tittle={"Permintaan Jasa"}
           defaultActive={false}
           active={accor.jasa}
           onClick={() => {
@@ -1125,7 +1074,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
             <>
               <DataTable
                 responsiveLayout="scroll"
-                value={so.sjasa?.map((v, i) => {
+                value={sale?.jjasa.map((v, i) => {
                   return {
                     ...v,
                     index: i,
@@ -1140,109 +1089,81 @@ const InputSO = ({ onCancel, onSuccess }) => {
               >
                 <Column
                   header="Supplier"
-                  style={{
-                    width: "15rem",
-                  }}
                   field={""}
+                  style={{
+                    maxWidth: "15rem",
+                  }}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <Dropdown
                         value={e.sup_id && checkSupp(e.sup_id)}
                         options={supplier}
-                        onChange={(u) => {
-                          console.log(e.value);
-                          let temp = [...so.sjasa];
-                          temp[e.index].sup_id = u.value.supplier.id;
-                          updateSo({ ...so, sjasa: temp });
+                        onChange={(t) => {
+                          let temp = [...sale.jjasa];
+                          temp[e.index].sup_id = t.value.supplier.id;
+                          updateSL({ ...sale, jjasa: temp });
+                          console.log(temp);
                         }}
                         optionLabel="supplier.sup_name"
                         placeholder="Pilih Supplier"
                         filter
                         filterBy="supplier.sup_name"
-                        itemTemplate={suppTemp}
-                        valueTemplate={valueSupTemp}
                       />
-                      <PButton
-                        onClick={() => {
-                          setShowSupplier(true);
-                        }}
-                      >
-                        <i class="bx bx-food-menu"></i>
-                      </PButton>
                     </div>
                   )}
                 />
 
                 <Column
                   header="Jasa"
+                  field={""}
                   style={{
                     maxWidth: "15rem",
                   }}
-                  field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <Dropdown
-                        value={e.jasa_id && checkJasa(e.jasa_id)}
-                        options={jasa}
-                        onChange={(u) => {
-                          console.log(e.value);
-                          let temp = [...so.sjasa];
-                          temp[e.index].jasa_id = u.value.jasa.id;
-                          updateSo({ ...so, sjasa: temp });
+                        value={e.jasa_id && checkjasa(e.jasa_id)}
+                        onChange={(t) => {
+                          let temp = [...sale.jjasa];
+                          temp[e.index].jasa_id = t.value.jasa.id;
+                          updateSL({ ...sale, jjasa: temp });
                         }}
+                        options={jasa}
                         optionLabel="jasa.name"
-                        placeholder="Pilih Jasa"
+                        placeholder="Pilih Kode Jasa"
                         filter
                         filterBy="jasa.name"
-                        itemTemplate={jasTemp}
-                        valueTemplate={valueJasTemp}
+                        disabled={e.id !== 0}
                       />
-                      <PButton
-                        onClick={() => {
-                          setShowJasa(true);
-                        }}
-                      >
-                        <i class="bx bx-food-menu"></i>
-                      </PButton>
                     </div>
                   )}
                 />
 
                 <Column
                   header="Satuan"
-                  style={{
-                    maxWidth: "12rem",
-                  }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <Dropdown
                         value={e.unit_id && checkUnit(e.unit_id)}
-                        options={satuan}
-                        onChange={(u) => {
-                          console.log(e.value);
-                          let temp = [...so.sjasa];
-                          temp[e.index].unit_id = u.value.id;
-                          updateSo({ ...so, sjasa: temp });
+                        onChange={(t) => {
+                          let temp = [...sale.jjasa];
+                          temp[e.index].unit_id = t.value.id;
+                          updateSL({ ...sale, jjasa: temp });
                         }}
+                        options={satuan}
                         optionLabel="name"
                         placeholder="Pilih Satuan"
                         filter
                         filterBy="name"
+                        disabled={e.id !== 0}
                       />
-                      <PButton
-                        onClick={() => {
-                          setShowSatuan(true);
-                        }}
-                      >
-                        <i class="bx bx-food-menu"></i>
-                      </PButton>
                     </div>
                   )}
                 />
 
                 <Column
-                  header="Pesanan"
+                  header="Jumlah"
                   // style={{
                   //   maxWidth: "15rem",
                   // }}
@@ -1250,13 +1171,13 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        value={e.qty && e.qty}
+                        value={e.order && e.order}
                         onChange={(u) => {
-                          let temp = [...so.sjasa];
-                          temp[e.index].qty = u.target.value;
+                          let temp = [...sale.jjasa];
+                          temp[e.index].order = u.target.value;
                           temp[e.index].total =
-                            temp[e.index].qty * temp[e.index].price;
-                          updateSo({ ...so, sjasa: temp });
+                            temp[e.index].order * temp[e.index].price;
+                          updateSL({ ...sale, jjasa: temp });
                           console.log(temp);
                         }}
                         placeholder="0"
@@ -1269,20 +1190,20 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Harga Satuan"
-                  style={{
-                    width: "25rem",
-                  }}
                   field={""}
+                  style={{
+                    minWidth: "10rem",
+                  }}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
                         value={e.price && e.price}
-                        onChange={(u) => {
-                          let temp = [...so.sjasa];
-                          temp[e.index].price = u.target.value;
+                        onChange={(t) => {
+                          let temp = [...sale.jjasa];
+                          temp[e.index].price = t.target.value;
                           temp[e.index].total =
-                            temp[e.index].qty * temp[e.index].price;
-                          updateSo({ ...so, sjasa: temp });
+                            temp[e.index].order * temp[e.index].price;
+                          updateSL({ ...sale, jjasa: temp });
                           console.log(temp);
                         }}
                         placeholder="0"
@@ -1295,18 +1216,18 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Diskon"
-                  style={{
-                    width: "25rem",
-                  }}
                   field={""}
+                  style={{
+                    minWidth: "10rem",
+                  }}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
                         value={e.disc && e.disc}
-                        onChange={(u) => {
-                          let temp = [...so.sjasa];
-                          temp[e.index].disc = u.target.value;
-                          updateSo({ ...so, sjasa: temp });
+                        onChange={(t) => {
+                          let temp = [...sale.jjasa];
+                          temp[e.index].disc = t.target.value;
+                          updateSL({ ...sale, jjasa: temp });
                           console.log(temp);
                         }}
                         placeholder="0"
@@ -1320,60 +1241,51 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Total"
-                  // style={{
-                  //   minWidth: "12rem",
-                  // }}
                   body={(e) => (
                     <label className="text-nowrap">
-                      <b>
-                        {`Rp. ${e.total - (e.total * e.disc) / 100}`.replace(
-                          /(\d)(?=(\d{3})+(?!\d))/g,
-                          "$1."
-                        )}
-                      </b>
+                      <b>Rp. {formatIdr(e.total - (e.total * e.disc) / 100)}</b>
                     </label>
                   )}
                 />
 
                 <Column
-                  header=""
-                  // style={{
-                  //   maxWidth: "10rem",
-                  // }}
-                  field={""}
                   body={(e) =>
-                    e.index === so.sjasa?.length - 1 ? (
+                    e.index === sale.jjasa.length - 1 ? (
                       <Link
                         onClick={() => {
-                          updateSo({
-                            ...so,
-                            sjasa: [
-                              ...so.sjasa,
+                          updateSL({
+                            ...sale,
+                            jjasa: [
+                              ...sale.jjasa,
                               {
                                 id: 0,
                                 jasa_id: null,
-                                sup_id: null,
                                 unit_id: null,
-                                qty: null,
+                                sup_id: null,
+                                order: null,
                                 price: null,
                                 disc: null,
+                                nett_price: null,
                                 total: null,
                               },
                             ],
                           });
                         }}
-                        className="btn btn-primary shadow btn-xs sharp"
+                        className="btn btn-primary shadow btn-xs sharp ml-1"
                       >
                         <i className="fa fa-plus"></i>
                       </Link>
                     ) : (
                       <Link
                         onClick={() => {
-                          let temp = [...so.sjasa];
+                          let temp = [...sale.jjasa];
                           temp.splice(e.index, 1);
-                          updateSo({ ...so, sjasa: temp });
+                          updateSL({
+                            ...sale,
+                            jjasa: temp,
+                          });
                         }}
-                        className="btn btn-danger shadow btn-xs sharp"
+                        className="btn btn-danger shadow btn-xs sharp ml-1"
                       >
                         <i className="fa fa-trash"></i>
                       </Link>
@@ -1388,22 +1300,22 @@ const InputSO = ({ onCancel, onSuccess }) => {
         <div className="row ml-0 mr-0 mb-0 mt-6 justify-content-between">
           <div>
             <div className="row ml-1">
-              {so?.sjasa?.length > 0 && so?.sprod?.length > 0 && (
+              {sale.jjasa.length > 0 && sale.jprod.length > 0 && (
                 <div className="d-flex col-12 align-items-center">
                   <label className="mt-1">{"Pisah Faktur"}</label>
                   <InputSwitch
                     className="ml-4"
-                    checked={so?.split_inv}
+                    checked={sale.split_inv}
                     onChange={(e) => {
                       if (e.value) {
-                        updateSo({
-                          ...so,
+                        updateSL({
+                          ...sale,
                           split_inv: e.value,
                           total_disc: null,
                         });
                       } else {
-                        updateSo({
-                          ...so,
+                        updateSL({
+                          ...sale,
                           split_inv: e.value,
                           prod_disc: null,
                           jasa_disc: null,
@@ -1419,27 +1331,13 @@ const InputSO = ({ onCancel, onSuccess }) => {
           <div className="row justify-content-right col-6">
             <div className="col-6">
               <label className="text-label">
-                {so?.split_inv ? "Sub Total Barang" : "Sub Total"}
+                {sale.split_inv ? "Sub Total Barang" : "Sub Total"}
               </label>
             </div>
 
             <div className="col-6">
               <label className="text-label">
-                {so?.split_inv ? (
-                  <b>Rp. {formatIdr(getSubTotalBarang())}</b>
-                ) : (
-                  <b>
-                    Rp. {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
-                  </b>
-                )}
-              </label>
-            </div>
-
-            <div className="col-6">{so?.split_inv ? "DPP Barang" : "DPP"}</div>
-
-            <div className="col-6">
-              <label className="text-label">
-                {so.split_inv ? (
+                {sale.split_inv ? (
                   <b>Rp. {formatIdr(getSubTotalBarang())}</b>
                 ) : (
                   <b>
@@ -1451,13 +1349,31 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
             <div className="col-6">
               <label className="text-label">
-                {so.split_inv ? "Pajak Atas Barang (11%)" : "Pajak (11%)"}
+                {sale.split_inv ? "DPP Barang" : "DPP"}
               </label>
             </div>
 
             <div className="col-6">
               <label className="text-label">
-                {so?.split_inv ? (
+                {sale.split_inv ? (
+                  <b>Rp. {formatIdr(getSubTotalBarang())}</b>
+                ) : (
+                  <b>
+                    Rp. {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
+                  </b>
+                )}
+              </label>
+            </div>
+
+            <div className="col-6">
+              <label className="text-label">
+                {sale.split_inv ? "Pajak Atas Barang (11%)" : "Pajak (11%)"}
+              </label>
+            </div>
+
+            <div className="col-6">
+              <label className="text-label">
+                {sale.split_inv ? (
                   <b>Rp. {formatIdr((getSubTotalBarang() * 11) / 100)}</b>
                 ) : (
                   <b>
@@ -1471,7 +1387,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
             </div>
 
             <div className="col-6 mt-3">
-              <label className="text-black fs-14">Diskon Tambahan</label>
+              <label className="text-label">Diskon Tambahan</label>
             </div>
 
             <div className="col-6">
@@ -1483,28 +1399,28 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 />
                 <InputText
                   value={
-                    so.split_inv
+                    sale.split_inv
                       ? isRp
-                        ? (getSubTotalBarang() * so.prod_disc) / 100
-                        : so.prod_disc
+                        ? (getSubTotalBarang() * sale.prod_disc) / 100
+                        : sale.prod_disc
                       : isRp
                       ? ((getSubTotalBarang() + getSubTotalJasa()) *
-                          so.total_disc) /
+                          sale.total_disc) /
                         100
-                      : so.total_disc
+                      : sale.total_disc
                   }
                   placeholder="Diskon"
                   type="number"
                   min={0}
                   onChange={(e) => {
-                    if (so.split_inv) {
+                    if (sale.split_inv) {
                       let disc = 0;
                       if (isRp) {
                         disc = (e.target.value / getSubTotalBarang()) * 100;
                       } else {
                         disc = e.target.value;
                       }
-                      updateSo({ ...so, prod_disc: disc });
+                      updateSL({ ...sale, prod_disc: disc });
                     } else {
                       let disc = 0;
                       if (isRp) {
@@ -1515,7 +1431,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                       } else {
                         disc = e.target.value;
                       }
-                      updateSo({ ...so, total_disc: disc });
+                      updateSL({ ...sale, total_disc: disc });
                     }
                   }}
                 />
@@ -1534,14 +1450,14 @@ const InputSO = ({ onCancel, onSuccess }) => {
             </div>
 
             <div className="col-6">
-              <label className="text-black fs-15">
+              <label className="text-label">
                 <b>Total Pembayaran</b>
               </label>
             </div>
 
             <div className="col-6">
               <label className="text-label fs-16">
-                {so?.split_inv ? (
+                {sale.split_inv ? (
                   <b>
                     Rp.{" "}
                     {formatIdr(
@@ -1565,74 +1481,72 @@ const InputSO = ({ onCancel, onSuccess }) => {
               <Divider className="ml-12"></Divider>
             </div>
 
-            {so?.split_inv ? (
+            {sale.split_inv ? (
               <>
                 {/* <div className="row justify-content-right col-12 mt-4"> */}
                 <div className="col-6 mt-4">
-                  <label className="text-black fs-14">Sub Total Jasa</label>
+                  <label className="text-label">Sub Total Jasa</label>
                 </div>
 
                 <div className="col-6 mt-4">
-                  <label className="text-black fs-14">
+                  <label className="text-label">
                     <b>Rp. {formatIdr(getSubTotalJasa())}</b>
                   </label>
                 </div>
 
                 <div className="col-6">
-                  <label className="text-black fs-14">DPP Jasa</label>
+                  <label className="text-label">DPP Jasa</label>
                 </div>
 
                 <div className="col-6">
-                  <label className="text-black fs-14">
+                  <label className="text-label">
                     <b>Rp. {formatIdr(getSubTotalJasa())}</b>
                   </label>
                 </div>
 
                 <div className="col-6">
-                  <label className="text-black fs-14">
-                    Pajak Atas Jasa (2%)
-                  </label>
+                  <label className="text-label">Pajak Atas Jasa (2%)</label>
                 </div>
 
                 <div className="col-6">
-                  <label className="text-black fs-14">
+                  <label className="text-label">
                     <b>Rp. {formatIdr((getSubTotalJasa() * 2) / 100)}</b>
                   </label>
                 </div>
 
                 <div className="col-6 mt-3">
-                  <label className="text-black fs-14">Diskon Tambahan</label>
+                  <label className="text-label">Diskon Tambahan</label>
                 </div>
 
                 <div className="col-6">
                   <div className="p-inputgroup">
                     <PButton
                       label="Rp."
-                      className={`${isRpJasa ? "" : "p-button-outlined"}`}
-                      onClick={() => setRpJasa(true)}
+                      className={`${isRjjasa ? "" : "p-button-outlined"}`}
+                      onClick={() => setRjjasa(true)}
                     />
                     <InputText
                       value={
-                        isRpJasa
-                          ? (getSubTotalJasa() * so.jasa_disc) / 100
-                          : so.jasa_disc
+                        isRjjasa
+                          ? (getSubTotalJasa() * sale.jasa_disc) / 100
+                          : sale.jasa_disc
                       }
                       placeholder="Diskon"
                       type="number"
                       min={0}
                       onChange={(e) => {
                         let disc = 0;
-                        if (isRpJasa) {
+                        if (isRjjasa) {
                           disc = (e.target.value / getSubTotalJasa()) * 100;
                         } else {
                           disc = e.target.value;
                         }
-                        updateSo({ ...so, jasa_disc: disc });
+                        updateSL({ ...sale, jasa_disc: disc });
                       }}
                     />
                     <PButton
-                      className={`${isRpJasa ? "p-button-outlined" : ""}`}
-                      onClick={() => setRpJasa(false)}
+                      className={`${isRjjasa ? "p-button-outlined" : ""}`}
+                      onClick={() => setRjjasa(false)}
                     >
                       {" "}
                       <b>%</b>{" "}
@@ -1645,13 +1559,13 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 </div>
 
                 <div className="col-6">
-                  <label className="text-black fs-15">
+                  <label className="text-label">
                     <b>Total Pembayaran</b>
                   </label>
                 </div>
 
                 <div className="col-6">
-                  <label className="text-black fs-15">
+                  <label className="text-label fs-16">
                     <b>
                       Rp.{" "}
                       {formatIdr(
@@ -1685,7 +1599,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
           <PButton
             label="Simpan"
             icon="pi pi-check"
-            onClick={onSubmit}
+            onClick={() => onSubmit()}
             autoFocus
             loading={update}
           />
@@ -1699,6 +1613,34 @@ const InputSO = ({ onCancel, onSuccess }) => {
       {header()}
       {body()}
       {footer()}
+
+      <DataPusatBiaya
+        data={pusatBiaya}
+        loading={false}
+        popUp={true}
+        show={showDepartemen}
+        onHide={() => {
+          setShowDept(false);
+        }}
+        onInput={(e) => {
+          setShowDept(!e);
+        }}
+        onSuccessInput={(e) => {
+          getPusatBiaya();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowDept(false);
+            updateSL({ ...sale, req_dep: e.data.id });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
 
       <DataRulesPay
         data={rulesPay}
@@ -1717,7 +1659,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowRulesPay(false);
-            updateSo({ ...so, top: e.data.id });
+            updateSL({ ...sale, req_dep: e.data.id });
           }
 
           setDoubleClick(true);
@@ -1745,119 +1687,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowSupplier(false);
-            updateSo({ ...so, sjasa: e.data.id });
-          }
-
-          setDoubleClick(true);
-
-          setTimeout(() => {
-            setDoubleClick(false);
-          }, 2000);
-        }}
-      />
-
-      <DataProduk
-        data={product}
-        loading={false}
-        popUp={true}
-        show={showProduk}
-        onHide={() => {
-          setShowProduk(false);
-        }}
-        onInput={(e) => {
-          setShowProduk(!e);
-        }}
-        onSuccessInput={(e) => {
-          getProduk();
-        }}
-        onRowSelect={(e) => {
-          if (doubleClick) {
-            setShowProduk(false);
-            updateSo({ ...so, sprod: e.data.id });
-          }
-
-          setDoubleClick(true);
-
-          setTimeout(() => {
-            setDoubleClick(false);
-          }, 2000);
-        }}
-      />
-
-      <DataJasa
-        data={jasa}
-        loading={false}
-        popUp={true}
-        show={showJasa}
-        onHide={() => {
-          setShowJasa(false);
-        }}
-        onInput={(e) => {
-          setShowJasa(!e);
-        }}
-        onSuccessInput={(e) => {
-          getJasa();
-        }}
-        onRowSelect={(e) => {
-          if (doubleClick) {
-            setShowJasa(false);
-            updateSo({ ...so, sjasa: e.data.id });
-          }
-
-          setDoubleClick(true);
-
-          setTimeout(() => {
-            setDoubleClick(false);
-          }, 2000);
-        }}
-      />
-
-      <DataPajak
-        data={ppn}
-        loading={false}
-        popUp={true}
-        show={showPpn}
-        onHide={() => {
-          setShowPpn(false);
-        }}
-        onInput={(e) => {
-          setShowPpn(!e);
-        }}
-        onSuccessInput={(e) => {
-          getPpn();
-        }}
-        onRowSelect={(e) => {
-          if (doubleClick) {
-            setShowPpn(false);
-            updateSo({ ...so, ppn_type: e.data.id });
-          }
-
-          setDoubleClick(true);
-
-          setTimeout(() => {
-            setDoubleClick(false);
-          }, 2000);
-        }}
-      />
-
-      <DataSatuan
-        data={satuan}
-        loading={false}
-        popUp={true}
-        show={showSatuan}
-        onHide={() => {
-          setShowSatuan(false);
-        }}
-        onInput={(e) => {
-          setShowSatuan(!e);
-        }}
-        onSuccessInput={(e) => {
-          getSatuan();
-        }}
-        onRowSelect={(e) => {
-          if (doubleClick) {
-            setShowSatuan(false);
-            updateSo({ ...so, sprod: e.data.unit.id });
+            updateSL({ ...sale, req_dep: e.data.id });
           }
 
           setDoubleClick(true);
@@ -1885,7 +1715,35 @@ const InputSO = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowCustomer(false);
-            updateSo({ ...so, pel_id: e.data.id });
+            updateSL({ ...sale, pel_id: e.data.id });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataCustomer
+        data={subCus}
+        loading={false}
+        popUp={true}
+        show={showSubCus}
+        onHide={() => {
+          setShowSub(false);
+        }}
+        onInput={(e) => {
+          setShowSub(!e);
+        }}
+        onSuccessInput={(e) => {
+          getSubCus();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowSub(false);
+            updateSL({ ...sale, sub_id: e.data.id });
           }
 
           setDoubleClick(true);
@@ -1899,4 +1757,4 @@ const InputSO = ({ onCancel, onSuccess }) => {
   );
 };
 
-export default InputSO;
+export default InputPenjualan;

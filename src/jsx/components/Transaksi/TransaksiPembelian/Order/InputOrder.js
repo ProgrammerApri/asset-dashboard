@@ -776,10 +776,10 @@ const InputOrder = ({ onCancel, onSuccess }) => {
               option={rulesPay}
               onChange={(e) => {
                 let result = new Date(`${order.ord_date}Z`);
-                result.setDate(result.getDate() + e.value.day);
+                result.setDate(result.getDate() + e.day);
                 console.log(result);
 
-                updateORD({ ...order, top: e.value.id, due_date: result });
+                updateORD({ ...order, top: e.id, due_date: result });
               }}
               placeholder="Pilih Syarat Pembayaran"
               detail
@@ -929,7 +929,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
-                  header="Pesanan"
+                  header="Jumlah"
                   // style={{
                   //   maxWidth: "10rem",
                   // }}

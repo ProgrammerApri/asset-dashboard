@@ -19,6 +19,7 @@ import DataPajak from "src/jsx/components/Master/Pajak/DataPajak";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { el, te, tr } from "date-fns/locale";
+import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 
 const InputPO = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
@@ -702,30 +703,20 @@ const InputPO = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-4">
+          <div className="col-3">
             <label className="text-label">Supplier</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={po.sup_id !== null ? supp(po.sup_id) : null}
-                options={supplier}
-                onChange={(e) => {
-                  updatePo({ ...po, sup_id: e.value.supplier.id });
-                }}
-                optionLabel="supplier.sup_name"
-                placeholder="Pilih Supplier"
-                filter
-                filterBy="supplier.sup_name"
-                itemTemplate={suppTemp}
-                valueTemplate={valueSupTemp}
-              />
-              <PButton
-                onClick={() => {
-                  setShowSupplier(true);
-                }}
-              >
-                <i class="bx bx-food-menu"></i>
-              </PButton>
-            </div>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
+              value={po.sup_id !== null ? supp(po.sup_id) : null}
+              option={supplier}
+              onChange={(e) => {
+                updatePo({ ...po, sup_id: e.supplier.id });
+              }}
+              placeholder="Pilih Supplier"
+              detail
+              onDetail={() => setShowSupplier(true)}
+              label={"[supplier.sup_code] ([supplier.sup_name])"}
+            />
           </div>
 
           <div className="col-4">
@@ -777,8 +768,8 @@ const InputPO = ({ onCancel, onSuccess }) => {
               <InputText
                 value={
                   po.preq_id !== null
-                    ? `${dept(req_pur(po.preq_id)?.req_dep.id).ccost_code} (${
-                        dept(req_pur(po.preq_id)?.req_dep.id).ccost_name
+                    ? `${dept(req_pur(po.preq_id)?.req_dep)?.ccost_code} (${
+                        dept(req_pur(po.preq_id)?.req_dep)?.ccost_name
                       })`
                     : null
                 }

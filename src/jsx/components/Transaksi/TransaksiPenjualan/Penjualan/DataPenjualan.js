@@ -12,26 +12,34 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_INV, SET_EDIT_INV, SET_INV } from "src/redux/actions";
-import { Badge } from "primereact/badge";
+import { SET_CURRENT_SL, SET_EDIT_SL, SET_SL } from "src/redux/actions";
 
 const data = {
   id: null,
-  fk_code: null,
-  fk_date: null,
-  fk_tax: null,
-  fk_ppn: null,
-  fk_lunas: null,
-  ord_id: null,
-  product: [],
-  jasa: [],
+  ord_code: null,
+  ord_date: null,
+  so_id: null,
+  invoice: null,
+  pel_id: null,
+  ppn_type: null,
+  sub_addr: null,
+  sub_id: null,
+  req_date: null,
+  top: null,
+  due_date: false,
+  split_inv: null,
+  prod_disc: null,
+  jasa_disc: null,
+  total_disc: null,
+  jprod: [],
+  jjasa: [],
 };
 
-const DataFaktur = ({ onAdd, onEdit }) => {
+const DataPenjualan = ({ onAdd, onEdit }) => {
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayDel, setDisplayDel] = useState(false);
-  const [fkCode, setFkCode] = useState(null);
+  const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
@@ -39,20 +47,19 @@ const DataFaktur = ({ onAdd, onEdit }) => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const dispatch = useDispatch();
-    const inv = useSelector((state) => state.inv.inv);
+  const sale = useSelector((state) => state.sl.sl);
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getFK();
-    getFkCode();
+    getSale();
     initFilters1();
   }, []);
 
-  const getFK = async (isUpdate = false) => {
+  const getSale = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.faktur,
+      ...endpoints.sale,
       data: {},
     };
     console.log(config.data);
@@ -63,7 +70,7 @@ const DataFaktur = ({ onAdd, onEdit }) => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        dispatch({ type: SET_INV, payload: data });
+        dispatch({ type: SET_SL, payload: data });
       }
     } catch (error) {}
     if (isUpdate) {
@@ -75,26 +82,10 @@ const DataFaktur = ({ onAdd, onEdit }) => {
     }
   };
 
-  const getFkCode = async () => {
+  const delSale = async (id) => {
     const config = {
-      ...endpoints.fakturCode,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setFkCode(data);
-      }
-    } catch (error) {}
-  };
-
-  const delFK = async (id) => {
-    const config = {
-      ...endpoints.delFK,
-      //   endpoint: endpoints.delDO.endpoint + pinv.id,
+      ...endpoints.delSales,
+      endpoint: endpoints.delSales.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -105,7 +96,7 @@ const DataFaktur = ({ onAdd, onEdit }) => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayDel(false);
-          getFK(true);
+          getSale(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -129,99 +120,90 @@ const DataFaktur = ({ onAdd, onEdit }) => {
     }
   };
 
-  // const FKCode = (value) => {
-  //   let selected = null;
-  //   fkCode?.forEach((element) => {
-  //     if (element.faktur.fk_code === value) {
-  //       selected = element;
-  //     }
-  //   });
-  //   console.log(selected);
-  //   return selected;
-  // };
+  const actionBodyTemplate = (data) => {
+    return (
+      // <React.Fragment>
+      <div className="d-flex">
+        <Link
+          onClick={() => {
+            onEdit();
+            dispatch({
+              type: SET_EDIT_SL,
+              payload: true,
+            });
 
-  // const actionBodyTemplate = (data) => {
-  //   return (
-  //     // <React.Fragment>
-  //     <div className="d-flex">
-  //       <Link
-  //         onClick={() => {
-  //           onEdit(data);
-  //           let dprod = data.dprod;
-  //           dispatch({
-  //             type: SET_EDIT_DO,
-  //             payload: true,
-  //           });
-  //           dprod.forEach((el) => {
-  //             el.prod_id = el.prod_id.id;
-  //             el.unit_id = el.unit_id.id;
-  //           });
-  //           let djasa = data.djasa;
-  //           djasa.forEach((el) => {
-  //             el.jasa_id = el.jasa_id.id;
-  //             el.unit_id = el.unit_id.id;
-  //           });
-  //           dispatch({
-  //             type: SET_CURRENT_DO,
-  //             payload: {
-  //               ...data,
-  //               dep_id: data?.dep_id?.id ?? null,
-  //               sup_id: data?.sup_id?.id ?? null,
-  //               top: data?.top?.id ?? null,
-  //               dprod:
-  //                 dprod.length > 0
-  //                   ? dprod
-  //                   : [
-  //                       {
-  //                         id: 0,
-  //                         do_id: null,
-  //                         prod_id: null,
-  //                         unit_id: null,
-  //                         order: null,
-  //                         price: null,
-  //                         disc: null,
-  //                         nett_price: null,
-  //                         total: null,
-  //                       },
-  //                     ],
-  //               djasa:
-  //                 djasa.length > 0
-  //                   ? djasa
-  //                   : [
-  //                       {
-  //                         id: 0,
-  //                         do_id: null,
-  //                         jasa_id: null,
-  //                         sup_id: null,
-  //                         unit_id: null,
-  //                         order: null,
-  //                         price: null,
-  //                         disc: null,
-  //                         total: null,
-  //                       },
-  //                     ],
-  //             },
-  //           });
-  //         }}
-  //         className="btn btn-primary shadow btn-xs sharp ml-1"
-  //       >
-  //         <i className="fa fa-pencil"></i>
-  //       </Link>
+            let jprod = data.jprod;
+            jprod.forEach((el) => {
+              el.prod_id = el.prod_id.id;
+              el.unit_id = el.unit_id.id;
+              el.location = el.location?.id;
+            });
+            let jjasa = data.jjasa;
+            jjasa.forEach((el) => {
+              el.jasa_id = el.jasa_id.id;
+              el.unit_id = el.unit_id.id;
+            });
 
-  //       <Link
-  //         onClick={() => {
-  //           setEdit(true);
-  //           setDisplayDel(true);
-  //           setCurrentItem(data);
-  //         }}
-  //         className="btn btn-danger shadow btn-xs sharp ml-1"
-  //       >
-  //         <i className="fa fa-trash"></i>
-  //       </Link>
-  //     </div>
-  //     // </React.Fragment>
-  //   );
-  // };
+            if (!jprod.length) {
+              jprod.push({
+                id: 0,
+                prod_id: null,
+                unit_id: null,
+                location: null,
+                order: null,
+                price: null,
+                disc: null,
+                nett_price: null,
+                total: null,
+              });
+            }
+
+            if (!jjasa.length) {
+              jjasa.push({
+                id: 0,
+                sup_id: null,
+                jasa_id: null,
+                unit_id: null,
+                order: null,
+                price: null,
+                disc: null,
+                nett_price: null,
+                total: null,
+              });
+            }
+
+            dispatch({
+              type: SET_CURRENT_SL,
+              payload: {
+                ...data,
+                so_id: data?.so_id?.id,
+                pel_id: data?.pel_id?.id,
+                sub_id: data?.sub_id?.id,
+                top: data?.top?.id,
+                jprod: jprod,
+                jjasa: jjasa,
+              },
+            });
+          }}
+          className="btn btn-primary shadow btn-xs sharp ml-1"
+        >
+          <i className="fa fa-pencil"></i>
+        </Link>
+
+        <Link
+          onClick={() => {
+            setEdit(true);
+            setDisplayDel(true);
+            setCurrentItem(data);
+          }}
+          className="btn btn-danger shadow btn-xs sharp ml-1"
+        >
+          <i className="fa fa-trash"></i>
+        </Link>
+      </div>
+      // </React.Fragment>
+    );
+  };
 
   const renderFooterDel = () => {
     return (
@@ -235,7 +217,7 @@ const DataFaktur = ({ onAdd, onEdit }) => {
           label="Hapus"
           icon="pi pi-trash"
           onClick={() => {
-            delFK();
+            delSale();
           }}
           autoFocus
           loading={update}
@@ -275,32 +257,31 @@ const DataFaktur = ({ onAdd, onEdit }) => {
           onClick={() => {
             onAdd();
             dispatch({
-              type: SET_EDIT_INV,
+              type: SET_EDIT_SL,
               payload: false,
             });
             dispatch({
-              type: SET_CURRENT_INV,
+              type: SET_CURRENT_SL,
               payload: {
                 ...data,
-                // fk_code: fkCode,
-                product: [
+                jprod: [
                   {
                     id: 0,
-                    ord_id: null,
+                    pj_id: null,
                     prod_id: null,
                     unit_id: null,
+                    location: null,
                     order: null,
                     price: null,
                     disc: null,
-                    location: null,
                     nett_price: null,
                     total: null,
                   },
                 ],
-                jasa: [
+                jjasa: [
                   {
                     id: 0,
-                    ord_id: null,
+                    pj_id: null,
                     jasa_id: null,
                     sup_id: null,
                     unit_id: null,
@@ -386,14 +367,14 @@ const DataFaktur = ({ onAdd, onEdit }) => {
       <Toast ref={toast} />
       <DataTable
         responsiveLayout="scroll"
-        value={loading ? dummy : inv}
+        value={loading ? dummy : sale}
         className="display w-150 datatable-wrapper"
         showGridlines
         dataKey="id"
         rowHover
         header={renderHeader}
         filters={filters1}
-        globalFilterFields={["e.fk_code"]}
+        globalFilterFields={["ord_code"]}
         emptyMessage="Tidak ada data"
         paginator
         paginatorTemplate={template2}
@@ -405,63 +386,36 @@ const DataFaktur = ({ onAdd, onEdit }) => {
         <Column
           header="Tanggal"
           style={{
-            minWidth: "8rem",
+            minWidth: "10rem",
           }}
-          field={(e) => formatDate(e.fk_date)}
+          field={(e) => formatDate(e.ord_date)}
           body={loading && <Skeleton />}
         />
         <Column
-          header="Nomor Faktur"
-          field={(e) => e.fk_code}
-          style={{ minWidth: "8rem" }}
+          header="No. Penjualan"
+          field={(e) => e.ord_code}
+          style={{ minWidth: "10rem" }}
           body={loading && <Skeleton />}
         />
         <Column
-          header="Nomor Pembelian"
-          field={(e) => e.ord_id.ord_code}
-          style={{ minWidth: "8rem" }}
-          body={loading && <Skeleton />}
-        />
-        {/* <Column
-          header="Nama Supplier"
-          field={(e) => e.customer.cus_name}
-          style={{ minWidth: "8rem" }}
+          header="No. Pesanan Penjualan"
+          field={(e) => e.so_id?.so_code}
+          style={{ minWidth: "10rem" }}
           body={loading && <Skeleton />}
         />
         <Column
-          header="J/T"
-          field={(e) => e.customer.cus_name}
-          style={{ minWidth: "4rem" }}
+          header="Pelanggan"
+          field={(e) => e.pel_id?.cus_name}
+          style={{ minWidth: "10rem" }}
           body={loading && <Skeleton />}
         />
         <Column
-          header="Pembayaran"
-          field={(e) => e.account.dou_type}
-          style={{ minWidth: "8rem" }}
-          body={(e) =>
-            loading ? (
-              <Skeleton />
-            ) : (
-              <div>
-                {e.account.dou_type === "P" ? (
-                  <Badge variant="success light">
-                    <i className="bx bxs-circle text-success mr-1"></i> Paid
-                  </Badge>
-                ) : (
-                  <Badge variant="info light">
-                    <i className="bx bxs-circle text-info mr-1"></i> Unpaid
-                  </Badge>
-                )}
-              </div>
-            )
-          }
+          header="Action"
+          dataType="boolean"
+          bodyClassName="text-center"
+          style={{ minWidth: "2rem" }}
+          body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
         />
-        <Column
-          header="Status"
-          field={(e) => e.cus_telp}
-          style={{ minWidth: "6rem" }}
-          body={loading && <Skeleton />}
-        /> */}
       </DataTable>
 
       <Dialog
@@ -485,4 +439,4 @@ const DataFaktur = ({ onAdd, onEdit }) => {
   );
 };
 
-export default DataFaktur;
+export default DataPenjualan;

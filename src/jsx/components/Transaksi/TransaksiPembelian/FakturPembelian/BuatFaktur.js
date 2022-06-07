@@ -461,9 +461,8 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
             <div className="p-inputgroup">
               <InputText
                 value={inv.fk_code}
-                // onChange={(e) => updateINV({ ...inv, fk_code: e.target.value })}
+                onChange={(e) => updateINV({ ...inv, fk_code: e.target.value })}
                 placeholder="Masukan No. Faktur"
-                disabled
               />
             </div>
           </div>

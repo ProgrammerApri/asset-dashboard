@@ -1,0 +1,5 @@
+export const SET_CURRENT_SL = "sl.SET_CURRENT_SL"
+export const SET_SL = "sl.SET_SL"
+export const RESET_CURRENT_SL = "sl.RESET_CURRENT_SL"
+export const UPDATE_CURRENT_SL = "sl.UPDATE_CURRENT_SL"
+export const SET_EDIT_SL = "sl.SET_EDIT_SL"

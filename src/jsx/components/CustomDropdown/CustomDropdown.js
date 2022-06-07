@@ -10,6 +10,7 @@ function useOutsideAlerter(ref, panel, callback = () => {}) {
         !ref.current.contains(event.target) &&
         !panel.current.contains(event.target)
       ) {
+        console.log(ref.current.offsetWidth);
         callback();
       }
     }
@@ -99,7 +100,7 @@ const CustomDropdown = ({
       <div className="row m-0">
         <div
           ref={drop}
-          className="p-dropdown p-component p-inputwrapper vw-100"
+          className="p-dropdown p-component p-inputwrapper w-100"
           onClick={() => {
             triggerPanel(active);
           }}
@@ -123,7 +124,11 @@ const CustomDropdown = ({
           </div>
         </div>
       </div>
-      <div ref={panel} className="row mr-3 mt-0 ml-0 c-dropdown-wrapper">
+      <div
+        ref={panel}
+        style={{width:`${drop?.current?.offsetWidth}px`, minWidth:"220px"}}
+        className="row mr-3 mt-0 ml-0 c-dropdown-wrapper"
+      >
         <div className="c-dropdown-header">
           <span className="p-input-icon-right d-flex justify-content-between">
             <InputText

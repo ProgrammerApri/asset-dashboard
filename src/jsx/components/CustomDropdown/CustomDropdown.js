@@ -10,7 +10,6 @@ function useOutsideAlerter(ref, panel, callback = () => {}) {
         !ref.current.contains(event.target) &&
         !panel.current.contains(event.target)
       ) {
-        console.log(ref.current.offsetWidth);
         callback();
       }
     }
@@ -59,7 +58,9 @@ const CustomDropdown = ({
         list.current.style.transition = "max-height 300ms linear";
       } else {
         setTimeout(() => {
-          panel.current.style.display = "none";
+          if (panel.current && list.current) {
+            panel.current.style.display = "none";
+          }
           setFilter("");
         }, 45);
         panel.current.style.height = "0";
@@ -78,20 +79,22 @@ const CustomDropdown = ({
   const getLabel = (value) => {
     let key = label.match(/(?<=\[)[^\][]*(?=])/g);
     let final = label;
-    key.forEach((e) => {
-      if (e.includes(".")) {
-        let subkey = e.split(".");
-        let subValue = value;
-        subkey.forEach((key) => {
-          subValue = subValue[`${key}`];
-        });
-        console.log(subValue);
-        final = final.replace(e, subValue);
-      } else {
-        final = final.replace(e, value[`${e}`]);
-      }
-    });
-    final = final.replaceAll("[", "").replaceAll("]", "");
+    if (option && value) {
+      key.forEach((e) => {
+        if (e.includes(".")) {
+          let subkey = e.split(".");
+          let subValue = value;
+          subkey.forEach((key) => {
+            subValue = subValue[`${key}`];
+          });
+          console.log(subValue);
+          final = final.replace(e, subValue);
+        } else {
+          final = final.replace(e, value[`${e}`]);
+        }
+      });
+      final = final.replaceAll("[", "").replaceAll("]", "");
+    }
     return final;
   };
 
@@ -100,7 +103,7 @@ const CustomDropdown = ({
       <div className="row m-0">
         <div
           ref={drop}
-          className="p-dropdown p-component p-inputwrapper w-100"
+          className="p-dropdown p-component p-inputwrapper vw-100"
           onClick={() => {
             triggerPanel(active);
           }}
@@ -124,11 +127,7 @@ const CustomDropdown = ({
           </div>
         </div>
       </div>
-      <div
-        ref={panel}
-        style={{width:`${drop?.current?.offsetWidth}px`, minWidth:"220px"}}
-        className="row mr-3 mt-0 ml-0 c-dropdown-wrapper"
-      >
+      <div ref={panel} className="row mr-3 mt-0 ml-0 c-dropdown-wrapper">
         <div className="c-dropdown-header">
           <span className="p-input-icon-right d-flex justify-content-between">
             <InputText

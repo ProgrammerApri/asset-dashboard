@@ -29,6 +29,7 @@ const CustomDropdown = ({
   placeholder,
   value,
   onChange = () => {},
+  disabled = false,
 }) => {
   const [active, setActive] = useState(true);
   const [filter, setFilter] = useState("");
@@ -47,24 +48,26 @@ const CustomDropdown = ({
   const [matches, setMatches] = useState(null);
 
   const triggerPanel = (active) => {
-    setActive(!active);
-    if (active) {
-      panel.current.style.display = "flex";
-      panel.current.style.height = "auto";
-      panel.current.style.transition = "height 300ms linear";
-      list.current.style.maxHeight = "15rem";
-      list.current.style.transition = "max-height 300ms linear";
-    } else {
-      setTimeout(() => {
-        panel.current.style.display = "none";
-        setFilter("");
-      }, 45);
-      panel.current.style.height = "0";
-      panel.current.style.transition = "height 55ms linear";
-      list.current.style.maxHeight = "0";
-      list.current.style.transition = "max-height 50ms linear";
+    if (!disabled) {
+      setActive(!active);
+      if (active) {
+        panel.current.style.display = "flex";
+        panel.current.style.height = "auto";
+        panel.current.style.transition = "height 300ms linear";
+        list.current.style.maxHeight = "15rem";
+        list.current.style.transition = "max-height 300ms linear";
+      } else {
+        setTimeout(() => {
+          panel.current.style.display = "none";
+          setFilter("");
+        }, 45);
+        panel.current.style.height = "0";
+        panel.current.style.transition = "height 55ms linear";
+        list.current.style.maxHeight = "0";
+        list.current.style.transition = "max-height 50ms linear";
+      }
+      setMatches(option);
     }
-    setMatches(option);
   };
 
   useOutsideAlerter(drop, panel, () => {
@@ -75,23 +78,21 @@ const CustomDropdown = ({
     let key = label.match(/(?<=\[)[^\][]*(?=])/g);
     let final = label;
     key.forEach((e) => {
-      if (e.includes(".")){
+      if (e.includes(".")) {
         let subkey = e.split(".");
-        let subValue = value
-        subkey.forEach(key => {
-          subValue = subValue[`${key}`]
+        let subValue = value;
+        subkey.forEach((key) => {
+          subValue = subValue[`${key}`];
         });
         console.log(subValue);
         final = final.replace(e, subValue);
       } else {
         final = final.replace(e, value[`${e}`]);
       }
-      
     });
     final = final.replaceAll("[", "").replaceAll("]", "");
     return final;
   };
-
 
   return (
     <>

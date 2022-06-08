@@ -5,14 +5,12 @@ import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
-import { Dropdown } from "primereact/dropdown";
 import { Divider } from "@material-ui/core";
 import { Calendar } from "primereact/calendar";
 import { InputSwitch } from "primereact/inputswitch";
 import CustomAccordion from "../../../Accordion/Accordion";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_SL } from "src/redux/actions";
-import DataPusatBiaya from "../../../MasterLainnya/PusatBiaya/DataPusatBiaya";
 import DataSupplier from "../../../Mitra/Pemasok/DataPemasok";
 import DataRulesPay from "src/jsx/components/MasterLainnya/RulesPay/DataRulesPay";
 import { DataTable } from "primereact/datatable";
@@ -20,6 +18,10 @@ import { Column } from "primereact/column";
 import { el } from "date-fns/locale";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import DataCustomer from "src/jsx/components/Mitra/Pelanggan/DataCustomer";
+import DataSatuan from "src/jsx/components/MasterLainnya/Satuan/DataSatuan";
+import DataProduk from "src/jsx/components/Master/Produk/DataProduk";
+import DataJasa from "src/jsx/components/Master/Jasa/DataJasa";
+import DataLokasi from "src/jsx/components/MasterLainnya/Lokasi/DataLokasi";
 
 const InputPenjualan = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
@@ -30,7 +32,6 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
   const dispatch = useDispatch();
   const [isRp, setRp] = useState(true);
   const [isRjjasa, setRjjasa] = useState(true);
-  const [pusatBiaya, setPusatBiaya] = useState(null);
   const [customer, setCustomer] = useState(null);
   const [subCus, setSubCus] = useState(null);
   const [supplier, setSupplier] = useState(null);
@@ -40,8 +41,11 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
   const [showSupplier, setShowSupplier] = useState(false);
   const [showCustomer, setShowCustomer] = useState(false);
   const [showSubCus, setShowSub] = useState(false);
-  const [showDepartemen, setShowDept] = useState(false);
+  const [showSatuan, setShowSatuan] = useState(false);
+  const [showProduk, setShowProduk] = useState(false);
+  const [showJasa, setShowJasa] = useState(false);
   const [showRulesPay, setShowRulesPay] = useState(false);
+  const [showLokasi, setShowLok] = useState(false);
   const [product, setProduct] = useState(null);
   const [jasa, setJasa] = useState(null);
   const [satuan, setSatuan] = useState(null);
@@ -57,7 +61,6 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
       left: 0,
       behavior: "smooth",
     });
-    getPusatBiaya();
     getCustomer();
     getSubCus();
     getSupplier();
@@ -130,24 +133,6 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
       if (response.status) {
         const { data } = response;
         setSupplier(data);
-      }
-    } catch (error) {}
-  };
-
-  const getPusatBiaya = async () => {
-    const config = {
-      ...endpoints.pusatBiaya,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setPusatBiaya(data);
       }
     } catch (error) {}
   };
@@ -566,7 +551,15 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
               <Calendar
                 value={new Date(`${sale.ord_date}Z`)}
                 onChange={(e) => {
-                  updateSL({ ...sale, ord_date: e.value });
+                  let result = null;
+                  if (sale.top) {
+                    result = new Date(`${sale.ord_date}Z`);
+                    result.setDate(
+                      result.getDate() + checkRulesP(sale?.top)?.day
+                    );
+                    console.log(result);
+                  }
+                  updateSL({ ...sale, ord_date: e.target.value, due_date: result });
                 }}
                 placeholder="Pilih Tanggal"
                 showIcon
@@ -611,7 +604,10 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   pel_id: e.pel_id?.id ?? null,
                   sub_id: e.sub_id?.id ?? null,
                   jprod: e.sprod,
-                  jjasa: e.sjasa,
+                  jjasa: e.sjasa.map((v) => {
+                    v.order = v.qty
+                    return v
+                  }),
                 });
               }}
               label={"[so_code] ([pel_id.cus_name])"}
@@ -631,15 +627,15 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                 updateSL({ ...sale, pel_id: e.customer.id });
               }}
               placeholder="Pilih Pelanggan"
-              label={"[customer.cus_code] ([customer.cus_name])"}
               detail
               onDetail={() => setShowCustomer(true)}
-              disabled={sale && sale.so_id !== null}
+              label={"[customer.cus_code] ([customer.cus_name])"}
+              disabled={sale && sale.so_id}
             />
           </div>
 
           <div className="col-3">
-            <label className="text-label">Alamat Pelanggan</label>
+            <label className="text-label">Alamat Supplier</label>
             <div className="p-inputgroup">
               <InputText
                 value={
@@ -647,7 +643,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                     ? checkCus(sale.pel_id)?.customer?.cus_address
                     : ""
                 }
-                placeholder="Alamat Supplier"
+                placeholder="Alamat Pelanggan"
                 disabled
               />
             </div>
@@ -683,21 +679,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-4">
-            <label className="text-label">Tanggal Pesanan</label>
-            <div className="p-inputgroup mt-2">
-              <Calendar
-                value={new Date(`${checkSO(sale.so_id)?.so_date}Z`)}
-                placeholder="Tanggal Permintaan"
-                disabled={sale && sale.so_id !== null}
-                dateFormat="dd/mm/yy"
-                showIcon
-              />
-
-            </div>
-          </div>
-
-          <div className="col-4">
+          <div className="col-6">
             <label className="text-label">Syarat Pembayaran</label>
             <div className="p-inputgroup mt-2"></div>
             <CustomDropdown
@@ -714,11 +696,11 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
               detail
               onDetail={() => setShowRulesPay(true)}
               label={"[name] ([day] Hari)"}
-              disabled={sale && sale.so_id !== null}
+              disabled={sale && sale.so_id}
             />
           </div>
 
-          <div className="col-4">
+          <div className="col-6">
             <label className="text-label">Tanggal Jatuh Tempo</label>
             <div className="p-inputgroup mt-2">
               <Calendar
@@ -737,15 +719,15 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
             </label>
             <InputSwitch
               className="ml-4"
-              checked={sale && sale.sub_addr}
+              checked={sale.so_id && checkSO(sale.so_id).sub_addr}
               onChange={(e) => {
                 updateSL({ ...sale, sub_addr: e.target.value });
               }}
-              //   disabled={sale && sale.so_id !== null}
+              disabled={sale && sale.so_id}
             />
           </div>
 
-          {sale && sale.sub_addr === true && (
+          {checkSO(sale.so_id).sub_addr === true && (
             <>
               <div className="col-4">
                 <label className="text-black fs-14">Sub Pelanggan</label>
@@ -760,7 +742,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   label={"[customer.cus_code] ([customer.cus_name])"}
                   detail
                   onDetail={() => setShowSub(true)}
-                  disabled={sale && sale.so_id !== null}
+                  disabled={sale && sale.so_id}
                 />
               </div>
 
@@ -770,7 +752,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   <InputText
                     value={
                       sale.sub_id !== null
-                        ? checkCus(sale.sub_id).cus_address
+                        ? checkSubCus(sale.sub_id)?.customer?.cus_address
                         : ""
                     }
                     placeholder="Alamat Sub Pelanggan"
@@ -785,7 +767,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   <InputText
                     value={
                       sale.sub_id !== null
-                        ? checkSubCus(sale.sub_id).cus_telp1
+                        ? checkSubCus(sale.sub_id)?.customer?.cus_telp1
                         : ""
                     }
                     placeholder="Kontak Person"
@@ -828,7 +810,6 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                 <Column
                   header="Produk"
                   field={""}
-                  style={{ maxWidth: "15em" }}
                   body={(e) => (
                     <CustomDropdown
                       value={e.prod_id && checkProd(e.prod_id)}
@@ -836,14 +817,15 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                       onChange={(u) => {
                         console.log(e.value);
                         let temp = [...sale.jprod];
-                        temp[e.index].prod_id = u.value.id;
-                        temp[e.index].unit_id = u.value.unit?.id;
+                        temp[e.index].prod_id = u.id;
+                        temp[e.index].unit_id = u.unit?.id;
                         updateSL({ ...sale, jprod: temp });
                       }}
                       placeholder="Pilih Kode Produk"
                       label={"[name]"}
                       detail
-                      disabled={sale && sale.so_id !== null}
+                      onDetail={() => setShowProduk(true)}
+                      disabled={sale && sale.so_id}
                     />
                   )}
                 />
@@ -852,22 +834,20 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   header="Satuan"
                   field={""}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={e.unit_id && checkUnit(e.unit_id)}
-                        onChange={(t) => {
-                          let temp = [...sale.jprod];
-                          temp[e.index].unit_id = t.value.id;
-                          updateSL({ ...sale, jprod: temp });
-                        }}
-                        options={satuan}
-                        optionLabel="name"
-                        placeholder="Pilih Satuan"
-                        filter
-                        filterBy="name"
-                        disabled={sale && sale.so_id !== null}
-                      />
-                    </div>
+                    <CustomDropdown
+                      value={e.unit_id && checkUnit(e.unit_id)}
+                      onChange={(t) => {
+                        let temp = [...sale.jprod];
+                        temp[e.index].unit_id = t.id;
+                        updateSL({ ...sale, jprod: temp });
+                      }}
+                      option={satuan}
+                      label={"[name]"}
+                      placeholder="Pilih Satuan"
+                      detail
+                      onDetail={() => setShowSatuan(true)}
+                      disabled={sale && sale.so_id}
+                    />
                   )}
                 />
 
@@ -875,21 +855,20 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   header="Lokasi"
                   field={""}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={e.location && checkLoc(e.location)}
-                        onChange={(u) => {
-                          let temp = [...sale.jprod];
-                          temp[e.index].location = u.value.id;
-                          updateSL({ ...sale, jprod: temp });
-                        }}
-                        options={lokasi}
-                        optionLabel="name"
-                        placeholder="Lokasi"
-                        filter
-                        filterBy="name"
-                      />
-                    </div>
+                    <CustomDropdown
+                      value={e.location && checkLoc(e.location)}
+                      onChange={(u) => {
+                        let temp = [...sale.jprod];
+                        temp[e.index].location = u.id;
+                        updateSL({ ...sale, jprod: temp });
+                      }}
+                      option={lokasi}
+                      label={"[name]"}
+                      placeholder="Lokasi"
+                      detail
+                      onDetail={() => setShowLok(true)}
+                      disabled={sale && sale.so_id}
+                    />
                   )}
                 />
 
@@ -914,7 +893,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         placeholder="0"
                         type="number"
                         min={0}
-                        disabled={sale && sale.so_id !== null}
+                        disabled={sale && sale.so_id}
                       />
                     </div>
                   )}
@@ -941,7 +920,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         placeholder="0"
                         type="number"
                         min={0}
-                        // disabled={sale && sale.so_id !== null}
+                        disabled={sale && sale.so_id}
                       />
                     </div>
                   )}
@@ -966,7 +945,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         placeholder="0"
                         type="number"
                         min={0}
-                        disabled={sale && sale.so_id !== null}
+                        disabled={sale && sale.so_id}
                       />
                       <span className="p-inputgroup-addon">%</span>
                     </div>
@@ -988,7 +967,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         }}
                         placeholder="0"
                         type="number"
-                        disabled={sale && sale.so_id !== null}
+                        disabled={sale && sale.so_id}
                       />
                     </div>
                   )}
@@ -1090,52 +1069,43 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                 <Column
                   header="Supplier"
                   field={""}
-                  style={{
-                    maxWidth: "15rem",
-                  }}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={e.sup_id && checkSupp(e.sup_id)}
-                        options={supplier}
-                        onChange={(t) => {
-                          let temp = [...sale.jjasa];
-                          temp[e.index].sup_id = t.value.supplier.id;
-                          updateSL({ ...sale, jjasa: temp });
-                          console.log(temp);
-                        }}
-                        optionLabel="supplier.sup_name"
-                        placeholder="Pilih Supplier"
-                        filter
-                        filterBy="supplier.sup_name"
-                      />
-                    </div>
+                    <CustomDropdown
+                      value={e.sup_id && checkSupp(e.sup_id)}
+                      option={supplier}
+                      onChange={(t) => {
+                        let temp = [...sale.jjasa];
+                        temp[e.index].sup_id = t.supplier.id;
+                        updateSL({ ...sale, jjasa: temp });
+                        console.log(temp);
+                      }}
+                      label={"[supplier.sup_name] ([supplier.sup_code])"}
+                      placeholder="Pilih Supplier"
+                      detail
+                      onDetail={() => setShowSupplier(true)}
+                      disabled={sale && sale.so_id}
+                    />
                   )}
                 />
 
                 <Column
                   header="Jasa"
                   field={""}
-                  style={{
-                    maxWidth: "15rem",
-                  }}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={e.jasa_id && checkjasa(e.jasa_id)}
-                        onChange={(t) => {
-                          let temp = [...sale.jjasa];
-                          temp[e.index].jasa_id = t.value.jasa.id;
-                          updateSL({ ...sale, jjasa: temp });
-                        }}
-                        options={jasa}
-                        optionLabel="jasa.name"
-                        placeholder="Pilih Kode Jasa"
-                        filter
-                        filterBy="jasa.name"
-                        disabled={e.id !== 0}
-                      />
-                    </div>
+                    <CustomDropdown
+                      value={e.jasa_id && checkjasa(e.jasa_id)}
+                      onChange={(t) => {
+                        let temp = [...sale.jjasa];
+                        temp[e.index].jasa_id = t.jasa.id;
+                        updateSL({ ...sale, jjasa: temp });
+                      }}
+                      option={jasa}
+                      label={"[jasa.name] ([jasa.code])"}
+                      placeholder="Pilih Kode Jasa"
+                      detail
+                      onDetail={() => setShowJasa(true)}
+                      disabled={sale && sale.so_id}
+                    />
                   )}
                 />
 
@@ -1143,30 +1113,25 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   header="Satuan"
                   field={""}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={e.unit_id && checkUnit(e.unit_id)}
-                        onChange={(t) => {
-                          let temp = [...sale.jjasa];
-                          temp[e.index].unit_id = t.value.id;
-                          updateSL({ ...sale, jjasa: temp });
-                        }}
-                        options={satuan}
-                        optionLabel="name"
-                        placeholder="Pilih Satuan"
-                        filter
-                        filterBy="name"
-                        disabled={e.id !== 0}
-                      />
-                    </div>
+                    <CustomDropdown
+                      value={e.unit_id && checkUnit(e.unit_id)}
+                      onChange={(t) => {
+                        let temp = [...sale.jjasa];
+                        temp[e.index].unit_id = t.id;
+                        updateSL({ ...sale, jjasa: temp });
+                      }}
+                      option={satuan}
+                      label={"[name]"}
+                      placeholder="Pilih Satuan"
+                      detail
+                      onDetail={() => setSatuan(true)}
+                      disabled={sale && sale.so_id}
+                    />
                   )}
                 />
 
                 <Column
                   header="Jumlah"
-                  // style={{
-                  //   maxWidth: "15rem",
-                  // }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
@@ -1183,6 +1148,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         placeholder="0"
                         type="number"
                         min={0}
+                        disabled={sale && sale.so_id}
                       />
                     </div>
                   )}
@@ -1209,6 +1175,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         placeholder="0"
                         type="number"
                         min={0}
+                        disabled={sale && sale.so_id}
                       />
                     </div>
                   )}
@@ -1233,6 +1200,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         placeholder="0"
                         type="number"
                         min={0}
+                        disabled={sale && sale.so_id}
                       />
                       <span className="p-inputgroup-addon">%</span>
                     </div>
@@ -1331,7 +1299,9 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
           <div className="row justify-content-right col-6">
             <div className="col-6">
               <label className="text-label">
-                {sale.split_inv ? "Sub Total Barang" : "Sub Total"}
+                {sale.split_inv
+                  ? "Sub Total Barang"
+                  : "Sub Total"}
               </label>
             </div>
 
@@ -1367,7 +1337,9 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
 
             <div className="col-6">
               <label className="text-label">
-                {sale.split_inv ? "Pajak Atas Barang (11%)" : "Pajak (11%)"}
+                {sale.split_inv
+                  ? "Pajak Atas Barang (11%)"
+                  : "Pajak (11%)"}
               </label>
             </div>
 
@@ -1614,24 +1586,80 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
       {body()}
       {footer()}
 
-      <DataPusatBiaya
-        data={pusatBiaya}
+      <DataProduk
+        data={product}
         loading={false}
         popUp={true}
-        show={showDepartemen}
+        show={showProduk}
         onHide={() => {
-          setShowDept(false);
+          setShowProduk(false);
         }}
         onInput={(e) => {
-          setShowDept(!e);
+          setShowProduk(!e);
         }}
         onSuccessInput={(e) => {
-          getPusatBiaya();
+          getProduct();
         }}
         onRowSelect={(e) => {
           if (doubleClick) {
-            setShowDept(false);
-            updateSL({ ...sale, req_dep: e.data.id });
+            setShowProduk(false);
+            updateSL({ ...sale, jprod: e.data.id });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataJasa
+        data={jasa}
+        loading={false}
+        popUp={true}
+        show={showJasa}
+        onHide={() => {
+          setShowJasa(false);
+        }}
+        onInput={(e) => {
+          setShowJasa(!e);
+        }}
+        onSuccessInput={(e) => {
+          getJasa();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowJasa(false);
+            updateSL({ ...sale, jjasa: e.data.id });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataSatuan
+        data={satuan}
+        loading={false}
+        popUp={true}
+        show={showSatuan}
+        onHide={() => {
+          setShowSatuan(false);
+        }}
+        onInput={(e) => {
+          setShowSatuan(!e);
+        }}
+        onSuccessInput={(e) => {
+          getSatuan();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowSatuan(false);
+            updateSL({ ...sale, jprod: e.data.id });
           }
 
           setDoubleClick(true);
@@ -1688,6 +1716,34 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
           if (doubleClick) {
             setShowSupplier(false);
             updateSL({ ...sale, req_dep: e.data.id });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataLokasi
+        data={lokasi}
+        loading={false}
+        popUp={true}
+        show={showLokasi}
+        onHide={() => {
+          setShowLok(false);
+        }}
+        onInput={(e) => {
+          setShowLok(!e);
+        }}
+        onSuccessInput={(e) => {
+          getLoct();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowLok(false);
+            updateSL({ ...sale, jprod: e.data.id });
           }
 
           setDoubleClick(true);

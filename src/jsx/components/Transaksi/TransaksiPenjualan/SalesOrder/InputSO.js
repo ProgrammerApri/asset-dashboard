@@ -21,6 +21,7 @@ import DataSatuan from "src/jsx/components/MasterLainnya/Satuan/DataSatuan";
 import DataProduk from "src/jsx/components/Master/Produk/DataProduk";
 import DataJasa from "src/jsx/components/Master/Jasa/DataJasa";
 import DataCustomer from "src/jsx/components/Mitra/Pelanggan/DataCustomer";
+import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 
 const InputSO = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
@@ -39,6 +40,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
   const [showCustomer, setShowCustomer] = useState(false);
   const [showPpn, setShowPpn] = useState(false);
   const [showRulesPay, setShowRulesPay] = useState(false);
+  const [showSubCus, setShowSub] = useState(false);
   const [product, setProduk] = useState(null);
   const [satuan, setSatuan] = useState(null);
   const [lokasi, setLokasi] = useState(null);
@@ -384,7 +386,6 @@ const InputSO = ({ onCancel, onSuccess }) => {
         selected = element;
       }
     });
-
     return selected;
   };
 
@@ -617,37 +618,27 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
           <div className="col-3">
             <label className="text-black fs-14">Pelanggan</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={so.pel_id !== null ? checkCus(so.pel_id) : null}
-                options={customer?.map((v) => v.customer)}
-                onChange={(e) => {
-                  console.log(e.value);
-                  updateSo({
-                    ...so,
-                    pel_id: e.value.id,
-                  });
-                }}
-                optionLabel="cus_name"
-                placeholder="Pilih Pelanggan"
-                filter
-                filterBy="cus_name"
-                itemTemplate={cusTemp}
-                valueTemplate={valueCusTemp}
-              />
-              <PButton
-                onClick={() => {
-                  setShowCustomer(true);
-                }}
-              >
-                <i class="bx bx-food-menu"></i>
-              </PButton>
-            </div>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
+              value={so.pel_id !== null ? checkCus(so.pel_id) : null}
+              option={customer?.map((v) => v.customer)}
+              onChange={(e) => {
+                console.log(e.value);
+                updateSo({
+                  ...so,
+                  pel_id: e.id,
+                });
+              }}
+              label={"[cus_name] ([cus_code])"}
+              placeholder="Pilih Pelanggan"
+              detail
+              onDetail={() => setShowCustomer(true)}
+            />
           </div>
 
           <div className="col-3">
-            <label className="text-black fs-14"></label>
-            <div className="p-inputgroup mt-2">
+            <label className="text-black fs-14">Alamat Pelanggan</label>
+            <div className="p-inputgroup">
               <InputText
                 value={
                   so.pel_id !== null ? checkCus(so.pel_id)?.cus_address : ""
@@ -659,8 +650,8 @@ const InputSO = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-3">
-            <label className="text-black fs-14"></label>
-            <div className="p-inputgroup mt-2">
+            <label className="text-black fs-14">Kontak Person</label>
+            <div className="p-inputgroup">
               <InputText
                 value={so.pel_id !== null ? checkCus(so.pel_id)?.cus_telp1 : ""}
                 placeholder="Kontak Person"
@@ -702,32 +693,22 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
           <div className="col-4">
             <label className="text-black fs-14">Jangka Pembayaran</label>
-            <div className="p-inputgroup mt-2">
-              <Dropdown
-                value={so.top !== null ? checkRules(so.top) : null}
-                options={rulesPay}
-                onChange={(e) => {
-                  let result = new Date(`${so.req_date}Z`);
-                  result.setDate(result.getDate() + e.value.day);
-                  console.log(result);
+            <div className="p-inputgroup mt-2"></div>
+            <CustomDropdown
+              value={so.top !== null ? checkRules(so.top) : null}
+              option={rulesPay}
+              onChange={(e) => {
+                let result = new Date(`${so.req_date}Z`);
+                result.setDate(result.getDate() + e.day);
+                console.log(result);
 
-                  updateSo({ ...so, top: e.value.id, due_date: result });
-                }}
-                optionLabel="name"
-                placeholder="Pilih Jangka Waktu"
-                filter
-                filterBy="name"
-                itemTemplate={rulTemp}
-                valueTemplate={valueRulTemp}
-              />
-              <PButton
-                onClick={() => {
-                  setShowRulesPay(true);
-                }}
-              >
-                <i class="bx bx-food-menu"></i>
-              </PButton>
-            </div>
+                updateSo({ ...so, top: e.id, due_date: result });
+              }}
+              label={"[name] ([day] Hari)"}
+              placeholder="Pilih Jangka Waktu"
+              detail
+              onDetail={() => setShowRulesPay(true)}
+            />
           </div>
 
           <div className="col-4">
@@ -760,35 +741,24 @@ const InputSO = ({ onCancel, onSuccess }) => {
             <>
               <div className="col-4">
                 <label className="text-black fs-14">Sub Pelanggan</label>
-                <div className="p-inputgroup">
-                  <Dropdown
-                    value={so.sub_id ? checkSubCus(so.sub_id) : null}
-                    options={subCus}
-                    onChange={(e) => {
-                      updateSo({ ...so, sub_id: e.value.id });
-                    }}
-                    optionLabel="cus_name"
-                    placeholder="Pilih Sub Pelanggan"
-                    filter
-                    filterBy="cus_name"
-                    itemTemplate={SubcusTemp}
-                    valueTemplate={valueSubCusTemp}
-                    disabled={so && !so.sub_addr}
-                  />
-                  <PButton
-                    onClick={() => {
-                      setShowCustomer(true);
-                    }}
-                    disabled={so && !so.sub_addr}
-                  >
-                    <i class="bx bx-food-menu"></i>
-                  </PButton>
-                </div>
+                <div className="p-inputgroup"></div>
+                <CustomDropdown
+                  value={so.sub_id ? checkSubCus(so.sub_id) : null}
+                  option={subCus}
+                  onChange={(e) => {
+                    updateSo({ ...so, sub_id: e.id });
+                  }}
+                  label={"[cus_name] ([cus_code])"}
+                  placeholder="Pilih Sub Pelanggan"
+                  detail
+                  onDetail={() => setShowSub(true)}
+                  disabled={so && !so.sub_addr}
+                />
               </div>
 
               <div className="col-4">
-                <label className="text-black fs-14"></label>
-                <div className="p-inputgroup mt-1">
+                <label className="text-black fs-14">Alamat Sub Pelanggan</label>
+                <div className="p-inputgroup">
                   <InputText
                     value={
                       so.sub_id !== null
@@ -802,8 +772,8 @@ const InputSO = ({ onCancel, onSuccess }) => {
               </div>
 
               <div className="col-4">
-                <label className="text-black fs-14"></label>
-                <div className="p-inputgroup mt-1">
+                <label className="text-black fs-14">Kontak Person</label>
+                <div className="p-inputgroup">
                   <InputText
                     value={
                       so.sub_id !== null
@@ -849,70 +819,43 @@ const InputSO = ({ onCancel, onSuccess }) => {
               >
                 <Column
                   header="Produk"
-                  // style={{
-                  //   maxWidth: "15rem",
-                  // }}
                   field={""}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={e.prod_id && checkProd(e.prod_id)}
-                        options={product}
-                        onChange={(u) => {
-                          console.log(e.value);
-                          let temp = [...so.sprod];
-                          temp[e.index].prod_id = u.value.id;
-                          temp[e.index].unit_id = u.value.unit?.id;
-                          updateSo({ ...so, sprod: temp });
-                        }}
-                        placeholder="Pilih Produk"
-                        optionLabel="name"
-                        filter
-                        filterBy="name"
-                        valueTemplate={valueProd}
-                        itemTemplate={prodTemp}
-                      />
-                      <PButton
-                        onClick={() => {
-                          setShowProduk(true);
-                        }}
-                      >
-                        <i class="bx bx-food-menu"></i>
-                      </PButton>
-                    </div>
+                    <CustomDropdown
+                      value={e.prod_id && checkProd(e.prod_id)}
+                      option={product}
+                      onChange={(u) => {
+                        console.log(e.value);
+                        let temp = [...so.sprod];
+                        temp[e.index].prod_id = u.id;
+                        temp[e.index].unit_id = u.unit?.id;
+                        updateSo({ ...so, sprod: temp });
+                      }}
+                      placeholder="Pilih Produk"
+                      label={"[name] ([code])"}
+                      detail
+                      onDetail={() => setShowProduk(true)}
+                    />
                   )}
                 />
 
                 <Column
                   header="Satuan"
-                  // style={{
-                  //   minWidth: "10rem",
-                  //   maxWidth: "15rem",
-                  // }}
                   field={""}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={e.unit_id && checkUnit(e.unit_id)}
-                        onChange={(u) => {
-                          let temp = [...so.sprod];
-                          temp[e.index].unit_id = u.value.id;
-                          updateSo({ ...so, sprod: temp });
-                        }}
-                        options={satuan}
-                        optionLabel="name"
-                        filter
-                        filterBy="name"
-                        placeholder="Pilih Satuan"
-                      />
-                      <PButton
-                        onClick={() => {
-                          setShowSatuan(true);
-                        }}
-                      >
-                        <i class="bx bx-food-menu"></i>
-                      </PButton>
-                    </div>
+                    <CustomDropdown
+                      value={e.unit_id && checkUnit(e.unit_id)}
+                      onChange={(u) => {
+                        let temp = [...so.sprod];
+                        temp[e.index].unit_id = u.id;
+                        updateSo({ ...so, sprod: temp });
+                      }}
+                      option={satuan}
+                      label={"[name]"}
+                      detail
+                      onDetail={() => setShowSatuan(true)}
+                      placeholder="Pilih Satuan"
+                    />
                   )}
                 />
 
@@ -920,21 +863,18 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   header="Lokasi"
                   field={""}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={e.location && checkLoc(e.location)}
-                        onChange={(u) => {
-                          let temp = [...so.sprod];
-                          temp[e.index].location = u.value.id;
-                          updateSo({ ...so, sprod: temp });
-                        }}
-                        options={lokasi}
-                        optionLabel="name"
-                        placeholder="Lokasi"
-                        filter
-                        filterBy="name"
-                      />
-                    </div>
+                    <CustomDropdown
+                      value={e.location && checkLoc(e.location)}
+                      onChange={(u) => {
+                        let temp = [...so.sprod];
+                        temp[e.index].location = u.id;
+                        updateSo({ ...so, sprod: temp });
+                      }}
+                      option={lokasi}
+                      label={"[name]"}
+                      placeholder="Lokasi"
+                      detail
+                    />
                   )}
                 />
 
@@ -966,9 +906,6 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Harga Satuan"
-                  style={{
-                    width: "25rem",
-                  }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
@@ -1140,71 +1077,42 @@ const InputSO = ({ onCancel, onSuccess }) => {
               >
                 <Column
                   header="Supplier"
-                  style={{
-                    width: "15rem",
-                  }}
                   field={""}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={e.sup_id && checkSupp(e.sup_id)}
-                        options={supplier}
-                        onChange={(u) => {
-                          console.log(e.value);
-                          let temp = [...so.sjasa];
-                          temp[e.index].sup_id = u.value.supplier.id;
-                          updateSo({ ...so, sjasa: temp });
-                        }}
-                        optionLabel="supplier.sup_name"
-                        placeholder="Pilih Supplier"
-                        filter
-                        filterBy="supplier.sup_name"
-                        itemTemplate={suppTemp}
-                        valueTemplate={valueSupTemp}
-                      />
-                      <PButton
-                        onClick={() => {
-                          setShowSupplier(true);
-                        }}
-                      >
-                        <i class="bx bx-food-menu"></i>
-                      </PButton>
-                    </div>
+                    <CustomDropdown
+                      value={e.sup_id && checkSupp(e.sup_id)}
+                      option={supplier}
+                      onChange={(u) => {
+                        let temp = [...so.sjasa];
+                        temp[e.index].sup_id = u.supplier.id;
+                        updateSo({ ...so, sjasa: temp });
+                      }}
+                      label={"[supplier.sup_name] ([supplier.sup_code])"}
+                      placeholder="Pilih Supplier"
+                      detail
+                      onDetail={() => setShowSupplier(true)}
+                    />
                   )}
                 />
 
                 <Column
                   header="Jasa"
-                  style={{
-                    maxWidth: "15rem",
-                  }}
                   field={""}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={e.jasa_id && checkJasa(e.jasa_id)}
-                        options={jasa}
-                        onChange={(u) => {
-                          console.log(e.value);
-                          let temp = [...so.sjasa];
-                          temp[e.index].jasa_id = u.value.jasa.id;
-                          updateSo({ ...so, sjasa: temp });
-                        }}
-                        optionLabel="jasa.name"
-                        placeholder="Pilih Jasa"
-                        filter
-                        filterBy="jasa.name"
-                        itemTemplate={jasTemp}
-                        valueTemplate={valueJasTemp}
-                      />
-                      <PButton
-                        onClick={() => {
-                          setShowJasa(true);
-                        }}
-                      >
-                        <i class="bx bx-food-menu"></i>
-                      </PButton>
-                    </div>
+                    <CustomDropdown
+                      value={e.jasa_id && checkJasa(e.jasa_id)}
+                      option={jasa}
+                      onChange={(u) => {
+                        console.log(e.value);
+                        let temp = [...so.sjasa];
+                        temp[e.index].jasa_id = u.jasa.id;
+                        updateSo({ ...so, sjasa: temp });
+                      }}
+                      label={"[jasa.name] ([jasa.code])"}
+                      placeholder="Pilih Jasa"
+                      detail
+                      onDetail={() => setShowJasa(true)}
+                    />
                   )}
                 />
 
@@ -1215,37 +1123,25 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   }}
                   field={""}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={e.unit_id && checkUnit(e.unit_id)}
-                        options={satuan}
-                        onChange={(u) => {
-                          console.log(e.value);
-                          let temp = [...so.sjasa];
-                          temp[e.index].unit_id = u.value.id;
-                          updateSo({ ...so, sjasa: temp });
-                        }}
-                        optionLabel="name"
-                        placeholder="Pilih Satuan"
-                        filter
-                        filterBy="name"
-                      />
-                      <PButton
-                        onClick={() => {
-                          setShowSatuan(true);
-                        }}
-                      >
-                        <i class="bx bx-food-menu"></i>
-                      </PButton>
-                    </div>
+                    <CustomDropdown
+                      value={e.unit_id && checkUnit(e.unit_id)}
+                      option={satuan}
+                      onChange={(u) => {
+                        console.log(e.value);
+                        let temp = [...so.sjasa];
+                        temp[e.index].unit_id = u.id;
+                        updateSo({ ...so, sjasa: temp });
+                      }}
+                      label={"[name]"}
+                      placeholder="Pilih Satuan"
+                      detail
+                      onDetail={() => setShowSatuan(true)}
+                    />
                   )}
                 />
 
                 <Column
-                  header="Pesanan"
-                  // style={{
-                  //   maxWidth: "15rem",
-                  // }}
+                  header="Jumlah"
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
@@ -1886,6 +1782,34 @@ const InputSO = ({ onCancel, onSuccess }) => {
           if (doubleClick) {
             setShowCustomer(false);
             updateSo({ ...so, pel_id: e.data.id });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataCustomer
+        data={subCus}
+        loading={false}
+        popUp={true}
+        show={showSubCus}
+        onHide={() => {
+          setShowSub(false);
+        }}
+        onInput={(e) => {
+          setShowSub(!e);
+        }}
+        onSuccessInput={(e) => {
+          getSubCus();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowSub(false);
+            updateSo({ ...so, sub_id: e.data.id });
           }
 
           setDoubleClick(true);

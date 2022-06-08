@@ -134,7 +134,6 @@ const DataSalesOrder = ({ onAdd, onEdit }) => {
             sprod.forEach((el) => {
               el.prod_id = el.prod_id.id;
               el.unit_id = el.unit_id.id;
-              el.location = el.location.id;
             });
             let sjasa = data.sjasa;
             sjasa.forEach((el) => {

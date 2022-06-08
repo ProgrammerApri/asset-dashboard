@@ -136,7 +136,7 @@ const DataPenjualan = ({ onAdd, onEdit }) => {
             jprod.forEach((el) => {
               el.prod_id = el.prod_id.id;
               el.unit_id = el.unit_id.id;
-              el.location = el.location?.id;
+              // el.location = el.location?.id;
             });
             let jjasa = data.jjasa;
             jjasa.forEach((el) => {
@@ -177,11 +177,14 @@ const DataPenjualan = ({ onAdd, onEdit }) => {
               payload: {
                 ...data,
                 so_id: data?.so_id?.id,
-                pel_id: data?.pel_id?.id,
-                sub_id: data?.sub_id?.id,
+                pel_id: data?.pel_id?.id ?? null,
+                sub_id: data?.sub_id?.id ?? null,
                 top: data?.top?.id,
                 jprod: jprod,
-                jjasa: jjasa,
+                jjasa: jjasa.map((v) => {
+                  v.order = v.qty
+                  return v
+                }),
               },
             });
           }}

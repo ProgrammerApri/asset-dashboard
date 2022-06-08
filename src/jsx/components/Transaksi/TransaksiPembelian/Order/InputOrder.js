@@ -434,50 +434,6 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
-  const deptTemp = (option) => {
-    return (
-      <div>
-        {option !== null ? `${option.ccost_code} (${option.ccost_name})` : ""}
-      </div>
-    );
-  };
-
-  const valueDeptTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null ? `${option.ccost_code} (${option.ccost_name})` : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const poTemp = (option) => {
-    return (
-      <div>
-        {option !== null
-          ? `${option.po_code} (${option.preq_id.req_dep.ccost_name})`
-          : ""}
-      </div>
-    );
-  };
-
-  const valuePOTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null
-            ? `${option.po_code} (${option.preq_id.req_dep.ccost_name})`
-            : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
   const suppTemp = (option) => {
     return (
       <div>
@@ -496,40 +452,6 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             ? `${option.supplier.sup_code} (${option.supplier.sup_name})`
             : ""}
         </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const rulTemp = (option) => {
-    return (
-      <div>{option !== null ? `${option.name} (${option.day} Hari)` : ""}</div>
-    );
-  };
-
-  const valueRulTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null ? `${option.name} (${option.day} Hari)` : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const prodTemp = (option) => {
-    return (
-      <div>{option !== null ? `${option.name} (${option.code})` : ""}</div>
-    );
-  };
-
-  const valueProd = (option, props) => {
-    if (option) {
-      return (
-        <div>{option !== null ? `${option.name} (${option.code})` : ""}</div>
       );
     }
 
@@ -634,7 +556,15 @@ const InputOrder = ({ onCancel, onSuccess }) => {
               <Calendar
                 value={new Date(`${order.ord_date}Z`)}
                 onChange={(e) => {
-                  updateORD({ ...order, ord_date: e.value });
+                  let result = null;
+                  if (order.top) {
+                    result = new Date(`${order.ord_date}Z`);
+                    result.setDate(
+                      result.getDate() + checRulPay(order?.top)?.day
+                    );
+                    console.log(result);
+                  }
+                  updateORD({ ...order, ord_date: e.value, due_date: result });
                 }}
                 placeholder="Pilih Tanggal"
                 showIcon
@@ -662,19 +592,11 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             <CustomDropdown
               value={order.po_id !== null ? checkPO(order.po_id) : null}
               onChange={(e) => {
-                let result = null;
-                if (order.top) {
-                  result = new Date(`${order.ord_date}Z`);
-                  result.setDate(
-                    result.getDate() + checRulPay(order?.top)?.day
-                  );
-                  console.log(result);
-                }
                 updateORD({
                   ...order,
                   po_id: e.id,
                   top: e.top.id ?? null,
-                  due_date: result,
+                  // due_date: result,
                   sup_id: e.sup_id.id ?? null,
                   dep_id: e.preq_id?.req_dep?.id ?? null,
                   dprod: e.pprod,
@@ -857,52 +779,22 @@ const InputOrder = ({ onCancel, onSuccess }) => {
               >
                 <Column
                   header="Produk"
-                  // style={{
-                  //   width: "15rem",
-                  // }}
                   field={""}
                   body={(e) => (
-                    // <div className="p-inputgroup">
-                    //   <Dropdown
-                    //     value={e.prod_id && checkProd(e.prod_id)}
-                    //     options={product}
-                    //     onChange={(u) => {
-                    //       console.log(e.value);
-                    //       let temp = [...order.dprod];
-                    //       temp[e.index].prod_id = u.value.id;
-                    //       temp[e.index].unit_id = u.value.unit?.id;
-                    //       updateORD({ ...order, dprod: temp });
-                    //     }}
-                    //     placeholder="Pilih Produk"
-                    //     optionLabel="name"
-                    //     filter
-                    //     filterBy="name"
-                    //     valueTemplate={valueProd}
-                    //     itemTemplate={prodTemp}
-                    //     disabled={order && order.po_id !== null}
-                    //   />
-                    //   <PButton
-                    //     onClick={() => {
-                    //       setShowProduk(true);
-                    //     }}
-                    //     disabled={order && order.po_id !== null}
-                    //   >
-                    //     <i class="bx bx-food-menu"></i>
-                    //   </PButton>
-                    // </div>
                     <CustomDropdown
                       value={e.prod_id && checkProd(e.prod_id)}
                       option={product}
                       onChange={(u) => {
                         console.log(e.value);
                         let temp = [...order.dprod];
-                        temp[e.index].prod_id = u.value.id;
-                        temp[e.index].unit_id = u.value.unit?.id;
+                        temp[e.index].prod_id = u.id;
+                        temp[e.index].unit_id = u.unit?.id;
                         updateORD({ ...order, dprod: temp });
                       }}
                       detail
                       label={"[name]"}
                       placeholder="Pilih Produk"
+                      disabled={order && order.po_id !== null}
                     />
                   )}
                 />
@@ -915,7 +807,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                       value={e.unit_id && checkUnit(e.unit_id)}
                       onChange={(u) => {
                         let temp = [...order.dprod];
-                        temp[e.index].unit_id = u.value.id;
+                        temp[e.index].unit_id = u.id;
                         updateORD({ ...order, dprod: temp });
                       }}
                       option={satuan}
@@ -925,15 +817,34 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                       }}
                       label={"[name]"}
                       placeholder="Pilih Satuan"
+                      disabled={order && order.po_id !== null}
                     />
                   )}
                 />
 
                 <Column
+                  header="Lokasi"
+                  field={""}
+                  body={(e) => (
+                    <div className="p-inputgroup">
+                      <CustomDropdown
+                        value={e.location && checkLoc(e.location)}
+                        onChange={(u) => {
+                          let temp = [...order.dprod];
+                          temp[e.index].location = u.id;
+                          updateORD({ ...order, dprod: temp });
+                        }}
+                        option={lokasi}
+                        label={"[name]"}
+                        placeholder="Lokasi"
+                        detail
+                      />
+                    </div>
+                  )}
+                />
+
+                <Column
                   header="Jumlah"
-                  // style={{
-                  //   maxWidth: "10rem",
-                  // }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
@@ -951,31 +862,6 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                         type="number"
                         min={0}
                         disabled={order && order.po_id !== null}
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header="Lokasi"
-                  // style={{
-                  //   maxWidth: "10rem",
-                  // }}
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={e.location && checkLoc(e.location)}
-                        onChange={(u) => {
-                          let temp = [...order.dprod];
-                          temp[e.index].location = u.value.id;
-                          updateORD({ ...order, dprod: temp });
-                        }}
-                        options={lokasi}
-                        optionLabel="name"
-                        placeholder="Lokasi"
-                        filter
-                        filterBy="name"
                       />
                     </div>
                   )}
@@ -1161,118 +1047,72 @@ const InputOrder = ({ onCancel, onSuccess }) => {
               >
                 <Column
                   header="Supplier"
-                  // style={{
-                  //   width: "15rem",
-                  // }}
                   field={""}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={e.sup_id && checkSupp(e.sup_id)}
-                        options={supplier}
-                        onChange={(u) => {
-                          console.log(e.value);
-                          let temp = [...order.djasa];
-                          temp[e.index].sup_id = u.value.supplier.id;
-                          updateORD({ ...order, djasa: temp });
-                        }}
-                        optionLabel="supplier.sup_name"
-                        placeholder="Pilih Supplier"
-                        filter
-                        filterBy="supplier.sup_name"
-                        itemTemplate={suppTemp}
-                        valueTemplate={valueSupTemp}
-                        disabled={order && order.po_id !== null}
-                      />
-                      <PButton
-                        onClick={() => {
-                          setShowSupplier(true);
-                        }}
-                        disabled={order && order.po_id !== null}
-                      >
-                        <i class="bx bx-food-menu"></i>
-                      </PButton>
-                    </div>
+                    <CustomDropdown
+                      value={e.sup_id && checkSupp(e.sup_id)}
+                      option={supplier}
+                      onChange={(u) => {
+                        console.log(e.value);
+                        let temp = [...order.djasa];
+                        temp[e.index].sup_id = u.supplier.id;
+                        updateORD({ ...order, djasa: temp });
+                      }}
+                      label={"[supplier.sup_name] ([supplier.sup_code])"}
+                      placeholder="Pilih Supplier"
+                      detail
+                      onDetail={() => setShowSupplier(true)}
+                      disabled={order && order.po_id !== null}
+                    />
                   )}
                 />
 
                 <Column
                   header="Jasa"
-                  // style={{
-                  //   maxWidth: "15rem",
-                  // }}
                   field={""}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={e.jasa_id && checkJasa(e.jasa_id)}
-                        options={jasa}
-                        onChange={(u) => {
-                          console.log(e.value);
-                          let temp = [...order.djasa];
-                          temp[e.index].jasa_id = u.value.jasa.id;
-                          updateORD({ ...order, djasa: temp });
-                        }}
-                        optionLabel="jasa.name"
-                        placeholder="Pilih Jasa"
-                        filter
-                        filterBy="jasa.name"
-                        itemTemplate={jasTemp}
-                        valueTemplate={valueJasTemp}
-                        disabled={order && order.po_id !== null}
-                      />
-                      <PButton
-                        onClick={() => {
-                          setShowJasa(true);
-                        }}
-                        disabled={order && order.po_id !== null}
-                      >
-                        <i class="bx bx-food-menu"></i>
-                      </PButton>
-                    </div>
+                    <CustomDropdown
+                      value={e.jasa_id && checkJasa(e.jasa_id)}
+                      option={jasa}
+                      onChange={(u) => {
+                        console.log(e.value);
+                        let temp = [...order.djasa];
+                        temp[e.index].jasa_id = u.jasa.id;
+                        updateORD({ ...order, djasa: temp });
+                      }}
+                      label={"[jasa.name] ([jasa.code])"}
+                      placeholder="Pilih Jasa"
+                      detail
+                      onDetail={() => setShowJasa(true)}
+                      disabled={order && order.po_id !== null}
+                    />
                   )}
                 />
 
                 <Column
                   header="Satuan"
-                  // style={{
-                  //   maxWidth: "12rem",
-                  // }}
                   field={""}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={e.unit_id && checkUnit(e.unit_id)}
-                        options={satuan}
-                        onChange={(u) => {
-                          console.log(e.value);
-                          let temp = [...order.djasa];
-                          temp[e.index].unit_id = u.value.id;
-                          updateORD({ ...order, djasa: temp });
-                        }}
-                        optionLabel="name"
-                        placeholder="Pilih Satuan"
-                        filter
-                        filterBy="name"
-                        disabled={order && order.po_id !== null}
-                      />
-                      <PButton
-                        onClick={() => {
-                          setShowSatuan(true);
-                        }}
-                        disabled={order && order.po_id !== null}
-                      >
-                        <i class="bx bx-food-menu"></i>
-                      </PButton>
-                    </div>
+                    <CustomDropdown
+                      value={e.unit_id && checkUnit(e.unit_id)}
+                      option={satuan}
+                      onChange={(u) => {
+                        console.log(e.value);
+                        let temp = [...order.djasa];
+                        temp[e.index].unit_id = u.id;
+                        updateORD({ ...order, djasa: temp });
+                      }}
+                      label={"[name]"}
+                      placeholder="Pilih Satuan"
+                      detail
+                      onDetail={() => setShowSatuan(true)}
+                      disabled={order && order.po_id !== null}
+                    />
                   )}
                 />
 
                 <Column
                   header="Pesanan"
-                  // style={{
-                  //   maxWidth: "15rem",
-                  // }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">

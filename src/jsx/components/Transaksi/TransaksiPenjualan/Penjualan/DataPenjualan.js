@@ -181,10 +181,7 @@ const DataPenjualan = ({ onAdd, onEdit }) => {
                 sub_id: data?.sub_id?.id ?? null,
                 top: data?.top?.id,
                 jprod: jprod,
-                jjasa: jjasa.map((v) => {
-                  v.order = v.qty
-                  return v
-                }),
+                jjasa: jjasa,
               },
             });
           }}

@@ -605,8 +605,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   sub_id: e.sub_id?.id ?? null,
                   jprod: e.sprod,
                   jjasa: e.sjasa.map((v) => {
-                    v.order = v.qty
-                    return v
+                    return {...v, order : v.qty}
                   }),
                 });
               }}

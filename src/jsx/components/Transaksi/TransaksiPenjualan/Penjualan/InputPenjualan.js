@@ -552,14 +552,18 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                 value={new Date(`${sale.ord_date}Z`)}
                 onChange={(e) => {
                   let result = null;
-                  if (sale.top) {
+                  if (sale.ord_date) {
                     result = new Date(`${sale.ord_date}Z`);
                     result.setDate(
                       result.getDate() + checkRulesP(sale?.top)?.day
                     );
                     console.log(result);
                   }
-                  updateSL({ ...sale, ord_date: e.target.value, due_date: result });
+                  updateSL({
+                    ...sale,
+                    ord_date: e.target.value,
+                    due_date: result,
+                  });
                 }}
                 placeholder="Pilih Tanggal"
                 showIcon
@@ -589,7 +593,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
               option={so}
               onChange={(e) => {
                 let result = null;
-                if (sale.top) {
+                if (sale.top != null) {
                   result = new Date(`${sale.ord_date}Z`);
                   result.setDate(
                     result.getDate() + checkRulesP(sale?.top)?.day
@@ -605,8 +609,8 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   sub_id: e.sub_id?.id ?? null,
                   jprod: e.sprod,
                   jjasa: e.sjasa.map((v) => {
-                    v.order = v.qty
-                    return v
+                    v.order = v.qty;
+                    return v;
                   }),
                 });
               }}
@@ -635,7 +639,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-3">
-            <label className="text-label">Alamat Supplier</label>
+            <label className="text-label">Alamat Pelanggan</label>
             <div className="p-inputgroup">
               <InputText
                 value={
@@ -719,15 +723,15 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
             </label>
             <InputSwitch
               className="ml-4"
-              checked={sale.so_id && checkSO(sale.so_id).sub_addr}
+              checked={sale.sub_addr}
               onChange={(e) => {
                 updateSL({ ...sale, sub_addr: e.target.value });
               }}
-              disabled={sale && sale.so_id}
+              // disabled={sale && sale.so_id}
             />
           </div>
 
-          {checkSO(sale.so_id).sub_addr === true && (
+          {sale.sub_addr === true && (
             <>
               <div className="col-4">
                 <label className="text-black fs-14">Sub Pelanggan</label>
@@ -1138,7 +1142,12 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                       <InputText
                         value={e.order && e.order}
                         onChange={(u) => {
-                          let temp = [...sale.jjasa];
+                          let temp = [
+                            ...sale.jjasa.map((v) => {
+                              v.order = v.qty;
+                              return v;
+                            }),
+                          ];
                           temp[e.index].order = u.target.value;
                           temp[e.index].total =
                             temp[e.index].order * temp[e.index].price;
@@ -1299,9 +1308,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
           <div className="row justify-content-right col-6">
             <div className="col-6">
               <label className="text-label">
-                {sale.split_inv
-                  ? "Sub Total Barang"
-                  : "Sub Total"}
+                {sale.split_inv ? "Sub Total Barang" : "Sub Total"}
               </label>
             </div>
 
@@ -1337,9 +1344,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
 
             <div className="col-6">
               <label className="text-label">
-                {sale.split_inv
-                  ? "Pajak Atas Barang (11%)"
-                  : "Pajak (11%)"}
+                {sale.split_inv ? "Pajak Atas Barang (11%)" : "Pajak (11%)"}
               </label>
             </div>
 

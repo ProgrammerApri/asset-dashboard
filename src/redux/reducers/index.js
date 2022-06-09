@@ -9,7 +9,7 @@ import SRReducer from "./SRReducer";
 import ODRReducer from "./ODRReducer";
 import RBReducer from "./RBReducer";
 import SLReducer from "./SLReducer";
-import OUTReducer from "./OUTReducer";
+import EXPReducer from "./EXPReducer";
 
 
 const rootReducer = combineReducers({
@@ -23,7 +23,7 @@ const rootReducer = combineReducers({
   inv: INVReducer,
   rb: RBReducer,
   sl: SLReducer,
-  out: OUTReducer,
+  exp: EXPReducer,
 });
 
 export default rootReducer;

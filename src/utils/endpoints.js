@@ -764,6 +764,31 @@ const endpoints = {
     method: "DELETE",
     data: {},
   },
+
+  /// Expense
+  expense: {
+    endpoint: "/v1/api/expense",
+    method: "GET",
+    data: {},
+  },
+
+  addEXP: {
+    endpoint: "/v1/api/expense",
+    method: "POST",
+    data: {},
+  },
+
+  editEXP: {
+    endpoint: "/v1/api/expense/",
+    method: "PUT",
+    data: {},
+  },
+
+  delEXP: {
+    endpoint: "/v1/api/expense/",
+    method: "DELETE",
+    data: {},
+  },
 };
 
 export default endpoints;

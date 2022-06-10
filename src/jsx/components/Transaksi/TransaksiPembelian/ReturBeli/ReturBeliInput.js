@@ -16,6 +16,7 @@ import DataSupplier from "../../../Mitra/Pemasok/DataPemasok";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
+import { el } from "date-fns/locale";
 
 const ReturBeliInput = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
@@ -23,12 +24,12 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
   const toast = useRef(null);
   const [doubleClick, setDoubleClick] = useState(false);
   const pr = useSelector((state) => state.pr.current);
-  const isEdit = useSelector((state) => state.po.editpo);
+  const isEdit = useSelector((state) => state.pr.editPr);
   const dispatch = useDispatch();
   const [isRp, setRp] = useState(true);
   const [supplier, setSupplier] = useState(null);
   const [ppn, setPpn] = useState(null);
-  const [rp, setRequest] = useState(null);
+  const [fk, setFk] = useState(null);
   const [showSupplier, setShowSupplier] = useState(false);
   const [product, setProduct] = useState(null);
   const [satuan, setSatuan] = useState(null);
@@ -36,7 +37,6 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
     produk: true,
     jasa: false,
   });
-
 
   useEffect(() => {
     window.scrollTo({
@@ -46,7 +46,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
     });
     getSupplier();
     getPpn();
-    getRp();
+    getFK();
     getProduct();
     getSatuan();
   }, []);
@@ -85,9 +85,9 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
-  const getRp = async () => {
+  const getFK = async () => {
     const config = {
-      ...endpoints.rPurchase,
+      ...endpoints.faktur,
       data: {},
     };
     console.log(config.data);
@@ -97,36 +97,49 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        let filt = [];
-        data.forEach((elem) => {
-          if (elem.status === 0) {
-            filt.push(elem);
-            elem.dprod.forEach((el) => {
-              el.order = el.order ?? 0;
-              if (el.order === 0 || el.request - el.order !== 0) {
-                el.prod_id = el.prod_id.id;
-                el.unit_id = el.unit_id.id;
-              }
-            });
-            elem.rjasa.forEach((element) => {
-              element.jasa_id = element.jasa_id.id;
-              element.unit_id = element.unit_id.id;
-            });
-            elem.rjasa.push({
-              id: 0,
-              preq_id: elem.id,
-              sup_id: null,
-              jasa_id: null,
-              unit_id: null,
-              qty: null,
-              price: null,
-              disc: null,
-              total: null,
-            });
-          }
-        });
-        console.log(data);
-        setRequest(filt);
+        // let filt = [];
+        // data.forEach((elem) => {
+        //   let prod = [];
+        //   elem.product.forEach((el) => {
+        //     el.prod_id = el.prod_id.id;
+        //     el.unit_id = el.unit_id.id;
+        //     el.location = el.location?.id;
+        //     prod.push({
+        //       ...el,
+        //       r_order: el.order,
+        //     });
+
+        //     let temp = [...pr.bproduct];
+        //     pr.bproduct.forEach((e, i) => {
+        //       if (el.id === e.product) {
+        //         temp[i].order = el.order;
+        //         updatePr({ ...pr, bproduct: temp });
+        //       }
+        //     });
+        //   });
+        //   elem.product = prod;
+
+        //   let jasa = [];
+        //   elem.jasa.forEach((element) => {
+        //     element.jasa_id = element.jasa_id.id;
+        //     element.unit_id = element.unit_id.id;
+        //     jasa.push({
+        //       ...element,
+        //       r_order: element.order,
+        //     });
+
+        //     let temp = [...pr.bjasa];
+        //     pr.bjasa.forEach((e, i) => {
+        //       if (el.id === e.jasa_id) {
+        //         temp[i].order = el.order;
+        //         updatePr({ ...pr, bjasa: temp });
+        //       }
+        //     });
+        //   });
+        //   elem.jasa = jasa;
+        //   filt.push(elem);
+        // });
+        setFk(data);
       }
     } catch (error) {}
   };
@@ -231,9 +244,9 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
     }
   };
 
-  const req_pur = (value) => {
+  const checkFK = (value) => {
     let selected = {};
-    rp?.forEach((element) => {
+    fk?.forEach((element) => {
       if (value === element.id) {
         selected = element;
       }
@@ -424,38 +437,34 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
 
           <div className="col-4">
             <label className="text-label">No. Faktur Pembelian</label>
-            <div className="p-inputgroup">
-              <CustomDropdown
-                value={pr.preq_id && req_pur(pr.preq_id)}
-                options={rp}
-                onChange={(e) => {
-                  console.log(e.value.dprod);
-                  let result = null;
-                  if (pr.top) {
-                    result = new Date(`${req_pur(e.value.id).req_date}Z`);
-                    // result.setDate(result.getDate() + rulPay(pr?.top)?.day);
-                    console.log(result);
-                  }
-                  updatePr({
-                    ...pr,
-                    preq_id: e.id,
-                    due_date: result,
-                    sup_id: e.ref_sup?.id ?? null,
-                    dprod: e.dprod,
-                    rjasa: e.rjasa,
-                  });
-                }}
-                optionLabel="req_code"
-                placeholder="Pilih Kode Permintaan"
-                filter
-                filterBy=""
-                itemTemplate={reqTemp}
-                valueTemplate={valueReqTemp}
-              />
-            </div>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
+              value={pr.fk_id && checkFK(pr.fk_id)}
+              option={fk}
+              onChange={(e) => {
+                // console.log(e.value.dprod);
+                // let result = null;
+                // if (pr.top) {
+                //   result = new Date(`${checkFK(e.value.id).req_date}Z`);
+                //   // result.setDate(result.getDate() + rulPay(pr?.top)?.day);
+                //   console.log(result);
+                // }
+                // updatePr({
+                //   ...pr,
+                //   preq_id: e.id,
+                //   due_date: result,
+                //   sup_id: e.ref_sup?.id ?? null,
+                //   dprod: e.dprod,
+                //   rjasa: e.rjasa,
+                // });
+              }}
+              label={"[fk_code]"}
+              placeholder="Pilih Kode Permintaan"
+              detail
+            />
           </div>
-            {/* kode suplier otomatis keluar, karena sudah melekat di faktur pembelian  */}
-            
+          {/* kode suplier otomatis keluar, karena sudah melekat di faktur pembelian  */}
+
           <div className="col-3">
             <label className="text-label">Supplier</label>
             <div className="p-inputgroup">
@@ -610,8 +619,8 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                         onChange={(a) => {
                           let temp = [...pr.dprod];
                           let result = temp[e.index]?.request - a.target.value;
-                          temp[e.index].remain = result
-                          temp[e.index].order = a.target.value
+                          temp[e.index].remain = result;
+                          temp[e.index].order = a.target.value;
                           updatePr({ ...pr, dprod: temp });
                         }}
                         placeholder="0"
@@ -962,7 +971,6 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
       {body()}
       {footer()}
 
-
       <DataSupplier
         data={supplier}
         loading={false}
@@ -980,7 +988,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowSupplier(false);
-            updatePr({ ...rp, req_dep: e.data.id });
+            updatePr({ ...pr, req_dep: e.data.id });
           }
 
           setDoubleClick(true);

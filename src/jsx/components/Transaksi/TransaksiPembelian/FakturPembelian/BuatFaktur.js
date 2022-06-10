@@ -15,6 +15,7 @@ import { SET_CURRENT_INV } from "src/redux/actions";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import { el } from "date-fns/locale";
 import { InputSwitch } from "primereact/inputswitch";
+import DataOrder from "../Order/DataOrder";
 
 const BuatFaktur = ({ onCancel, onSuccess }) => {
   const inv = useSelector((state) => state.inv.current);
@@ -33,6 +34,8 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
   const isEdit = useSelector((state) => state.inv.editinv);
   const [isRp, setRp] = useState(false);
   const [isRpJasa, setRpJasa] = useState(false);
+  const [showOrder, SetShowOrder] = useState(false);
+  const [doubleClick, setDoubleClick] = useState(false);
   const dispatch = useDispatch();
   const [accor, setAccor] = useState({
     produk: true,
@@ -89,15 +92,37 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
               el.prod_id = el.prod_id.id;
               el.unit_id = el.unit_id.id;
               el.location = el.location?.id;
-              prod.push(el);
+              prod.push({
+                ...el,
+                r_order: el.order,
+              });
+
+              let temp = [...inv.product];
+              inv.product.forEach((e, i) => {
+                if (el.id === e.dprod_id) {
+                  temp[i].order = el.order;
+                  updateINV({ ...inv, product: temp });
+                }
+              });
             });
-            console.log(prod);
             elem.dprod = prod;
+
             let jasa = [];
             elem.djasa.forEach((element) => {
-              element.jasa_id = element.jasa_id.jasa.id;
+              element.jasa_id = element.jasa_id.id;
               element.unit_id = element.unit_id.id;
-              jasa.push(element);
+              jasa.push({
+                ...element,
+                r_order: element.order,
+              });
+
+              let temp = [...inv.jasa];
+              inv.jasa.forEach((e, i) => {
+                if (el.id === e.djasa_id) {
+                  temp[i].order = el.order;
+                  updateINV({ ...inv, jasa: temp });
+                }
+              });
             });
             elem.djasa = jasa;
             filt.push(elem);
@@ -483,7 +508,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
               }}
               option={order}
               detail
-              // onDetail={() => SetShowOrder()}
+              // onDetail={() => SetShowOrder(true)}
               label={"[ord_code]"}
               placeholder="No. Pembelian"
             />
@@ -491,21 +516,23 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
 
           <div className="col-3">
             <label className="text-label">Supplier</label>
-            <div className="p-inputgroup"></div>
-            <InputText
-              value={
-                inv.ord_id !== null
-                  ? `${
-                      checkSupp(checkOrd(inv.ord_id)?.sup_id?.id).supplier
-                        .sup_name
-                    } (${
-                      checkSupp(checkOrd(inv.ord_id)?.sup_id?.id).supplier
-                        .sup_code
-                    })`
-                  : null
-              }
-              placeholder="Pilih Supplier"
-            />
+            <div className="p-inputgroup">
+              <InputText
+                value={
+                  inv.ord_id !== null
+                    ? `${
+                        checkSupp(checkOrd(inv.ord_id)?.sup_id?.id).supplier
+                          .sup_name
+                      } (${
+                        checkSupp(checkOrd(inv.ord_id)?.sup_id?.id).supplier
+                          .sup_code
+                      })`
+                    : null
+                }
+                placeholder="Pilih Supplier"
+                disabled
+              />
+            </div>
           </div>
 
           <div className="col-3">
@@ -676,9 +703,6 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Jumlah"
-                  style={{
-                    width: "5rem",
-                  }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
@@ -813,7 +837,10 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        value={e.jasa_id && checkJasa(e.sup_id)}
+                        value={e.sup_id &&
+                          `${checkSupp(e.sup_id).supplier.sup_name} (${
+                            checkSupp(e.sup_id).supplier.sup_code
+                          })`}
                         placeholder="Supplier"
                         disabled
                       />
@@ -829,8 +856,8 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                       <InputText
                         value={
                           e.jasa_id &&
-                          `${checkJasa(e.jasa_id).name} (${
-                            checkJasa(e.jasa_id).code
+                          `${checkJasa(e.jasa_id).jasa.name} (${
+                            checkJasa(e.jasa_id).jasa.code
                           })`
                         }
                         placeholder="Jasa"
@@ -855,7 +882,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
-                  header="Pesanan"
+                  header="Jumlah"
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
@@ -1252,6 +1279,34 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
       {header()}
       {body()}
       {footer()}
+
+      {/* <DataOrder
+        data={order}
+        loading={false}
+        popUp={true}
+        show={showOrder}
+        onHide={() => {
+          SetShowOrder(false);
+        }}
+        onInput={(e) => {
+          SetShowOrder(!e);
+        }}
+        onSuccessInput={(e) => {
+          getORD();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            SetShowOrder(false);
+            updateINV({ ...inv, ord_id: e.data.id });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      /> */}
     </>
   );
 };

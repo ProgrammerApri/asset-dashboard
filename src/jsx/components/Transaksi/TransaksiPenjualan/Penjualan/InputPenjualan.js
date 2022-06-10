@@ -552,7 +552,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                 value={new Date(`${sale.ord_date}Z`)}
                 onChange={(e) => {
                   let result = null;
-                  if (sale.ord_date) {
+                  if (sale.top) {
                     result = new Date(`${sale.ord_date}Z`);
                     result.setDate(
                       result.getDate() + checkRulesP(sale?.top)?.day

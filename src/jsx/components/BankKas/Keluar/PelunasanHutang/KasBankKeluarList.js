@@ -249,6 +249,7 @@ const KasBankOutList = ({ onAdd, onEdit }) => {
               type: SET_CURRENT_EXP,
               payload: {
                 ...data,
+                exp_type: 1,
                 acq: [
                   {
                     id: null,
@@ -372,7 +373,7 @@ const KasBankOutList = ({ onAdd, onEdit }) => {
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
         />
-        <Column
+        {/* <Column
           header="Cara Pengeluaran"
           field={(e) => e.acq_pay}
           style={{ minWidth: "8rem" }}
@@ -389,7 +390,7 @@ const KasBankOutList = ({ onAdd, onEdit }) => {
           field={(e) => e.acq.value}
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
-        />
+        /> */}
       </DataTable>
 
       <Dialog

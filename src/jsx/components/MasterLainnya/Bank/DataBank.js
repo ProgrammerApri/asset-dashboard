@@ -14,7 +14,7 @@ import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 
-const data = {
+const def = {
   bank: {
     id: 1,
     BANK_CODE: "",
@@ -40,26 +40,32 @@ const data = {
   },
 };
 
-const Bank = () => {
+const DataBank = ({
+  data,
+  load,
+  popUp = false,
+  show = false,
+  onHide = () => {},
+  onInput = () => {},
+  onRowSelect,
+  onSuccessInput,
+}) => {
   const [bank, setBank] = useState(null);
   const [account, setAccount] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
-  const [displayData, setDisplayData] = useState(false);
-  const [displayDel, setDisplayDel] = useState(false);
+  const [showInput, setShowInput] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
   const [position, setPosition] = useState("center");
-  const [currentItem, setCurrentItem] = useState(null);
+  const [currentItem, setCurrentItem] = useState(def);
   const toast = useRef(null);
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
-  const [isEdit, setEdit] = useState(false);
+  const [isEdit, setEdit] = useState(def);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
 
-  const dummy = Array.from({ length: 10 });
-
   useEffect(() => {
-    // getBank();
     getAccount();
     initFilters1();
   }, []);
@@ -89,33 +95,6 @@ const Bank = () => {
         setAccount(filt);
       }
     } catch (error) {}
-    getBank();
-  };
-
-  const getBank = async (isUpdate = false) => {
-    setLoading(true);
-    const config = {
-      ...endpoints.bank,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setBank(data);
-      }
-    } catch (error) {}
-    if (isUpdate) {
-      setLoading(false);
-    } else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1500);
-    }
   };
 
   const editBank = async () => {
@@ -136,9 +115,10 @@ const Bank = () => {
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setUpdate(false);
-          setDisplayData(false);
-          getBank(true);
+          onSuccessInput();
+          setLoading(false);
+          onHideInput();
+          onInput(false);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -177,9 +157,10 @@ const Bank = () => {
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setUpdate(false);
-          setDisplayData(false);
-          getBank(true);
+          onSuccessInput();
+          setLoading(false);
+          onHideInput();
+          onInput(false);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -226,9 +207,10 @@ const Bank = () => {
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setUpdate(false);
-          setDisplayDel(false);
-          getBank(true);
+          setLoading(false);
+          setShowDelete(false);
+          onSuccessInput();
+          onInput(false);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -240,8 +222,10 @@ const Bank = () => {
     } catch (error) {
       console.log(error);
       setTimeout(() => {
-        setUpdate(false);
-        setDisplayDel(false);
+        setLoading(false);
+        setShowDelete(false);
+        onSuccessInput();
+        onInput(false);
         toast.current.show({
           severity: "error",
           summary: "Gagal",
@@ -259,8 +243,9 @@ const Bank = () => {
         <Link
           onClick={() => {
             setEdit(true);
-            onClick("displayData", data);
             setCurrentItem(data);
+            setShowInput(true);
+            onInput(true);
           }}
           className="btn btn-primary shadow btn-xs sharp ml-2"
         >
@@ -269,9 +254,9 @@ const Bank = () => {
 
         <Link
           onClick={() => {
-            setEdit(true);
-            setDisplayDel(true);
             setCurrentItem(data);
+            setShowDelete(true);
+            onInput(true);
           }}
           className="btn btn-danger shadow btn-xs sharp ml-2"
         >
@@ -282,20 +267,12 @@ const Bank = () => {
     );
   };
 
-  const onClick = () => {
-    setDisplayData(true);
-
-    if (position) {
-      setPosition(position);
-    }
-  };
-
   const onSubmit = () => {
     if (isEdit) {
-      setUpdate(true);
+      setLoading(true);
       editBank();
     } else {
-      setUpdate(true);
+      setLoading(true);
       addBank();
     }
   };
@@ -305,7 +282,10 @@ const Bank = () => {
       <div>
         <PButton
           label="Batal"
-          onClick={() => setDisplayData(false)}
+          onClick={() => {
+            onHideInput();
+            onInput(false);
+          }}
           className="p-button-text btn-primary"
         />
         <PButton
@@ -313,7 +293,7 @@ const Bank = () => {
           icon="pi pi-check"
           onClick={() => onSubmit()}
           autoFocus
-          loading={update}
+          loading={loading}
         />
       </div>
     );
@@ -324,7 +304,11 @@ const Bank = () => {
       <div>
         <PButton
           label="Batal"
-          onClick={() => setDisplayDel(false)}
+          onClick={() => {
+            setShowDelete(false);
+            setLoading(false);
+            onInput(false);
+          }}
           className="p-button-text btn-s btn-primary"
         />
         <PButton
@@ -335,7 +319,7 @@ const Bank = () => {
             delBank();
           }}
           autoFocus
-          loading={update}
+          loading={loading}
         />
       </div>
     );
@@ -370,9 +354,11 @@ const Bank = () => {
         <Button
           variant="primary"
           onClick={() => {
+            setShowInput(true);
             setEdit(false);
-            setCurrentItem(data);
-            setDisplayData(true);
+            setLoading(false);
+            setCurrentItem(def);
+            onInput(true);
           }}
         >
           Tambah{" "}
@@ -430,187 +416,246 @@ const Bank = () => {
     setRows2(event.rows);
   };
 
-  return (
-    <>
-      <Toast ref={toast} />
-      <Row>
-        <Col>
-          <Card>
-            <Card.Body>
-              <DataTable
-                responsiveLayout="scroll"
-                value={loading ? dummy : bank}
-                className="display w-150 datatable-wrapper"
-                showGridlines
-                dataKey="id"
-                rowHover
-                header={renderHeader}
-                filters={filters1}
-                globalFilterFields={[
-                  "bank.BANK_CODE",
-                  "account.acc_name",
-                  "bank.BANK_NAME",
-                  "bank.BANK_DESC",
-                ]}
-                emptyMessage="Tidak ada data"
-                paginator
-                paginatorTemplate={template2}
-                first={first2}
-                rows={rows2}
-                onPage={onCustomPage2}
-                paginatorClassName="justify-content-end mt-3"
-              >
-                <Column
-                  header="Kode Bank"
-                  style={{
-                    minWidth: "8rem",
-                  }}
-                  field={(e) => e.bank.BANK_CODE}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Nama"
-                  field={(e) => e.bank.BANK_NAME}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Keterangan"
-                  field={(e) => e.bank.BANK_DESC}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="GL"
-                  field={(e) => e.account.acc_name}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Action"
-                  dataType="boolean"
-                  bodyClassName="text-center"
-                  style={{ minWidth: "2rem" }}
-                  body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
-                />
-              </DataTable>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+  const glTemplate = (option) => {
+    return (
+      <div>
+        {option !== null ? `${option.acc_name} - (${option.acc_code})` : ""}
+      </div>
+    );
+  };
 
-      <Dialog
-        header={isEdit ? "Edit Bank" : "Tambah Bank"}
-        visible={displayData}
-        style={{ width: "40vw" }}
-        footer={renderFooter("displayData")}
-        onHide={() => {
-          setEdit(false);
-          setDisplayData(false);
-        }}
-      >
-        <div className="row ml-0 mt-0">
-          <div className="col-6">
-            <label className="text-label">Kode Bank</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={
-                  currentItem !== null ? `${currentItem.bank.BANK_CODE}` : ""
-                }
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    bank: { ...currentItem.bank, BANK_CODE: e.target.value },
-                  })
-                }
-                placeholder="Masukan Kode Bank"
-              />
-            </div>
-          </div>
-
-          <div className="col-6">
-            <label className="text-label">Nama</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={
-                  currentItem !== null ? `${currentItem.bank.BANK_NAME}` : ""
-                }
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    bank: { ...currentItem.bank, BANK_NAME: e.target.value },
-                  })
-                }
-                placeholder="Masukan Nama Akun"
-              />
-            </div>
-          </div>
+  const valueTemp = (option, props) => {
+    if (option) {
+      return (
+        <div>
+          {option !== null ? `${option.acc_name} - (${option.acc_code})` : ""}
         </div>
+      );
+    }
 
-        <div className="row ml-0 mt-0">
-          <div className="col-12">
-            <label className="text-label">Keterangan</label>
-            <div className="p-inputgroup">
-              <InputTextarea
-                value={
-                  currentItem !== null ? `${currentItem.bank.BANK_DESC}` : ""
-                }
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    bank: { ...currentItem.bank, BANK_DESC: e.target.value },
-                  })
-                }
-                placeholder="Masukan Keterangan"
-              />
-            </div>
-          </div>
-        </div>
+    return <span>{props.placeholder}</span>;
+  };
 
-        <div className="row ml-0 mt-0">
-          <div className="col-12">
-            <label className="text-label">Akun Distribusi GL</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={currentItem !== null ? currentItem.account : null}
-                options={account && account}
-                onChange={(e) => {
-                  console.log(e.value);
-                  setCurrentItem({
-                    ...currentItem,
-                    account: e.value,
-                  });
-                  // console.log(currentItem.account);
-                }}
-                optionLabel="acc_name"
-                filter
-                filterBy="acc_name"
-                placeholder="Pilih Akun GL"
-              />
-            </div>
-          </div>
-        </div>
-      </Dialog>
+  const onHideInput = () => {
+    setLoading(false);
+    setCurrentItem(def);
+    setEdit(false);
+    setShowInput(false);
+  };
 
-      <Dialog
-        header={"Hapus Data"}
-        visible={displayDel}
-        style={{ width: "30vw" }}
-        footer={renderFooterDel("displayDel")}
-        onHide={() => {
-          setDisplayDel(false);
-        }}
-      >
-        <div className="ml-2 mr-3">
-          <i
-            className="pi pi-exclamation-triangle mr-2 align-middle"
-            style={{ fontSize: "1rem" }}
+  const renderBody = () => {
+    return (
+      <>
+        <Toast ref={toast} />
+        <DataTable
+          responsiveLayout="scroll"
+          value={data}
+          className="display w-150 datatable-wrapper"
+          showGridlines
+          dataKey="id"
+          rowHover
+          header={renderHeader}
+          filters={filters1}
+          globalFilterFields={[
+            "bank.BANK_CODE",
+            "account.acc_name",
+            "bank.BANK_NAME",
+            "bank.BANK_DESC",
+          ]}
+          emptyMessage="Tidak ada data"
+          paginator
+          paginatorTemplate={template2}
+          first={first2}
+          rows={rows2}
+          onPage={onCustomPage2}
+          paginatorClassName="justify-content-end mt-3"
+          selectionMode="single"
+          onRowSelect={onRowSelect}
+        >
+          <Column
+            header="Kode Bank"
+            style={{
+              minWidth: "8rem",
+            }}
+            field={(e) => e.bank.BANK_CODE}
+            body={load && <Skeleton />}
           />
-          <span>Apakah anda yakin ingin menghapus data ?</span>
-        </div>
-      </Dialog>
-    </>
-  );
+          <Column
+            header="Nama"
+            field={(e) => e.bank.BANK_NAME}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="GL"
+            field={(e) => e.account.acc_name}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Keterangan"
+            field={(e) => e.bank.BANK_DESC}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Action"
+            dataType="boolean"
+            bodyClassName="text-center"
+            style={{ minWidth: "2rem" }}
+            body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
+          />
+        </DataTable>
+      </>
+    );
+  };
+
+  const renderDialog = () => {
+    return (
+      <>
+        <Toast ref={toast} />
+        <Dialog
+          header={isEdit ? "Edit Bank" : "Tambah Bank"}
+          visible={showInput}
+          style={{ width: "60vw" }}
+          footer={renderFooter()}
+          onHide={() => {
+            onHideInput();
+            onInput(false);
+          }}
+        >
+          <div className="row ml-0 mt-0">
+            <div className="col-6">
+              <label className="text-label">Kode Bank</label>
+              <div className="p-inputgroup">
+                <InputText
+                  value={
+                    currentItem !== null ? `${currentItem.bank.BANK_CODE}` : ""
+                  }
+                  onChange={(e) =>
+                    setCurrentItem({
+                      ...currentItem,
+                      bank: { ...currentItem.bank, BANK_CODE: e.target.value },
+                    })
+                  }
+                  placeholder="Masukan Kode Bank"
+                />
+              </div>
+            </div>
+
+            <div className="col-6">
+              <label className="text-label">Nama</label>
+              <div className="p-inputgroup">
+                <InputText
+                  value={
+                    currentItem !== null ? `${currentItem.bank.BANK_NAME}` : ""
+                  }
+                  onChange={(e) =>
+                    setCurrentItem({
+                      ...currentItem,
+                      bank: { ...currentItem.bank, BANK_NAME: e.target.value },
+                    })
+                  }
+                  placeholder="Masukan Nama Akun"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="row ml-0 mt-0">
+            <div className="col-12">
+              <label className="text-label">Akun Distribusi GL</label>
+              <div className="p-inputgroup">
+                <Dropdown
+                  value={currentItem !== null ? currentItem.account : null}
+                  options={account && account}
+                  onChange={(e) => {
+                    console.log(e.value);
+                    setCurrentItem({
+                      ...currentItem,
+                      account: e.value,
+                    });
+                  }}
+                  optionLabel="acc_name"
+                  filter
+                  filterBy="acc_name"
+                  placeholder="Pilih Akun GL"
+                  itemTemplate={glTemplate}
+                  valueTemplate={valueTemp}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="row ml-0 mt-0">
+            <div className="col-12">
+              <label className="text-label">Keterangan</label>
+              <div className="p-inputgroup">
+                <InputTextarea
+                  value={
+                    currentItem !== null ? `${currentItem.bank.BANK_DESC}` : ""
+                  }
+                  onChange={(e) =>
+                    setCurrentItem({
+                      ...currentItem,
+                      bank: { ...currentItem.bank, BANK_DESC: e.target.value },
+                    })
+                  }
+                  placeholder="Masukan Keterangan"
+                />
+              </div>
+            </div>
+          </div>
+        </Dialog>
+
+        <Dialog
+          header={"Hapus Data"}
+          visible={showDelete}
+          style={{ width: "30vw" }}
+          footer={renderFooterDel()}
+          onHide={() => {
+            setLoading(false);
+            setShowDelete(false);
+            onInput(false);
+          }}
+        >
+          <div className="ml-2 mr-3">
+            <i
+              className="pi pi-exclamation-triangle mr-2 align-middle"
+              style={{ fontSize: "1rem" }}
+            />
+            <span>Apakah anda yakin ingin menghapus data ?</span>
+          </div>
+        </Dialog>
+      </>
+    );
+  };
+
+  if (popUp) {
+    return (
+      <>
+        <Dialog
+          header={"Data Bank"}
+          visible={show}
+          footer={() => <div></div>}
+          style={{ width: "60vw" }}
+          onHide={onHide}
+        >
+          <Row className="ml-0 mr-0">
+            <Col>{renderBody()}</Col>
+          </Row>
+        </Dialog>
+        {renderDialog()}
+      </>
+    );
+  } else {
+    return (
+      <>
+        {renderBody()}
+        {renderDialog()}
+      </>
+    );
+  }
 };
 
-export default Bank;
+export default DataBank;

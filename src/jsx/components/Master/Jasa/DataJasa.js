@@ -248,9 +248,8 @@ const DataJasa = ({
 
         <Link
           onClick={() => {
-            setEdit(true);
             setCurrentItem(data);
-            setShowInput(true);
+            setShowDelete(true);
             onInput(true);
           }}
           className="btn btn-danger shadow btn-xs sharp ml-2"

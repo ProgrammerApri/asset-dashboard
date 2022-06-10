@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button, Col, Row } from "react-bootstrap";
 import PerfectScrollbar from "react-perfect-scrollbar";
-import Bank from "../Master/Bank";
+import Bank from "./Bank";
 import Currency from "../Master/Currency";
 import Divisi from "../Master/Divisi";
 import JenisPelanggan from "../Master/JenisPelanggan";
@@ -46,7 +46,7 @@ const MasterLainnya = () => {
       component: <RulesPay />,
     },
     {
-      tittle: "bank",
+      tittle: "Bank",
       icon: "bx-money-withdraw",
       component: <Bank />,
     },

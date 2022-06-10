@@ -5,23 +5,19 @@ import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
-import { Dropdown } from "primereact/dropdown";
-import { Divider } from "@material-ui/core";
 import { Calendar } from "primereact/calendar";
-import { InputSwitch } from "primereact/inputswitch";
 import CustomAccordion from "../../../Accordion/Accordion";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_EXP } from "src/redux/actions";
 import DataPusatBiaya from "../../../MasterLainnya/PusatBiaya/DataPusatBiaya";
 import DataSupplier from "../../../Mitra/Pemasok/DataPemasok";
-import DataRulesPay from "src/jsx/components/MasterLainnya/RulesPay/DataRulesPay";
-import DataPajak from "src/jsx/components/Master/Pajak/DataPajak";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { SelectButton } from "primereact/selectbutton";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
-import { InputTextarea } from "primereact/inputtextarea";
 import DataProject from "src/jsx/components/MasterLainnya/Project/DataProject";
+import DataBank from "src/jsx/components/MasterLainnya/Bank/DataBank";
+import DataAkun from "src/jsx/components/Master/Akun/DataAkun";
 
 const KasBankOutInput = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
@@ -32,23 +28,27 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
   const dispatch = useDispatch();
   const [account, setAccount] = useState(null);
   const [accKas, setAccKas] = useState(null);
-  const [accBank, setAccBank] = useState(null);
+  const [bank, setBank] = useState(null);
   const [supplier, setSupplier] = useState(null);
   const [faktur, setFaktur] = useState(null);
-  const [rp, setRequest] = useState(null);
   const [dept, setDept] = useState(null);
   const [proj, setProj] = useState(null);
   const [showSupplier, setShowSupplier] = useState(false);
   const [showDepartemen, setShowDept] = useState(false);
   const [showProj, setShowProj] = useState(false);
-  const [showPpn, setShowPpn] = useState(false);
-  const [product, setProduct] = useState(null);
-  const [jasa, setJasa] = useState(null);
-  const [satuan, setSatuan] = useState(null);
+  const [showAccKas, setShowAccKas] = useState(false);
+  const [showAcc, setShowAcc] = useState(false);
+  const [showBank, setShowBank] = useState(false);
+  const [showBankG, setShowBankG] = useState(false);
   const [accor, setAccor] = useState({
     bayar: true,
     keluar: false,
   });
+
+  const exp_type = [
+    {typePengeluaran: "Pelunasan", kode: 1 },
+    {typePengeluaran: "Pengeluaran Kas/Bank", kode: 2 },
+  ];
 
   const [type, setType] = useState({ kode: 1, typePengeluaran: "Pelunasan" });
   const [typeB, setTypeB] = useState({ kode: 1, jenisPengeluaran: "Kas" });
@@ -60,12 +60,11 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
       behavior: "smooth",
     });
     getAccKas();
-    getAccBank();
+    getBank();
     getSupplier();
     getDept();
     getProj();
     getAccount();
-    getRp();
   }, []);
 
   const getFaktur = async () => {
@@ -91,7 +90,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
             sup.push(element);
           }
         });
-        setFaktur(data)
+        setFaktur(data);
         setSupplier(sup);
       }
     } catch (error) {}
@@ -127,7 +126,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
         const { data } = response;
         // let filt = [];
         // data.forEach((elem) => {
-        //   if (elem.account.kat_code === 1 && elem.account.kat_code === 2) {
+        //   if (elem.account.kat_code === 1 & 2) {
         //     filt.push(elem);
         //   }
         // });
@@ -150,7 +149,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
         const { data } = response;
         let filt = [];
         data.forEach((elem) => {
-          if (elem.account.kat_code === 1) {
+          if (elem.account.kat_code === 1 && elem.account.dou_type === "D") {
             filt.push(elem);
           }
         });
@@ -160,9 +159,9 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
-  const getAccBank = async () => {
+  const getBank = async () => {
     const config = {
-      ...endpoints.account,
+      ...endpoints.bank,
       data: {},
     };
     console.log(config.data);
@@ -172,13 +171,13 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        let filt = [];
-        data.forEach((elem) => {
-          if (elem.account.kat_code === 2) {
-            filt.push(elem);
-          }
-        });
-        setAccBank(filt);
+        // let filt = [];
+        // data.forEach((elem) => {
+        //   if (elem.account.kat_code === 2) {
+        //     filt.push(elem);
+        //   }
+        // });
+        setBank(data);
       }
     } catch (error) {}
   };
@@ -211,52 +210,6 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
       if (response.status) {
         const { data } = response;
         setProj(data);
-      }
-    } catch (error) {}
-  };
-
-  const getRp = async () => {
-    const config = {
-      ...endpoints.rPurchase,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        let filt = [];
-        data.forEach((elem) => {
-          if (elem.status === 0) {
-            filt.push(elem);
-            elem.rprod.forEach((el) => {
-              el.order = el.order ?? 0;
-              if (el.order === 0 || el.request - el.order !== 0) {
-                el.prod_id = el.prod_id.id;
-                el.unit_id = el.unit_id.id;
-              }
-            });
-            elem.rjasa.forEach((element) => {
-              element.jasa_id = element.jasa_id.id;
-              element.unit_id = element.unit_id.id;
-            });
-            elem.rjasa.push({
-              id: 0,
-              preq_id: elem.id,
-              sup_id: null,
-              jasa_id: null,
-              unit_id: null,
-              qty: null,
-              price: null,
-              disc: null,
-              total: null,
-            });
-          }
-        });
-        console.log(data);
-        setRequest(filt);
       }
     } catch (error) {}
   };
@@ -371,10 +324,10 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
-  const checkAccBank = (value) => {
+  const checkBank = (value) => {
     let selected = {};
-    accBank?.forEach((element) => {
-      if (value === element.account.id) {
+    bank?.forEach((element) => {
+      if (value === element.bank.id) {
         selected = element;
       }
     });
@@ -480,14 +433,15 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
             <label className="text-label">Jenis Pengeluaran</label>
             <div className="p-inputgroup">
               <SelectButton
-                value={type}
-                options={[
-                  { kode: 1, typePengeluaran: "Pelunasan" },
-                  { kode: 2, typePengeluaran: "Pengeluaran Kas / Bank" },
-                ]}
+                value={exp !== null && exp.exp_type !== ""
+                ? exp.exp_type === 1
+                  ? { kode: 1, typePengeluaran: "Pelunasan" }
+                  : { kode: 2, typePengeluaran: "Pengeluaran Kas/Bank" }
+                : null}
+                options={exp_type}
                 onChange={(e) => {
                   console.log(e.value);
-                  setType(e.value);
+                  updateExp({ ...exp, exp_type: e.value.kode });
                 }}
                 optionLabel="typePengeluaran"
               />
@@ -495,7 +449,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
           </div>
 
           {/* Type Pembayaran */}
-          {type.kode === 1 ? (
+          {exp !== null && exp.exp_type === 1 ? (
             <>
               <div className="col-8">
                 <label className="text-label">Kode Pemasok</label>
@@ -506,7 +460,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                   onChange={(e) => {
                     updateExp({
                       ...exp,
-                      acq_sup: e.supplier.id,
+                      acq_sup: e.supplier?.id,
                       acq: e.fk?.map((v) => {
                         let total = 0;
                         v.product.forEach((element) => {
@@ -518,6 +472,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                         v.jasa.forEach((element) => {
                           total += element.total;
                         });
+
                         return {
                           id: null,
                           fk_id: v.id,
@@ -527,7 +482,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                       }),
                     });
                   }}
-                  label={"[supplier.sup_name]"}
+                  label={"[supplier.sup_name] ([supplier.sup_code])"}
                   placeholder="Pilih Kode Pemasok"
                   detail
                 />
@@ -567,6 +522,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                       label={"[account.acc_name] ([account.acc_code])"}
                       placeholder="Pilih Kode Akun"
                       detail
+                      onDetail={() => setShowAccKas(true)}
                     />
                   </div>
                 </>
@@ -577,14 +533,15 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                     <label className="text-label">Kode Bank</label>
                     <div className="p-inputgroup"></div>
                     <CustomDropdown
-                      value={exp.bank_acc && checkAccBank(exp.bank_acc)}
-                      option={accBank}
+                      value={exp.bank_acc && checkBank(exp.bank_acc)}
+                      option={bank}
                       onChange={(e) => {
-                        updateExp({ ...exp, bank_acc: e.account.id });
+                        updateExp({ ...exp, bank_acc: e.bank.id });
                       }}
-                      label={"[account.acc_name] ([account.acc_code])"}
+                      label={"[bank.BANK_NAME] ([bank.BANK_CODE])"}
                       placeholder="Pilih Kode Bank"
                       detail
+                      onDetail={() => setShowBank(true)}
                     />
                   </div>
 
@@ -636,13 +593,14 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                     <label className="text-label">Kode Bank</label>
                     <div className="p-inputgroup"></div>
                     <CustomDropdown
-                      value={exp.bank_id && checkAccBank(exp.bank_id)}
-                      option={accBank}
+                      value={exp.bank_id && checkBank(exp.bank_id)}
+                      option={bank}
                       onChange={(e) => {
-                        updateExp({ ...exp, bank_id: e.account.id });
+                        updateExp({ ...exp, bank_id: e.bank.id });
                       }}
-                      label={"[account.acc_name] ([account.acc_code])"}
+                      label={"[bank.BANK_NAME] ([bank.BANK_CODE])"}
                       placeholder="Pilih Kode Bank"
+                      onDetail={() => setShowBankG(true)}
                       detail
                     />
                   </div>
@@ -686,10 +644,10 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                         body={(e) => (
                           <div className="p-inputgroup">
                             <InputText
-                              value={e.fk_id && supp(e.fk_id).fk_code}
+                              value={e.fk_id && checkFk(e.fk_id).fk_code}
                               onChange={(u) => {}}
                               placeholder="Kode Faktur"
-                              // type="number"
+                              disabled
                             />
                           </div>
                         )}
@@ -703,16 +661,13 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                             <Calendar
                               value={
                                 new Date(
-                                  `${
-                                    exp.acq[e.index].fk_id
-                                      ? exp.acq[e.index].fk_id
-                                      : null
-                                  }Z`
+                                  `${e.fk_id && checkFk(e.fk_id).ord_id.due_date}Z`
                                 )
                               }
                               onChange={(e) => {}}
                               placeholder="Tanggal Jatuh Tempo"
                               dateFormat="dd/mm/yy"
+                              disabled
                             />
                           </div>
                         )}
@@ -734,7 +689,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                               }
                               onChange={(a) => {}}
                               placeholder="Type"
-                              // type="number"
+                              disabled
                             />
                           </div>
                         )}
@@ -757,6 +712,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                               onChange={(e) => {}}
                               placeholder="0"
                               type="number"
+                              disabled
                             />
                           </div>
                         )}
@@ -829,6 +785,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                   label={"[account.acc_name] ([account.acc_code])"}
                   placeholder="Pilih Kode Akun"
                   detail
+                  onDetail={() => setShowAcc(true)}
                 />
               </div>
               <div className="col-4">
@@ -1103,7 +1060,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowDept(false);
-            updateExp({ ...exp, req_dep: e.data.id });
+            updateExp({ ...exp, exp_dep: e.data.id });
           }
 
           setDoubleClick(true);
@@ -1131,7 +1088,119 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowProj(false);
-            updateExp({ ...exp, req_dep: e.data.id });
+            updateExp({ ...exp, exp_prj: e.data.id });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataBank
+        data={bank}
+        loading={false}
+        popUp={true}
+        show={showBank}
+        onHide={() => {
+          setShowBank(false);
+        }}
+        onInput={(e) => {
+          setShowBank(!e);
+        }}
+        onSuccessInput={(e) => {
+          getBank();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowBank(false);
+            updateExp({ ...exp, bank_acc: e.data.bank.id });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataBank
+        data={bank}
+        loading={false}
+        popUp={true}
+        show={showBankG}
+        onHide={() => {
+          setShowBankG(false);
+        }}
+        onInput={(e) => {
+          setShowBankG(!e);
+        }}
+        onSuccessInput={(e) => {
+          getBank();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowBankG(false);
+            updateExp({ ...exp, bank_id: e.data.bank.id });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataAkun
+        data={accKas}
+        loading={false}
+        popUp={true}
+        show={showAccKas}
+        onHide={() => {
+          setShowAccKas(false);
+        }}
+        onInput={(e) => {
+          setShowAccKas(!e);
+        }}
+        onSuccessInput={(e) => {
+          getAccKas();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowAccKas(false);
+            updateExp({ ...exp, kas_acc: e.data.account.id});
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataAkun
+        data={account}
+        loading={false}
+        popUp={true}
+        show={showAcc}
+        onHide={() => {
+          setShowAcc(false);
+        }}
+        onInput={(e) => {
+          setShowAcc(!e);
+        }}
+        onSuccessInput={(e) => {
+          getAccount();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowAcc(false);
+            updateExp({ ...exp, exp_acc: e.data.account.id});
           }
 
           setDoubleClick(true);

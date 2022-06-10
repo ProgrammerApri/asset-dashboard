@@ -288,8 +288,10 @@ const DataJenisPelanggan = ({
           onClick={() => {
             if (isEdit) {
               editJenisPel();
+              setLoading(true)
             } else {
               addJenisPel();
+              setLoading(true)
             }
           }}
           autoFocus

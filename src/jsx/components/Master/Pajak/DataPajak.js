@@ -19,7 +19,7 @@ import { MultiSelect } from "primereact/multiselect";
 
 const def = {
   id: null,
-  type: null,
+  type: "T",
   name: null,
   nilai: null,
   cutting: null,
@@ -520,7 +520,7 @@ const DataPajak = ({
             }
           />
           <Column
-            header="Potongan"
+            header="Pemotongan"
             field={(e) => e?.cutting ?? ""}
             style={{ minWidth: "8rem" }}
             body={(e) =>
@@ -530,12 +530,11 @@ const DataPajak = ({
                 <div>
                   {e.cutting === false ? (
                     <Badge variant="danger light">
-                      <i className="bx bxs-circle text-danger mr-1"></i> Tidak
-                      Ada Potongan
+                      <i className="bx bxs-circle text-danger mr-1"></i> Bukan Pemotongan
                     </Badge>
                   ) : (
                     <Badge variant="info light">
-                      <i className="bx bxs-circle text-info mr-1"></i> Potongan
+                      <i className="bx bxs-circle text-info mr-1"></i> Pemotongan
                     </Badge>
                   )}
                 </div>
@@ -705,12 +704,11 @@ const DataPajak = ({
                 </div>
               </div>
             </>
-          ) : // ) : null
-          null}
+          ) : (
 
-          {currentItem !== null && currentItem.type === "G" ? (
             // currentItem.type === "G" ? (
             <>
+            {" "}
               <div className="row ml-0 mt-0">
                 <div className="col-6">
                   <label className="text-label">Nama Pajak</label>
@@ -774,8 +772,7 @@ const DataPajak = ({
                 </div>
               </div>
             </>
-          ) : // ) : null
-          null}
+          )}
         </Dialog>
 
         <Dialog

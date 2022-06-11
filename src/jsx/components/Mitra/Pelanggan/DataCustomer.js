@@ -566,7 +566,7 @@ const DataCustomer = ({
           ) : (
             <PButton
               label="Batal"
-              oonClick={() => {
+              onClick={() => {
                 onHideInput();
                 onInput(false);
               }}
@@ -735,7 +735,7 @@ const DataCustomer = ({
   const ppn = (value) => {
     let selected = {};
     pajak?.forEach((element) => {
-      if (element.id === `${value}`) {
+      if (value === element.id) {
         selected = element;
       }
     });
@@ -1329,9 +1329,8 @@ const DataCustomer = ({
                   <div className="p-inputgroup">
                     <Dropdown
                       value={
-                        currentItem !== null &&
-                        currentItem.customer.cus_pjk !== null
-                          ? ppn(currentItem.customer.cus_pjk)
+                        currentItem !== null 
+                          ? ppn(currentItem?.customer?.cus_pjk)
                           : null
                       }
                       options={pajak}

@@ -60,10 +60,9 @@ const ReturJualList = ({ onAdd }) => {
               type: SET_CURRENT_SR,
               payload: {
                 ...data,
-                dprod: [
+                product: [
                   {
                     id: 0,
-                    do_id: null,
                     prod_id: null,
                     unit_id: null,
                     retur: null,

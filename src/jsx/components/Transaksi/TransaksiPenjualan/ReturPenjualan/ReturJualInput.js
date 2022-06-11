@@ -5,20 +5,18 @@ import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
-import { Dropdown } from "primereact/dropdown";
 import { Divider } from "@material-ui/core";
 import { Calendar } from "primereact/calendar";
-import { InputSwitch } from "primereact/inputswitch";
 import CustomAccordion from "../../../Accordion/Accordion";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_SR } from "src/redux/actions";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import DataCustomer from "src/jsx/components/Mitra/Pelanggan/DataCustomer";
+import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 
 const ReturJualInput = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
-  const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
   const [doubleClick, setDoubleClick] = useState(false);
   const sr = useSelector((state) => state.sr.current);
@@ -27,7 +25,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
   const [isRp, setRp] = useState(true);
   const [customer, setCustomer] = useState(null);
   const [ppn, setPpn] = useState(null);
-  const [rp, setRequest] = useState(null);
+  const [sale, setSale] = useState(null);
   const [showSupplier, setShowSupplier] = useState(false);
   const [product, setProduct] = useState(null);
   const [satuan, setSatuan] = useState(null);
@@ -35,7 +33,6 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
     produk: true,
     jasa: false,
   });
-
 
   useEffect(() => {
     window.scrollTo({
@@ -45,7 +42,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
     });
     getCustomer();
     getPpn();
-    getRp();
+    getSale();
     getProduct();
     getSatuan();
   }, []);
@@ -84,9 +81,9 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
-  const getRp = async () => {
+  const getSale = async () => {
     const config = {
-      ...endpoints.rPurchase,
+      ...endpoints.sale,
       data: {},
     };
     console.log(config.data);
@@ -98,34 +95,27 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
         const { data } = response;
         let filt = [];
         data.forEach((elem) => {
-          if (elem.status === 0) {
-            filt.push(elem);
-            elem.dprod.forEach((el) => {
-              el.order = el.order ?? 0;
-              if (el.order === 0 || el.request - el.order !== 0) {
-                el.prod_id = el.prod_id.id;
-                el.unit_id = el.unit_id.id;
+          let prod = [];
+          elem.jprod.forEach((el) => {
+            el.prod_id = el.prod_id.id;
+            el.unit_id = el.unit_id.id;
+            prod.push({
+              ...el,
+              r_order: el.order,
+            });
+
+            let temp = [...sr.product];
+            sr.product.forEach((e, i) => {
+              if (el.id === e.prod_id) {
+                temp[i].order = el.order;
+                updateSr({ ...sr, product: temp });
               }
             });
-            elem.rjasa.forEach((element) => {
-              element.jasa_id = element.jasa_id.id;
-              element.unit_id = element.unit_id.id;
-            });
-            elem.rjasa.push({
-              id: 0,
-              preq_id: elem.id,
-              sup_id: null,
-              jasa_id: null,
-              unit_id: null,
-              qty: null,
-              price: null,
-              disc: null,
-              total: null,
-            });
-          }
+          });
+          elem.jprod = prod;
+          filt.push(elem);
         });
-        console.log(data);
-        setRequest(filt);
+        setSale(filt);
       }
     } catch (error) {}
   };
@@ -230,9 +220,9 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
     }
   };
 
-  const req_pur = (value) => {
+  const checkSale = (value) => {
     let selected = {};
-    rp?.forEach((element) => {
+    sale?.forEach((element) => {
       if (value === element.id) {
         selected = element;
       }
@@ -309,68 +299,23 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
     return [year, month, day].join("-");
   };
 
-  const reqTemp = (option) => {
-    return (
-      <div>
-        {option !== null
-          ? `${option.req_code} (${option.req_dep.ccost_name})`
-          : ""}
-      </div>
-    );
+  const getSubTotalBarang = () => {
+    let total = 0;
+    sr?.product?.forEach((el) => {
+      if (el.nett_price && el.nett_price > 0) {
+        total += parseInt(el.nett_price);
+      } else {
+        total += el.total - (el.total * el.disc) / 100;
+      }
+    });
+
+    return total;
   };
 
-  const valueReqTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null
-            ? `${option.req_code} (${option.req_dep.ccost_name})`
-            : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const cusTemp = (option) => {
-    return (
-      <div>
-        {option !== null
-          ? `${option.customer.cus_code} (${option.customer.cus_name})`
-          : ""}
-      </div>
-    );
-  };
-
-  const valueCusTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null
-            ? `${option.customer.cus_code} (${option.customer.cus_name})`
-            : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const prodTemp = (option) => {
-    return (
-      <div>{option !== null ? `${option.name} (${option.code})` : ""}</div>
-    );
-  };
-
-  const valueProd = (option, props) => {
-    if (option) {
-      return (
-        <div>{option !== null ? `${option.name} (${option.code})` : ""}</div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
+  const formatIdr = (value) => {
+    return `${value}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
 
   const updateSr = (e) => {
@@ -422,72 +367,52 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-4">
-            <label className="text-label">No. Faktur Penjualan</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={sr.preq_id && req_pur(sr.preq_id)}
-                options={rp}
-                onChange={(e) => {
-                  console.log(e.value.dprod);
-                  let result = null;
-                  if (sr.top) {
-                    result = new Date(`${req_pur(e.value.id).req_date}Z`);
-                    // result.setDate(result.getDate() + rulPay(sr?.top)?.day);
-                    console.log(result);
-                  }
-                  updateSr({
-                    ...sr,
-                    preq_id: e.value.id,
-                    due_date: result,
-                    sup_id: e.value?.ref_sup?.id ?? null,
-                    dprod: e.value.dprod,
-                    rjasa: e.value.rjasa,
-                  });
-                }}
-                optionLabel="req_code"
-                placeholder="Pilih Kode Permintaan"
-                filter
-                filterBy=""
-                itemTemplate={reqTemp}
-                valueTemplate={valueReqTemp}
-              />
-            </div>
+            <label className="text-label">No. Penjualan</label>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
+              value={sr.sale_id && checkSale(sr.sale_id)}
+              option={sale}
+              onChange={(e) => {
+                updateSr({
+                  ...sr,
+                  sale_id: e.id,
+                  product: e.jprod,
+                });
+              }}
+              label={"[ord_code] ([pel_id.cus_name])"}
+              placeholder="Pilih No. Penjualan"
+              detail
+            />
           </div>
-            {/* kode suplier otomatis keluar, karena sudah melekat di faktur pembelian  */}
-            
+          {/* kode suplier otomatis keluar, karena sudah melekat di faktur pembelian  */}
+
           <div className="col-3">
             <label className="text-label">Pelanggan</label>
             <div className="p-inputgroup">
-              <Dropdown
-                value={sr.pel_id !== null ? checkCus(sr.pel_id) : null}
-                options={customer}
-                onChange={(e) => {
-                  updateSr({ ...sr, pel_id: e.value.customer.id });
-                }}
-                optionLabel="customer.cus_name"
-                placeholder="Pilih Pelanggan"
-                filter
-                filterBy="customer.cus_name"
-                itemTemplate={cusTemp}
-                valueTemplate={valueCusTemp}
+              <InputText
+                value={
+                  sr.sale_id !== null
+                    ? `${
+                        checkCus(checkSale(sr.sale_id)?.pel_id).cus_name
+                      } (${
+                        checkCus(checkSale(sr.sale_id)?.pel_id).cus_code
+                      })`
+                    : null
+                }
+                placeholder="Pelanggan"
+                disabled
               />
-              <PButton
-                onClick={() => {
-                  setShowSupplier(true);
-                }}
-              >
-                <i class="bx bx-food-menu"></i>
-              </PButton>
             </div>
           </div>
 
           <div className="col-3">
-            <label className="text-label"></label>
+            <label className="text-label">Alamat Pelanggan</label>
             <div className="p-inputgroup mt-2">
               <InputText
                 value={
-                  sr.sup_id !== null
-                    ? checkCus(sr.pel_id)?.customer?.cus_address
+                  sr.sale_id !== null
+                    ? checkCus(checkSale(sr.sale_id)?.pel_id)
+                        .cus_address
                     : ""
                 }
                 placeholder="Alamat Pelanggan"
@@ -497,11 +422,14 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-3">
-            <label className="text-label"></label>
+            <label className="text-label">Kontak Person</label>
             <div className="p-inputgroup mt-2">
               <InputText
                 value={
-                  sr.pel_id !== null ? checkCus(sr.pel_id)?.customer?.cus_telp1 : ""
+                  sr.sale_id !== null
+                    ? checkCus(checkSale(sr.sale_id)?.pel_id)
+                        .cus_telp1
+                    : ""
                 }
                 placeholder="Kontak Person"
                 disabled
@@ -514,7 +442,9 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
             <div className="p-inputgroup">
               <InputText
                 value={
-                  sr.pel_id !== null ? checkPjk(checkCus(sr.pel_id)?.customer?.id) : null
+                  sr.pel_id !== null
+                    ? checkPjk(checkCus(sr.pel_id)?.customer?.id).name
+                    : null
                 }
                 placeholder="Pilih Jenis Pajak"
                 disabled
@@ -538,12 +468,13 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
             <>
               <DataTable
                 responsiveLayout="none"
-                value={sr.dprod?.map((v, i) => {
+                value={sr.product?.map((v, i) => {
                   return {
                     ...v,
                     index: i,
                     price: v?.price ?? 0,
                     disc: v?.disc ?? 0,
+                    nett_price: v?.nett_price ?? 0,
                     total: v?.total ?? 0,
                   };
                 })}
@@ -553,83 +484,63 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
               >
                 <Column
                   header="Produk"
-                  style={{
-                    maxWidth: "15rem",
-                  }}
                   field={""}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={
-                          sr.dprod[e.index].prod_id &&
-                          checkProd(sr.dprod[e.index].prod_id)
-                        }
-                        options={product}
-                        onChange={(e) => {
-                          console.log(e.value);
-                        }}
-                        placeholder="Pilih Kode Produk"
-                        optionLabel="name"
-                        filter
-                        filterBy="name"
-                        valueTemplate={valueProd}
-                        itemTemplate={prodTemp}
-                      />
-                    </div>
+                    <CustomDropdown
+                      value={e.prod_id && checkProd(e.prod_id)}
+                      option={product}
+                      onChange={(u) => {
+                        console.log(e.value);
+                        let temp = [...sr.product];
+                        temp[e.index].prod_id = u.id;
+                        temp[e.index].unit_id = u.unit?.id;
+                        updateSr({ ...sr, product: temp });
+                      }}
+                      placeholder="Pilih Kode Produk"
+                      label={"[name]"}
+                      detail
+                      // onDetail={() => setShowProduk(true)}
+                    />
                   )}
                 />
 
                 <Column
                   header="Satuan"
-                  style={{
-                    maxWidth: "15rem",
-                  }}
                   field={""}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={
-                          sr.dprod[e.index].unit_id &&
-                          checkUnit(sr.dprod[e.index].unit_id)
-                        }
-                        onChange={(e) => {
-                          let temp = [...sr.dprod];
-                          temp[e.index].unit_id = e.value.id;
-                          updateSr({ ...sr, dprod: temp });
-                        }}
-                        options={satuan}
-                        optionLabel="name"
-                        placeholder="Pilih Satuan"
-                        filter
-                        filterBy="name"
-                      />
-                    </div>
+                    <CustomDropdown
+                      value={e.unit_id && checkUnit(e.unit_id)}
+                      onChange={(t) => {
+                        let temp = [...sr.product];
+                        temp[e.index].unit_id = t.id;
+                        updateSr({ ...sr, product: temp });
+                      }}
+                      option={satuan}
+                      label={"[name]"}
+                      placeholder="Pilih Satuan"
+                      detail
+                      // onDetail={() => setShowSatuan(true)}
+                    />
                   )}
                 />
 
                 <Column
                   header="Retur"
-                  style={{
-                    width: "10rem",
-                  }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        value={
-                          sr.dprod[e.index].order
-                            ? sr.dprod[e.index].order
-                            : null
-                        }
-                        onChange={(a) => {
-                          let temp = [...sr.dprod];
-                          let result = temp[e.index]?.request - a.target.value;
-                          temp[e.index].remain = result
-                          temp[e.index].order = a.target.value
-                          updateSr({ ...sr, dprod: temp });
+                        value={e.retur && e.retur}
+                        onChange={(u) => {
+                          let temp = [...sr.product];
+                          temp[e.index].retur = u.target.value;
+                          temp[e.index].total =
+                            temp[e.index].retur * temp[e.index].price;
+                          updateSr({ ...sr, product: temp });
                         }}
                         placeholder="0"
                         type="number"
+                        min={0}
                       />
                     </div>
                   )}
@@ -637,26 +548,22 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Harga Satuan"
-                  style={{
-                    maxWidth: "15rem",
-                  }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        value={
-                          sr.dprod[e.index].price
-                            ? sr.dprod[e.index].price
-                            : null
-                        }
-                        onChange={(e) => {
-                          let temp = [...sr.dprod];
-                          temp[e.index].price = e.target.value;
-                          updateSr({ ...sr, dprod: temp });
+                        value={e.price && e.price}
+                        onChange={(u) => {
+                          let temp = [...sr.product];
+                          temp[e.index].price = u.target.value;
+                          temp[e.index].total =
+                            temp[e.index].retur * temp[e.index].price;
+                          updateSr({ ...sr, product: temp });
                           console.log(temp);
                         }}
                         placeholder="0"
                         type="number"
+                        min={0}
                       />
                     </div>
                   )}
@@ -664,51 +571,42 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Diskon"
-                  style={{
-                    maxWidth: "10rem",
-                  }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        value={
-                          sr.dprod[e.index].disc ? sr.dprod[e.index].disc : null
-                        }
-                        onChange={(e) => {
-                          let temp = [...sr.dprod];
-                          temp[e.index].disc = e.target.value;
-                          updateSr({ ...sr, dprod: temp });
+                        value={e.disc && e.disc}
+                        onChange={(u) => {
+                          let temp = [...sr.product];
+                          temp[e.index].disc = u.target.value;
+                          updateSr({ ...sr, product: temp });
                           console.log(temp);
                         }}
                         placeholder="0"
                         type="number"
+                        min={0}
                       />
+                      <span className="p-inputgroup-addon">%</span>
                     </div>
                   )}
                 />
 
                 <Column
                   header="Harga Nett"
-                  style={{
-                    maxWidth: "15rem",
-                  }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        value={
-                          sr.dprod[e.index].nett_price
-                            ? sr.dprod[e.index].nett_price
-                            : null
-                        }
-                        onChange={(e) => {
-                          let temp = [...sr.dprod];
-                          temp[e.index].nett_price = e.target.value;
-                          updateSr({ ...sr, dprod: temp });
+                        value={e.nett_price && e.nett_price}
+                        onChange={(u) => {
+                          let temp = [...sr.product];
+                          temp[e.index].nett_price = u.target.value;
+                          updateSr({ ...sr, product: temp });
                           console.log(temp);
                         }}
-                        placeholder="Masukan Harga Nett"
+                        placeholder="0"
                         type="number"
+                        min={0}
                       />
                     </div>
                   )}
@@ -716,34 +614,35 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Total"
-                  style={{
-                    maxWidth: "15rem",
-                  }}
                   field={""}
                   body={(e) => (
                     <label className="text-nowrap">
-                      <b>{`Rp. ${
-                        sr.dprod[e.index].order * sr.dprod[e.index].price -
-                        sr.dprod[e.index].disc
-                      }`}</b>
+                      <b>
+                        Rp.{" "}
+                        {formatIdr(getSubTotalBarang())}
+                      </b>
                     </label>
                   )}
                 />
 
                 <Column
                   body={(e) =>
-                    e.index === sr.dprod.length - 1 ? (
+                    e.index === sr.product.length - 1 ? (
                       <Link
                         onClick={() => {
                           updateSr({
                             ...sr,
-                            dprod: [
-                              ...sr.dprod,
+                            product: [
+                              ...sr.product,
                               {
                                 id: 0,
                                 prod_id: null,
                                 unit_id: null,
-                                request: null,
+                                retur: null,
+                                price: null,
+                                disc: null,
+                                nett_price: null,
+                                total: null,
                               },
                             ],
                           });
@@ -755,11 +654,11 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                     ) : (
                       <Link
                         onClick={() => {
-                          let temp = [...sr.dprod];
+                          let temp = [...sr.product];
                           temp.splice(e.index, 1);
                           updateSr({
                             ...sr,
-                            dprod: temp,
+                            product: temp,
                           });
                         }}
                         className="btn btn-danger shadow btn-xs sharp ml-1"
@@ -776,7 +675,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
 
         <div className="row ml-0 mr-0 mb-0 mt-6 justify-content-between">
           <div>
-            <div className="row ml-1">
+            {/* <div className="row ml-1">
               <div className="d-flex col-12 align-items-center">
                 <label className="mt-1">{"Pisah Faktur"}</label>
                 <InputSwitch
@@ -790,7 +689,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                   }}
                 />
               </div>
-            </div>
+            </div> */}
           </div>
 
           <div className="row justify-content-right col-6">
@@ -800,7 +699,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
 
             <div className="col-6">
               <label className="text-label">
-                <b>Rp. </b>
+                <b>Rp. {formatIdr(getSubTotalBarang())}</b>
               </label>
             </div>
 
@@ -810,7 +709,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
 
             <div className="col-6">
               <label className="text-label">
-                <b>Rp. </b>
+                <b>Rp. {formatIdr(getSubTotalBarang())}</b>
               </label>
             </div>
 
@@ -820,7 +719,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
 
             <div className="col-6">
               <label className="text-label">
-                <b>Rp. </b>
+                <b>Rp. {formatIdr((getSubTotalBarang() * 11) / 100)}</b>
               </label>
             </div>
 
@@ -835,7 +734,25 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                   className={`${isRp ? "" : "p-button-outlined"}`}
                   onClick={() => setRp(true)}
                 />
-                <InputText placeholder="Diskon" />
+                <InputText
+                  value={
+                    isRp
+                      ? (getSubTotalBarang() * sr.prod_disc) / 100
+                      : sr.prod_disc
+                  }
+                  placeholder="Diskon"
+                  type="number"
+                  min={0}
+                  onChange={(e) => {
+                    let disc = 0;
+                    if (isRp) {
+                      disc = (e.target.value / getSubTotalBarang()) * 100;
+                    } else {
+                      disc = e.target.value;
+                    }
+                    updateSr({ ...sr, prod_disc: disc });
+                  }}
+                />
                 <PButton
                   className={`${isRp ? "p-button-outlined" : ""}`}
                   onClick={() => setRp(false)}
@@ -858,7 +775,12 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
 
             <div className="col-6">
               <label className="text-label fs-16">
-                <b>Rp. </b>
+                <b>
+                  Rp.{" "}
+                  {formatIdr(
+                    getSubTotalBarang() + (getSubTotalBarang() * 11) / 100
+                  )}
+                </b>
               </label>
             </div>
 
@@ -866,83 +788,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
               <Divider className="ml-12"></Divider>
             </div>
 
-            {currentItem !== null && currentItem.faktur ? (
-              <>
-                {/* <div className="row justify-content-right col-12 mt-4"> */}
-                <div className="col-6 mt-4">
-                  <label className="text-label">Sub Total Jasa</label>
-                </div>
-
-                <div className="col-6 mt-4">
-                  <label className="text-label">
-                    <b>Rp. </b>
-                  </label>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label">DPP Jasa</label>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label">
-                    <b>Rp. </b>
-                  </label>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label">Pajak Atas Jasa (2%)</label>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label">
-                    <b>Rp. </b>
-                  </label>
-                </div>
-
-                <div className="col-6 mt-3">
-                  <label className="text-label">Diskon Tambahan</label>
-                </div>
-
-                <div className="col-6">
-                  <div className="p-inputgroup">
-                    <PButton
-                      label="Rp."
-                      className={`${isRp ? "" : "p-button-outlined"}`}
-                      onClick={() => setRp(true)}
-                    />
-                    <InputText placeholder="Diskon" />
-                    <PButton
-                      className={`${isRp ? "p-button-outlined" : ""}`}
-                      onClick={() => setRp(false)}
-                    >
-                      {" "}
-                      <b>%</b>{" "}
-                    </PButton>
-                  </div>
-                </div>
-
-                <div className="col-12">
-                  <Divider className="ml-12"></Divider>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label">
-                    <b>Total Pembayaran</b>
-                  </label>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label fs-16">
-                    <b>Rp. </b>
-                  </label>
-                </div>
-
-                <div className="col-12">
-                  <Divider className="ml-12"></Divider>
-                </div>
-                {/* </div> */}
-              </>
-            ) : null}
+            {/*  */}
           </div>
         </div>
       </>
@@ -993,7 +839,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowSupplier(false);
-            updateSr({ ...rp, req_dep: e.data.id });
+            updateSr({ ...sr, pel_id: e.data.id });
           }
 
           setDoubleClick(true);

@@ -21,10 +21,12 @@ const data = {
   exp_date: null,
   exp_type: null,
   exp_acc: null,
+  exp_dep: null,
   exp_prj: null,
   acq_sup: null,
   acq_pay: null,
   kas_acc: null,
+  bank_acc: null,
   bank_id: null,
   bank_ref: null,
   giro_num: null,
@@ -250,14 +252,15 @@ const KasBankOutList = ({ onAdd, onEdit }) => {
               payload: {
                 ...data,
                 exp_type: 1,
+                acq_pay: 1,
                 acq: [
-                  {
-                    id: null,
-                    exp_id: null,
-                    fk_id: null,
-                    value: null,
-                    payment: null,
-                  },
+                  // {
+                  //   id: null,
+                  //   exp_id: null,
+                  //   fk_id: null,
+                  //   value: null,
+                  //   payment: null,
+                  // },
                 ],
                 exp: [
                   {

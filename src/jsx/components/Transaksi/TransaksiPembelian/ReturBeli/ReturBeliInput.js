@@ -97,49 +97,29 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        // let filt = [];
-        // data.forEach((elem) => {
-        //   let prod = [];
-        //   elem.product.forEach((el) => {
-        //     el.prod_id = el.prod_id.id;
-        //     el.unit_id = el.unit_id.id;
-        //     el.location = el.location?.id;
-        //     prod.push({
-        //       ...el,
-        //       r_order: el.order,
-        //     });
+        let filt = [];
+        data.forEach((elem) => {
+          let prod = [];
+          elem.product.forEach((el) => {
+            el.prod_id = el.prod_id.id;
+            el.unit_id = el.unit_id.id;
+            prod.push({
+              ...el,
+              r_order: el.order,
+            });
 
-        //     let temp = [...pr.bproduct];
-        //     pr.bproduct.forEach((e, i) => {
-        //       if (el.id === e.product) {
-        //         temp[i].order = el.order;
-        //         updatePr({ ...pr, bproduct: temp });
-        //       }
-        //     });
-        //   });
-        //   elem.product = prod;
-
-        //   let jasa = [];
-        //   elem.jasa.forEach((element) => {
-        //     element.jasa_id = element.jasa_id.id;
-        //     element.unit_id = element.unit_id.id;
-        //     jasa.push({
-        //       ...element,
-        //       r_order: element.order,
-        //     });
-
-        //     let temp = [...pr.bjasa];
-        //     pr.bjasa.forEach((e, i) => {
-        //       if (el.id === e.jasa_id) {
-        //         temp[i].order = el.order;
-        //         updatePr({ ...pr, bjasa: temp });
-        //       }
-        //     });
-        //   });
-        //   elem.jasa = jasa;
-        //   filt.push(elem);
-        // });
-        setFk(data);
+            let temp = [...pr.product];
+            pr.product.forEach((e, i) => {
+              if (el.id === e.prod_id) {
+                temp[i].order = el.order;
+                updatePr({ ...pr, product: temp });
+              }
+            });
+          });
+          elem.product = prod;
+          filt.push(elem);
+        });
+        setFk(filt);
       }
     } catch (error) {}
   };
@@ -178,10 +158,10 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
-  const editPO = async () => {
+  const editPr = async () => {
     const config = {
-      ...endpoints.editPO,
-      endpoint: endpoints.editPO.endpoint + pr.id,
+      ...endpoints.editPr,
+      endpoint: endpoints.editPr.endpoint + pr.id,
       data: pr,
     };
     console.log(config.data);
@@ -205,9 +185,9 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
     }
   };
 
-  const addPO = async () => {
+  const addPr = async () => {
     const config = {
-      ...endpoints.addPO,
+      ...endpoints.addPr,
       data: pr,
     };
     console.log(config.data);
@@ -226,7 +206,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${pr.po_code} Sudah Digunakan`,
+            detail: `Kode ${pr.ret_code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -304,10 +284,10 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
   const onSubmit = () => {
     if (isEdit) {
       setUpdate(true);
-      editPO();
+      editPr();
     } else {
       setUpdate(true);
-      addPO();
+      addPr();
     }
   };
 
@@ -323,68 +303,23 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
     return [year, month, day].join("-");
   };
 
-  const reqTemp = (option) => {
-    return (
-      <div>
-        {option !== null
-          ? `${option.req_code} (${option.req_dep.ccost_name})`
-          : ""}
-      </div>
-    );
+  const getSubTotalBarang = () => {
+    let total = 0;
+    pr?.product?.forEach((el) => {
+      if (el.nett_price && el.nett_price > 0) {
+        total += parseInt(el.nett_price);
+      } else {
+        total += el.total - (el.total * el.disc) / 100;
+      }
+    });
+
+    return total;
   };
 
-  const valueReqTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null
-            ? `${option.req_code} (${option.req_dep.ccost_name})`
-            : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const suppTemp = (option) => {
-    return (
-      <div>
-        {option !== null
-          ? `${option.supplier.sup_code} (${option.supplier.sup_name})`
-          : ""}
-      </div>
-    );
-  };
-
-  const valueSupTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null
-            ? `${option.supplier.sup_code} (${option.supplier.sup_name})`
-            : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const prodTemp = (option) => {
-    return (
-      <div>{option !== null ? `${option.name} (${option.code})` : ""}</div>
-    );
-  };
-
-  const valueProd = (option, props) => {
-    if (option) {
-      return (
-        <div>{option !== null ? `${option.name} (${option.code})` : ""}</div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
+  const formatIdr = (value) => {
+    return `${value}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
 
   const updatePr = (e) => {
@@ -413,9 +348,9 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
             <label className="text-label">Tanggal</label>
             <div className="p-inputgroup">
               <Calendar
-                value={new Date(`${pr.po_date}Z`)}
+                value={new Date(`${pr.ret_date}Z`)}
                 onChange={(e) => {
-                  updatePr({ ...pr, po_date: e.value });
+                  updatePr({ ...pr, ret_date: e.target.value });
                 }}
                 placeholder="Pilih Tanggal"
                 showIcon
@@ -428,8 +363,8 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
             <label className="text-label">Kode Referensi</label>
             <div className="p-inputgroup">
               <InputText
-                value={pr.po_code}
-                onChange={(e) => updatePr({ ...pr, po_code: e.target.value })}
+                value={pr.ret_code}
+                onChange={(e) => updatePr({ ...pr, ret_code: e.target.value })}
                 placeholder="Masukan Kode Referensi"
               />
             </div>
@@ -442,24 +377,14 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
               value={pr.fk_id && checkFK(pr.fk_id)}
               option={fk}
               onChange={(e) => {
-                // console.log(e.value.dprod);
-                // let result = null;
-                // if (pr.top) {
-                //   result = new Date(`${checkFK(e.value.id).req_date}Z`);
-                //   // result.setDate(result.getDate() + rulPay(pr?.top)?.day);
-                //   console.log(result);
-                // }
-                // updatePr({
-                //   ...pr,
-                //   preq_id: e.id,
-                //   due_date: result,
-                //   sup_id: e.ref_sup?.id ?? null,
-                //   dprod: e.dprod,
-                //   rjasa: e.rjasa,
-                // });
+                updatePr({
+                  ...pr,
+                  fk_id: e.id,
+                  product: e.product,
+                });
               }}
               label={"[fk_code]"}
-              placeholder="Pilih Kode Permintaan"
+              placeholder="Pilih No. Faktur Pembelian"
               detail
             />
           </div>
@@ -469,7 +394,15 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
             <label className="text-label">Supplier</label>
             <div className="p-inputgroup">
               <InputText
-                value={pr.sup_id !== null ? supp(pr.sup_id) : null}
+                value={
+                  pr.fk_id !== null
+                    ? `${
+                        supp(checkFK(pr.fk_id)?.ord_id.sup_id).supplier.sup_name
+                      } (${
+                        supp(checkFK(pr.fk_id)?.ord_id.sup_id).supplier.sup_code
+                      })`
+                    : null
+                }
                 placeholder="Pilih Supplier"
                 disabled
               />
@@ -481,8 +414,9 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
             <div className="p-inputgroup">
               <InputText
                 value={
-                  pr.sup_id !== null
-                    ? supp(pr.sup_id)?.supplier?.sup_address
+                  pr.fk_id !== null
+                    ? supp(checkFK(pr.fk_id)?.ord_id.sup_id).supplier
+                        .sup_address
                     : ""
                 }
                 placeholder="Alamat Supplier"
@@ -496,7 +430,9 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
             <div className="p-inputgroup">
               <InputText
                 value={
-                  pr.sup_id !== null ? supp(pr.sup_id)?.supplier?.sup_telp1 : ""
+                  pr.fk_id !== null
+                    ? supp(checkFK(pr.fk_id)?.ord_id.sup_id).supplier.sup_telp1
+                    : ""
                 }
                 placeholder="Kontak Person"
                 disabled
@@ -509,7 +445,11 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
             <div className="p-inputgroup">
               <InputText
                 value={
-                  pr.sup_id !== null ? pjk(supp(pr.sup_id)?.supplier?.id) : null
+                  pr.fk_id !== null
+                    ? pjk(
+                        supp(checkFK(pr.fk_id)?.ord_id?.sup_id).supplier.sup_ppn
+                      )?.name
+                    : null
                 }
                 placeholder="Jenis Pajak"
                 disabled
@@ -533,12 +473,13 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
             <>
               <DataTable
                 responsiveLayout="none"
-                value={pr.dprod?.map((v, i) => {
+                value={pr.product?.map((v, i) => {
                   return {
                     ...v,
                     index: i,
                     price: v?.price ?? 0,
                     disc: v?.disc ?? 0,
+                    nett_price: v?.nett_price ?? 0,
                     total: v?.total ?? 0,
                   };
                 })}
@@ -548,83 +489,63 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
               >
                 <Column
                   header="Produk"
-                  style={{
-                    maxWidth: "15rem",
-                  }}
                   field={""}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={
-                          pr.dprod[e.index].prod_id &&
-                          checkProd(pr.dprod[e.index].prod_id)
-                        }
-                        options={product}
-                        onChange={(e) => {
-                          console.log(e.value);
-                        }}
-                        placeholder="Pilih Kode Produk"
-                        optionLabel="name"
-                        filter
-                        filterBy="name"
-                        valueTemplate={valueProd}
-                        itemTemplate={prodTemp}
-                      />
-                    </div>
+                    <CustomDropdown
+                      value={e.prod_id && checkProd(e.prod_id)}
+                      option={product}
+                      onChange={(u) => {
+                        console.log(e.value);
+                        let temp = [...pr.product];
+                        temp[e.index].prod_id = u.id;
+                        temp[e.index].unit_id = u.unit?.id;
+                        updatePr({ ...pr, product: temp });
+                      }}
+                      placeholder="Pilih Kode Produk"
+                      label={"[name]"}
+                      detail
+                      // onDetail={() => setShowProduk(true)}
+                    />
                   )}
                 />
 
                 <Column
                   header="Satuan"
-                  style={{
-                    maxWidth: "15rem",
-                  }}
                   field={""}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={
-                          pr.dprod[e.index].unit_id &&
-                          checkUnit(pr.dprod[e.index].unit_id)
-                        }
-                        onChange={(e) => {
-                          let temp = [...pr.dprod];
-                          temp[e.index].unit_id = e.value.id;
-                          updatePr({ ...pr, dprod: temp });
-                        }}
-                        options={satuan}
-                        optionLabel="name"
-                        placeholder="Pilih Satuan"
-                        filter
-                        filterBy="name"
-                      />
-                    </div>
+                    <CustomDropdown
+                      value={e.unit_id && checkUnit(e.unit_id)}
+                      onChange={(t) => {
+                        let temp = [...pr.product];
+                        temp[e.index].unit_id = t.id;
+                        updatePr({ ...pr, product: temp });
+                      }}
+                      option={satuan}
+                      label={"[name]"}
+                      placeholder="Pilih Satuan"
+                      detail
+                      // onDetail={() => setShowSatuan(true)}
+                    />
                   )}
                 />
 
                 <Column
                   header="Retur"
-                  style={{
-                    width: "10rem",
-                  }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        value={
-                          pr.dprod[e.index].order
-                            ? pr.dprod[e.index].order
-                            : null
-                        }
-                        onChange={(a) => {
-                          let temp = [...pr.dprod];
-                          let result = temp[e.index]?.request - a.target.value;
-                          temp[e.index].remain = result;
-                          temp[e.index].order = a.target.value;
-                          updatePr({ ...pr, dprod: temp });
+                        value={e.retur && e.retur}
+                        onChange={(u) => {
+                          let temp = [...pr.product];
+                          temp[e.index].retur = u.target.value;
+                          temp[e.index].total =
+                            temp[e.index].retur * temp[e.index].price;
+                          updatePr({ ...pr, product: temp });
                         }}
                         placeholder="0"
                         type="number"
+                        min={0}
                       />
                     </div>
                   )}
@@ -632,26 +553,22 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Harga Satuan"
-                  style={{
-                    maxWidth: "15rem",
-                  }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        value={
-                          pr.dprod[e.index].price
-                            ? pr.dprod[e.index].price
-                            : null
-                        }
-                        onChange={(e) => {
-                          let temp = [...pr.dprod];
-                          temp[e.index].price = e.target.value;
-                          updatePr({ ...pr, dprod: temp });
+                        value={e.price && e.price}
+                        onChange={(u) => {
+                          let temp = [...pr.product];
+                          temp[e.index].price = u.target.value;
+                          temp[e.index].total =
+                            temp[e.index].retur * temp[e.index].price;
+                          updatePr({ ...pr, product: temp });
                           console.log(temp);
                         }}
                         placeholder="0"
                         type="number"
+                        min={0}
                       />
                     </div>
                   )}
@@ -659,51 +576,42 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Diskon"
-                  style={{
-                    maxWidth: "10rem",
-                  }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        value={
-                          pr.dprod[e.index].disc ? pr.dprod[e.index].disc : null
-                        }
-                        onChange={(e) => {
-                          let temp = [...pr.dprod];
-                          temp[e.index].disc = e.target.value;
-                          updatePr({ ...pr, dprod: temp });
+                        value={e.disc && e.disc}
+                        onChange={(u) => {
+                          let temp = [...pr.product];
+                          temp[e.index].disc = u.target.value;
+                          updatePr({ ...pr, product: temp });
                           console.log(temp);
                         }}
                         placeholder="0"
                         type="number"
+                        min={0}
                       />
+                      <span className="p-inputgroup-addon">%</span>
                     </div>
                   )}
                 />
 
                 <Column
                   header="Harga Nett"
-                  style={{
-                    maxWidth: "15rem",
-                  }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        value={
-                          pr.dprod[e.index].nett_price
-                            ? pr.dprod[e.index].nett_price
-                            : null
-                        }
-                        onChange={(e) => {
-                          let temp = [...pr.dprod];
-                          temp[e.index].nett_price = e.target.value;
-                          updatePr({ ...pr, dprod: temp });
+                        value={e.nett_price && e.nett_price}
+                        onChange={(u) => {
+                          let temp = [...pr.product];
+                          temp[e.index].nett_price = u.target.value;
+                          updatePr({ ...pr, product: temp });
                           console.log(temp);
                         }}
-                        placeholder="Masukan Harga Nett"
+                        placeholder="0"
                         type="number"
+                        min={0}
                       />
                     </div>
                   )}
@@ -711,34 +619,35 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Total"
-                  style={{
-                    maxWidth: "15rem",
-                  }}
                   field={""}
                   body={(e) => (
                     <label className="text-nowrap">
-                      <b>{`Rp. ${
-                        pr.dprod[e.index].order * pr.dprod[e.index].price -
-                        pr.dprod[e.index].disc
-                      }`}</b>
+                      <b>
+                        Rp.{" "}
+                        {formatIdr(getSubTotalBarang())}
+                      </b>
                     </label>
                   )}
                 />
 
                 <Column
                   body={(e) =>
-                    e.index === pr.dprod.length - 1 ? (
+                    e.index === pr.product.length - 1 ? (
                       <Link
                         onClick={() => {
                           updatePr({
                             ...pr,
-                            dprod: [
-                              ...pr.dprod,
+                            product: [
+                              ...pr.product,
                               {
                                 id: 0,
                                 prod_id: null,
                                 unit_id: null,
-                                request: null,
+                                retur: null,
+                                price: null,
+                                disc: null,
+                                nett_price: null,
+                                total: null,
                               },
                             ],
                           });
@@ -750,11 +659,11 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                     ) : (
                       <Link
                         onClick={() => {
-                          let temp = [...pr.dprod];
+                          let temp = [...pr.product];
                           temp.splice(e.index, 1);
                           updatePr({
                             ...pr,
-                            dprod: temp,
+                            product: temp,
                           });
                         }}
                         className="btn btn-danger shadow btn-xs sharp ml-1"
@@ -772,7 +681,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
         <div className="row ml-0 mr-0 mb-0 mt-6 justify-content-between">
           <div>
             <div className="row ml-1">
-              <div className="d-flex col-12 align-items-center">
+              {/* <div className="d-flex col-12 align-items-center">
                 <label className="mt-1">{"Pisah Faktur"}</label>
                 <InputSwitch
                   className="ml-4"
@@ -784,7 +693,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                     });
                   }}
                 />
-              </div>
+              </div> */}
             </div>
           </div>
 
@@ -795,7 +704,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
 
             <div className="col-6">
               <label className="text-label">
-                <b>Rp. </b>
+                <b>Rp. {formatIdr(getSubTotalBarang())}</b>
               </label>
             </div>
 
@@ -805,7 +714,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
 
             <div className="col-6">
               <label className="text-label">
-                <b>Rp. </b>
+                <b>Rp. {formatIdr(getSubTotalBarang())}</b>
               </label>
             </div>
 
@@ -815,7 +724,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
 
             <div className="col-6">
               <label className="text-label">
-                <b>Rp. </b>
+                <b>Rp. {formatIdr((getSubTotalBarang() * 11) / 100)}</b>
               </label>
             </div>
 
@@ -830,7 +739,25 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                   className={`${isRp ? "" : "p-button-outlined"}`}
                   onClick={() => setRp(true)}
                 />
-                <InputText placeholder="Diskon" />
+                <InputText
+                  value={
+                    isRp
+                      ? (getSubTotalBarang() * pr.prod_disc) / 100
+                      : pr.prod_disc
+                  }
+                  placeholder="Diskon"
+                  type="number"
+                  min={0}
+                  onChange={(e) => {
+                    let disc = 0;
+                    if (isRp) {
+                      disc = (e.target.value / getSubTotalBarang()) * 100;
+                    } else {
+                      disc = e.target.value;
+                    }
+                    updatePr({ ...pr, prod_disc: disc });
+                  }}
+                />
                 <PButton
                   className={`${isRp ? "p-button-outlined" : ""}`}
                   onClick={() => setRp(false)}
@@ -853,7 +780,12 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
 
             <div className="col-6">
               <label className="text-label fs-16">
-                <b>Rp. </b>
+                <b>
+                  Rp.{" "}
+                  {formatIdr(
+                    getSubTotalBarang() + (getSubTotalBarang() * 11) / 100
+                  )}
+                </b>
               </label>
             </div>
 
@@ -861,83 +793,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
               <Divider className="ml-12"></Divider>
             </div>
 
-            {currentItem !== null && currentItem.faktur ? (
-              <>
-                {/* <div className="row justify-content-right col-12 mt-4"> */}
-                <div className="col-6 mt-4">
-                  <label className="text-label">Sub Total Jasa</label>
-                </div>
-
-                <div className="col-6 mt-4">
-                  <label className="text-label">
-                    <b>Rp. </b>
-                  </label>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label">DPP Jasa</label>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label">
-                    <b>Rp. </b>
-                  </label>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label">Pajak Atas Jasa (2%)</label>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label">
-                    <b>Rp. </b>
-                  </label>
-                </div>
-
-                <div className="col-6 mt-3">
-                  <label className="text-label">Diskon Tambahan</label>
-                </div>
-
-                <div className="col-6">
-                  <div className="p-inputgroup">
-                    <PButton
-                      label="Rp."
-                      className={`${isRp ? "" : "p-button-outlined"}`}
-                      onClick={() => setRp(true)}
-                    />
-                    <InputText placeholder="Diskon" />
-                    <PButton
-                      className={`${isRp ? "p-button-outlined" : ""}`}
-                      onClick={() => setRp(false)}
-                    >
-                      {" "}
-                      <b>%</b>{" "}
-                    </PButton>
-                  </div>
-                </div>
-
-                <div className="col-12">
-                  <Divider className="ml-12"></Divider>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label">
-                    <b>Total Pembayaran</b>
-                  </label>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label fs-16">
-                    <b>Rp. </b>
-                  </label>
-                </div>
-
-                <div className="col-12">
-                  <Divider className="ml-12"></Divider>
-                </div>
-                {/* </div> */}
-              </>
-            ) : null}
+            {/*  */}
           </div>
         </div>
       </>

@@ -10,22 +10,15 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_RB, SET_EDIT_RB, SET_RB } from "src/redux/actions";
+import { SET_CURRENT_PR, SET_EDIT_PR, SET_PR } from "src/redux/actions";
+import { formatDate } from "@fullcalendar/core";
 
 const data = {
   id: null,
-  do_code: null,
-  do_date: null,
-  dep_id: null,
-  sup_id: null,
-  top: null,
-  due_date: false,
-  split_inv: null,
-  prod_disc: null,
-  jasa_disc: null,
-  total_disc: null,
-  dprod: [],
-  djasa: [],
+  ret_code: null,
+  ret_date: null,
+  fk_id: null,
+  product: [],
 };
 
 const ReturBeliList = ({ onAdd }) => {
@@ -36,19 +29,19 @@ const ReturBeliList = ({ onAdd }) => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const dispatch = useDispatch();
-  const rb = useSelector((state) => state.rb.rb);
+  const pr = useSelector((state) => state.pr.pr);
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getRB();
+    getPR();
     initFilters1();
   }, []);
 
-  const getRB = async (isUpdate = false) => {
+  const getPR = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.faktur,
+      ...endpoints.retur_order,
       data: {},
     };
     console.log(config.data);
@@ -59,7 +52,7 @@ const ReturBeliList = ({ onAdd }) => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        dispatch({ type: SET_RB, payload: data });
+        dispatch({ type: SET_PR, payload: data });
       }
     } catch (error) {}
     if (isUpdate) {
@@ -87,24 +80,23 @@ const ReturBeliList = ({ onAdd }) => {
           onClick={() => {
             onAdd();
             dispatch({
-              type: SET_EDIT_RB,
+              type: SET_EDIT_PR,
               payload: false,
             });
             dispatch({
-              type: SET_CURRENT_RB,
+              type: SET_CURRENT_PR,
               payload: {
                 ...data,
-                dprod: [
+                product: [
                   {
                     id: 0,
-                    do_id: null,
                     prod_id: null,
                     unit_id: null,
                     retur: null,
                     price: null,
                     disc: null,
                     nett_price: null,
-                    total: null,
+                    total: 0,
                   },
                 ],
               },
@@ -181,11 +173,23 @@ const ReturBeliList = ({ onAdd }) => {
     setRows2(event.rows);
   };
 
+  const formatDate = (date) => {
+    var d = new Date(`${date}Z`),
+      month = "" + (d.getMonth() + 1),
+      day = "" + d.getDate(),
+      year = d.getFullYear();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+
+    return [year, month, day].join("-");
+  };
+
   return (
     <>
       <DataTable
         responsiveLayout="scroll"
-        value={loading ? dummy : rb}
+        value={loading ? dummy : pr}
         className="display w-150 datatable-wrapper"
         showGridlines
         dataKey="id"
@@ -206,27 +210,27 @@ const ReturBeliList = ({ onAdd }) => {
           style={{
             minWidth: "8rem",
           }}
-          // field={(e) => e.customer.cus_code}
-          // body={loading && <Skeleton />}
+          field={(e) => formatDate(e.ret_date)}
+          body={loading && <Skeleton />}
         />
         <Column
           header="Nomor Retur Pembelian"
-          // field={(e) => e.customer.cus_name}
           style={{ minWidth: "8rem" }}
-          //  body={loading && <Skeleton />}
+          field={(e) => e.ret_code}
+           body={loading && <Skeleton />}
         />
         <Column
           header="Nomor Faktur"
-          // field={(e) => e.customer.cus_address}
           style={{ minWidth: "8rem" }}
-          // body={loading && <Skeleton />}
+          field={(e) => e.fk_id.fk_code}
+          body={loading && <Skeleton />}
         />
-        <Column
+        {/* <Column
           header="Nama Supplier"
-          // field={(e) => e.customer.cus_name}
           style={{ minWidth: "8rem" }}
-          // body={loading && <Skeleton />}
-        />
+          field={(e) => e.fk_id?.sup_id?.sup_name}
+          body={loading && <Skeleton />}
+        /> */}
       </DataTable>
     </>
   );

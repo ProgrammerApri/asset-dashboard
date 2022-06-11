@@ -740,6 +740,31 @@ const endpoints = {
     data: {},
   },
 
+  /// Retur-Beli
+  retur_order: {
+    endpoint: "/v1/api/retur-order",
+    method: "GET",
+    data: {},
+  },
+
+  addPr: {
+    endpoint: "/v1/api/retur-order",
+    method: "POST",
+    data: {},
+  },
+
+  editPr: {
+    endpoint: "/v1/api/retur-order/",
+    method: "PUT",
+    data: {},
+  },
+
+  delPr: {
+    endpoint: "/v1/api/retur-order/",
+    method: "DELETE",
+    data: {},
+  },
+
    /// Penjualan
    sale: {
     endpoint: "/v1/api/sales",

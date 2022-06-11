@@ -46,8 +46,14 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
   });
 
   const exp_type = [
-    {typePengeluaran: "Pelunasan", kode: 1 },
-    {typePengeluaran: "Pengeluaran Kas/Bank", kode: 2 },
+    { typePengeluaran: "Pelunasan", kode: 1 },
+    { typePengeluaran: "Pengeluaran Kas/Bank", kode: 2 },
+  ];
+
+  const acq_pay = [
+    { kode: 1, jenisPengeluaran: "Kas" },
+    { kode: 2, jenisPengeluaran: "Bank" },
+    { kode: 3, jenisPengeluaran: "Giro" },
   ];
 
   const [type, setType] = useState({ kode: 1, typePengeluaran: "Pelunasan" });
@@ -433,11 +439,13 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
             <label className="text-label">Jenis Pengeluaran</label>
             <div className="p-inputgroup">
               <SelectButton
-                value={exp !== null && exp.exp_type !== ""
-                ? exp.exp_type === 1
-                  ? { kode: 1, typePengeluaran: "Pelunasan" }
-                  : { kode: 2, typePengeluaran: "Pengeluaran Kas/Bank" }
-                : null}
+                value={
+                  exp !== null && exp.exp_type !== ""
+                    ? exp.exp_type === 1
+                      ? { kode: 1, typePengeluaran: "Pelunasan" }
+                      : { kode: 2, typePengeluaran: "Pengeluaran Kas/Bank" }
+                    : null
+                }
                 options={exp_type}
                 onChange={(e) => {
                   console.log(e.value);
@@ -483,7 +491,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                     });
                   }}
                   label={"[supplier.sup_name] ([supplier.sup_code])"}
-                  placeholder="Pilih Kode Pemasok"
+                  placeholder="Pilih Pemasok"
                   detail
                 />
               </div>
@@ -492,15 +500,17 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                 <label className="text-label">Jenis Pengeluaran</label>
                 <div className="p-inputgroup">
                   <SelectButton
-                    value={typeB}
-                    options={[
-                      { kode: 1, jenisPengeluaran: "Kas" },
-                      { kode: 2, jenisPengeluaran: "Bank" },
-                      { kode: 3, jenisPengeluaran: "Giro" },
-                    ]}
+                    value={
+                      exp !== null && exp.acq_pay !== ""
+                        ? exp.acq_pay === 1
+                          ? { kode: 1, jenisPengeluaran: "Kas" }
+                          : { kode: 2, jenisPengeluaran: "Bank" }
+                        : //  : { kode: 3, jenisPengeluaran: "Giro" }
+                          null
+                    }
+                    options={acq_pay}
                     onChange={(e) => {
-                      console.log(e.value);
-                      setTypeB(e.value);
+                      updateExp({ ...exp, acq_pay: e.value.kode });
                     }}
                     optionLabel="jenisPengeluaran"
                   />
@@ -508,7 +518,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
               </div>
 
               {/* kode pembayaran cash  */}
-              {typeB.kode === 1 ? (
+              {exp !== null && exp.acq_pay === 1 ? (
                 <>
                   <div className="col-4">
                     <label className="text-label">Kode Akun</label>
@@ -527,7 +537,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                   </div>
                 </>
               ) : // pembayaran bank
-              typeB.kode === 2 ? (
+              exp !== null && exp.acq_pay === 2 ? (
                 <>
                   <div className="col-4">
                     <label className="text-label">Kode Bank</label>
@@ -607,164 +617,168 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                 </>
               )}
 
-              <CustomAccordion
-                className="col-12 mt-4"
-                tittle={"Data Pembayaran"}
-                defaultActive={true}
-                active={accor.bayar}
-                onClick={() => {
-                  setAccor({
-                    ...accor,
-                    bayar: !accor.bayar,
-                  });
-                }}
-                key={1}
-                body={
-                  <>
-                    <DataTable
-                      responsiveLayout="none"
-                      value={exp.acq?.map((v, i) => {
-                        return {
-                          ...v,
-                          index: i,
-                          value: v?.value ?? 0,
-                          payment: v?.payment ?? 0,
-                        };
-                      })}
-                      className="display w-150 datatable-wrapper header-white no-border"
-                      showGridlines={false}
-                      emptyMessage={() => <div></div>}
-                    >
-                      <Column
-                        header="Kode Faktur"
-                        style={{
-                          maxWidth: "15rem",
-                        }}
-                        field={""}
-                        body={(e) => (
-                          <div className="p-inputgroup">
-                            <InputText
-                              value={e.fk_id && checkFk(e.fk_id).fk_code}
-                              onChange={(u) => {}}
-                              placeholder="Kode Faktur"
-                              disabled
-                            />
-                          </div>
-                        )}
-                      />
+              {exp?.acq?.length ? (
+                <CustomAccordion
+                  className="col-12 mt-4"
+                  tittle={"Data Pembayaran"}
+                  defaultActive={true}
+                  active={accor.bayar}
+                  onClick={() => {
+                    setAccor({
+                      ...accor,
+                      bayar: !accor.bayar,
+                    });
+                  }}
+                  key={1}
+                  body={
+                    <>
+                      <DataTable
+                        responsiveLayout="none"
+                        value={exp?.acq?.map((v, i) => {
+                          return {
+                            ...v,
+                            index: i,
+                            value: v?.value ?? 0,
+                            payment: v?.payment ?? 0,
+                          };
+                        })}
+                        className="display w-150 datatable-wrapper header-white no-border"
+                        showGridlines={false}
+                        emptyMessage={() => <div></div>}
+                      >
+                        <Column
+                          header="Kode Faktur"
+                          style={{
+                            maxWidth: "15rem",
+                          }}
+                          field={""}
+                          body={(e) => (
+                            <div className="p-inputgroup">
+                              <InputText
+                                value={e.fk_id && checkFk(e.fk_id)?.fk_code}
+                                onChange={(u) => {}}
+                                placeholder="Kode Faktur"
+                                disabled
+                              />
+                            </div>
+                          )}
+                        />
 
-                      <Column
-                        header="Tanggal J/T tempo"
-                        field={""}
-                        body={(e) => (
-                          <div className="p-inputgroup">
-                            <Calendar
-                              value={
-                                new Date(
-                                  `${e.fk_id && checkFk(e.fk_id).ord_id.due_date}Z`
-                                )
-                              }
-                              onChange={(e) => {}}
-                              placeholder="Tanggal Jatuh Tempo"
-                              dateFormat="dd/mm/yy"
-                              disabled
-                            />
-                          </div>
-                        )}
-                      />
+                        <Column
+                          header="Tanggal J/T tempo"
+                          field={""}
+                          body={(e) => (
+                            <div className="p-inputgroup">
+                              <Calendar
+                                value={
+                                  new Date(
+                                    `${
+                                      e.fk_id &&
+                                      checkFk(e.fk_id)?.ord_id?.due_date
+                                    }Z`
+                                  )
+                                }
+                                onChange={(e) => {}}
+                                placeholder="Tanggal Jatuh Tempo"
+                                dateFormat="dd/mm/yy"
+                                disabled
+                              />
+                            </div>
+                          )}
+                        />
 
-                      <Column
-                        header="Type"
-                        style={{
-                          width: "10rem",
-                        }}
-                        field={""}
-                        body={(e) => (
-                          <div className="p-inputgroup">
-                            <InputText
-                              value={
-                                exp.acq[e.index].fk_id
-                                  ? exp.acq[e.index].fk_id
-                                  : null
-                              }
-                              onChange={(a) => {}}
-                              placeholder="Type"
-                              disabled
-                            />
-                          </div>
-                        )}
-                      />
+                        <Column
+                          header="Type"
+                          style={{
+                            width: "10rem",
+                          }}
+                          field={""}
+                          body={(e) => (
+                            <div className="p-inputgroup">
+                              <InputText
+                                value={
+                                  exp.acq[e.index].fk_id
+                                    ? exp.acq[e.index].fk_id
+                                    : null
+                                }
+                                onChange={(a) => {}}
+                                placeholder="Type"
+                                disabled
+                              />
+                            </div>
+                          )}
+                        />
 
-                      <Column
-                        header="Nilai"
-                        style={{
-                          maxWidth: "15rem",
-                        }}
-                        field={""}
-                        body={(e) => (
-                          <div className="p-inputgroup">
-                            <InputText
-                              value={
-                                exp.acq[e.index].value
-                                  ? exp.acq[e.index].value
-                                  : null
-                              }
-                              onChange={(e) => {}}
-                              placeholder="0"
-                              type="number"
-                              disabled
-                            />
-                          </div>
-                        )}
-                      />
+                        <Column
+                          header="Nilai"
+                          style={{
+                            maxWidth: "15rem",
+                          }}
+                          field={""}
+                          body={(e) => (
+                            <div className="p-inputgroup">
+                              <InputText
+                                value={e.value && e.value}
+                                onChange={(e) => {}}
+                                placeholder="0"
+                                type="number"
+                                disabled
+                              />
+                            </div>
+                          )}
+                        />
 
-                      <Column
-                        header="Nilai Pembayaran"
-                        style={{
-                          maxWidth: "10rem",
-                        }}
-                        field={""}
-                        body={(e) => (
-                          <div className="p-inputgroup">
-                            <InputText
-                              value={
-                                exp.acq[e.index].payment
-                                  ? exp.acq[e.index].payment
-                                  : null
-                              }
-                              onChange={(e) => {}}
-                              placeholder="0"
-                              type="number"
-                            />
-                          </div>
-                        )}
-                      />
+                        <Column
+                          header="Nilai Pembayaran"
+                          style={{
+                            maxWidth: "10rem",
+                          }}
+                          field={""}
+                          body={(e) => (
+                            <div className="p-inputgroup">
+                              <InputText
+                                value={e.payment && e.payment}
+                                onChange={(u) => {
+                                  let temp = [...exp.acq];
+                                  temp[e.index].payment = u.target.value;
+                                  updateExp({ ...exp, acq: temp });
+                                }}
+                                placeholder="0"
+                                type="number"
+                                min={0}
+                              />
+                            </div>
+                          )}
+                        />
 
-                      <Column
-                        body={
-                          (e) => (
-                            // e.index === out.rprod.length - 1 ? (
-                            <Link
-                              onClick={() => {
-                                let temp = [...exp.acq];
-                                temp.splice(e.index, 1);
-                                updateExp({
-                                  ...exp,
-                                  acq: temp,
-                                });
-                              }}
-                              className="btn btn-danger shadow btn-xs sharp ml-1"
-                            >
-                              <i className="fa fa-trash"></i>
-                            </Link>
-                          )
-                          // )
-                        }
-                      />
-                    </DataTable>
-                  </>
-                }
-              />
+                        <Column
+                          body={
+                            (e) => (
+                              // e.index === out.rprod.length - 1 ? (
+                              <Link
+                                onClick={() => {
+                                  let temp = [...exp.acq];
+                                  temp.splice(e.index, 1);
+                                  updateExp({
+                                    ...exp,
+                                    acq: temp,
+                                  });
+                                }}
+                                className="btn btn-danger shadow btn-xs sharp ml-1"
+                              >
+                                <i className="fa fa-trash"></i>
+                              </Link>
+                            )
+                            // )
+                          }
+                        />
+                      </DataTable>
+                    </>
+                  }
+                />
+              ) : (
+                <></>
+              )}
             </>
           ) : (
             // Type Pengeluaran
@@ -819,7 +833,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                     });
                   }}
                   label={"[proj_name] ([proj_code])"}
-                  placeholder="Pilih Kode Akun"
+                  placeholder="Pilih Project"
                   detail
                   onDetail={() => setShowProj(true)}
                 />
@@ -1172,7 +1186,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowAccKas(false);
-            updateExp({ ...exp, kas_acc: e.data.account.id});
+            updateExp({ ...exp, kas_acc: e.data.account.id });
           }
 
           setDoubleClick(true);
@@ -1200,7 +1214,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowAcc(false);
-            updateExp({ ...exp, exp_acc: e.data.account.id});
+            updateExp({ ...exp, exp_acc: e.data.account.id });
           }
 
           setDoubleClick(true);

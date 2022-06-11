@@ -712,7 +712,7 @@ const DataSupplier = ({
   const ppn = (value) => {
     let selected = {};
     pajak?.forEach((element) => {
-      if (element.id === `${value}`) {
+      if (value === element.id) {
         selected = element;
       }
     });
@@ -1208,7 +1208,7 @@ const DataSupplier = ({
                     <Dropdown
                       value={
                         currentItem !== null 
-                          ? ppn(currentItem?.supplier?.sup_ppn ?? "")
+                          ? ppn(currentItem?.supplier?.sup_ppn)
                           : null
                       }
                       options={pajak}

@@ -548,11 +548,13 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             <CustomDropdown
               value={order.po_id !== null ? checkPO(order.po_id) : null}
               onChange={(e) => {
+                let result = new Date(`${order.ord_date}Z`);
+                result.setDate(result.getDate() + checRulPay(e.top.id).day );
                 updateORD({
                   ...order,
                   po_id: e.id,
                   top: e.top.id ?? null,
-                  // due_date: result,
+                  due_date: result,
                   sup_id: e.sup_id.id ?? null,
                   dep_id: e.preq_id?.req_dep?.id ?? null,
                   dprod: e.pprod,

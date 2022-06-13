@@ -876,6 +876,18 @@ const InputPO = ({ onCancel, onSuccess }) => {
                           value={e.prod_id && checkProd(e.prod_id)}
                           options={product}
                           onChange={(t) => {
+                            let sat = [];
+                            satuan.forEach((element) => {
+                              if (element.id === t.unit.id) {
+                                sat.push(element);
+                              } else {
+                                if (element.u_from?.id === t.unit.id) {
+                                  sat.push(element);
+                                }
+                              }
+                            });
+                            setSatuan(sat);
+
                             let temp = [...po.pprod];
                             temp[e.index].prod_id = t.value.id;
                             updatePo({ ...po, pprod: temp });

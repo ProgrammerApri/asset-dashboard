@@ -10,6 +10,7 @@ import ODRReducer from "./ODRReducer";
 import RBReducer from "./RBReducer";
 import SLReducer from "./SLReducer";
 import EXPReducer from "./EXPReducer";
+import GIROReducer from "./GIROReducer";
 
 
 const rootReducer = combineReducers({
@@ -24,6 +25,7 @@ const rootReducer = combineReducers({
   rb: RBReducer,
   sl: SLReducer,
   exp: EXPReducer,
+  giro: GIROReducer,
 });
 
 export default rootReducer;

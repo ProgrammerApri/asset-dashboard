@@ -444,7 +444,18 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                         detail
                         onDetail={() => setShowProduk(true)}
                         onChange={(e) => {
-                          console.log(e);
+                          let sat = [];
+                          satuan.forEach((element) => {
+                            if (element.id === e.unit.id) {
+                              sat.push(element);
+                            } else {
+                              if (element.u_from?.id === e.unit.id) {
+                                sat.push(element);
+                              }
+                            }
+                          });
+                          setSatuan(sat);
+                          
                           let temp = [...rp.rprod];
                           temp[i].prod_id = e.id;
                           temp[i].unit_id = e.unit?.id;

@@ -495,7 +495,18 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                       value={e.prod_id && checkProd(e.prod_id)}
                       option={product}
                       onChange={(u) => {
-                        console.log(e.value);
+                        let sat = [];
+                        satuan.forEach((element) => {
+                          if (element.id === u.unit.id) {
+                            sat.push(element);
+                          } else {
+                            if (element.u_from?.id === u.unit.id) {
+                              sat.push(element);
+                            }
+                          }
+                        });
+                        setSatuan(sat);
+                        
                         let temp = [...pr.product];
                         temp[e.index].prod_id = u.id;
                         temp[e.index].unit_id = u.unit?.id;

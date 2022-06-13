@@ -434,50 +434,6 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
-  const suppTemp = (option) => {
-    return (
-      <div>
-        {option !== null
-          ? `${option.supplier.sup_code} (${option.supplier.sup_name})`
-          : ""}
-      </div>
-    );
-  };
-
-  const valueSupTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null
-            ? `${option.supplier.sup_code} (${option.supplier.sup_name})`
-            : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const jasTemp = (option) => {
-    return (
-      <div>
-        {option !== null ? `${option.jasa.name} (${option.jasa.code})` : ""}
-      </div>
-    );
-  };
-
-  const valueJasTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null ? `${option.jasa.name} (${option.jasa.code})` : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
   const onSubmit = () => {
     if (isEdit) {
       setUpdate(true);
@@ -785,7 +741,19 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                       value={e.prod_id && checkProd(e.prod_id)}
                       option={product}
                       onChange={(u) => {
-                        console.log(e.value);
+                        // looping satuan
+                        let sat = [];
+                        satuan.forEach((element) => {
+                          if (element.id === u.unit.id) {
+                            sat.push(element);
+                          } else {
+                            if (element.u_from?.id === u.unit.id) {
+                              sat.push(element);
+                            }
+                          }
+                        });
+                        setSatuan(sat);
+
                         let temp = [...order.dprod];
                         temp[e.index].prod_id = u.id;
                         temp[e.index].unit_id = u.unit?.id;

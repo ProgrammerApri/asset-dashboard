@@ -31,6 +31,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
   const [bank, setBank] = useState(null);
   const [supplier, setSupplier] = useState(null);
   const [faktur, setFaktur] = useState(null);
+  const [apcard, setAP] = useState(null);
   const [dept, setDept] = useState(null);
   const [proj, setProj] = useState(null);
   const [showSupplier, setShowSupplier] = useState(false);
@@ -73,6 +74,39 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
     getAccount();
   }, []);
 
+  const getAPCard = async () => {
+    const config = {
+      ...endpoints.apcard,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        let sup = [];
+        data.forEach((elem) => {
+          if (elem.trx_type === "LP" && elem.pay_type === "P1") {
+            supplier.forEach((element) => {
+              element.fk = [];
+              data.forEach((el) => {
+                if (element.supplier.id === el.sup_id.id) {
+                  element.fk.push(el);
+                }
+              });
+              if (element.fk.length > 0) {
+                sup.push(element);
+              }
+            });
+          }
+        });
+        setAP(data);
+        setSupplier(sup)
+      }
+    } catch (error) {}
+  };
+
   const getFaktur = async () => {
     const config = {
       ...endpoints.faktur,
@@ -114,7 +148,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
       if (response.status) {
         const { data } = response;
         setSupplier(data);
-        getFaktur();
+        getAPCard();
       }
     } catch (error) {}
   };
@@ -363,6 +397,17 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
+  const checkAP = (value) => {
+    let selected = {};
+    apcard?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
   const onSubmit = () => {
     if (isEdit) {
       setUpdate(true);
@@ -463,34 +508,16 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                 <label className="text-label">Kode Pemasok</label>
                 <div className="p-inputgroup"></div>
                 <CustomDropdown
-                  value={exp.acq_sup && supp(exp.acq_sup)}
-                  option={supplier}
+                  value={exp.acq_sup && checkAP(exp.acq_sup)}
+                  option={apcard}
                   onChange={(e) => {
                     updateExp({
                       ...exp,
                       acq_sup: e.supplier?.id,
-                      acq: e.fk?.map((v) => {
-                        let total = 0;
-                        v.product.forEach((element) => {
-                          total +=
-                            element.nett_price > 0
-                              ? element.nett_price
-                              : element.total;
-                        });
-                        v.jasa.forEach((element) => {
-                          total += element.total;
-                        });
-
-                        return {
-                          id: null,
-                          fk_id: v.id,
-                          value: total,
-                          payment: 0,
-                        };
-                      }),
+                      acq: e.ord_id?.id,
                     });
                   }}
-                  label={"[supplier.sup_name] ([supplier.sup_code])"}
+                  label={"[sup_id.sup_name] ([sup_id.sup_code])"}
                   placeholder="Pilih Pemasok"
                   detail
                 />
@@ -655,7 +682,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                           body={(e) => (
                             <div className="p-inputgroup">
                               <InputText
-                                value={e.fk_id && checkFk(e.fk_id)?.fk_code}
+                                value={e.ord_id && checkAP(e.ord_id)?.fk_code}
                                 onChange={(u) => {}}
                                 placeholder="Kode Faktur"
                                 disabled
@@ -673,8 +700,8 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                                 value={
                                   new Date(
                                     `${
-                                      e.fk_id &&
-                                      checkFk(e.fk_id)?.ord_id?.due_date
+                                      e.ord_due &&
+                                      e.ord_due
                                     }Z`
                                   )
                                 }
@@ -697,9 +724,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                             <div className="p-inputgroup">
                               <InputText
                                 value={
-                                  exp.acq[e.index].fk_id
-                                    ? exp.acq[e.index].fk_id
-                                    : null
+                                  e.trx_type && e.trx_type
                                 }
                                 onChange={(a) => {}}
                                 placeholder="Type"
@@ -718,7 +743,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                           body={(e) => (
                             <div className="p-inputgroup">
                               <InputText
-                                value={e.value && e.value}
+                                value={e.trx_amnh && e.trx_amnh}
                                 onChange={(e) => {}}
                                 placeholder="0"
                                 type="number"

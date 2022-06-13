@@ -814,6 +814,38 @@ const endpoints = {
     method: "DELETE",
     data: {},
   },
+
+  /// Retur-Jual
+  retur_sale: {
+    endpoint: "/v1/api/retur-sales",
+    method: "GET",
+    data: {},
+  },
+
+  addSR: {
+    endpoint: "/v1/api/retur-sales",
+    method: "POST",
+    data: {},
+  },
+
+  editSR: {
+    endpoint: "/v1/api/retur-sales/",
+    method: "PUT",
+    data: {},
+  },
+
+  delSR: {
+    endpoint: "/v1/api/retur-sales/",
+    method: "DELETE",
+    data: {},
+  },
+
+  /// APCARD
+  apcard: {
+    endpoint: "/v1/api/apcard",
+    method: "GET",
+    data: {},
+  },
 };
 
 export default endpoints;

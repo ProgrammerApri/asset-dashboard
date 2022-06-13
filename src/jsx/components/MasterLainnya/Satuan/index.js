@@ -40,13 +40,14 @@ const Satuan = () => {
         const { data } = response;
         console.log(data);
         setSatuan(data);
-        let dasar = [];
-        data.forEach((el) => {
-          if (el.type == "d") {
-            dasar.push(el);
-          }
-        });
-        setSatuan(dasar);
+        // let dasar = [];
+        // data.forEach((el) => {
+        //   if (el.type === "d") {
+        //     dasar.push(el);
+        //   }
+        // });
+        setSatuan(data);
+        
       }
     } catch (error) {}
     if (isUpdate) {

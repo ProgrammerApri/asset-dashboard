@@ -376,19 +376,19 @@ const KasBankOutList = ({ onAdd, onEdit }) => {
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
         />
-        {/* <Column
+        <Column
           header="Cara Pengeluaran"
-          field={(e) => e.acq_pay}
+          field={(e) => e.exp_type}
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
         />
         <Column
           header="Pemasok"
-          // field={(e) => e.customer.cus_address}
+          field={(e) => e.acq_sup?.sup_name}
           style={{ minWidth: "8rem" }}
-          // body={loading && <Skeleton />}
+          body={loading && <Skeleton />}
         />
-        <Column
+        {/* <Column
           header="Nilai"
           field={(e) => e.acq.value}
           style={{ minWidth: "8rem" }}

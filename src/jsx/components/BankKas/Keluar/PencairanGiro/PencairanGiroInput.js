@@ -2,53 +2,32 @@ import React, { useState, useEffect, useRef } from "react";
 import { request, endpoints } from "src/utils";
 import { Row, Col, Card } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
-import { Link } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
-import { Divider } from "@material-ui/core";
 import { Calendar } from "primereact/calendar";
-import { InputSwitch } from "primereact/inputswitch";
-import CustomAccordion from "../../../Accordion/Accordion";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_PO } from "src/redux/actions";
+import { SET_CURRENT_GIRO } from "src/redux/actions";
 import DataPusatBiaya from "../../../MasterLainnya/PusatBiaya/DataPusatBiaya";
 import DataSupplier from "../../../Mitra/Pemasok/DataPemasok";
 import DataRulesPay from "src/jsx/components/MasterLainnya/RulesPay/DataRulesPay";
 import DataPajak from "src/jsx/components/Master/Pajak/DataPajak";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
+import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
+import DataBank from "src/jsx/components/MasterLainnya/Bank/DataBank";
 
 const PencairanGiroMundurInput = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
-  const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
   const [doubleClick, setDoubleClick] = useState(false);
-  const po = useSelector((state) => state.po.current);
-  const isEdit = useSelector((state) => state.po.editpo);
+  const giro = useSelector((state) => state.giro.current);
+  const isEdit = useSelector((state) => state.giro.editGiro);
   const dispatch = useDispatch();
-  const [isRp, setRp] = useState(true);
-  const [pusatBiaya, setPusatBiaya] = useState(null);
-  const [supplier, setSupplier] = useState(null);
-  const [rulesPay, setRulesPay] = useState(null);
-  const [ppn, setPpn] = useState(null);
-  const [rp, setRequest] = useState(null);
-  const [showSupplier, setShowSupplier] = useState(false);
-  const [showDepartemen, setShowDept] = useState(false);
-  const [showRulesPay, setShowRulesPay] = useState(false);
-  const [showPpn, setShowPpn] = useState(false);
-  const [product, setProduct] = useState(null);
-  const [jasa, setJasa] = useState(null);
-  const [satuan, setSatuan] = useState(null);
+  const [bank, setBank] = useState(null);
+  const [showBank, setShowBank] = useState(false);
   const [accor, setAccor] = useState({
     produk: true,
     jasa: false,
   });
-
-  const type = [
-    { name: "%", code: "P" },
-    { name: "Rp", code: "R" },
-  ];
 
   useEffect(() => {
     window.scrollTo({
@@ -56,19 +35,12 @@ const PencairanGiroMundurInput = ({ onCancel, onSuccess }) => {
       left: 0,
       behavior: "smooth",
     });
-    getPusatBiaya();
-    getSupplier();
-    getRulesPay();
-    getPpn();
-    getRp();
-    getProduct();
-    getJasa();
-    getSatuan();
+    getBank();
   }, []);
 
-  const getSupplier = async () => {
+  const getBank = async () => {
     const config = {
-      ...endpoints.supplier,
+      ...endpoints.bank,
       data: {},
     };
     let response = null;
@@ -77,166 +49,16 @@ const PencairanGiroMundurInput = ({ onCancel, onSuccess }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        setSupplier(data);
+        setBank(data);
       }
     } catch (error) {}
   };
 
-  const getPusatBiaya = async () => {
+  const editGiro = async () => {
     const config = {
-      ...endpoints.pusatBiaya,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setPusatBiaya(data);
-      }
-    } catch (error) {}
-  };
-
-  const getRulesPay = async () => {
-    const config = {
-      ...endpoints.rules_pay,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setRulesPay(data);
-      }
-    } catch (error) {}
-  };
-
-  const getPpn = async () => {
-    const config = {
-      ...endpoints.pajak,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setPpn(data);
-      }
-    } catch (error) {}
-  };
-
-  const getRp = async () => {
-    const config = {
-      ...endpoints.rPurchase,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        let filt = [];
-        data.forEach((elem) => {
-          if (elem.status === 0) {
-            filt.push(elem);
-            elem.rprod.forEach((el) => {
-              el.order = el.order ?? 0;
-              if (el.order === 0 || el.request - el.order !== 0) {
-                el.prod_id = el.prod_id.id;
-                el.unit_id = el.unit_id.id;
-              }
-            });
-            elem.rjasa.forEach((element) => {
-              element.jasa_id = element.jasa_id.id;
-              element.unit_id = element.unit_id.id;
-            });
-            elem.rjasa.push({
-              id: 0,
-              preq_id: elem.id,
-              sup_id: null,
-              jasa_id: null,
-              unit_id: null,
-              qty: null,
-              price: null,
-              disc: null,
-              total: null,
-            });
-          }
-        });
-        console.log(data);
-        setRequest(filt);
-      }
-    } catch (error) {}
-  };
-
-  const getProduct = async () => {
-    const config = {
-      ...endpoints.product,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-
-      if (response.status) {
-        const { data } = response;
-        setProduct(data);
-        console.log("jsdj");
-        console.log(data);
-      }
-    } catch (error) {}
-  };
-
-  const getJasa = async () => {
-    const config = {
-      ...endpoints.jasa,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setJasa(data);
-      }
-    } catch (error) {}
-  };
-
-  const getSatuan = async () => {
-    const config = {
-      ...endpoints.getSatuan,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setSatuan(data);
-      }
-    } catch (error) {}
-  };
-
-  const editPO = async () => {
-    const config = {
-      ...endpoints.editPO,
-      endpoint: endpoints.editPO.endpoint + po.id,
-      data: po,
+      ...endpoints.editGiro,
+      endpoint: endpoints.editGiro.endpoint + giro.id,
+      data: giro,
     };
     console.log(config.data);
     let response = null;
@@ -259,10 +81,10 @@ const PencairanGiroMundurInput = ({ onCancel, onSuccess }) => {
     }
   };
 
-  const addPO = async () => {
+  const addGiro = async () => {
     const config = {
-      ...endpoints.addPO,
-      data: po,
+      ...endpoints.addGiro,
+      data: giro,
     };
     console.log(config.data);
     let response = null;
@@ -280,7 +102,7 @@ const PencairanGiroMundurInput = ({ onCancel, onSuccess }) => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${po.po_code} Sudah Digunakan`,
+            detail: `Kode ${giro.giro_code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -298,89 +120,10 @@ const PencairanGiroMundurInput = ({ onCancel, onSuccess }) => {
     }
   };
 
-  const req_pur = (value) => {
+  const checkBank = (value) => {
     let selected = {};
-    rp?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const dept = (value) => {
-    let selected = {};
-    pusatBiaya?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const pjk = (value) => {
-    let selected = {};
-    ppn?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const supp = (value) => {
-    let selected = {};
-    supplier?.forEach((element) => {
-      if (value === element.supplier.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const rulPay = (value) => {
-    let selected = {};
-    rulesPay?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const checkProd = (value) => {
-    let selected = {};
-    product?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-        console.log("SELEC");
-        console.log(selected);
-      }
-    });
-
-    return selected;
-  };
-
-  const checkUnit = (value) => {
-    let selected = {};
-    satuan?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const checkjasa = (value) => {
-    let selected = {};
-    jasa?.forEach((element) => {
-      if (value === element.jasa.id) {
+    bank?.forEach((element) => {
+      if (value === element.bank.id) {
         selected = element;
       }
     });
@@ -391,10 +134,10 @@ const PencairanGiroMundurInput = ({ onCancel, onSuccess }) => {
   const onSubmit = () => {
     if (isEdit) {
       setUpdate(true);
-      editPO();
+      editGiro();
     } else {
       setUpdate(true);
-      addPO();
+      addGiro();
     }
   };
 
@@ -410,131 +153,9 @@ const PencairanGiroMundurInput = ({ onCancel, onSuccess }) => {
     return [year, month, day].join("-");
   };
 
-  const reqTemp = (option) => {
-    return (
-      <div>
-        {option !== null
-          ? `${option.req_code} (${option.req_dep.ccost_name})`
-          : ""}
-      </div>
-    );
-  };
-
-  const valueReqTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null
-            ? `${option.req_code} (${option.req_dep.ccost_name})`
-            : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const deptTemp = (option) => {
-    return (
-      <div>
-        {option !== null ? `${option.ccost_code} (${option.ccost_name})` : ""}
-      </div>
-    );
-  };
-
-  const valueDeptTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null ? `${option.ccost_code} (${option.ccost_name})` : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const suppTemp = (option) => {
-    return (
-      <div>
-        {option !== null
-          ? `${option.supplier.sup_code} (${option.supplier.sup_name})`
-          : ""}
-      </div>
-    );
-  };
-
-  const valueSupTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null
-            ? `${option.supplier.sup_code} (${option.supplier.sup_name})`
-            : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const rulTemp = (option) => {
-    return (
-      <div>{option !== null ? `${option.name} (${option.day} Hari)` : ""}</div>
-    );
-  };
-
-  const valueRulTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null ? `${option.name} (${option.day} Hari)` : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const prodTemp = (option) => {
-    return (
-      <div>{option !== null ? `${option.name} (${option.code})` : ""}</div>
-    );
-  };
-
-  const valueProd = (option, props) => {
-    if (option) {
-      return (
-        <div>{option !== null ? `${option.name} (${option.code})` : ""}</div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const jasTemp = (option) => {
-    return (
-      <div>
-        {option !== null ? `${option.jasa.name} (${option.jasa.code})` : ""}
-      </div>
-    );
-  };
-
-  const valueJasTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null ? `${option.jasa.name} (${option.jasa.code})` : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const updatePo = (e) => {
+  const updateGR = (e) => {
     dispatch({
-      type: SET_CURRENT_PO,
+      type: SET_CURRENT_GIRO,
       payload: e,
     });
   };
@@ -558,9 +179,9 @@ const PencairanGiroMundurInput = ({ onCancel, onSuccess }) => {
             <label className="text-label">Tanggal</label>
             <div className="p-inputgroup">
               <Calendar
-                value={new Date(`${po.po_date}Z`)}
+                value={new Date(`${giro.giro_date}Z`)}
                 onChange={(e) => {
-                  updatePo({ ...po, po_date: e.value });
+                  updateGR({ ...giro, giro_date: e.value });
                 }}
                 placeholder="Tanggal Pencairan"
                 showIcon
@@ -570,12 +191,14 @@ const PencairanGiroMundurInput = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-4">
-            <label className="text-label">Nomer Giro</label>
+            <label className="text-label">Nomor Giro</label>
             <div className="p-inputgroup">
               <InputText
-                value={po.po_code}
-                onChange={(e) => updatePo({ ...po, po_code: e.target.value })}
-                placeholder="Nomer Giro"
+                value={giro.giro_code}
+                onChange={(e) =>
+                  updateGR({ ...giro, giro_code: e.target.value })
+                }
+                placeholder="Nomor Giro"
               />
             </div>
           </div>
@@ -584,55 +207,31 @@ const PencairanGiroMundurInput = ({ onCancel, onSuccess }) => {
             <label className="text-label">Nilai Giro</label>
             <div className="p-inputgroup">
               <InputText
-                value={po.po_code}
-                onChange={(e) => updatePo({ ...po, po_code: e.target.value })}
-                placeholder="Nomer Giro"
+                value={giro.giro_value}
+                onChange={(e) =>
+                  updateGR({ ...giro, giro_value: e.target.value })
+                }
+                placeholder="Nilai Giro"
+                type="number"
+                min={0}
               />
             </div>
           </div>
 
           <div className="col-4">
             <label className="text-label">Kode Bank</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={po.preq_id && req_pur(po.preq_id)}
-                options={rp}
-                onChange={(e) => {
-                  console.log(e.value.rprod);
-                  let result = null;
-                  if (po.top) {
-                    result = new Date(`${req_pur(e.value.id).req_date}Z`);
-                    result.setDate(result.getDate() + rulPay(po?.top)?.day);
-                    console.log(result);
-                  }
-                  updatePo({
-                    ...po,
-                    preq_id: e.value.id,
-                    due_date: result,
-                    sup_id: e.value?.ref_sup?.id ?? null,
-                    rprod: e.value.rprod,
-                    rjasa: e.value.rjasa,
-                  });
-                }}
-                optionLabel="req_code"
-                placeholder="Pilih Kode Bank"
-                itemTemplate={reqTemp}
-                valueTemplate={valueReqTemp}
-              />
-            </div>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
+              value={giro.bank_code && checkBank(giro.bank_code)}
+              option={bank}
+              onChange={(e) => updateGR({ ...giro, bank_code: e.target.value })}
+              label={"[bank.BANK_NAME] ([bank.BANK_CODE])"}
+              placeholder="Pilih Kode Bank"
+              detail
+              onDetail={() => setShowBank(true)}
+            />
           </div>
-
-          
-
-          
-            {/* kode suplier otomatis keluar, karena sudah melekat di faktur pembelian  */}
-            
-          
         </Row>
-
-       
-
-      
       </>
     );
   };
@@ -664,108 +263,24 @@ const PencairanGiroMundurInput = ({ onCancel, onSuccess }) => {
       {body()}
       {footer()}
 
-      <DataPusatBiaya
-        data={pusatBiaya}
+      <DataBank
+        data={bank}
         loading={false}
         popUp={true}
-        show={showDepartemen}
+        show={showBank}
         onHide={() => {
-          setShowDept(false);
+          setShowBank(false);
         }}
         onInput={(e) => {
-          setShowDept(!e);
+          setShowBank(!e);
         }}
         onSuccessInput={(e) => {
-          getPusatBiaya();
+          getBank();
         }}
         onRowSelect={(e) => {
           if (doubleClick) {
-            setShowDept(false);
-            updatePo({ ...rp, req_dep: e.data.id });
-          }
-
-          setDoubleClick(true);
-
-          setTimeout(() => {
-            setDoubleClick(false);
-          }, 2000);
-        }}
-      />
-
-      <DataRulesPay
-        data={rulesPay}
-        loading={false}
-        popUp={true}
-        show={showRulesPay}
-        onHide={() => {
-          setShowRulesPay(false);
-        }}
-        onInput={(e) => {
-          setShowRulesPay(!e);
-        }}
-        onSuccessInput={(e) => {
-          getRulesPay();
-        }}
-        onRowSelect={(e) => {
-          if (doubleClick) {
-            setShowRulesPay(false);
-            updatePo({ ...rp, req_dep: e.data.id });
-          }
-
-          setDoubleClick(true);
-
-          setTimeout(() => {
-            setDoubleClick(false);
-          }, 2000);
-        }}
-      />
-
-      <DataSupplier
-        data={supplier}
-        loading={false}
-        popUp={true}
-        show={showSupplier}
-        onHide={() => {
-          setShowSupplier(false);
-        }}
-        onInput={(e) => {
-          setShowSupplier(!e);
-        }}
-        onSuccessInput={(e) => {
-          getSupplier();
-        }}
-        onRowSelect={(e) => {
-          if (doubleClick) {
-            setShowSupplier(false);
-            updatePo({ ...rp, req_dep: e.data.id });
-          }
-
-          setDoubleClick(true);
-
-          setTimeout(() => {
-            setDoubleClick(false);
-          }, 2000);
-        }}
-      />
-
-      <DataPajak
-        data={ppn}
-        loading={false}
-        popUp={true}
-        show={showPpn}
-        onHide={() => {
-          setShowPpn(false);
-        }}
-        onInput={(e) => {
-          setShowPpn(!e);
-        }}
-        onSuccessInput={(e) => {
-          getPpn();
-        }}
-        onRowSelect={(e) => {
-          if (doubleClick) {
-            setShowPpn(false);
-            updatePo({ ...rp, req_dep: e.data.id });
+            setShowBank(false);
+            updateGR({ ...giro, bank_code: e.data.id });
           }
 
           setDoubleClick(true);

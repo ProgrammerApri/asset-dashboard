@@ -46,6 +46,7 @@ const DataSatuan = ({
 }) => {
   const [satuan, setSatuan] = useState(null);
   const [satuanDasar, setSatuanDasar] = useState(null);
+  const [satuanKonversi, setSatuanKonversi] = useState(null);
   const [loading, setLoading] = useState(true);
   const [position, setPosition] = useState("center");
   const [currentItem, setCurrentItem] = useState(def);
@@ -88,11 +89,13 @@ const DataSatuan = ({
         setSatuan(data);
         let dasar = [];
         data.forEach((el) => {
-          if (el.type == "d") {
+          if (el.type === "d") {
             dasar.push(el);
           }
         });
         setSatuanDasar(dasar);
+
+        
       }
     } catch (error) {}
     if (isUpdate) {
@@ -103,6 +106,8 @@ const DataSatuan = ({
       }, 500);
     }
   };
+
+
 
   const editSatuan = async () => {
     // setLoading(true);

@@ -1257,7 +1257,7 @@ const DataSupplier = ({
               </div>
 
               <h4 className="mt-4">
-                <b>Distribusi GL/AR</b>
+                <b>Distribusi GL/AP</b>
               </h4>
               <Divider className="mb-3"></Divider>
 

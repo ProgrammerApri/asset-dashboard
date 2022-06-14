@@ -198,7 +198,7 @@ const ReturJualList = ({ onAdd }) => {
         />
         <Column
           header="Nomor Penjualan"
-          field={(e) => e.sale_id.so_code}
+          field={(e) => e.sale_id.ord_code}
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
         />

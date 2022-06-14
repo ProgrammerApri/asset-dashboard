@@ -371,23 +371,39 @@ const KasBankOutList = ({ onAdd, onEdit }) => {
           body={loading && <Skeleton />}
         />
         <Column
-          header="Nomor Referensi Pengeluran"
+          header="Nomor Referensi"
           field={(e) => e.exp_code}
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
         />
         <Column
-          header="Cara Pengeluaran"
-          field={(e) => e.exp_type}
-          style={{ minWidth: "8rem" }}
-          body={loading && <Skeleton />}
-        />
-        <Column
+            header="Tipe Pengeluaran"
+            field={(e) => e?.exp_type ?? ""}
+            style={{ minWidth: "8rem" }}
+            body={(e) =>
+              loading ? (
+                <Skeleton />
+              ) : (
+                <div>
+                  {e.exp_type === 1 ? (
+                    <Badge variant="info light">
+                      <i className="bx bxs-circle text-info mr-1"></i> Pelunasan
+                    </Badge>
+                  ) : (
+                    <Badge variant="warning light">
+                      <i className="bx bxs-circle text-warning mr-1"></i> Pengeluaran Kas/Bank
+                    </Badge>
+                  )}
+                </div>
+              )
+            }
+          />
+        {/* <Column
           header="Pemasok"
           field={(e) => e.acq_sup?.sup_name}
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
-        />
+        /> */}
         {/* <Column
           header="Nilai"
           field={(e) => e.acq.value}

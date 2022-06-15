@@ -372,7 +372,7 @@ const DataSalesOrder = ({ onAdd, onEdit }) => {
         rowHover
         header={renderHeader}
         filters={filters1}
-        globalFilterFields={["so.so_code", "so.so_date"]}
+        globalFilterFields={["so.so_code", "so.so_date", "pel_id.cus_name"]}
         emptyMessage="Tidak ada data"
         paginator
         paginatorTemplate={template2}

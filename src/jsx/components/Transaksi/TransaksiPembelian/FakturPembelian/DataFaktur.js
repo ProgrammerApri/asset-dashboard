@@ -393,7 +393,7 @@ const DataFaktur = ({ onAdd, onEdit }) => {
         rowHover
         header={renderHeader}
         filters={filters1}
-        globalFilterFields={["e.fk_code"]}
+        globalFilterFields={["fk_code", "ord_id.ord_code", "formatDate(fk_date)"]}
         emptyMessage="Tidak ada data"
         paginator
         paginatorTemplate={template2}

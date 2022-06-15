@@ -475,7 +475,7 @@ const PesananPO = ({ onAdd, onEdit }) => {
         rowHover
         header={renderHeader}
         filters={filters1}
-        globalFilterFields={["customer.cus_code", "customer.cus_limit"]}
+        globalFilterFields={["po_code", "preq_id?.req_code", "formatDate(po_date)"]}
         emptyMessage="Tidak ada data"
         paginator
         paginatorTemplate={template2}

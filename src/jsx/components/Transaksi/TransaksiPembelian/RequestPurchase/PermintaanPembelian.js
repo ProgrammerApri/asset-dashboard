@@ -344,7 +344,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
         rowHover
         header={renderHeader}
         filters={filters1}
-        globalFilterFields={["customer.cus_code"]}
+        globalFilterFields={["req_code", "req_dep.ccost_name"]}
         emptyMessage="Tidak ada data"
         paginator
         paginatorTemplate={template2}

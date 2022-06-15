@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Button, Col, Row } from "react-bootstrap";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import ReportGRA from "./Gra";
-import ReportJurnal from "./Jurnal";
-import ReportSaldo from "./Saldo";
+import ReportJurnal from "../Jurnal";
+import ReportHutang from "./Hutang";
 
 const LaporanPembelian = () => {
   const [active, setActive] = useState(0);
@@ -13,15 +13,15 @@ const LaporanPembelian = () => {
       icon: "bx-receipt",
       component: <ReportGRA />,
     },
+    // {
+    //   tittle: "Jurnal",
+    //   icon: "bx-detail",
+    //   component: <ReportJurnal />,
+    // },
     {
-      tittle: "Jurnal",
-      icon: "bx-detail",
-      component: <ReportJurnal />,
-    },
-    {
-      tittle: "Saldo",
+      tittle: "Hutang",
       icon: "bx-money",
-      component: <ReportSaldo />,
+      component: <ReportHutang />,
     },
   ]);
 

@@ -52,6 +52,11 @@ const SideMenu = () => {
         to: "laporan-pembelian",
         icon: "bx-spreadsheet",
       },
+      {
+        tittle: "Jurnal",
+        to: "jurnal",
+        icon: "bx-detail",
+      },
     ],
     lainnya: [
       {

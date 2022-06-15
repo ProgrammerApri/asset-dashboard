@@ -11,66 +11,15 @@ import { Skeleton } from "primereact/skeleton";
 import ReactExport from "react-data-export";
 import ReactToPrint from "react-to-print";
 import CustomeWrapper from "../../CustomeWrapper/CustomeWrapper";
-import { Divider } from "@material-ui/core";
-
-const data = {
-  id: 0,
-  ord_code: null,
-  ord_date: null,
-  faktur: null,
-  po_id: null,
-  dep_id: null,
-  sup_id: null,
-  top: null,
-  due_date: null,
-  split_inv: null,
-  prod_disc: null,
-  jasa_disc: null,
-  total_disc: null,
-  dprod: [],
-  djasa: [],
-};
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
-const ReportGRA = () => {
-  const [reportGra, setReportGra] = useState(null);
+const ReportHutang = () => {
+  const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const printPage = useRef(null);
   const [date, setDate] = useState(null);
-
-  const dummy = Array.from({ length: 10 });
-
-  useEffect(() => {
-    getOrd();
-  }, []);
-
-  const getOrd = async (isUpdate = false) => {
-    setLoading(true);
-    const config = {
-      ...endpoints.ord_gra,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setReportGra(data);
-      }
-    } catch (error) {}
-    if (isUpdate) {
-      setLoading(false);
-    } else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 500);
-    }
-  };
 
   const jsonForExcel = () => {};
 
@@ -93,7 +42,7 @@ const ReportGRA = () => {
           </div>
         </div>
         <div style={{ height: "1rem" }}></div>
-        <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
+        <Row className="mr-1 mt-2" style={{height: "3rem"}}>
           <div className="mr-3">
             <ExcelFile
               filename={`report_export_${new Date().getTime()}`}
@@ -107,7 +56,7 @@ const ReportGRA = () => {
               }
             >
               <ExcelSheet
-                dataSet={reportGra ? jsonForExcel(reportGra) : null}
+                dataSet={report ? jsonForExcel(report) : null}
                 name="Report"
               />
             </ExcelFile>
@@ -130,18 +79,6 @@ const ReportGRA = () => {
     );
   };
 
-  const formatDate = (date) => {
-    var d = new Date(`${date}Z`),
-      month = "" + (d.getMonth() + 1),
-      day = "" + d.getDate(),
-      year = d.getFullYear();
-
-    if (month.length < 2) month = "0" + month;
-    if (day.length < 2) day = "0" + day;
-
-    return [year, month, day].join("-");
-  };
-
   return (
     <>
       {/* <Toast ref={toast} /> */}
@@ -151,46 +88,40 @@ const ReportGRA = () => {
             <Card.Body>
               <DataTable
                 responsiveLayout="scroll"
-                value={
-                  loading
-                    ? dummy
-                    : reportGra
-                    // ? jsonForExcel(reportGra, false)
-                    // : null
-                }
+                value={null}
                 header={renderHeader}
                 showGridlines
                 dataKey="id"
                 rowHover
                 emptyMessage="Data Tidak Ditemukan"
               >
-                <Column
-                  className="header-center body-center"
+                {/* <Column
+                  className="center-header"
                   header="Referensi"
                   style={{ minWidht: "10rem" }}
-                  field={(e) => e.ord_code}
-                  body={loading && <Skeleton />}
-                />
+                  field={() => null}
+                  body={() => null}
+                /> */}
                 <Column
-                  className="header-center body-center"
+                  className="header-center"
                   header="Tanggal"
                   style={{ minWidht: "10rem" }}
-                  field={(e) => formatDate(e.ord_date)}
-                  body={loading && <Skeleton />}
+                  field={() => null}
+                  body={() => null}
                 />
                 <Column
-                  className="header-center body-center"
+                  className="header-center"
                   header="Departemen"
                   style={{ minWidht: "10rem" }}
-                  field={(e) => e.dep_id?.ccost_name}
-                  body={loading && <Skeleton />}
+                  field={() => null}
+                  body={() => null}
                 />
                 <Column
-                  className="header-center body-center"
-                  header="Nomor"
+                  className="header-center"
+                  header="Saldo"
                   style={{ minWidht: "10rem" }}
-                  field={(e) => e.po_id?.po_code}
-                  body={loading && <Skeleton />}
+                  field={() => null}
+                  body={() => null}
                 />
               </DataTable>
             </Card.Body>
@@ -211,4 +142,4 @@ const ReportGRA = () => {
   );
 };
 
-export default ReportGRA;
+export default ReportHutang;

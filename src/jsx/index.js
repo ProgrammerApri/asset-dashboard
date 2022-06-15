@@ -60,6 +60,7 @@ import TransaksiPersediaan from "./components/TransaksiPersediaan";
 import Report from "./components/Report/LaporanPembelian/Gra";
 import LaporanPembelian from "./components/Report/LaporanPembelian";
 import ReportGRA from "./components/Report/LaporanPembelian/Gra";
+import ReportJurnal from "./components/Report/Jurnal";
 
 const Markup = ({ width }) => {
   const routes = [
@@ -75,6 +76,7 @@ const Markup = ({ width }) => {
     { url: "bank-&-kas", component: BankKas },
     { url: "transaksi-persediaan", component: TransaksiPersediaan },
     { url: "laporan-pembelian", component: LaporanPembelian },
+    { url: "jurnal", component: ReportJurnal },
 
     /// Klasifikasi
     { url: "klasifikasi", component: KlasifikasiAkun },

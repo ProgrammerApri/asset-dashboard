@@ -852,6 +852,18 @@ const endpoints = {
     method: "GET",
     data: {},
   },
+
+  ord_gra: {
+    endpoint: "/v1/api/order",
+    method: "GET",
+    data: {},
+  },
+
+  ord_date: {
+    endpoint: "/v1/api/order/date",
+    method: "POST",
+    data: {},
+  },
 };
 
 export default endpoints;

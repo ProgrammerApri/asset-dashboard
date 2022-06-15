@@ -10,7 +10,7 @@ import { Skeleton } from "primereact/skeleton";
 
 import ReactExport from "react-data-export";
 import ReactToPrint from "react-to-print";
-import CustomeWrapper from "../../CustomeWrapper/CustomeWrapper";
+import CustomeWrapper from "../CustomeWrapper/CustomeWrapper";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;

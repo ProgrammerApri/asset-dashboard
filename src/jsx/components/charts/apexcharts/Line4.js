@@ -16,10 +16,9 @@ const ProductionStat = ({series}) => {
     dataLabels: {
       enabled: false,
     },
-
     stroke: {
-      width: [4, 4, 4, 4],
-      colors: ["#C046D3", "#1EA7C5", "#FF9432", "#6D6F53"],
+      width: [4, 4],
+      colors: ["#FF9432", "#1EA7C5"],
       curve: 'smooth',
     },
     legend: {
@@ -32,24 +31,24 @@ const ProductionStat = ({series}) => {
         "Feb",
         "Mar",
         "Apr",
-        "May",
+        "Mei",
         "Jun",
         "Jul",
-        "Aug",
+        "Agu",
         "Sep",
-        "Oct",
+        "Okt",
         "Nov",
-        "Dec",
+        "Des",
       ],
     },
-    colors: ["#C046D3", "#1EA7C5", "#FF9432", "#6D6F53"],
+    colors: ["#FF9432", "#1EA7C5"],
 
     markers: {
-      size: [6, 6, 6, 6],
-      strokeWidth: [4, 4, 4, 4],
-      strokeColors: ["#C046D3", "#1EA7C5", "#FF9432", "#6D6F53"],
+      size: [6, 6],
+      strokeWidth: [4, 4],
+      strokeColors: ["#FF9432", "#1EA7C5"],
       border: 0,
-      colors: ["#fff", "#fff", "#fff", "#fff"],
+      colors: ["#fff", "#fff"],
       hover: {
         size: 10,
       },

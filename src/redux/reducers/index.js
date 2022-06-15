@@ -11,6 +11,7 @@ import RBReducer from "./RBReducer";
 import SLReducer from "./SLReducer";
 import EXPReducer from "./EXPReducer";
 import GIROReducer from "./GIROReducer";
+import DashboardReducer from "./DashboardReducer";
 
 
 const rootReducer = combineReducers({
@@ -26,6 +27,7 @@ const rootReducer = combineReducers({
   sl: SLReducer,
   exp: EXPReducer,
   giro: GIROReducer,
+  dash: DashboardReducer,
 });
 
 export default rootReducer;

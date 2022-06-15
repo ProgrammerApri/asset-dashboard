@@ -474,7 +474,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
     return (
       <div>
         {option !== null
-          ? `${option.req_code} (${option.req_dep.ccost_name})`
+          ? `${option.req_code} ${option.req_dep ? ` (${option.req_dep?.ccost_name})` : ""}`
           : ""}
       </div>
     );
@@ -485,7 +485,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
       return (
         <div>
           {option !== null
-            ? `${option.req_code} (${option.req_dep.ccost_name})`
+            ? `${option.req_code} ${option.req_dep ? ` (${option.req_dep?.ccost_name})` : ""}`
             : ""}
         </div>
       );

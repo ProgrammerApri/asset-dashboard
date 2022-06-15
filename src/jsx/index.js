@@ -57,6 +57,9 @@ import PusatBiaya from "./components/MasterLainnya/PusatBiaya/DataPusatBiaya";
 import Transaksi from "./components/Transaksi";
 import BankKas from "./components/BankKas";
 import TransaksiPersediaan from "./components/TransaksiPersediaan";
+import Report from "./components/Report/LaporanPembelian/Gra";
+import LaporanPembelian from "./components/Report/LaporanPembelian";
+import ReportGRA from "./components/Report/LaporanPembelian/Gra";
 
 const Markup = ({ width }) => {
   const routes = [
@@ -71,6 +74,7 @@ const Markup = ({ width }) => {
     { url: "transaksi", component: Transaksi },
     { url: "bank-&-kas", component: BankKas },
     { url: "transaksi-persediaan", component: TransaksiPersediaan },
+    { url: "laporan-pembelian", component: LaporanPembelian },
 
     /// Klasifikasi
     { url: "klasifikasi", component: KlasifikasiAkun },
@@ -99,6 +103,7 @@ const Markup = ({ width }) => {
 
     // Report
     { url: "neraca", component: Neraca },
+    { url: "report", component: ReportGRA },
 
     // Setup
     { url: "setup", component: Setup },

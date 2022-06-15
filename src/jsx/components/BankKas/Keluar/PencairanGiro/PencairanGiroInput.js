@@ -1,17 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { request, endpoints } from "src/utils";
-import { Row, Col, Card } from "react-bootstrap";
+import { Row } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
-import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_GIRO } from "src/redux/actions";
-import DataPusatBiaya from "../../../MasterLainnya/PusatBiaya/DataPusatBiaya";
-import DataSupplier from "../../../Mitra/Pemasok/DataPemasok";
-import DataRulesPay from "src/jsx/components/MasterLainnya/RulesPay/DataRulesPay";
-import DataPajak from "src/jsx/components/Master/Pajak/DataPajak";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import DataBank from "src/jsx/components/MasterLainnya/Bank/DataBank";
 
@@ -24,10 +19,6 @@ const PencairanGiroMundurInput = ({ onCancel, onSuccess }) => {
   const dispatch = useDispatch();
   const [bank, setBank] = useState(null);
   const [showBank, setShowBank] = useState(false);
-  const [accor, setAccor] = useState({
-    produk: true,
-    jasa: false,
-  });
 
   useEffect(() => {
     window.scrollTo({

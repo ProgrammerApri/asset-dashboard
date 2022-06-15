@@ -369,7 +369,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
         />
         <Column
           header="Departemen"
-          field={(e) => e.req_dep.ccost_name}
+          field={(e) => e.req_dep?.ccost_name}
           style={{ minWidth: "10rem" }}
           body={loading && <Skeleton />}
         />

@@ -46,6 +46,13 @@ const SideMenu = () => {
         icon: "bx-barcode",
       },
     ],
+    Laporan: [
+      {
+        tittle: "Laporan Pembelian",
+        to: "laporan-pembelian",
+        icon: "bx-spreadsheet",
+      },
+    ],
     lainnya: [
       {
         tittle: "Klasifikasi",
@@ -66,6 +73,11 @@ const SideMenu = () => {
         tittle: "setup",
         to: "setup",
         icon: "bx-rename",
+      },
+      {
+        tittle: "Neraca",
+        to: "neraca",
+        icon: "bx-abacus",
       },
     ],
   });

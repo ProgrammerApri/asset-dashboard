@@ -129,7 +129,7 @@ const ReportHutang = () => {
         </Col>
       </Row>
 
-      <Row className="m-0">
+      <Row className="m-0 d-none">
         <Card ref={printPage}>
           <Card.Body className="p-0">
             <CustomeWrapper

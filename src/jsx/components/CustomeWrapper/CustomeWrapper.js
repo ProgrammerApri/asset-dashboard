@@ -3,6 +3,19 @@ import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 
 const CustomeWrapper = ({ body, subTittle, tittle, page }) => {
+  const formatDate = (date) => {
+    let today = new Date();
+    const yyyy = today.getFullYear();
+    let mm = today.getMonth() + 1; // Months start at 0!
+    let dd = today.getDate();
+
+    if (dd < 10) dd = "0" + dd;
+    if (mm < 10) mm = "0" + mm;
+
+    today = dd + "/" + mm + "/" + yyyy;
+    return today;
+  };
+
   return (
     <div className="book">
       <div className="page">
@@ -10,12 +23,15 @@ const CustomeWrapper = ({ body, subTittle, tittle, page }) => {
           <h3 className="center">
             <b>{tittle}</b>
           </h3>
-          <h5 className="mt-2">{subTittle}</h5>
+          {/* <h5 className="mt-2">{subTittle}</h5> */}
           <div className="mt-5">{body}</div>
         </div>
-        <Divider></Divider>
-        <div className="ml-2">
-          <span className="fs-12">Halaman : 1</span>
+        <Divider className="mr-4"></Divider>
+        <div className="row m-0">
+          <span className="fs-12 col-6 ml-2">Halaman : <b>1</b></span>
+          <span className="fs-12 col-5 text-right ml-5">
+            <i>Tanggal Cetak: {formatDate("")}</i>
+          </span>
         </div>
       </div>
     </div>

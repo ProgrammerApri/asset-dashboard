@@ -339,8 +339,8 @@ const ReportGRA = () => {
           <Card ref={printPage}>
             <Card.Body>
               <CustomeWrapper
-                tittle={"Laporan GRA"}
-                subTittle={"Laporan GRA Periode yyyy-mm-dd - yyyy-mm-dd"}
+                tittle={"Laporan Pembelian"}
+                subTittle={"Laporan Pembelian Periode yyyy-mm-dd - yyyy-mm-dd"}
                 body={
                   <DataTable
                     responsiveLayout="scroll"

@@ -157,7 +157,7 @@ const Home = () => {
       </div>
 
       <div className="row">
-        <div className="col-xl-9 col-xxl-8">
+        <div className="col-xl-12 col-xxl-12">
           <div className="card">
             <div className="card-header flex-wrap pb-0 border-0">
               <div className="mr-auto pr-3 mb-2">
@@ -213,7 +213,7 @@ const Home = () => {
             </div>
           </div>
         </div>
-        <div className="col-xl-3 col-xxl-4 col-md-6">
+        {/* <div className="col-xl-3 col-xxl-4 col-md-6">
           <div className="card">
             <div className="card-header border-0 pb-0">
               <h4 className="text-black fs-20 mb-0">Status Panen</h4>
@@ -225,8 +225,8 @@ const Home = () => {
               </p>
             </div>
           </div>
-        </div>
-        <div className="col-xl-3 col-xxl-4 col-md-6">
+        </div> */}
+        {/* <div className="col-xl-3 col-xxl-4 col-md-6">
           <div className="card">
             <div className="card-header border-0 pb-0">
               <h4 className="text-black fs-20 mb-0">Duration Worked</h4>
@@ -388,17 +388,17 @@ const Home = () => {
               </div>
             </div>
           </div>
-        </div>
-        <div className="col-xl-9 col-xxl-8">
+        </div> */}
+        <div className="col-xl-12 col-xxl-12">
           <div className="card">
             <div className="card-header d-sm-flex d-block pb-0 border-0">
               <div className="mr-auto pr-3">
-                <h4 className="text-black fs-20">Calories Chart</h4>
+                <h4 className="text-black fs-20">AR/AP</h4>
                 <p className="fs-13 mb-0 text-black">
-                  Lorem ipsum dolor sit amet, consectetur
+                  Grafik AR / AP
                 </p>
               </div>
-              <Dropdown className="dropdown mt-sm-0 mt-3">
+              {/* <Dropdown className="dropdown mt-sm-0 mt-3">
                 <Dropdown.Toggle
                   as="button"
                   variant=""
@@ -411,7 +411,7 @@ const Home = () => {
                   <Dropdown.Item>Kolam C</Dropdown.Item>
                   <Dropdown.Item>Kolam D</Dropdown.Item>
                 </Dropdown.Menu>
-              </Dropdown>
+              </Dropdown> */}
             </div>
             <div className="card-body">
               <ApexNagetivePosative />

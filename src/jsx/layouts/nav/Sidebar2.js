@@ -40,11 +40,11 @@ const SideMenu = () => {
         to: "bank-&-kas",
         icon: "bx-barcode",
       },
-      {
-        tittle: "Persediaan",
-        to: "transaksi-persediaan",
-        icon: "bx-barcode",
-      },
+      // {
+      //   tittle: "Persediaan",
+      //   to: "transaksi-persediaan",
+      //   icon: "bx-barcode",
+      // },
     ],
     Laporan: [
       {
@@ -56,6 +56,11 @@ const SideMenu = () => {
         tittle: "Jurnal",
         to: "jurnal",
         icon: "bx-detail",
+      },
+      {
+        tittle: "Neraca",
+        to: "neraca",
+        icon: "bx-abacus",
       },
     ],
     lainnya: [
@@ -78,11 +83,6 @@ const SideMenu = () => {
         tittle: "setup",
         to: "setup",
         icon: "bx-rename",
-      },
-      {
-        tittle: "Neraca",
-        to: "neraca",
-        icon: "bx-abacus",
       },
     ],
   });

@@ -496,7 +496,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
             <label className="text-label">No. Pembelian</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
-              value={inv.ord_id && checkOrd(inv.ord_id)}
+              value={inv.ord_id && checkOrd(inv?.ord_id)}
               onChange={(e) => {
                 console.log(e);
                 updateINV({
@@ -522,10 +522,10 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                   inv.ord_id !== null
                     ? `${
                         checkSupp(checkOrd(inv.ord_id)?.sup_id?.id).supplier
-                          .sup_name
+                          ?.sup_name
                       } (${
                         checkSupp(checkOrd(inv.ord_id)?.sup_id?.id).supplier
-                          .sup_code
+                          ?.sup_code
                       })`
                     : null
                 }
@@ -542,7 +542,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                 value={
                   inv.ord_id !== null
                     ? checkSupp(checkOrd(inv.ord_id)?.sup_id?.id).supplier
-                        .sup_address
+                        ?.sup_address
                     : ""
                 }
                 placeholder="Alamat Supplier"
@@ -558,7 +558,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                 value={
                   inv.ord_id !== null
                     ? checkSupp(checkOrd(inv.ord_id)?.sup_id?.id).supplier
-                        .sup_telp1
+                        ?.sup_telp1
                     : ""
                 }
                 placeholder="Kontak Person"

@@ -518,7 +518,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
     return (
       <div>
         {option !== null
-          ? `${option.supplier.sup_code} (${option.supplier.sup_name})`
+          ? `${option.supplier?.sup_code} (${option.supplier?.sup_name})`
           : ""}
       </div>
     );
@@ -529,7 +529,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
       return (
         <div>
           {option !== null
-            ? `${option.supplier.sup_code} (${option.supplier.sup_name})`
+            ? `${option.supplier?.sup_code} (${option.supplier?.sup_name})`
             : ""}
         </div>
       );
@@ -707,7 +707,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
             <label className="text-label">Supplier</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
-              value={po.sup_id !== null ? supp(po.sup_id) : null}
+              value={po.sup_id ? supp(po?.sup_id) : null}
               option={supplier}
               onChange={(e) => {
                 updatePo({ ...po, sup_id: e.supplier.id });

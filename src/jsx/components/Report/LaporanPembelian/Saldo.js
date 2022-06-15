@@ -42,7 +42,7 @@ const ReportSaldo = () => {
           </div>
         </div>
         <div style={{ height: "1rem" }}></div>
-        <Row className="mr-1 mt-2" style={{height: "3rem"}}>
+        <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
             <ExcelFile
               filename={`report_export_${new Date().getTime()}`}
@@ -130,11 +130,51 @@ const ReportSaldo = () => {
       </Row>
 
       <Row className="m-0 d-none">
-          <Card ref={printPage}>
-            <Card.Body className="p-0">
-            <CustomeWrapper />
-            </Card.Body>
-          </Card>
+        <Card ref={printPage}>
+          <Card.Body className="p-0">
+            <CustomeWrapper
+              body={
+                <DataTable
+                  responsiveLayout="scroll"
+                  value={null}
+                  showGridlines
+                  dataKey="id"
+                  rowHover
+                  emptyMessage="Data Tidak Ditemukan"
+                >
+                  <Column
+                    className="center-header"
+                    header="Referensi"
+                    style={{ minWidht: "10rem" }}
+                    field={() => null}
+                    body={() => null}
+                  />
+                  <Column
+                    className="header-center"
+                    header="Tanggal"
+                    style={{ minWidht: "10rem" }}
+                    field={() => null}
+                    body={() => null}
+                  />
+                  <Column
+                    className="header-center"
+                    header="Departemen"
+                    style={{ minWidht: "10rem" }}
+                    field={() => null}
+                    body={() => null}
+                  />
+                  <Column
+                    className="header-center"
+                    header="Nomor"
+                    style={{ minWidht: "10rem" }}
+                    field={() => null}
+                    body={() => null}
+                  />
+                </DataTable>
+              }
+            />
+          </Card.Body>
+        </Card>
       </Row>
     </>
   );

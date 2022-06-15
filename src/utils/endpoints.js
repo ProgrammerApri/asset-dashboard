@@ -846,6 +846,12 @@ const endpoints = {
     method: "GET",
     data: {},
   },
+
+  dashboard: {
+    endpoint: "/v1/api/dashboard-info",
+    method: "GET",
+    data: {},
+  },
 };
 
 export default endpoints;

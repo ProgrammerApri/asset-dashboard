@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 // import { Chart } from 'primereact/chart';
 
@@ -23,6 +23,9 @@ import CircleProgress from "../CircleProgress/circleProgress";
 
 import ApexRadialBar from "../charts/apexcharts/RadialBar";
 import ProductionStat from "../charts/apexcharts/Line4";
+import { useDispatch, useSelector } from "react-redux";
+import { endpoints, request } from "src/utils";
+import { SET_DASHBOARD_DATA } from "src/redux/actions";
 
 // import Ext from "../../layouts/Ext";
 
@@ -34,6 +37,32 @@ const ApexNagetivePosative = loadable(() =>
 );
 
 const Home = () => {
+  const dispatch = useDispatch();
+  const dash = useSelector((state) => state.dash.dashboard);
+
+  useEffect(() => {
+    getDashboardInfo();
+  }, []);
+
+  const getDashboardInfo = async () => {
+    const config = {
+      ...endpoints.dashboard,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        dispatch({
+          type: SET_DASHBOARD_DATA,
+          payload: data,
+        });
+      }
+    } catch (error) {}
+  };
+
   function SampleNextArrow(props) {
     const { onClick } = props;
     return (
@@ -81,13 +110,20 @@ const Home = () => {
       },
     ],
   };
+
+  const formatIdr = (value) => {
+    return `${value}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
   return (
     <>
       <div className="row">
         <div className="col-xl col-md-6 col-sm-6">
           <div className="card">
-            <div className="card-body p-4"> 
-              <h2 className="fs-160 text-black font-w600 mb-0">3</h2>
+            <div className="card-body p-4">
+              <h2 className="fs-160 text-black font-w600 mb-0">{dash.out_pur}</h2>
               <span className="fs-14">Outstanding Purchase</span>
             </div>
           </div>
@@ -95,18 +131,8 @@ const Home = () => {
         <div className="col-xl col-md-6 col-sm-6">
           <div className="card">
             <div className="card-body p-4">
-
-              <h2 className="fs-24 text-black font-w600 mb-0">91 Kg</h2>
-              <span className="fs-14">IRAWAN 683 SP</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="col-xl col-md-6 col-sm-6">
-          <div className="card">
-            <div className="card-body p-4"> 
-                <h2 className="fs-24 text-black font-w600 mb-0">10 Jrigen</h2>
-              <span className="fs-14">Super NB 5 ltr</span>
+              <h2 className="fs-24 text-black font-w600 mb-0">Rp. {formatIdr(dash.ap)}</h2>
+              <span className="fs-14">Account Payable</span>
             </div>
           </div>
         </div>
@@ -114,13 +140,20 @@ const Home = () => {
         <div className="col-xl col-md-6 col-sm-6">
           <div className="card">
             <div className="card-body p-4">
-
-              <h2 className="fs-24 text-black font-w600 mb-0">141 Sak</h2>
-              <span className="fs-14">Samponen 25 kg</span>
+              <h2 className="fs-24 text-black font-w600 mb-0">{dash.out_sls}</h2>
+              <span className="fs-14">Outstanding Sales</span>
             </div>
           </div>
         </div>
 
+        <div className="col-xl col-md-6 col-sm-6">
+          <div className="card">
+            <div className="card-body p-4">
+              <h2 className="fs-24 text-black font-w600 mb-0">Rp. {formatIdr(dash.ar)}</h2>
+              <span className="fs-14">Account Receivable</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="row">
@@ -128,9 +161,9 @@ const Home = () => {
           <div className="card">
             <div className="card-header flex-wrap pb-0 border-0">
               <div className="mr-auto pr-3 mb-2">
-                <h4 className="text-black fs-20">Statistik Produksi</h4>
+                <h4 className="text-black fs-20">Statistik</h4>
                 <p className="fs-13 mb-2 mb-sm-0 text-black">
-                  Statistik produksi kolam A1 periode ke 6
+                  Statistik Pembelian - Penjualan
                 </p>
               </div>
               <div className="d-flex mr-3 mr-sm-2 mb-2">
@@ -145,7 +178,7 @@ const Home = () => {
                   <circle cx="10" cy="10" r="7" fill="#FF9432" />
                 </svg>
                 <div>
-                  <span className="fs-12 text-black">DOC</span>
+                  <span className="fs-12 text-black">Pembelian</span>
                 </div>
               </div>
               <div className="d-flex mr-3 mr-sm-2 mb-2">
@@ -160,74 +193,20 @@ const Home = () => {
                   <circle cx="10" cy="10" r="7" fill="#1EA7C5" />
                 </svg>
                 <div>
-                  <span className="fs-12 text-black">ABW</span>
+                  <span className="fs-12 text-black">Penjualan</span>
                 </div>
               </div>
-              <div className="d-flex mr-3 mr-sm-2 mb-2">
-                <svg
-                  className="mr-0 mt-1"
-                  width={24}
-                  height={24}
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <circle cx="10" cy="10" r="7" fill="#C046D3" />
-                </svg>
-                <div>
-                  <span className="fs-12 text-black">FCR</span>
-                </div>
-              </div>
-              <div className="d-flex mr-3 mr-sm-5 mb-2">
-                <svg
-                  className="mr-0 mt-1"
-                  width={24}
-                  height={24}
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <circle cx="10" cy="10" r="7" fill="#6D6F53" />
-                </svg>
-                <div>
-                  <span className="fs-12 text-black">SR</span>
-                </div>
-              </div>
-              <Dropdown className="dropdown mt-sm-0 mt-3 mb-0">
-                <Dropdown.Toggle
-                  variant=""
-                  as="button"
-                  className="btn rounded border border-light dropdown-toggle"
-                >
-                  Kolam A1-6
-                </Dropdown.Toggle>
-                <Dropdown.Menu className="dropdown-menu-right">
-                  <Dropdown.Item>Kolam A2-6</Dropdown.Item>
-                  <Dropdown.Item>Kolam A3-6</Dropdown.Item>
-                  <Dropdown.Item>Kolam A4-6</Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
             </div>
             <div className="card-body pt-3">
               <ProductionStat
                 series={[
                   {
-                    name: "DOC",
-                    data: [
-                      65, 65, 65, 120, 120, 80, 120, 100, 100, 120, 120, 120,
-                    ],
+                    name: "Penjualan",
+                    data: dash.sls_list,
                   },
                   {
-                    name: "ABW",
-                    data: [50, 100, 35, 35, 0, 0, 80, 20, 40, 40, 40, 40],
-                  },
-                  {
-                    name: "FCR",
-                    data: [20, 40, 20, 80, 40, 40, 20, 60, 60, 20, 110, 60],
-                  },
-                  {
-                    name: "SR",
-                    data: [15, 25, 50, 65, 32, 51, 43, 20, 20, 85, 96, 80],
+                    name: "Pembelian",
+                    data: dash.pur_list,
                   },
                 ]}
               />

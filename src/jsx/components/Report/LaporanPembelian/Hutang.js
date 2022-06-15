@@ -129,14 +129,54 @@ const ReportHutang = () => {
         </Col>
       </Row>
 
-      <Row className="d-none">
-        <Col>
-          <Card ref={printPage}>
-            <Card.Body>
-              <CustomeWrapper />
-            </Card.Body>
-          </Card>
-        </Col>
+      <Row className="m-0">
+        <Card ref={printPage}>
+          <Card.Body className="p-0">
+            <CustomeWrapper
+            tittle={"Laporan Hutang"}
+            subTittle={"Laporan Hutang Periode dd/mm/yyyy - dd/mm/yyyy"}
+              body={
+                <DataTable
+                  responsiveLayout="scroll"
+                  value={null}
+                  showGridlines
+                  dataKey="id"
+                  rowHover
+                  emptyMessage="Data Tidak Ditemukan"
+                >
+                  <Column
+                    className="center-header"
+                    header="Referensi"
+                    style={{ minWidht: "10rem" }}
+                    field={() => null}
+                    body={() => null}
+                  />
+                  <Column
+                    className="header-center"
+                    header="Tanggal"
+                    style={{ minWidht: "10rem" }}
+                    field={() => null}
+                    body={() => null}
+                  />
+                  <Column
+                    className="header-center"
+                    header="Departemen"
+                    style={{ minWidht: "10rem" }}
+                    field={() => null}
+                    body={() => null}
+                  />
+                  <Column
+                    className="header-center"
+                    header="Nomor"
+                    style={{ minWidht: "10rem" }}
+                    field={() => null}
+                    body={() => null}
+                  />
+                </DataTable>
+              }
+            />
+          </Card.Body>
+        </Card>
       </Row>
     </>
   );

@@ -47741,13 +47741,13 @@ a .sidebar-logo .logo{
 }
 .page {
   width: 29cm;
-  min-height: 41cm;
+  min-height: 40cm;
   /* padding: 5mm; */
   margin: auto;
   background: white;
 }
 .subpage {
   padding: 1cm;
-  height: 41cm;
+  height: 40cm;
   text-align: center;
 }

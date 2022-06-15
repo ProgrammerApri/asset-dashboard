@@ -47740,17 +47740,14 @@ a .sidebar-logo .logo{
   -moz-box-sizing: border-box;
 }
 .page {
-  width: 210mm;
-  min-height: 330mm;
-  padding: 5mm;
-  margin: 10mm auto;
-  border: 1px #D3D3D3 solid;
-  border-radius: 5px;
+  width: 29cm;
+  min-height: 41cm;
+  /* padding: 5mm; */
+  margin: auto;
   background: white;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 }
 .subpage {
   padding: 1cm;
-  height: 330mm;
+  height: 41cm;
   text-align: center;
 }

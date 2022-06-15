@@ -129,14 +129,12 @@ const ReportSaldo = () => {
         </Col>
       </Row>
 
-      <Row className="d-none">
-        <Col>
+      <Row className="m-0 d-none">
           <Card ref={printPage}>
-            <Card.Body>
-              <CustomeWrapper />
+            <Card.Body className="p-0">
+            <CustomeWrapper />
             </Card.Body>
           </Card>
-        </Col>
       </Row>
     </>
   );

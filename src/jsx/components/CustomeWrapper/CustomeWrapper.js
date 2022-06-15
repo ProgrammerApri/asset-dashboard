@@ -4,9 +4,10 @@ import { DataTable } from "primereact/datatable";
 
 const CustomeWrapper = () => {
   return (
-    <div className="page">
-      <div className="subpage">
-        <h3 className="center">
+    <div className="book">
+      <div className="page">
+        <div className="subpage">
+          <h3 className="center">
           <b>Laporan</b>
         </h3>
         <h5 className="mt-2">Transaksi Pembelian</h5>
@@ -49,10 +50,11 @@ const CustomeWrapper = () => {
           />
         </DataTable>
         </div>
-      </div>
-      <Divider></Divider>
+        </div>
+        <Divider></Divider>
       <div className="ml-2">
       <span className="fs-12">Halaman : 1</span>
+      </div>
       </div>
     </div>
   );

@@ -9,7 +9,7 @@ const LaporanPembelian = () => {
   const [active, setActive] = useState(0);
   const [subMenu, setSubMenu] = useState([
     {
-      tittle: "GRA",
+      tittle: "Pembelian",
       icon: "bx-receipt",
       component: <ReportGRA />,
     },

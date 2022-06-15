@@ -196,7 +196,7 @@ const ReturBeliList = ({ onAdd }) => {
         rowHover
         header={renderHeader}
         filters={null}
-        globalFilterFields={["customer.cus_code"]}
+        globalFilterFields={["ret_code", "formatDate(ret_date)", "fk_id.fk_code"]}
         emptyMessage="Tidak ada data"
         paginator
         paginatorTemplate={template2}

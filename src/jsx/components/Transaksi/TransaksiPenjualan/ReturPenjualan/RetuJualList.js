@@ -173,7 +173,7 @@ const ReturJualList = ({ onAdd }) => {
         rowHover
         header={renderHeader}
         filters={null}
-        globalFilterFields={["customer.cus_code"]}
+        globalFilterFields={["ret_code", "sale_id.ord_code"]}
         emptyMessage="Tidak ada data"
         paginator
         paginatorTemplate={template2}

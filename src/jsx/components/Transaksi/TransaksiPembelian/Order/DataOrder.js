@@ -374,7 +374,7 @@ const DataOrder = ({ onAdd, onEdit }) => {
         rowHover
         header={renderHeader}
         filters={filters1}
-        globalFilterFields={["Do.do_code"]}
+        globalFilterFields={["ord_code"]}
         emptyMessage="Tidak ada data"
         paginator
         paginatorTemplate={template2}

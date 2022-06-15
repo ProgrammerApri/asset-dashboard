@@ -374,7 +374,7 @@ const DataPenjualan = ({ onAdd, onEdit }) => {
         rowHover
         header={renderHeader}
         filters={filters1}
-        globalFilterFields={["ord_code"]}
+        globalFilterFields={["ord_code", "formatDate(ord_date)", "so_id.so_code", "pel_id.cus_name"]}
         emptyMessage="Tidak ada data"
         paginator
         paginatorTemplate={template2}

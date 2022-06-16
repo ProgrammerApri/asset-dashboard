@@ -11,6 +11,7 @@ import Satuan from "./Satuan";
 import PusatBiaya from "./PusatBiaya";
 import RulesPay from "./RulesPay";
 import Lokasi from "./Lokasi";
+import Salesman from "./Salesman";
 
 const MasterLainnya = () => {
   const [active, setActive] = useState(0);
@@ -29,6 +30,11 @@ const MasterLainnya = () => {
       tittle: "Departemen",
       icon: "bx-globe-alt",
       component: <PusatBiaya />,
+    },
+    {
+      tittle: "Salesman",
+      icon: "bx-user",
+      component: <Salesman />,
     },
     {
       tittle: "Project",

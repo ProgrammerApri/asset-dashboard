@@ -22,6 +22,7 @@ import DataSatuan from "src/jsx/components/MasterLainnya/Satuan/DataSatuan";
 import DataProduk from "src/jsx/components/Master/Produk/DataProduk";
 import DataJasa from "src/jsx/components/Master/Jasa/DataJasa";
 import DataLokasi from "src/jsx/components/MasterLainnya/Lokasi/DataLokasi";
+import DataSalesman from "src/jsx/components/MasterLainnya/Salesman/DataSalesman";
 
 const InputPenjualan = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
@@ -37,8 +38,10 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
   const [supplier, setSupplier] = useState(null);
   const [rulesPay, setRulesPay] = useState(null);
   const [ppn, setPpn] = useState(null);
+  const [salesman, setSalesman] = useState(null);
   const [so, setSO] = useState(null);
   const [showSupplier, setShowSupplier] = useState(false);
+  const [showSalesman, setShowSalesman] = useState(false);
   const [showCustomer, setShowCustomer] = useState(false);
   const [showSubCus, setShowSub] = useState(false);
   const [showSatuan, setShowSatuan] = useState(false);
@@ -71,6 +74,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     getJasa();
     getSatuan();
     getLoct();
+    getSalesman();
   }, []);
 
   const getCustomer = async () => {
@@ -169,6 +173,24 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
         const { data } = response;
         console.log(data);
         setPpn(data);
+      }
+    } catch (error) {}
+  };
+
+  const getSalesman = async () => {
+    const config = {
+      ...endpoints.salesman,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setSalesman(data);
       }
     } catch (error) {}
   };
@@ -376,6 +398,17 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
   const checkPpn = (value) => {
     let selected = {};
     ppn?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkSales = (value) => {
+    let selected = {};
+    salesman?.forEach((element) => {
       if (value === element.id) {
         selected = element;
       }
@@ -615,7 +648,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
               }}
               label={"[so_code] ([pel_id.cus_name])"}
               placeholder="Pilih No. Pesanan"
-              detail
+              // detail
               //   onDetail={() => setShowr(true)}
             />
           </div>
@@ -682,7 +715,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-6">
+          <div className="col-4">
             <label className="text-label">Syarat Pembayaran</label>
             <div className="p-inputgroup mt-2"></div>
             <CustomDropdown
@@ -703,7 +736,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-6">
+          <div className="col-4">
             <label className="text-label">Tanggal Jatuh Tempo</label>
             <div className="p-inputgroup mt-2">
               <Calendar
@@ -714,6 +747,22 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                 dateFormat="dd/mm/yy"
               />
             </div>
+          </div>
+
+          <div className="col-4">
+            <label className="text-label">Salesman</label>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
+              value={sale.slsm_id && checkSales(sale.slsm_id)}
+              option={salesman}
+              onChange={(e) => {
+                updateSL({ ...sale, slsm_id: e.id });
+              }}
+              placeholder="Pilih Salesman"
+              detail
+              onDetail={() => setShowSalesman(true)}
+              label={"[sales_name] ([sales_code])"}
+            />
           </div>
 
           <div className="d-flex col-12 align-items-center mt-4">
@@ -1702,7 +1751,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowRulesPay(false);
-            updateSL({ ...sale, req_dep: e.data.id });
+            updateSL({ ...sale, top: e.data.id });
           }
 
           setDoubleClick(true);
@@ -1759,6 +1808,34 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
           if (doubleClick) {
             setShowLok(false);
             updateSL({ ...sale, jprod: e.data.id });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataSalesman
+        data={salesman}
+        loading={false}
+        popUp={true}
+        show={showSalesman}
+        onHide={() => {
+          setShowSalesman(false);
+        }}
+        onInput={(e) => {
+          setShowSalesman(!e);
+        }}
+        onSuccessInput={(e) => {
+          getSalesman();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowSalesman(false);
+            updateSL({ ...sale, slsm_id: e.data.id });
           }
 
           setDoubleClick(true);

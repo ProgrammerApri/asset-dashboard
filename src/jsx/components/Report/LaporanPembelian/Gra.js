@@ -5,6 +5,7 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Calendar } from "primereact/calendar";
 import { Button, Card, Col, Row } from "react-bootstrap";
+import { Button as PButton } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { Skeleton } from "primereact/skeleton";
 
@@ -170,6 +171,12 @@ const ReportGRA = () => {
               placeholder="Pilih Tanggal"
               dateFormat="yy-mm-dd"
             />
+            <PButton
+              className="btn-primary"
+              label="Show"
+              icon="bx bx-show"
+              onClick={null}
+            />
           </div>
         </div>
         <div style={{ height: "1rem" }}></div>
@@ -246,10 +253,15 @@ const ReportGRA = () => {
                 header={renderHeader}
                 filters={filters1}
                 globalFilterFields={["tgl_gra"]}
-                showGridlines
                 dataKey="id"
+                Gridlines
                 rowHover
                 emptyMessage="Data Tidak Ditemukan"
+                rowGroupMode="rowspan"
+                groupRowsBy="nm_sup"
+                sortMode="single"
+                sortField="nm_sup"
+                sortOrder={1}
               >
                 <Column
                   className="header-center body-center"

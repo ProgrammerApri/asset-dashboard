@@ -31,7 +31,7 @@ import Akun from "./components/Master/Akun/DataAkun";
 import Project from "./components/MasterLainnya/Project/DataProject";
 import Bank from "./components/MasterLainnya/Bank/DataBank";
 import JenisPemasok from "./components/Master/JenisPemasok";
-import Salesman from "./components/Master/Salesman";
+import Salesman from "./components/MasterLainnya/Salesman/DataSalesman";
 import AreaPenjualan from "./components/Master/AreaPenjualan";
 import SubArea from "./components/Master/SubArea";
 import Neraca from "./components/Report/Neraca";

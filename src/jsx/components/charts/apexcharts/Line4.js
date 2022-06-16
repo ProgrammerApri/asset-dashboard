@@ -42,7 +42,18 @@ const ProductionStat = ({series}) => {
       ],
     },
     colors: ["#FF9432", "#1EA7C5"],
-
+    tooltip: {
+      x : {
+        show:true,
+      },
+      y: {
+        formatter: function(value, { series, seriesIndex, dataPointIndex, w }) {
+          // console.log(seriesIndex);
+          return `Rp. ${formatIdr(series[seriesIndex][dataPointIndex])}`
+        }
+      },
+      followCursor: true,
+    },
     markers: {
       size: [6, 6],
       strokeWidth: [4, 4],
@@ -57,6 +68,11 @@ const ProductionStat = ({series}) => {
       title: {
         text: "",
       },
+      labels: {
+        formatter: function (value) {
+          return `${formatIdr(value)}`;
+        }
+      }
     },
   };
 
@@ -66,6 +82,12 @@ const ProductionStat = ({series}) => {
     }, 500);
     return () => clearTimeout(timer);
   }, [500]);
+
+  const formatIdr = (value) => {
+    return `${value}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
 
   return isShown ? (
     <div id="chart">

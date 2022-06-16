@@ -157,7 +157,7 @@ const Home = () => {
       </div>
 
       <div className="row">
-        <div className="col-xl-12 col-xxl-12">
+        <div className="col-xl-9 col-xxl-8">
           <div className="card">
             <div className="card-header flex-wrap pb-0 border-0">
               <div className="mr-auto pr-3 mb-2">
@@ -226,10 +226,10 @@ const Home = () => {
             </div>
           </div>
         </div> */}
-        {/* <div className="col-xl-3 col-xxl-4 col-md-6">
+        <div className="col-xl-3 col-xxl-4 col-md-6">
           <div className="card">
             <div className="card-header border-0 pb-0">
-              <h4 className="text-black fs-20 mb-0">Duration Worked</h4>
+              <h4 className="text-black fs-20 mb-0">Neraca</h4>
             </div>
             <div className="card-body">
               <div className="media align-items-center border border-warning rounded p-3 mb-md-4 mb-3">
@@ -388,7 +388,7 @@ const Home = () => {
               </div>
             </div>
           </div>
-        </div> */}
+        </div>
         <div className="col-xl-12 col-xxl-12">
           <div className="card">
             <div className="card-header d-sm-flex d-block pb-0 border-0">

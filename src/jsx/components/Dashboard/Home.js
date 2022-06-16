@@ -201,11 +201,11 @@ const Home = () => {
               <ProductionStat
                 series={[
                   {
-                    name: "Penjualan",
+                    name: "Pembelian",
                     data: dash.sls_list,
                   },
                   {
-                    name: "Pembelian",
+                    name: "Penjualan",
                     data: dash.pur_list,
                   },
                 ]}

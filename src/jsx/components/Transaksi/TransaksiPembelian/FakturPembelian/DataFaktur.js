@@ -3,7 +3,7 @@ import { request, endpoints } from "src/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Button } from "react-bootstrap";
+import { Button, Card, Row } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { Dialog } from "primereact/dialog";
@@ -30,6 +30,8 @@ const data = {
 const DataFaktur = ({ onAdd, onEdit }) => {
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
+  const [displayData, setDisplayData] = useState(false);
+  const [position, setPosition] = useState("center");
   const [displayDel, setDisplayDel] = useState(false);
   const [fkCode, setFkCode] = useState(null);
   const toast = useRef(null);
@@ -39,7 +41,7 @@ const DataFaktur = ({ onAdd, onEdit }) => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const dispatch = useDispatch();
-    const inv = useSelector((state) => state.inv.inv);
+  const inv = useSelector((state) => state.inv.inv);
 
   const dummy = Array.from({ length: 10 });
 
@@ -129,99 +131,30 @@ const DataFaktur = ({ onAdd, onEdit }) => {
     }
   };
 
-  // const FKCode = (value) => {
-  //   let selected = null;
-  //   fkCode?.forEach((element) => {
-  //     if (element.faktur.fk_code === value) {
-  //       selected = element;
-  //     }
-  //   });
-  //   console.log(selected);
-  //   return selected;
-  // };
+  const actionBodyTemplate = (data) => {
+    return (
+      // <React.Fragment>
+      <div className="d-flex">
+        <Link
+          onClick={() => {
+            onClick("displayData", data);
+          }}
+          className="btn btn-warning shadow btn-xs sharp ml-1 mt-1"
+        >
+          <i className="bx bx-show mt-1"></i>
+        </Link>
+      </div>
+      // </React.Fragment>
+    );
+  };
 
-  // const actionBodyTemplate = (data) => {
-  //   return (
-  //     // <React.Fragment>
-  //     <div className="d-flex">
-  //       <Link
-  //         onClick={() => {
-  //           onEdit(data);
-  //           let dprod = data.dprod;
-  //           dispatch({
-  //             type: SET_EDIT_DO,
-  //             payload: true,
-  //           });
-  //           dprod.forEach((el) => {
-  //             el.prod_id = el.prod_id.id;
-  //             el.unit_id = el.unit_id.id;
-  //           });
-  //           let djasa = data.djasa;
-  //           djasa.forEach((el) => {
-  //             el.jasa_id = el.jasa_id.id;
-  //             el.unit_id = el.unit_id.id;
-  //           });
-  //           dispatch({
-  //             type: SET_CURRENT_DO,
-  //             payload: {
-  //               ...data,
-  //               dep_id: data?.dep_id?.id ?? null,
-  //               sup_id: data?.sup_id?.id ?? null,
-  //               top: data?.top?.id ?? null,
-  //               dprod:
-  //                 dprod.length > 0
-  //                   ? dprod
-  //                   : [
-  //                       {
-  //                         id: 0,
-  //                         do_id: null,
-  //                         prod_id: null,
-  //                         unit_id: null,
-  //                         order: null,
-  //                         price: null,
-  //                         disc: null,
-  //                         nett_price: null,
-  //                         total: null,
-  //                       },
-  //                     ],
-  //               djasa:
-  //                 djasa.length > 0
-  //                   ? djasa
-  //                   : [
-  //                       {
-  //                         id: 0,
-  //                         do_id: null,
-  //                         jasa_id: null,
-  //                         sup_id: null,
-  //                         unit_id: null,
-  //                         order: null,
-  //                         price: null,
-  //                         disc: null,
-  //                         total: null,
-  //                       },
-  //                     ],
-  //             },
-  //           });
-  //         }}
-  //         className="btn btn-primary shadow btn-xs sharp ml-1"
-  //       >
-  //         <i className="fa fa-pencil"></i>
-  //       </Link>
+  const onClick = () => {
+    setDisplayData(true);
 
-  //       <Link
-  //         onClick={() => {
-  //           setEdit(true);
-  //           setDisplayDel(true);
-  //           setCurrentItem(data);
-  //         }}
-  //         className="btn btn-danger shadow btn-xs sharp ml-1"
-  //       >
-  //         <i className="fa fa-trash"></i>
-  //       </Link>
-  //     </div>
-  //     // </React.Fragment>
-  //   );
-  // };
+    if (position) {
+      setPosition(position);
+    }
+  };
 
   const renderFooterDel = () => {
     return (
@@ -239,6 +172,18 @@ const DataFaktur = ({ onAdd, onEdit }) => {
           }}
           autoFocus
           loading={update}
+        />
+      </div>
+    );
+  };
+
+  const renderFooter = () => {
+    return (
+      <div>
+        <PButton
+          label="Batal"
+          onClick={() => setDisplayData(false)}
+          className="p-button-text btn-primary"
         />
       </div>
     );
@@ -393,7 +338,11 @@ const DataFaktur = ({ onAdd, onEdit }) => {
         rowHover
         header={renderHeader}
         filters={filters1}
-        globalFilterFields={["fk_code", "ord_id.ord_code", "formatDate(fk_date)"]}
+        globalFilterFields={[
+          "fk_code",
+          "ord_id.ord_code",
+          "formatDate(fk_date)",
+        ]}
         emptyMessage="Tidak ada data"
         paginator
         paginatorTemplate={template2}
@@ -422,47 +371,118 @@ const DataFaktur = ({ onAdd, onEdit }) => {
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
         />
-        {/* <Column
-          header="Nama Supplier"
-          field={(e) => e.customer.cus_name}
-          style={{ minWidth: "8rem" }}
-          body={loading && <Skeleton />}
-        />
         <Column
-          header="J/T"
-          field={(e) => e.customer.cus_name}
-          style={{ minWidth: "4rem" }}
-          body={loading && <Skeleton />}
-        />
-        <Column
-          header="Pembayaran"
-          field={(e) => e.account.dou_type}
-          style={{ minWidth: "8rem" }}
-          body={(e) =>
-            loading ? (
-              <Skeleton />
-            ) : (
-              <div>
-                {e.account.dou_type === "P" ? (
-                  <Badge variant="success light">
-                    <i className="bx bxs-circle text-success mr-1"></i> Paid
-                  </Badge>
-                ) : (
-                  <Badge variant="info light">
-                    <i className="bx bxs-circle text-info mr-1"></i> Unpaid
-                  </Badge>
-                )}
-              </div>
-            )
-          }
-        />
-        <Column
-          header="Status"
-          field={(e) => e.cus_telp}
+          header="Action"
+          field={actionBodyTemplate}
           style={{ minWidth: "6rem" }}
           body={loading && <Skeleton />}
-        /> */}
+        />
       </DataTable>
+
+      <Dialog
+        header={"Detail Data"}
+        visible={displayData}
+        style={{ width: "40vw" }}
+        footer={renderFooter("displayData")}
+        onHide={() => {
+          setDisplayData(false);
+        }}
+      >
+        <Row className="ml-0 pt-0">
+          <div className="col-6">
+            <label className="text-label  textAlign-right">
+              <b>Tanggal</b>
+            </label>
+            <div className="p-inputgroup">
+              <span className="ml-0">--------</span>
+            </div>
+          </div>
+
+          <div className="col-6">
+            <label className="text-label">
+              <b>No. Faktur</b>
+            </label>
+            <div className="p-inputgroup">
+              <span className="ml-0">-------</span>
+            </div>
+          </div>
+
+          <div className="col-6">
+            <label className="text-label">
+              <b>No. Pembelian</b>
+            </label>
+            <div className="p-inputgroup"></div>
+            <span className="ml-0">---------</span>
+          </div>
+
+          <div className="col-6">
+            <label className="text-label">
+              <b>Supplier</b>
+            </label>
+            <div className="p-inputgroup">
+              <span className="ml-0">-------</span>
+            </div>
+          </div>
+
+          <Row className="ml-1">
+            <DataTable className="display w-150 datatable-wrapper">
+              <Column
+                header="Produk"
+                field={(e) => null}
+                style={{ minWidth: "8rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header="Jumlah"
+                field={null}
+                style={{ minWidth: "6rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header="Harga Satuan"
+                field={(e) => null}
+                style={{ minWidth: "8rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header="Lokasi"
+                field={(e) => null}
+                style={{ minWidth: "8rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header="Total"
+                field={(e) => null}
+                style={{ minWidth: "8rem" }}
+                // body={loading && <Skeleton />}
+              />
+            </DataTable>
+          </Row>
+
+          {/* <div className="row justify-content-right col-6">
+            <div className="col-6">
+              <label className="text-label">Nomor Faktur</label>
+            </div>
+
+            <div className="col-6">
+              <label className="text-label">
+                <b>No. Faktur {}</b>
+              </label>
+            </div>
+
+            <div className="col-6">
+              <label className="text-label">Nomor Pembelian</label>
+            </div>
+
+            <div className="col-6">
+              <label className="text-label">
+                <b>No. Pembelian {}</b>
+              </label>
+            </div>
+
+          </div> */}
+        </Row>
+      </Dialog>
 
       <Dialog
         header={"Hapus Data"}

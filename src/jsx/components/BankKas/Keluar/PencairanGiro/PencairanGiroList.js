@@ -3,7 +3,7 @@ import { request, endpoints } from "src/utils";
 import { FilterMatchMode } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Row } from "react-bootstrap";
+import { Row, Col, Card } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
@@ -15,6 +15,18 @@ import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_GIRO } from "src/redux/actions";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import DataBank from "src/jsx/components/MasterLainnya/Bank/DataBank";
+
+const data = {
+  id: null,
+  giro_date: null,
+  giro_num: null,
+  bank_id: null,
+  pay_code: null,
+  pay_date: null,
+  sup_id: null,
+  value: null,
+  status: null,
+};
 
 const PencairanGiroMundurList = ({ onSuccess }) => {
   const [update, setUpdate] = useState(false);
@@ -85,45 +97,6 @@ const PencairanGiroMundurList = ({ onSuccess }) => {
     }
   };
 
-  const addGiro = async () => {
-    const config = {
-      ...endpoints.addGiro,
-      data: giro,
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        onSuccess();
-      }
-    } catch (error) {
-      console.log(error);
-      if (error.status === 400) {
-        setTimeout(() => {
-          setUpdate(false);
-          toast.current.show({
-            severity: "error",
-            summary: "Gagal",
-            detail: `Kode ${giro.giro_code} Sudah Digunakan`,
-            life: 3000,
-          });
-        }, 500);
-      } else {
-        setTimeout(() => {
-          setUpdate(false);
-          toast.current.show({
-            severity: "error",
-            summary: "Gagal",
-            detail: "Gagal Memperbarui Data",
-            life: 3000,
-          });
-        }, 500);
-      }
-    }
-  };
-
   const checkBank = (value) => {
     let selected = {};
     bank?.forEach((element) => {
@@ -136,13 +109,38 @@ const PencairanGiroMundurList = ({ onSuccess }) => {
   };
 
   const onSubmit = () => {
-    if (isEdit) {
       setUpdate(true);
       editGiro();
-    } else {
-      setUpdate(true);
-      addGiro();
-    }
+  };
+
+  const onGlobalFilterChange1 = (e) => {
+    const value = e.target.value;
+    let _filters1 = { ...filters1 };
+    _filters1["global"].value = value;
+
+    setFilters1(_filters1);
+    setGlobalFilterValue1(value);
+  };
+
+  const initFilters1 = () => {
+    setFilters1({
+      global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    });
+  };
+
+  const renderHeader = () => {
+    return (
+      <div className="flex justify-content-between">
+        <span className="p-input-icon-left">
+          <i className="pi pi-search" />
+          <InputText
+            value={globalFilterValue1}
+            onChange={onGlobalFilterChange1}
+            placeholder="Cari disini"
+          />
+        </span>
+      </div>
+    );
   };
 
   const formatDate = (date) => {
@@ -252,12 +250,6 @@ const PencairanGiroMundurList = ({ onSuccess }) => {
     },
   };
 
-  const initFilters1 = () => {
-    setFilters1({
-      global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    });
-  };
-
   const onCustomPage2 = (event) => {
     setFirst2(event.first);
     setRows2(event.rows);
@@ -265,70 +257,79 @@ const PencairanGiroMundurList = ({ onSuccess }) => {
 
   return (
     <>
-      <DataTable
-        responsiveLayout="scroll"
-        value={null}
-        className="display w-150 datatable-wrapper"
-        showGridlines
-        dataKey="id"
-        rowHover
-        header={null}
-        filters={filters1}
-        globalFilterFields={["customer.cus_code"]}
-        emptyMessage="Tidak ada data"
-        paginator
-        paginatorTemplate={template2}
-        first={first2}
-        rows={rows2}
-        onPage={onCustomPage2}
-        doubleClick={displayData}
-        paginatorClassName="justify-content-end mt-3"
-      >
-        <Column
-          header="Tanggal Pencairan"
-          style={{
-            minWidth: "8rem",
-          }}
-          // field={(e) => e.customer.cus_code}
-          body={loading && <Skeleton />}
-        />
-        <Column
-          header="Nomer Giro"
-          // field={(e) => e.customer.cus_name}
-          style={{ minWidth: "8rem" }}
-           body={loading && <Skeleton />}
-        />
-        <Column
-          header="Bank"
-          // field={(e) => e.customer.cus_name}
-          style={{ minWidth: "8rem" }}
-           body={loading && <Skeleton />}
-        />
-        <Column
-          header="Kode Pembayaran"
-          // field={(e) => e.customer.cus_name}
-          style={{ minWidth: "8rem" }}
-           body={loading && <Skeleton />}
-        />
-        <Column
-          header="Tanggal Pembayaran"
-          // field={(e) => e.customer.cus_name}
-          style={{ minWidth: "8rem" }}
-           body={loading && <Skeleton />}
-        />
-        <Column
-          header="Pemasok"
-          // field={(e) => e.customer.cus_name}
-          style={{ minWidth: "8rem" }}
-           body={loading && <Skeleton />}
-        />
-        <Column
-          header="Nilai"
-          // field={(e) => e.customer.cus_address}
-          style={{ minWidth: "8rem" }}
-          body={loading && <Skeleton />}
-        />
-      </DataTable>
+      <Toast ref={toast} />
+      <Row>
+        <Col className="pt-0">
+          <Card>
+            <Card.Body>
+              <DataTable
+                responsiveLayout="scroll"
+                value={null}
+                className="display w-150 datatable-wrapper"
+                showGridlines
+                dataKey="id"
+                rowHover
+                header={renderHeader}
+                filters={filters1}
+                globalFilterFields={["giro_code"]}
+                emptyMessage="Tidak ada data"
+                paginator
+                paginatorTemplate={template2}
+                first={first2}
+                rows={rows2}
+                onPage={onCustomPage2}
+                doubleClick={displayData}
+                paginatorClassName="justify-content-end mt-3"
+              >
+                <Column
+                  header="Tanggal Pencairan"
+                  style={{
+                    minWidth: "8rem",
+                  }}
+                  field={(e) => formatDate(e.giro_date)}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Nomer Giro"
+                  field={(e) => e.giro_code}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Bank"
+                  field={(e) => e.bank_id.BANK_NAME}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Kode Pembayaran"
+                  // field={(e) => e.customer.cus_name}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Tanggal Pembayaran"
+                  // field={(e) => e.customer.cus_name}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Pemasok"
+                  // field={(e) => e.customer.cus_name}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Nilai"
+                  // field={(e) => e.customer.cus_address}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+              </DataTable>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
 
       <Dialog
         header={"Pencairan Giro"}
@@ -360,9 +361,9 @@ const PencairanGiroMundurList = ({ onSuccess }) => {
             <label className="text-label">Nomor Giro</label>
             <div className="p-inputgroup">
               <InputText
-                value={giro.giro_code}
+                value={giro.giro_num}
                 onChange={(e) =>
-                  updateGR({ ...giro, giro_code: e.target.value })
+                  updateGR({ ...giro, giro_num: e.target.value })
                 }
                 placeholder="Nomor Giro"
               />
@@ -373,9 +374,9 @@ const PencairanGiroMundurList = ({ onSuccess }) => {
             <label className="text-label">Nilai Giro</label>
             <div className="p-inputgroup">
               <InputText
-                value={giro.giro_value}
+                value={giro.value}
                 onChange={(e) =>
-                  updateGR({ ...giro, giro_value: e.target.value })
+                  updateGR({ ...giro, value: e.target.value })
                 }
                 placeholder="Nilai Giro"
                 type="number"
@@ -388,9 +389,9 @@ const PencairanGiroMundurList = ({ onSuccess }) => {
             <label className="text-label">Kode Bank</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
-              value={giro.bank_code && checkBank(giro.bank_code)}
+              value={giro.bank_id && checkBank(giro.bank_id)}
               option={bank}
-              onChange={(e) => updateGR({ ...giro, bank_code: e.target.value })}
+              onChange={(e) => updateGR({ ...giro, bank_id: e.target.value })}
               label={"[bank.BANK_NAME] ([bank.BANK_CODE])"}
               placeholder="Pilih Kode Bank"
               detail

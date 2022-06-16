@@ -4,6 +4,7 @@ import KoreksiHutangAP from "./KoreksiHutang";
 import PelunasanHutang from "./PelunasanHutang";
 import KasBankOutList from "./PelunasanHutang/KasBankKeluarList";
 import PencairanGiroMundur from "./PencairanGiro";
+import PencairanGiroMundurList from "./PencairanGiro/PencairanGiroList";
 
 const KasBankKeluar = () => {
   return (
@@ -12,7 +13,7 @@ const KasBankKeluar = () => {
           <PelunasanHutang/>
       </TabPanel>
       <TabPanel header="Pencairan Giro">
-          <PencairanGiroMundur/>
+          <PencairanGiroMundurList/>
       </TabPanel>
       <TabPanel header="Koreksi Hutang">
           <KoreksiHutangAP/>

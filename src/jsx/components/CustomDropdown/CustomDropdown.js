@@ -77,10 +77,10 @@ const CustomDropdown = ({
   });
 
   const getLabel = (value) => {
-    let key = label.match(/(?<=\[)[^\][]*(?=])/g);
+    let key = label.match(/(?!=\[)[^\][]*(?=])/g);
     let final = label;
     if (option && value) {
-      key.forEach((e) => {
+      key?.filter(e => e != "")?.forEach((e) => {
         if (e.includes(".")) {
           let subkey = e.split(".");
           let subValue = value;

@@ -3,7 +3,7 @@ import { request, endpoints } from "src/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Button } from "react-bootstrap";
+import { Button, Row } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { Dialog } from "primereact/dialog";
@@ -13,6 +13,7 @@ import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_PO, SET_EDIT_PO } from "src/redux/actions";
+import { Divider } from "@material-ui/core";
 
 const data = {
   id: null,
@@ -23,7 +24,7 @@ const data = {
   ppn_type: null,
   top: null,
   due_date: false,
-  split_inv: null,
+  split_PO: null,
   prod_disc: null,
   jasa_disc: null,
   total_disc: null,
@@ -46,7 +47,8 @@ const PesananPO = ({ onAdd, onEdit }) => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const dispatch = useDispatch();
-  const PO = useSelector((state) => state.po);
+  const PO = useSelector((state) => state.po.po);
+  const show = useSelector((state) => state.po.current);
 
   const dummy = Array.from({ length: 10 });
 
@@ -59,7 +61,7 @@ const PesananPO = ({ onAdd, onEdit }) => {
     setLoading(true);
     const config = {
       ...endpoints.po,
-      data: {},
+      data: PO,
     };
     console.log(config.data);
     let response = null;
@@ -280,6 +282,57 @@ const PesananPO = ({ onAdd, onEdit }) => {
 
         <Link
           onClick={() => {
+            onClick("displayData", data);
+            let pprod = data.pprod;
+            let pjasa = data.pjasa;
+            dispatch({
+              type: SET_CURRENT_PO,
+              payload: {
+                ...data,
+                ord_id: data?.ord_id?.id ?? null,
+                product:
+                  pprod.length > 0
+                    ? pprod
+                    : [
+                        {
+                          id: 0,
+                          rprod_id: null,
+                          prod_id: null,
+                          unit_id: null,
+                          location: null,
+                          order: null,
+                          price: null,
+                          disc: null,
+                          nett_price: null,
+                          total: null,
+                        },
+                      ],
+                pjasa:
+                  pjasa.length > 0
+                    ? pjasa
+                    : [
+                        {
+                          id: 0,
+                          rjasa_id: null,
+                          jasa_id: null,
+                          sup_id: null,
+                          unit_id: null,
+                          order: null,
+                          price: null,
+                          disc: null,
+                          total: null,
+                        },
+                      ],
+              },
+            });
+          }}
+          className="btn btn-warning shadow btn-xs sharp ml-1"
+        >
+          <i className="bx bx-show mt-1"></i>
+        </Link>
+
+        <Link
+          onClick={() => {
             setEdit(true);
             setDisplayDel(true);
             setCurrentItem(data);
@@ -319,13 +372,6 @@ const PesananPO = ({ onAdd, onEdit }) => {
           label="Batal"
           onClick={() => setDisplayData(false)}
           className="p-button-text btn-primary"
-        />
-        <PButton
-          label="Simpan"
-          icon="pi pi-check"
-          onClick={() => onSubmit()}
-          autoFocus
-          loading={update}
         />
       </div>
     );
@@ -463,6 +509,34 @@ const PesananPO = ({ onAdd, onEdit }) => {
     return [year, month, day].join("-");
   };
 
+  const formatIdr = (value) => {
+    return `${value}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
+  const getSubTotalBarang = () => {
+    let total = 0;
+    show?.pprod?.forEach((el) => {
+      if (el.nett_price && el.nett_price > 0) {
+        total += parseInt(el.nett_price);
+      } else {
+        total += el.total - (el.total * el.disc) / 100;
+      }
+    });
+
+    return total;
+  };
+
+  const getSubTotalJasa = () => {
+    let total = 0;
+    show?.pjasa?.forEach((el) => {
+      total += el.total - (el.total * el.disc) / 100;
+    });
+
+    return total;
+  };
+
   return (
     <>
       <Toast ref={toast} />
@@ -475,7 +549,11 @@ const PesananPO = ({ onAdd, onEdit }) => {
         rowHover
         header={renderHeader}
         filters={filters1}
-        globalFilterFields={["po_code", "preq_id?.req_code", "formatDate(po_date)"]}
+        globalFilterFields={[
+          "po_code",
+          "preq_id?.req_code",
+          "formatDate(po_date)",
+        ]}
         emptyMessage="Tidak ada data"
         paginator
         paginatorTemplate={template2}
@@ -512,6 +590,269 @@ const PesananPO = ({ onAdd, onEdit }) => {
           body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
         />
       </DataTable>
+
+      <Dialog
+        header={"Detail Faktur"}
+        visible={displayData}
+        style={{ width: "41vw" }}
+        footer={renderFooter("displayData")}
+        onHide={() => {
+          setDisplayData(false);
+        }}
+      >
+        <Row className="ml-0 pt-0">
+          <div className="col-6">
+            <label className="text-label  textAlign-right">
+              Tanggal Pesanan
+            </label>
+            <div className="p-inputgroup">
+              <span className="ml-0">{formatDate(show.po_date)}</span>
+            </div>
+          </div>
+
+          <div className="col-6">
+            <label className="text-label">Tanggal Jatuh Tempo</label>
+            <div className="p-inputgroup">
+              <span className="ml-0">{formatDate(show.due_date)}</span>
+            </div>
+          </div>
+
+          <div className="col-6">
+            <label className="text-label">No. Pesanan</label>
+            <div className="p-inputgroup"></div>
+            <span className="ml-0">{show.ord_id?.ord_code}</span>
+          </div>
+
+          <div className="col-6">
+            <label className="text-label">Supplier</label>
+            <div className="p-inputgroup">
+              <span className="ml-0">{show.sup_id?.sup_name}</span>
+            </div>
+          </div>
+
+          <Row className="ml-1 mt-4">
+            <DataTable
+              value={show.pprod?.map((v, i) => {
+                return {
+                  ...v,
+                  index: i,
+                  price: v?.price ?? 0,
+                  total: v?.total ?? 0,
+                };
+              })}
+              responsiveLayout="scroll"
+              className="display w-150 datatable-wrapper"
+              showGridlines
+              dataKey="id"
+              rowHover
+            >
+              <Column
+                header="Produk"
+                field={(e) => e.prod_id?.name}
+                style={{ minWidth: "10rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header="Jumlah"
+                field={(e) => e.order}
+                style={{ minWidth: "6rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header="Satuan"
+                field={(e) => e.unit_id?.name}
+                style={{ minWidth: "6rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header="Harga Satuan"
+                field={(e) => formatIdr(e.price)}
+                style={{ minWidth: "10rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header="Total"
+                field={(e) => formatIdr(e.total)}
+                style={{ minWidth: "9rem" }}
+                // body={loading && <Skeleton />}
+              />
+            </DataTable>
+          </Row>
+
+          <Row className="ml-1 mt-5">
+          <DataTable
+              value={show.pjasa?.map((v, i) => {
+                return {
+                  ...v,
+                  index: i,
+                  price: v?.price ?? 0,
+                  disc: v?.disc ?? 0,
+                  total: v?.total ?? 0,
+                };
+              })}
+              responsiveLayout="scroll"
+              className="display w-150 datatable-wrapper"
+              showGridlines
+              dataKey="id"
+              rowHover
+            >
+              <Column
+                header="Supplier"
+                field={(e) => e.sup_id?.sup_name}
+                style={{ minWidth: "14rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header="Jasa"
+                field={(e) => e.jasa_id?.name}
+                style={{ minWidth: "14rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header="Total"
+                field={(e) => e.total}
+                style={{ minWidth: "13rem" }}
+                // body={loading && <Skeleton />}
+              />
+            </DataTable>
+          </Row>
+
+          <Row className="ml-0 mr-0 mb-0 mt-4 justify-content-between">
+            <div>
+              <div className="row ml-0 mt-3 center"></div>
+            </div>
+
+            <div className="row justify-content-right col-6 mr-4">
+              <div className="col-6">
+                <label className="text-label">
+                  {PO.split_PO ? "Sub Total Barang" : "Subtotal"}
+                </label>
+              </div>
+
+              <div className="col-6">
+                <label className="text-label">
+                  {PO.split_PO ? (
+                    <b>
+                      Rp.
+                      {/* {formatIdr(getSubTotalBarang())} */}
+                    </b>
+                  ) : (
+                    <b>
+                      Rp.
+                      {/* {formatIdr(getSubTotalBarang() + getSubTotalJasa())} */}
+                    </b>
+                  )}
+                </label>
+              </div>
+
+              <div className="col-6">
+                <label className="text-label">
+                  {PO.split_PO ? "DPP Barang" : "DPP"}
+                </label>
+              </div>
+
+              <div className="col-6">
+                <label className="text-label">
+                  {PO.split_PO ? (
+                    <b>
+                      Rp.
+                      {/* {formatIdr(getSubTotalBarang())} */}
+                    </b>
+                  ) : (
+                    <b>
+                      Rp.
+                      {/* {formatIdr(getSubTotalBarang() + getSubTotalJasa())} */}
+                    </b>
+                  )}
+                </label>
+              </div>
+
+              <div className="col-6">
+                <label className="text-label">
+                  {PO.split_PO ? "Pajak Atas Barang (11%)" : "Pajak (11%)"}
+                </label>
+              </div>
+
+              <div className="col-6">
+                <label className="text-label">
+                  {PO.split_PO ? (
+                    <b>
+                      Rp.
+                      {/* {formatIdr((getSubTotalBarang() * 11) / 100)} */}
+                    </b>
+                  ) : (
+                    <b>
+                      Rp.{" "}
+                      {/* {formatIdr(
+                        ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
+                      )} */}
+                    </b>
+                  )}
+                </label>
+              </div>
+
+              <div className="col-6 mt-3">
+                <label className="text-label">Diskon</label>
+              </div>
+
+              <div className="col-6">
+                <div className="p-inputgroup">
+                  <InputText
+                    // value={
+                    //   PO.split_PO
+                    //     ? isRp
+                    //       ? (getSubTotalBarang() * Do.prod_disc) / 100
+                    //       : PO.prod_disc
+                    //     : isRp
+                    //     ? ((getSubTotalBarang() + getSubTotalJasa()) *
+                    //         Do.total_disc) /
+                    //       100
+                    //     : Do.total_disc
+                    // }
+                    placeholder="Diskon"
+                    type="number"
+                    min={0}
+                    disabled
+                    onChange={(e) => {}}
+                  />
+                </div>
+              </div>
+
+              <div className="col-12">
+                <Divider className="ml-12"></Divider>
+              </div>
+
+              <div className="col-6">
+                <label className="text-label">
+                  <b>Total</b>
+                </label>
+              </div>
+
+              <div className="col-6">
+                <label className="text-label fs-16">
+                  {PO.split_PO ? (
+                    <b>
+                      Rp.{" "}
+                      {/* {formatIdr(
+                        getSubTotalBarang() + (getSubTotalBarang() * 11) / 100
+                      )} */}
+                    </b>
+                  ) : (
+                    <b>
+                      Rp.{" "}
+                      {/* {formatIdr(
+                        getSubTotalBarang() +
+                          getSubTotalJasa() +
+                          ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
+                      )} */}
+                    </b>
+                  )}
+                </label>
+              </div>
+            </div>
+          </Row>
+        </Row>
+      </Dialog>
 
       <Dialog
         header={"Hapus Data"}

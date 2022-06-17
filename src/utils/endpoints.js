@@ -847,6 +847,13 @@ const endpoints = {
     data: {},
   },
 
+  /// GIRO
+  giro: {
+    endpoint: "/v1/api/giro",
+    method: "GET",
+    data: {},
+  },
+
   dashboard: {
     endpoint: "/v1/api/dashboard-info",
     method: "GET",

@@ -3,7 +3,7 @@ import { request, endpoints } from "src/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Badge, Button } from "react-bootstrap";
+import { Badge, Button, Row } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { Dialog } from "primereact/dialog";
@@ -12,7 +12,7 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_RP, SET_EDIT } from "src/redux/actions";
+import { SET_CURRENT_RP, SET_EDIT, SET_RP } from "src/redux/actions";
 
 const data = {
   id: null,
@@ -32,6 +32,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayDel, setDisplayDel] = useState(false);
+  const [displayData, setDisplayDat] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
   const [filters1, setFilters1] = useState(null);
@@ -40,7 +41,8 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const dispatch = useDispatch();
-  const rp = useSelector((state) => state.rp);
+  const rp = useSelector((state) => state.rp.rp);
+  const show = useSelector((state) => state.rp.current);
 
   const dummy = Array.from({ length: 10 });
 
@@ -53,7 +55,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
     setLoading(true);
     const config = {
       ...endpoints.rPurchase,
-      data: {},
+      data: rp,
     };
     console.log(config.data);
     let response = null;
@@ -63,7 +65,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        setPermintaan(data);
+        dispatch({ type: SET_RP, payload: data });
       }
     } catch (error) {}
     if (isUpdate) {
@@ -165,9 +167,60 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
               },
             });
           }}
-          className={`btn ${data.status === 0 ? "" : "disabled"} btn-primary shadow btn-xs sharp ml-1`}
+          className={`btn ${
+            data.status === 0 ? "" : "disabled"
+          } btn-primary shadow btn-xs sharp ml-1`}
         >
           <i className="fa fa-pencil"></i>
+        </Link>
+
+        <Link
+          onClick={() => {
+            setDisplayDat(data);
+            let rprod = data.rprod;
+            // rprod.forEach((el) => {
+            //   el.prod_id = el.prod_id?.id;
+            //   el.unit_id = el.unit_id?.id;
+            // });
+            let rjasa = data.rjasa;
+            // rjasa.forEach((el) => {
+            //   el.jasa_id = el.jasa_id?.id;
+            //   el.unit_id = el.unit_id?.id;
+            // });
+            dispatch({
+              type: SET_CURRENT_RP,
+              payload: {
+                ...data,
+                req_dep: data?.req_dep?.id ?? null,
+                ref_sup: data?.ref_sup?.id ?? null,
+                rprod:
+                  rprod.length > 0
+                    ? rprod
+                    : [
+                        {
+                          id: 0,
+                          prod_id: null,
+                          unit_id: null,
+                          request: null,
+                        },
+                      ],
+                rjasa:
+                  rjasa.length > 0
+                    ? rjasa
+                    : [
+                        {
+                          id: 0,
+                          jasa_id: null,
+                          unit_id: null,
+                          request: null,
+                        },
+                      ],
+              },
+            });
+          }}
+          className="btn btn-warning shadow btn-xs sharp ml-1"
+        >
+          <i className="bx bx-show mt-1"></i>
         </Link>
 
         <Link
@@ -176,7 +229,9 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
             setDisplayDel(true);
             setCurrentItem(data);
           }}
-          className={`btn ${data.status === 0 ? "" : "disabled"} btn-danger shadow btn-xs sharp ml-1`}
+          className={`btn ${
+            data.status === 0 ? "" : "disabled"
+          } btn-danger shadow btn-xs sharp ml-1`}
         >
           <i className="fa fa-trash"></i>
         </Link>
@@ -273,6 +328,18 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
     );
   };
 
+  const renderFooter = () => {
+    return (
+      <div>
+        <PButton
+          label="Batal"
+          onClick={() => setDisplayDat(false)}
+          className="p-button-text btn-primary"
+        />
+      </div>
+    );
+  };
+
   const template2 = {
     layout: "RowsPerPageDropdown CurrentPageReport PrevPageLink NextPageLink",
     RowsPerPageDropdown: (options) => {
@@ -337,7 +404,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
 
       <DataTable
         responsiveLayout="scroll"
-        value={loading ? dummy : permintaan}
+        value={loading ? dummy : rp}
         className="display w-150 datatable-wrapper"
         showGridlines
         dataKey="id"
@@ -382,20 +449,21 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
               <Skeleton />
             ) : (
               <div>
-                {e.status !== 2 ? (
-                  <Badge variant="success light">
-                    <i className="bx bxs-circle text-success mr-1"></i> Open
-                  </Badge>
-                ) : (
-                  <Badge variant="danger light">
-                    <i className="bx bxs-circle text-danger mr-1"></i> Selesai
-                  </Badge>
-                ) 
-                // (
-                //   <Badge variant="success light">
-                //     <i className="bx bxs-circle text-success mr-1"></i> Selesai
-                //   </Badge>
-                // )
+                {
+                  e.status !== 2 ? (
+                    <Badge variant="success light">
+                      <i className="bx bxs-circle text-success mr-1"></i> Open
+                    </Badge>
+                  ) : (
+                    <Badge variant="danger light">
+                      <i className="bx bxs-circle text-danger mr-1"></i> Selesai
+                    </Badge>
+                  )
+                  // (
+                  //   <Badge variant="success light">
+                  //     <i className="bx bxs-circle text-success mr-1"></i> Selesai
+                  //   </Badge>
+                  // )
                 }
               </div>
             )
@@ -409,6 +477,109 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
           body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
         />
       </DataTable>
+
+      <Dialog
+        header={"Detail Permintaan"}
+        visible={displayData}
+        style={{ width: "38vw" }}
+        footer={renderFooter("displayData")}
+        onHide={() => {
+          setDisplayDat(false);
+        }}
+      >
+        <Row className="ml-0 pt-0">
+          <div className="col-6">
+            <label className="text-label">Tanggal Permintaan</label>
+            <div className="p-inputgroup">
+              <span className="ml-0">{formatDate(show.req_date)}</span>
+            </div>
+          </div>
+
+          <div className="col-6">
+            <label className="text-label">No. Permintaan</label>
+            <div className="p-inputgroup">
+              <span className="ml-0">{show.req_code}</span>
+            </div>
+          </div>
+
+          <div className="col-6">
+            <label className="text-label">Departemen</label>
+            <div className="p-inputgroup"></div>
+            <span className="ml-0">{show.req_dep?.ccost_name}</span>
+          </div>
+
+          <div className="col-6">
+            <label className="text-label">Ref. Supplier</label>
+            <div className="p-inputgroup">
+              <span className="ml-0">{show.ref_sup?.sup_name}</span>
+            </div>
+          </div>
+
+          <Row className="ml-2 mt-5">
+            <DataTable
+              className="display w-150 datatable-wrapper"
+              value={show?.rprod?.map((v, i) => {
+                return {
+                  ...v,
+                  index: i,
+                  request: v?.request ?? 0,
+                };
+              })}
+            >
+              <Column
+                header="Produk"
+                field={(e) => e.prod_id?.name}
+                style={{ minWidth: "14rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header="Jumlah"
+                field={(e) => e.request}
+                style={{ minWidth: "12rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header="Satuan"
+                field={(e) => e.unit_id?.name}
+                style={{ minWidth: "12rem" }}
+                // body={loading && <Skeleton />}
+              />
+            </DataTable>
+          </Row>
+
+          <Row className="ml-1 mt-5">
+            <DataTable
+              className="display w-150 datatable-wrapper"
+              value={show?.rjasa?.map((v, i) => {
+                return {
+                  ...v,
+                  index: i,
+                  qty: v?.qty ?? 0,
+                };
+              })}
+            >
+              <Column
+                header="Jasa"
+                field={(e) => e.jasa_id?.name}
+                style={{ minWidth: "13rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header="Jumlah"
+                field={(e) => e.qty}
+                style={{ minWidth: "13rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header="Satuan"
+                field={(e) => e.unit_id?.name}
+                style={{ minWidth: "12rem" }}
+                // body={loading && <Skeleton />}
+              />
+            </DataTable>
+          </Row>
+        </Row>
+      </Dialog>
 
       <Dialog
         header={"Hapus Data"}

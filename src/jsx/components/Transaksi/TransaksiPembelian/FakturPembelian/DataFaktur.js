@@ -3,7 +3,7 @@ import { request, endpoints } from "src/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Button, Card, Row } from "react-bootstrap";
+import { Button, Card, Col, Row } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { Dialog } from "primereact/dialog";
@@ -14,6 +14,9 @@ import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_INV, SET_EDIT_INV, SET_INV } from "src/redux/actions";
 import { Badge } from "primereact/badge";
+import { Divider } from "@material-ui/core";
+import ReactToPrint from "react-to-print";
+import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 
 const data = {
   id: null,
@@ -27,9 +30,10 @@ const data = {
   jasa: [],
 };
 
-const DataFaktur = ({ onAdd, onEdit }) => {
+const DataFaktur = ({ onAdd, onDetail }) => {
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
+  const [currentItem, setCurrentItem] = useState(null);
   const [displayData, setDisplayData] = useState(false);
   const [position, setPosition] = useState("center");
   const [displayDel, setDisplayDel] = useState(false);
@@ -38,10 +42,15 @@ const DataFaktur = ({ onAdd, onEdit }) => {
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
   const [isEdit, setEdit] = useState(false);
+  const [isRp, setRp] = useState(false);
+  const [isRpJasa, setRpJasa] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const dispatch = useDispatch();
   const inv = useSelector((state) => state.inv.inv);
+  const fk = useSelector((state) => state.inv.current);
+  const printPage = useRef(null);
+  const [doubleClick, setDoubleClick] = useState(false);
 
   const dummy = Array.from({ length: 10 });
 
@@ -96,7 +105,7 @@ const DataFaktur = ({ onAdd, onEdit }) => {
   const delFK = async (id) => {
     const config = {
       ...endpoints.delFK,
-      //   endpoint: endpoints.delDO.endpoint + pinv.id,
+      endpoint: endpoints.delDO.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -137,11 +146,64 @@ const DataFaktur = ({ onAdd, onEdit }) => {
       <div className="d-flex">
         <Link
           onClick={() => {
-            onClick("displayData", data);
+            setDisplayData(data);
+            let product = data.product;
+            let jasa = data.jasa;
+            dispatch({
+              type: SET_CURRENT_INV,
+              payload: {
+                ...data,
+                ord_id: data?.ord_id?.id ?? null,
+                product:
+                  product.length > 0
+                    ? product
+                    : [
+                        {
+                          id: 0,
+                          do_id: null,
+                          prod_id: null,
+                          unit_id: null,
+                          location: null,
+                          order: null,
+                          price: null,
+                          disc: null,
+                          nett_price: null,
+                          total: null,
+                        },
+                      ],
+                jasa:
+                  jasa.length > 0
+                    ? jasa
+                    : [
+                        {
+                          id: 0,
+                          do_id: null,
+                          jasa_id: null,
+                          sup_id: null,
+                          unit_id: null,
+                          order: null,
+                          price: null,
+                          disc: null,
+                          total: null,
+                        },
+                      ],
+              },
+            });
           }}
           className="btn btn-warning shadow btn-xs sharp ml-1 mt-1"
         >
           <i className="bx bx-show mt-1"></i>
+        </Link>
+
+        <Link
+          onClick={() => {
+            setEdit(true);
+            setDisplayDel(true);
+            setCurrentItem(data);
+          }}
+          className="btn btn-danger shadow btn-xs sharp ml-1 mt-1"
+        >
+          <i className="fa fa-trash"></i>
         </Link>
       </div>
       // </React.Fragment>
@@ -184,6 +246,20 @@ const DataFaktur = ({ onAdd, onEdit }) => {
           label="Batal"
           onClick={() => setDisplayData(false)}
           className="p-button-text btn-primary"
+        />
+
+        <ReactToPrint
+          trigger={() => {
+            return (
+              <PButton variant="primary" onClick={() => {}}>
+                PDF{" "}
+                <span className="btn-icon-right">
+                  <i class="bx bxs-file-pdf"></i>
+                </span>
+              </PButton>
+            );
+          }}
+          content={() => printPage.current}
         />
       </div>
     );
@@ -326,6 +402,34 @@ const DataFaktur = ({ onAdd, onEdit }) => {
     return [year, month, day].join("-");
   };
 
+  const formatIdr = (value) => {
+    return `${value}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
+  const getSubTotalBarang = () => {
+    let total = 0;
+    fk?.product?.forEach((el) => {
+      if (el.nett_price && el.nett_price > 0) {
+        total += parseInt(el.nett_price);
+      } else {
+        total += el.total - (el.total * el.disc) / 100;
+      }
+    });
+
+    return total;
+  };
+
+  const getSubTotalJasa = () => {
+    let total = 0;
+    fk?.jasa?.forEach((el) => {
+      total += el.total - (el.total * el.disc) / 100;
+    });
+
+    return total;
+  };
+
   return (
     <>
       <Toast ref={toast} />
@@ -380,107 +484,517 @@ const DataFaktur = ({ onAdd, onEdit }) => {
       </DataTable>
 
       <Dialog
-        header={"Detail Data"}
+        header={"Detail Faktur"}
         visible={displayData}
-        style={{ width: "40vw" }}
+        style={{ width: "41vw" }}
         footer={renderFooter("displayData")}
         onHide={() => {
           setDisplayData(false);
         }}
       >
         <Row className="ml-0 pt-0">
-          <div className="col-6">
+          <div className="col-8">
             <label className="text-label  textAlign-right">
-              <b>Tanggal</b>
+              Tanggal Faktur
             </label>
             <div className="p-inputgroup">
-              <span className="ml-0">--------</span>
+              <span className="ml-4">{formatDate(fk.fk_date)}</span>
             </div>
           </div>
 
-          <div className="col-6">
-            <label className="text-label">
-              <b>No. Faktur</b>
-            </label>
+          <div className="col-4">
+            <label className="text-label">No. Faktur</label>
             <div className="p-inputgroup">
-              <span className="ml-0">-------</span>
+              <span className="ml-4">{fk.fk_code}</span>
             </div>
           </div>
 
-          <div className="col-6">
-            <label className="text-label">
-              <b>No. Pembelian</b>
-            </label>
+          <div className="col-8">
+            <label className="text-label">No. Pembelian</label>
             <div className="p-inputgroup"></div>
-            <span className="ml-0">---------</span>
+            <span className="ml-0">{fk.ord_id?.ord_code}</span>
           </div>
 
-          <div className="col-6">
-            <label className="text-label">
-              <b>Supplier</b>
-            </label>
+          <div className="col-4">
+            <label className="text-label">Supplier</label>
             <div className="p-inputgroup">
-              <span className="ml-0">-------</span>
+              <span className="ml-0">{fk.ord_id?.sup_id?.sup_name}</span>
             </div>
           </div>
 
-          <Row className="ml-1">
-            <DataTable className="display w-150 datatable-wrapper">
+          <Row className="ml-1 mt-4">
+            <DataTable
+              value={fk.product?.map((v, i) => {
+                return {
+                  ...v,
+                  index: i,
+                  price: v?.price ?? 0,
+                  total: v?.total ?? 0,
+                };
+              })}
+              responsiveLayout="scroll"
+              className="display w-150 datatable-wrapper"
+              showGridlines
+              dataKey="id"
+              rowHover
+            >
               <Column
                 header="Produk"
-                field={(e) => null}
+                field={(e) => e.prod_id?.name}
                 style={{ minWidth: "8rem" }}
                 // body={loading && <Skeleton />}
               />
               <Column
                 header="Jumlah"
-                field={null}
+                field={(e) => e.order}
+                style={{ minWidth: "6rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header="Satuan"
+                field={(e) => e.unit_id?.name}
                 style={{ minWidth: "6rem" }}
                 // body={loading && <Skeleton />}
               />
               <Column
                 header="Harga Satuan"
-                field={(e) => null}
+                field={(e) => formatIdr(e.price)}
                 style={{ minWidth: "8rem" }}
                 // body={loading && <Skeleton />}
               />
               <Column
                 header="Lokasi"
-                field={(e) => null}
+                field={(e) => e.location?.name}
                 style={{ minWidth: "8rem" }}
                 // body={loading && <Skeleton />}
               />
               <Column
                 header="Total"
-                field={(e) => null}
-                style={{ minWidth: "8rem" }}
+                field={(e) => formatIdr(e.total)}
+                style={{ minWidth: "5rem" }}
                 // body={loading && <Skeleton />}
               />
             </DataTable>
           </Row>
 
-          {/* <div className="row justify-content-right col-6">
-            <div className="col-6">
-              <label className="text-label">Nomor Faktur</label>
-            </div>
+          <Row className="ml-1 mt-5">
+            <DataTable
+              value={fk.jasa?.map((v, i) => {
+                return {
+                  ...v,
+                  index: i,
+                  price: v?.price ?? 0,
+                  disc: v?.disc ?? 0,
+                  total: v?.total ?? 0,
+                };
+              })}
+              responsiveLayout="scroll"
+              className="display w-150 datatable-wrapper"
+              showGridlines
+              dataKey="id"
+              rowHover
+            >
+              <Column
+                header="Supplier"
+                field={(e) => e.sup_id?.sup_name}
+                style={{ minWidth: "14rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header="Jasa"
+                field={(e) => e.jasa_id?.name}
+                style={{ minWidth: "14rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header="Total"
+                field={(e) => e.total}
+                style={{ minWidth: "13rem" }}
+                // body={loading && <Skeleton />}
+              />
+            </DataTable>
+          </Row>
 
-            <div className="col-6">
-              <label className="text-label">
-                <b>No. Faktur {}</b>
-              </label>
-            </div>
+          <Row className="ml-0 mr-0 mb-0 mt-4 justify-content-between">
+            <div></div>
+            <div className="row justify-content-right col-6 mr-4">
+              <div className="col-12 mb-0">
+                <label className="text-label">
+                  <b>Detail Pembayaran</b>
+                </label>
+                <Divider className="ml-12"></Divider>
+              </div>
 
-            <div className="col-6">
-              <label className="text-label">Nomor Pembelian</label>
-            </div>
+              <div className="col-5 mt-2">
+                <label className="text-label">
+                  {fk.split_inv ? "Sub Total Barang" : "Subtotal"}
+                </label>
+              </div>
 
-            <div className="col-6">
-              <label className="text-label">
-                <b>No. Pembelian {}</b>
-              </label>
-            </div>
+              <div className="col-7 mt-2">
+                <label className="text-label">
+                  {fk.split_inv ? (
+                    <b>
+                      Rp.
+                      {formatIdr(getSubTotalBarang())}
+                    </b>
+                  ) : (
+                    <b>
+                      Rp.
+                      {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
+                    </b>
+                  )}
+                </label>
+              </div>
 
-          </div> */}
+              <div className="col-5">
+                <label className="text-label">
+                  {fk.split_inv ? "DPP Barang" : "DPP"}
+                </label>
+              </div>
+
+              <div className="col-7">
+                <label className="text-label">
+                  {fk.split_inv ? (
+                    <b>
+                      Rp.
+                      {formatIdr(getSubTotalBarang())}
+                    </b>
+                  ) : (
+                    <b>
+                      Rp.
+                      {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
+                    </b>
+                  )}
+                </label>
+              </div>
+
+              <div className="col-5">
+                <label className="text-label">
+                  {fk.split_inv ? "Pajak Atas Barang (11%)" : "Pajak (11%)"}
+                </label>
+              </div>
+
+              <div className="col-7">
+                <label className="text-label">
+                  {fk.split_inv ? (
+                    <b>
+                      Rp.
+                      {formatIdr((getSubTotalBarang() * 11) / 100)}
+                    </b>
+                  ) : (
+                    <b>
+                      Rp.{" "}
+                      {formatIdr(
+                        ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
+                      )}
+                    </b>
+                  )}
+                </label>
+              </div>
+
+              <div className="col-5 mt-3">
+                <label className="text-label">Diskon(%)</label>
+              </div>
+
+              <div className="col-7">
+                <label className="text-label">{fk.total_disc}</label>
+              </div>
+
+              <div className="col-12">
+                <Divider className="ml-12"></Divider>
+              </div>
+
+              <div className="col-5">
+                <label className="text-label">
+                  <b>Total</b>
+                </label>
+              </div>
+
+              <div className="col-7">
+                <label className="text-label fs-16">
+                  {fk.split_inv ? (
+                    <b>
+                      Rp.{" "}
+                      {formatIdr(
+                        getSubTotalBarang() + (getSubTotalBarang() * 11) / 100
+                      )}
+                    </b>
+                  ) : (
+                    <b>
+                      Rp.{" "}
+                      {formatIdr(
+                        getSubTotalBarang() +
+                          getSubTotalJasa() +
+                          ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
+                      )}
+                    </b>
+                  )}
+                </label>
+              </div>
+            </div>
+          </Row>
+        </Row>
+
+        <Row className="ml-0 pt-0 d-none">
+          <Col>
+            <Card ref={printPage}>
+              <Card.Body>
+                <CustomeWrapper
+                  tittle={"Faktur Pembelian"}
+                  body={
+                    <Card>
+                      <div className="col-8">
+                        <label className="text-label">Tanggal Faktur</label>
+                        <div className="p-inputgroup">
+                          <span className="ml-4">{formatDate(fk.fk_date)}</span>
+                        </div>
+                      </div>
+
+                      <div className="col-4">
+                        <label className="text-label">No. Faktur</label>
+                        <div className="p-inputgroup">
+                          <span className="ml-4">{fk.fk_code}</span>
+                        </div>
+                      </div>
+
+                      <div className="col-8">
+                        <label className="text-label">No. Pembelian</label>
+                        <div className="p-inputgroup"></div>
+                        <span className="ml-0">{fk.ord_id?.ord_code}</span>
+                      </div>
+
+                      <div className="col-4">
+                        <label className="text-label">Supplier</label>
+                        <div className="p-inputgroup">
+                          <span className="ml-0">
+                            {fk.ord_id?.sup_id?.sup_name}
+                          </span>
+                        </div>
+                      </div>
+
+                      <Row className="ml-1 mt-4">
+                        <DataTable
+                          className="display w-150 datatable-wrapper"
+                          value={fk.product?.map((v, i) => {
+                            return {
+                              ...v,
+                              index: i,
+                              price: v?.price ?? 0,
+                              total: v?.total ?? 0,
+                            };
+                          })}
+                        >
+                          <Column
+                            header="Produk"
+                            field={(e) => e.prod_id?.name}
+                            style={{ minWidth: "12rem" }}
+                            // body={loading && <Skeleton />}
+                          />
+                          <Column
+                            header="Jumlah"
+                            field={(e) => e.order}
+                            style={{ minWidth: "8rem" }}
+                            // body={loading && <Skeleton />}
+                          />
+                          <Column
+                            header="Satuan"
+                            field={(e) => e.unit_id?.name}
+                            style={{ minWidth: "8rem" }}
+                            // body={loading && <Skeleton />}
+                          />
+                          <Column
+                            header="Harga Satuan"
+                            field={(e) => formatIdr(e.price)}
+                            style={{ minWidth: "12rem" }}
+                            // body={loading && <Skeleton />}
+                          />
+                          <Column
+                            header="Lokasi"
+                            field={(e) => e.location?.name}
+                            style={{ minWidth: "11rem" }}
+                            // body={loading && <Skeleton />}
+                          />
+                          <Column
+                            header="Total"
+                            field={(e) => formatIdr(e.total)}
+                            style={{ minWidth: "10rem" }}
+                            // body={loading && <Skeleton />}
+                          />
+                        </DataTable>
+                      </Row>
+
+                      <Row className="ml-1 mt-5">
+                        <DataTable
+                          className="display w-150 datatable-wrapper"
+                          value={fk.jasa?.map((v, i) => {
+                            return {
+                              ...v,
+                              index: i,
+                              total: v?.total ?? 0,
+                            };
+                          })}
+                        >
+                          <Column
+                            header="Supplier"
+                            field={(e) => e.sup_id?.sup_name}
+                            style={{ minWidth: "21rem" }}
+                            // body={loading && <Skeleton />}
+                          />
+                          <Column
+                            header="Jasa"
+                            field={(e) => e.jasa_id?.name}
+                            style={{ minWidth: "20rem" }}
+                            // body={loading && <Skeleton />}
+                          />
+                          <Column
+                            header="Total"
+                            field={(e) => formatIdr(e.total)}
+                            style={{ minWidth: "20rem" }}
+                            // body={loading && <Skeleton />}
+                          />
+                        </DataTable>
+                      </Row>
+
+                      <Row className="ml-0 mr-0 mb-0 mt-4 justify-content-between">
+                        <div></div>
+                        <div className="row justify-content-right col-6 mr-4">
+                          <div className="col-12 mb-0">
+                            <label className="text-label">
+                              <b>Detail Pembayaran</b>
+                            </label>
+                            <Divider className="ml-12"></Divider>
+                          </div>
+
+                          <div className="col-5 mt-2">
+                            <label className="text-label">
+                              {fk.split_inv ? "Sub Total Barang" : "Subtotal"}
+                            </label>
+                          </div>
+
+                          <div className="col-7 mt-2">
+                            <label className="text-label">
+                              {fk.split_inv ? (
+                                <b>
+                                  Rp.
+                                  {formatIdr(getSubTotalBarang())}
+                                </b>
+                              ) : (
+                                <b>
+                                  Rp.
+                                  {formatIdr(
+                                    getSubTotalBarang() + getSubTotalJasa()
+                                  )}
+                                </b>
+                              )}
+                            </label>
+                          </div>
+
+                          <div className="col-5">
+                            <label className="text-label">
+                              {fk.split_inv ? "DPP Barang" : "DPP"}
+                            </label>
+                          </div>
+
+                          <div className="col-7">
+                            <label className="text-label">
+                              {fk.split_inv ? (
+                                <b>
+                                  Rp.
+                                  {formatIdr(getSubTotalBarang())}
+                                </b>
+                              ) : (
+                                <b>
+                                  Rp.
+                                  {formatIdr(
+                                    getSubTotalBarang() + getSubTotalJasa()
+                                  )}
+                                </b>
+                              )}
+                            </label>
+                          </div>
+
+                          <div className="col-5">
+                            <label className="text-label">
+                              {fk.split_inv
+                                ? "Pajak Atas Barang (11%)"
+                                : "Pajak (11%)"}
+                            </label>
+                          </div>
+
+                          <div className="col-7">
+                            <label className="text-label">
+                              {fk.split_inv ? (
+                                <b>
+                                  Rp.
+                                  {formatIdr((getSubTotalBarang() * 11) / 100)}
+                                </b>
+                              ) : (
+                                <b>
+                                  Rp.{" "}
+                                  {formatIdr(
+                                    ((getSubTotalBarang() + getSubTotalJasa()) *
+                                      11) /
+                                      100
+                                  )}
+                                </b>
+                              )}
+                            </label>
+                          </div>
+
+                          <div className="col-5 mt-3">
+                            <label className="text-label">Diskon(%)</label>
+                          </div>
+
+                          <div className="col-7">
+                            <label className="text-label">
+                              {fk.total_disc}
+                            </label>
+                          </div>
+
+                          <div className="col-12">
+                            <Divider className="ml-12"></Divider>
+                          </div>
+
+                          <div className="col-5">
+                            <label className="text-label">
+                              <b>Total</b>
+                            </label>
+                          </div>
+
+                          <div className="col-7">
+                            <label className="text-label fs-16">
+                              {fk.split_inv ? (
+                                <b>
+                                  Rp.{" "}
+                                  {formatIdr(
+                                    getSubTotalBarang() +
+                                      (getSubTotalBarang() * 11) / 100
+                                  )}
+                                </b>
+                              ) : (
+                                <b>
+                                  Rp.{" "}
+                                  {formatIdr(
+                                    getSubTotalBarang() +
+                                      getSubTotalJasa() +
+                                      ((getSubTotalBarang() +
+                                        getSubTotalJasa()) *
+                                        11) /
+                                        100
+                                  )}
+                                </b>
+                              )}
+                            </label>
+                          </div>
+                        </div>
+                      </Row>
+                    </Card>
+                  }
+                />
+              </Card.Body>
+            </Card>
+          </Col>
         </Row>
       </Dialog>
 

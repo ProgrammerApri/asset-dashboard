@@ -12,7 +12,7 @@ import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_GIRO } from "src/redux/actions";
+import { SET_CURRENT_GIRO, SET_GIRO } from "src/redux/actions";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import DataBank from "src/jsx/components/MasterLainnya/Bank/DataBank";
 
@@ -33,7 +33,7 @@ const PencairanGiroMundurList = ({ onSuccess }) => {
   const [loading, setLoading] = useState(true);
   const [doubleClick, setDoubleClick] = useState(false);
   const toast = useRef(null);
-  const giro = useSelector((state) => state.giro.current);
+  const giro = useSelector((state) => state.giro.giro);
   const isEdit = useSelector((state) => state.giro.editGiro);
   const dispatch = useDispatch();
   const [bank, setBank] = useState(null);
@@ -44,15 +44,41 @@ const PencairanGiroMundurList = ({ onSuccess }) => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
 
+  const dummy = Array.from({ length: 10 });
+
   useEffect(() => {
     window.scrollTo({
       top: 0,
       left: 0,
       behavior: "smooth",
     });
+    getGiro();
     getBank();
     initFilters1();
   }, []);
+
+  const getGiro = async (isUpdate = false) => {
+    const config = {
+      ...endpoints.giro,
+      data: giro,
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        dispatch({ type: SET_GIRO, payload: data });
+      }
+    } catch (error) {}
+    if (isUpdate) {
+      setLoading(false);
+    } else {
+      setTimeout(() => {
+        setLoading(false);
+      }, 500);
+    }
+  };
 
   const getBank = async () => {
     const config = {
@@ -109,8 +135,8 @@ const PencairanGiroMundurList = ({ onSuccess }) => {
   };
 
   const onSubmit = () => {
-      setUpdate(true);
-      editGiro();
+    setUpdate(true);
+    editGiro();
   };
 
   const onGlobalFilterChange1 = (e) => {
@@ -153,6 +179,12 @@ const PencairanGiroMundurList = ({ onSuccess }) => {
     if (day.length < 2) day = "0" + day;
 
     return [year, month, day].join("-");
+  };
+
+  const formatIdr = (value) => {
+    return `${value}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
 
   const updateGR = (e) => {
@@ -264,7 +296,7 @@ const PencairanGiroMundurList = ({ onSuccess }) => {
             <Card.Body>
               <DataTable
                 responsiveLayout="scroll"
-                value={null}
+                value={loading ? dummy : giro}
                 className="display w-150 datatable-wrapper"
                 showGridlines
                 dataKey="id"
@@ -278,7 +310,17 @@ const PencairanGiroMundurList = ({ onSuccess }) => {
                 first={first2}
                 rows={rows2}
                 onPage={onCustomPage2}
-                doubleClick={displayData}
+                onRowSelect={(e) => {
+                  if (doubleClick) {
+                    setDisplayData(false);
+                  }
+        
+                  setDoubleClick(true);
+        
+                  setTimeout(() => {
+                    setDoubleClick(false);
+                  }, 2000);
+                }}
                 paginatorClassName="justify-content-end mt-3"
               >
                 <Column
@@ -291,7 +333,7 @@ const PencairanGiroMundurList = ({ onSuccess }) => {
                 />
                 <Column
                   header="Nomer Giro"
-                  field={(e) => e.giro_code}
+                  field={(e) => e.giro_num}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
@@ -303,25 +345,25 @@ const PencairanGiroMundurList = ({ onSuccess }) => {
                 />
                 <Column
                   header="Kode Pembayaran"
-                  // field={(e) => e.customer.cus_name}
+                  field={(e) => e.pay_code?.exp_code}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Tanggal Pembayaran"
-                  // field={(e) => e.customer.cus_name}
+                  field={(e) => formatDate(e.pay_date)}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Pemasok"
-                  // field={(e) => e.customer.cus_name}
+                  field={(e) => e.sup_id?.sup_name}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Nilai"
-                  // field={(e) => e.customer.cus_address}
+                  field={(e) => formatIdr(e.value)}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
@@ -375,9 +417,7 @@ const PencairanGiroMundurList = ({ onSuccess }) => {
             <div className="p-inputgroup">
               <InputText
                 value={giro.value}
-                onChange={(e) =>
-                  updateGR({ ...giro, value: e.target.value })
-                }
+                onChange={(e) => updateGR({ ...giro, value: e.target.value })}
                 placeholder="Nilai Giro"
                 type="number"
                 min={0}

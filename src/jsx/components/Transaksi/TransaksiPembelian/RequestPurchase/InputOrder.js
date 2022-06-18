@@ -40,6 +40,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
   const [satuan, setSatuan] = useState(null);
   const [supplier, setSupplier] = useState(null);
   const [doubleClick, setDoubleClick] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const rp = useSelector((state) => state.rp.current);
   const isEdit = useSelector((state) => state.rp.editRp);
   const dispatch = useDispatch();
@@ -442,7 +443,10 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                         value={v.prod_id && checkProd(v.prod_id)}
                         option={product}
                         detail
-                        onDetail={() => setShowProduk(true)}
+                        onDetail={() => {
+                          setCurrentIndex(i);
+                          setShowProduk(true);
+                        }}
                         onChange={(e) => {
                           let sat = [];
                           satuan.forEach((element) => {
@@ -455,7 +459,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                             }
                           });
                           setSatuan(sat);
-                          
+
                           let temp = [...rp.rprod];
                           temp[i].prod_id = e.id;
                           temp[i].unit_id = e.unit?.id;
@@ -785,9 +789,25 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
           getProduk();
         }}
         onRowSelect={(e) => {
+          console.log(e);
           if (doubleClick) {
             setShowProduk(false);
-            updateRp({ ...rp, rprod: e.data.id });
+            let sat = [];
+            satuan.forEach((element) => {
+              if (element.id === e.data.unit.id) {
+                sat.push(element);
+              } else {
+                if (element.u_from?.id === e.data.unit.id) {
+                  sat.push(element);
+                }
+              }
+            });
+            setSatuan(sat);
+
+            let temp = [...rp.rprod];
+            temp[currentIndex].prod_id = e.data.id;
+            temp[currentIndex].unit_id = e.data.unit?.id;
+            updateRp({ ...rp, rprod: temp });
           }
 
           setDoubleClick(true);

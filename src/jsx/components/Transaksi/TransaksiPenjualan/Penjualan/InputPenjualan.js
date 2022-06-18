@@ -21,8 +21,8 @@ import DataCustomer from "src/jsx/components/Mitra/Pelanggan/DataCustomer";
 import DataSatuan from "src/jsx/components/MasterLainnya/Satuan/DataSatuan";
 import DataProduk from "src/jsx/components/Master/Produk/DataProduk";
 import DataJasa from "src/jsx/components/Master/Jasa/DataJasa";
-import DataLokasi from "src/jsx/components/MasterLainnya/Lokasi/DataLokasi";
 import DataSalesman from "src/jsx/components/MasterLainnya/Salesman/DataSalesman";
+import DataLokasi from "src/jsx/components/Master/Lokasi/DataLokasi";
 
 const InputPenjualan = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);

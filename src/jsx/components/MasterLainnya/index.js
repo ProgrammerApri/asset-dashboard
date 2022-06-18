@@ -10,7 +10,6 @@ import Project from "./Project";
 import Satuan from "./Satuan";
 import PusatBiaya from "./PusatBiaya";
 import RulesPay from "./RulesPay";
-import Lokasi from "../Master/Lokasi";
 import Salesman from "./Salesman";
 
 const MasterLainnya = () => {

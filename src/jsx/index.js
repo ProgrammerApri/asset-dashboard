@@ -37,7 +37,7 @@ import SubArea from "./components/Master/SubArea";
 import Neraca from "./components/Report/Neraca";
 import Perusahaan from "./components/Setup/Perusahaan";
 import Currency from "./components/Master/Currency";
-import Lokasi from "./components/MasterLainnya/Lokasi/DataLokasi";
+import Lokasi from "./components/Master/Lokasi/DataLokasi";
 import RulesPay from "./components/MasterLainnya/RulesPay/DataRulesPay";
 import Setup from "./components/Setup";
 import Divisi from "./components/Master/Divisi";

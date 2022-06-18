@@ -3,7 +3,7 @@ import { request, endpoints } from "src/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Button, Row } from "react-bootstrap";
+import { Button, Row, Col, Card } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { Dialog } from "primereact/dialog";
@@ -14,6 +14,7 @@ import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_PO, SET_EDIT_PO } from "src/redux/actions";
 import { Divider } from "@material-ui/core";
+import ReactToPrint from "react-to-print";
 
 const data = {
   id: null,
@@ -49,6 +50,7 @@ const PesananPO = ({ onAdd, onEdit }) => {
   const dispatch = useDispatch();
   const PO = useSelector((state) => state.po.po);
   const show = useSelector((state) => state.po.current);
+  const printPage = useRef(null);
 
   const dummy = Array.from({ length: 10 });
 
@@ -217,6 +219,57 @@ const PesananPO = ({ onAdd, onEdit }) => {
       <div className="d-flex">
         <Link
           onClick={() => {
+            onClick("displayData", data);
+            let pprod = data.pprod;
+            let pjasa = data.pjasa;
+            dispatch({
+              type: SET_CURRENT_PO,
+              payload: {
+                ...data,
+                ord_id: data?.ord_id?.id ?? null,
+                product:
+                  pprod.length > 0
+                    ? pprod
+                    : [
+                        {
+                          id: 0,
+                          rprod_id: null,
+                          prod_id: null,
+                          unit_id: null,
+                          location: null,
+                          order: null,
+                          price: null,
+                          disc: null,
+                          nett_price: null,
+                          total: null,
+                        },
+                      ],
+                pjasa:
+                  pjasa.length > 0
+                    ? pjasa
+                    : [
+                        {
+                          id: 0,
+                          rjasa_id: null,
+                          jasa_id: null,
+                          sup_id: null,
+                          unit_id: null,
+                          order: null,
+                          price: null,
+                          disc: null,
+                          total: null,
+                        },
+                      ],
+              },
+            });
+          }}
+          className="btn btn-info shadow btn-xs sharp ml-1"
+        >
+          <i className="bx bx-show mt-1"></i>
+        </Link>
+
+        <Link
+          onClick={() => {
             onEdit();
             dispatch({
               type: SET_EDIT_PO,
@@ -282,57 +335,6 @@ const PesananPO = ({ onAdd, onEdit }) => {
 
         <Link
           onClick={() => {
-            onClick("displayData", data);
-            let pprod = data.pprod;
-            let pjasa = data.pjasa;
-            dispatch({
-              type: SET_CURRENT_PO,
-              payload: {
-                ...data,
-                ord_id: data?.ord_id?.id ?? null,
-                product:
-                  pprod.length > 0
-                    ? pprod
-                    : [
-                        {
-                          id: 0,
-                          rprod_id: null,
-                          prod_id: null,
-                          unit_id: null,
-                          location: null,
-                          order: null,
-                          price: null,
-                          disc: null,
-                          nett_price: null,
-                          total: null,
-                        },
-                      ],
-                pjasa:
-                  pjasa.length > 0
-                    ? pjasa
-                    : [
-                        {
-                          id: 0,
-                          rjasa_id: null,
-                          jasa_id: null,
-                          sup_id: null,
-                          unit_id: null,
-                          order: null,
-                          price: null,
-                          disc: null,
-                          total: null,
-                        },
-                      ],
-              },
-            });
-          }}
-          className="btn btn-warning shadow btn-xs sharp ml-1"
-        >
-          <i className="bx bx-show mt-1"></i>
-        </Link>
-
-        <Link
-          onClick={() => {
             setEdit(true);
             setDisplayDel(true);
             setCurrentItem(data);
@@ -372,6 +374,20 @@ const PesananPO = ({ onAdd, onEdit }) => {
           label="Batal"
           onClick={() => setDisplayData(false)}
           className="p-button-text btn-primary"
+        />
+
+        <ReactToPrint
+          trigger={() => {
+            return (
+              <PButton variant="primary" onClick={() => {}}>
+                Print{" "}
+                <span className="btn-icon-right">
+                  <i class="bx bxs-printer"></i>
+                </span>
+              </PButton>
+            );
+          }}
+          content={() => printPage.current}
         />
       </div>
     );
@@ -592,7 +608,7 @@ const PesananPO = ({ onAdd, onEdit }) => {
       </DataTable>
 
       <Dialog
-        header={"Detail Faktur"}
+        header={"Detail Pesanan"}
         visible={displayData}
         style={{ width: "41vw" }}
         footer={renderFooter("displayData")}
@@ -601,36 +617,46 @@ const PesananPO = ({ onAdd, onEdit }) => {
         }}
       >
         <Row className="ml-0 pt-0">
-          <div className="col-6">
-            <label className="text-label  textAlign-right">
-              Tanggal Pesanan
-            </label>
-            <div className="p-inputgroup">
-              <span className="ml-0">{formatDate(show.po_date)}</span>
+          <div className="col-8 fs-12">
+            <label className="text-label">Tanggal Pesanan : </label>
+            <span className="ml-1">
+              <b>{formatDate(show.po_date)}</b>
+            </span>
+          </div>
+
+          <div className="col-4 fs-12">
+            <label className="text-label">Jatuh Tempo :</label>
+            <span className="ml-1">
+              <b>{formatDate(show.due_date)}</b>
+            </span>
+          </div>
+
+          <Card className="col-12">
+            <div className="row">
+              <div className="col-8 fs-12">
+                <label className="text-label">No. Pesanan</label>
+                <div className="p-inputgroup"></div>
+                <span className="ml-0">
+                  <b>{show.preq_id?.req_code}</b>
+                </span>
+              </div>
+
+              <div className="col-4 fs-12">
+                <label className="text-label">Supplier</label>
+                <div className="">
+                  <span className="ml-0">
+                    <b>{show.sup_id?.sup_name}</b>
+                  </span>
+                  <br />
+                  <span>{show.sup_id?.sup_address}</span>
+                  <br />
+                  <span>{show.sup_id?.sup_telp1}</span>
+                </div>
+              </div>
             </div>
-          </div>
+          </Card>
 
-          <div className="col-6">
-            <label className="text-label">Tanggal Jatuh Tempo</label>
-            <div className="p-inputgroup">
-              <span className="ml-0">{formatDate(show.due_date)}</span>
-            </div>
-          </div>
-
-          <div className="col-6">
-            <label className="text-label">No. Pesanan</label>
-            <div className="p-inputgroup"></div>
-            <span className="ml-0">{show.ord_id?.ord_code}</span>
-          </div>
-
-          <div className="col-6">
-            <label className="text-label">Supplier</label>
-            <div className="p-inputgroup">
-              <span className="ml-0">{show.sup_id?.sup_name}</span>
-            </div>
-          </div>
-
-          <Row className="ml-1 mt-4">
+          <Row className="ml-1 mt-0">
             <DataTable
               value={show.pprod?.map((v, i) => {
                 return {
@@ -641,7 +667,7 @@ const PesananPO = ({ onAdd, onEdit }) => {
                 };
               })}
               responsiveLayout="scroll"
-              className="display w-150 datatable-wrapper"
+              className="display w-150 datatable-wrapper fs-12"
               showGridlines
               dataKey="id"
               rowHover
@@ -679,172 +705,163 @@ const PesananPO = ({ onAdd, onEdit }) => {
             </DataTable>
           </Row>
 
-          <Row className="ml-1 mt-5">
-          <DataTable
-              value={show.pjasa?.map((v, i) => {
-                return {
-                  ...v,
-                  index: i,
-                  price: v?.price ?? 0,
-                  disc: v?.disc ?? 0,
-                  total: v?.total ?? 0,
-                };
-              })}
-              responsiveLayout="scroll"
-              className="display w-150 datatable-wrapper"
-              showGridlines
-              dataKey="id"
-              rowHover
-            >
-              <Column
-                header="Supplier"
-                field={(e) => e.sup_id?.sup_name}
-                style={{ minWidth: "14rem" }}
-                // body={loading && <Skeleton />}
-              />
-              <Column
-                header="Jasa"
-                field={(e) => e.jasa_id?.name}
-                style={{ minWidth: "14rem" }}
-                // body={loading && <Skeleton />}
-              />
-              <Column
-                header="Total"
-                field={(e) => e.total}
-                style={{ minWidth: "13rem" }}
-                // body={loading && <Skeleton />}
-              />
-            </DataTable>
-          </Row>
+          {PO.pjasa?.length ? (
+            <Row className="ml-1 mt-4">
+              <>
+                <DataTable
+                  value={show.pjasa?.map((v, i) => {
+                    return {
+                      ...v,
+                      index: i,
+                      total: v?.total ?? 0,
+                    };
+                  })}
+                  responsiveLayout="scroll"
+                  className="display w-150 datatable-wrapper fs-12"
+                  showGridlines
+                  dataKey="id"
+                  rowHover
+                >
+                  <Column
+                    header="Supplier"
+                    field={(e) => e.sup_id?.sup_name}
+                    style={{ minWidth: "14rem" }}
+                    // body={loading && <Skeleton />}
+                  />
+                  <Column
+                    header="Jasa"
+                    field={(e) => e.jasa_id?.name}
+                    style={{ minWidth: "14rem" }}
+                    // body={loading && <Skeleton />}
+                  />
+                  <Column
+                    header="Total"
+                    field={(e) => e.total}
+                    style={{ minWidth: "13rem" }}
+                    // body={loading && <Skeleton />}
+                  />
+                </DataTable>
+              </>
+            </Row>
+          ) : (
+            <></>
+          )}
 
-          <Row className="ml-0 mr-0 mb-0 mt-4 justify-content-between">
-            <div>
-              <div className="row ml-0 mt-3 center"></div>
-            </div>
-
+          <Row className="ml-0 mr-0 mb-0 mt-4 justify-content-between fs-12">
+            <div></div>
             <div className="row justify-content-right col-6 mr-4">
-              <div className="col-6">
+              <div className="col-12 mb-0">
                 <label className="text-label">
-                  {PO.split_PO ? "Sub Total Barang" : "Subtotal"}
+                  <b>Detail Pembayaran</b>
+                </label>
+                <Divider className="ml-12"></Divider>
+              </div>
+
+              <div className="col-5 mt-2 ">
+                <label className="text-label">
+                  {show.split_inv ? "Sub Total Barang" : "Subtotal"}
                 </label>
               </div>
 
-              <div className="col-6">
+              <div className="col-7 mt-2  text-right">
                 <label className="text-label">
-                  {PO.split_PO ? (
+                  {show.split_inv ? (
                     <b>
                       Rp.
-                      {/* {formatIdr(getSubTotalBarang())} */}
+                      {formatIdr(getSubTotalBarang())}
                     </b>
                   ) : (
                     <b>
                       Rp.
-                      {/* {formatIdr(getSubTotalBarang() + getSubTotalJasa())} */}
+                      {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
                     </b>
                   )}
                 </label>
               </div>
 
-              <div className="col-6">
+              <div className="col-5">
                 <label className="text-label">
-                  {PO.split_PO ? "DPP Barang" : "DPP"}
+                  {show.split_inv ? "DPP Barang" : "DPP"}
                 </label>
               </div>
 
-              <div className="col-6">
+              <div className="col-7 text-right">
                 <label className="text-label">
-                  {PO.split_PO ? (
+                  {show.split_inv ? (
                     <b>
                       Rp.
-                      {/* {formatIdr(getSubTotalBarang())} */}
+                      {formatIdr(getSubTotalBarang())}
                     </b>
                   ) : (
                     <b>
                       Rp.
-                      {/* {formatIdr(getSubTotalBarang() + getSubTotalJasa())} */}
+                      {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
                     </b>
                   )}
                 </label>
               </div>
 
-              <div className="col-6">
+              <div className="col-5">
                 <label className="text-label">
-                  {PO.split_PO ? "Pajak Atas Barang (11%)" : "Pajak (11%)"}
+                  {show.split_inv ? "Pajak Atas Barang (11%)" : "Pajak (11%)"}
                 </label>
               </div>
 
-              <div className="col-6">
+              <div className="col-7 text-right">
                 <label className="text-label">
-                  {PO.split_PO ? (
+                  {show.split_inv ? (
                     <b>
                       Rp.
-                      {/* {formatIdr((getSubTotalBarang() * 11) / 100)} */}
+                      {formatIdr((getSubTotalBarang() * 11) / 100)}
                     </b>
                   ) : (
                     <b>
                       Rp.{" "}
-                      {/* {formatIdr(
+                      {formatIdr(
                         ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
-                      )} */}
+                      )}
                     </b>
                   )}
                 </label>
               </div>
 
-              <div className="col-6 mt-3">
-                <label className="text-label">Diskon</label>
+              <div className="col-5 mt-0">
+                <label className="text-label">Diskon(%)</label>
               </div>
 
-              <div className="col-6">
-                <div className="p-inputgroup">
-                  <InputText
-                    // value={
-                    //   PO.split_PO
-                    //     ? isRp
-                    //       ? (getSubTotalBarang() * Do.prod_disc) / 100
-                    //       : PO.prod_disc
-                    //     : isRp
-                    //     ? ((getSubTotalBarang() + getSubTotalJasa()) *
-                    //         Do.total_disc) /
-                    //       100
-                    //     : Do.total_disc
-                    // }
-                    placeholder="Diskon"
-                    type="number"
-                    min={0}
-                    disabled
-                    onChange={(e) => {}}
-                  />
-                </div>
+              <div className="col-7 text-right">
+                <label className="text-label">
+                  <b>Rp. {show.total_disc !== null ? show.total_disc : 0}</b>
+                </label>
               </div>
 
               <div className="col-12">
                 <Divider className="ml-12"></Divider>
               </div>
 
-              <div className="col-6">
+              <div className="col-5">
                 <label className="text-label">
                   <b>Total</b>
                 </label>
               </div>
 
-              <div className="col-6">
-                <label className="text-label fs-16">
-                  {PO.split_PO ? (
+              <div className="col-7 text-right">
+                <label className="text-label fs-13">
+                  {show.split_inv ? (
                     <b>
                       Rp.{" "}
-                      {/* {formatIdr(
+                      {formatIdr(
                         getSubTotalBarang() + (getSubTotalBarang() * 11) / 100
-                      )} */}
+                      )}
                     </b>
                   ) : (
                     <b>
                       Rp.{" "}
-                      {/* {formatIdr(
+                      {formatIdr(
                         getSubTotalBarang() +
                           getSubTotalJasa() +
                           ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
-                      )} */}
+                      )}
                     </b>
                   )}
                 </label>

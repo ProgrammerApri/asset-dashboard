@@ -50,13 +50,14 @@ const DataFaktur = ({ onAdd, onDetail }) => {
   const inv = useSelector((state) => state.inv.inv);
   const fk = useSelector((state) => state.inv.current);
   const printPage = useRef(null);
+  const [supplier, setSupplier] = useState(null);
   const [doubleClick, setDoubleClick] = useState(false);
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
     getFK();
-    getFkCode();
+    getSupplier();
     initFilters1();
   }, []);
 
@@ -86,9 +87,9 @@ const DataFaktur = ({ onAdd, onDetail }) => {
     }
   };
 
-  const getFkCode = async () => {
+  const getSupplier = async () => {
     const config = {
-      ...endpoints.fakturCode,
+      ...endpoints.supplier,
       data: {},
     };
     let response = null;
@@ -97,9 +98,20 @@ const DataFaktur = ({ onAdd, onDetail }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        setFkCode(data);
+        setSupplier(data);
       }
     } catch (error) {}
+  };
+
+  const checkSupp = (value) => {
+    let selected = {};
+    supplier?.forEach((element) => {
+      if (value === element.supplier.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
   };
 
   const delFK = async (id) => {
@@ -153,7 +165,6 @@ const DataFaktur = ({ onAdd, onDetail }) => {
               type: SET_CURRENT_INV,
               payload: {
                 ...data,
-                ord_id: data?.ord_id?.id ?? null,
                 product:
                   product.length > 0
                     ? product
@@ -190,7 +201,7 @@ const DataFaktur = ({ onAdd, onDetail }) => {
               },
             });
           }}
-          className="btn btn-warning shadow btn-xs sharp ml-1 mt-1"
+          className="btn btn-info shadow btn-xs sharp ml-1 mt-1"
         >
           <i className="bx bx-show mt-1"></i>
         </Link>
@@ -252,9 +263,9 @@ const DataFaktur = ({ onAdd, onDetail }) => {
           trigger={() => {
             return (
               <PButton variant="primary" onClick={() => {}}>
-                PDF{" "}
+                Print{" "}
                 <span className="btn-icon-right">
-                  <i class="bx bxs-file-pdf"></i>
+                  <i class="bx bxs-printer"></i>
                 </span>
               </PButton>
             );
@@ -492,37 +503,48 @@ const DataFaktur = ({ onAdd, onDetail }) => {
           setDisplayData(false);
         }}
       >
-        <Row className="ml-0 pt-0">
+        <Row className="ml-0 pt-0 fs-12">
           <div className="col-8">
-            <label className="text-label  textAlign-right">
-              Tanggal Faktur
-            </label>
-            <div className="p-inputgroup">
-              <span className="ml-4">{formatDate(fk.fk_date)}</span>
+            <label className="text-label">Tanggal Faktur :</label>
+            <span className="ml-1">
+              <b>{formatDate(fk.fk_date)}</b>
+            </span>
+          </div>
+
+          <Card className="col-12">
+            <div className="row">
+              <div className="col-8">
+                <label className="text-label">No. Faktur :</label>
+                <span className="ml-1">
+                  <b>{fk.fk_code}</b>
+                </span>
+              </div>
+
+              <div className="col-4">
+                <label className="text-label">No. Pembelian :</label>
+                <span className="ml-1">
+                  <b>{fk.ord_id?.ord_code}</b>
+                </span>
+              </div>
             </div>
-          </div>
 
-          <div className="col-4">
-            <label className="text-label">No. Faktur</label>
-            <div className="p-inputgroup">
-              <span className="ml-4">{fk.fk_code}</span>
+            <div className="row">
+              <div className="col-8">
+                <label className="text-label">Supplier</label>
+                <div className="">
+                  <span className="ml-0">
+                    <b>{checkSupp(fk.ord_id?.sup_id).supplier?.sup_name}</b>
+                  </span>
+                  <br />
+                  <span>{checkSupp(fk.ord_id?.sup_id)?.supplier?.sup_address}</span>
+                  <br />
+                  <span>{checkSupp(fk.ord_id?.sup_id)?.supplier?.sup_telp1}</span>
+                </div>
+              </div>
             </div>
-          </div>
+          </Card>
 
-          <div className="col-8">
-            <label className="text-label">No. Pembelian</label>
-            <div className="p-inputgroup"></div>
-            <span className="ml-0">{fk.ord_id?.ord_code}</span>
-          </div>
-
-          <div className="col-4">
-            <label className="text-label">Supplier</label>
-            <div className="p-inputgroup">
-              <span className="ml-0">{fk.ord_id?.sup_id?.sup_name}</span>
-            </div>
-          </div>
-
-          <Row className="ml-1 mt-4">
+          <Row className="ml-1 mt-0">
             <DataTable
               value={fk.product?.map((v, i) => {
                 return {
@@ -533,7 +555,7 @@ const DataFaktur = ({ onAdd, onDetail }) => {
                 };
               })}
               responsiveLayout="scroll"
-              className="display w-150 datatable-wrapper"
+              className="display w-150 datatable-wrapper fs-12"
               showGridlines
               dataKey="id"
               rowHover
@@ -577,43 +599,49 @@ const DataFaktur = ({ onAdd, onDetail }) => {
             </DataTable>
           </Row>
 
-          <Row className="ml-1 mt-5">
-            <DataTable
-              value={fk.jasa?.map((v, i) => {
-                return {
-                  ...v,
-                  index: i,
-                  price: v?.price ?? 0,
-                  disc: v?.disc ?? 0,
-                  total: v?.total ?? 0,
-                };
-              })}
-              responsiveLayout="scroll"
-              className="display w-150 datatable-wrapper"
-              showGridlines
-              dataKey="id"
-              rowHover
-            >
-              <Column
-                header="Supplier"
-                field={(e) => e.sup_id?.sup_name}
-                style={{ minWidth: "14rem" }}
-                // body={loading && <Skeleton />}
-              />
-              <Column
-                header="Jasa"
-                field={(e) => e.jasa_id?.name}
-                style={{ minWidth: "14rem" }}
-                // body={loading && <Skeleton />}
-              />
-              <Column
-                header="Total"
-                field={(e) => e.total}
-                style={{ minWidth: "13rem" }}
-                // body={loading && <Skeleton />}
-              />
-            </DataTable>
-          </Row>
+          {inv.jasa?.length ? (
+            <Row className="ml-1 mt-5">
+              <>
+                <DataTable
+                  value={fk.jasa?.map((v, i) => {
+                    return {
+                      ...v,
+                      index: i,
+                      price: v?.price ?? 0,
+                      disc: v?.disc ?? 0,
+                      total: v?.total ?? 0,
+                    };
+                  })}
+                  responsiveLayout="scroll"
+                  className="display w-150 datatable-wrapper fs-12"
+                  showGridlines
+                  dataKey="id"
+                  rowHover
+                >
+                  <Column
+                    header="Supplier"
+                    field={(e) => e.sup_id?.sup_name}
+                    style={{ minWidth: "14rem" }}
+                    // body={loading && <Skeleton />}
+                  />
+                  <Column
+                    header="Jasa"
+                    field={(e) => e.jasa_id?.name}
+                    style={{ minWidth: "14rem" }}
+                    // body={loading && <Skeleton />}
+                  />
+                  <Column
+                    header="Total"
+                    field={(e) => e.total}
+                    style={{ minWidth: "13rem" }}
+                    // body={loading && <Skeleton />}
+                  />
+                </DataTable>
+              </>
+            </Row>
+          ) : (
+            <></>
+          )}
 
           <Row className="ml-0 mr-0 mb-0 mt-4 justify-content-between">
             <div></div>
@@ -693,12 +721,12 @@ const DataFaktur = ({ onAdd, onDetail }) => {
                 </label>
               </div>
 
-              <div className="col-5 mt-3">
+              <div className="col-5 mt-0">
                 <label className="text-label">Diskon(%)</label>
               </div>
 
               <div className="col-7">
-                <label className="text-label">{fk.total_disc}</label>
+                <label className="text-label"><b>{fk.total_disc !== null ? fk.total_disc : 0}</b></label>
               </div>
 
               <div className="col-12">
@@ -712,7 +740,7 @@ const DataFaktur = ({ onAdd, onDetail }) => {
               </div>
 
               <div className="col-7">
-                <label className="text-label fs-16">
+                <label className="text-label fs-13">
                   {fk.split_inv ? (
                     <b>
                       Rp.{" "}
@@ -775,7 +803,7 @@ const DataFaktur = ({ onAdd, onDetail }) => {
 
                       <Row className="ml-1 mt-4">
                         <DataTable
-                          className="display w-150 datatable-wrapper"
+                          className="display w-150 datatable-wrapper fs-12"
                           value={fk.product?.map((v, i) => {
                             return {
                               ...v,
@@ -824,37 +852,43 @@ const DataFaktur = ({ onAdd, onDetail }) => {
                         </DataTable>
                       </Row>
 
-                      <Row className="ml-1 mt-5">
-                        <DataTable
-                          className="display w-150 datatable-wrapper"
-                          value={fk.jasa?.map((v, i) => {
-                            return {
-                              ...v,
-                              index: i,
-                              total: v?.total ?? 0,
-                            };
-                          })}
-                        >
-                          <Column
-                            header="Supplier"
-                            field={(e) => e.sup_id?.sup_name}
-                            style={{ minWidth: "21rem" }}
-                            // body={loading && <Skeleton />}
-                          />
-                          <Column
-                            header="Jasa"
-                            field={(e) => e.jasa_id?.name}
-                            style={{ minWidth: "20rem" }}
-                            // body={loading && <Skeleton />}
-                          />
-                          <Column
-                            header="Total"
-                            field={(e) => formatIdr(e.total)}
-                            style={{ minWidth: "20rem" }}
-                            // body={loading && <Skeleton />}
-                          />
-                        </DataTable>
-                      </Row>
+                      {inv.jasa?.length ? (
+                        <Row className="ml-1 mt-5">
+                          <>
+                            <DataTable
+                              className="display w-150 datatable-wrapper fs-12"
+                              value={fk.jasa?.map((v, i) => {
+                                return {
+                                  ...v,
+                                  index: i,
+                                  total: v?.total ?? 0,
+                                };
+                              })}
+                            >
+                              <Column
+                                header="Supplier"
+                                field={(e) => e.sup_id?.sup_name}
+                                style={{ minWidth: "21rem" }}
+                                // body={loading && <Skeleton />}
+                              />
+                              <Column
+                                header="Jasa"
+                                field={(e) => e.jasa_id?.name}
+                                style={{ minWidth: "20rem" }}
+                                // body={loading && <Skeleton />}
+                              />
+                              <Column
+                                header="Total"
+                                field={(e) => formatIdr(e.total)}
+                                style={{ minWidth: "20rem" }}
+                                // body={loading && <Skeleton />}
+                              />
+                            </DataTable>
+                          </>
+                        </Row>
+                      ) : (
+                        <></>
+                      )}
 
                       <Row className="ml-0 mr-0 mb-0 mt-4 justify-content-between">
                         <div></div>
@@ -872,7 +906,7 @@ const DataFaktur = ({ onAdd, onDetail }) => {
                             </label>
                           </div>
 
-                          <div className="col-7 mt-2">
+                          <div className="col-7 mt-2 text-right">
                             <label className="text-label">
                               {fk.split_inv ? (
                                 <b>
@@ -896,7 +930,7 @@ const DataFaktur = ({ onAdd, onDetail }) => {
                             </label>
                           </div>
 
-                          <div className="col-7">
+                          <div className="col-7 text-right">
                             <label className="text-label">
                               {fk.split_inv ? (
                                 <b>
@@ -922,7 +956,7 @@ const DataFaktur = ({ onAdd, onDetail }) => {
                             </label>
                           </div>
 
-                          <div className="col-7">
+                          <div className="col-7 text-right">
                             <label className="text-label">
                               {fk.split_inv ? (
                                 <b>
@@ -946,9 +980,9 @@ const DataFaktur = ({ onAdd, onDetail }) => {
                             <label className="text-label">Diskon(%)</label>
                           </div>
 
-                          <div className="col-7">
+                          <div className="col-7 text-right">
                             <label className="text-label">
-                              {fk.total_disc}
+                            <b>Rp. {fk.ord_id?.total_disc !== null ? fk.ord_id?.total_disc : 0}</b>
                             </label>
                           </div>
 
@@ -962,8 +996,8 @@ const DataFaktur = ({ onAdd, onDetail }) => {
                             </label>
                           </div>
 
-                          <div className="col-7">
-                            <label className="text-label fs-16">
+                          <div className="col-7 text-right">
+                            <label className="text-label fs-13">
                               {fk.split_inv ? (
                                 <b>
                                   Rp.{" "}

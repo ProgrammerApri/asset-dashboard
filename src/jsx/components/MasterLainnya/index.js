@@ -10,7 +10,7 @@ import Project from "./Project";
 import Satuan from "./Satuan";
 import PusatBiaya from "./PusatBiaya";
 import RulesPay from "./RulesPay";
-import Lokasi from "./Lokasi";
+import Lokasi from "../Master/Lokasi";
 import Salesman from "./Salesman";
 
 const MasterLainnya = () => {
@@ -65,11 +65,6 @@ const MasterLainnya = () => {
       tittle: "jenis pemasok",
       icon: "bx-user-voice",
       component: <JenisPemasok />,
-    },
-    {
-      tittle: "Lokasi",
-      icon: "bx-map",
-      component: <Lokasi />,
     },
   ]);
 

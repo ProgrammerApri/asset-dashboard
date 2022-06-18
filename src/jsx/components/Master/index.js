@@ -4,6 +4,7 @@ import Mitra from "../Mitra/Mitra";
 import Akun from "./Akun";
 import GroupProduk from "./GroupProduk";
 import Jasa from "./Jasa";
+import Lokasi from "./Lokasi";
 import Pajak from "./Pajak";
 import Produk from "./Produk";
 
@@ -33,7 +34,7 @@ const Master = () => {
     {
       tittle: "Gudang",
       icon: "bx-building",
-      component: <></>,
+      component: <Lokasi/>,
     },
     {
       tittle: "Aset",

@@ -3,7 +3,7 @@ import { request, endpoints } from "src/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Badge, Button, Row } from "react-bootstrap";
+import { Badge, Button, Row, Card } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { Dialog } from "primereact/dialog";
@@ -121,6 +121,53 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
       <div className="d-flex">
         <Link
           onClick={() => {
+            setDisplayDat(data);
+            let rprod = data.rprod;
+            // rprod.forEach((el) => {
+            //   el.prod_id = el.prod_id?.id;
+            //   el.unit_id = el.unit_id?.id;
+            // });
+            let rjasa = data.rjasa;
+            // rjasa.forEach((el) => {
+            //   el.jasa_id = el.jasa_id?.id;
+            //   el.unit_id = el.unit_id?.id;
+            // });
+            dispatch({
+              type: SET_CURRENT_RP,
+              payload: {
+                ...data,
+                rprod:
+                  rprod.length > 0
+                    ? rprod
+                    : [
+                        {
+                          id: 0,
+                          prod_id: null,
+                          unit_id: null,
+                          request: null,
+                        },
+                      ],
+                rjasa:
+                  rjasa.length > 0
+                    ? rjasa
+                    : [
+                        {
+                          id: 0,
+                          jasa_id: null,
+                          unit_id: null,
+                          request: null,
+                        },
+                      ],
+              },
+            });
+          }}
+          className="btn btn-info shadow btn-xs sharp ml-1"
+        >
+          <i className="bx bx-show mt-1"></i>
+        </Link>
+
+        <Link
+          onClick={() => {
             onEdit(data);
             let rprod = data.rprod;
             dispatch({
@@ -172,55 +219,6 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
           } btn-primary shadow btn-xs sharp ml-1`}
         >
           <i className="fa fa-pencil"></i>
-        </Link>
-
-        <Link
-          onClick={() => {
-            setDisplayDat(data);
-            let rprod = data.rprod;
-            // rprod.forEach((el) => {
-            //   el.prod_id = el.prod_id?.id;
-            //   el.unit_id = el.unit_id?.id;
-            // });
-            let rjasa = data.rjasa;
-            // rjasa.forEach((el) => {
-            //   el.jasa_id = el.jasa_id?.id;
-            //   el.unit_id = el.unit_id?.id;
-            // });
-            dispatch({
-              type: SET_CURRENT_RP,
-              payload: {
-                ...data,
-                req_dep: data?.req_dep?.id ?? null,
-                ref_sup: data?.ref_sup?.id ?? null,
-                rprod:
-                  rprod.length > 0
-                    ? rprod
-                    : [
-                        {
-                          id: 0,
-                          prod_id: null,
-                          unit_id: null,
-                          request: null,
-                        },
-                      ],
-                rjasa:
-                  rjasa.length > 0
-                    ? rjasa
-                    : [
-                        {
-                          id: 0,
-                          jasa_id: null,
-                          unit_id: null,
-                          request: null,
-                        },
-                      ],
-              },
-            });
-          }}
-          className="btn btn-warning shadow btn-xs sharp ml-1"
-        >
-          <i className="bx bx-show mt-1"></i>
         </Link>
 
         <Link
@@ -487,37 +485,45 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
           setDisplayDat(false);
         }}
       >
-        <Row className="ml-0 pt-0">
-          <div className="col-6">
-            <label className="text-label">Tanggal Permintaan</label>
-            <div className="p-inputgroup">
-              <span className="ml-0">{formatDate(show.req_date)}</span>
+        <Row className="ml-0 pt-0 fs-12">
+          <div className="col-8">
+            <label className="text-label">Tanggal Permintaan :</label>
+            <span className="ml-1">
+              <b>{formatDate(show.req_date)}</b>
+            </span>
+          </div>
+
+          <div className="col-4">
+            <label className="text-label">No. Permintaan :</label>
+            <span className="ml-1">
+              <b>{show.req_code}</b>
+            </span>
+          </div>
+
+          <Card className="col-12 ml-0 mr-0">
+            <div className="row">
+              <div className="col-8">
+                <label className="text-label">Departemen</label>
+                <div className="p-inputgroup"></div>
+                <span className="ml-0">
+                  <b>{show.req_dep?.ccost_name}</b>
+                </span>
+              </div>
+
+              <div className="col-4">
+                <label className="text-label">Ref. Supplier</label>
+                <div className="p-inputgroup">
+                  <span className="ml-0">
+                    <b>{show.ref_sup?.sup_name}</b>
+                  </span>
+                </div>
+              </div>
             </div>
-          </div>
+          </Card>
 
-          <div className="col-6">
-            <label className="text-label">No. Permintaan</label>
-            <div className="p-inputgroup">
-              <span className="ml-0">{show.req_code}</span>
-            </div>
-          </div>
-
-          <div className="col-6">
-            <label className="text-label">Departemen</label>
-            <div className="p-inputgroup"></div>
-            <span className="ml-0">{show.req_dep?.ccost_name}</span>
-          </div>
-
-          <div className="col-6">
-            <label className="text-label">Ref. Supplier</label>
-            <div className="p-inputgroup">
-              <span className="ml-0">{show.ref_sup?.sup_name}</span>
-            </div>
-          </div>
-
-          <Row className="ml-2 mt-5">
+          <Row className="ml-2 mt-0">
             <DataTable
-              className="display w-150 datatable-wrapper"
+              className="display w-150 datatable-wrapper fs-12"
               value={show?.rprod?.map((v, i) => {
                 return {
                   ...v,
@@ -547,37 +553,43 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
             </DataTable>
           </Row>
 
-          <Row className="ml-1 mt-5">
-            <DataTable
-              className="display w-150 datatable-wrapper"
-              value={show?.rjasa?.map((v, i) => {
-                return {
-                  ...v,
-                  index: i,
-                  qty: v?.qty ?? 0,
-                };
-              })}
-            >
-              <Column
-                header="Jasa"
-                field={(e) => e.jasa_id?.name}
-                style={{ minWidth: "13rem" }}
-                // body={loading && <Skeleton />}
-              />
-              <Column
-                header="Jumlah"
-                field={(e) => e.qty}
-                style={{ minWidth: "13rem" }}
-                // body={loading && <Skeleton />}
-              />
-              <Column
-                header="Satuan"
-                field={(e) => e.unit_id?.name}
-                style={{ minWidth: "12rem" }}
-                // body={loading && <Skeleton />}
-              />
-            </DataTable>
-          </Row>
+          {rp.rjasa?.length ? (
+            <Row className="ml-1 mt-5">
+              <>
+                <DataTable
+                  className="display w-150 datatable-wrapper fs-12"
+                  value={show?.rjasa?.map((v, i) => {
+                    return {
+                      ...v,
+                      index: i,
+                      request: v?.request,
+                    };
+                  })}
+                >
+                  <Column
+                    header="Jasa"
+                    field={(e) => e.jasa_id?.name}
+                    style={{ minWidth: "13rem" }}
+                    // body={loading && <Skeleton />}
+                  />
+                  <Column
+                    header="Jumlah"
+                    field={(e) => e.request}
+                    style={{ minWidth: "13rem" }}
+                    // body={loading && <Skeleton />}
+                  />
+                  <Column
+                    header="Satuan"
+                    field={(e) => e.unit_id?.name}
+                    style={{ minWidth: "12rem" }}
+                    // body={loading && <Skeleton />}
+                  />
+                </DataTable>
+              </>
+            </Row>
+          ) : (
+            <></>
+          )}
         </Row>
       </Dialog>
 

@@ -323,23 +323,23 @@ const DataSupplier = ({
       ...endpoints.editSupplier,
       endpoint: endpoints.editSupplier.endpoint + currentItem.supplier.id,
       data: {
-        sup_code: currentItem.supplier.sup_code,
-        sup_name: currentItem.supplier.sup_name,
-        sup_jpem: currentItem.jpem.id,
-        sup_ppn: currentItem.supplier.sup_ppn,
-        sup_npwp: currentItem.supplier.sup_npwp,
-        sup_address: currentItem.supplier.sup_address,
-        sup_kota: currentItem.supplier.sup_kota,
-        sup_kpos: currentItem.supplier.sup_kpos,
-        sup_telp1: currentItem.supplier.sup_telp1,
-        sup_telp2: currentItem.supplier.sup_telp2,
-        sup_fax: currentItem.supplier.sup_fax,
-        sup_cp: currentItem.supplier.sup_cp,
-        sup_curren: currentItem.currency.id,
-        sup_ket: currentItem.supplier.sup_ket,
-        sup_hutang: currentItem.supplier.sup_hutang,
-        sup_uang_muka: currentItem.supplier.sup_uang_muka,
-        sup_limit: currentItem.supplier.sup_limit,
+        sup_code: currentItem?.supplier?.sup_code ?? null,
+        sup_name: currentItem?.supplier?.sup_name ?? null,
+        sup_jpem: currentItem?.jpem?.id ?? null,
+        sup_ppn: currentItem?.supplier?.sup_ppn ?? null,
+        sup_npwp: currentItem?.supplier?.sup_npwp ?? null,
+        sup_address: currentItem?.supplier?.sup_address ?? null,
+        sup_kota: currentItem?.supplier?.sup_kota ?? null,
+        sup_kpos: currentItem?.supplier?.sup_kpos ?? null,
+        sup_telp1: currentItem?.supplier?.sup_telp1 ?? null,
+        sup_telp2: currentItem?.supplier?.sup_telp2 ?? null,
+        sup_fax: currentItem?.supplier?.sup_fax ?? null,
+        sup_cp: currentItem?.supplier?.sup_cp ?? null,
+        sup_curren: currentItem?.currency?.id ?? null,
+        sup_ket: currentItem?.supplier?.sup_ket ?? null,
+        sup_hutang: currentItem?.supplier?.sup_hutang ?? null,
+        sup_uang_muka: currentItem?.supplier?.sup_uang_muka ?? null,
+        sup_limit: currentItem?.supplier?.sup_limit ?? null,
       },
     };
     console.log(config.data);
@@ -378,23 +378,23 @@ const DataSupplier = ({
     const config = {
       ...endpoints.addSupplier,
       data: {
-        sup_code: currentItem.supplier.sup_code,
-        sup_name: currentItem.supplier.sup_name,
-        sup_jpem: currentItem.jpem.id,
-        sup_ppn: currentItem.supplier.sup_ppn,
-        sup_npwp: currentItem.supplier.sup_npwp,
-        sup_address: currentItem.supplier.sup_address,
-        sup_kota: currentItem.supplier.sup_kota,
-        sup_kpos: currentItem.supplier.sup_kpos,
-        sup_telp1: currentItem.supplier.sup_telp1,
-        sup_telp2: currentItem.supplier.sup_telp2,
-        sup_fax: currentItem.supplier.sup_fax,
-        sup_cp: currentItem.supplier.sup_cp,
-        sup_curren: currentItem.currency.id,
-        sup_ket: currentItem.supplier.sup_ket,
-        sup_hutang: currentItem.supplier.sup_hutang,
-        sup_uang_muka: currentItem.supplier.sup_uang_muka,
-        sup_limit: currentItem.supplier.sup_limit,
+        sup_code: currentItem?.supplier?.sup_code ?? null,
+        sup_name: currentItem?.supplier?.sup_name ?? null,
+        sup_jpem: currentItem?.jpem?.id ?? null,
+        sup_ppn: currentItem?.supplier?.sup_ppn ?? null,
+        sup_npwp: currentItem?.supplier?.sup_npwp ?? null,
+        sup_address: currentItem?.supplier?.sup_address ?? null,
+        sup_kota: currentItem?.supplier?.sup_kota ?? null,
+        sup_kpos: currentItem?.supplier?.sup_kpos ?? null,
+        sup_telp1: currentItem?.supplier?.sup_telp1 ?? null,
+        sup_telp2: currentItem?.supplier?.sup_telp2 ?? null,
+        sup_fax: currentItem?.supplier?.sup_fax ?? null,
+        sup_cp: currentItem?.supplier?.sup_cp ?? null,
+        sup_curren: currentItem?.currency?.id ?? null,
+        sup_ket: currentItem?.supplier?.sup_ket ?? null,
+        sup_hutang: currentItem?.supplier?.sup_hutang ?? null,
+        sup_uang_muka: currentItem?.supplier?.sup_uang_muka ?? null,
+        sup_limit: currentItem?.supplier?.sup_limit ?? null,
       },
     };
     console.log(config.data);
@@ -502,8 +502,7 @@ const DataSupplier = ({
         <Link
           onClick={() => {
             setCurrentItem(data);
-            setShowInput(true);
-            onInput(true);
+            setShowDelete(true);
           }}
           className="btn btn-danger shadow btn-xs sharp ml-1"
         >
@@ -786,6 +785,12 @@ const DataSupplier = ({
     );
   };
 
+  const formatIdr = (value) => {
+    return `${value}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
   const onHideInput = () => {
     setLoading(false);
     setCurrentItem(def);
@@ -826,30 +831,30 @@ const DataSupplier = ({
           style={{
             minWidth: "8rem",
           }}
-          field={(e) => e.supplier.sup_code}
+          field={(e) => e.supplier?.sup_code}
           body={load && <Skeleton />}
         />
         <Column
           header="Nama Pemasok"
-          field={(e) => e.supplier.sup_name}
+          field={(e) => e.supplier?.sup_name}
           style={{ minWidth: "8rem" }}
           body={load && <Skeleton />}
         />
         <Column
           header="Alamat"
-          field={(e) => e.supplier.sup_address}
+          field={(e) => e.supplier?.sup_address}
           style={{ minWidth: "8rem" }}
           body={load && <Skeleton />}
         />
         <Column
           header="Telp"
-          field={(e) => e.supplier.sup_telp1}
+          field={(e) => e.supplier?.sup_telp1}
           style={{ minWidth: "8rem" }}
           body={load && <Skeleton />}
         />
         <Column
           header="Limit Kredit"
-          field={(e) => e.supplier.sup_limit}
+          field={(e) => formatIdr(e.supplier?.sup_limit ?? "")}
           style={{ minWidth: "8rem" }}
           body={load && <Skeleton />}
         />

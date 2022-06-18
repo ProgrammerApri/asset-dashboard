@@ -827,6 +827,12 @@ const DataCustomer = ({
     setShowInput(false);
   };
 
+  const formatIdr = (value) => {
+    return `${value}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
   const renderBody = () => {
     return (
       <DataTable
@@ -897,7 +903,7 @@ const DataCustomer = ({
         />
         <Column
           header="Limit Kredit"
-          field={(e) => e?.customer?.cus_limit}
+          field={(e) => formatIdr(e?.customer?.cus_limit ?? "")}
           style={{ minWidth: "8rem" }}
           body={load && <Skeleton />}
         />

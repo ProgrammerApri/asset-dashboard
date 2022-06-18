@@ -203,11 +203,11 @@ const Home = () => {
                 series={[
                   {
                     name: "Pembelian",
-                    data: dash.sls_list,
+                    data: dash.pur_list,
                   },
                   {
                     name: "Penjualan",
-                    data: dash.pur_list,
+                    data: dash.sls_list,
                   },
                 ]}
               />

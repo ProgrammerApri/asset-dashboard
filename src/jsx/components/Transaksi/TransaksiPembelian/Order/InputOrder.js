@@ -1710,34 +1710,6 @@ const InputOrder = ({ onCancel, onSuccess }) => {
           }, 2000);
         }}
       />
-
-      {/* <PesananPO
-        data={po}
-        loading={false}
-        popUp={true}
-        show={showPO}
-        onHide={() => {
-          setShowPO(false);
-        }}
-        onInput={(e) => {
-          setShowPO(!e);
-        }}
-        onSuccessInput={(e) => {
-          getPO();
-        }}
-        onRowSelect={(e) => {
-          if (doubleClick) {
-            setShowPO(false);
-            updateORD({ ...order, po_id: e.data.id });
-          }
-
-          setDoubleClick(true);
-
-          setTimeout(() => {
-            setDoubleClick(false);
-          }, 2000);
-        }}
-      /> */}
     </>
   );
 };

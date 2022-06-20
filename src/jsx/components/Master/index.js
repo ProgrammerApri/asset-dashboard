@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button, Col, Row } from "react-bootstrap";
 import Mitra from "../Mitra/Mitra";
 import Akun from "./Akun";
-import GroupProduk from "./GroupProduk";
+import GroupProduk from "./GroupProduk/GroupProduk";
 import Jasa from "./Jasa";
 import Lokasi from "./Lokasi";
 import Pajak from "./Pajak";

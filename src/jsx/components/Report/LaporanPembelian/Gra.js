@@ -12,8 +12,6 @@ import { Skeleton } from "primereact/skeleton";
 import ReactExport from "react-data-export";
 import ReactToPrint from "react-to-print";
 import CustomeWrapper from "../../CustomeWrapper/CustomeWrapper";
-import { Divider } from "@material-ui/core";
-import CustomDropdown from "../../CustomDropdown/CustomDropdown";
 import { Dropdown } from "primereact/dropdown";
 
 const data = {
@@ -46,7 +44,10 @@ const ReportGRA = () => {
   const [date, setDate] = useState(null);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
-  const [filters1, setFilters1] = useState(null);
+  const [filtersDate, setFiltersDate] = useState({
+    start_date: null,
+    end_date: null,
+  });
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
 
   const dummy = Array.from({ length: 10 });
@@ -220,15 +221,21 @@ const ReportGRA = () => {
 
   const onGlobalFilterChange1 = (e) => {
     const value = e.target.value;
-    let _filters1 = { ...filters1 };
-    _filters1["global"].value = value;
+    let _filters1 = { ...filtersDate };
+    if (filtersDate.start_date) {
+      _filters1 = _filters1 && new Date(filtersDate.start_date);
+    }
+    if (filtersDate.end_date) {
+      _filters1 = _filters1 && new Date(filtersDate.end_date);
+    }
+    return _filters1;
 
-    setFilters1(_filters1);
+    setFiltersDate(_filters1);
     setGlobalFilterValue1(value);
   };
 
   const initFilters1 = () => {
-    setFilters1({
+    setFiltersDate({
       global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     });
   };
@@ -340,7 +347,6 @@ const ReportGRA = () => {
     setRows2(event.rows);
   };
 
-
   const formatDate = (date) => {
     var d = new Date(`${date}Z`),
       month = "" + (d.getMonth() + 1),
@@ -387,7 +393,7 @@ const ReportGRA = () => {
                       body={(e) => (
                         <div
                           className={
-                            e.type == "header" || e.type == "footer"
+                            e.type === "header" || e.type === "footer"
                               ? "font-weight-bold"
                               : ""
                           }
@@ -402,7 +408,7 @@ const ReportGRA = () => {
                       style={{ minWidht: "10rem" }}
                       body={(e) => (
                         <div
-                          className={e.type == "header" && "font-weight-bold"}
+                          className={e.type === "header" && "font-weight-bold"}
                         >
                           {e.value.po}
                         </div>
@@ -414,7 +420,7 @@ const ReportGRA = () => {
                       style={{ minWidht: "10rem" }}
                       body={(e) => (
                         <div
-                          className={e.type == "header" && "font-weight-bold"}
+                          className={e.type === "header" && "font-weight-bold"}
                         >
                           {e.value.sup}
                         </div>
@@ -426,7 +432,7 @@ const ReportGRA = () => {
                       style={{ minWidht: "10rem" }}
                       body={(e) => (
                         <div
-                          className={e.type == "header" && "font-weight-bold"}
+                          className={e.type === "header" && "font-weight-bold"}
                         >
                           {e.value.prod}
                         </div>
@@ -438,7 +444,7 @@ const ReportGRA = () => {
                       style={{ minWidht: "10rem" }}
                       body={(e) => (
                         <div
-                          className={e.type == "header" && "font-weight-bold"}
+                          className={e.type === "header" && "font-weight-bold"}
                         >
                           {e.value.ord}
                         </div>
@@ -450,7 +456,7 @@ const ReportGRA = () => {
                       style={{ minWidht: "10rem" }}
                       body={(e) => (
                         <div
-                          className={e.type == "header" && "font-weight-bold"}
+                          className={e.type === "header" && "font-weight-bold"}
                         >
                           {e.value.unit}
                         </div>
@@ -463,9 +469,9 @@ const ReportGRA = () => {
                       body={(e) => (
                         <div
                           className={
-                            e.type == "header"
+                            e.type === "header"
                               ? "font-weight-bold text-right"
-                              : e.type == "footer"
+                              : e.type ==="footer"
                               ? "font-weight-bold text-right"
                               : "text-right"
                           }
@@ -481,9 +487,9 @@ const ReportGRA = () => {
                       body={(e) => (
                         <div
                           className={
-                            e.type == "header"
+                            e.type === "header"
                               ? "font-weight-bold text-right"
-                              : e.type == "footer"
+                              : e.type === "footer"
                               ? "font-weight-bold text-right"
                               : "text-right"
                           }
@@ -529,7 +535,7 @@ const ReportGRA = () => {
                             body={(e) => (
                               <div
                                 className={
-                                  e.type == "header" || e.type == "footer"
+                                  e.type === "header" || e.type === "footer"
                                     ? "font-weight-bold"
                                     : ""
                                 }
@@ -545,7 +551,7 @@ const ReportGRA = () => {
                             body={(e) => (
                               <div
                                 className={
-                                  e.type == "header" && "font-weight-bold"
+                                  e.type === "header" && "font-weight-bold"
                                 }
                               >
                                 {e.value.date}
@@ -559,7 +565,7 @@ const ReportGRA = () => {
                             body={(e) => (
                               <div
                                 className={
-                                  e.type == "header" && "font-weight-bold"
+                                  e.type === "header" && "font-weight-bold"
                                 }
                               >
                                 {e.value.sup}
@@ -573,7 +579,7 @@ const ReportGRA = () => {
                             body={(e) => (
                               <div
                                 className={
-                                  e.type == "header" && "font-weight-bold"
+                                  e.type === "header" && "font-weight-bold"
                                 }
                               >
                                 {e.value.prod}
@@ -587,7 +593,7 @@ const ReportGRA = () => {
                             body={(e) => (
                               <div
                                 className={
-                                  e.type == "header" && "font-weight-bold"
+                                  e.type === "header" && "font-weight-bold"
                                 }
                               >
                                 {e.value.ord}
@@ -601,7 +607,7 @@ const ReportGRA = () => {
                             body={(e) => (
                               <div
                                 className={
-                                  e.type == "header" && "font-weight-bold"
+                                  e.type === "header" && "font-weight-bold"
                                 }
                               >
                                 {e.value.unit}
@@ -615,9 +621,9 @@ const ReportGRA = () => {
                             body={(e) => (
                               <div
                                 className={
-                                  e.type == "header"
+                                  e.type === "header"
                                     ? "font-weight-bold text-right"
-                                    : e.type == "footer"
+                                    : e.type === "footer"
                                     ? "font-weight-bold text-right"
                                     : "text-right"
                                 }
@@ -633,9 +639,9 @@ const ReportGRA = () => {
                             body={(e) => (
                               <div
                                 className={
-                                  e.type == "header"
+                                  e.type === "header"
                                     ? "font-weight-bold text-right"
-                                    : e.type == "footer"
+                                    : e.type === "footer"
                                     ? "font-weight-bold text-right"
                                     : "text-right"
                                 }

@@ -150,10 +150,10 @@ const DataLokasi = ({
     }
   };
 
-  const delProject = async (id) => {
+  const delLokasi = async (id) => {
     const config = {
-      ...endpoints.delProject,
-      endpoint: endpoints.delProject.endpoint + currentItem.id,
+      ...endpoints.delLokasi,
+      endpoint: endpoints.delLokasi.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -178,7 +178,7 @@ const DataLokasi = ({
       console.log(error);
       setTimeout(() => {
         setUpdate(false);
-        setDisplayDel(false);
+        setShowDelete(false);
         toast.current.show({
           severity: "error",
           summary: "Gagal",
@@ -268,7 +268,7 @@ const DataLokasi = ({
           label="Hapus"
           icon="pi pi-trash"
           onClick={() => {
-            delProject();
+            delLokasi();
           }}
           autoFocus
           loading={update}

@@ -24,6 +24,7 @@ import { SelectButton } from "primereact/selectbutton";
 import { el } from "date-fns/locale";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import PesananPO from "../PO/PesananPembelian";
+import DataLokasi from "src/jsx/components/Master/Lokasi/DataLokasi";
 
 const InputOrder = ({ onCancel, onSuccess }) => {
   const order = useSelector((state) => state.order.current);
@@ -43,7 +44,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
   const [showProduk, setShowProduk] = useState(false);
   const [showJasa, setShowJasa] = useState(false);
   const [showSatuan, setShowSatuan] = useState(false);
-  const [showPO, setShowPO] = useState(false);
+  const [showLok, setShowLok] = useState(false);
   const isEdit = useSelector((state) => state.order.editOdr);
   const [update, setUpdate] = useState(false);
   const toast = useRef(null);
@@ -762,7 +763,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                       }}
                       detail
                       onDetail={() => {
-                        setCurrentIndex(e.i);
+                        setCurrentIndex(e.index);
                         setShowProduk(true);
                       }}
                       label={"[name]"}
@@ -786,6 +787,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                       option={satuan}
                       detail
                       onDetail={() => {
+                        setCurrentIndex(e.index);
                         setShowSatuan(true);
                       }}
                       label={"[name]"}
@@ -811,6 +813,10 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                         label={"[name]"}
                         placeholder="Lokasi"
                         detail
+                        onDetail={() => {
+                          setCurrentIndex(e.index);
+                          setShowLok(true);
+                        }}
                       />
                     </div>
                   )}
@@ -1056,7 +1062,10 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                       label={"[jasa.name] ([jasa.code])"}
                       placeholder="Pilih Jasa"
                       detail
-                      onDetail={() => setShowJasa(true)}
+                      onDetail={() => {
+                        setCurrentIndex(e.index);
+                        setShowJasa(true);
+                      }}
                       disabled={order && order.po_id !== null}
                     />
                   )}
@@ -1078,7 +1087,10 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                       label={"[name]"}
                       placeholder="Pilih Satuan"
                       detail
-                      onDetail={() => setShowSatuan(true)}
+                      onDetail={() => {
+                        setCurrentIndex(e.index)
+                        setShowSatuan(true);
+                      }}
                       disabled={order && order.po_id !== null}
                     />
                   )}
@@ -1619,7 +1631,9 @@ const InputOrder = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowSupplier(false);
-            updateORD({ ...order, sup_id: e.data.supplier.id });
+            let temp = [...order.djasa];
+            temp[currentIndex].sup_id = e.data.supplier.id;
+            updateORD({ ...order, sup_id: e.data.supplier.id, djasa: temp });
           }
 
           setDoubleClick(true);
@@ -1660,8 +1674,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             setSatuan(sat);
 
             let temp = [...order.dprod];
-            temp[e.currentIndex].prod_id = e.data.id;
-            temp[e.currentIndex].unit_id = e.data.unit?.id;
+            temp[currentIndex].prod_id = e.data.id;
+            temp[currentIndex].unit_id = e.data.unit?.id;
             updateORD({ ...order, dprod: temp });
           }
 
@@ -1690,7 +1704,9 @@ const InputOrder = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowJasa(false);
-            updateORD({ ...order, djasa: e.data.id });
+            let temp = [...order.djasa];
+            temp[currentIndex].jasa_id = e.data.jasa.id;
+            updateORD({ ...order, djasa: temp });
           }
 
           setDoubleClick(true);
@@ -1718,7 +1734,42 @@ const InputOrder = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowSatuan(false);
-            updateORD({ ...order, sup_id: e.data.id });
+            let temp = [...order.dprod];
+            temp[currentIndex].unit_id = e.data.id;
+
+            let tempj = [...order.djasa];
+            tempj[currentIndex].unit_id = e.data.id;
+            updateORD({ ...order, dprod: temp, djasa: tempj });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataLokasi
+        data={lokasi}
+        loading={false}
+        popUp={true}
+        show={showLok}
+        onHide={() => {
+          setShowLok(false);
+        }}
+        onInput={(e) => {
+          setShowLok(!e);
+        }}
+        onSuccessInput={(e) => {
+          getSatuan();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowLok(false);
+            let temp = [...order.dprod];
+            temp[currentIndex].location = e.data.id;
+            updateORD({ ...order, dprod: temp });
           }
 
           setDoubleClick(true);

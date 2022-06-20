@@ -28,6 +28,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
   const toast = useRef(null);
   const [doubleClick, setDoubleClick] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const sale = useSelector((state) => state.sl.current);
   const isEdit = useSelector((state) => state.sl.editSL);
   const dispatch = useDispatch();
@@ -586,7 +587,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                 onChange={(e) => {
                   let result = null;
                   if (sale.top) {
-                    result = new Date(`${sale.ord_date}Z`);
+                    result = e.value;
                     result.setDate(
                       result.getDate() + checkRulesP(sale?.top)?.day
                     );
@@ -884,10 +885,13 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         temp[e.index].unit_id = u.unit?.id;
                         updateSL({ ...sale, jprod: temp });
                       }}
-                      placeholder="Pilih Kode Produk"
+                      placeholder="Pilih Produk"
                       label={"[name]"}
                       detail
-                      onDetail={() => setShowProduk(true)}
+                      onDetail={() => {
+                        setCurrentIndex(e.index);
+                        setShowProduk(true);
+                      }}
                       disabled={sale && sale.so_id}
                     />
                   )}
@@ -908,7 +912,10 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                       label={"[name]"}
                       placeholder="Pilih Satuan"
                       detail
-                      onDetail={() => setShowSatuan(true)}
+                      onDetail={() => {
+                        setCurrentIndex(e.index);
+                        setShowSatuan(true);
+                      }}
                       disabled={sale && sale.so_id}
                     />
                   )}
@@ -929,7 +936,10 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                       label={"[name]"}
                       placeholder="Lokasi"
                       detail
-                      onDetail={() => setShowLok(true)}
+                      onDetail={() => {
+                        setCurrentIndex(e.index);
+                        setShowLok(true);
+                      }}
                       disabled={sale && sale.so_id}
                     />
                   )}
@@ -1145,7 +1155,10 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                       label={"[supplier.sup_name] ([supplier.sup_code])"}
                       placeholder="Pilih Supplier"
                       detail
-                      onDetail={() => setShowSupplier(true)}
+                      onDetail={() => {
+                        setCurrentIndex(e.index);
+                        setShowSupplier(true);
+                      }}
                       disabled={sale && sale.so_id}
                     />
                   )}
@@ -1166,7 +1179,10 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                       label={"[jasa.name] ([jasa.code])"}
                       placeholder="Pilih Kode Jasa"
                       detail
-                      onDetail={() => setShowJasa(true)}
+                      onDetail={() => {
+                        setCurrentIndex(e.index);
+                        setShowJasa(true);
+                      }}
                       disabled={sale && sale.so_id}
                     />
                   )}
@@ -1187,7 +1203,10 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                       label={"[name]"}
                       placeholder="Pilih Satuan"
                       detail
-                      onDetail={() => setSatuan(true)}
+                      onDetail={() => {
+                        setCurrentIndex(e.index);
+                        setShowSatuan(true);
+                      }}
                       disabled={sale && sale.so_id}
                     />
                   )}
@@ -1667,7 +1686,22 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowProduk(false);
-            updateSL({ ...sale, jprod: e.data.id });
+            let sat = [];
+            satuan.forEach((element) => {
+              if (element.id === e.data.unit.id) {
+                sat.push(element);
+              } else {
+                if (element.u_from?.id === e.data.unit.id) {
+                  sat.push(element);
+                }
+              }
+            });
+            setSatuan(sat);
+
+            let temp = [...sale.jprod];
+            temp[currentIndex].prod_id = e.data.id;
+            temp[currentIndex].unit_id = e.data.unit?.id;
+            updateSL({ ...sale, jprod: temp });
           }
 
           setDoubleClick(true);
@@ -1695,7 +1729,9 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowJasa(false);
-            updateSL({ ...sale, jjasa: e.data.id });
+            let temp = [...sale.jjasa];
+            temp[currentIndex].jasa_id = e.data.jasa.id;
+            updateSL({ ...sale, jjasa: temp });
           }
 
           setDoubleClick(true);
@@ -1723,7 +1759,12 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowSatuan(false);
-            updateSL({ ...sale, jprod: e.data.id });
+            let temp = [...sale.jprod];
+            temp[currentIndex].unit_id = e.data.id;
+
+            let tempj = [...sale.jjasa];
+            tempj[currentIndex].unit_id = e.data.id;
+            updateSL({ ...sale, jprod: temp, jjasa: tempj });
           }
 
           setDoubleClick(true);
@@ -1779,7 +1820,9 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowSupplier(false);
-            updateSL({ ...sale, req_dep: e.data.id });
+            let temp = [...sale.jjasa];
+            temp[currentIndex].sup_id = e.data.supplier.id;
+            updateSL({ ...sale, jjasa: temp });
           }
 
           setDoubleClick(true);
@@ -1807,7 +1850,9 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowLok(false);
-            updateSL({ ...sale, jprod: e.data.id });
+            let temp = [...sale.jprod];
+            temp[currentIndex].location = e.data.id;
+            updateSL({ ...sale, jprod: temp });
           }
 
           setDoubleClick(true);
@@ -1863,7 +1908,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowCustomer(false);
-            updateSL({ ...sale, pel_id: e.data.id });
+            updateSL({ ...sale, pel_id: e.data.customer.id });
           }
 
           setDoubleClick(true);

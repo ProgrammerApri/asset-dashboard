@@ -14,7 +14,7 @@ import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 
-const data = {
+const def = {
   subArea: {
     id: 1,
     sub_code: "",
@@ -25,12 +25,20 @@ const data = {
   areaPen: {
     id: 0,
     area_pen_code: "",
-    area_pen_name: ""
-  },   
+    area_pen_name: "",
+  },
 };
 
-
-const SubArea = () => {
+const DataSubArea = ({
+  data,
+  load,
+  popUp = false,
+  show = false,
+  onHide = () => {},
+  onInput = () => {},
+  onRowSelect,
+  onSuccessInput,
+}) => {
   const [subArea, setSubArea] = useState(null);
   const [areaPen, setAreaPen] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -38,22 +46,20 @@ const SubArea = () => {
   const [displayData, setDisplayData] = useState(false);
   const [displayDel, setDisplayDel] = useState(false);
   const [position, setPosition] = useState("center");
-  const [currentItem, setCurrentItem] = useState(null);
+  const [currentItem, setCurrentItem] = useState(def);
   const toast = useRef(null);
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
-  const [isEdit, setEdit] = useState(false);
+  const [isEdit, setEdit] = useState(def);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
-
-  const dummy = Array.from({ length: 10 });
+  const [showInput, setShowInput] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
 
   useEffect(() => {
-    getSubArea();
     getAreaPen();
     initFilters1();
   }, []);
-
 
   const getAreaPen = async () => {
     console.log("-------------------");
@@ -74,34 +80,6 @@ const SubArea = () => {
         setAreaPen(data);
       }
     } catch (error) {}
-    getSubArea();
-  };
-
-
-  const getSubArea = async (isUpdate = false) => {
-    setLoading(true);
-    const config = {
-      ...endpoints.subArea,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setSubArea(data);
-      }
-    } catch (error) {}
-    if (isUpdate) {
-      setLoading(false);
-    } else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1500);
-    }
   };
 
   const editSubArea = async () => {
@@ -122,9 +100,10 @@ const SubArea = () => {
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setUpdate(false);
-          setDisplayData(false);
-          getSubArea(true);
+          onSuccessInput();
+          setLoading(false);
+          onHideInput();
+          onInput(false);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -163,9 +142,10 @@ const SubArea = () => {
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setUpdate(false);
-          setDisplayData(false);
-          getSubArea(true);
+          onSuccessInput();
+          setLoading(false);
+          onHideInput();
+          onInput(false);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -212,9 +192,9 @@ const SubArea = () => {
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setUpdate(false);
-          setDisplayDel(false);
-          getSubArea(true);
+          setLoading(false);
+          setShowDelete(false);
+          onSuccessInput();
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -227,7 +207,7 @@ const SubArea = () => {
       console.log(error);
       setTimeout(() => {
         setUpdate(false);
-        setDisplayDel(false);
+        setShowDelete(false);
         toast.current.show({
           severity: "error",
           summary: "Gagal",
@@ -245,8 +225,9 @@ const SubArea = () => {
         <Link
           onClick={() => {
             setEdit(true);
-            onClick("displayData", data);
             setCurrentItem(data);
+            setShowInput(true);
+            onInput(true);
           }}
           className="btn btn-primary shadow btn-xs sharp ml-1"
         >
@@ -254,10 +235,10 @@ const SubArea = () => {
         </Link>
 
         <Link
-          onClick={() => {
-            setEdit(true);
-            setDisplayDel(true);
+          nClick={() => {
             setCurrentItem(data);
+            setShowDelete(true);
+            onInput(true);
           }}
           className="btn btn-danger shadow btn-xs sharp ml-1"
         >
@@ -292,7 +273,10 @@ const SubArea = () => {
       <div>
         <PButton
           label="Batal"
-          onClick={() => setDisplayData(false)}
+          onClick={() => {
+            onHideInput();
+            onInput(false);
+          }}
           className="p-button-text btn-primary"
         />
         <PButton
@@ -300,7 +284,7 @@ const SubArea = () => {
           icon="pi pi-check"
           onClick={() => onSubmit()}
           autoFocus
-          loading={update}
+          loading={loading}
         />
       </div>
     );
@@ -311,7 +295,11 @@ const SubArea = () => {
       <div>
         <PButton
           label="Batal"
-          onClick={() => setDisplayDel(false)}
+          onClick={() => {
+            setShowDelete(false);
+            setLoading(false);
+            onInput(false);
+          }}
           className="p-button-text btn-primary"
         />
         <PButton
@@ -321,7 +309,7 @@ const SubArea = () => {
             delSubArea();
           }}
           autoFocus
-          loading={update}
+          loading={loading}
         />
       </div>
     );
@@ -356,9 +344,11 @@ const SubArea = () => {
         <Button
           variant="primary"
           onClick={() => {
+            setShowInput(true);
             setEdit(false);
+            setLoading(false);
             setCurrentItem(data);
-            setDisplayData(true);
+            onInput(true);
           }}
         >
           Tambah{" "}
@@ -369,7 +359,6 @@ const SubArea = () => {
       </div>
     );
   };
-
 
   const template2 = {
     layout: "RowsPerPageDropdown CurrentPageReport PrevPageLink NextPageLink",
@@ -417,175 +406,227 @@ const SubArea = () => {
     setRows2(event.rows);
   };
 
-  return (
-    <>
-      <Toast ref={toast} />
-      <Row>
-        <Col>
-          <Card>
-            <Card.Body>
-              <DataTable
-                responsiveLayout="scroll"
-                value={loading ? dummy : subArea}
-                className="display w-150 datatable-wrapper"
-                showGridlines
-                dataKey="id"
-                rowHover
-                header={renderHeader}
-                filters={filters1}
-                globalFilterFields={[
-                  "subArea.sub_code",
-                  "areaPen.sub_area_code",
-                  "subArea.sub_name",
-                  "subArea.sub_ket",
-                ]}
-                emptyMessage="Tidak ada data"
-                paginator
-                paginatorTemplate={template2}
-                first={first2}
-                rows={rows2}
-                onPage={onCustomPage2}
-                paginatorClassName="justify-content-end mt-3"
-              >
-                <Column
-                  header="Kode"
-                  style={{
-                    minWidth: "8rem",
-                  }}
-                  field={(e) => e.subArea.sub_code}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Nama Sub Area"
-                  field={(e) => e.subArea.sub_name}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Nama Area"
-                  field={(e) => e.areaPen.area_pen_name}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                 <Column
-                  header="Keterangan"
-                  field={(e) => e.subArea.sub_ket}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Action"
-                  dataType="boolean"
-                  bodyClassName="text-center"
-                  style={{ minWidth: "2rem" }}
-                  body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
-                />
-              </DataTable>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+  const onHideInput = () => {
+    setLoading(false);
+    setCurrentItem(def);
+    setEdit(false);
+    setShowInput(false);
+  };
 
-      <Dialog
-        header={isEdit ? "Edit Sub Area" : "Tambah Sub Area"}
-        visible={displayData}
-        style={{ width: "40vw" }}
-        footer={renderFooter("displayData")}
-        onHide={() => {
-          setEdit(false);
-          setDisplayData(false);
-        }}
-      >
-        <div className="col-12">
-          <label className="text-label">Kode</label>
-          <div className="p-inputgroup">
-            <InputText
-              value={currentItem !== null ? `${currentItem.subArea.sub_code}` : ""}
-              onChange={(e) =>
-                setCurrentItem({
-                  ...currentItem,
-                  subArea: { ...currentItem.subArea, sub_code: e.target.value },
-                })
-              }
-              placeholder="Masukan Kode"
-            
-            />
-          </div>
-        </div>
-
-        <div className="col-12">
-          <label className="text-label">Nama Sub Area</label>
-          <div className="p-inputgroup">
-            <InputText
-              value={currentItem !== null ? `${currentItem.subArea.sub_name}` : ""}
-              onChange={(e) =>
-                setCurrentItem({
-                  ...currentItem,
-                  subArea: { ...currentItem.subArea, sub_name: e.target.value },
-                })
-              }
-              placeholder="Masukan Nama Sub Area"
-            />
-          </div>
-        </div>
-
-        <div className="col-12">
-          <label className="text-label">Nama Area</label>
-          <div className="p-inputgroup">
-          <Dropdown
-              value={currentItem !== null ? currentItem.areaPen : null}
-              options={areaPen}
-              onChange={(e) => {
-                console.log(e.value);
-                setCurrentItem({
-                  ...currentItem,
-                  areaPen: e.value,
-                });
-              }}
-              optionLabel="area_pen_name"
-              filter
-              filterBy="area_pen_name"
-              placeholder="Pilih Area"
-            />
-          </div>
-        </div>
-
-        <div className="col-12">
-          <label className="text-label">Keterangan</label>
-          <div className="p-inputgroup">
-            <InputTextarea
-              value={currentItem !== null ? `${currentItem.subArea.sub_ket}` : ""}
-              onChange={(e) =>
-                setCurrentItem({
-                  ...currentItem,
-                  subArea: { ...currentItem.subArea, sub_ket: e.target.value },
-                })
-              }
-              placeholder="Masukan Keterangan"
-            />
-          </div>
-        </div>
-      </Dialog>
-
-      <Dialog
-        header={"Hapus Data"}
-        visible={displayDel}
-        style={{ width: "30vw" }}
-        footer={renderFooterDel("displayDel")}
-        onHide={() => {
-          setDisplayDel(false);
-        }}
-      >
-        <div className="ml-3 mr-3">
-          <i
-            className="pi pi-exclamation-triangle mr-3 align-middle"
-            style={{ fontSize: "2rem" }}
+  const renderBody = () => {
+    return (
+      <>
+        <Toast ref={toast} />
+        <DataTable
+          responsiveLayout="scroll"
+          value={data}
+          className="display w-150 datatable-wrapper"
+          showGridlines
+          dataKey="id"
+          rowHover
+          header={renderHeader}
+          filters={filters1}
+          globalFilterFields={[
+            "subArea.sub_code",
+            "areaPen.sub_area_code",
+            "subArea.sub_name",
+            "subArea.sub_ket",
+          ]}
+          emptyMessage="Tidak ada data"
+          paginator
+          paginatorTemplate={template2}
+          first={first2}
+          rows={rows2}
+          onPage={onCustomPage2}
+          paginatorClassName="justify-content-end mt-3"
+          selectionMode="single"
+          onRowSelect={onRowSelect}
+        >
+          <Column
+            header="Kode"
+            style={{
+              minWidth: "8rem",
+            }}
+            field={(e) => e.subArea.sub_code}
+            body={load && <Skeleton />}
           />
-          <span>Apakah anda yakin ingin menghapus data ?</span>
-        </div>
-      </Dialog>
-    </>
-  );
+          <Column
+            header="Nama Sub Area"
+            field={(e) => e.subArea.sub_name}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Nama Area"
+            field={(e) => e.areaPen.area_pen_name}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Keterangan"
+            field={(e) => e.subArea.sub_ket}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Action"
+            dataType="boolean"
+            bodyClassName="text-center"
+            style={{ minWidth: "2rem" }}
+            body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
+          />
+        </DataTable>
+      </>
+    );
+  };
+
+  const renderDialog = () => {
+    return (
+      <>
+        <Toast ref={toast} />
+        <Dialog
+          header={isEdit ? "Edit Sub Area" : "Tambah Sub Area"}
+          visible={showInput}
+          style={{ width: "40vw" }}
+          footer={renderFooter("displayData")}
+          onHide={() => {
+            onHideInput();
+            onInput(false);
+          }}
+        >
+          <div className="col-12">
+            <label className="text-label">Kode</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={
+                  currentItem !== null ? `${currentItem.subArea.sub_code}` : ""
+                }
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    subArea: {
+                      ...currentItem.subArea,
+                      sub_code: e.target.value,
+                    },
+                  })
+                }
+                placeholder="Masukan Kode"
+              />
+            </div>
+          </div>
+
+          <div className="col-12">
+            <label className="text-label">Nama Sub Area</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={
+                  currentItem !== null ? `${currentItem.subArea.sub_name}` : ""
+                }
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    subArea: {
+                      ...currentItem.subArea,
+                      sub_name: e.target.value,
+                    },
+                  })
+                }
+                placeholder="Masukan Nama Sub Area"
+              />
+            </div>
+          </div>
+
+          <div className="col-12">
+            <label className="text-label">Nama Area</label>
+            <div className="p-inputgroup">
+              <Dropdown
+                value={currentItem !== null ? currentItem.areaPen : null}
+                options={areaPen}
+                onChange={(e) => {
+                  console.log(e.value);
+                  setCurrentItem({
+                    ...currentItem,
+                    areaPen: e.value,
+                  });
+                }}
+                optionLabel="area_pen_name"
+                filter
+                filterBy="area_pen_name"
+                placeholder="Pilih Area"
+              />
+            </div>
+          </div>
+
+          <div className="col-12">
+            <label className="text-label">Keterangan</label>
+            <div className="p-inputgroup">
+              <InputTextarea
+                value={
+                  currentItem !== null ? `${currentItem.subArea.sub_ket}` : ""
+                }
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem,
+                    subArea: {
+                      ...currentItem.subArea,
+                      sub_ket: e.target.value,
+                    },
+                  })
+                }
+                placeholder="Masukan Keterangan"
+              />
+            </div>
+          </div>
+        </Dialog>
+
+        <Dialog
+          header={"Hapus Data"}
+          visible={showDelete}
+          style={{ width: "30vw" }}
+          footer={renderFooterDel("displayDel")}
+          onHide={() => {
+            setLoading(false);
+            setShowDelete(false);
+            onInput(false);
+          }}
+        >
+          <div className="ml-3 mr-3">
+            <i
+              className="pi pi-exclamation-triangle mr-3 align-middle"
+              style={{ fontSize: "2rem" }}
+            />
+            <span>Apakah anda yakin ingin menghapus data ?</span>
+          </div>
+        </Dialog>
+      </>
+    );
+  };
+
+  if (popUp) {
+    return (
+      <>
+        <Dialog
+          header={"Data Sub Area"}
+          visible={show}
+          footer={() => <div></div>}
+          style={{ width: "60vw" }}
+          onHide={onHide}
+        >
+          <Row className="ml-0 mr-0">
+            <Col>{renderBody()}</Col>
+          </Row>
+        </Dialog>
+        {renderDialog()}
+      </>
+    );
+  } else {
+    return (
+      <>
+        {renderBody()}
+        {renderDialog()}
+      </>
+    );
+  }
 };
 
-export default SubArea;
+export default DataSubArea;

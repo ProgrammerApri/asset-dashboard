@@ -102,10 +102,10 @@ const DataBank = ({
       ...endpoints.editBank,
       endpoint: endpoints.editBank.endpoint + currentItem.bank.id,
       data: {
-        BANK_CODE: currentItem.bank.BANK_CODE,
-        ACC_ID: currentItem.account.id,
-        BANK_NAME: currentItem.bank.BANK_NAME,
-        BANK_DESC: currentItem.bank.BANK_DESC,
+        BANK_CODE: currentItem?.bank?.BANK_CODE,
+        ACC_ID: currentItem?.account?.id,
+        BANK_NAME: currentItem?.bank?.BANK_NAME,
+        BANK_DESC: currentItem?.bank?.BANK_DESC,
       },
     };
     console.log(config.data);
@@ -129,7 +129,7 @@ const DataBank = ({
       }
     } catch (error) {
       setTimeout(() => {
-        setUpdate(false);
+        setLoading(false);
         toast.current.show({
           severity: "error",
           summary: "Gagal",
@@ -283,6 +283,7 @@ const DataBank = ({
         <PButton
           label="Batal"
           onClick={() => {
+            setLoading(false)
             onHideInput();
             onInput(false);
           }}
@@ -293,7 +294,7 @@ const DataBank = ({
           icon="pi pi-check"
           onClick={() => onSubmit()}
           autoFocus
-          loading={loading}
+          loading={update}
         />
       </div>
     );
@@ -319,7 +320,7 @@ const DataBank = ({
             delBank();
           }}
           autoFocus
-          loading={loading}
+          loading={update}
         />
       </div>
     );

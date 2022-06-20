@@ -16,6 +16,11 @@ import { Badge } from "primereact/badge";
 import { InputNumber } from "primereact/inputnumber";
 import { TabPanel, TabView } from "primereact/tabview";
 import { Tooltip } from "primereact/tooltip";
+import CustomDropdown from "../../CustomDropdown/CustomDropdown";
+import DataSupplier from "../../Mitra/Pemasok/DataPemasok";
+import DataSatuan from "../../MasterLainnya/Satuan/DataSatuan";
+import DataGroupProduk from "../GroupProduk/GroupProduk";
+import Satuan from "../../MasterLainnya/Satuan";
 
 const def = {
   id: null,
@@ -75,6 +80,10 @@ const DataProduk = ({
   const [active, setActive] = useState(0);
   const picker = useRef(null);
   const [file, setFile] = useState(null);
+  const [doubleClick, setDoubleClick] = useState(false);
+  const [showGroup, setShowGroup] = useState(false);
+  const [showSatuan, setShowSatuan] = useState(false);
+  const [showSupp, setShowSupp] = useState(false);
 
   useEffect(() => {
     initFilters1();
@@ -727,48 +736,44 @@ const DataProduk = ({
               <div className="row mr-0 ml-0">
                 <div className="col-6">
                   <label className="text-label">Group Barang</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={currentItem !== null ? currentItem.group : null}
-                      options={group}
-                      onChange={(e) => {
-                        console.log(e.value);
-                        setCurrentItem({
-                          ...currentItem,
-                          group: e.target.value,
-                        });
-                      }}
-                      optionLabel="name"
-                      filter
-                      filterBy="name"
-                      placeholder="Pilih Group Barang"
-                    />
-                  </div>
+                  <div className="p-inputgroup"></div>
+                  <CustomDropdown
+                    value={currentItem !== null ? currentItem.group : null}
+                    option={group}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        group: e.id,
+                      });
+                    }}
+                    label={"[name]"}
+                    detail
+                    onDetail={() => setShowGroup(true)}
+                    placeholder="Pilih Group Barang"
+                  />
                 </div>
 
                 <div className="col-6">
                   <label className="text-label">Type Barang</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={
-                        currentItem !== null && currentItem.type !== null
-                          ? getType(currentItem.type)
-                          : null
-                      }
-                      options={type}
-                      onChange={(e) => {
-                        console.log(e.value);
-                        setCurrentItem({
-                          ...currentItem,
-                          type: e.value.id,
-                        });
-                      }}
-                      optionLabel="name"
-                      filter
-                      filterBy="name"
-                      placeholder="Pilih Type Barang"
-                    />
-                  </div>
+                  <div className="p-inputgroup"></div>
+                  <CustomDropdown
+                    value={
+                      currentItem !== null && currentItem.type !== null
+                        ? getType(currentItem.type)
+                        : null
+                    }
+                    option={type}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        type: e.id,
+                      });
+                    }}
+                    label={"[name]"}
+                    placeholder="Pilih Type Barang"
+                  />
                 </div>
               </div>
 
@@ -793,44 +798,42 @@ const DataProduk = ({
               <div className="row mr-0 ml-0">
                 <div className="col-6">
                   <label className="text-label">Satuan</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={currentItem !== null ? currentItem.unit : null}
-                      options={unit}
-                      onChange={(e) => {
-                        console.log(e.value);
-                        setCurrentItem({
-                          ...currentItem,
-                          unit: e.target.value,
-                        });
-                      }}
-                      optionLabel="name"
-                      filter
-                      filterBy="name"
-                      placeholder="Pilih Satuan Barang"
-                    />
-                  </div>
+                  <div className="p-inputgroup"></div>
+                  <CustomDropdown
+                    value={currentItem !== null ? currentItem.unit : null}
+                    option={unit}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        unit: e.id,
+                      });
+                    }}
+                    label={"[name]"}
+                    detail
+                    onDetail={() => setShowSatuan(true)}
+                    placeholder="Pilih Satuan Barang"
+                  />
                 </div>
 
                 <div className="col-6">
                   <label className="text-label">Pemasok</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={currentItem !== null ? currentItem.suplier : null}
-                      options={suplier}
-                      onChange={(e) => {
-                        console.log(e.value);
-                        setCurrentItem({
-                          ...currentItem,
-                          suplier: e.target.value,
-                        });
-                      }}
-                      optionLabel="sup_name"
-                      filter
-                      filterBy="sup_name"
-                      placeholder="Pilih Pemasok"
-                    />
-                  </div>
+                  <div className="p-inputgroup"></div>
+                  <CustomDropdown
+                    value={currentItem !== null ? currentItem.suplier : null}
+                    option={suplier}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        suplier: e.id,
+                      });
+                    }}
+                    label={"[sup_name]"}
+                    detail
+                    onDetail={() => setShowSupp(true)}
+                    placeholder="Pilih Pemasok"
+                  />
                 </div>
               </div>
 
@@ -886,27 +889,24 @@ const DataProduk = ({
 
                 <div className="col-6">
                   <label className="text-label">Metode HPP</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={
-                        currentItem !== null && currentItem.metode !== null
-                          ? getMetodeHPP(currentItem.metode)
-                          : null
-                      }
-                      options={metode}
-                      onChange={(e) => {
-                        console.log(e.value);
-                        setCurrentItem({
-                          ...currentItem,
-                          metode: e.value.id,
-                        });
-                      }}
-                      optionLabel="name"
-                      filter
-                      filterBy="name"
-                      placeholder="Pilih Metode HPP"
-                    />
-                  </div>
+                  <div className="p-inputgroup"></div>
+                  <CustomDropdown
+                    value={
+                      currentItem !== null && currentItem.metode !== null
+                        ? getMetodeHPP(currentItem.metode)
+                        : null
+                    }
+                    option={metode}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        metode: e.id,
+                      });
+                    }}
+                    label={"[name]"}
+                    placeholder="Pilih Metode HPP"
+                  />
                 </div>
               </div>
 
@@ -1070,6 +1070,99 @@ const DataProduk = ({
             <span>Apakah anda yakin ingin menghapus data ?</span>
           </div>
         </Dialog>
+
+        <DataSupplier
+          data={suplier}
+          loading={false}
+          popUp={true}
+          show={showSupp}
+          onHide={() => {
+            setShowSupp(false);
+          }}
+          onInput={(e) => {
+            setShowSupp(!e);
+          }}
+          onSuccessInput={(e) => {
+            getSupplier(true);
+          }}
+          onRowSelect={(e) => {
+            if (doubleClick) {
+              setShowSupp(false);
+              setCurrentItem({
+                ...currentItem,
+                suplier: e.data.supplier.id,
+              });
+            }
+
+            setDoubleClick(true);
+
+            setTimeout(() => {
+              setDoubleClick(false);
+            }, 2000);
+          }}
+        />
+
+        <DataSatuan
+          data={unit}
+          loading={false}
+          popUp={true}
+          show={showSupp}
+          onHide={() => {
+            setShowSatuan(false);
+          }}
+          onInput={(e) => {
+            setShowSatuan(!e);
+          }}
+          onSuccessInput={(e) => {
+            getUnit(true);
+          }}
+          onRowSelect={(e) => {
+            if (doubleClick) {
+              setShowSatuan(false);
+              setCurrentItem({
+                ...currentItem,
+                unit: e.data.unit.id,
+              });
+            }
+
+            setDoubleClick(true);
+
+            setTimeout(() => {
+              setDoubleClick(false);
+            }, 2000);
+          }}
+        />
+
+        <DataGroupProduk
+          data={group}
+          loading={false}
+          popUp={true}
+          show={showGroup}
+          onHide={() => {
+            setShowGroup(false);
+          }}
+          onInput={(e) => {
+            setShowGroup(!e);
+          }}
+          onSuccessInput={(e) => {
+            getGroup(true);
+          }}
+          onRowSelect={(e) => {
+            if (doubleClick) {
+              setShowGroup(false);
+              setCurrentItem({
+                ...currentItem,
+                group: e.data.id,
+              });
+            }
+
+            setDoubleClick(true);
+
+            setTimeout(() => {
+              setDoubleClick(false);
+            }, 2000);
+          }}
+        />
       </>
     );
   };

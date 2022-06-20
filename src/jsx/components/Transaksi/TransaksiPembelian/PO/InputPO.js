@@ -887,7 +887,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                         label={"[name] ([code])"}
                         detail
                         onDetail={() => {
-                          setCurrentIndex(e.i);
+                          setCurrentIndex(e.index);
                           setShowProd(true);
                         }}
                       />
@@ -901,22 +901,22 @@ const InputPO = ({ onCancel, onSuccess }) => {
                       width: "8rem",
                     }}
                     body={(e) => (
-                        <CustomDropdown
-                          value={e.unit_id && checkUnit(e.unit_id)}
-                          onChange={(t) => {
-                            let temp = [...po.pprod];
-                            temp[e.index].unit_id = t.id;
-                            updatePo({ ...po, pprod: temp });
-                          }}
-                          option={satuan}
-                          label={"[name]"}
-                          placeholder="Pilih Satuan"
-                          detail
-                          onDetail={() => {
-                            setCurrentIndex(e.i);
-                            setShowSatuan(true);
-                          }}
-                        />
+                      <CustomDropdown
+                        value={e.unit_id && checkUnit(e.unit_id)}
+                        onChange={(t) => {
+                          let temp = [...po.pprod];
+                          temp[e.index].unit_id = t.id;
+                          updatePo({ ...po, pprod: temp });
+                        }}
+                        option={satuan}
+                        label={"[name]"}
+                        placeholder="Pilih Satuan"
+                        detail
+                        onDetail={() => {
+                          setCurrentIndex(e.index);
+                          setShowSatuan(true);
+                        }}
+                      />
                     )}
                   />
 
@@ -1174,31 +1174,23 @@ const InputPO = ({ onCancel, onSuccess }) => {
                       maxWidth: "15rem",
                     }}
                     body={(e) => (
-                      <div className="p-inputgroup">
-                        <Dropdown
-                          value={e.sup_id && supp(e.sup_id)}
-                          options={supplier}
-                          onChange={(t) => {
-                            let temp = [...po.pjasa];
-                            temp[e.index].sup_id = t.value.supplier.id;
-                            updatePo({ ...po, pjasa: temp });
-                            console.log(temp);
-                          }}
-                          optionLabel="supplier.sup_name"
-                          placeholder="Pilih Supplier"
-                          filter
-                          filterBy="supplier.sup_name"
-                          itemTemplate={suppTemp}
-                          valueTemplate={valueSupTemp}
-                        />
-                        <PButton
-                        // onClick={() => {
-                        //   setShowJenisPelanggan(true);
-                        // }}
-                        >
-                          <i class="bx bx-food-menu"></i>
-                        </PButton>
-                      </div>
+                      <CustomDropdown
+                        value={e.sup_id && supp(e.sup_id)}
+                        option={supplier}
+                        onChange={(t) => {
+                          let temp = [...po.pjasa];
+                          temp[e.index].sup_id = t.value.supplier.id;
+                          updatePo({ ...po, pjasa: temp });
+                          console.log(temp);
+                        }}
+                        label={"[supplier.sup_name]"}
+                        placeholder="Pilih Supplier"
+                        detail
+                        onDetail={() => {
+                          setCurrentIndex(e.index)
+                          setShowSupplier(true);
+                        }}
+                      />
                     )}
                   />
 
@@ -1828,7 +1820,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
           console.log(e);
           if (doubleClick) {
             setShowSupplier(false);
-            updatePo({ ...rp, sup_id: e.data.supplier?.id });
+            let temp = [...po.pjasa];
+            temp[currentIndex].sup_id = e.data.supplier.id;
+            updatePo({ ...rp, sup_id: e.data.supplier?.id, pjasa: temp });
           }
 
           setDoubleClick(true);
@@ -1929,8 +1923,8 @@ const InputPO = ({ onCancel, onSuccess }) => {
             setSatuan(sat);
 
             let temp = [...po.pprod];
-            temp[e.currentIndex].prod_id = e.data?.id;
-            temp[e.currentIndex].unit_id = e.data.id;
+            temp[currentIndex].prod_id = e.data?.id;
+            temp[currentIndex].unit_id = e.data.id;
             updatePo({ ...po, pprod: temp });
           }
 
@@ -1960,7 +1954,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
           if (doubleClick) {
             setShowSatuan(false);
             let temp = [...po.pprod];
-            temp[e.currentIndex].unit_id = e.data.unit?.id;
+            temp[currentIndex].unit_id = e.data.unit?.id;
             updatePo({ ...po, pprod: temp });
           }
 

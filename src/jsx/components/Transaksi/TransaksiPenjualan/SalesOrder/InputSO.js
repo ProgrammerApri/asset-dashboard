@@ -22,12 +22,14 @@ import DataProduk from "src/jsx/components/Master/Produk/DataProduk";
 import DataJasa from "src/jsx/components/Master/Jasa/DataJasa";
 import DataCustomer from "src/jsx/components/Mitra/Pelanggan/DataCustomer";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
+import DataLokasi from "src/jsx/components/Master/Lokasi/DataLokasi";
 
 const InputSO = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
   const dispatch = useDispatch();
   const toast = useRef(null);
   const [doubleClick, setDoubleClick] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const so = useSelector((state) => state.so.current);
   const isEdit = useSelector((state) => state.so.editso);
   const [isRp, setRp] = useState(true);
@@ -39,6 +41,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
   const [showSupplier, setShowSupplier] = useState(false);
   const [showCustomer, setShowCustomer] = useState(false);
   const [showPpn, setShowPpn] = useState(false);
+  const [showLok, setShowLok] = useState(false);
   const [showRulesPay, setShowRulesPay] = useState(false);
   const [showSubCus, setShowSub] = useState(false);
   const [product, setProduk] = useState(null);
@@ -836,7 +839,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                           }
                         });
                         setSatuan(sat);
-                        
+
                         let temp = [...so.sprod];
                         temp[e.index].prod_id = u.id;
                         temp[e.index].unit_id = u.unit?.id;
@@ -845,7 +848,10 @@ const InputSO = ({ onCancel, onSuccess }) => {
                       placeholder="Pilih Produk"
                       label={"[name] ([code])"}
                       detail
-                      onDetail={() => setShowProduk(true)}
+                      onDetail={() => {
+                        setCurrentIndex(e.index);
+                        setShowProduk(true);
+                      }}
                     />
                   )}
                 />
@@ -864,7 +870,10 @@ const InputSO = ({ onCancel, onSuccess }) => {
                       option={satuan}
                       label={"[name]"}
                       detail
-                      onDetail={() => setShowSatuan(true)}
+                      onDetail={() => {
+                        setCurrentIndex(e.index);
+                        setShowSatuan(true);
+                      }}
                       placeholder="Pilih Satuan"
                     />
                   )}
@@ -885,6 +894,10 @@ const InputSO = ({ onCancel, onSuccess }) => {
                       label={"[name]"}
                       placeholder="Lokasi"
                       detail
+                      onDetail={() => {
+                        setCurrentIndex(e.index);
+                        setShowLok(true);
+                      }}
                     />
                   )}
                 />
@@ -1101,7 +1114,10 @@ const InputSO = ({ onCancel, onSuccess }) => {
                       label={"[supplier.sup_name] ([supplier.sup_code])"}
                       placeholder="Pilih Supplier"
                       detail
-                      onDetail={() => setShowSupplier(true)}
+                      onDetail={() => {
+                        setCurrentIndex(e.index);
+                        setShowSupplier(true);
+                      }}
                     />
                   )}
                 />
@@ -1122,7 +1138,10 @@ const InputSO = ({ onCancel, onSuccess }) => {
                       label={"[jasa.name] ([jasa.code])"}
                       placeholder="Pilih Jasa"
                       detail
-                      onDetail={() => setShowJasa(true)}
+                      onDetail={() => {
+                        setCurrentIndex(e.index);
+                        setShowJasa(true);
+                      }}
                     />
                   )}
                 />
@@ -1146,7 +1165,10 @@ const InputSO = ({ onCancel, onSuccess }) => {
                       label={"[name]"}
                       placeholder="Pilih Satuan"
                       detail
-                      onDetail={() => setShowSatuan(true)}
+                      onDetail={() => {
+                        setCurrentIndex(e.index)
+                        setShowSatuan(true);
+                      }}
                     />
                   )}
                 />
@@ -1652,7 +1674,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowSupplier(false);
-            updateSo({ ...so, sjasa: e.data.id });
+            let temp = [...so.sjasa];
+            temp[currentIndex].sup_id = e.data.supplier.id;
+            updateSo({ ...so, sjasa: temp });
           }
 
           setDoubleClick(true);
@@ -1680,7 +1704,22 @@ const InputSO = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowProduk(false);
-            updateSo({ ...so, sprod: e.data.id });
+            let sat = [];
+            satuan.forEach((element) => {
+              if (element.id === e.data.unit.id) {
+                sat.push(element);
+              } else {
+                if (element.u_from?.id === e.data.unit.id) {
+                  sat.push(element);
+                }
+              }
+            });
+            setSatuan(sat);
+
+            let temp = [...so.sprod];
+            temp[currentIndex].prod_id = e.data.id;
+            temp[currentIndex].unit_id = e.data.unit?.id;
+            updateSo({ ...so, sprod: temp });
           }
 
           setDoubleClick(true);
@@ -1708,7 +1747,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowJasa(false);
-            updateSo({ ...so, sjasa: e.data.id });
+            let temp = [...so.sjasa];
+            temp[currentIndex].jasa_id = e.data.jasa.id;
+            updateSo({ ...so, sjasa: temp });
           }
 
           setDoubleClick(true);
@@ -1764,7 +1805,42 @@ const InputSO = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowSatuan(false);
-            updateSo({ ...so, sprod: e.data.unit.id });
+            let temp = [...so.sprod];
+            temp[currentIndex].unit_id = e.data.id;
+
+            let tempj = [...so.sjasa];
+            tempj[currentIndex].unit_id = e.data.id;
+            updateSo({ ...so, sprod: temp, sjasa: tempj });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataLokasi
+        data={lokasi}
+        loading={false}
+        popUp={true}
+        show={showLok}
+        onHide={() => {
+          setShowLok(false);
+        }}
+        onInput={(e) => {
+          setShowLok(!e);
+        }}
+        onSuccessInput={(e) => {
+          getloct();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowLok(false);
+            let temp = [...so.sprod];
+            temp[currentIndex].location = e.data.id;
+            updateSo({ ...so, sprod: temp });
           }
 
           setDoubleClick(true);

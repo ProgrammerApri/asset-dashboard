@@ -109,7 +109,7 @@ const DataDivisi = ({
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setUpdate(false);
+          setLoading(false);
           setDisplayData(false);
           onSuccessInput();
           onInput(false);
@@ -410,13 +410,13 @@ const DataDivisi = ({
             header="Nama Group"
             field={(e) => e.name}
             style={{ minWidth: "8rem" }}
-            body={loading && <Skeleton />}
+            body={load && <Skeleton />}
           />
           <Column
             header="Keterangan"
             field={(e) => e.desc}
             style={{ minWidth: "8rem" }}
-            body={loading && <Skeleton />}
+            body={load && <Skeleton />}
           />
           <Column
             header="Action"

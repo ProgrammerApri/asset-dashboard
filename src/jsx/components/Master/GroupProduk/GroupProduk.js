@@ -129,17 +129,17 @@ const DataGroupProduk = ({
       ...endpoints.editGroupPro,
       endpoint: endpoints.editGroupPro.endpoint + currentItem.groupPro.id,
       data: {
-        code: currentItem?.groupPro?.code,
-        name: currentItem?.groupPro?.name,
-        div_code: currentItem?.divisi?.id,
-        acc_sto: currentItem?.groupPro?.acc_sto,
-        acc_send: currentItem?.groupPro?.acc_send,
-        acc_terima: currentItem?.groupPro?.acc_terima,
-        hrg_pokok: currentItem?.groupPro?.hrg_pokok,
-        acc_penj: currentItem?.groupPro?.acc_penj,
-        potongan: currentItem?.groupPro?.potongan,
-        pengembalian: currentItem?.groupPro?.pengembalian,
-        selisih: currentItem?.groupPro?.selisih,
+        code: currentItem?.groupPro?.code ?? null,
+        name: currentItem?.groupPro?.name ?? null,
+        div_code: currentItem?.divisi?.id ?? null,
+        acc_sto: currentItem?.groupPro?.acc_sto ?? null,
+        acc_send: currentItem?.groupPro?.acc_send ?? null,
+        acc_terima: currentItem?.groupPro?.acc_terima ?? null,
+        hrg_pokok: currentItem?.groupPro?.hrg_pokok ?? null,
+        acc_penj: currentItem?.groupPro?.acc_penj ?? null,
+        potongan: currentItem?.groupPro?.potongan ?? null,
+        pengembalian: currentItem?.groupPro?.pengembalian ?? null,
+        selisih: currentItem?.groupPro?.selisih ?? null,
       },
     };
     console.log(config.data);
@@ -152,7 +152,7 @@ const DataGroupProduk = ({
           setUpdate(false);
           setDisplayData(false);
           setActive(0);
-          onSuccessInput();
+          onSuccessInput(true);
           onInput(false);
           toast.current.show({
             severity: "info",
@@ -179,17 +179,17 @@ const DataGroupProduk = ({
     const config = {
       ...endpoints.addGroupPro,
       data: {
-        code: currentItem?.groupPro?.code,
-        name: currentItem?.groupPro?.name,
-        div_code: currentItem?.divisi?.id,
-        acc_sto: currentItem?.groupPro?.acc_sto,
-        acc_send: currentItem?.groupPro?.acc_send,
-        acc_terima: currentItem?.groupPro?.acc_terima,
-        hrg_pokok: currentItem?.groupPro?.hrg_pokok,
-        acc_penj: currentItem?.groupPro?.acc_penj,
-        potongan: currentItem?.groupPro?.potongan,
-        pengembalian: currentItem?.groupPro?.pengembalian,
-        selisih: currentItem?.groupPro?.selisih,
+        code: currentItem?.groupPro?.code ?? null,
+        name: currentItem?.groupPro?.name ?? null,
+        div_code: currentItem?.divisi?.id ?? null,
+        acc_sto: currentItem?.groupPro?.acc_sto ?? null,
+        acc_send: currentItem?.groupPro?.acc_send ?? null,
+        acc_terima: currentItem?.groupPro?.acc_terima ?? null,
+        hrg_pokok: currentItem?.groupPro?.hrg_pokok ?? null,
+        acc_penj: currentItem?.groupPro?.acc_penj ?? null,
+        potongan: currentItem?.groupPro?.potongan ?? null,
+        pengembalian: currentItem?.groupPro?.pengembalian ?? null,
+        selisih: currentItem?.groupPro?.selisih ?? null,
       },
     };
     console.log(config.data);
@@ -604,7 +604,7 @@ const DataGroupProduk = ({
             style={{
               minWidth: "8rem",
             }}
-            field={(e) => e.groupPro.code}
+            field={(e) => e.groupPro?.code}
             body={load && <Skeleton />}
           />
           <Column
@@ -612,12 +612,12 @@ const DataGroupProduk = ({
             style={{
               minWidth: "8rem",
             }}
-            field={(e) => e.groupPro.name}
+            field={(e) => e.groupPro?.name}
             body={load && <Skeleton />}
           />
           <Column
             header="Divisi"
-            field={(e) => e.divisi.name}
+            field={(e) => e.divisi?.name}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
@@ -752,6 +752,7 @@ const DataGroupProduk = ({
                       filterBy="account.acc_name"
                       placeholder="Pilih Akun Persediaan"
                       showClear
+                      // disabled
                     />
                   </div>
                 </div>
@@ -784,6 +785,7 @@ const DataGroupProduk = ({
                       filterBy="account.acc_name"
                       placeholder="Pilih Akun Pengiriman"
                       showClear
+                      // disabled
                     />
                   </div>
                 </div>
@@ -818,6 +820,7 @@ const DataGroupProduk = ({
                       filterBy="account.acc_name"
                       placeholder="Pilih Akun Penerimaan"
                       showClear
+                      // disabled
                     />
                   </div>
                 </div>
@@ -857,6 +860,7 @@ const DataGroupProduk = ({
                       filterBy="account.acc_name"
                       placeholder="Pilih Harga Pokok Penjualan"
                       showClear
+                      // disabled
                     />
                   </div>
                 </div>

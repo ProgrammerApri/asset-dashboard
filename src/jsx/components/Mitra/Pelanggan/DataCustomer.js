@@ -20,8 +20,6 @@ import { Badge } from "primereact/badge";
 import DataJenisPelanggan from "../../Master/JenisPelanggan/DataJenisPelanggan";
 import { InputSwitch } from "primereact/inputswitch";
 import DataPajak from "../../Master/Pajak/DataPajak";
-import CustomDropdown from "../../CustomDropdown/CustomDropdown";
-import DataSubArea from "../../Master/SubArea/SubArea";
 
 const def = {
   customer: {
@@ -106,9 +104,6 @@ const DataCustomer = ({
   const [active, setActive] = useState(0);
   const [showJenisPelanggan, setShowJenisPelanggan] = useState(false);
   const [showPajak, setShowPajak] = useState(false);
-  const [showSubA, setShowSubA] = useState(false);
-  const [showSubPel, setShowSubPel] = useState(false);
-  const [showCurrency, setShowCurreny] = useState(false);
   const [doubleClick, setDoubleClick] = useState(false);
 
   useEffect(() => {
@@ -468,7 +463,7 @@ const DataCustomer = ({
   };
 
   const delCustomer = async () => {
-    setLoading(true);
+    setLoading(true)
     const config = {
       ...endpoints.delCustomer,
       endpoint: endpoints.delCustomer.endpoint + currentItem.customer.id,
@@ -747,33 +742,14 @@ const DataCustomer = ({
     return selected;
   };
 
-  const subA = (value) => {
-    let selected = {};
-    subArea?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-    return selected;
-  };
-
-  const jpel_check = (value) => {
-    let selected = {};
-    jpel?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-    return selected;
-  };
-
   const kota = (value) => {
     let selected = {};
     city?.forEach((element) => {
-      if (value === element.city_id) {
+      if (element.city_id === `${value}`) {
         selected = element;
       }
     });
+    console.log(currentItem);
     return selected;
   };
 
@@ -955,7 +931,7 @@ const DataCustomer = ({
           onHide={() => {
             onHideInput();
             onInput(false);
-            setActive(0);
+            setActive(0)
           }}
         >
           <TabView activeIndex={active} onTabChange={(e) => setActive(e.index)}>
@@ -968,9 +944,7 @@ const DataCustomer = ({
                   <label className="text-label">Kode Pelanggan</label>
                   <div className="p-inputgroup">
                     <InputText
-                      value={
-                        currentItem !== null ? currentItem.cus_code : null
-                      }
+                      value={`${currentItem?.customer?.cus_code ?? ""}`}
                       onChange={(e) =>
                         setCurrentItem({
                           ...currentItem,
@@ -1008,46 +982,51 @@ const DataCustomer = ({
               <div className="row mr-0 ml-0">
                 <div className="col-6">
                   <label className="text-label">Jenis Pelanggan</label>
-                  <div className="p-inputgroup"> </div>
-                  <CustomDropdown
-                    value={
-                      currentItem !== null ? jpel_check(currentItem.jpel) : null
-                    }
-                    option={jpel}
-                    onChange={(e) => {
-                      console.log(e.value);
-                      setCurrentItem({
-                        ...currentItem,
-                        jpel: e.id,
-                      });
-                    }}
-                    label={"[jpel_name]"}
-                    detail
-                    onDetail={() => setShowJenisPelanggan(true)}
-                    placeholder="Pilih Jenis Pelanggan"
-                  />
+                  <div className="p-inputgroup">
+                    <Dropdown
+                      value={currentItem !== null ? currentItem.jpel : null}
+                      options={jpel}
+                      onChange={(e) => {
+                        console.log(e.value);
+                        setCurrentItem({
+                          ...currentItem,
+                          jpel: e.value,
+                        });
+                      }}
+                      optionLabel="jpel_name"
+                      filter
+                      filterBy="jpel_name"
+                      placeholder="Pilih Jenis Pelanggan"
+                    />
+                    {/* <PButton
+                      onClick={() => {
+                        setShowJenisPelanggan(true);
+                      }}
+                    >
+                      <i class="bx bx-food-menu"></i>
+                    </PButton> */}
+                  </div>
                 </div>
 
                 <div className="col-6">
                   <label className="text-label">Sub Area Penjualan</label>
-                  <div className="p-inputgroup"></div>
-                  <CustomDropdown
-                    value={
-                      currentItem !== null ? subA(currentItem?.subArea) : null
-                    }
-                    option={subArea}
-                    onChange={(e) => {
-                      console.log(e.value);
-                      setCurrentItem({
-                        ...currentItem,
-                        subArea: e.id,
-                      });
-                    }}
-                    label={"[sub_name]"}
-                    detail
-                    onDetail={() => setShowSubA(true)}
-                    placeholder="Pilih Sub Area"
-                  />
+                  <div className="p-inputgroup">
+                    <Dropdown
+                      value={currentItem !== null ? currentItem.subArea : null}
+                      options={subArea}
+                      onChange={(e) => {
+                        console.log(e.value);
+                        setCurrentItem({
+                          ...currentItem,
+                          subArea: e.value,
+                        });
+                      }}
+                      optionLabel="sub_name"
+                      filter
+                      filterBy="sub_name"
+                      placeholder="Pilih Sub Area"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -1160,28 +1139,31 @@ const DataCustomer = ({
               <div className="row mr-0 ml-0">
                 <div className="col-6">
                   <label className="text-label">Kota</label>
-                  <div className="p-inputgroup"></div>
-                  <CustomDropdown
-                    value={
-                      currentItem !== null &&
-                      currentItem.customer.cus_kota !== null
-                        ? kota(currentItem.customer.cus_kota)
-                        : null
-                    }
-                    option={city}
-                    onChange={(e) => {
-                      console.log(e.value);
-                      setCurrentItem({
-                        ...currentItem,
-                        customer: {
-                          ...currentItem.customer,
-                          cus_kota: e.city_id,
-                        },
-                      });
-                    }}
-                    label={"[city_name]"}
-                    placeholder="Pilih Kota"
-                  />
+                  <div className="p-inputgroup">
+                    <Dropdown
+                      value={
+                        currentItem !== null &&
+                        currentItem.customer.cus_kota !== null
+                          ? kota(currentItem.customer.cus_kota)
+                          : null
+                      }
+                      options={city}
+                      onChange={(e) => {
+                        console.log(e.value);
+                        setCurrentItem({
+                          ...currentItem,
+                          customer: {
+                            ...currentItem.customer,
+                            cus_kota: e.value.city_id,
+                          },
+                        });
+                      }}
+                      optionLabel="city_name"
+                      filter
+                      filterBy="city_name"
+                      placeholder="Pilih Kota"
+                    />
+                  </div>
                 </div>
 
                 <div className="col-6">
@@ -1215,20 +1197,20 @@ const DataCustomer = ({
                 <div className="col-6">
                   <label className="text-label">No. Telepon 1</label>
                   <div className="p-inputgroup">
-                    <InputText
+                    <InputNumber
                       value={`${currentItem?.customer?.cus_telp1 ?? ""}`}
                       onChange={(e) =>
                         setCurrentItem({
                           ...currentItem,
                           customer: {
                             ...currentItem.customer,
-                            cus_telp1: e.target.value,
+                            cus_telp1: e.value,
                           },
                         })
                       }
                       placeholder="Masukan No. Telepon"
-                      type="number"
-                      // useGrouping={false}
+                      mode="decimal"
+                      useGrouping={false}
                     />
                   </div>
                 </div>
@@ -1236,19 +1218,20 @@ const DataCustomer = ({
                 <div className="col-6">
                   <label className="text-label">No. Telepon 2</label>
                   <div className="p-inputgroup">
-                    <InputText
+                    <InputNumber
                       value={`${currentItem?.customer?.cus_telp2 ?? ""}`}
                       onChange={(e) =>
                         setCurrentItem({
                           ...currentItem,
                           customer: {
                             ...currentItem.customer,
-                            cus_telp2: e.target.value,
+                            cus_telp2: e.value,
                           },
                         })
                       }
                       placeholder="Masukan No. Telepon"
-                      type="number"
+                      mode="decimal"
+                      useGrouping={false}
                     />
                   </div>
                 </div>
@@ -1259,9 +1242,7 @@ const DataCustomer = ({
                   <label className="text-label">Email</label>
                   <div className="p-inputgroup">
                     <InputText
-                      value={
-                        currentItem !== null ? currentItem.cus_email : null
-                      }
+                      value={`${currentItem?.customer?.cus_email ?? null}`}
                       onChange={(e) =>
                         setCurrentItem({
                           ...currentItem,
@@ -1325,24 +1306,24 @@ const DataCustomer = ({
               <div className="row mr-0 ml-0">
                 <div className="col-6">
                   <label className="text-label">Currency</label>
-                  <div className="p-inputgroup"></div>
-                  <CustomDropdown
-                    value={currentItem !== null ? currentItem.currency : null}
-                    option={currency}
-                    onChange={(e) => {
-                      console.log(e.value);
-                      setCurrentItem({
-                        ...currentItem,
-                        currency: e.id,
-                      });
-                    }}
-                    label={"[code] ([name])"}
-                    detail
-                    onDetail={() => setShowCurreny(true)}
-                    placeholder="Pilih Jenis Currency"
-                    disabled={company && !company.multi_currency}
-                  />
-
+                  <div className="p-inputgroup">
+                    <Dropdown
+                      value={currentItem !== null ? currentItem.currency : null}
+                      options={currency}
+                      onChange={(e) => {
+                        console.log(e.value);
+                        setCurrentItem({
+                          ...currentItem,
+                          currency: e.value,
+                        });
+                      }}
+                      optionLabel="code"
+                      filter
+                      filterBy="name"
+                      placeholder="Pilih Jenis Currency"
+                      disabled={company && !company.multi_currency}
+                    />
+                  </div>
                   <small className="text-blue">
                     *Aktifkan Multi Currency Pada Setup Perusahaan Terlebih
                     Dahulu
@@ -1351,29 +1332,37 @@ const DataCustomer = ({
 
                 <div className="col-6">
                   <label className="text-label">PPN</label>
-                  <div className="p-inputgroup"></div>
-                  <CustomDropdown
-                    value={
-                      currentItem !== null
-                        ? ppn(currentItem?.customer?.cus_pjk)
-                        : null
-                    }
-                    option={pajak}
-                    onChange={(e) => {
-                      console.log(e.value);
-                      setCurrentItem({
-                        ...currentItem,
-                        customer: {
-                          ...currentItem.customer,
-                          cus_pjk: e.id,
-                        },
-                      });
-                    }}
-                    label={"[name]"}
-                    detail
-                    onDetail={() => setShowPajak(true)}
-                    placeholder="Pilih Jenis Pajak"
-                  />
+                  <div className="p-inputgroup">
+                    <Dropdown
+                      value={
+                        currentItem !== null 
+                          ? ppn(currentItem?.customer?.cus_pjk)
+                          : null
+                      }
+                      options={pajak}
+                      onChange={(e) => {
+                        console.log(e.value);
+                        setCurrentItem({
+                          ...currentItem,
+                          customer: {
+                            ...currentItem.customer,
+                            cus_pjk: e.value.id,
+                          },
+                        });
+                      }}
+                      optionLabel="name"
+                      filter
+                      filterBy="name"
+                      placeholder="Pilih Jenis Pajak"
+                    />
+                    <PButton
+                      onClick={() => {
+                        setShowPajak(true);
+                      }}
+                    >
+                      <i class="bx bx-food-menu"></i>
+                    </PButton>
+                  </div>
                 </div>
               </div>
 
@@ -1558,48 +1547,14 @@ const DataCustomer = ({
             setShowPajak(!e);
           }}
           onSuccessInput={(e) => {
-            getPajak(true);
+           getPajak(true);
           }}
           onRowSelect={(e) => {
             if (doubleClick) {
               setShowPajak(false);
               setCurrentItem({
                 ...currentItem,
-                customer: {
-                  ...currentItem.customer,
-                  cus_pjk: e.data.id,
-                },
-              });
-            }
-
-            setDoubleClick(true);
-
-            setTimeout(() => {
-              setDoubleClick(false);
-            }, 2000);
-          }}
-        />
-
-        <DataSubArea
-          data={subArea}
-          loading={false}
-          popUp={true}
-          show={showSubA}
-          onHide={() => {
-            setShowSubA(false);
-          }}
-          onInput={(e) => {
-            setShowSubA(!e);
-          }}
-          onSuccessInput={(e) => {
-            getSubArea(true);
-          }}
-          onRowSelect={(e) => {
-            if (doubleClick) {
-              setShowSubA(false);
-              setCurrentItem({
-                ...currentItem,
-                subArea: e.data.subArea.id,
+                cus_pjk: e.data,
               });
             }
 

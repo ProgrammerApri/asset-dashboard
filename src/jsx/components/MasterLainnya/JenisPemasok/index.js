@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { request, endpoints } from "src/utils";
 import { Row, Col, Card } from "react-bootstrap";
-import DataLokasi from "./DataLokasi";
+import DataJenisPemasok from "./DataJenisPemasok";
 
 const data = {
   id: 1,
@@ -21,7 +21,7 @@ const JenisPemasok = () => {
   }, []);
 
   const getJenisPemasok = async (isUpdate = false) => {
-    setLoading(true);
+    // setLoading(true);
     const config = {
       ...endpoints.jenisPemasok,
       data: {},
@@ -52,7 +52,7 @@ const JenisPemasok = () => {
         <Col>
           <Card>
             <Card.Body>
-              <DataLokasi
+              <DataJenisPemasok
                 data={loading ? dummy : jenisPemasok}
                 load={loading}
                 onSuccessInput={() => getJenisPemasok()}

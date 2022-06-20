@@ -643,11 +643,11 @@ const DataSupplier = ({
             setEdit(false);
             setLoading(false);
             setCurrentItem({
-              ...def,
+              ...data,
               supplier: {
-                ...def.supplier,
-                sup_hutang: setup.ap.id,
-                sup_uang_muka: setup.pur_advance.id,
+                ...data.supplier,
+                sup_hutang: setup?.ap?.id,
+                sup_uang_muka: setup?.pur_advance?.id,
               },
             });
             onInput(true);
@@ -720,12 +720,11 @@ const DataSupplier = ({
 
   const kota = (value) => {
     let selected = {};
-    city.forEach((element) => {
-      if (element.city_id === `${value}`) {
+    city?.forEach((element) => {
+      if (value === element.city_id) {
         selected = element;
       }
     });
-    console.log(selected);
     return selected;
   };
 
@@ -896,8 +895,8 @@ const DataSupplier = ({
                     <InputText
                       value={
                         currentItem !== null
-                          ? `${currentItem?.supplier?.sup_code ?? ""}`
-                          : ""
+                          ? currentItem?.supplier?.sup_code
+                          : null
                       }
                       onChange={(e) =>
                         setCurrentItem({
@@ -1278,23 +1277,24 @@ const DataSupplier = ({
                           : null
                       }
                       options={accHut}
-                      onChange={(e) => {
-                        console.log(e.value);
-                        setCurrentItem({
-                          ...currentItem,
-                          supplier: {
-                            ...currentItem.supplier,
-                            sup_hutang: e.value?.id ?? null,
-                          },
-                        });
-                      }}
+                      // onChange={(e) => {
+                      //   console.log(e.value);
+                      //   setCurrentItem({
+                      //     ...currentItem,
+                      //     supplier: {
+                      //       ...currentItem.supplier,
+                      //       sup_hutang: e.value?.id ?? null,
+                      //     },
+                      //   });
+                      // }}
                       optionLabel="account.acc_name"
                       valueTemplate={clear}
                       itemTemplate={glTemplate}
                       filter
                       filterBy="account.acc_name"
-                      placeholder="Pilih Kode Distribusi Hutang"
+                      placeholder="Kode Distribusi Hutang"
                       showClear
+                      // disabled
                     />
                   </div>
                 </div>

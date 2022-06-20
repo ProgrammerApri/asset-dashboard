@@ -227,10 +227,10 @@ const DataJenisPemasok = ({
 
   const onSubmit = () => {
     if (isEdit) {
-      setUpdate(true);
+      setLoading(true);
       editJenisPemasok();
     } else {
-      setUpdate(true);
+      setLoading(true);
       addJenisPemasok();
     }
   };
@@ -276,7 +276,7 @@ const DataJenisPemasok = ({
             delJenisPemasok();
           }}
           autoFocus
-          loading={loading}
+          loading={update}
         />
       </div>
     );

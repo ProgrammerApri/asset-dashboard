@@ -491,7 +491,10 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                         value={v.unit_id && checkUnit(v.unit_id)}
                         option={satuan}
                         detail
-                        onDetail={() => setShowSatuan(true)}
+                        onDetail={() => {
+                          setCurrentIndex(i);
+                          setShowSatuan(true);
+                        }}
                         onChange={(e) => {
                           let temp = [...rp.rprod];
                           temp[i].unit_id = e.id;
@@ -588,7 +591,10 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                         value={v.jasa_id && jas(v.jasa_id)}
                         option={jasa}
                         detail
-                        onDetail={() => setShowJasa(true)}
+                        onDetail={() => {
+                          setCurrentIndex(i);
+                          setShowJasa(true);
+                        }}
                         onChange={(e) => {
                           let temp = [...rp.rjasa];
                           temp[i].jasa_id = e.jasa.id;
@@ -625,7 +631,10 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                         }}
                         option={satuan}
                         detail
-                        onDetail={() => setShowSatuan(true)}
+                        onDetail={() => {
+                          setCurrentIndex(i);
+                          setShowSatuan(true);
+                        }}
                         label={"[name]"}
                         placeholder="Pilih Satuan"
                       />
@@ -835,7 +844,9 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowJasa(false);
-            updateRp({ ...rp, rjasa: e.data.id });
+            let temp = [...rp.rjasa];
+            temp[currentIndex].jasa_id = e.data.jasa.id;
+            updateRp({ ...rp, rjasa: temp });
           }
 
           setDoubleClick(true);
@@ -863,7 +874,9 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowSatuan(false);
-            updateRp({ ...rp, unit_id: e.data.id });
+            let temp = [...rp.rprod];
+            temp[currentIndex].unit_id = e.data.id;
+            updateRp({ ...rp, rprod: temp });
           }
 
           setDoubleClick(true);

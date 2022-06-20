@@ -75,7 +75,7 @@ const Markup = ({ width }) => {
     { url: "transaksi", component: Transaksi },
     { url: "bank-&-kas", component: BankKas },
     { url: "transaksi-persediaan", component: TransaksiPersediaan },
-    { url: "laporan-pembelian", component: LaporanPembelian },
+    { url: "laporan", component: LaporanPembelian },
     { url: "jurnal", component: ReportJurnal },
 
     /// Klasifikasi

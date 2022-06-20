@@ -29,6 +29,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
   const order = useSelector((state) => state.order.current);
   const [dept, setDept] = useState(null);
   const [po, setPO] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [supplier, setSupplier] = useState(null);
   const [rulesPay, setRulesPay] = useState(null);
   const [pajak, setPajak] = useState(null);
@@ -549,7 +550,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
               value={order.po_id !== null ? checkPO(order.po_id) : null}
               onChange={(e) => {
                 let result = new Date(`${order.ord_date}Z`);
-                result.setDate(result.getDate() + checRulPay(e.top?.id)?.day );
+                result.setDate(result.getDate() + checRulPay(e.top?.id)?.day);
                 updateORD({
                   ...order,
                   po_id: e.id,
@@ -563,8 +564,6 @@ const InputOrder = ({ onCancel, onSuccess }) => {
               }}
               placeholder="Pilih No. Pesanan Pembelian"
               option={po}
-              detail
-              onDetail={() => setShowPO(true)}
               label={"[po_code]"}
             />
           </div>
@@ -762,6 +761,10 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                         updateORD({ ...order, dprod: temp });
                       }}
                       detail
+                      onDetail={() => {
+                        setCurrentIndex(e.i);
+                        setShowProduk(true);
+                      }}
                       label={"[name]"}
                       placeholder="Pilih Produk"
                       disabled={order && order.po_id !== null}
@@ -1616,7 +1619,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowSupplier(false);
-            updateORD({ ...order, sup_id: e.data.id });
+            updateORD({ ...order, sup_id: e.data.supplier.id });
           }
 
           setDoubleClick(true);
@@ -1644,7 +1647,22 @@ const InputOrder = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowProduk(false);
-            updateORD({ ...order, dprod: e.data.id });
+            let sat = [];
+            satuan.forEach((element) => {
+              if (element.id === e.data.unit.id) {
+                sat.push(element);
+              } else {
+                if (element.u_from?.id === e.data.unit.id) {
+                  sat.push(element);
+                }
+              }
+            });
+            setSatuan(sat);
+
+            let temp = [...order.dprod];
+            temp[e.currentIndex].prod_id = e.data.id;
+            temp[e.currentIndex].unit_id = e.data.unit?.id;
+            updateORD({ ...order, dprod: temp });
           }
 
           setDoubleClick(true);

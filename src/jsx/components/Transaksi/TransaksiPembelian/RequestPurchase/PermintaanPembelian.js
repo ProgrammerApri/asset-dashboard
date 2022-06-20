@@ -523,6 +523,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
 
           <Row className="ml-2 mt-0">
             <DataTable
+              responsiveLayout="scroll"
               className="display w-150 datatable-wrapper fs-12"
               value={show?.rprod?.map((v, i) => {
                 return {

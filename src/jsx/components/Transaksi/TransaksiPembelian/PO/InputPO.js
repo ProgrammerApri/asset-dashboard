@@ -20,10 +20,13 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { el, te, tr } from "date-fns/locale";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
+import DataJasa from "src/jsx/components/Master/Jasa/DataJasa";
+import DataProduk from "src/jsx/components/Master/Produk/DataProduk";
+import DataSatuan from "src/jsx/components/MasterLainnya/Satuan/DataSatuan";
 
 const InputPO = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
-  const [currentItem, setCurrentItem] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const toast = useRef(null);
   const [doubleClick, setDoubleClick] = useState(false);
   const po = useSelector((state) => state.po.current);
@@ -37,9 +40,11 @@ const InputPO = ({ onCancel, onSuccess }) => {
   const [ppn, setPpn] = useState(null);
   const [rp, setRequest] = useState(null);
   const [showSupplier, setShowSupplier] = useState(false);
-  const [showDepartemen, setShowDept] = useState(false);
   const [showRulesPay, setShowRulesPay] = useState(false);
   const [showPpn, setShowPpn] = useState(false);
+  const [showProd, setShowProd] = useState(false);
+  const [showSatuan, setShowSatuan] = useState(false);
+  const [showJasa, setShowJasa] = useState(false);
   const [product, setProduct] = useState(null);
   const [jasa, setJasa] = useState(null);
   const [satuan, setSatuan] = useState(null);
@@ -474,7 +479,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
     return (
       <div>
         {option !== null
-          ? `${option.req_code} ${option.req_dep ? ` (${option.req_dep?.ccost_name})` : ""}`
+          ? `${option.req_code} ${
+              option.req_dep ? ` (${option.req_dep?.ccost_name})` : ""
+            }`
           : ""}
       </div>
     );
@@ -485,7 +492,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
       return (
         <div>
           {option !== null
-            ? `${option.req_code} ${option.req_dep ? ` (${option.req_dep?.ccost_name})` : ""}`
+            ? `${option.req_code} ${
+                option.req_dep ? ` (${option.req_dep?.ccost_name})` : ""
+              }`
             : ""}
         </div>
       );
@@ -670,37 +679,31 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
           <div className="col-4">
             <label className="text-label">No. Permintaan Pembelian</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={po.preq_id && req_pur(po.preq_id)}
-                options={rp}
-                onChange={(e) => {
-                  console.log(e.value.rprod);
-                  let result = null;
-                  if (po.top) {
-                    result = new Date(`${po.po_date}Z`);
-                    result.setDate(result.getDate() + rulPay(po?.top)?.day);
-                    console.log(result);
-                  }
-                  updatePo({
-                    ...po,
-                    preq_id: e.value.id,
-                    due_date: result,
-                    sup_id: e.value?.ref_sup?.id ?? null,
-                    dep_id: e.value?.req_dep?.id ?? null,
-                    pprod: e.value.rprod,
-                    pjasa: e.value.rjasa,
-                  });
-                }}
-                optionLabel="req_code"
-                placeholder="Pilih Kode Permintaan"
-                itemTemplate={reqTemp}
-                valueTemplate={valueReqTemp}
-                filter
-                filterBy="req_code"
-                disabled={isEdit}
-              />
-            </div>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
+              value={po.preq_id && req_pur(po.preq_id)}
+              option={rp}
+              onChange={(e) => {
+                let result = null;
+                if (po.top) {
+                  result = new Date(`${po.po_date}Z`);
+                  result.setDate(result.getDate() + rulPay(po?.top)?.day);
+                  console.log(result);
+                }
+                updatePo({
+                  ...po,
+                  preq_id: e.id,
+                  due_date: result,
+                  sup_id: e.ref_sup?.id ?? null,
+                  dep_id: e.req_dep?.id ?? null,
+                  pprod: e.rprod ?? null,
+                  pjasa: e.rjasa ?? null,
+                });
+              }}
+              label={"[req_code]"}
+              placeholder="Pilih Kode Permintaan"
+              disabled={isEdit}
+            />
           </div>
 
           <div className="col-3">
@@ -768,9 +771,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
               <InputText
                 value={
                   po.preq_id !== null
-                    ? `${dept(req_pur(po.preq_id)?.req_dep)?.ccost_code} (${
-                        dept(req_pur(po.preq_id)?.req_dep)?.ccost_name
-                      })`
+                    ? dept(req_pur(po.preq_id)?.req_dep)?.ccost_code
                     : null
                 }
                 placeholder="Departemen"
@@ -781,32 +782,22 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
           <div className="col-4">
             <label className="text-label">Syarat Pembayaran</label>
-            <div className="p-inputgroup mt-2">
-              <Dropdown
-                value={po.top !== null ? rulPay(po.top) : null}
-                options={rulesPay}
-                onChange={(e) => {
-                  let result = new Date(`${po.po_date}Z`);
-                  result.setDate(result.getDate() + e.value.day);
-                  console.log(result);
+            <div className="p-inputgroup mt-2"></div>
+            <CustomDropdown
+              value={po.top !== null ? rulPay(po.top) : null}
+              option={rulesPay}
+              onChange={(e) => {
+                let result = new Date(`${po.po_date}Z`);
+                result.setDate(result.getDate() + e.day);
+                console.log(result);
 
-                  updatePo({ ...po, top: e.value.id, due_date: result });
-                }}
-                optionLabel="name"
-                placeholder="Pilih Syarat Pembayaran"
-                filter
-                filterBy="name"
-                itemTemplate={rulTemp}
-                valueTemplate={valueRulTemp}
-              />
-              <PButton
-                onClick={() => {
-                  setShowRulesPay(true);
-                }}
-              >
-                <i class="bx bx-food-menu"></i>
-              </PButton>
-            </div>
+                updatePo({ ...po, top: e.id, due_date: result });
+              }}
+              label={"[name] ([day] Hari)"}
+              placeholder="Pilih Syarat Pembayaran"
+              detail
+              onDetail={() => setShowRulesPay(true)}
+            />
           </div>
 
           <div className="col-6">
@@ -851,7 +842,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
               <>
                 <DataTable
                   responsiveLayout="scroll"
-                  value={po.pprod.map((v, i) => {
+                  value={po.pprod?.map((v, i) => {
                     return {
                       ...v,
                       index: i,
@@ -871,35 +862,35 @@ const InputPO = ({ onCancel, onSuccess }) => {
                       width: "12rem",
                     }}
                     body={(e) => (
-                      <div className="p-inputgroup">
-                        <Dropdown
-                          value={e.prod_id && checkProd(e.prod_id)}
-                          options={product}
-                          onChange={(t) => {
-                            let sat = [];
-                            satuan.forEach((element) => {
-                              if (element.id === t.unit.id) {
+                      <CustomDropdown
+                        value={e.prod_id && checkProd(e.prod_id)}
+                        option={product}
+                        onChange={(t) => {
+                          let sat = [];
+                          satuan.forEach((element) => {
+                            if (element.id === t.unit.id) {
+                              sat.push(element);
+                            } else {
+                              if (element.u_from?.id === t.unit.id) {
                                 sat.push(element);
-                              } else {
-                                if (element.u_from?.id === t.unit.id) {
-                                  sat.push(element);
-                                }
                               }
-                            });
-                            setSatuan(sat);
+                            }
+                          });
+                          setSatuan(sat);
 
-                            let temp = [...po.pprod];
-                            temp[e.index].prod_id = t.value.id;
-                            updatePo({ ...po, pprod: temp });
-                          }}
-                          placeholder="Pilih Kode Produk"
-                          optionLabel="name"
-                          filter
-                          filterBy="name"
-                          valueTemplate={valueProd}
-                          itemTemplate={prodTemp}
-                        />
-                      </div>
+                          let temp = [...po.pprod];
+                          temp[e.index].prod_id = t.id;
+                          temp[e.index].unit_id = t.unit?.id;
+                          updatePo({ ...po, pprod: temp });
+                        }}
+                        placeholder="Pilih Kode Produk"
+                        label={"[name] ([code])"}
+                        detail
+                        onDetail={() => {
+                          setCurrentIndex(e.i);
+                          setShowProd(true);
+                        }}
+                      />
                     )}
                   />
 
@@ -910,21 +901,22 @@ const InputPO = ({ onCancel, onSuccess }) => {
                       width: "8rem",
                     }}
                     body={(e) => (
-                      <div className="p-inputgroup">
-                        <Dropdown
+                        <CustomDropdown
                           value={e.unit_id && checkUnit(e.unit_id)}
                           onChange={(t) => {
                             let temp = [...po.pprod];
-                            temp[e.index].unit_id = t.value.id;
+                            temp[e.index].unit_id = t.id;
                             updatePo({ ...po, pprod: temp });
                           }}
-                          options={satuan}
-                          optionLabel="name"
+                          option={satuan}
+                          label={"[name]"}
                           placeholder="Pilih Satuan"
-                          filter
-                          filterBy="name"
+                          detail
+                          onDetail={() => {
+                            setCurrentIndex(e.i);
+                            setShowSatuan(true);
+                          }}
                         />
-                      </div>
                     )}
                   />
 
@@ -1162,7 +1154,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
               <>
                 <DataTable
                   responsiveLayout="scroll"
-                  value={po.pjasa.map((v, i) => {
+                  value={po.pjasa?.map((v, i) => {
                     return {
                       ...v,
                       index: i,
@@ -1217,24 +1209,18 @@ const InputPO = ({ onCancel, onSuccess }) => {
                       maxWidth: "15rem",
                     }}
                     body={(e) => (
-                      <div className="p-inputgroup">
-                        <Dropdown
-                          value={e.jasa_id && checkjasa(e.jasa_id)}
-                          onChange={(t) => {
-                            let temp = [...po.pjasa];
-                            temp[e.index].jasa_id = t.value.jasa.id;
-                            updatePo({ ...po, pjasa: temp });
-                          }}
-                          options={jasa}
-                          optionLabel="jasa.name"
-                          placeholder="Pilih Kode Jasa"
-                          filter
-                          filterBy="jasa.name"
-                          itemTemplate={jasTemp}
-                          valueTemplate={valueJasTemp}
-                          disabled={e.id !== 0}
-                        />
-                      </div>
+                      <CustomDropdown
+                        value={e.jasa_id && checkjasa(e.jasa_id)}
+                        onChange={(t) => {
+                          let temp = [...po.pjasa];
+                          temp[e.index].jasa_id = t.jasa.id;
+                          updatePo({ ...po, pjasa: temp });
+                        }}
+                        option={jasa}
+                        label={"[jasa.name]"}
+                        placeholder="Pilih Kode Jasa"
+                        disabled={e.id !== 0}
+                      />
                     )}
                   />
 
@@ -1454,7 +1440,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
         <div className="row ml-0 mr-0 mb-0 mt-6 justify-content-between">
           <div>
             <div className="row ml-1">
-              {po.pjasa.length > 0 && po.pprod.length > 0 && (
+              {po.pjasa?.length > 0 && po.pprod?.length > 0 && (
                 <div className="d-flex col-12 align-items-center">
                   <label className="mt-1">{"Pisah Faktur"}</label>
                   <InputSwitch
@@ -1768,7 +1754,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
       {body()}
       {footer()}
 
-      <DataPusatBiaya
+      {/* <DataPusatBiaya
         data={pusatBiaya}
         loading={false}
         popUp={true}
@@ -1794,7 +1780,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
             setDoubleClick(false);
           }, 2000);
         }}
-      />
+      /> */}
 
       <DataRulesPay
         data={rulesPay}
@@ -1813,7 +1799,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowRulesPay(false);
-            updatePo({ ...rp, req_dep: e.data.id });
+            updatePo({ ...rp, top: e.data.id });
           }
 
           setDoubleClick(true);
@@ -1839,9 +1825,10 @@ const InputPO = ({ onCancel, onSuccess }) => {
           getSupplier();
         }}
         onRowSelect={(e) => {
+          console.log(e);
           if (doubleClick) {
             setShowSupplier(false);
-            updatePo({ ...rp, req_dep: e.data.id });
+            updatePo({ ...rp, sup_id: e.data.supplier?.id });
           }
 
           setDoubleClick(true);
@@ -1870,6 +1857,111 @@ const InputPO = ({ onCancel, onSuccess }) => {
           if (doubleClick) {
             setShowPpn(false);
             updatePo({ ...rp, req_dep: e.data.id });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataJasa
+        data={jasa}
+        loading={false}
+        popUp={true}
+        show={showJasa}
+        onHide={() => {
+          setShowJasa(false);
+        }}
+        onInput={(e) => {
+          setShowJasa(!e);
+        }}
+        onSuccessInput={(e) => {
+          getJasa();
+        }}
+        onRowSelect={(e) => {
+          console.log(e);
+          if (doubleClick) {
+            setShowJasa(false);
+            let temp = [...po.pjasa];
+            temp[currentIndex].jasa_id = e.data?.jasa?.id;
+            updatePo({ ...po, pjasa: temp });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataProduk
+        data={product}
+        loading={false}
+        popUp={true}
+        show={showProd}
+        onHide={() => {
+          setShowProd(false);
+        }}
+        onInput={(e) => {
+          setShowProd(!e);
+        }}
+        onSuccessInput={(e) => {
+          getProduct();
+        }}
+        onRowSelect={(e) => {
+          console.log(e);
+          if (doubleClick) {
+            setShowProd(false);
+            let sat = [];
+            satuan.forEach((element) => {
+              if (element.id === e.data.unit.id) {
+                sat.push(element);
+              } else {
+                if (element.u_from?.id === e.data.unit.id) {
+                  sat.push(element);
+                }
+              }
+            });
+            setSatuan(sat);
+
+            let temp = [...po.pprod];
+            temp[e.currentIndex].prod_id = e.data?.id;
+            temp[e.currentIndex].unit_id = e.data.id;
+            updatePo({ ...po, pprod: temp });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataSatuan
+        data={satuan}
+        loading={false}
+        popUp={true}
+        show={showSatuan}
+        onHide={() => {
+          setShowSatuan(false);
+        }}
+        onInput={(e) => {
+          setShowSatuan(!e);
+        }}
+        onSuccessInput={(e) => {
+          getSatuan();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowSatuan(false);
+            let temp = [...po.pprod];
+            temp[e.currentIndex].unit_id = e.data.unit?.id;
+            updatePo({ ...po, pprod: temp });
           }
 
           setDoubleClick(true);

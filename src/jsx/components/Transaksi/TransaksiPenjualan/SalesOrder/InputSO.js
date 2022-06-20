@@ -1792,7 +1792,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowCustomer(false);
-            updateSo({ ...so, pel_id: e.data.id });
+            updateSo({ ...so, pel_id: e.data.customer.id });
           }
 
           setDoubleClick(true);

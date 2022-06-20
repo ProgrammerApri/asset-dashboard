@@ -48,8 +48,8 @@ const SideMenu = () => {
     ],
     Laporan: [
       {
-        tittle: "Laporan Pembelian",
-        to: "laporan-pembelian",
+        tittle: "Laporan",
+        to: "laporan",
         icon: "bx-spreadsheet",
       },
       {

@@ -507,7 +507,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                 });
               }}
               option={order}
-              detail
+              // detail
               // onDetail={() => SetShowOrder(true)}
               label={"[ord_code]"}
               placeholder="No. Pembelian"

@@ -631,9 +631,9 @@ const PesananPO = ({ onAdd, onEdit }) => {
             </span>
           </div>
 
-          <Card className="col-12">
-            <div className="row">
-              <div className="col-8 fs-12">
+          <Card style={{width: "39rem"}}>
+            <div className="row col-12">
+              <div className="col-8 fs-12 ml-0">
                 <label className="text-label">No. Pesanan</label>
                 <div className="p-inputgroup"></div>
                 <span className="ml-0">
@@ -641,7 +641,7 @@ const PesananPO = ({ onAdd, onEdit }) => {
                 </span>
               </div>
 
-              <div className="col-4 fs-12">
+              <div className="col-4 fs-12 ml-0">
                 <label className="text-label">Supplier</label>
                 <div className="">
                   <span className="ml-0">
@@ -674,7 +674,7 @@ const PesananPO = ({ onAdd, onEdit }) => {
             >
               <Column
                 header="Produk"
-                field={(e) => e.prod_id?.name}
+                field={(e) => `${e.prod_id?.name} (${e.prod_id?.code})`}
                 style={{ minWidth: "10rem" }}
                 // body={loading && <Skeleton />}
               />
@@ -699,7 +699,7 @@ const PesananPO = ({ onAdd, onEdit }) => {
               <Column
                 header="Total"
                 field={(e) => formatIdr(e.total)}
-                style={{ minWidth: "9rem" }}
+                style={{ minWidth: "7rem" }}
                 // body={loading && <Skeleton />}
               />
             </DataTable>

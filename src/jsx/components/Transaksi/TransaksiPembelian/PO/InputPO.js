@@ -696,6 +696,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   due_date: result,
                   sup_id: e.ref_sup?.id ?? null,
                   dep_id: e.req_dep?.id ?? null,
+                  split_inv: false,
                   pprod: e.rprod ?? null,
                   pjasa: e.rjasa ?? null,
                 });

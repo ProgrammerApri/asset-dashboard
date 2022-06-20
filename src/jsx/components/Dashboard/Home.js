@@ -124,7 +124,9 @@ const Home = () => {
         <div className="col-xl col-md-6 col-sm-6">
           <div className="card">
             <div className="card-body p-4">
-              <h2 className="fs-160 text-black font-w600 mb-0">{dash.out_pur}</h2>
+              <h2 className="fs-160 text-black font-w600 mb-0">
+                {dash.out_pur}
+              </h2>
               <span className="fs-14">Outstanding Purchase</span>
             </div>
           </div>
@@ -132,7 +134,9 @@ const Home = () => {
         <div className="col-xl col-md-6 col-sm-6">
           <div className="card">
             <div className="card-body p-4">
-              <h2 className="fs-24 text-black font-w600 mb-0">Rp. {formatIdr(dash.ap)}</h2>
+              <h2 className="fs-24 text-black font-w600 mb-0">
+                Rp. {formatIdr(dash.ap)}
+              </h2>
               <span className="fs-14">Account Payable</span>
             </div>
           </div>
@@ -141,7 +145,9 @@ const Home = () => {
         <div className="col-xl col-md-6 col-sm-6">
           <div className="card">
             <div className="card-body p-4">
-              <h2 className="fs-24 text-black font-w600 mb-0">{dash.out_sls}</h2>
+              <h2 className="fs-24 text-black font-w600 mb-0">
+                {dash.out_sls}
+              </h2>
               <span className="fs-14">Outstanding Sales</span>
             </div>
           </div>
@@ -150,7 +156,9 @@ const Home = () => {
         <div className="col-xl col-md-6 col-sm-6">
           <div className="card">
             <div className="card-body p-4">
-              <h2 className="fs-24 text-black font-w600 mb-0">Rp. {formatIdr(dash.ar)}</h2>
+              <h2 className="fs-24 text-black font-w600 mb-0">
+                Rp. {formatIdr(dash.ar)}
+              </h2>
               <span className="fs-14">Account Receivable</span>
             </div>
           </div>
@@ -214,19 +222,6 @@ const Home = () => {
             </div>
           </div>
         </div>
-        {/* <div className="col-xl-3 col-xxl-4 col-md-6">
-          <div className="card">
-            <div className="card-header border-0 pb-0">
-              <h4 className="text-black fs-20 mb-0">Status Panen</h4>
-            </div>
-            <div className="card-body text-center">
-              <ApexRadialBar series={80} />
-              <p className="fs-14">
-                Status panen kolam A1-6 adalah Parsial ke 4
-              </p>
-            </div>
-          </div>
-        </div> */}
         <div className="col-xl-3 col-xxl-4 col-md-6">
           <div className="card">
             <div className="card-header border-0 pb-0">
@@ -235,12 +230,10 @@ const Home = () => {
             <div className="card-body">
               <div className="media align-items-center border border-warning rounded p-3 mb-md-4 mb-3">
                 <CircleProgressWhite
-                    percent={30}
-                    colors={"#F2D182"}
-                    icon={
-                      <i class='bx bxs-factory'></i>
-                    }
-                  />
+                  percent={30}
+                  colors={"#F2D182"}
+                  icon={<i class="bx bxs-factory"></i>}
+                />
                 <div>
                   <h4 className="fs-18 text-black mb-0">Assets</h4>
                   <span className="fs-14 text-warning">Rp. 350.000.000</span>
@@ -248,12 +241,10 @@ const Home = () => {
               </div>
               <div className="media align-items-center border border-info rounded p-3 mb-md-4 mb-3">
                 <CircleProgressWhite
-                    percent={30}
-                    colors={"#1EA7C5"}
-                    icon={
-                      <i class='bx bxs-error' ></i>
-                    }
-                  />
+                  percent={30}
+                  colors={"#1EA7C5"}
+                  icon={<i class="bx bxs-error"></i>}
+                />
                 <div>
                   <h4 className="fs-18 text-black mb-0">Kewajiban</h4>
                   <span className="fs-14 text-info">Rp. 3.000.000</span>
@@ -261,12 +252,10 @@ const Home = () => {
               </div>
               <div className="media align-items-center border border-danger rounded p-3 mb-md-4 mb-3">
                 <CircleProgressWhite
-                    percent={30}
-                    colors={"#ff285c"}
-                    icon={
-                      <i class='bx bxs-zap' ></i>
-                    }
-                  />
+                  percent={30}
+                  colors={"#ff285c"}
+                  icon={<i class="bx bxs-zap"></i>}
+                />
                 <div>
                   <h4 className="fs-18 text-black mb-0">Modal</h4>
                   <span className="fs-14 text-danger">Rp. 3.000.000</span>
@@ -280,9 +269,7 @@ const Home = () => {
             <div className="card-header d-sm-flex d-block pb-0 border-0">
               <div className="mr-auto pr-3">
                 <h4 className="text-black fs-20">AR/AP</h4>
-                <p className="fs-13 mb-0 text-black">
-                  Grafik AR / AP
-                </p>
+                <p className="fs-13 mb-0 text-black">Grafik AR / AP</p>
               </div>
               {/* <Dropdown className="dropdown mt-sm-0 mt-3">
                 <Dropdown.Toggle
@@ -300,7 +287,16 @@ const Home = () => {
               </Dropdown> */}
             </div>
             <div className="card-body">
-              <ApexNagetivePosative />
+              <ApexNagetivePosative
+                ar={dash?.ar_list}
+                ap={dash?.ap_list?.map((v) => {
+                  if (v > 0) {
+                    return 0 - v;
+                  } else {
+                    return v;
+                  }
+                })}
+              />
             </div>
           </div>
         </div>

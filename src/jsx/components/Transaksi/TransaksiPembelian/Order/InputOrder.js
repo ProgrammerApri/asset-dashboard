@@ -516,7 +516,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                 onChange={(e) => {
                   let result = null;
                   if (order.top) {
-                    result = new Date(`${order.ord_date}Z`);
+                    result = new Date(e.value);
                     result.setDate(
                       result.getDate() + checRulPay(order?.top)?.day
                     );
@@ -559,6 +559,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                   due_date: result,
                   sup_id: e.sup_id?.id ?? null,
                   dep_id: e.preq_id?.req_dep?.id ?? null,
+                  split_inv: e.split_inv,
                   dprod: e.pprod,
                   djasa: e.pjasa,
                 });

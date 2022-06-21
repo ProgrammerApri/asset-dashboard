@@ -41,9 +41,6 @@ const ReportGRA = () => {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const printPage = useRef(null);
-  const [date, setDate] = useState(null);
-  const [first2, setFirst2] = useState(0);
-  const [rows2, setRows2] = useState(20);
   const [filtersDate, setFiltersDate] = useState({
     start_date: null,
     end_date: null,
@@ -253,7 +250,7 @@ const ReportGRA = () => {
               onChange={onGlobalFilterChange1}
               selectionMode="range"
               placeholder="Pilih Tanggal"
-              dateFormat="yy-mm-dd"
+              dateFormat="dd-mm-yy"
             />
             <PButton
               className="btn-primary"
@@ -278,7 +275,7 @@ const ReportGRA = () => {
               }
             >
               <ExcelSheet
-                dataSet={report ? jsonForExcel(report) : null}
+                dataSet={gra ? jsonForExcel(gra) : null}
                 name="Report"
               />
             </ExcelFile>
@@ -301,52 +298,6 @@ const ReportGRA = () => {
     );
   };
 
-  const template2 = {
-    layout: "RowsPerPageDropdown CurrentPageReport PrevPageLink NextPageLink",
-    RowsPerPageDropdown: (options) => {
-      const dropdownOptions = [
-        { label: 20, value: 20 },
-        { label: 50, value: 50 },
-        { label: "Semua", value: options.totalRecords },
-      ];
-
-      return (
-        <React.Fragment>
-          <span
-            className="mx-1"
-            style={{ color: "var(--text-color)", userSelect: "none" }}
-          >
-            Data per halaman:{" "}
-          </span>
-          <Dropdown
-            value={options.value}
-            options={dropdownOptions}
-            onChange={options.onChange}
-          />
-        </React.Fragment>
-      );
-    },
-    CurrentPageReport: (options) => {
-      return (
-        <span
-          style={{
-            color: "var(--text-color)",
-            userSelect: "none",
-            width: "120px",
-            textAlign: "center",
-          }}
-        >
-          {options.first} - {options.last} dari {options.totalRecords}
-        </span>
-      );
-    },
-  };
-
-  const onCustomPage2 = (event) => {
-    setFirst2(event.first);
-    setRows2(event.rows);
-  };
-
   const formatDate = (date) => {
     var d = new Date(`${date}Z`),
       month = "" + (d.getMonth() + 1),
@@ -356,7 +307,7 @@ const ReportGRA = () => {
     if (month.length < 2) month = "0" + month;
     if (day.length < 2) day = "0" + day;
 
-    return [year, month, day].join("-");
+    return [day, month, year].join("-");
   };
 
   const formatIdr = (value) => {
@@ -471,7 +422,7 @@ const ReportGRA = () => {
                           className={
                             e.type === "header"
                               ? "font-weight-bold text-right"
-                              : e.type ==="footer"
+                              : e.type === "footer"
                               ? "font-weight-bold text-right"
                               : "text-right"
                           }
@@ -529,7 +480,7 @@ const ReportGRA = () => {
                           <Column
                             className="header-center"
                             header={(e) =>
-                              e.props.value ? e.props?.value[0]?.po : null
+                              e.props.value ? e.props?.value[0]?.ref : null
                             }
                             style={{ width: "15rem" }}
                             body={(e) => (
@@ -540,7 +491,7 @@ const ReportGRA = () => {
                                     : ""
                                 }
                               >
-                                {e.value.ref}
+                                {e.value.date}
                               </div>
                             )}
                           />
@@ -554,7 +505,7 @@ const ReportGRA = () => {
                                   e.type === "header" && "font-weight-bold"
                                 }
                               >
-                                {e.value.date}
+                                {e.value.po}
                               </div>
                             )}
                           />

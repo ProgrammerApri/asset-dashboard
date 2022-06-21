@@ -4,6 +4,7 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import ReportGRA from "./Gra";
 import ReportJurnal from "../Jurnal";
 import ReportHutang from "./Hutang";
+import AnalisaUmHutang from "./UmurHutang";
 
 const LaporanPembelian = () => {
   const [active, setActive] = useState(0);
@@ -22,6 +23,11 @@ const LaporanPembelian = () => {
       tittle: "Hutang",
       icon: "bx-money",
       component: <ReportHutang />,
+    },
+    {
+      tittle: "Analisa Umur Hutang",
+      icon: "bx-money",
+      component: <AnalisaUmHutang />,
     },
   ]);
 

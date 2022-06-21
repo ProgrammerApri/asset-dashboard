@@ -765,8 +765,8 @@ const endpoints = {
     data: {},
   },
 
-   /// Penjualan
-   sale: {
+  /// Penjualan
+  sale: {
     endpoint: "/v1/api/sales",
     method: "GET",
     data: {},
@@ -843,6 +843,13 @@ const endpoints = {
   /// APCARD
   apcard: {
     endpoint: "/v1/api/apcard",
+    method: "GET",
+    data: {},
+  },
+
+  /// ARCARD
+  arcard: {
+    endpoint: "/v1/api/arcard",
     method: "GET",
     data: {},
   },

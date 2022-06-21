@@ -23,7 +23,7 @@ const def = {
   name: null,
   group: null,
   type: null,
-  codeb: "",
+  codeb: null,
   unit: null,
   suplier: null,
   b_price: null,
@@ -362,7 +362,7 @@ const DataProduk = ({
 
   const onClick = () => {
     setDisplayData(true);
-    setCurrentItem();
+    // setCurrentItem();
 
     if (position) {
       setPosition(position);
@@ -495,7 +495,7 @@ const DataProduk = ({
           variant="primary"
           onClick={() => {
             setEdit(false);
-            setCurrentItem(data);
+            setCurrentItem(def);
             setDisplayData(true);
             onInput(true);
           }}

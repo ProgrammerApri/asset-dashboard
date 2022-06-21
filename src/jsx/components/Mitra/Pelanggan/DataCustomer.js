@@ -220,12 +220,12 @@ const DataCustomer = ({
         const { data } = response;
         let filt = [];
         data.forEach((elem) => {
-          if (elem.account.kat_code === 3) {
-            filt.push(elem.account);
-          }
+          // if (elem.account.kat_code === 3) {
+          //   filt.push(elem.account);
+          // }
         });
         console.log(data);
-        setAccount(filt);
+        setAccount(data);
       }
     } catch (error) {}
   };
@@ -244,12 +244,12 @@ const DataCustomer = ({
         const { data } = response;
         let filt = [];
         data.forEach((elem) => {
-          if (elem.account.kat_code === 5) {
-            filt.push(elem.account);
-          }
+          // if (elem.account.kat_code === 5) {
+          //   filt.push(elem.account);
+          // }
         });
         console.log(data);
-        setAcc(filt);
+        setAcc(data);
       }
     } catch (error) {}
   };
@@ -335,11 +335,12 @@ const DataCustomer = ({
       ...endpoints.editCustomer,
       endpoint: endpoints.editCustomer.endpoint + currentItem.customer.id,
       data: {
+        ...currentItem,
         cus_code: currentItem?.customer?.cus_code ?? null,
         cus_name: currentItem?.customer?.cus_name ?? null,
         cus_jpel: currentItem?.jpel?.id ?? null,
         cus_sub_area: currentItem?.subArea?.id ?? null,
-        cus_pjk: currentItem?.pajak?.id ?? null,
+        cus_pjk: currentItem?.customer?.cus_pjk ?? null,
         cus_npwp: currentItem?.customer?.cus_npwp ?? null,
         cus_address: currentItem?.customer?.cus_address ?? null,
         cus_kota: currentItem?.customer?.cus_kota ?? null,
@@ -366,7 +367,7 @@ const DataCustomer = ({
       if (response.status) {
         setTimeout(() => {
           onSuccessInput();
-          setLoading(false);
+          setUpdate(false);
           onHideInput();
           onInput(false);
           toast.current.show({
@@ -394,11 +395,12 @@ const DataCustomer = ({
     const config = {
       ...endpoints.addCustomer,
       data: {
+        ...currentItem,
         cus_code: currentItem?.customer?.cus_code ?? null,
         cus_name: currentItem?.customer?.cus_name ?? null,
         cus_jpel: currentItem?.jpel?.id ?? null,
         cus_sub_area: currentItem?.subArea?.id ?? null,
-        cus_pjk: currentItem?.pajak?.id ?? null,
+        cus_pjk: currentItem?.customer?.cus_pjk ?? null,
         cus_npwp: currentItem?.customer?.cus_npwp ?? null,
         cus_address: currentItem?.customer?.cus_address ?? null,
         cus_kota: currentItem?.customer?.cus_kota ?? null,
@@ -425,7 +427,7 @@ const DataCustomer = ({
       if (response.status) {
         setTimeout(() => {
           onSuccessInput();
-          setLoading(false);
+          setUpdate(false);
           onHideInput();
           onInput(false);
           toast.current.show({
@@ -475,7 +477,7 @@ const DataCustomer = ({
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setLoading(false);
+          setUpdate(false);
           setShowDelete(false);
           onSuccessInput();
           onInput(false);
@@ -490,7 +492,7 @@ const DataCustomer = ({
     } catch (error) {
       console.log(error);
       setTimeout(() => {
-        setLoading(false);
+        setUpdate(false);
         setShowDelete(false);
         onInput(false);
         toast.current.show({
@@ -616,7 +618,7 @@ const DataCustomer = ({
           label="Batal"
           onClick={() => {
             setShowDelete(false);
-            setLoading(false);
+            setUpdate(false);
             onInput(false);
           }}
           className="p-button-text btn-primary"
@@ -667,9 +669,9 @@ const DataCustomer = ({
             setEdit(false);
             setLoading(false);
             setCurrentItem({
-              ...data,
+              ...def,
               customer: {
-                ...data.customer,
+                ...def.customer,
                 cus_gl: setup?.ar?.id,
                 cus_uang_muka: setup?.pur_advance?.id,
               },
@@ -756,27 +758,27 @@ const DataCustomer = ({
   const gl = (value) => {
     let gl = {};
     account.forEach((element) => {
-      if (value === element.id) {
+      if (value === element.account.id) {
         gl = element;
       }
     });
     return gl;
   };
 
-  const um = (value) => {
-    let um = {};
-    accU.forEach((element) => {
-      if (value === element.id) {
-        um = element;
-      }
-    });
-    return um;
-  };
+  // const um = (value) => {
+  //   let um = {};
+  //   accU?.forEach((element) => {
+  //     if (value === element.id) {
+  //       um = element;
+  //     }
+  //   });
+  //   return um;
+  // };
 
   const glTemplate = (option) => {
     return (
       <div>
-        {option !== null ? `${option.acc_name} - (${option.acc_code})` : ""}
+        {option !== null ? `${option.account.acc_name} - (${option.account.acc_code})` : ""}
       </div>
     );
   };
@@ -785,7 +787,7 @@ const DataCustomer = ({
     if (option) {
       return (
         <div>
-          {option !== null ? `${option.acc_name} - (${option.acc_code})` : ""}
+          {option !== null ? `${option.account.acc_name} - (${option.account.acc_code})` : ""}
         </div>
       );
     }
@@ -1242,7 +1244,7 @@ const DataCustomer = ({
                   <label className="text-label">Email</label>
                   <div className="p-inputgroup">
                     <InputText
-                      value={`${currentItem?.customer?.cus_email ?? null}`}
+                      value={currentItem !== null ? `${currentItem?.customer?.cus_email ?? ""}` : ""}
                       onChange={(e) =>
                         setCurrentItem({
                           ...currentItem,
@@ -1355,13 +1357,6 @@ const DataCustomer = ({
                       filterBy="name"
                       placeholder="Pilih Jenis Pajak"
                     />
-                    <PButton
-                      onClick={() => {
-                        setShowPajak(true);
-                      }}
-                    >
-                      <i class="bx bx-food-menu"></i>
-                    </PButton>
                   </div>
                 </div>
               </div>
@@ -1432,9 +1427,8 @@ const DataCustomer = ({
                   <div className="p-inputgroup">
                     <Dropdown
                       value={
-                        currentItem !== null &&
-                        currentItem.customer.cus_uang_muka !== null
-                          ? um(currentItem.customer.cus_uang_muka)
+                        currentItem !== null 
+                          ? gl(currentItem?.customer?.cus_uang_muka)
                           : null
                       }
                       options={accU}
@@ -1444,7 +1438,7 @@ const DataCustomer = ({
                           ...currentItem,
                           customer: {
                             ...currentItem.customer,
-                            cus_uang_muka: e.value?.id ?? null,
+                            cus_uang_muka: e.value.id,
                           },
                         });
                       }}

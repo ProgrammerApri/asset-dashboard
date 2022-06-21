@@ -99,7 +99,6 @@ const DataSupplier = ({
   const [rows2, setRows2] = useState(20);
   const [active, setActive] = useState(0);
 
-
   useEffect(() => {
     getJpem();
     getCurrency();
@@ -231,9 +230,10 @@ const DataSupplier = ({
         const { data } = response;
         let filt = [];
         data.forEach((elem) => {
-          if (elem.account.kat_code === 9) {
-            filt.push(elem.account);
-          }
+          // if (elem.account.kat_code === 9) {
+          //   filt.push(elem.account);
+          // }
+          filt.push(elem.account);
         });
         console.log(data);
         setAccHut(filt);
@@ -256,12 +256,12 @@ const DataSupplier = ({
         const { data } = response;
         let filt = [];
         data.forEach((elem) => {
-          if (elem.account.kat_code === 5) {
-            filt.push(elem.account);
-          }
+          // if (elem.account.kat_code === 5) {
+          //   filt.push(elem.account);
+          // }
         });
         console.log(data);
-        setAccUm(filt);
+        setAccUm(data);
       }
     } catch (error) {}
   };
@@ -643,9 +643,9 @@ const DataSupplier = ({
             setEdit(false);
             setLoading(false);
             setCurrentItem({
-              ...data,
+              ...def,
               supplier: {
-                ...data.supplier,
+                ...def.supplier,
                 sup_hutang: setup?.ap?.id,
                 sup_uang_muka: setup?.pur_advance?.id,
               },
@@ -730,22 +730,12 @@ const DataSupplier = ({
 
   const hut = (value) => {
     let hut = {};
-    accHut.forEach((element) => {
+    accHut?.forEach((element) => {
       if (value === element.id) {
         hut = element;
       }
     });
     return hut;
-  };
-
-  const um = (value) => {
-    let um = {};
-    accUm.forEach((element) => {
-      if (value === element.id) {
-        um = element;
-      }
-    });
-    return um;
   };
 
   const glTemplate = (option) => {
@@ -760,13 +750,33 @@ const DataSupplier = ({
     if (option) {
       return (
         <div>
-          {option !== null ? `${option.acc_name} - (${option.acc_code})` : ""}
+          {option !== null ? `${option?.acc_name} - (${option?.acc_code})` : ""}
         </div>
       );
     }
 
     return <span>{props.placeholder}</span>;
   };
+
+  // const glTemp = (option) => {
+  //   return (
+  //     <div>
+  //       {option !== null ? `${option.acc_name} - (${option.acc_code})` : ""}
+  //     </div>
+  //   );
+  // };
+
+  // const value = (option, props) => {
+  //   if (option) {
+  //     return (
+  //       <div>
+  //         {option !== null ? `${option?.acc_name} - (${option?.acc_code})` : ""}
+  //       </div>
+  //     );
+  //   }
+
+  //   return <span>{props.placeholder}</span>;
+  // };
 
   const renderTabHeader = (options) => {
     return (
@@ -880,7 +890,7 @@ const DataSupplier = ({
           onHide={() => {
             onHideInput();
             onInput(false);
-            setActive(0)
+            setActive(0);
           }}
         >
           <TabView activeIndex={active} onTabChange={(e) => setActive(e.index)}>
@@ -1211,7 +1221,7 @@ const DataSupplier = ({
                   <div className="p-inputgroup">
                     <Dropdown
                       value={
-                        currentItem !== null 
+                        currentItem !== null
                           ? ppn(currentItem?.supplier?.sup_ppn)
                           : null
                       }
@@ -1277,16 +1287,16 @@ const DataSupplier = ({
                           : null
                       }
                       options={accHut}
-                      // onChange={(e) => {
-                      //   console.log(e.value);
-                      //   setCurrentItem({
-                      //     ...currentItem,
-                      //     supplier: {
-                      //       ...currentItem.supplier,
-                      //       sup_hutang: e.value?.id ?? null,
-                      //     },
-                      //   });
-                      // }}
+                      onChange={(e) => {
+                        console.log(e.value);
+                        setCurrentItem({
+                          ...currentItem,
+                          supplier: {
+                            ...currentItem.supplier,
+                            sup_hutang: e.value?.id ?? null,
+                          },
+                        });
+                      }}
                       optionLabel="account.acc_name"
                       valueTemplate={clear}
                       itemTemplate={glTemplate}
@@ -1304,12 +1314,11 @@ const DataSupplier = ({
                   <div className="p-inputgroup">
                     <Dropdown
                       value={
-                        currentItem !== null &&
-                        currentItem.supplier.sup_uang_muka !== null
-                          ? um(currentItem.supplier.sup_uang_muka)
+                        currentItem !== null 
+                          ? hut(currentItem?.supplier?.sup_uang_muka)
                           : null
                       }
-                      options={accUm}
+                      options={accHut}
                       onChange={(e) => {
                         console.log(e.value);
                         setCurrentItem({
@@ -1325,8 +1334,9 @@ const DataSupplier = ({
                       itemTemplate={glTemplate}
                       filter
                       filterBy="account.acc_name"
-                      placeholder="Pilih Kode Distribusi Hutang"
+                      placeholder="Kode Distribusi Uang Muka"
                       showClear
+                      // disabled
                     />
                   </div>
                 </div>

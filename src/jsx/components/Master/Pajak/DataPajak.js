@@ -22,9 +22,9 @@ const def = {
   type: "T",
   name: null,
   nilai: null,
-  cutting: null,
-  acc_sls_fax: null,
-  acc_pur_fax: null,
+  cutting: false,
+  acc_sls_tax: null,
+  acc_pur_tax: null,
   combined: null,
 };
 
@@ -103,7 +103,7 @@ const DataPajak = ({
         const { data } = response;
         let filt = [];
         data.forEach((elem) => {
-          if (elem.account.kat_code === 5) {
+          if (elem.account.dou_type === "D") {
             filt.push(elem.account);
           }
         });
@@ -118,13 +118,13 @@ const DataPajak = ({
       ...endpoints.editPajak,
       endpoint: endpoints.editPajak.endpoint + currentItem.id,
       data: {
-        type: currentItem.type,
-        name: currentItem.name,
-        nilai: currentItem.nilai,
-        cutting: currentItem.cutting,
-        acc_sls_fax: currentItem.account.id,
-        acc_pur_fax: currentItem.account.id,
-        combined: currentItem.combined,
+        type: currentItem?.type,
+        name: currentItem?.name,
+        nilai: currentItem?.nilai,
+        cutting: currentItem?.cutting,
+        acc_sls_tax: currentItem?.account?.id ?? null,
+        acc_pur_tax: currentItem?.account?.id ?? null,
+        combined: currentItem?.combined,
       },
     };
     console.log(config.data);
@@ -162,15 +162,7 @@ const DataPajak = ({
   const addPajak = async () => {
     const config = {
       ...endpoints.addPajak,
-      data: {
-        type: currentItem.type,
-        name: currentItem.name,
-        nilai: currentItem.nilai,
-        cutting: currentItem.cutting,
-        acc_sls_fax: currentItem.id,
-        acc_pur_fax: currentItem.id,
-        combined: currentItem.combined,
-      },
+      data: currentItem,
     };
     console.log(config.data);
     let response = null;
@@ -206,6 +198,7 @@ const DataPajak = ({
   };
 
   const delPajak = async (id) => {
+    setLoading(true)
     const config = {
       ...endpoints.delPajak,
       endpoint: endpoints.delPajak.endpoint + currentItem.id,
@@ -237,7 +230,7 @@ const DataPajak = ({
         toast.current.show({
           severity: "error",
           summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Project`,
+          detail: `Tidak Dapat Menghapus Data`,
           life: 3000,
         });
       }, 500);
@@ -425,7 +418,7 @@ const DataPajak = ({
 
   const acc = (value) => {
     let acc = {};
-    account.forEach((element) => {
+    account?.forEach((element) => {
       if (value === element.id) {
         acc = element;
       }
@@ -654,8 +647,8 @@ const DataPajak = ({
                   <div className="p-inputgroup">
                     <Dropdown
                       value={
-                        currentItem !== null && currentItem.acc_sls_fax !== null
-                          ? acc(currentItem.acc_sls_fax)
+                        currentItem !== null && currentItem.acc_sls_tax !== null
+                          ? acc(currentItem.acc_sls_tax)
                           : null
                       }
                       options={account}
@@ -663,14 +656,14 @@ const DataPajak = ({
                         console.log(e.value);
                         setCurrentItem({
                           ...currentItem,
-                          acc_sls_fax: e.target?.value?.id ?? null,
+                          acc_sls_tax: e.value?.id,
                         });
                       }}
                       optionLabel="account.acc_name"
                       valueTemplate={clear}
                       itemTemplate={glTemplate}
                       filter
-                      filterBy="account.acc_name"
+                      filterBy="acc_name"
                       placeholder="Pilih Ppn Masukan"
                     />
                   </div>
@@ -681,8 +674,8 @@ const DataPajak = ({
                   <div className="p-inputgroup">
                     <Dropdown
                       value={
-                        currentItem !== null && currentItem.acc_pur_fax !== null
-                          ? acc(currentItem.acc_pur_fax)
+                        currentItem !== null && currentItem.acc_pur_tax !== null
+                          ? acc(currentItem.acc_pur_tax)
                           : null
                       }
                       options={account}
@@ -690,14 +683,14 @@ const DataPajak = ({
                         console.log(e.value);
                         setCurrentItem({
                           ...currentItem,
-                          acc_pur_fax: e.target?.value?.id ?? null,
+                          acc_pur_tax: e.value?.id,
                         });
                       }}
                       optionLabel="account.acc_name"
                       valueTemplate={clear}
                       itemTemplate={glTemplate}
                       filter
-                      filterBy="account.acc_name"
+                      filterBy="acc_name"
                       placeholder="Pilih Ppn Keluaran"
                     />
                   </div>

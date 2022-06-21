@@ -631,7 +631,7 @@ const PesananPO = ({ onAdd, onEdit }) => {
             </span>
           </div>
 
-          <Card style={{width: "39rem"}}>
+          <Card className="col-12">
             <div className="row col-12">
               <div className="col-8 fs-12 ml-0">
                 <label className="text-label">No. Pesanan</label>

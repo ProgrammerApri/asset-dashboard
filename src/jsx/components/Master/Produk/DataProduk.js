@@ -23,7 +23,7 @@ const def = {
   name: null,
   group: null,
   type: null,
-  codeb: null,
+  codeb: "",
   unit: null,
   suplier: null,
   b_price: null,

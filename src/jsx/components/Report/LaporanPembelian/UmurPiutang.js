@@ -21,7 +21,7 @@ const UmurPiutang = () => {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const printPage = useRef(null);
-  const [date, setDate] = useState(null);
+  const [date, setDate] = useState(new Date());
   const [customer, setCustomer] = useState(null);
   const [selectCus, setSelectCus] = useState(null);
   const [ar, setAr] = useState(null);
@@ -47,15 +47,15 @@ const UmurPiutang = () => {
         plg.forEach((element) => {
           element.ar = [];
           data.forEach((el) => {
-            if (el.trx_type === "LP" && el.pay_type === "P1") {
+            if (el.trx_type === "JL" && el.pay_type === "P1") {
               if (element.customer.id === el.cus_id.id) {
                 element.ar.push({ ...el, trx_amnh: 0, acq_amnh: 0 });
               }
             }
           });
-          element.ap.forEach((el) => {
+          element.ar.forEach((el) => {
             data.forEach((ek) => {
-              if (el.ord_id.id === ek.ord_id.id) {
+              if (el.id === ek.id) {
                 el.trx_amnh = ek?.trx_amnh ?? 0;
                 el.acq_amnh += ek?.acq_amnh ?? 0;
               }
@@ -105,10 +105,10 @@ const UmurPiutang = () => {
     return [day, month, year].join("-");
   };
 
-  const jsonForExcel = (ap) => {
+  const jsonForExcel = (ar) => {
     let data = [];
 
-    ap?.forEach((el) => {
+    ar?.forEach((el) => {
       let val = [
         {
           cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
@@ -129,39 +129,51 @@ const UmurPiutang = () => {
         },
       ];
       let amn = 0;
-      let acq = 0;
-      el.ap.forEach((ek) => {
+      let t_jt = 0;
+      let t_day1 = 0;
+      let t_day2 = 0;
+      let t_day3 = 0;
+      let t_day4 = 0;
+      let t_older = 0;
+      el.ar.forEach((ek) => {
+        let due = new Date(`${ek?.trx_due}Z`);
+        let diff = (date - due)/(1000 * 60 * 60 * 24);
         val.push({
           cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
           type: "item",
           value: {
-            ref: ek.ord_id.fk_code,
-            jt: `Rp. ${formatIdr(ek.ord_due < ek.ord_date)}`,
-            day1: `Rp. ${formatIdr(0)}`,
-            day2: `Rp. ${formatIdr(0)}`,
-            day3: `Rp. ${formatIdr(0)}`,
-            day4: `Rp. ${formatIdr(0)}`,
-            older: `Rp. ${formatIdr(0)}`,
+            ref: ek.trx_code,
+            jt: diff <= 0 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
+            day1: diff <= 7 && diff > 0 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
+            day2: diff <= 14 && diff > 7 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
+            day3: diff <= 30 && diff > 14 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
+            day4: diff <= 60 && diff > 30 ? `Rp. ${formatIdr(ek.trx_amnh) }` : "-",
+            older: diff > 60 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
             nota: `Rp. ${formatIdr(0)}`,
             rtr: `Rp. ${formatIdr(0)}`,
-            total: `Rp. ${formatIdr(0)}`,
+            total: `Rp. ${formatIdr(ek.trx_amnh)}`,
             giro: `Rp. ${formatIdr(0)}`,
           },
         });
         amn += ek.trx_amnh;
-        // acq += ek.acq_amnh;
+        t_jt += diff <= 0 ? ek.trx_amnh : 0;
+        t_day1 += diff <= 7 && diff > 0 ? ek.trx_amnh : 0;
+        t_day2 += diff <= 14 && diff > 7 ? ek.trx_amnh : 0;
+        t_day3 += diff <= 30 && diff > 14 ? ek.trx_amnh : 0;
+        t_day4 += diff <= 30 && diff > 14 ? ek.trx_amnh : 0;
+        t_older += diff > 60 ? ek.trx_amnh : 0;
       });
       val.push({
         cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
         type: "footer",
         value: {
           ref: "Total",
-          jt: "",
-          day1: "",
-          day2: "",
-          day3: "",
-          day4: "",
-          older: "",
+          jt: `Rp. ${formatIdr(t_jt)}`,
+          day1: `Rp. ${formatIdr(t_day1)}`,
+          day2: `Rp. ${formatIdr(t_day2)}`,
+          day3: `Rp. ${formatIdr(t_day3)}`,
+          day4: `Rp. ${formatIdr(t_day4)}`,
+          older: `Rp. ${formatIdr(t_older)}`,
           nota: "",
           rtr: "",
           total: `Rp. ${formatIdr(amn)}`,
@@ -280,7 +292,7 @@ const UmurPiutang = () => {
                               : ""
                           }
                         >
-                          {e.value.fk}
+                          {e.value.ref}
                         </div>
                       )}
                     />
@@ -482,8 +494,8 @@ const UmurPiutang = () => {
         <Card ref={printPage}>
           <Card.Body className="p-0">
             <CustomeWrapper
-              tittle={"Laporan Umur Hutang"}
-              subTittle={"Laporan Umur Hutang Periode dd/mm/yyyy - dd/mm/yyyy"}
+              tittle={"Laporan Umur Piutang"}
+              subTittle={"Laporan Umur Piutang Periode dd/mm/yyyy - dd/mm/yyyy"}
               body={
                 <>
                   {jsonForExcel(ar, false)?.map((v) => {

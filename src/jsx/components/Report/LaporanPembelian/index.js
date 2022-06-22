@@ -4,7 +4,9 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import ReportGRA from "./Gra";
 import ReportJurnal from "../Jurnal";
 import ReportHutang from "./Hutang";
-import AnalisaUmHutang from "./UmurHutang";
+import ReportPiutang from "./Piutang";
+import UmurPiutang from "./UmurPiutang";
+import UmurHutang from "./UmurHutang";
 
 const LaporanPembelian = () => {
   const [active, setActive] = useState(0);
@@ -14,20 +16,25 @@ const LaporanPembelian = () => {
       icon: "bx-receipt",
       component: <ReportGRA />,
     },
-    // {
-    //   tittle: "Jurnal",
-    //   icon: "bx-detail",
-    //   component: <ReportJurnal />,
-    // },
     {
-      tittle: "Hutang",
+      tittle: "Saldo Hutang",
       icon: "bx-money",
       component: <ReportHutang />,
     },
     {
       tittle: "Analisa Umur Hutang",
+      icon: "bx-calendar-x",
+      component: <UmurHutang />,
+    },
+    {
+      tittle: "Saldo Piutang",
       icon: "bx-money",
-      component: <AnalisaUmHutang />,
+      component: <ReportPiutang />,
+    },
+    {
+      tittle: "Analisa Umur Piutang",
+      icon: "bx-calendar-x",
+      component: <UmurPiutang />,
     },
   ]);
 

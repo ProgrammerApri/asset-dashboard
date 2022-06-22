@@ -21,7 +21,7 @@ const ReportPiutang = () => {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const printPage = useRef(null);
-  const [date, setDate] = useState(null);
+  const [filtDate, setFiltDate] = useState(new Date());
   const [customer, setCustomer] = useState(null);
   const [selectCus, setSelectCus] = useState(null);
   const [ar, setAr] = useState(null);
@@ -47,15 +47,15 @@ const ReportPiutang = () => {
         plg.forEach((element) => {
           element.ar = [];
           data.forEach((el) => {
-            if (el.trx_type === "LP" && el.pay_type === "P1") {
+            if (el.trx_type === "JL" && el.pay_type === "P1") {
               if (element.customer.id === el.cus_id.id) {
                 element.ar.push({ ...el, trx_amnh: 0, acq_amnh: 0 });
               }
             }
           });
-          element.ap.forEach((el) => {
+          element.ar.forEach((el) => {
             data.forEach((ek) => {
-              if (el.ord_id.id === ek.ord_id.id) {
+              if (el.id === ek.id) {
                 el.trx_amnh = ek?.trx_amnh ?? 0;
                 el.acq_amnh += ek?.acq_amnh ?? 0;
               }
@@ -109,51 +109,58 @@ const ReportPiutang = () => {
     let data = [];
 
     ar?.forEach((el) => {
-      let val = [
-        {
-          cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
-          type: "header",
-          value: {
-            ref: "Nomor Referensi",
-            date: "Tanggal",
-            jt: "J/T",
-            value: "Total Piutang",
-            lns: "Total dilunasi",
-            sisa: "Sisa Piutang",
-          },
-        },
-      ];
-      let amn = 0;
-      let acq = 0;
-      el.ar.forEach((ek) => {
-        val.push({
+      // let selC = `${el.customer.cus_name} (${el.customer.cus_code})`;
+      // if (selectCus === selC) {
+        let val = [
+          {
             cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
-          type: "item",
+            type: "header",
+            value: {
+              ref: "Nomor Referensi",
+              date: "Tanggal",
+              jt: "J/T",
+              value: "Total Piutang",
+              lns: "Total dilunasi",
+              sisa: "Sisa Piutang",
+            },
+          },
+        ];
+        let amn = 0;
+        let acq = 0;
+        el.ar.forEach((ek) => {
+          let filt = new Date(`${ek?.trx_date}Z`);
+          console.log(filt);
+          if (filt <= filtDate) {
+            val.push({
+              cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
+              type: "item",
+              value: {
+                ref: ek.trx_code,
+                date: formatDate(ek.trx_date),
+                jt: ek.trx_due ? formatDate(ek.trx_due) : "-",
+                value: `Rp. ${formatIdr(ek.trx_amnh)}`,
+                lns: `Rp. ${formatIdr(ek.acq_amnh)}`,
+                sisa: `Rp. ${formatIdr(ek.trx_amnh - ek.acq_amnh)}`,
+              },
+            });
+            amn += ek.trx_amnh;
+            acq += ek.acq_amnh;
+          }
+        });
+        val.push({
+          cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
+          type: "footer",
           value: {
-            ref: ek.ord_id.fk_code,
-            date: formatDate(ek.ord_date),
-            jt: ek.ord_due ? formatDate(ek.ord_due) : "-",
-            value: `Rp. ${formatIdr(ek.trx_amnh)}`,
-            lns: `Rp. ${formatIdr(ek.acq_amnh)}`,
-            sisa: `Rp. ${formatIdr(ek.trx_amnh - ek.acq_amnh)}`,
+            ref: "Total",
+            date: "",
+            jt: "",
+            value: `Rp. ${formatIdr(amn)}`,
+            lns: `Rp. ${formatIdr(acq)}`,
+            sisa: `Rp. ${formatIdr(amn - acq)}`,
           },
         });
-        amn += ek.trx_amnh;
-        acq += ek.acq_amnh;
-      });
-      val.push({
-        cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
-        type: "footer",
-        value: {
-          ref: "Total",
-          date: "",
-          jt: "",
-          value: `Rp. ${formatIdr(amn)}`,
-          lns: `Rp. ${formatIdr(acq)}`,
-          sisa: `Rp. ${formatIdr(amn - acq)}`,
-        },
-      });
-      data.push(val);
+        data.push(val);
+      // }
     });
 
     return data;
@@ -175,15 +182,16 @@ const ReportPiutang = () => {
                 <i className="pi pi-calendar" />
               </span>
               <Calendar
-                value={date}
+                value={filtDate}
                 id="range"
                 onChange={(e) => {
                   console.log(e.value);
-                  setDate(e.value);
+                  setFiltDate(e.value);
                 }}
-                selectionMode="range"
+                // selectionMode="range"
                 placeholder="Pilih Tanggal"
                 readOnlyInput
+                dateFormat="dd-mm-yy"
               />
             </div>
             <div className="col-4">
@@ -354,7 +362,9 @@ const ReportPiutang = () => {
                 );
               })}
               <Row className="m-0 mt-5">
-                <div className="font-weight-bold col-6">Total Piutang</div>
+                <div className="font-weight-bold col-6">
+                  Total Saldo Piutang
+                </div>
                 <div className="col-6 text-right font-weight-bold">
                   Rp. {formatIdr(total)}
                 </div>
@@ -369,7 +379,7 @@ const ReportPiutang = () => {
           <Card.Body className="p-0">
             <CustomeWrapper
               tittle={"Laporan Piutang"}
-              subTittle={"Laporan Piutang Periode dd/mm/yyyy - dd/mm/yyyy"}
+              subTittle={"Laporan Piutang Periode"}
               body={
                 <>
                   {jsonForExcel(ar, false)?.map((v) => {
@@ -391,7 +401,7 @@ const ReportPiutang = () => {
                           body={(e) => (
                             <div
                               className={
-                                e.type == "header" || e.type == "footer"
+                                e.type === "header" || e.type === "footer"
                                   ? "font-weight-bold"
                                   : ""
                               }
@@ -407,7 +417,7 @@ const ReportPiutang = () => {
                           body={(e) => (
                             <div
                               className={
-                                e.type == "header" && "font-weight-bold"
+                                e.type === "header" && "font-weight-bold"
                               }
                             >
                               {e.value.date}
@@ -421,7 +431,7 @@ const ReportPiutang = () => {
                           body={(e) => (
                             <div
                               className={
-                                e.type == "header" && "font-weight-bold"
+                                e.type === "header" && "font-weight-bold"
                               }
                             >
                               {e.value.jt}
@@ -435,9 +445,9 @@ const ReportPiutang = () => {
                           body={(e) => (
                             <div
                               className={
-                                e.type == "header"
+                                e.type === "header"
                                   ? "font-weight-bold text-right"
-                                  : e.type == "footer"
+                                  : e.type === "footer"
                                   ? "font-weight-bold text-right"
                                   : "text-right"
                               }
@@ -453,9 +463,9 @@ const ReportPiutang = () => {
                           body={(e) => (
                             <div
                               className={
-                                e.type == "header"
+                                e.type === "header"
                                   ? "font-weight-bold text-right"
-                                  : e.type == "footer"
+                                  : e.type === "footer"
                                   ? "font-weight-bold text-right"
                                   : "text-right"
                               }
@@ -471,9 +481,9 @@ const ReportPiutang = () => {
                           body={(e) => (
                             <div
                               className={
-                                e.type == "header"
+                                e.type === "header"
                                   ? "font-weight-bold text-right"
-                                  : e.type == "footer"
+                                  : e.type === "footer"
                                   ? "font-weight-bold text-right"
                                   : "text-right"
                               }
@@ -486,7 +496,9 @@ const ReportPiutang = () => {
                     );
                   })}
                   <Row className="m-0 mt-5">
-                    <div className="text-left font-weight-bold col-6">Total Hutang</div>
+                    <div className="text-left font-weight-bold col-6">
+                      Total Hutang
+                    </div>
                     <div className="col-6 text-right font-weight-bold">
                       Rp. {formatIdr(total)}
                     </div>

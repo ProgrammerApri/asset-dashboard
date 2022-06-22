@@ -21,7 +21,8 @@ const UmurHutang = () => {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const printPage = useRef(null);
-  const [date, setDate] = useState(null);
+  const [date, setDate] = useState(new Date());
+  const [rawAP, setRawAP] = useState(null);
   const [supplier, setSupplier] = useState(null);
   const [selectSup, setSelectSup] = useState(null);
   const [ap, setAp] = useState(null);
@@ -67,6 +68,7 @@ const UmurHutang = () => {
           }
         });
         setAp(sup);
+        setRawAP(data);
         setTotal(total);
       }
     } catch (error) {
@@ -129,39 +131,70 @@ const UmurHutang = () => {
         },
       ];
       let amn = 0;
-      let acq = 0;
+      let t_jt = 0;
+      let t_day1 = 0;
+      let t_day2 = 0;
+      let t_day3 = 0;
+      let t_day4 = 0;
+      let t_older = 0;
       el.ap.forEach((ek) => {
+        let due = new Date(`${ek?.ord_due}Z`);
+        let diff = (date - due)/(1000 * 60 * 60 * 24);
+        console.log(`${ek.ord_id.fk_code} ${diff} hari`);
+        // val.push({
+        //   sup: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
+        //   type: "item",
+        //   value: {
+        //     fk: ek.ord_id.fk_code,
+        //     jt: `Rp. ${formatIdr(diff <= 0 ? ek.trx_amnh : 0)}`,
+        //     day1: `Rp. ${formatIdr(diff <= 7 && diff > 0 ? ek.trx_amnh : 0)}`,
+        //     day2: `Rp. ${formatIdr(diff <= 14 && diff > 7 ? ek.trx_amnh : 0)}`,
+        //     day3: `Rp. ${formatIdr(diff <= 30 && diff > 14 ? ek.trx_amnh : 0)}`,
+        //     day4: `Rp. ${formatIdr(diff <= 60 && diff > 30 ? ek.trx_amnh : 0)}`,
+        //     older: `Rp. ${formatIdr(diff > 60 ? ek.trx_amnh : 0)}`,
+        //     nota: `Rp. ${formatIdr(0)}`,
+        //     rtr: `Rp. ${formatIdr(0)}`,
+        //     total: `Rp. ${formatIdr(ek.trx_amnh)}`,
+        //     giro: `Rp. ${formatIdr(0)}`,
+        //   },
+        // });
+
         val.push({
           sup: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
           type: "item",
           value: {
             fk: ek.ord_id.fk_code,
-            jt: `Rp. ${formatIdr(ek.ord_due < ek.ord_date  )}`,
-            day1: `Rp. ${formatIdr(0)}`,
-            day2: `Rp. ${formatIdr(0)}`,
-            day3: `Rp. ${formatIdr(0)}`,
-            day4: `Rp. ${formatIdr(0)}`,
-            older: `Rp. ${formatIdr(0)}`,
+            jt: diff <= 0 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
+            day1: diff <= 7 && diff > 0 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
+            day2: diff <= 14 && diff > 7 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
+            day3: diff <= 30 && diff > 14 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
+            day4: diff <= 60 && diff > 30 ? `Rp. ${formatIdr(ek.trx_amnh) }` : "-",
+            older: diff > 60 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
             nota: `Rp. ${formatIdr(0)}`,
             rtr: `Rp. ${formatIdr(0)}`,
-            total: `Rp. ${formatIdr(0)}`,
+            total: `Rp. ${formatIdr(ek.trx_amnh)}`,
             giro: `Rp. ${formatIdr(0)}`,
           },
         });
         amn += ek.trx_amnh;
-        // acq += ek.acq_amnh;
+        t_jt += diff <= 0 ? ek.trx_amnh : 0;
+        t_day1 += diff <= 7 && diff > 0 ? ek.trx_amnh : 0;
+        t_day2 += diff <= 14 && diff > 7 ? ek.trx_amnh : 0;
+        t_day3 += diff <= 30 && diff > 14 ? ek.trx_amnh : 0;
+        t_day4 += diff <= 30 && diff > 14 ? ek.trx_amnh : 0;
+        t_older += diff > 60 ? ek.trx_amnh : 0;
       });
       val.push({
         sup: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
         type: "footer",
         value: {
           fk: "Total",
-          jt: "",
-          day1: "",
-          day2: "",
-          day3: "",
-          day4: "",
-          older: "",
+          jt: `Rp. ${formatIdr(t_jt)}`,
+          day1: `Rp. ${formatIdr(t_day1)}`,
+          day2: `Rp. ${formatIdr(t_day2)}`,
+          day3: `Rp. ${formatIdr(t_day3)}`,
+          day4: `Rp. ${formatIdr(t_day4)}`,
+          older: `Rp. ${formatIdr(t_older)}`,
           nota: "",
           rtr: "",
           total: `Rp. ${formatIdr(amn)}`,
@@ -271,7 +304,7 @@ const UmurHutang = () => {
                       header={(e) =>
                         e.props.value ? e.props?.value[0]?.sup : null
                       }
-                      style={{ width: "15rem" }}
+                      style={{ width: "11rem" }}
                       body={(e) => (
                         <div
                           className={
@@ -287,7 +320,7 @@ const UmurHutang = () => {
                     <Column
                       className="header-center"
                       header=""
-                      style={{ minWidht: "10rem" }}
+                      style={{ minWidht: "13rem" }}
                       body={(e) => (
                         <div
                           className={
@@ -305,7 +338,7 @@ const UmurHutang = () => {
                     <Column
                       className="header-center"
                       header=""
-                      style={{ minWidht: "10rem" }}
+                      style={{ minWidht: "13rem" }}
                       body={(e) => (
                         <div
                           className={
@@ -323,7 +356,7 @@ const UmurHutang = () => {
                     <Column
                       className="header-center"
                       header=""
-                      style={{ minWidht: "10rem" }}
+                      style={{ minWidht: "11rem" }}
                       body={(e) => (
                         <div
                           className={
@@ -341,7 +374,7 @@ const UmurHutang = () => {
                     <Column
                       className="header-center"
                       header=""
-                      style={{ minWidht: "10rem" }}
+                      style={{ minWidht: "13rem" }}
                       body={(e) => (
                         <div
                           className={
@@ -359,7 +392,7 @@ const UmurHutang = () => {
                     <Column
                       className="header-center"
                       header=""
-                      style={{ minWidht: "10rem" }}
+                      style={{ minWidht: "13rem" }}
                       body={(e) => (
                         <div
                           className={
@@ -377,7 +410,7 @@ const UmurHutang = () => {
                     <Column
                       className="header-center"
                       header=""
-                      style={{ minWidht: "10rem" }}
+                      style={{ minWidht: "13rem" }}
                       body={(e) => (
                         <div
                           className={
@@ -395,7 +428,7 @@ const UmurHutang = () => {
                     <Column
                       className="header-center"
                       header=""
-                      style={{ minWidht: "10rem" }}
+                      style={{ minWidht: "13rem" }}
                       body={(e) => (
                         <div
                           className={
@@ -413,7 +446,7 @@ const UmurHutang = () => {
                     <Column
                       className="header-center"
                       header=""
-                      style={{ minWidht: "10rem" }}
+                      style={{ minWidht: "13rem" }}
                       body={(e) => (
                         <div
                           className={
@@ -431,7 +464,7 @@ const UmurHutang = () => {
                     <Column
                       className="header-center"
                       header=""
-                      style={{ minWidht: "10rem" }}
+                      style={{ minWidht: "13rem" }}
                       body={(e) => (
                         <div
                           className={
@@ -449,7 +482,7 @@ const UmurHutang = () => {
                     <Column
                       className="header-center"
                       header=""
-                      style={{ minWidht: "10rem" }}
+                      style={{ minWidht: "13rem" }}
                       body={(e) => (
                         <div
                           className={

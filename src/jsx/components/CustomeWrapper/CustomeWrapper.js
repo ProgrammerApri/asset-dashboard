@@ -26,10 +26,10 @@ const CustomeWrapper = ({ body, subTittle, tittle, page }) => {
           {/* <h5 className="mt-2">{subTittle}</h5> */}
           <div className="mt-5">{body}</div>
         </div>
-        <Divider className="mr-4"></Divider>
+        <Divider className="ml-3 mr-3"></Divider>
         <div className="row m-0">
-          <span className="fs-12 col-6 ml-2">Halaman : <b>1</b></span>
-          <span className="fs-12 col-5 text-right ml-5">
+          <span className="fs-12 col-6">Halaman : <b>{page ? page : 1}</b></span>
+          <span className="fs-12 col-6 text-right">
             <i>Tanggal Cetak: {formatDate("")}</i>
           </span>
         </div>

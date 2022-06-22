@@ -117,15 +117,8 @@ const DataPajak = ({
     const config = {
       ...endpoints.editPajak,
       endpoint: endpoints.editPajak.endpoint + currentItem.id,
-      data: {
-        type: currentItem?.type,
-        name: currentItem?.name,
-        nilai: currentItem?.nilai,
-        cutting: currentItem?.cutting,
-        acc_sls_tax: currentItem?.account?.id ?? null,
-        acc_pur_tax: currentItem?.account?.id ?? null,
-        combined: currentItem?.combined,
-      },
+      data: 
+        currentItem,
     };
     console.log(config.data);
     let response = null;

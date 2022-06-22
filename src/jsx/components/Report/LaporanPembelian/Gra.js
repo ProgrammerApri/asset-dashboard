@@ -41,10 +41,7 @@ const ReportGRA = () => {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const printPage = useRef(null);
-  const [filtersDate, setFiltersDate] = useState({
-    start_date: null,
-    end_date: null,
-  });
+  const [filtersDate, setFiltersDate] = useState([new Date(), new Date()]);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
 
   const dummy = Array.from({ length: 10 });
@@ -164,71 +161,59 @@ const ReportGRA = () => {
     let data = [];
 
     gra?.forEach((el) => {
-      let val = [
-        {
-          ref: el.kd_gra,
-          type: "header",
-          value: {
-            date: "Tanggal Pembelian",
-            po: "Nomor Pesanan",
-            sup: "Supplier",
-            prod: "Produk",
-            ord: "Jumlah",
-            unit: "Satuan",
-            prc: "Harga Satuan",
-            tot: "Total",
+      let dt = new Date(`${el?.tgl_gra}Z`);
+      if (dt >= filtersDate[0] && dt <= filtersDate[1]) {
+        let val = [
+          {
+            ref: el.kd_gra,
+            type: "header",
+            value: {
+              date: "Tanggal Pembelian",
+              po: "Nomor Pesanan",
+              sup: "Supplier",
+              prod: "Produk",
+              ord: "Jumlah",
+              unit: "Satuan",
+              prc: "Harga Satuan",
+              tot: "Total",
+            },
           },
-        },
-      ];
+        ];
+        val.push({
+          ref: el.kd_gra,
+          type: "item",
+          value: {
+            date: formatDate(el.tgl_gra),
+            po: el.no_po,
+            sup: `${el.nm_sup} (${el.kd_sup})`,
+            prod: `${el.prod_nm} (${el.prod_kd})`,
+            ord: el.ord,
+            unit: el.sat,
+            prc: `Rp. ${formatIdr(el.prc)}`,
+            tot: `Rp. ${formatIdr(el.total)}`,
+          },
+        });
+        val.push({
+          ref: el.kd_gra,
+          type: "footer",
+          value: {
+            date: "Total",
+            po: "",
+            sup: "",
+            prod: "",
+            ord: "",
+            unit: "",
+            prc: "",
+            tot: `Rp. ${formatIdr(el.total)}`,
+          },
+        });
+        data.push(val);
+      }
       // el.gra.forEach((element) => {
-      val.push({
-        ref: el.kd_gra,
-        type: "item",
-        value: {
-          date: formatDate(el.tgl_gra),
-          po: el.no_po,
-          sup: `${el.nm_sup} (${el.kd_sup})`,
-          prod: `${el.prod_nm} (${el.prod_kd})`,
-          ord: el.ord,
-          unit: el.sat,
-          prc: `Rp. ${formatIdr(el.prc)}`,
-          tot: `Rp. ${formatIdr(el.total)}`,
-        },
-      });
       // });
-      val.push({
-        ref: el.kd_gra,
-        type: "footer",
-        value: {
-          date: "Total",
-          po: "",
-          sup: "",
-          prod: "",
-          ord: "",
-          unit: "",
-          prc: "",
-          tot: `Rp. ${formatIdr(el.total)}`,
-        },
-      });
-      data.push(val);
     });
 
     return data;
-  };
-
-  const onGlobalFilterChange1 = (e) => {
-    const value = e.target.value;
-    let _filters1 = { ...filtersDate };
-    if (filtersDate.start_date) {
-      _filters1 = _filters1 && new Date(filtersDate.start_date);
-    }
-    if (filtersDate.end_date) {
-      _filters1 = _filters1 && new Date(filtersDate.end_date);
-    }
-    return _filters1;
-
-    setFiltersDate(_filters1);
-    setGlobalFilterValue1(value);
   };
 
   const initFilters1 = () => {
@@ -246,17 +231,14 @@ const ReportGRA = () => {
               <i className="pi pi-calendar" />
             </span>
             <Calendar
-              value={globalFilterValue1}
-              onChange={onGlobalFilterChange1}
+              value={filtersDate}
+              onChange={(e) => {
+                console.log(e.value);
+                setFiltersDate(e.value);
+              }}
               selectionMode="range"
               placeholder="Pilih Tanggal"
               dateFormat="dd-mm-yy"
-            />
-            <PButton
-              className="btn-primary"
-              label="Show"
-              icon="bx bx-show"
-              onClick={null}
             />
           </div>
         </div>

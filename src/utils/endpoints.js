@@ -878,6 +878,12 @@ const endpoints = {
     method: "POST",
     data: {},
   },
+
+  trans: {
+    endpoint: "/v1/api/trans",
+    method: "GET",
+    data: {},
+  },
 };
 
 export default endpoints;

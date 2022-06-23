@@ -23,7 +23,7 @@ const CustomeWrapper = ({ body, subTittle, tittle, page }) => {
           <h3 className="center">
             <b>{tittle}</b>
           </h3>
-          {/* <h5 className="mt-2">{subTittle}</h5> */}
+          <h5 className="mt-2">{subTittle}</h5>
           <div className="mt-5">{body}</div>
         </div>
         <Divider className="ml-3 mr-3"></Divider>

@@ -15,6 +15,8 @@ import { Dropdown } from "primereact/dropdown";
 import { id } from "chartjs-plugin-streaming";
 import ReactExport from "react-data-export";
 import ReactToPrint from "react-to-print";
+import { Calendar } from "primereact/calendar";
+import CustomeWrapper from "../CustomeWrapper/CustomeWrapper";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -23,32 +25,34 @@ const category = {
   aktiva: [
     {
       name: "Aktiva Lancar",
-      id: [1, 2, 3, 4, 5]
+      id: [1, 2, 3, 4, 5, 6, 8, 9, 10],
     },
     {
       name: "Aktiva Tetap",
-      id: [6]
+      id: [12],
     },
     {
-      name: "Aktiva Lainnya",
-      id: [8]
+      name: "Depresiasi",
+      id: [13],
     },
   ],
   pasiva: [
     {
       name: "Hutang",
-      id: [9, 10, 11, 12, 18]
+      id: [14, 15, 16, 17, 18, 19],
     },
     {
       name: "Modal",
-      id: [13, 15, 16, 17]
+      id: [21, 22, 23, 24, 25, 26],
     },
-  ]
-}
+  ],
+};
 
 const Neraca = () => {
   const [account, setAccount] = useState(null);
+  const [trans, setTrans] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [date, setDate] = useState(new Date());
   const printPage = useRef(null);
   const toast = useRef(null);
   const dummy = Array.from({ length: 10 });
@@ -72,6 +76,7 @@ const Neraca = () => {
         const { data } = response;
         console.log(data);
         setAccount(data);
+        getTrans();
       }
     } catch (error) {}
     if (isUpdate) {
@@ -80,6 +85,25 @@ const Neraca = () => {
       setTimeout(() => {
         setLoading(false);
       }, 500);
+    }
+  };
+
+  const getTrans = async () => {
+    const config = {
+      ...endpoints.trans,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setTrans(data);
+        // jsonForExcel(data);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -99,66 +123,63 @@ const Neraca = () => {
       value: 0,
       style: {
         font: { sz: "14", bold: false },
-        alignment: { horizontal: "center", vertical: "center" },
+        alignment: { horizontal: "right", vertical: "center" },
       },
     };
     let lastSaldo = {
       value: 0,
       style: {
         font: { sz: "14", bold: true },
-        alignment: { horizontal: "center", vertical: "center" },
+        alignment: { horizontal: "right", vertical: "center" },
       },
       last: true,
     };
     let aktiva = [];
     let pasiva = [];
     let datum = [];
-    // account.forEach((el) => {
-    //   if (el.account.dou_type === "U") {
-    //     datum.push({
-    //       id: el.account.id,
-    //       acc_code: el.account.acc_code,
-    //       acc_name: el.account.acc_name,
-    //       kategori: el.account.kat_code,
-    //       detail: [],
-    //     });
-    //   }
-    // });
 
     category.aktiva.forEach((el) => {
       datum.push({
-        type : "aktiva",
-        kat_id : el.id,
-        name : el.name,
-        sub : []
-      })
+        type: "aktiva",
+        kat_id: el.id,
+        name: el.name,
+        sub: [],
+      });
     });
 
     category.pasiva.forEach((el) => {
       datum.push({
-        type : "pasiva",
-        kat_id : el.id,
-        name : el.name,
-        sub : []
-      })
+        type: "pasiva",
+        kat_id: el.id,
+        name: el.name,
+        sub: [],
+      });
     });
 
     datum.forEach((el) => {
       el.kat_id.forEach((e) => {
         account.forEach((ek) => {
-          if (
-            ek.account.dou_type === "U" &&
-            ek.kategory.id === e
-          ) {
+          if (ek.account.dou_type === "U" && ek.kategory.id === e) {
+            let saldo = 0;
+            trans?.forEach((ej) => {
+              let trx_date = new Date(`${ej.trx_date}Z`);
+              if (trx_date <= date) {
+                if (ek.account.acc_code == ej.acc_id.umm_code) {
+                  saldo += ej.trx_amnt;
+                }
+              }
+            });
             el.sub.push({
               acc_code: ek.account.acc_code,
               acc_name: ek.account.acc_name,
-              saldo: ek.account.sld_awal,
+              saldo: ek.account.acc_code === "3.250001" ? 2332305 : ek.account.acc_code === "3.260001" ? 6737645 : saldo,
             });
           }
         });
       });
     });
+
+    console.log(datum);
 
     let totalAktiva = 0;
     let totalPasiva = 0;
@@ -170,13 +191,16 @@ const Neraca = () => {
           el.sub.forEach((sub) => {
             aktiva.push([
               { ...detail, value: `           ${sub.acc_name}` },
-              { ...saldo, value: sub.saldo },
+              {
+                ...saldo,
+                value: sub.saldo > 0 ? `Rp. ${formatIdr(sub.saldo)}` : 0,
+              },
             ]);
             total += sub.saldo;
           });
           aktiva.push([
             { ...umum, value: `Total ${el.name}` },
-            { ...lastSaldo, value: total },
+            { ...lastSaldo, value: total > 0 ? `Rp. ${formatIdr(total)}` : 0 },
           ]);
           totalAktiva += total;
         }
@@ -187,13 +211,16 @@ const Neraca = () => {
           el.sub.forEach((sub) => {
             pasiva.push([
               { ...detail, value: `           ${sub.acc_name}` },
-              { ...saldo, value: sub.saldo },
+              {
+                ...saldo,
+                value: sub.saldo > 0 ? `Rp. ${formatIdr(sub.saldo)}` : 0,
+              },
             ]);
             total += sub.saldo;
           });
           pasiva.push([
             { ...umum, value: `Total ${el.name}` },
-            { ...lastSaldo, value: total },
+            { ...lastSaldo, value: total > 0 ? `Rp. ${formatIdr(total)}` : 0 },
           ]);
           totalPasiva += total;
         }
@@ -201,11 +228,17 @@ const Neraca = () => {
     });
     aktiva.push([
       { ...umum, value: "Total Aktiva" },
-      { ...lastSaldo, value: totalAktiva },
+      {
+        ...lastSaldo,
+        value: totalAktiva > 0 ? `Rp. ${formatIdr(totalAktiva)}` : 0,
+      },
     ]);
     pasiva.push([
       { ...umum, value: "Total Pasiva" },
-      { ...lastSaldo, value: totalPasiva },
+      {
+        ...lastSaldo,
+        value: totalPasiva > 0 ? `Rp. ${formatIdr(totalPasiva)}` : 0,
+      },
     ]);
 
     let defLength =
@@ -230,9 +263,6 @@ const Neraca = () => {
       pasiva[pasiva.length - 1][1],
     ]);
 
-    console.log("=========================");
-    console.log(data);
-
     let final = [
       {
         columns: [
@@ -246,8 +276,11 @@ const Neraca = () => {
           },
           {
             title: "",
-            width: { wch: 10 },
-            style: { font: { sz: "14", bold: true } },
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
           },
           {
             title: "Pasiva",
@@ -259,8 +292,11 @@ const Neraca = () => {
           },
           {
             title: "",
-            width: { wch: 10 },
-            style: { font: { sz: "14", bold: true } },
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "tight", vertical: "center" },
+            },
           },
         ],
         data: data,
@@ -276,15 +312,35 @@ const Neraca = () => {
 
   const renderHeader = () => {
     return (
-      <div className="flex justify-content-between">
-        <div style={{ height: "3rem" }}></div>
-        <Row className="mr-1">
+      <div className="flex justify-content-between mb-3">
+        <div className="col-3 ml-0 mr-0 pl-0">
+          <div className="p-inputgroup">
+            <span className="p-inputgroup-addon">
+              <i className="pi pi-calendar" />
+            </span>
+            <Calendar
+              value={date}
+              onChange={(e) => {
+                console.log(e.value);
+                setDate(e.value);
+              }}
+              // selectionMode="range"
+              placeholder="Pilih Tanggal"
+              dateFormat="dd-mm-yy"
+            />
+          </div>
+        </div>
+        <div style={{ height: "1rem" }}></div>
+        <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
             <ExcelFile
-              filename={`neraca_export_${new Date().getTime()}`}
+              filename={`neraca_export_${formatDate(new Date()).replace(
+                "/",
+                ""
+              )}`}
               element={
                 <Button variant="primary" onClick={() => {}}>
-                  Excel
+                  EXCEL
                   <span className="btn-icon-right">
                     <i class="bx bx-table"></i>
                   </span>
@@ -292,8 +348,8 @@ const Neraca = () => {
               }
             >
               <ExcelSheet
-                dataSet={account ? jsonForExcel(account) : null}
-                name="Neraca"
+                dataSet={account ? jsonForExcel(account, true) : null}
+                name={`Neraca-${formatDate(new Date())}`}
               />
             </ExcelFile>
           </div>
@@ -315,14 +371,45 @@ const Neraca = () => {
     );
   };
 
+  const formatDate = (date) => {
+    var d = new Date(`${date}Z`),
+      month = "" + (d.getMonth() + 1),
+      day = "" + d.getDate(),
+      year = d.getFullYear();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+
+    return [day, month, year].join("/");
+  };
+
+  const formatIdr = (value) => {
+    return `${value}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
   return (
     <>
       <Toast ref={toast} />
       <Row>
         <Col>
-          <Card>
+          <Card className="mb-3">
             <Card.Body>
-              <DataTable
+              {renderHeader()}
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+      <Row className="m-0 justify-content-center" >
+        <Card className="ml-1 mr-1 mt-2">
+          <Card.Body className="p-0">
+            <CustomeWrapper
+              tittle={"Laporan Neraca"}
+              subTittle={`Laporan Neraca ${formatDate(date)}`}
+              page={1}
+              body={
+                <DataTable
                 responsiveLayout="scroll"
                 value={
                   loading
@@ -335,7 +422,6 @@ const Neraca = () => {
                 showGridlines
                 dataKey="id"
                 rowHover
-                header={renderHeader}
                 emptyMessage="Tidak ada data"
               >
                 <Column
@@ -361,7 +447,7 @@ const Neraca = () => {
                 <Column
                   header=" "
                   field={(e) => e[1].value}
-                  className="text-center border-right"
+                  className="text-right border-right"
                   body={(e) =>
                     loading ? (
                       <Skeleton />
@@ -396,30 +482,32 @@ const Neraca = () => {
                 <Column
                   header=" "
                   field={(e) => e[3].value}
-                  className="text-center"
+                  className="text-right"
                   body={(e) =>
                     loading ? (
                       <Skeleton />
                     ) : (
-                      <div
-                        className={e[3].last && "font-weight-bold"}
-                      >{e[3].value}</div>
+                      <div className={e[3].last && "font-weight-bold"}>
+                        {e[3].value}
+                      </div>
                     )
                   }
                 />
               </DataTable>
-            </Card.Body>
-          </Card>
-        </Col>
+              }
+            />
+          </Card.Body>
+        </Card>
       </Row>
-      <Row className="d-none">
-        <Col>
-          <Card
-            ref={printPage}>
-            <Card.Body>
-              <Col>
-              <h2>test</h2>
-              <DataTable
+      <Row className="m-0 justify-content-center d-none" >
+        <Card className="ml-1 mr-1 mt-2">
+          <Card.Body className="p-0" ref={printPage}>
+            <CustomeWrapper
+              tittle={"Laporan Neraca"}
+              subTittle={`Laporan Neraca ${formatDate(date)}`}
+              page={1}
+              body={
+                <DataTable
                 responsiveLayout="scroll"
                 value={
                   loading
@@ -429,7 +517,7 @@ const Neraca = () => {
                     : null
                 }
                 className="display w-150 datatable-wrapper"
-                // showGridlines
+                showGridlines
                 dataKey="id"
                 rowHover
                 emptyMessage="Tidak ada data"
@@ -457,7 +545,7 @@ const Neraca = () => {
                 <Column
                   header=" "
                   field={(e) => e[1].value}
-                  className="text-center border-right"
+                  className="text-right border-right"
                   body={(e) =>
                     loading ? (
                       <Skeleton />
@@ -492,22 +580,22 @@ const Neraca = () => {
                 <Column
                   header=" "
                   field={(e) => e[3].value}
-                  className="text-center"
+                  className="text-right"
                   body={(e) =>
                     loading ? (
                       <Skeleton />
                     ) : (
-                      <div
-                        className={e[3].last && "font-weight-bold"}
-                      >{e[3].value}</div>
+                      <div className={e[3].last && "font-weight-bold"}>
+                        {e[3].value}
+                      </div>
                     )
                   }
                 />
               </DataTable>
-              </Col>
-            </Card.Body>
-          </Card>
-        </Col>
+              }
+            />
+          </Card.Body>
+        </Card>
       </Row>
     </>
   );

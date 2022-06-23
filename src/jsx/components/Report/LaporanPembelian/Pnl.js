@@ -10,24 +10,26 @@ import { Skeleton } from "primereact/skeleton";
 
 import ReactExport from "react-data-export";
 import ReactToPrint from "react-to-print";
-import CustomeWrapper from "../CustomeWrapper/CustomeWrapper";
+import CustomeWrapper from "../../CustomeWrapper/CustomeWrapper";
+import { sub } from "date-fns";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
-const ReportJurnal = () => {
+const Pnl = () => {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const printPage = useRef(null);
   const [date, setDate] = useState([new Date(), new Date()]);
   const [trans, setTrans] = useState(null);
+  const [account, setAccount] = useState(null);
   const chunkSize = 4;
 
   useEffect(() => {
     var d = new Date();
     d.setDate(d.getDate() - 7);
-    setDate([d, new Date()])
-    getTrans();
+    setDate([d, new Date()]);
+    getAccount();
   }, []);
 
   const getTrans = async () => {
@@ -49,6 +51,34 @@ const ReportJurnal = () => {
     }
   };
 
+  const getAccount = async (isUpdate = false) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.account,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setAccount(data);
+        getTrans();
+        // jsonForExcel(data);
+      }
+    } catch (error) {}
+    if (isUpdate) {
+      setLoading(false);
+    } else {
+      setTimeout(() => {
+        setLoading(false);
+      }, 500);
+    }
+  };
+
   const formatDate = (date) => {
     var d = new Date(`${date}Z`),
       month = "" + (d.getMonth() + 1),
@@ -61,71 +91,49 @@ const ReportJurnal = () => {
     return [day, month, year].join("/");
   };
 
-  const jsonForExcel = (trans) => {
+  const jsonForExcel = (acc) => {
     let data = [];
-    let grouped = trans?.filter(
-      (el, i) => i === trans.findIndex((ek) => el?.trx_code === ek?.trx_code)
+    let new_acc = [];
+    let grouped = acc?.filter(
+      (el, i) =>
+        i ===
+        acc.findIndex(
+          (ek) =>
+            el.klasifikasi.id >= 4 &&
+            el.klasifikasi.id <= 9 &&
+            el?.klasifikasi.id === ek?.klasifikasi.id
+        )
     );
-    let new_trans = [];
     grouped?.forEach((el) => {
-      let trx_date = new Date(`${el?.trx_date}Z`)
-      if (trx_date >= date[0] && trx_date <= date[1]) {
-        let trx = [];
-        trans?.forEach((ek) => {
-          if (el.trx_code === ek.trx_code) {
-            trx.push(ek);
+      let total = 0;
+      let sub = []
+      acc.forEach((ek) => {
+        if (ek.account.dou_type === "U") {
+          if (el.klasifikasi.id === ek.klasifikasi.id) {
+            let saldo = 0
+            trans?.forEach((ej) => {
+                if (ej.acc_id.acc_code === ek.account.acc_code){
+                    saldo += ej.trx_amnt
+                }
+            })
+            sub.push({
+              acc_name: `${ek.account.acc_code}-${ek.account.acc_name}`,
+              type: "item",
+              saldo: `Rp. ${formatIdr(saldo)}`,
+            });
+            total += saldo
           }
-        });
-        new_trans.push({
-          trx_code: el.trx_code,
-          trx_date: formatDate(el.trx_date),
-          trx: trx,
-        });
-      }
-    });
-
-    console.log(new_trans);
-
-    new_trans.forEach((el) => {
-      let val = [
-        {
-          trx_code: `(${el.trx_code})  ${el.trx_date}`,
-          type: "header",
-          value: {
-            acc: "Account",
-            debit: "Mutasi Debit",
-            kredit: "Mutasi Kredit",
-            desc: "Deskripsi",
-          },
-        },
-      ];
-      let k = 0;
-      let d = 0;
-      el.trx.forEach((ek) => {
-        val.push({
-          trx_code: `(${el.trx_code}) ${el.trx_date}`,
-          type: "item",
-          value: {
-            acc: `(${ek?.acc_id?.acc_code}) ${ek?.acc_id?.acc_name}`,
-            debit: ek.trx_dbcr === "D" ? `Rp. ${formatIdr(ek.trx_amnt)}` : 0,
-            kredit: ek.trx_dbcr === "K" ? `Rp. ${formatIdr(ek.trx_amnt)}` : 0,
-            desc: ek.trx_desc,
-          },
-        });
-        k += ek.trx_dbcr === "K" ? ek.trx_amnt : 0;
-        d += ek.trx_dbcr === "D" ? ek.trx_amnt : 0;
+        }
       });
-      val.push({
-        trx_code: `(${el.trx_code}) ${el.trx_date}`,
+      sub.push({
+        acc_name: `Sub Total ${el.klasifikasi.klasiname}`,
         type: "footer",
-        value: {
-          acc: "Total",
-          debit: `Rp. ${formatIdr(d)}`,
-          kredit: `Rp. ${formatIdr(k)}`,
-          desc: "",
-        },
+        saldo: `Rp. ${formatIdr(total)}`,
       });
-      data.push(val);
+      data.push({
+        klasifikasi: `${el.klasifikasi.id}-${el.klasifikasi.klasiname}`,
+        sub: sub,
+      });
     });
 
     return data;
@@ -214,13 +222,13 @@ const ReportJurnal = () => {
 
       <>
         <Row className="m-0 justify-content-center" ref={printPage}>
-          {chunk(jsonForExcel(trans) ?? [], chunkSize)?.map((val, idx) => {
+          {chunk(jsonForExcel(account) ?? [], chunkSize)?.map((val, idx) => {
             return (
               <Card className="ml-1 mr-1 mt-2">
                 <Card.Body className="p-0">
                   <CustomeWrapper
-                    tittle={"Jurnal Transaksi"}
-                    subTittle={`Jurnal Transaksi Periode ${formatDate(date[0])} - ${formatDate(date[1])}`}
+                    tittle={"Laporan Laba/Rugi"}
+                    // subTittle={`Laporan Laba/Rugi Periode ${0}`}
                     page={idx + 1}
                     body={
                       <>
@@ -228,7 +236,7 @@ const ReportJurnal = () => {
                           return (
                             <DataTable
                               responsiveLayout="scroll"
-                              value={v}
+                              value={v.sub}
                               showGridlines
                               dataKey="id"
                               rowHover
@@ -236,21 +244,17 @@ const ReportJurnal = () => {
                             >
                               <Column
                                 className="header-center"
-                                header={(e) =>
-                                  e.props.value
-                                    ? e.props?.value[0]?.trx_code
-                                    : null
-                                }
+                                header={v.klasifikasi}
                                 style={{ width: "20rem" }}
                                 body={(e) => (
                                   <div
                                     className={
-                                      e.type == "header" || e.type == "footer"
+                                        e.type == "footer"
                                         ? "font-weight-bold"
-                                        : ""
+                                        : "ml-4"
                                     }
                                   >
-                                    {e.value.acc}
+                                    {e.acc_name}
                                   </div>
                                 )}
                               />
@@ -268,41 +272,7 @@ const ReportJurnal = () => {
                                         : "text-right"
                                     }
                                   >
-                                    {e.value.debit}
-                                  </div>
-                                )}
-                              />
-                              <Column
-                                className="header-center"
-                                header=""
-                                style={{ minWidht: "10rem" }}
-                                body={(e) => (
-                                  <div
-                                    className={
-                                      e.type == "header"
-                                        ? "font-weight-bold text-right"
-                                        : e.type == "footer"
-                                        ? "font-weight-bold text-right"
-                                        : "text-right"
-                                    }
-                                  >
-                                    {e.value.kredit}
-                                  </div>
-                                )}
-                              />
-                              <Column
-                                className="header-center"
-                                header=""
-                                style={{ width: "20rem" }}
-                                body={(e) => (
-                                  <div
-                                    className={
-                                      e.type === "header" || e.type === "footer"
-                                        ? "font-weight-bold"
-                                        : ""
-                                    }
-                                  >
-                                    {e.value.desc}
+                                    {e.saldo}
                                   </div>
                                 )}
                               />
@@ -322,4 +292,4 @@ const ReportJurnal = () => {
   );
 };
 
-export default ReportJurnal;
+export default Pnl;

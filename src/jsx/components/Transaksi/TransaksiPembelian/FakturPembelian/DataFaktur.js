@@ -117,7 +117,7 @@ const DataFaktur = ({ onAdd, onDetail }) => {
   const delFK = async (id) => {
     const config = {
       ...endpoints.delFK,
-      endpoint: endpoints.delDO.endpoint + currentItem.id,
+      endpoint: endpoints.delFK.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;

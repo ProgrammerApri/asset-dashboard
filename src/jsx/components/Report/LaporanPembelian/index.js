@@ -7,6 +7,8 @@ import ReportHutang from "./Hutang";
 import ReportPiutang from "./Piutang";
 import UmurPiutang from "./UmurPiutang";
 import UmurHutang from "./UmurHutang";
+import Neraca from "../Neraca";
+import Pnl from "./Pnl";
 
 const LaporanPembelian = () => {
   const [active, setActive] = useState(0);
@@ -35,6 +37,21 @@ const LaporanPembelian = () => {
       tittle: "Analisa Umur Piutang",
       icon: "bx-calendar-x",
       component: <UmurPiutang />,
+    },
+    {
+      tittle: "Jurnal",
+      icon: "bx-calendar-x",
+      component: <ReportJurnal />,
+    },
+    {
+      tittle: "Neraca",
+      icon: "bx-calendar-x",
+      component: <Neraca />,
+    },
+    {
+      tittle: "Laba Rugi",
+      icon: "bx-calendar-x",
+      component: <Pnl />,
     },
   ]);
 

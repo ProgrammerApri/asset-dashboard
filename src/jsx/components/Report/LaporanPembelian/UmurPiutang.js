@@ -208,6 +208,7 @@ const UmurPiutang = () => {
                 }}
                 placeholder="Pilih Tanggal"
                 readOnlyInput
+                dateFormat="dd-mm-yy"
               />
             </div>
             <div className="col-4">
@@ -228,7 +229,7 @@ const UmurPiutang = () => {
             <ExcelFile
               filename={`report_export_${new Date().getTime()}`}
               element={
-                <Button variant="primary" onClick={() => {}}>
+                <Button variant="primary" onClick={() => {jsonForExcel()}}>
                   EXCEL
                   <span className="btn-icon-right">
                     <i class="bx bx-table"></i>
@@ -283,7 +284,7 @@ const UmurPiutang = () => {
                       header={(e) =>
                         e.props.value ? e.props?.value[0]?.cus : null
                       }
-                      style={{ width: "15rem" }}
+                      style={{ width: "12rem" }}
                       body={(e) => (
                         <div
                           className={
@@ -299,7 +300,7 @@ const UmurPiutang = () => {
                     <Column
                       className="header-center"
                       header=""
-                      style={{ minWidht: "10rem" }}
+                      style={{ widht: "10rem" }}
                       body={(e) => (
                         <div
                           className={
@@ -317,7 +318,7 @@ const UmurPiutang = () => {
                     <Column
                       className="header-center"
                       header=""
-                      style={{ minWidht: "10rem" }}
+                      style={{ widht: "10rem" }}
                       body={(e) => (
                         <div
                           className={
@@ -335,7 +336,7 @@ const UmurPiutang = () => {
                     <Column
                       className="header-center"
                       header=""
-                      style={{ minWidht: "10rem" }}
+                      style={{ widht: "10rem" }}
                       body={(e) => (
                         <div
                           className={
@@ -353,7 +354,7 @@ const UmurPiutang = () => {
                     <Column
                       className="header-center"
                       header=""
-                      style={{ minWidht: "10rem" }}
+                      style={{ widht: "10rem" }}
                       body={(e) => (
                         <div
                           className={
@@ -371,7 +372,7 @@ const UmurPiutang = () => {
                     <Column
                       className="header-center"
                       header=""
-                      style={{ minWidht: "10rem" }}
+                      style={{ widht: "10rem" }}
                       body={(e) => (
                         <div
                           className={
@@ -389,7 +390,7 @@ const UmurPiutang = () => {
                     <Column
                       className="header-center"
                       header=""
-                      style={{ minWidht: "10rem" }}
+                      style={{ widht: "10rem" }}
                       body={(e) => (
                         <div
                           className={
@@ -407,7 +408,7 @@ const UmurPiutang = () => {
                     <Column
                       className="header-center"
                       header=""
-                      style={{ minWidht: "10rem" }}
+                      style={{ widht: "10rem" }}
                       body={(e) => (
                         <div
                           className={
@@ -425,7 +426,7 @@ const UmurPiutang = () => {
                     <Column
                       className="header-center"
                       header=""
-                      style={{ minWidht: "10rem" }}
+                      style={{ widht: "10rem" }}
                       body={(e) => (
                         <div
                           className={
@@ -443,7 +444,7 @@ const UmurPiutang = () => {
                     <Column
                       className="header-center"
                       header=""
-                      style={{ minWidht: "10rem" }}
+                      style={{ widht: "10rem" }}
                       body={(e) => (
                         <div
                           className={
@@ -461,7 +462,7 @@ const UmurPiutang = () => {
                     <Column
                       className="header-center"
                       header=""
-                      style={{ minWidht: "10rem" }}
+                      style={{ widht: "10rem" }}
                       body={(e) => (
                         <div
                           className={

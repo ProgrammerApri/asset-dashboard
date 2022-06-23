@@ -57,10 +57,10 @@ import PusatBiaya from "./components/MasterLainnya/PusatBiaya/DataPusatBiaya";
 import Transaksi from "./components/Transaksi";
 import BankKas from "./components/BankKas";
 import TransaksiPersediaan from "./components/TransaksiPersediaan";
-import Report from "./components/Report/LaporanPembelian/Gra";
 import LaporanPembelian from "./components/Report/LaporanPembelian";
 import ReportGRA from "./components/Report/LaporanPembelian/Gra";
 import ReportJurnal from "./components/Report/Jurnal";
+import ReportKBB from "./components/Report/KartuBB";
 
 const Markup = ({ width }) => {
   const routes = [
@@ -77,6 +77,7 @@ const Markup = ({ width }) => {
     { url: "transaksi-persediaan", component: TransaksiPersediaan },
     { url: "laporan", component: LaporanPembelian },
     { url: "jurnal", component: ReportJurnal },
+    { url: "kartu-buku-besar", component: ReportKBB },
 
     /// Klasifikasi
     { url: "klasifikasi", component: KlasifikasiAkun },

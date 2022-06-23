@@ -248,7 +248,12 @@ const ReportGRA = () => {
             <ExcelFile
               filename={`report_export_${new Date().getTime()}`}
               element={
-                <Button variant="primary" onClick={() => {}}>
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    jsonForExcel();
+                  }}
+                >
                   EXCEL
                   <span className="btn-icon-right">
                     <i class="bx bx-table"></i>
@@ -256,10 +261,10 @@ const ReportGRA = () => {
                 </Button>
               }
             >
-              <ExcelSheet
+              {/* <ExcelSheet
                 dataSet={gra ? jsonForExcel(gra) : null}
                 name="Report"
-              />
+              /> */}
             </ExcelFile>
           </div>
           <ReactToPrint

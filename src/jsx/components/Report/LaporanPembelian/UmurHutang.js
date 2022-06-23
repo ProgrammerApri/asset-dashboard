@@ -229,6 +229,7 @@ const UmurHutang = () => {
                 }}
                 placeholder="Pilih Tanggal"
                 readOnlyInput
+                dateFormat="dd-mm-yy"
               />
             </div>
             <div className="col-4">
@@ -249,7 +250,7 @@ const UmurHutang = () => {
             <ExcelFile
               filename={`report_export_${new Date().getTime()}`}
               element={
-                <Button variant="primary" onClick={() => {}}>
+                <Button variant="primary" onClick={() => {jsonForExcel()}}>
                   EXCEL
                   <span className="btn-icon-right">
                     <i class="bx bx-table"></i>

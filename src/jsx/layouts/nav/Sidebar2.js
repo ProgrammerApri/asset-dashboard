@@ -62,6 +62,11 @@ const SideMenu = () => {
         to: "neraca",
         icon: "bx-abacus",
       },
+      {
+        tittle: "Kartu Buku Besar",
+        to: "kartu-buku-besar",
+        icon: "bx-abacus",
+      },
     ],
     lainnya: [
       {

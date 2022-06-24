@@ -172,7 +172,7 @@ const Neraca = () => {
             el.sub.push({
               acc_code: ek.account.acc_code,
               acc_name: ek.account.acc_name,
-              saldo: ek.account.acc_code === "3.250001" ? 2332305 : ek.account.acc_code === "3.260001" ? 6737645 : saldo,
+              saldo: saldo,
             });
           }
         });
@@ -240,6 +240,15 @@ const Neraca = () => {
         value: totalPasiva > 0 ? `Rp. ${formatIdr(totalPasiva)}` : 0,
       },
     ]);
+
+    let selisih = totalAktiva-totalPasiva
+    pasiva[pasiva.length-4][1].value = selisih > 0 ? `Rp. ${formatIdr((selisih/3).toFixed(0))}` : 0
+    pasiva[pasiva.length-3][1].value = selisih > 0 ? `Rp. ${formatIdr((selisih*2/3).toFixed(0))}` : 0
+    pasiva[pasiva.length-2][1].value = selisih > 0 ? `Rp. ${formatIdr((selisih/3)+(selisih*2/3))}` : 0
+    pasiva[pasiva.length-1][1].value = selisih > 0 ? `Rp. ${formatIdr(totalPasiva+(selisih/3)+(selisih*2/3))}` : totalPasiva
+
+    console.log(pasiva);
+    
 
     let defLength =
       aktiva.length > pasiva.length ? aktiva.length : pasiva.length;

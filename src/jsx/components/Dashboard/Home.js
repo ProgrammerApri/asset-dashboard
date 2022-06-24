@@ -230,35 +230,35 @@ const Home = () => {
             <div className="card-body">
               <div className="media align-items-center border border-warning rounded p-3 mb-md-4 mb-3">
                 <CircleProgressWhite
-                  percent={30}
+                  percent={dash?.assets/dash?.modal*100}
                   colors={"#F2D182"}
                   icon={<i class="bx bxs-factory"></i>}
                 />
                 <div>
                   <h4 className="fs-18 text-black mb-0">Assets</h4>
-                  <span className="fs-14 text-warning">Rp. 350.000.000</span>
+                  <span className="fs-14 text-warning">{`Rp. ${dash?.assets}`}</span>
                 </div>
               </div>
               <div className="media align-items-center border border-info rounded p-3 mb-md-4 mb-3">
                 <CircleProgressWhite
-                  percent={30}
+                  percent={dash?.kewajiban/dash?.modal*100}
                   colors={"#1EA7C5"}
                   icon={<i class="bx bxs-error"></i>}
                 />
                 <div>
                   <h4 className="fs-18 text-black mb-0">Kewajiban</h4>
-                  <span className="fs-14 text-info">Rp. 3.000.000</span>
+                  <span className="fs-14 text-info">{`Rp. ${dash?.kewajiban}`}</span>
                 </div>
               </div>
               <div className="media align-items-center border border-danger rounded p-3 mb-md-4 mb-3">
                 <CircleProgressWhite
-                  percent={30}
+                  percent={100}
                   colors={"#ff285c"}
                   icon={<i class="bx bxs-zap"></i>}
                 />
                 <div>
-                  <h4 className="fs-18 text-black mb-0">Modal</h4>
-                  <span className="fs-14 text-danger">Rp. 3.000.000</span>
+                  <h4 className="fs-18 text-black mb-0">P/L Month</h4>
+                  <span className="fs-14 text-danger">{`Rp. ${dash?.modal}`}</span>
                 </div>
               </div>
             </div>

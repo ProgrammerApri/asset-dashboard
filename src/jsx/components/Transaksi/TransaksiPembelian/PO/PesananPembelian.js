@@ -15,6 +15,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_PO, SET_EDIT_PO } from "src/redux/actions";
 import { Divider } from "@material-ui/core";
 import ReactToPrint from "react-to-print";
+import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
+import Wrapper from "src/jsx/components/CustomeWrapper/Wrapper";
 
 const data = {
   id: null,
@@ -33,8 +35,9 @@ const data = {
   rjasa: [],
 };
 
-const PesananPO = ({ onAdd, onEdit }) => {
+const PesananPO = ({ onAdd, onEdit, onDetail }) => {
   const [po, setPO] = useState(null);
+  const [comp, setComp] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
@@ -56,6 +59,7 @@ const PesananPO = ({ onAdd, onEdit }) => {
 
   useEffect(() => {
     getPO();
+    getComp();
     initFilters1();
   }, []);
 
@@ -83,6 +87,25 @@ const PesananPO = ({ onAdd, onEdit }) => {
         setLoading(false);
       }, 500);
     }
+  };
+
+  const getComp = async (isUpdate = false) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.getCompany,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setComp(data);
+      }
+    } catch (error) {}
   };
 
   const editPO = async () => {
@@ -219,9 +242,10 @@ const PesananPO = ({ onAdd, onEdit }) => {
       <div className="d-flex">
         <Link
           onClick={() => {
-            onClick("displayData", data);
+            onDetail();
             let pprod = data.pprod;
             let pjasa = data.pjasa;
+
             dispatch({
               type: SET_CURRENT_PO,
               payload: {
@@ -556,320 +580,404 @@ const PesananPO = ({ onAdd, onEdit }) => {
   return (
     <>
       <Toast ref={toast} />
-      <DataTable
-        responsiveLayout="scroll"
-        value={loading ? dummy : po}
-        className="display w-150 datatable-wrapper"
-        showGridlines
-        dataKey="id"
-        rowHover
-        header={renderHeader}
-        filters={filters1}
-        globalFilterFields={[
-          "po_code",
-          "preq_id?.req_code",
-          "formatDate(po_date)",
-        ]}
-        emptyMessage="Tidak ada data"
-        paginator
-        paginatorTemplate={template2}
-        first={first2}
-        rows={rows2}
-        onPage={onCustomPage2}
-        paginatorClassName="justify-content-end mt-3"
-      >
-        <Column
-          header="Tanggal"
-          style={{
-            minWidth: "10rem",
-          }}
-          field={(e) => formatDate(e.po_date)}
-          body={loading && <Skeleton />}
-        />
-        <Column
-          header="Nomor PO"
-          field={(e) => e.po_code}
-          style={{ minWidth: "10rem" }}
-          body={loading && <Skeleton />}
-        />
-        <Column
-          header="Nomor Permintaan"
-          field={(e) => e.preq_id?.req_code}
-          style={{ minWidth: "10rem" }}
-          body={loading && <Skeleton />}
-        />
-        <Column
-          header="Action"
-          dataType="boolean"
-          bodyClassName="text-center"
-          style={{ minWidth: "2rem" }}
-          body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
-        />
-      </DataTable>
+      <Row>
+        <Col className="pt-0">
+          <Card>
+            <Card.Body>
+              <DataTable
+                responsiveLayout="scroll"
+                value={loading ? dummy : po}
+                className="display w-150 datatable-wrapper"
+                showGridlines
+                dataKey="id"
+                rowHover
+                header={renderHeader}
+                filters={filters1}
+                globalFilterFields={[
+                  "po_code",
+                  "preq_id?.req_code",
+                  "formatDate(po_date)",
+                ]}
+                emptyMessage="Tidak ada data"
+                paginator
+                paginatorTemplate={template2}
+                first={first2}
+                rows={rows2}
+                onPage={onCustomPage2}
+                paginatorClassName="justify-content-end mt-3"
+              >
+                <Column
+                  header="Tanggal"
+                  style={{
+                    minWidth: "10rem",
+                  }}
+                  field={(e) => formatDate(e.po_date)}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Nomor PO"
+                  field={(e) => e.po_code}
+                  style={{ minWidth: "10rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Nomor Permintaan"
+                  field={(e) => e.preq_id?.req_code}
+                  style={{ minWidth: "10rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Action"
+                  dataType="boolean"
+                  bodyClassName="text-center"
+                  style={{ minWidth: "2rem" }}
+                  body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
+                />
+              </DataTable>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
 
-      <Dialog
-        header={"Detail Pesanan"}
+      {/* <Dialog
+        header={""}
         visible={displayData}
-        style={{ width: "41vw" }}
+        style={{ width: "66vw" }}
         footer={renderFooter("displayData")}
         onHide={() => {
           setDisplayData(false);
         }}
       >
-        <Row className="ml-0 pt-0">
-          <div className="col-8 fs-12">
-            <label className="text-label">Tanggal Pesanan : </label>
-            <span className="ml-1">
-              <b>{formatDate(show.po_date)}</b>
-            </span>
-          </div>
+        <Row className="ml-0 pt-0" ref={printPage}>
+          <Card>
+            <Card.Body>
+              <Wrapper
+                // tittle={"Informasi PO"}
+                body={
+                  <>
+                    <Row className="ml-0 mr-0 mb-0 mt-0 justify-content-between fs-12">
+                      <div></div>
+                      <div className="row justify-content-left col-6 ml-0">
+                        <div className="col-6 fs-16 ml-0 text-left">
+                          <img
+                            style={{
+                              height: "130px",
+                              width: "130px",
+                            }}
+                            src={comp?.cp_logo}
+                            alt=""
+                          />
+                          <br></br>
+                          <label className="text-label ml-4">
+                            <b>{comp?.cp_name}</b>
+                          </label>
+                        </div>
+                      </div>
 
-          <div className="col-4 fs-12">
-            <label className="text-label">Jatuh Tempo :</label>
-            <span className="ml-1">
-              <b>{formatDate(show.due_date)}</b>
-            </span>
-          </div>
+                      <div className="row justify-content-right col-6 ml-0">
+                        <div className="col-6 fs-12 ml-0 text-right"></div>
 
-          <Card className="col-12">
-            <div className="row col-12">
-              <div className="col-8 fs-12 ml-0">
-                <label className="text-label">No. Pesanan</label>
-                <div className="p-inputgroup"></div>
-                <span className="ml-0">
-                  <b>{show.preq_id?.req_code}</b>
-                </span>
-              </div>
+                        <div className="col-6 fs-12 ml-0 mt-3 text-right">
+                          <label className="text-label mb-2">
+                            <b>Informasi Pengirim</b>
+                          </label>
+                          <br></br>
+                          <span className="ml-0">{comp?.cp_addr}</span>
+                          <br></br>
+                          <span className="ml-0">{comp?.cp_email}</span>
+                          <br></br>
+                          <span className="ml-0">{comp?.cp_telp}</span>
+                        </div>
+                      </div>
+                    </Row>
 
-              <div className="col-4 fs-12 ml-0">
-                <label className="text-label">Supplier</label>
-                <div className="">
-                  <span className="ml-0">
-                    <b>{show.sup_id?.sup_name}</b>
-                  </span>
-                  <br />
-                  <span>{show.sup_id?.sup_address}</span>
-                  <br />
-                  <span>{show.sup_id?.sup_telp1}</span>
-                </div>
-              </div>
-            </div>
+                    <Divider></Divider>
+
+                    <Row className="ml-0 mr-0 mb-0 mt-1 justify-content-between fs-12">
+                      <div></div>
+                      <div className="row justify-content-right col-12">
+                        <div className="col-12 mt-0 fs-12 text-right">
+                          <label className="text-label">
+                            Tanggal Pesanan :{" "}
+                          </label>
+                          <span className="ml-1">
+                            <b>{formatDate(show.po_date)}</b>
+                          </span>
+                        </div>
+                      </div>
+                    </Row>
+
+                    <Card className="col-12 mt-0">
+                      <div className="row col-12">
+                        <div className="col-9 fs-12 ml-0">
+                          <label className="text-label">
+                            <b>Informasi Pengirim</b>
+                          </label>
+                        </div>
+
+                        <div className="col-3 fs-12 ml-0">
+                          <label className="text-label">
+                            <b>Informasi Penerima</b>
+                          </label>
+                        </div>
+
+                        <div className="col-9 fs-12 ml-0">
+                          <span className="ml-0">{comp?.cp_addr}</span>
+                          <br></br>
+                          <span className="ml-0">{comp?.cp_email}</span>
+                          <br></br>
+                          <span className="ml-0">{comp?.cp_telp}</span>
+                        </div>
+
+                        <div className="col-3 fs-12 ml-0">
+                          <span className="ml-0">
+                            {show?.sup_id.sup_address}
+                          </span>
+                          <br></br>
+                          <span className="ml-0">{show?.sup_id?.sup_cp}</span>
+                          <br></br>
+                          <span className="ml-0">
+                            {show?.sup_id?.sup_telp1}
+                          </span>
+                        </div>
+                      </div>
+                    </Card>
+
+                    <Row className="ml-1 mt-0">
+                      <DataTable
+                        value={show.pprod?.map((v, i) => {
+                          return {
+                            ...v,
+                            index: i,
+                            price: v?.price ?? 0,
+                            total: v?.total ?? 0,
+                          };
+                        })}
+                        responsiveLayout="scroll"
+                        className="display w-150 datatable-wrapper fs-12"
+                        showGridlines
+                        dataKey="id"
+                        rowHover
+                      >
+                        <Column
+                          header="Produk"
+                          field={(e) =>
+                            `${e.prod_id?.name} (${e.prod_id?.code})`
+                          }
+                          style={{ minWidth: "19rem" }}
+                          // body={loading && <Skeleton />}
+                        />
+                        <Column
+                          header="Jumlah"
+                          field={(e) => e.order}
+                          style={{ minWidth: "9rem" }}
+                          // body={loading && <Skeleton />}
+                        />
+                        <Column
+                          header="Satuan"
+                          field={(e) => e.unit_id?.name}
+                          style={{ minWidth: "9rem" }}
+                          // body={loading && <Skeleton />}
+                        />
+                        <Column
+                          header="Harga Satuan"
+                          field={(e) => `Rp. ${formatIdr(e.price)}`}
+                          style={{ minWidth: "13rem" }}
+                          // body={loading && <Skeleton />}
+                        />
+                        <Column
+                          header="Total"
+                          field={(e) => `Rp. ${formatIdr(e.total)}`}
+                          style={{ minWidth: "13rem" }}
+                          // body={loading && <Skeleton />}
+                        />
+                      </DataTable>
+                    </Row>
+
+                    {PO.pjasa?.length ? (
+                      <Row className="ml-1 mt-4">
+                        <>
+                          <DataTable
+                            value={show.pjasa?.map((v, i) => {
+                              return {
+                                ...v,
+                                index: i,
+                                total: v?.total ?? 0,
+                              };
+                            })}
+                            responsiveLayout="scroll"
+                            className="display w-150 datatable-wrapper fs-12"
+                            showGridlines
+                            dataKey="id"
+                            rowHover
+                          >
+                            <Column
+                              header="Supplier"
+                              field={(e) => e.sup_id?.sup_name}
+                              style={{ minWidth: "14rem" }}
+                              // body={loading && <Skeleton />}
+                            />
+                            <Column
+                              header="Jasa"
+                              field={(e) => e.jasa_id?.name}
+                              style={{ minWidth: "14rem" }}
+                              // body={loading && <Skeleton />}
+                            />
+                            <Column
+                              header="Total"
+                              field={(e) => e.total}
+                              style={{ minWidth: "13rem" }}
+                              // body={loading && <Skeleton />}
+                            />
+                          </DataTable>
+                        </>
+                      </Row>
+                    ) : (
+                      <></>
+                    )}
+
+                    <Row className="ml-0 mr-0 mb-0 mt-4 justify-content-between fs-12">
+                      <div></div>
+                      <div className="row justify-content-right col-6 mr-4">
+                        <div className="col-12 mb-0">
+                          <label className="text-label">
+                            <b>Detail Pembayaran</b>
+                          </label>
+                          <Divider className="ml-12"></Divider>
+                        </div>
+
+                        <div className="col-5 mt-2 ">
+                          <label className="text-label">
+                            {show.split_inv ? "Sub Total Barang" : "Subtotal"}
+                          </label>
+                        </div>
+
+                        <div className="col-7 mt-2  text-right">
+                          <label className="text-label">
+                            {show.split_inv ? (
+                              <b>
+                                Rp.
+                                {formatIdr(getSubTotalBarang())}
+                              </b>
+                            ) : (
+                              <b>
+                                Rp.
+                                {formatIdr(
+                                  getSubTotalBarang() + getSubTotalJasa()
+                                )}
+                              </b>
+                            )}
+                          </label>
+                        </div>
+
+                        <div className="col-5">
+                          <label className="text-label">
+                            {show.split_inv ? "DPP Barang" : "DPP"}
+                          </label>
+                        </div>
+
+                        <div className="col-7 text-right">
+                          <label className="text-label">
+                            {show.split_inv ? (
+                              <b>
+                                Rp.
+                                {formatIdr(getSubTotalBarang())}
+                              </b>
+                            ) : (
+                              <b>
+                                Rp.
+                                {formatIdr(
+                                  getSubTotalBarang() + getSubTotalJasa()
+                                )}
+                              </b>
+                            )}
+                          </label>
+                        </div>
+
+                        <div className="col-5">
+                          <label className="text-label">
+                            {show.split_inv
+                              ? "Pajak Atas Barang (11%)"
+                              : "Pajak (11%)"}
+                          </label>
+                        </div>
+
+                        <div className="col-7 text-right">
+                          <label className="text-label">
+                            {show.split_inv ? (
+                              <b>
+                                Rp.
+                                {formatIdr((getSubTotalBarang() * 11) / 100)}
+                              </b>
+                            ) : (
+                              <b>
+                                Rp.{" "}
+                                {formatIdr(
+                                  ((getSubTotalBarang() + getSubTotalJasa()) *
+                                    11) /
+                                    100
+                                )}
+                              </b>
+                            )}
+                          </label>
+                        </div>
+
+                        <div className="col-5 mt-0">
+                          <label className="text-label">Diskon(%)</label>
+                        </div>
+
+                        <div className="col-7 text-right">
+                          <label className="text-label">
+                            <b>
+                              Rp.{" "}
+                              {show.total_disc !== null ? show.total_disc : 0}
+                            </b>
+                          </label>
+                        </div>
+
+                        <div className="col-12">
+                          <Divider className="ml-12"></Divider>
+                        </div>
+
+                        <div className="col-5">
+                          <label className="text-label">
+                            <b>Total</b>
+                          </label>
+                        </div>
+
+                        <div className="col-7 text-right">
+                          <label className="text-label fs-13">
+                            {show.split_inv ? (
+                              <b>
+                                Rp.{" "}
+                                {formatIdr(
+                                  getSubTotalBarang() +
+                                    (getSubTotalBarang() * 11) / 100
+                                )}
+                              </b>
+                            ) : (
+                              <b>
+                                Rp.{" "}
+                                {formatIdr(
+                                  getSubTotalBarang() +
+                                    getSubTotalJasa() +
+                                    ((getSubTotalBarang() + getSubTotalJasa()) *
+                                      11) /
+                                      100
+                                )}
+                              </b>
+                            )}
+                          </label>
+                        </div>
+                      </div>
+                    </Row>
+                  </>
+                }
+              />
+            </Card.Body>
           </Card>
-
-          <Row className="ml-1 mt-0">
-            <DataTable
-              value={show.pprod?.map((v, i) => {
-                return {
-                  ...v,
-                  index: i,
-                  price: v?.price ?? 0,
-                  total: v?.total ?? 0,
-                };
-              })}
-              responsiveLayout="scroll"
-              className="display w-150 datatable-wrapper fs-12"
-              showGridlines
-              dataKey="id"
-              rowHover
-            >
-              <Column
-                header="Produk"
-                field={(e) => `${e.prod_id?.name} (${e.prod_id?.code})`}
-                style={{ minWidth: "10rem" }}
-                // body={loading && <Skeleton />}
-              />
-              <Column
-                header="Jumlah"
-                field={(e) => e.order}
-                style={{ minWidth: "6rem" }}
-                // body={loading && <Skeleton />}
-              />
-              <Column
-                header="Satuan"
-                field={(e) => e.unit_id?.name}
-                style={{ minWidth: "6rem" }}
-                // body={loading && <Skeleton />}
-              />
-              <Column
-                header="Harga Satuan"
-                field={(e) => formatIdr(e.price)}
-                style={{ minWidth: "10rem" }}
-                // body={loading && <Skeleton />}
-              />
-              <Column
-                header="Total"
-                field={(e) => formatIdr(e.total)}
-                style={{ minWidth: "7rem" }}
-                // body={loading && <Skeleton />}
-              />
-            </DataTable>
-          </Row>
-
-          {PO.pjasa?.length ? (
-            <Row className="ml-1 mt-4">
-              <>
-                <DataTable
-                  value={show.pjasa?.map((v, i) => {
-                    return {
-                      ...v,
-                      index: i,
-                      total: v?.total ?? 0,
-                    };
-                  })}
-                  responsiveLayout="scroll"
-                  className="display w-150 datatable-wrapper fs-12"
-                  showGridlines
-                  dataKey="id"
-                  rowHover
-                >
-                  <Column
-                    header="Supplier"
-                    field={(e) => e.sup_id?.sup_name}
-                    style={{ minWidth: "14rem" }}
-                    // body={loading && <Skeleton />}
-                  />
-                  <Column
-                    header="Jasa"
-                    field={(e) => e.jasa_id?.name}
-                    style={{ minWidth: "14rem" }}
-                    // body={loading && <Skeleton />}
-                  />
-                  <Column
-                    header="Total"
-                    field={(e) => e.total}
-                    style={{ minWidth: "13rem" }}
-                    // body={loading && <Skeleton />}
-                  />
-                </DataTable>
-              </>
-            </Row>
-          ) : (
-            <></>
-          )}
-
-          <Row className="ml-0 mr-0 mb-0 mt-4 justify-content-between fs-12">
-            <div></div>
-            <div className="row justify-content-right col-6 mr-4">
-              <div className="col-12 mb-0">
-                <label className="text-label">
-                  <b>Detail Pembayaran</b>
-                </label>
-                <Divider className="ml-12"></Divider>
-              </div>
-
-              <div className="col-5 mt-2 ">
-                <label className="text-label">
-                  {show.split_inv ? "Sub Total Barang" : "Subtotal"}
-                </label>
-              </div>
-
-              <div className="col-7 mt-2  text-right">
-                <label className="text-label">
-                  {show.split_inv ? (
-                    <b>
-                      Rp.
-                      {formatIdr(getSubTotalBarang())}
-                    </b>
-                  ) : (
-                    <b>
-                      Rp.
-                      {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
-                    </b>
-                  )}
-                </label>
-              </div>
-
-              <div className="col-5">
-                <label className="text-label">
-                  {show.split_inv ? "DPP Barang" : "DPP"}
-                </label>
-              </div>
-
-              <div className="col-7 text-right">
-                <label className="text-label">
-                  {show.split_inv ? (
-                    <b>
-                      Rp.
-                      {formatIdr(getSubTotalBarang())}
-                    </b>
-                  ) : (
-                    <b>
-                      Rp.
-                      {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
-                    </b>
-                  )}
-                </label>
-              </div>
-
-              <div className="col-5">
-                <label className="text-label">
-                  {show.split_inv ? "Pajak Atas Barang (11%)" : "Pajak (11%)"}
-                </label>
-              </div>
-
-              <div className="col-7 text-right">
-                <label className="text-label">
-                  {show.split_inv ? (
-                    <b>
-                      Rp.
-                      {formatIdr((getSubTotalBarang() * 11) / 100)}
-                    </b>
-                  ) : (
-                    <b>
-                      Rp.{" "}
-                      {formatIdr(
-                        ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
-                      )}
-                    </b>
-                  )}
-                </label>
-              </div>
-
-              <div className="col-5 mt-0">
-                <label className="text-label">Diskon(%)</label>
-              </div>
-
-              <div className="col-7 text-right">
-                <label className="text-label">
-                  <b>Rp. {show.total_disc !== null ? show.total_disc : 0}</b>
-                </label>
-              </div>
-
-              <div className="col-12">
-                <Divider className="ml-12"></Divider>
-              </div>
-
-              <div className="col-5">
-                <label className="text-label">
-                  <b>Total</b>
-                </label>
-              </div>
-
-              <div className="col-7 text-right">
-                <label className="text-label fs-13">
-                  {show.split_inv ? (
-                    <b>
-                      Rp.{" "}
-                      {formatIdr(
-                        getSubTotalBarang() + (getSubTotalBarang() * 11) / 100
-                      )}
-                    </b>
-                  ) : (
-                    <b>
-                      Rp.{" "}
-                      {formatIdr(
-                        getSubTotalBarang() +
-                          getSubTotalJasa() +
-                          ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
-                      )}
-                    </b>
-                  )}
-                </label>
-              </div>
-            </div>
-          </Row>
         </Row>
-      </Dialog>
+      </Dialog> */}
 
       <Dialog
         header={"Hapus Data"}

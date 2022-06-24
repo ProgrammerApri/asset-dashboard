@@ -1029,9 +1029,8 @@ const DataSupplier = ({
                   <div className="p-inputgroup">
                     <Dropdown
                       value={
-                        currentItem !== null &&
-                        currentItem.supplier.sup_kota !== null
-                          ? kota(currentItem.supplier.sup_kota)
+                        currentItem !== null
+                          ? kota(currentItem?.supplier?.sup_kota)
                           : null
                       }
                       options={city}

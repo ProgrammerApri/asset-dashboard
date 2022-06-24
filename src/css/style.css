@@ -47751,3 +47751,21 @@ a .sidebar-logo .logo{
   height: 40cm;
   text-align: center;
 }
+
+* {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+}
+.pages {
+  width: 29cm;
+  min-height: 40cm;
+  /* padding: 5mm; */
+  margin: auto;
+  background: white;
+}
+.subpages {
+  padding: 1cm;
+  height: 40cm;
+  /* text-align: left; */
+  font-size: 12px;
+}

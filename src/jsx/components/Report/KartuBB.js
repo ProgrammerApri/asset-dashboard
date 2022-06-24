@@ -241,25 +241,25 @@ const ReportKBB = () => {
                   field={(e) => e?.acco}
                 />
                 <Column
-                  className="header-center"
+                  className="header-center text-right"
                   header="Saldo Awal"
                   style={{ minWidht: "8rem" }}
                   field={(e) => e?.slda}
                 />
                 <Column
-                  className="header-center"
+                  className="header-center text-right"
                   header="Mutasi Debit"
                   style={{ minWidht: "8rem" }}
                   field={(e) => e?.debe}
                 />
                 <Column
-                  className="header-center"
+                  className="header-center text-right"
                   header="Mutasi Kredit"
                   style={{ minWidht: "10rem" }}
                   field={(e) => e?.kred}
                 />
                 <Column
-                  className="header-center"
+                  className="header-center text-right"
                   header="Balance"
                   style={{ minWidht: "10rem" }}
                   field={(e) => e?.blce}
@@ -277,7 +277,7 @@ const ReportKBB = () => {
           <Card.Body className="p-0">
             <CustomeWrapper
               tittle={"Laporan Kartu Buku Besar"}
-              subTittle={""}
+              subTittle={`Laporan Kartu Buku Besar Per ${formatDate(filtDate)}`}
               body={
                 <>
                   <DataTable
@@ -295,25 +295,25 @@ const ReportKBB = () => {
                       field={(e) => e?.acco}
                     />
                     <Column
-                      className="header-center"
+                      className="header-center text-right"
                       header="Saldo Awal"
                       style={{ minWidht: "8rem" }}
                       field={(e) => e?.slda}
                     />
                     <Column
-                      className="header-center"
+                      className="header-center text-right"
                       header="Mutasi Debit"
                       style={{ minWidht: "8rem" }}
                       field={(e) => e?.debe}
                     />
                     <Column
-                      className="header-center"
+                      className="header-center text-right"
                       header="Mutasi Kredit"
                       style={{ minWidht: "10rem" }}
                       field={(e) => e?.kred}
                     />
                     <Column
-                      className="header-center"
+                      className="header-center text-right"
                       header="Balance"
                       style={{ minWidht: "10rem" }}
                       field={(e) => e?.blce}

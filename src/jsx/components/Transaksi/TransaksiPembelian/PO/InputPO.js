@@ -1188,7 +1188,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                         placeholder="Pilih Supplier"
                         detail
                         onDetail={() => {
-                          setCurrentIndex(e.index)
+                          setCurrentIndex(e.index);
                           setShowSupplier(true);
                         }}
                       />
@@ -1743,9 +1743,17 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
   return (
     <>
-      {header()}
-      {body()}
-      {footer()}
+      <Row>
+        <Col className="pt-0">
+          <Card>
+            <Card.Body>
+              {header()}
+              {body()}
+              {footer()}
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
 
       {/* <DataPusatBiaya
         data={pusatBiaya}

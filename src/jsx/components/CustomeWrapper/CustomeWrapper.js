@@ -1,8 +1,34 @@
 import { Divider } from "@material-ui/core";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
+import { useEffect, useState } from "react";
+import { endpoints, request } from "src/utils";
 
 const CustomeWrapper = ({ body, subTittle, tittle, page }) => {
+  const [comp, setComp] = useState(null);
+
+  useEffect(() => {
+    getComp();
+  }, []);
+
+  const getComp = async () => {
+    const config = {
+      ...endpoints.getCompany,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setComp(data);
+      }
+    } catch (error) {}
+  };
+
   const formatDate = (date) => {
     let today = new Date();
     const yyyy = today.getFullYear();
@@ -21,7 +47,7 @@ const CustomeWrapper = ({ body, subTittle, tittle, page }) => {
       <div className="page">
         <div className="subpage">
           <h3 className="center">
-            <b>{tittle}</b>
+            <b>{tittle} {comp?.cp_name}</b>
           </h3>
           <h5 className="mt-2">{subTittle}</h5>
           <div className="mt-5">{body}</div>

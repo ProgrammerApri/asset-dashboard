@@ -376,7 +376,7 @@ const ReportHutang = () => {
           <Card.Body className="p-0">
             <CustomeWrapper
               tittle={"Laporan Hutang"}
-              subTittle={"Laporan Hutang Periode"}
+              subTittle={`Laporan Hutang Per ${formatDate(filtDate)}`}
               body={
                 <>
                   {jsonForExcel(ap, false)?.map((v) => {

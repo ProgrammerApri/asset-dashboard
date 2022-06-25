@@ -450,7 +450,7 @@ const ReportGRA = () => {
             <Card.Body>
               <CustomeWrapper
                 tittle={"Laporan Pembelian"}
-                subTittle={"Laporan Pembelian Periode yyyy-mm-dd - yyyy-mm-dd"}
+                subTittle={`Laporan Pembelian Per ${formatDate(filtersDate[0])} - ${formatDate(filtersDate[1])}`}
                 body={
                   <>
                     {jsonForExcel(gra, false)?.map((v) => {

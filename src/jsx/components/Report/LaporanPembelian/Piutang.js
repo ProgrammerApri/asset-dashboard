@@ -111,55 +111,55 @@ const ReportPiutang = () => {
     ar?.forEach((el) => {
       // let selC = `${el.customer.cus_name} (${el.customer.cus_code})`;
       // if (selectCus === selC) {
-        let val = [
-          {
-            cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
-            type: "header",
-            value: {
-              ref: "Nomor Referensi",
-              date: "Tanggal",
-              jt: "J/T",
-              value: "Total Piutang",
-              lns: "Total dilunasi",
-              sisa: "Sisa Piutang",
-            },
-          },
-        ];
-        let amn = 0;
-        let acq = 0;
-        el.ar.forEach((ek) => {
-          let filt = new Date(`${ek?.trx_date}Z`);
-          console.log(filt);
-          if (filt <= filtDate) {
-            val.push({
-              cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
-              type: "item",
-              value: {
-                ref: ek.trx_code,
-                date: formatDate(ek.trx_date),
-                jt: ek.trx_due ? formatDate(ek.trx_due) : "-",
-                value: `Rp. ${formatIdr(ek.trx_amnh)}`,
-                lns: `Rp. ${formatIdr(ek.acq_amnh)}`,
-                sisa: `Rp. ${formatIdr(ek.trx_amnh - ek.acq_amnh)}`,
-              },
-            });
-            amn += ek.trx_amnh;
-            acq += ek.acq_amnh;
-          }
-        });
-        val.push({
+      let val = [
+        {
           cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
-          type: "footer",
+          type: "header",
           value: {
-            ref: "Total",
-            date: "",
-            jt: "",
-            value: `Rp. ${formatIdr(amn)}`,
-            lns: `Rp. ${formatIdr(acq)}`,
-            sisa: `Rp. ${formatIdr(amn - acq)}`,
+            ref: "Nomor Referensi",
+            date: "Tanggal",
+            jt: "J/T",
+            value: "Total Piutang",
+            lns: "Total dilunasi",
+            sisa: "Sisa Piutang",
           },
-        });
-        data.push(val);
+        },
+      ];
+      let amn = 0;
+      let acq = 0;
+      el.ar.forEach((ek) => {
+        let filt = new Date(`${ek?.trx_date}Z`);
+        console.log(filt);
+        if (filt <= filtDate) {
+          val.push({
+            cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
+            type: "item",
+            value: {
+              ref: ek.trx_code,
+              date: formatDate(ek.trx_date),
+              jt: ek.trx_due ? formatDate(ek.trx_due) : "-",
+              value: `Rp. ${formatIdr(ek.trx_amnh)}`,
+              lns: `Rp. ${formatIdr(ek.acq_amnh)}`,
+              sisa: `Rp. ${formatIdr(ek.trx_amnh - ek.acq_amnh)}`,
+            },
+          });
+          amn += ek.trx_amnh;
+          acq += ek.acq_amnh;
+        }
+      });
+      val.push({
+        cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
+        type: "footer",
+        value: {
+          ref: "Total",
+          date: "",
+          jt: "",
+          value: `Rp. ${formatIdr(amn)}`,
+          lns: `Rp. ${formatIdr(acq)}`,
+          sisa: `Rp. ${formatIdr(amn - acq)}`,
+        },
+      });
+      data.push(val);
       // }
     });
 
@@ -379,7 +379,7 @@ const ReportPiutang = () => {
           <Card.Body className="p-0">
             <CustomeWrapper
               tittle={"Laporan Piutang"}
-              subTittle={"Laporan Piutang Periode"}
+              subTittle={`Laporan Piutang Per ${formatDate(filtDate)}`}
               body={
                 <>
                   {jsonForExcel(ar, false)?.map((v) => {
@@ -395,7 +395,7 @@ const ReportPiutang = () => {
                         <Column
                           className="header-center"
                           header={(e) =>
-                            e.props.value ? e.props?.value[0]?.sup : null
+                            e.props.value ? e.props?.value[0]?.cus : null
                           }
                           style={{ width: "15rem" }}
                           body={(e) => (

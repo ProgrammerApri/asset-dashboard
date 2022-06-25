@@ -524,7 +524,7 @@ const UmurPiutang = () => {
           <Card.Body className="p-0">
             <CustomeWrapper
               tittle={"Laporan Umur Piutang"}
-              subTittle={"Laporan Umur Piutang Periode dd/mm/yyyy - dd/mm/yyyy"}
+              subTittle={`Laporan Umur Piutang Per ${formatDate(date)}`}
               body={
                 <>
                   {jsonForExcel(ar, false)?.map((v) => {
@@ -540,9 +540,9 @@ const UmurPiutang = () => {
                         <Column
                           className="header-center"
                           header={(e) =>
-                            e.props.value ? e.props?.value[0]?.sup : null
+                            e.props.value ? e.props?.value[0]?.cus : null
                           }
-                          style={{ width: "15rem" }}
+                          style={{ width: "12rem" }}
                           body={(e) => (
                             <div
                               className={
@@ -551,14 +551,14 @@ const UmurPiutang = () => {
                                   : ""
                               }
                             >
-                              {e.value.fk}
+                              {e.value.ref}
                             </div>
                           )}
                         />
                         <Column
                           className="header-center"
                           header=""
-                          style={{ minWidht: "10rem" }}
+                          style={{ widht: "10rem" }}
                           body={(e) => (
                             <div
                               className={
@@ -576,7 +576,7 @@ const UmurPiutang = () => {
                         <Column
                           className="header-center"
                           header=""
-                          style={{ minWidht: "10rem" }}
+                          style={{ widht: "10rem" }}
                           body={(e) => (
                             <div
                               className={
@@ -594,7 +594,7 @@ const UmurPiutang = () => {
                         <Column
                           className="header-center"
                           header=""
-                          style={{ minWidht: "10rem" }}
+                          style={{ widht: "10rem" }}
                           body={(e) => (
                             <div
                               className={
@@ -612,7 +612,7 @@ const UmurPiutang = () => {
                         <Column
                           className="header-center"
                           header=""
-                          style={{ minWidht: "10rem" }}
+                          style={{ widht: "10rem" }}
                           body={(e) => (
                             <div
                               className={
@@ -630,7 +630,7 @@ const UmurPiutang = () => {
                         <Column
                           className="header-center"
                           header=""
-                          style={{ minWidht: "10rem" }}
+                          style={{ widht: "10rem" }}
                           body={(e) => (
                             <div
                               className={
@@ -648,7 +648,7 @@ const UmurPiutang = () => {
                         <Column
                           className="header-center"
                           header=""
-                          style={{ minWidht: "10rem" }}
+                          style={{ widht: "10rem" }}
                           body={(e) => (
                             <div
                               className={
@@ -666,7 +666,7 @@ const UmurPiutang = () => {
                         <Column
                           className="header-center"
                           header=""
-                          style={{ minWidht: "10rem" }}
+                          style={{ widht: "10rem" }}
                           body={(e) => (
                             <div
                               className={
@@ -684,7 +684,7 @@ const UmurPiutang = () => {
                         <Column
                           className="header-center"
                           header=""
-                          style={{ minWidht: "10rem" }}
+                          style={{ widht: "10rem" }}
                           body={(e) => (
                             <div
                               className={
@@ -702,7 +702,7 @@ const UmurPiutang = () => {
                         <Column
                           className="header-center"
                           header=""
-                          style={{ minWidht: "10rem" }}
+                          style={{ widht: "10rem" }}
                           body={(e) => (
                             <div
                               className={
@@ -720,7 +720,7 @@ const UmurPiutang = () => {
                         <Column
                           className="header-center"
                           header=""
-                          style={{ minWidht: "10rem" }}
+                          style={{ widht: "10rem" }}
                           body={(e) => (
                             <div
                               className={

@@ -9,6 +9,7 @@ import UmurPiutang from "./UmurPiutang";
 import UmurHutang from "./UmurHutang";
 import Neraca from "../Neraca";
 import Pnl from "./Pnl";
+import ReportKBB from "../KartuBB";
 
 const LaporanPembelian = () => {
   const [active, setActive] = useState(0);
@@ -24,7 +25,7 @@ const LaporanPembelian = () => {
       component: <ReportHutang />,
     },
     {
-      tittle: "Analisa Umur Hutang",
+      tittle: "Umur Hutang",
       icon: "bx-calendar-x",
       component: <UmurHutang />,
     },
@@ -34,24 +35,29 @@ const LaporanPembelian = () => {
       component: <ReportPiutang />,
     },
     {
-      tittle: "Analisa Umur Piutang",
+      tittle: "Umur Piutang",
       icon: "bx-calendar-x",
       component: <UmurPiutang />,
     },
     {
       tittle: "Jurnal",
-      icon: "bx-calendar-x",
+      icon: "bx-spreadsheet",
       component: <ReportJurnal />,
     },
     {
       tittle: "Neraca",
-      icon: "bx-calendar-x",
+      icon: "bx-spreadsheet",
       component: <Neraca />,
     },
     {
       tittle: "Laba Rugi",
-      icon: "bx-calendar-x",
+      icon: "bx-spreadsheet",
       component: <Pnl />,
+    },
+    {
+      tittle: "Kartu Buku Besar",
+      icon: "bx-spreadsheet",
+      component: <ReportKBB />,
     },
   ]);
 

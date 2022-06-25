@@ -192,7 +192,7 @@ const ReportHutang = () => {
                 dateFormat="dd-mm-yy"
               />
             </div>
-            <div className="col-4">
+            {/* <div className="col-4">
               <CustomDropdown
                 value={supplier && selectSup}
                 option={supplier}
@@ -203,7 +203,7 @@ const ReportHutang = () => {
                 label={"[supplier.sup_name] ([supplier.sup_code])"}
                 placeholder="Pilih Pemasok"
               />
-            </div>
+            </div> */}
           </Row>
         </div>
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>

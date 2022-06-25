@@ -11,6 +11,8 @@ import Satuan from "./Satuan";
 import PusatBiaya from "./PusatBiaya";
 import RulesPay from "./RulesPay";
 import Salesman from "./Salesman";
+import Pajak from "../Master/Pajak";
+import Jasa from "../Master/Jasa";
 
 const MasterLainnya = () => {
   const [active, setActive] = useState(0);
@@ -51,9 +53,19 @@ const MasterLainnya = () => {
       component: <RulesPay />,
     },
     {
-      tittle: "Bank",
-      icon: "bx-money-withdraw",
-      component: <Bank />,
+      tittle: "Aset",
+      icon: "bx-car",
+      component: <></>,
+    },
+    {
+      tittle: "Pajak",
+      icon: "bx-equalizer",
+      component: <Pajak />,
+    },
+    {
+      tittle: "Jasa",
+      icon: "bx-run",
+      component: <Jasa />,
     },
     {
       tittle: "jenis pelanggan",

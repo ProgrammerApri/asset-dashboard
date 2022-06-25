@@ -721,10 +721,11 @@ const DataSupplier = ({
   const kota = (value) => {
     let selected = {};
     city?.forEach((element) => {
-      if (value === element.city_id) {
+      if (element.city_id === `${value}`) {
         selected = element;
       }
     });
+    console.log(currentItem);
     return selected;
   };
 

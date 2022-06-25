@@ -193,7 +193,7 @@ const ReportKBB = () => {
               }
             >
               <ExcelSheet
-                dataSet={report ? jsonForExcel(report) : null}
+                dataSet={account ? jsonForExcel(account) : null}
                 name="Report"
               />
             </ExcelFile>
@@ -224,8 +224,6 @@ const ReportKBB = () => {
           <Card>
             <Card.Body>
               {renderHeader()}
-              {/* {jsonForExcel(account, false)?.map((v) => { */}
-              {/* return ( */}
               <DataTable
                 responsiveLayout="scroll"
                 value={jsonForExcel(account)}
@@ -241,32 +239,30 @@ const ReportKBB = () => {
                   field={(e) => e?.acco}
                 />
                 <Column
-                  className="header-center"
+                  className="header-center text-right"
                   header="Saldo Awal"
                   style={{ minWidht: "8rem" }}
                   field={(e) => e?.slda}
                 />
                 <Column
-                  className="header-center"
+                  className="header-center text-right"
                   header="Mutasi Debit"
                   style={{ minWidht: "8rem" }}
                   field={(e) => e?.debe}
                 />
                 <Column
-                  className="header-center"
+                  className="header-center text-right"
                   header="Mutasi Kredit"
                   style={{ minWidht: "10rem" }}
                   field={(e) => e?.kred}
                 />
                 <Column
-                  className="header-center"
+                  className="header-center text-right"
                   header="Balance"
                   style={{ minWidht: "10rem" }}
                   field={(e) => e?.blce}
                 />
               </DataTable>
-              {/* ); */}
-              {/* })} */}
             </Card.Body>
           </Card>
         </Col>
@@ -276,8 +272,8 @@ const ReportKBB = () => {
         <Card ref={printPage}>
           <Card.Body className="p-0">
             <CustomeWrapper
-              tittle={"Laporan Kartu Buku Besar"}
-              subTittle={""}
+              tittle={"Kartu Buku Besar"}
+              subTittle={`Laporan Kartu Buku Besar Per ${formatDate(filtDate)}`}
               body={
                 <>
                   <DataTable
@@ -295,25 +291,25 @@ const ReportKBB = () => {
                       field={(e) => e?.acco}
                     />
                     <Column
-                      className="header-center"
+                      className="header-center text-right"
                       header="Saldo Awal"
                       style={{ minWidht: "8rem" }}
                       field={(e) => e?.slda}
                     />
                     <Column
-                      className="header-center"
+                      className="header-center text-right"
                       header="Mutasi Debit"
                       style={{ minWidht: "8rem" }}
                       field={(e) => e?.debe}
                     />
                     <Column
-                      className="header-center"
+                      className="header-center text-right"
                       header="Mutasi Kredit"
                       style={{ minWidht: "10rem" }}
                       field={(e) => e?.kred}
                     />
                     <Column
-                      className="header-center"
+                      className="header-center text-right"
                       header="Balance"
                       style={{ minWidht: "10rem" }}
                       field={(e) => e?.blce}

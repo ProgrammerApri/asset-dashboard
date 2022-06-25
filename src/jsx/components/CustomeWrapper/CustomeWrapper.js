@@ -47,7 +47,7 @@ const CustomeWrapper = ({ body, subTittle, tittle, page }) => {
       <div className="page">
         <div className="subpage">
           <h3 className="center">
-            <b>{tittle} {comp?.cp_name}</b>
+            <b>{tittle} <br/> {comp?.cp_name}</b>
           </h3>
           <h5 className="mt-2">{subTittle}</h5>
           <div className="mt-5">{body}</div>

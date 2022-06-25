@@ -194,7 +194,7 @@ const ReportPiutang = () => {
                 dateFormat="dd-mm-yy"
               />
             </div>
-            <div className="col-4">
+            {/* <div className="col-4">
               <CustomDropdown
                 value={customer && selectCus}
                 option={customer}
@@ -204,7 +204,7 @@ const ReportPiutang = () => {
                 label={"[customer.cus_name] ([customer.cus_code])"}
                 placeholder="Pilih Pelanggan"
               />
-            </div>
+            </div> */}
           </Row>
         </div>
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>

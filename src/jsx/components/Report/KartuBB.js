@@ -193,7 +193,7 @@ const ReportKBB = () => {
               }
             >
               <ExcelSheet
-                dataSet={report ? jsonForExcel(report) : null}
+                dataSet={account ? jsonForExcel(account) : null}
                 name="Report"
               />
             </ExcelFile>
@@ -224,8 +224,6 @@ const ReportKBB = () => {
           <Card>
             <Card.Body>
               {renderHeader()}
-              {/* {jsonForExcel(account, false)?.map((v) => { */}
-              {/* return ( */}
               <DataTable
                 responsiveLayout="scroll"
                 value={jsonForExcel(account)}
@@ -265,8 +263,6 @@ const ReportKBB = () => {
                   field={(e) => e?.blce}
                 />
               </DataTable>
-              {/* ); */}
-              {/* })} */}
             </Card.Body>
           </Card>
         </Col>
@@ -276,7 +272,7 @@ const ReportKBB = () => {
         <Card ref={printPage}>
           <Card.Body className="p-0">
             <CustomeWrapper
-              tittle={"Laporan Kartu Buku Besar"}
+              tittle={"Kartu Buku Besar"}
               subTittle={`Laporan Kartu Buku Besar Per ${formatDate(filtDate)}`}
               body={
                 <>

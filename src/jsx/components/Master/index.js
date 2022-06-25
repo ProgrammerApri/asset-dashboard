@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Button, Col, Row } from "react-bootstrap";
+import Bank from "../MasterLainnya/Bank";
 import Mitra from "../Mitra/Mitra";
 import Akun from "./Akun";
 import GroupProduk from "./GroupProduk";
@@ -22,6 +23,11 @@ const Master = () => {
       component: <Mitra />,
     },
     {
+      tittle: "Bank",
+      icon: "bx-money-withdraw",
+      component: <Bank />,
+    },
+    {
       tittle: "grup produk",
       icon: "bx-cabinet",
       component: <GroupProduk />,
@@ -36,21 +42,7 @@ const Master = () => {
       icon: "bx-building",
       component: <Lokasi/>,
     },
-    {
-      tittle: "Aset",
-      icon: "bx-car",
-      component: <></>,
-    },
-    {
-      tittle: "Pajak",
-      icon: "bx-equalizer",
-      component: <Pajak />,
-    },
-    {
-      tittle: "Jasa",
-      icon: "bx-run",
-      component: <Jasa />,
-    },
+    
   ]);
 
   const renderSubMenu = () => {

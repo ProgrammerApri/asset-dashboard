@@ -30,7 +30,6 @@ const Detail = ({ onCancel }) => {
     });
     getPO();
     getComp();
-    getCity();
     getSupp();
   }, []);
 
@@ -48,6 +47,7 @@ const Detail = ({ onCancel }) => {
         const { data } = response;
         console.log(data);
         dispatch({ type: SET_PO, payload: data });
+        getCity();
       }
     } catch (error) {}
   };
@@ -143,7 +143,7 @@ const Detail = ({ onCancel }) => {
                 </span>
               </div>
 
-              <div className="col-3 fs-12 ml-0 mt-3">
+              <div className="col-2 fs-12 ml-0 mt-3">
                 <label className="text-label">Supplier</label>
                 <br></br>
                 <span className="ml-0 fs-14">
@@ -151,7 +151,7 @@ const Detail = ({ onCancel }) => {
                 </span>
               </div>
 
-              <div className="col-3 ml-0 mt-2 text-right">
+              <div className="col-4 ml-0 mt-3 text-center">
                 <span className="p-buttonset">
                   <ReactToPrint
                     trigger={() => {
@@ -170,7 +170,7 @@ const Detail = ({ onCancel }) => {
                   <Button
                     className="p-button-info"
                     label="Kirim"
-                    icon="bx bxs-send"
+                    icon="bx bxs-paper-plane"
                     onClick={() => {}}
                     disabled={show?.apprv === false}
                   />
@@ -235,22 +235,20 @@ const Detail = ({ onCancel }) => {
   const kota = (value) => {
     let selected = {};
     city?.forEach((element) => {
-      if (value === element.city_id) {
+      if (element.city_id === `${value}`) {
         selected = element;
       }
     });
-
     return selected;
   };
 
   const spl = (value) => {
     let selected = {};
     supp?.forEach((element) => {
-      if (value === element.supplier.id) {
+      if (element.supplier?.id === `${value}`) {
         selected = element;
       }
     });
-
     return selected;
   };
 
@@ -258,8 +256,8 @@ const Detail = ({ onCancel }) => {
     return (
       <>
         <Row className="ml-0 pt-0 justify-content-center" ref={printPage}>
-          <Card>
-            <Card.Body>
+          {/* <Card>
+            <Card.Body> */}
               <Wrapper
                 // tittle={"Informasi PO"}
                 body={
@@ -352,8 +350,8 @@ const Detail = ({ onCancel }) => {
                           </span>
                           <br></br>
                           <span className="ml-0">
-                            {show?.sup_id.sup_address}
-                            {kota(spl(show?.sup_id)?.supplier?.id)?.city_name}
+                            {show?.sup_id.sup_address},
+                            {kota(show?.sup_id.sup_kota)?.city_name}
                           </span>
                           <br></br>
                           <span className="ml-0">
@@ -609,8 +607,8 @@ const Detail = ({ onCancel }) => {
                   </>
                 }
               />
-            </Card.Body>
-          </Card>
+            {/* </Card.Body>
+          </Card> */}
         </Row>
       </>
     );

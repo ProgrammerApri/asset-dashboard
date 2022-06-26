@@ -117,14 +117,14 @@ const UmurHutang = () => {
           sup: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
           type: "header",
           value: {
-            fk: "No. Faktur",
-            jt: "Sebelum J/T",
-            day1: "7 Hari",
-            day2: "14 Hari",
-            day3: "30 Hari",
-            day4: "60 Hari",
+            fk: "Invoice",
+            jt: "Before Due",
+            day1: "7 Day",
+            day2: "14 Day",
+            day3: "30 Day",
+            day4: "60 Day",
             older: "Older",
-            nota: "Nota Debit",
+            nota: "Debit",
             rtr: "Retur",
             total: "Total",
             giro: "Giro",
@@ -313,10 +313,11 @@ const UmurHutang = () => {
       <Row className="ml-0 pt-0 justify-content-center" ref={printPage}>
         {chunk(jsonForExcel(ap, false) ?? [], chunkSize)?.map((val, idx) => {
           return (
-            <Card>
-              <Card.Body>
+            <Card >
+              <Card.Body className="p-0 m-0">
                 <CustomeWrapper
-                  tittle={"Laporan Umur Hutang"}
+                  tittle={"Payable Age Report"}
+                  subTittle={`Payable Age Report as of ${formatDate(date)}`}
                   page={idx + 1}
                   body={
                     <>
@@ -544,8 +545,8 @@ const UmurHutang = () => {
         <Card ref={printPage}>
           <Card.Body className="p-0">
             <CustomeWrapper
-              tittle={"Laporan Umur Hutang"}
-              subTittle={`Laporan Umur Hutang Per ${formatDate(date)}`}
+             tittle={"Due Date Payable"}
+             subTittle={`Due Date Payable as of ${formatDate(date)}`}
               body={
                 <>
                   {jsonForExcel(ap, false)?.map((v) => {

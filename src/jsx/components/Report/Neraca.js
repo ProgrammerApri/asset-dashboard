@@ -24,25 +24,25 @@ const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 const category = {
   aktiva: [
     {
-      name: "Aktiva Lancar",
+      name: "Current Asset",
       id: [1, 2, 3, 4, 5, 6, 8, 9, 10],
     },
     {
-      name: "Aktiva Tetap",
+      name: "Fixed Asset",
       id: [12],
     },
     {
-      name: "Depresiasi",
+      name: "Depreciation",
       id: [13],
     },
   ],
   pasiva: [
     {
-      name: "Hutang",
+      name: "Payable",
       id: [14, 15, 16, 17, 18, 19],
     },
     {
-      name: "Modal",
+      name: "Capital",
       id: [21, 22, 23, 24, 25, 26],
     },
   ],
@@ -227,14 +227,14 @@ const Neraca = () => {
       }
     });
     aktiva.push([
-      { ...umum, value: "Total Aktiva" },
+      { ...umum, value: "Asset Total" },
       {
         ...lastSaldo,
         value: totalAktiva > 0 ? `Rp. ${formatIdr(totalAktiva)}` : 0,
       },
     ]);
     pasiva.push([
-      { ...umum, value: "Total Pasiva" },
+      { ...umum, value: "Liabilities Total" },
       {
         ...lastSaldo,
         value: totalPasiva > 0 ? `Rp. ${formatIdr(totalPasiva)}` : 0,
@@ -276,7 +276,7 @@ const Neraca = () => {
       {
         columns: [
           {
-            title: "Aktiva",
+            title: "Asset",
             width: { wch: 50 },
             style: {
               font: { sz: "14", bold: true },
@@ -292,7 +292,7 @@ const Neraca = () => {
             },
           },
           {
-            title: "Pasiva",
+            title: "Liabilities",
             width: { wch: 50 },
             style: {
               font: { sz: "14", bold: true },
@@ -414,8 +414,8 @@ const Neraca = () => {
         <Card className="ml-1 mr-1 mt-2">
           <Card.Body className="p-0">
             <CustomeWrapper
-              tittle={"Laporan Neraca"}
-              subTittle={`Laporan Neraca ${formatDate(date)}`}
+              tittle={"Balance Sheet"}
+              subTittle={`Balance Sheet as of ${formatDate(date)}`}
               page={1}
               body={
                 <DataTable
@@ -435,7 +435,7 @@ const Neraca = () => {
               >
                 <Column
                   className="center-header"
-                  header="Aktiva"
+                  header="Asset"
                   style={{
                     minWidth: "8rem",
                   }}
@@ -469,7 +469,7 @@ const Neraca = () => {
                 />
                 <Column
                   className="center-header"
-                  header="Pasiva"
+                  header="Liabilities"
                   style={{
                     minWidth: "8rem",
                   }}
@@ -512,8 +512,8 @@ const Neraca = () => {
         <Card className="ml-1 mr-1 mt-2">
           <Card.Body className="p-0" ref={printPage}>
             <CustomeWrapper
-              tittle={"Laporan Neraca"}
-              subTittle={`Laporan Neraca ${formatDate(date)}`}
+              tittle={"Balance Sheet"}
+              subTittle={`Balance Sheet as of ${formatDate(date)}`}
               page={1}
               body={
                 <DataTable
@@ -533,7 +533,7 @@ const Neraca = () => {
               >
                 <Column
                   className="center-header"
-                  header="Aktiva"
+                  header="Asset"
                   style={{
                     minWidth: "8rem",
                   }}
@@ -551,10 +551,24 @@ const Neraca = () => {
                     )
                   }
                 />
-                <Column
-                  header=" "
+                {/* <Column
+                  header="May 2022"
                   field={(e) => e[1].value}
-                  className="text-right border-right"
+                  className="text-right border-right center-header"
+                  body={(e) =>
+                    loading ? (
+                      <Skeleton />
+                    ) : (
+                      <div
+                        className={e[1].last && "font-weight-bold"}
+                      >{`${e[1].value}`}</div>
+                    )
+                  }
+                /> */}
+                <Column
+                  header=""
+                  field={(e) => e[1].value}
+                  className="text-right border-right center-header"
                   body={(e) =>
                     loading ? (
                       <Skeleton />
@@ -567,7 +581,7 @@ const Neraca = () => {
                 />
                 <Column
                   className="center-header"
-                  header="Pasiva"
+                  header="Liabilities"
                   style={{
                     minWidth: "8rem",
                   }}
@@ -587,9 +601,9 @@ const Neraca = () => {
                   }
                 />
                 <Column
-                  header=" "
+                  header=""
                   field={(e) => e[3].value}
-                  className="text-right"
+                  className="text-right center-header"
                   body={(e) =>
                     loading ? (
                       <Skeleton />
@@ -606,6 +620,132 @@ const Neraca = () => {
           </Card.Body>
         </Card>
       </Row>
+      {/* <Row className="m-0 justify-content-center" >
+        <Card className="ml-1 mr-1 mt-2">
+          <Card.Body className="p-0" ref={printPage}>
+            <CustomeWrapper
+              tittle={"Balance Sheet Comparison"}
+              subTittle={`Balance Sheet Comparison as of ${formatDate(date)}`}
+              page={1}
+              body={
+                <DataTable
+                responsiveLayout="scroll"
+                value={
+                  loading
+                    ? dummy
+                    : account
+                    ? jsonForExcel(account, false)
+                    : null
+                }
+                className="display w-150 datatable-wrapper"
+                showGridlines
+                dataKey="id"
+                rowHover
+                emptyMessage="Tidak ada data"
+              >
+                <Column
+                  className="center-header"
+                  header="Asset"
+                  style={{
+                    minWidth: "8rem",
+                  }}
+                  field={(e) => e[0].value}
+                  body={(e) =>
+                    loading ? (
+                      <Skeleton />
+                    ) : (
+                      <Row>
+                        <div className={e[0].type == "D" && "mr-4"}></div>
+                        <div className={e[0].type == "U" && "font-weight-bold"}>
+                          {e[0].value}
+                        </div>
+                      </Row>
+                    )
+                  }
+                />
+                <Column
+                  header="May 2022"
+                  field={(e) => e[1].value}
+                  className="text-right border-right center-header"
+                  body={(e) =>
+                    loading ? (
+                      <Skeleton />
+                    ) : (
+                      <div
+                        className={e[1].last && "font-weight-bold"}
+                      >{`${e[1].value}`}</div>
+                    )
+                  }
+                />
+                <Column
+                  header="June 2022"
+                  field={(e) => e[1].value}
+                  className="text-right border-right center-header"
+                  body={(e) =>
+                    loading ? (
+                      <Skeleton />
+                    ) : (
+                      <div
+                        className={e[1].last && "font-weight-bold"}
+                      >{`${e[1].value}`}</div>
+                    )
+                  }
+                />
+                <Column
+                  className="center-header"
+                  header="Liabilities"
+                  style={{
+                    minWidth: "8rem",
+                  }}
+                  field={(e) => e[2].value}
+                  body={(e) =>
+                    loading ? (
+                      <Skeleton />
+                    ) : (
+                      <Row>
+                        <div className={"mr-4"}></div>
+                        <div className={e[2].type == "D" && "mr-4"}></div>
+                        <div className={e[2].type == "U" && "font-weight-bold"}>
+                          {e[2].value}
+                        </div>
+                      </Row>
+                    )
+                  }
+                />
+                <Column
+                  header="May 2022"
+                  field={(e) => e[3].value}
+                  className="text-right center-header border-right"
+                  body={(e) =>
+                    loading ? (
+                      <Skeleton />
+                    ) : (
+                      <div className={e[3].last && "font-weight-bold"}>
+                        {e[3].value}
+                      </div>
+                    )
+                  }
+                />
+                <Column
+                  header="June 2022"
+                  field={(e) => e[3].value}
+                  className="text-right center-header border-right"
+                  body={(e) =>
+                    loading ? (
+                      <Skeleton />
+                    ) : (
+                      <div className={e[3].last && "font-weight-bold"}>
+                        {e[3].value}
+                      </div>
+                    )
+                  }
+                />
+              </DataTable>
+              }
+            />
+          </Card.Body>
+        </Card>
+      </Row> */}
     </>
   );
 };

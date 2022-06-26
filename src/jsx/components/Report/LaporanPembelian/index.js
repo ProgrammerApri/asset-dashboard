@@ -10,6 +10,7 @@ import UmurHutang from "./UmurHutang";
 import Neraca from "../Neraca";
 import Pnl from "./Pnl";
 import ReportKBB from "../KartuBB";
+import SalesReport from "./Penjualan";
 
 const LaporanPembelian = () => {
   const [active, setActive] = useState(0);
@@ -18,6 +19,11 @@ const LaporanPembelian = () => {
       tittle: "Pembelian",
       icon: "bx-receipt",
       component: <ReportGRA />,
+    },
+    {
+      tittle: "Penjualan",
+      icon: "bx-receipt",
+      component: <SalesReport />,
     },
     {
       tittle: "Saldo Hutang",

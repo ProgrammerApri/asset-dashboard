@@ -227,8 +227,8 @@ const Pnl = () => {
               <Card className="ml-1 mr-1 mt-2">
                 <Card.Body className="p-0">
                   <CustomeWrapper
-                    tittle={"Laporan Laba/Rugi"}
-                    // subTittle={`Laporan Laba/Rugi Periode ${0}`}
+                    tittle={"Profit/Loss Report"}
+                    subTittle={`Profit/Loss Report as of 25/06/2022`}
                     page={idx + 1}
                     body={
                       <>

@@ -115,14 +115,14 @@ const UmurPiutang = () => {
           cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
           type: "header",
           value: {
-            ref: "No. Referensi",
-            jt: "Sebelum J/T",
-            day1: "7 Hari",
-            day2: "14 Hari",
-            day3: "30 Hari",
-            day4: "60 Hari",
+            ref: "Code",
+            jt: "Before Due",
+            day1: "7 Day",
+            day2: "14 Day",
+            day3: "30 Day",
+            day4: "60 Day",
             older: "Older",
-            nota: "Nota Debit",
+            nota: "Debit",
             rtr: "Retur",
             total: "Total",
             giro: "Giro",
@@ -523,8 +523,8 @@ const UmurPiutang = () => {
         <Card ref={printPage}>
           <Card.Body className="p-0">
             <CustomeWrapper
-              tittle={"Laporan Umur Piutang"}
-              subTittle={`Laporan Umur Piutang Per ${formatDate(date)}`}
+              tittle={"Due Date Receivable"}
+              subTittle={`Due Date Receivable as of ${formatDate(date)}`}
               body={
                 <>
                   {jsonForExcel(ar, false)?.map((v) => {
@@ -542,7 +542,7 @@ const UmurPiutang = () => {
                           header={(e) =>
                             e.props.value ? e.props?.value[0]?.cus : null
                           }
-                          style={{ width: "12rem" }}
+                          style={{ width: "11rem" }}
                           body={(e) => (
                             <div
                               className={
@@ -558,7 +558,7 @@ const UmurPiutang = () => {
                         <Column
                           className="header-center"
                           header=""
-                          style={{ widht: "10rem" }}
+                          style={{ widht: "7rem" }}
                           body={(e) => (
                             <div
                               className={
@@ -576,7 +576,7 @@ const UmurPiutang = () => {
                         <Column
                           className="header-center"
                           header=""
-                          style={{ widht: "10rem" }}
+                          style={{ widht: "7rem" }}
                           body={(e) => (
                             <div
                               className={

@@ -116,12 +116,12 @@ const ReportPiutang = () => {
           cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
           type: "header",
           value: {
-            ref: "Nomor Referensi",
-            date: "Tanggal",
-            jt: "J/T",
-            value: "Total Piutang",
-            lns: "Total dilunasi",
-            sisa: "Sisa Piutang",
+            ref: "Code",
+            date: "Date",
+            jt: "Due Date",
+            value: "Receivable",
+            lns: "Total Paid",
+            sisa: "Remain",
           },
         },
       ];
@@ -378,8 +378,8 @@ const ReportPiutang = () => {
         <Card ref={printPage}>
           <Card.Body className="p-0">
             <CustomeWrapper
-              tittle={"Laporan Piutang"}
-              subTittle={`Laporan Piutang Per ${formatDate(filtDate)}`}
+              tittle={"Receivable Report"}
+              subTittle={`Receivable Report as of ${formatDate(filtDate)}`}
               body={
                 <>
                   {jsonForExcel(ar, false)?.map((v) => {

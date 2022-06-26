@@ -168,13 +168,13 @@ const ReportGRA = () => {
             ref: el.kd_gra,
             type: "header",
             value: {
-              date: "Tanggal Pembelian",
-              po: "Nomor Pesanan",
+              date: "Date",
+              po: "Code",
               sup: "Supplier",
-              prod: "Produk",
-              ord: "Jumlah",
-              unit: "Satuan",
-              prc: "Harga Satuan",
+              prod: "Product Name",
+              ord: "Quantity",
+              unit: "Unit",
+              prc: "Price",
               tot: "Total",
             },
           },
@@ -444,159 +444,161 @@ const ReportGRA = () => {
         </Col>
       </Row>
 
-      <Row className="d-none">
-        <Col>
-          <Card ref={printPage}>
-            <Card.Body>
-              <CustomeWrapper
-                tittle={"Laporan Pembelian"}
-                subTittle={`Laporan Pembelian Per ${formatDate(filtersDate[0])} - ${formatDate(filtersDate[1])}`}
-                body={
-                  <>
-                    {jsonForExcel(gra, false)?.map((v) => {
-                      return (
-                        <DataTable
-                          responsiveLayout="scroll"
-                          value={v}
-                          showGridlines
-                          dataKey="id"
-                          rowHover
-                          emptyMessage="Data Tidak Ditemukan"
-                          className="mt-4"
-                        >
-                          <Column
-                            className="header-center"
-                            header={(e) =>
-                              e.props.value ? e.props?.value[0]?.ref : null
-                            }
-                            style={{ width: "15rem" }}
-                            body={(e) => (
-                              <div
-                                className={
-                                  e.type === "header" || e.type === "footer"
-                                    ? "font-weight-bold"
-                                    : ""
-                                }
-                              >
-                                {e.value.date}
-                              </div>
-                            )}
-                          />
-                          <Column
-                            className="header-center"
-                            header=""
-                            style={{ minWidht: "10rem" }}
-                            body={(e) => (
-                              <div
-                                className={
-                                  e.type === "header" && "font-weight-bold"
-                                }
-                              >
-                                {e.value.po}
-                              </div>
-                            )}
-                          />
-                          <Column
-                            className="header-center"
-                            header=""
-                            style={{ minWidht: "10rem" }}
-                            body={(e) => (
-                              <div
-                                className={
-                                  e.type === "header" && "font-weight-bold"
-                                }
-                              >
-                                {e.value.sup}
-                              </div>
-                            )}
-                          />
-                          <Column
-                            className="header-center"
-                            header=""
-                            style={{ minWidht: "10rem" }}
-                            body={(e) => (
-                              <div
-                                className={
-                                  e.type === "header" && "font-weight-bold"
-                                }
-                              >
-                                {e.value.prod}
-                              </div>
-                            )}
-                          />
-                          <Column
-                            className="header-center"
-                            header=""
-                            style={{ minWidht: "10rem" }}
-                            body={(e) => (
-                              <div
-                                className={
-                                  e.type === "header" && "font-weight-bold"
-                                }
-                              >
-                                {e.value.ord}
-                              </div>
-                            )}
-                          />
-                          <Column
-                            className="header-center"
-                            header=""
-                            style={{ minWidht: "10rem" }}
-                            body={(e) => (
-                              <div
-                                className={
-                                  e.type === "header" && "font-weight-bold"
-                                }
-                              >
-                                {e.value.unit}
-                              </div>
-                            )}
-                          />
-                          <Column
-                            className="header-center"
-                            header=""
-                            style={{ minWidht: "10rem" }}
-                            body={(e) => (
-                              <div
-                                className={
-                                  e.type === "header"
-                                    ? "font-weight-bold text-right"
-                                    : e.type === "footer"
-                                    ? "font-weight-bold text-right"
-                                    : "text-right"
-                                }
-                              >
-                                {e.value.prc}
-                              </div>
-                            )}
-                          />
-                          <Column
-                            className="header-center"
-                            header=""
-                            style={{ minWidht: "10rem" }}
-                            body={(e) => (
-                              <div
-                                className={
-                                  e.type === "header"
-                                    ? "font-weight-bold text-right"
-                                    : e.type === "footer"
-                                    ? "font-weight-bold text-right"
-                                    : "text-right"
-                                }
-                              >
-                                {e.value.tot}
-                              </div>
-                            )}
-                          />
-                        </DataTable>
-                      );
-                    })}
-                  </>
-                }
-              />
-            </Card.Body>
-          </Card>
-        </Col>
+     
+
+      <Row className="m-0 justify-content-center d-none">
+        <Card className="ml-1 mr-1 mt-2">
+          <Card.Body className="p-0" ref={printPage}>
+            <CustomeWrapper
+              tittle={"Purchase Report"}
+              subTittle={`Purchase Report for Period ${formatDate(
+                filtersDate[0]
+              )} to ${formatDate(filtersDate[1])}`}
+              body={
+                <>
+                  {jsonForExcel(gra, false)?.map((v) => {
+                    return (
+                      <DataTable
+                        responsiveLayout="scroll"
+                        value={v}
+                        showGridlines
+                        dataKey="id"
+                        rowHover
+                        emptyMessage="Data Tidak Ditemukan"
+                        className="mt-4"
+                      >
+                        <Column
+                          className="header-center"
+                          header={(e) =>
+                            e.props.value ? e.props?.value[0]?.ref : null
+                          }
+                          style={{ width: "10rem" }}
+                          body={(e) => (
+                            <div
+                              className={
+                                e.type === "header" || e.type === "footer"
+                                  ? "font-weight-bold"
+                                  : ""
+                              }
+                            >
+                              {e.value.date}
+                            </div>
+                          )}
+                        />
+                        <Column
+                          className="header-center"
+                          header=""
+                          style={{ width: "10rem" }}
+                          body={(e) => (
+                            <div
+                              className={
+                                e.type === "header" && "font-weight-bold"
+                              }
+                            >
+                              {e.value.po}
+                            </div>
+                          )}
+                        />
+                        <Column
+                          className="header-center"
+                          header=""
+                          style={{ minWidht: "10rem" }}
+                          body={(e) => (
+                            <div
+                              className={
+                                e.type === "header" && "font-weight-bold"
+                              }
+                            >
+                              {e.value.sup}
+                            </div>
+                          )}
+                        />
+                        <Column
+                          className="header-center"
+                          header=""
+                          style={{ width: "10rem" }}
+                          body={(e) => (
+                            <div
+                              className={
+                                e.type === "header" && "font-weight-bold"
+                              }
+                            >
+                              {e.value.prod}
+                            </div>
+                          )}
+                        />
+                        <Column
+                          className="header-center"
+                          header=""
+                          style={{ maxWidth: "10rem" }}
+                          body={(e) => (
+                            <div
+                              className={
+                                e.type === "header" && "font-weight-bold"
+                              }
+                            >
+                              {e.value.ord}
+                            </div>
+                          )}
+                        />
+                        <Column
+                          className="header-center"
+                          header=""
+                          style={{ minWidht: "10rem" }}
+                          body={(e) => (
+                            <div
+                              className={
+                                e.type === "header" && "font-weight-bold"
+                              }
+                            >
+                              {e.value.unit}
+                            </div>
+                          )}
+                        />
+                        <Column
+                          className="header-center"
+                          header=""
+                          style={{ minWidht: "10rem" }}
+                          body={(e) => (
+                            <div
+                              className={
+                                e.type === "header"
+                                  ? "font-weight-bold text-right"
+                                  : e.type === "footer"
+                                  ? "font-weight-bold text-right"
+                                  : "text-right"
+                              }
+                            >
+                              {e.value.prc}
+                            </div>
+                          )}
+                        />
+                        <Column
+                          className="header-center"
+                          header=""
+                          style={{ minWidht: "10rem" }}
+                          body={(e) => (
+                            <div
+                              className={
+                                e.type === "header"
+                                  ? "font-weight-bold text-right"
+                                  : e.type === "footer"
+                                  ? "font-weight-bold text-right"
+                                  : "text-right"
+                              }
+                            >
+                              {e.value.tot}
+                            </div>
+                          )}
+                        />
+                      </DataTable>
+                    );
+                  })}
+                </>
+              }
+            />
+          </Card.Body>
+        </Card>
       </Row>
     </>
   );

@@ -117,12 +117,12 @@ const ReportHutang = () => {
             sup: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
             type: "header",
             value: {
-              ref: "Kode Faktur",
-              date: "Tanggal Faktur",
-              jt: "J/T",
-              value: "Total Hutang",
-              lns: "Total dilunasi",
-              sisa: "Sisa Hutang",
+              ref: "Invoice",
+              date: "Date",
+              jt: "Due Date",
+              value: "Payable",
+              lns: "Payment",
+              sisa: "Remain",
             },
           },
         ];
@@ -375,8 +375,8 @@ const ReportHutang = () => {
         <Card ref={printPage}>
           <Card.Body className="p-0">
             <CustomeWrapper
-              tittle={"Laporan Hutang"}
-              subTittle={`Laporan Hutang Per ${formatDate(filtDate)}`}
+              tittle={"Payable Report"}
+              subTittle={`Payable Report as of ${formatDate(filtDate)}`}
               body={
                 <>
                   {jsonForExcel(ap, false)?.map((v) => {

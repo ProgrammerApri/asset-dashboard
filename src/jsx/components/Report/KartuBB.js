@@ -22,12 +22,13 @@ const ReportKBB = () => {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const printPage = useRef(null);
-  const [filtDate, setFiltDate] = useState(null);
+  const [filtDate, setFiltDate] = useState(new Date());
   const [customer, setCustomer] = useState(null);
   const [selectCus, setSelectCus] = useState(null);
   const [account, setAcc] = useState(null);
   const [trans, setTrans] = useState(null);
   const [total, setTotal] = useState(null);
+  const chunkSize = 27;
 
   useEffect(() => {
     getAcc();
@@ -123,7 +124,7 @@ const ReportKBB = () => {
           dt = new Date(`${element?.trx_date}Z`);
         }
       });
-      if (filtDate <= dt) {
+      if (dt <= filtDate) {
         data.push({
           acco: `${el.account.acc_name} (${el.account.acc_code})`,
           slda: `Rp. ${formatIdr(0)}`,
@@ -216,6 +217,14 @@ const ReportKBB = () => {
     );
   };
 
+  const chunk = (arr, size) =>
+    arr.reduce(
+      (acc, e, i) => (
+        i % size ? acc[acc.length - 1].push(e) : acc.push([e]), acc
+      ),
+      []
+    );
+
   return (
     <>
       {/* <Toast ref={toast} /> */}
@@ -224,7 +233,7 @@ const ReportKBB = () => {
           <Card>
             <Card.Body>
               {renderHeader()}
-              <DataTable
+              {/* <DataTable
                 responsiveLayout="scroll"
                 value={jsonForExcel(account)}
                 showGridlines
@@ -234,25 +243,25 @@ const ReportKBB = () => {
               >
                 <Column
                   className="header-center"
-                  header="Akun"
+                  header="Account"
                   style={{ width: "20rem" }}
                   field={(e) => e?.acco}
                 />
                 <Column
                   className="header-center text-right"
-                  header="Saldo Awal"
+                  header="Begining Balance"
                   style={{ minWidht: "8rem" }}
                   field={(e) => e?.slda}
                 />
                 <Column
                   className="header-center text-right"
-                  header="Mutasi Debit"
+                  header="Debit"
                   style={{ minWidht: "8rem" }}
                   field={(e) => e?.debe}
                 />
                 <Column
                   className="header-center text-right"
-                  header="Mutasi Kredit"
+                  header="Credit"
                   style={{ minWidht: "10rem" }}
                   field={(e) => e?.kred}
                 />
@@ -262,13 +271,13 @@ const ReportKBB = () => {
                   style={{ minWidht: "10rem" }}
                   field={(e) => e?.blce}
                 />
-              </DataTable>
+              </DataTable> */}
             </Card.Body>
           </Card>
         </Col>
       </Row>
 
-      <Row className="m-0 d-none">
+      {/* <Row className="m-0 d-none">
         <Card ref={printPage}>
           <Card.Body className="p-0">
             <CustomeWrapper
@@ -320,6 +329,71 @@ const ReportKBB = () => {
             />
           </Card.Body>
         </Card>
+      </Row> */}
+
+      <Row className="m-0 justify-content-center" ref={printPage}>
+        {chunk(jsonForExcel(account) ?? [], chunkSize)?.map((val, idx) => {
+          return (
+            <Card className="ml-1 mr-1 mt-2">
+              <Card.Body className="p-0">
+                <CustomeWrapper
+                  tittle={"General Ledger Card"}
+                  subTittle={`General Ledger Card as of ${formatDate(
+                    filtDate
+                  )}`}
+                  page={idx + 1}
+                  body={
+                    <>
+                      {/* {val.map((v) => { */}
+                        {/* return ( */}
+                          <DataTable
+                            responsiveLayout="scroll"
+                            value={val}
+                            showGridlines
+                            dataKey="id"
+                            rowHover
+                            emptyMessage="Data Tidak Ditemukan"
+                          >
+                            <Column
+                              className="header-center"
+                              header="Akun"
+                              style={{ width: "20rem" }}
+                              field={(e) => e?.acco}
+                            />
+                            <Column
+                              className="header-center text-right"
+                              header="Saldo Awal"
+                              style={{ minWidht: "8rem" }}
+                              field={(e) => e?.slda}
+                            />
+                            <Column
+                              className="header-center text-right"
+                              header="Mutasi Debit"
+                              style={{ minWidht: "8rem" }}
+                              field={(e) => e?.debe}
+                            />
+                            <Column
+                              className="header-center text-right"
+                              header="Mutasi Kredit"
+                              style={{ minWidht: "10rem" }}
+                              field={(e) => e?.kred}
+                            />
+                            <Column
+                              className="header-center text-right"
+                              header="Balance"
+                              style={{ minWidht: "10rem" }}
+                              field={(e) => e?.blce}
+                            />
+                          </DataTable>
+                        {/* );
+                       })} */}
+                    </>
+                  }
+                />
+              </Card.Body>
+            </Card>
+          );
+        })}
       </Row>
     </>
   );

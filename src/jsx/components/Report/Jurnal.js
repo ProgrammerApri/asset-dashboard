@@ -219,8 +219,8 @@ const ReportJurnal = () => {
               <Card className="ml-1 mr-1 mt-2">
                 <Card.Body className="p-0">
                   <CustomeWrapper
-                    tittle={"Jurnal Transaksi"}
-                    subTittle={`Jurnal Transaksi Periode ${formatDate(date[0])} - ${formatDate(date[1])}`}
+                    tittle={"Transaction Journal"}
+                    subTittle={`Transaction Journal for Period ${formatDate(date[0])} to ${formatDate(date[1])}`}
                     page={idx + 1}
                     body={
                       <>

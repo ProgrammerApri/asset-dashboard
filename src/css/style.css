@@ -83,6 +83,14 @@
   color: var(--text-color);
   padding: 0.7rem 1rem;
 }
+
+.p-datatable .p-datatable-tbody > tr > td.header-center {
+  border: 0px solid #dee2e6;
+  border-bottom: 1px solid var(--input-bg);
+  color: var(--text-color);
+  padding: 0.7rem 0.2rem;
+}
+
 .no-border.p-datatable .p-datatable-tbody > tr > td {
   border: 0px;
   border-bottom: 0px;
@@ -7327,7 +7335,7 @@ button.bg-dark:focus {
 }
 
 .border-right {
-  border-right: 1px solid #eeeeee !important;
+  border-right: 1px solid var(--input-bg)!important;
 }
 
 .border-bottom {
@@ -7335,7 +7343,7 @@ button.bg-dark:focus {
 }
 
 .border-left {
-  border-left: 1px solid #eeeeee !important;
+  border-left: 1px solid var(--input-bg) !important;
 }
 
 .border-0 {

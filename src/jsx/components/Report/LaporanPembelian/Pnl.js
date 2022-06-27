@@ -91,7 +91,7 @@ const Pnl = () => {
     return [day, month, year].join("/");
   };
 
-  const jsonForExcel = (acc) => {
+  const jsonForExcel = (acc, excel = false) => {
     let data = [];
     let new_acc = [];
     let grouped = acc?.filter(
@@ -104,6 +104,7 @@ const Pnl = () => {
             el?.klasifikasi.id === ek?.klasifikasi.id
         )
     );
+
     grouped?.forEach((el) => {
       let total = 0;
       let sub = []
@@ -136,7 +137,127 @@ const Pnl = () => {
       });
     });
 
-    return data;
+    console.log(data);
+
+    let final = [
+      {
+        columns: [
+          {
+            title: `Periode (${formatDate(date[0])}) - (${formatDate(date[1])})`,
+            width: { wch: 50 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          }
+        ],
+        data: [
+          [
+            {
+              value: "",
+              style: {
+                font: { sz: "14", bold: false },
+                alignment: { horizontal: "left", vertical: "center" },
+              },
+            },
+            {
+              value: "",
+              style: {
+                font: { sz: "14", bold: false },
+                alignment: { horizontal: "left", vertical: "center" },
+              },
+            }
+          ],
+        ],
+      },
+    ];
+
+    data.forEach((el) => {
+      let item = [];
+      el.sub.forEach((ek) => {
+        item.push([
+          {
+            value: `${ek.type === "item" ? "         " : ""}${ek.acc_name}`,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.saldo}`,
+            style: {
+              font: { sz: "14", bold: ek.type === "header" ? true : false },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          }
+        ]);
+      });
+
+      item.push([
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+      ]);
+
+      final.push({
+        columns: [
+          {
+            title: `${el.klasifikasi}`,
+            width: { wch: 50 },
+            style: {
+              font: { sz: "14", bold: false },
+              alignment: { horizontal: "left", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "left", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          }
+        ],
+        data: item,
+      });
+    });
+
+    if (excel) {
+      return final;
+    } else {
+      return data;
+    }
   };
 
   const formatIdr = (value) => {
@@ -167,7 +288,9 @@ const Pnl = () => {
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
             <ExcelFile
-              filename={`report_export_${new Date().getTime()}`}
+              filename={`pnl_report_${formatDate(new Date())
+                .replace("-", "")
+                .replace("-", "")}`}
               element={
                 <Button variant="primary" onClick={() => {}}>
                   EXCEL
@@ -178,7 +301,7 @@ const Pnl = () => {
               }
             >
               <ExcelSheet
-                dataSet={report ? jsonForExcel(report) : null}
+                dataSet={account ? jsonForExcel(account, true) : null}
                 name="Report"
               />
             </ExcelFile>

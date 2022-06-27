@@ -163,9 +163,106 @@ const ReportHutang = () => {
       // }
     });
 
-    let final = [];
-
-    console.log(data);
+    let final = [
+      {
+        columns: [
+          {
+            title: `Periode ${formatDate(filtDate)}`,
+            width: { wch: 30 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+        ],
+        data: [
+          [
+            {
+              value: "",
+              style: {
+                font: { sz: "14", bold: false },
+                alignment: { horizontal: "left", vertical: "center" },
+              },
+            },
+            {
+              value: "",
+              style: {
+                font: { sz: "14", bold: false },
+                alignment: { horizontal: "left", vertical: "center" },
+              },
+            },
+            {
+              value: "",
+              style: {
+                font: { sz: "14", bold: false },
+                alignment: { horizontal: "left", vertical: "center" },
+              },
+            },
+            {
+              value: "",
+              style: {
+                font: { sz: "14", bold: false },
+                alignment: { horizontal: "right", vertical: "center" },
+              },
+            },
+            {
+              value: "",
+              style: {
+                font: { sz: "14", bold: false },
+                alignment: { horizontal: "right", vertical: "center" },
+              },
+            },
+            {
+              value: "",
+              style: {
+                font: { sz: "14", bold: false },
+                alignment: { horizontal: "right", vertical: "center" },
+              },
+            },
+          ],
+        ],
+      },
+    ];
 
     data.forEach((el) => {
       let item = [];
@@ -406,10 +503,9 @@ const ReportHutang = () => {
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
             <ExcelFile
-              filename={`payable_report_${formatDate(new Date()).replace(
-                "-",
-                ""
-              )}`}
+              filename={`payable_report_${formatDate(new Date())
+                .replace("-", "")
+                .replace("-", "")}`}
               element={
                 <Button variant="primary" onClick={() => {}}>
                   EXCEL

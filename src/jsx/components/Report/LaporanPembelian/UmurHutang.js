@@ -108,7 +108,7 @@ const UmurHutang = () => {
     return [day, month, year].join("-");
   };
 
-  const jsonForExcel = (ap) => {
+  const jsonForExcel = (ap, excel = false) => {
     let data = [];
 
     ap?.forEach((el) => {
@@ -141,24 +141,6 @@ const UmurHutang = () => {
       el.ap.forEach((ek) => {
         let due = new Date(`${ek?.ord_due}Z`);
         let diff = (date - due) / (1000 * 60 * 60 * 24);
-        console.log(`${ek.ord_id.fk_code} ${diff} hari`);
-        // val.push({
-        //   sup: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
-        //   type: "item",
-        //   value: {
-        //     fk: ek.ord_id.fk_code,
-        //     jt: `Rp. ${formatIdr(diff <= 0 ? ek.trx_amnh : 0)}`,
-        //     day1: `Rp. ${formatIdr(diff <= 7 && diff > 0 ? ek.trx_amnh : 0)}`,
-        //     day2: `Rp. ${formatIdr(diff <= 14 && diff > 7 ? ek.trx_amnh : 0)}`,
-        //     day3: `Rp. ${formatIdr(diff <= 30 && diff > 14 ? ek.trx_amnh : 0)}`,
-        //     day4: `Rp. ${formatIdr(diff <= 60 && diff > 30 ? ek.trx_amnh : 0)}`,
-        //     older: `Rp. ${formatIdr(diff > 60 ? ek.trx_amnh : 0)}`,
-        //     nota: `Rp. ${formatIdr(0)}`,
-        //     rtr: `Rp. ${formatIdr(0)}`,
-        //     total: `Rp. ${formatIdr(ek.trx_amnh)}`,
-        //     giro: `Rp. ${formatIdr(0)}`,
-        //   },
-        // });
 
         val.push({
           sup: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
@@ -207,7 +189,444 @@ const UmurHutang = () => {
       data.push(val);
     });
 
-    return data;
+    let final = [
+      {
+        columns: [
+          {
+            title: `Periode ${formatDate(date)}`,
+            width: { wch: 20 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+        ],
+        data: [
+          [
+            {
+              value: "",
+              style: {
+                font: { sz: "14", bold: false },
+                alignment: { horizontal: "left", vertical: "center" },
+              },
+            },
+            {
+              value: "",
+              style: {
+                font: { sz: "14", bold: false },
+                alignment: { horizontal: "left", vertical: "center" },
+              },
+            },
+            {
+              value: "",
+              style: {
+                font: { sz: "14", bold: false },
+                alignment: { horizontal: "left", vertical: "center" },
+              },
+            },
+            {
+              value: "",
+              style: {
+                font: { sz: "14", bold: false },
+                alignment: { horizontal: "right", vertical: "center" },
+              },
+            },
+            {
+              value: "",
+              style: {
+                font: { sz: "14", bold: false },
+                alignment: { horizontal: "right", vertical: "center" },
+              },
+            },
+            {
+              value: "",
+              style: {
+                font: { sz: "14", bold: false },
+                alignment: { horizontal: "right", vertical: "center" },
+              },
+            },
+            {
+              value: "",
+              style: {
+                font: { sz: "14", bold: false },
+                alignment: { horizontal: "right", vertical: "center" },
+              },
+            },
+            {
+              value: "",
+              style: {
+                font: { sz: "14", bold: false },
+                alignment: { horizontal: "right", vertical: "center" },
+              },
+            },
+            {
+              value: "",
+              style: {
+                font: { sz: "14", bold: false },
+                alignment: { horizontal: "right", vertical: "center" },
+              },
+            },
+          ],
+        ],
+      },
+    ];
+
+    data.forEach((el) => {
+      let item = [];
+      el.forEach((ek) => {
+        item.push([
+          {
+            value: `${ek.value.fk}`,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.value.jt}`,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.value.day1}`,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.value.day2}`,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.value.day3}`,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.value.day4}`,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.value.nota}`,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.value.rtr}`,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.value.total}`,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+        ]);
+      });
+
+      item.push([
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+      ]);
+
+      final.push({
+        columns: [
+          {
+            title: `${el[0].sup}`,
+            width: { wch: 20 },
+            style: {
+              font: { sz: "14", bold: false },
+              alignment: { horizontal: "left", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "left", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "left", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+        ],
+        data: item,
+      });
+    });
+
+    if (excel) {
+      return final;
+    } else {
+      return data;
+    }
   };
 
   const formatIdr = (value) => {
@@ -252,14 +671,11 @@ const UmurHutang = () => {
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
             <ExcelFile
-              filename={`report_export_${new Date().getTime()}`}
+              filename={`due_date_payable_${formatDate(new Date())
+                .replace("-", "")
+                .replace("-", "")}`}
               element={
-                <Button
-                  variant="primary"
-                  onClick={() => {
-                    jsonForExcel();
-                  }}
-                >
+                <Button variant="primary" onClick={() => {}}>
                   EXCEL
                   <span className="btn-icon-right">
                     <i class="bx bx-table"></i>
@@ -268,7 +684,7 @@ const UmurHutang = () => {
               }
             >
               <ExcelSheet
-                dataSet={report ? jsonForExcel(report) : null}
+                dataSet={ap ? jsonForExcel(ap, true) : null}
                 name="Report"
               />
             </ExcelFile>
@@ -313,12 +729,11 @@ const UmurHutang = () => {
       <Row className="ml-0 pt-0 justify-content-center" ref={printPage}>
         {chunk(jsonForExcel(ap, false) ?? [], chunkSize)?.map((val, idx) => {
           return (
-            <Card >
+            <Card>
               <Card.Body className="p-0 m-0">
                 <CustomeWrapper
-                  tittle={"Payable Age Report"}
-                  subTittle={`Payable Age Report as of ${formatDate(date)}`}
-                  page={idx + 1}
+                  tittle={"Due Date Payable"}
+                  subTittle={`Due Date Payable as of ${formatDate(date)}`}
                   body={
                     <>
                       {val.map((v) => {
@@ -332,7 +747,7 @@ const UmurHutang = () => {
                             emptyMessage="Data Tidak Ditemukan"
                           >
                             <Column
-                              className="header-center"
+                              className="header-center border-right border-left"
                               header={(e) =>
                                 e.props.value ? e.props?.value[0]?.sup : null
                               }
@@ -350,7 +765,7 @@ const UmurHutang = () => {
                               )}
                             />
                             <Column
-                              className="header-center"
+                              className="header-center border-right"
                               header=""
                               style={{ minWidht: "13rem" }}
                               body={(e) => (
@@ -368,7 +783,7 @@ const UmurHutang = () => {
                               )}
                             />
                             <Column
-                              className="header-center"
+                              className="header-center border-right"
                               header=""
                               style={{ minWidht: "13rem" }}
                               body={(e) => (
@@ -386,7 +801,7 @@ const UmurHutang = () => {
                               )}
                             />
                             <Column
-                              className="header-center"
+                              className="header-center border-right"
                               header=""
                               style={{ minWidht: "11rem" }}
                               body={(e) => (
@@ -404,7 +819,7 @@ const UmurHutang = () => {
                               )}
                             />
                             <Column
-                              className="header-center"
+                              className="header-center border-right"
                               header=""
                               style={{ minWidht: "13rem" }}
                               body={(e) => (
@@ -422,7 +837,7 @@ const UmurHutang = () => {
                               )}
                             />
                             <Column
-                              className="header-center"
+                              className="header-center border-right"
                               header=""
                               style={{ minWidht: "13rem" }}
                               body={(e) => (
@@ -440,7 +855,7 @@ const UmurHutang = () => {
                               )}
                             />
                             <Column
-                              className="header-center"
+                              className="header-center border-right"
                               header=""
                               style={{ minWidht: "13rem" }}
                               body={(e) => (
@@ -458,7 +873,7 @@ const UmurHutang = () => {
                               )}
                             />
                             <Column
-                              className="header-center"
+                              className="header-center border-right"
                               header=""
                               style={{ minWidht: "13rem" }}
                               body={(e) => (
@@ -476,7 +891,7 @@ const UmurHutang = () => {
                               )}
                             />
                             <Column
-                              className="header-center"
+                              className="header-center border-right"
                               header=""
                               style={{ minWidht: "13rem" }}
                               body={(e) => (
@@ -494,7 +909,7 @@ const UmurHutang = () => {
                               )}
                             />
                             <Column
-                              className="header-center"
+                              className="header-center border-right"
                               header=""
                               style={{ minWidht: "13rem" }}
                               body={(e) => (
@@ -512,7 +927,7 @@ const UmurHutang = () => {
                               )}
                             />
                             <Column
-                              className="header-center"
+                              className="header-center border-right"
                               header=""
                               style={{ minWidht: "13rem" }}
                               body={(e) => (
@@ -545,8 +960,8 @@ const UmurHutang = () => {
         <Card ref={printPage}>
           <Card.Body className="p-0">
             <CustomeWrapper
-             tittle={"Due Date Payable"}
-             subTittle={`Due Date Payable as of ${formatDate(date)}`}
+              tittle={"Due Date Payable"}
+              subTittle={`Due Date Payable as of ${formatDate(date)}`}
               body={
                 <>
                   {jsonForExcel(ap, false)?.map((v) => {
@@ -560,7 +975,7 @@ const UmurHutang = () => {
                         emptyMessage="Data Tidak Ditemukan"
                       >
                         <Column
-                          className="header-center"
+                          className="header-center border-right border-left"
                           header={(e) =>
                             e.props.value ? e.props?.value[0]?.sup : null
                           }
@@ -578,7 +993,7 @@ const UmurHutang = () => {
                           )}
                         />
                         <Column
-                          className="header-center"
+                          className="header-center border-right"
                           header=""
                           style={{ minWidht: "13rem" }}
                           body={(e) => (
@@ -596,7 +1011,7 @@ const UmurHutang = () => {
                           )}
                         />
                         <Column
-                          className="header-center"
+                          className="header-center border-right"
                           header=""
                           style={{ minWidht: "13rem" }}
                           body={(e) => (
@@ -614,13 +1029,13 @@ const UmurHutang = () => {
                           )}
                         />
                         <Column
-                          className="header-center"
+                          className="header-center border-right"
                           header=""
                           style={{ minWidht: "11rem" }}
                           body={(e) => (
                             <div
                               className={
-                                e.type === "header"
+                                e.type === "header border-right"
                                   ? "font-weight-bold text-right"
                                   : e.type === "footer"
                                   ? "font-weight-bold text-right"
@@ -632,7 +1047,7 @@ const UmurHutang = () => {
                           )}
                         />
                         <Column
-                          className="header-center"
+                          className="header-center border-right"
                           header=""
                           style={{ minWidht: "13rem" }}
                           body={(e) => (
@@ -650,7 +1065,7 @@ const UmurHutang = () => {
                           )}
                         />
                         <Column
-                          className="header-center"
+                          className="header-center border-right"
                           header=""
                           style={{ minWidht: "13rem" }}
                           body={(e) => (
@@ -668,7 +1083,7 @@ const UmurHutang = () => {
                           )}
                         />
                         <Column
-                          className="header-center"
+                          className="header-center border-right"
                           header=""
                           style={{ minWidht: "13rem" }}
                           body={(e) => (
@@ -686,7 +1101,7 @@ const UmurHutang = () => {
                           )}
                         />
                         <Column
-                          className="header-center"
+                          className="header-center border-right"
                           header=""
                           style={{ minWidht: "13rem" }}
                           body={(e) => (
@@ -704,7 +1119,7 @@ const UmurHutang = () => {
                           )}
                         />
                         <Column
-                          className="header-center"
+                          className="header-center border-right"
                           header=""
                           style={{ minWidht: "13rem" }}
                           body={(e) => (
@@ -722,7 +1137,7 @@ const UmurHutang = () => {
                           )}
                         />
                         <Column
-                          className="header-center"
+                          className="header-center border-right"
                           header=""
                           style={{ minWidht: "13rem" }}
                           body={(e) => (
@@ -740,7 +1155,7 @@ const UmurHutang = () => {
                           )}
                         />
                         <Column
-                          className="header-center"
+                          className="header-center border-right"
                           header=""
                           style={{ minWidht: "13rem" }}
                           body={(e) => (

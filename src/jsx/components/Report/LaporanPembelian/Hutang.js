@@ -105,65 +105,262 @@ const ReportHutang = () => {
     return [day, month, year].join("-");
   };
 
-  const jsonForExcel = (ap) => {
+  const jsonForExcel = (ap, excel = false) => {
     let data = [];
 
     ap?.forEach((el) => {
       // let sel = `${el.supplier.sup_name} (${el.supplier.sup_code})`;
       // console.log(sel);
       // if (selectSup === sel) {
-        let val = [
-          {
-            sup: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
-            type: "header",
-            value: {
-              ref: "Invoice",
-              date: "Date",
-              jt: "Due Date",
-              value: "Payable",
-              lns: "Payment",
-              sisa: "Remain",
-            },
-          },
-        ];
-        let amn = 0;
-        let acq = 0;
-        el.ap.forEach((ek) => {
-          let dt = new Date(`${ek.ord_id.fk_date}Z`);
-          if (dt <= filtDate) {
-            val.push({
-              sup: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
-              type: "item",
-              value: {
-                ref: ek.ord_id.fk_code,
-                date: formatDate(ek.ord_id.fk_date),
-                jt: ek.ord_due ? formatDate(ek.ord_due) : "-",
-                value: `Rp. ${formatIdr(ek.trx_amnh)}`,
-                lns: `Rp. ${formatIdr(ek.acq_amnh)}`,
-                sisa: `Rp. ${formatIdr(ek.trx_amnh - ek.acq_amnh)}`,
-              },
-            });
-            amn += ek.trx_amnh;
-            acq += ek.acq_amnh;
-          }
-        });
-        val.push({
+      let val = [
+        {
           sup: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
-          type: "footer",
+          type: "header",
           value: {
-            ref: "Total",
-            date: "",
-            jt: "",
-            value: `Rp. ${formatIdr(amn)}`,
-            lns: `Rp. ${formatIdr(acq)}`,
-            sisa: `Rp. ${formatIdr(amn - acq)}`,
+            ref: "Invoice",
+            date: "Date",
+            jt: "Due Date",
+            value: "Payable",
+            lns: "Payment",
+            sisa: "Remain",
           },
-        });
-        data.push(val);
+        },
+      ];
+      let amn = 0;
+      let acq = 0;
+      el.ap.forEach((ek) => {
+        let dt = new Date(`${ek.ord_id.fk_date}Z`);
+        if (dt <= filtDate) {
+          val.push({
+            sup: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
+            type: "item",
+            value: {
+              ref: ek.ord_id.fk_code,
+              date: formatDate(ek.ord_id.fk_date),
+              jt: ek.ord_due ? formatDate(ek.ord_due) : "-",
+              value: `Rp. ${formatIdr(ek.trx_amnh)}`,
+              lns: `Rp. ${formatIdr(ek.acq_amnh)}`,
+              sisa: `Rp. ${formatIdr(ek.trx_amnh - ek.acq_amnh)}`,
+            },
+          });
+          amn += ek.trx_amnh;
+          acq += ek.acq_amnh;
+        }
+      });
+      val.push({
+        sup: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
+        type: "footer",
+        value: {
+          ref: "Total",
+          date: "",
+          jt: "",
+          value: `Rp. ${formatIdr(amn)}`,
+          lns: `Rp. ${formatIdr(acq)}`,
+          sisa: `Rp. ${formatIdr(amn - acq)}`,
+        },
+      });
+      data.push(val);
       // }
     });
 
-    return data;
+    let final = [];
+
+    console.log(data);
+
+    data.forEach((el) => {
+      let item = [];
+      el.forEach((ek) => {
+        item.push([
+          {
+            value: `${ek.value.ref}`,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.value.date}`,
+            style: {
+              font: { sz: "14", bold: ek.type === "header" ? true : false },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.value.jt}`,
+            style: {
+              font: { sz: "14", bold: ek.type === "header" ? true : false },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.value.value}`,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.value.lns}`,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.value.sisa}`,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+        ]);
+      });
+
+      item.push([
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+      ]);
+
+      final.push({
+        columns: [
+          {
+            title: `${el[0].sup}`,
+            width: { wch: 30 },
+            style: {
+              font: { sz: "14", bold: false },
+              alignment: { horizontal: "left", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "left", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "left", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+        ],
+        data: item,
+      });
+    });
+
+    if (excel) {
+      return final;
+    } else {
+      return data;
+    }
   };
 
   const formatIdr = (value) => {
@@ -209,7 +406,10 @@ const ReportHutang = () => {
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
             <ExcelFile
-              filename={`report_export_${new Date().getTime()}`}
+              filename={`payable_report_${formatDate(new Date()).replace(
+                "-",
+                ""
+              )}`}
               element={
                 <Button variant="primary" onClick={() => {}}>
                   EXCEL
@@ -220,7 +420,7 @@ const ReportHutang = () => {
               }
             >
               <ExcelSheet
-                dataSet={ap ? jsonForExcel(ap) : null}
+                dataSet={ap ? jsonForExcel(ap, true) : null}
                 name="Report"
               />
             </ExcelFile>

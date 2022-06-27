@@ -44,8 +44,6 @@ const ReportGRA = () => {
   const [filtersDate, setFiltersDate] = useState([new Date(), new Date()]);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
 
-  const dummy = Array.from({ length: 10 });
-
   useEffect(() => {
     initFilters1();
     getOrd();
@@ -157,7 +155,7 @@ const ReportGRA = () => {
     });
   };
 
-  const jsonForExcel = (gra) => {
+  const jsonForExcel = (gra, excel = false) => {
     let data = [];
 
     gra?.forEach((el) => {
@@ -167,6 +165,7 @@ const ReportGRA = () => {
           {
             ref: el.kd_gra,
             type: "header",
+            style: { font: { sz: "14", bold: true } },
             value: {
               date: "Date",
               po: "Code",
@@ -209,11 +208,333 @@ const ReportGRA = () => {
         });
         data.push(val);
       }
-      // el.gra.forEach((element) => {
-      // });
     });
 
-    return data;
+    let final = [{
+      columns: [
+        {
+          title: `Period ${formatDate(
+            filtersDate[0]
+          )} to ${formatDate(filtersDate[1])}`,
+          width: { wch: 30 },
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          title: "",
+          width: { wch: 15 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          title: "",
+          width: { wch: 30 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          title: "",
+          width: { wch: 35 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          title: "",
+          width: { wch: 13 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          title: "",
+          width: { wch: 12 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          title: "",
+          width: { wch: 20 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          title: "",
+          width: { wch: 20 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+      ],
+      data: [[]],
+    }];
+    data.forEach((el) => {
+      let item = [];
+      el.forEach((ek) => {
+        item.push([
+          {
+            value: `${ek.value.date}`,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.value.po}`,
+            style: {
+              font: { sz: "14", bold: ek.type === "header" ? true : false },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.value.sup}`,
+            style: {
+              font: { sz: "14", bold: ek.type === "header" ? true : false },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.value.prod}`,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.value.ord}`,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.value.unit}`,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.value.prc}`,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.value.tot}`,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+        ]);
+      });
+
+      item.push([
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+      ]);
+
+      final.push({
+        columns: [
+          {
+            title: `${el[0].ref}`,
+            width: { wch: 30 },
+            style: {
+              font: { sz: "14", bold: false },
+              alignment: { horizontal: "left", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "left", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 30 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "left", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 35 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 13 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 12 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 20 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 20 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+        ],
+        data: item,
+      });
+    });
+
+    if (excel) {
+      return final;
+    } else {
+      return data;
+    }
   };
 
   const initFilters1 = () => {
@@ -246,14 +567,9 @@ const ReportGRA = () => {
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
             <ExcelFile
-              filename={`report_export_${new Date().getTime()}`}
+              filename={`purchase_report_export_${new Date().getTime()}`}
               element={
-                <Button
-                  variant="primary"
-                  onClick={() => {
-                    jsonForExcel();
-                  }}
-                >
+                <Button variant="primary" onClick={() => {}}>
                   EXCEL
                   <span className="btn-icon-right">
                     <i class="bx bx-table"></i>
@@ -261,10 +577,10 @@ const ReportGRA = () => {
                 </Button>
               }
             >
-              {/* <ExcelSheet
-                dataSet={gra ? jsonForExcel(gra) : null}
-                name="Report"
-              /> */}
+              <ExcelSheet
+                dataSet={gra ? jsonForExcel(gra, true) : null}
+                name={"Purchase"}
+              />
             </ExcelFile>
           </div>
           <ReactToPrint
@@ -443,8 +759,6 @@ const ReportGRA = () => {
           </Card>
         </Col>
       </Row>
-
-     
 
       <Row className="m-0 justify-content-center d-none">
         <Card className="ml-1 mr-1 mt-2">

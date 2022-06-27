@@ -110,7 +110,7 @@ const ReportKBB = () => {
     return [day, month, year].join("-");
   };
 
-  const jsonForExcel = (account) => {
+  const jsonForExcel = (account, excel = false) => {
     let data = [];
 
     account?.forEach((el) => {
@@ -134,9 +134,176 @@ const ReportKBB = () => {
         });
       }
     });
-    console.log(data);
 
-    return data;
+    let final = [
+      {
+        columns: [
+          {
+            title: `Period ${formatDate(filtDate)}`,
+            width: { wch: 40 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 20 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 20 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 20 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 20 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+        ],
+        data: [[]],
+      },
+    ];
+
+    let item = [];
+    data.forEach((el) => {
+      item.push([
+        {
+          value: `${el.acco}`,
+          style: {
+            font: {
+              sz: "14",
+              bold: false,
+            },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: `${el.slda}`,
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: `${el.debe}`,
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: `${el.kred}`,
+          style: {
+            font: {
+              sz: "14",
+              bold: false,
+            },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: `${el.blce}`,
+          style: {
+            font: {
+              sz: "14",
+              bold: false,
+            },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+      ]);
+    });
+
+    final.push({
+      columns: [
+        {
+          title: "Account",
+          width: { wch: 40 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "left", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          title: "Start Balance",
+          width: { wch: 20 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "right", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          title: "Mutasi Debit",
+          width: { wch: 20 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "right", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          title: "Mutasi Kredit",
+          width: { wch: 20 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "right", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          title: "Balance",
+          width: { wch: 20 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "right", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+      ],
+      data: item,
+    });
+
+    if (excel) {
+      return final;
+    } else {
+      return data;
+    }
   };
 
   const formatIdr = (value) => {
@@ -183,7 +350,7 @@ const ReportKBB = () => {
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
             <ExcelFile
-              filename={`report_export_${new Date().getTime()}`}
+              filename={`gl_card_report_export_${new Date().getTime()}`}
               element={
                 <Button variant="primary" onClick={() => {}}>
                   EXCEL
@@ -194,8 +361,8 @@ const ReportKBB = () => {
               }
             >
               <ExcelSheet
-                dataSet={account ? jsonForExcel(account) : null}
-                name="Report"
+                dataSet={account ? jsonForExcel(account, true) : null}
+                name="GL Card Report"
               />
             </ExcelFile>
           </div>
@@ -345,47 +512,47 @@ const ReportKBB = () => {
                   body={
                     <>
                       {/* {val.map((v) => { */}
-                        {/* return ( */}
-                          <DataTable
-                            responsiveLayout="scroll"
-                            value={val}
-                            showGridlines
-                            dataKey="id"
-                            rowHover
-                            emptyMessage="Data Tidak Ditemukan"
-                          >
-                            <Column
-                              className="header-center"
-                              header="Akun"
-                              style={{ width: "20rem" }}
-                              field={(e) => e?.acco}
-                            />
-                            <Column
-                              className="header-center text-right"
-                              header="Saldo Awal"
-                              style={{ minWidht: "8rem" }}
-                              field={(e) => e?.slda}
-                            />
-                            <Column
-                              className="header-center text-right"
-                              header="Mutasi Debit"
-                              style={{ minWidht: "8rem" }}
-                              field={(e) => e?.debe}
-                            />
-                            <Column
-                              className="header-center text-right"
-                              header="Mutasi Kredit"
-                              style={{ minWidht: "10rem" }}
-                              field={(e) => e?.kred}
-                            />
-                            <Column
-                              className="header-center text-right"
-                              header="Balance"
-                              style={{ minWidht: "10rem" }}
-                              field={(e) => e?.blce}
-                            />
-                          </DataTable>
-                        {/* );
+                      {/* return ( */}
+                      <DataTable
+                        responsiveLayout="scroll"
+                        value={val}
+                        showGridlines
+                        dataKey="id"
+                        rowHover
+                        emptyMessage="Data Tidak Ditemukan"
+                      >
+                        <Column
+                          className="header-center"
+                          header="Akun"
+                          style={{ width: "20rem" }}
+                          field={(e) => e?.acco}
+                        />
+                        <Column
+                          className="header-center text-right"
+                          header="Saldo Awal"
+                          style={{ minWidht: "8rem" }}
+                          field={(e) => e?.slda}
+                        />
+                        <Column
+                          className="header-center text-right"
+                          header="Mutasi Debit"
+                          style={{ minWidht: "8rem" }}
+                          field={(e) => e?.debe}
+                        />
+                        <Column
+                          className="header-center text-right"
+                          header="Mutasi Kredit"
+                          style={{ minWidht: "10rem" }}
+                          field={(e) => e?.kred}
+                        />
+                        <Column
+                          className="header-center text-right"
+                          header="Balance"
+                          style={{ minWidht: "10rem" }}
+                          field={(e) => e?.blce}
+                        />
+                      </DataTable>
+                      {/* );
                        })} */}
                     </>
                   }

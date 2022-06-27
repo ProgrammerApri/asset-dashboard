@@ -61,7 +61,7 @@ const ReportJurnal = () => {
     return [day, month, year].join("/");
   };
 
-  const jsonForExcel = (trans) => {
+  const jsonForExcel = (trans, excel = false) => {
     let data = [];
     let grouped = trans?.filter(
       (el, i) => i === trans.findIndex((ek) => el?.trx_code === ek?.trx_code)
@@ -128,7 +128,177 @@ const ReportJurnal = () => {
       data.push(val);
     });
 
-    return data;
+    let final = [{
+      columns: [
+        {
+          title: `Period ${formatDate(date[0])} to ${formatDate(date[1])}`,
+          width: { wch: 35 },
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          title: "",
+          width: { wch: 15 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          title: "",
+          width: { wch: 30 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          title: "",
+          width: { wch: 40 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+      ],
+      data: [[]],
+    }];
+    data.forEach((el) => {
+      let item = [];
+      el.forEach((ek) => {
+        item.push([
+          {
+            value: `${ek.value.acc}`,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.value.debit}`,
+            style: {
+              font: { sz: "14", bold: ek.type === "header" ? true : false },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.value.kredit}`,
+            style: {
+              font: { sz: "14", bold: ek.type === "header" ? true : false },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.value.desc}`,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+        ]);
+      });
+
+      item.push([
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+      ]);
+
+      final.push({
+        columns: [
+          {
+            title: `${el[0].trx_code}`,
+            width: { wch: 35 },
+            style: {
+              font: { sz: "14", bold: false },
+              alignment: { horizontal: "left", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 30 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 40 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "left", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+        ],
+        data: item,
+      });
+    });
+
+    if (excel) {
+      return final;
+    } else {
+      return data;
+    }
   };
 
   const formatIdr = (value) => {
@@ -159,7 +329,7 @@ const ReportJurnal = () => {
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
             <ExcelFile
-              filename={`report_export_${new Date().getTime()}`}
+              filename={`journal_report_export_${new Date().getTime()}`}
               element={
                 <Button variant="primary" onClick={() => {}}>
                   EXCEL
@@ -170,8 +340,8 @@ const ReportJurnal = () => {
               }
             >
               <ExcelSheet
-                dataSet={report ? jsonForExcel(report) : null}
-                name="Report"
+                dataSet={trans ? jsonForExcel(trans, true) : null}
+                name="Jurnal Report"
               />
             </ExcelFile>
           </div>

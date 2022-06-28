@@ -74,7 +74,7 @@
 
 /* prime react style */
 .p-component {
-  font-size: 0.9rem;
+  font-size: 13px;
 }
 
 .p-datatable .p-datatable-tbody > tr > td {
@@ -13123,7 +13123,7 @@ a.active {
   position: relative;
   padding: 0rem;
   z-index: 3;
-  padding-left: 17rem;
+  padding-left: 15rem;
   transition: all 0.2s ease;
   background-color: var(--body-bg);
 }
@@ -13340,7 +13340,7 @@ svg.pulse-svg .third-circle {
   align-items: center;
 }
 .header-left .dashboard_bar {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 600;
   color: var(--text-color);
 }
@@ -16223,7 +16223,7 @@ html[dir="rtl"]
 }
 
 .content-body {
-  margin-left: 17rem;
+  margin-left: 15rem;
   z-index: 0;
   transition: all 0.2s ease;
 }
@@ -38837,7 +38837,7 @@ button:focus {
   padding: 0.5rem 1rem;
   border-radius: 10px;
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: 13px;
 }
 .btn:hover,
 .btn:focus,
@@ -47500,7 +47500,7 @@ html[dir="rtl"]
   position: fixed;
   top: 0;
   left: 0;
-  width: 17rem;
+  width: 15rem;
   height: 100vh;
   box-shadow: var(--shadow);
   overflow-y: auto;
@@ -47516,7 +47516,7 @@ html[dir="rtl"]
   align-items: center;
   position: fixed;
   top: 0;
-  width: 17rem;
+  width: 15rem;
   background: var(--card-bg);
   z-index: 10;
   transition: 0.25s;
@@ -47529,7 +47529,7 @@ html[dir="rtl"]
   justify-content: center;
   position: fixed;
   top: 2rem;
-  left: 16.1rem;
+  left: 14.1rem;
   width: 28px !important;
   height: 28px;
   background: var(--card-bg);
@@ -47558,7 +47558,7 @@ a .sidebar-logo .logo{
 }
 
 .sidebar-menu {
-  width: 17rem;
+  width: 15rem;
 }
 
 .sidebar-menu .menu-tittle {
@@ -47566,7 +47566,7 @@ a .sidebar-logo .logo{
   width: 100%;
   display: flex;
   align-items: center;
-  font-size: 0.8rem;
+  font-size: 11px;
   font-weight: 400;
   text-transform: uppercase;
   transition: color 0.2s ease-in-out;
@@ -47586,7 +47586,7 @@ a .sidebar-logo .logo{
   height: 45px;
   display: flex;
   align-items: center;
-  font-size: 0.9rem;
+  font-size: 12px;
   font-weight: 500;
   text-transform: capitalize;
   transition: color 0.2s ease-in-out;
@@ -47627,12 +47627,12 @@ a .sidebar-logo .logo{
 }
 
 .sidebar .sidebar-footer {
-  font-size: 14px;
+  font-size: 13px;
   padding: 1.5rem;
   position: fixed;
   bottom: 0;
   color: #7A80AB;
-  width: 17rem;
+  width: 15rem;
   background: var(--card-bg);
 }
 

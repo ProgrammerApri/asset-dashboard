@@ -56,6 +56,7 @@ const Neraca = () => {
   const printPage = useRef(null);
   const toast = useRef(null);
   const dummy = Array.from({ length: 10 });
+  const [cp, setCp] = useState("");
 
   useEffect(() => {
     getAccount();
@@ -241,14 +242,19 @@ const Neraca = () => {
       },
     ]);
 
-    let selisih = totalAktiva-totalPasiva
-    pasiva[pasiva.length-4][1].value = selisih > 0 ? `Rp. ${formatIdr((selisih/3).toFixed(0))}` : 0
-    pasiva[pasiva.length-3][1].value = selisih > 0 ? `Rp. ${formatIdr((selisih*2/3).toFixed(0))}` : 0
-    pasiva[pasiva.length-2][1].value = selisih > 0 ? `Rp. ${formatIdr((selisih/3)+(selisih*2/3))}` : 0
-    pasiva[pasiva.length-1][1].value = selisih > 0 ? `Rp. ${formatIdr(totalPasiva+(selisih/3)+(selisih*2/3))}` : totalPasiva
+    let selisih = totalAktiva - totalPasiva;
+    pasiva[pasiva.length - 4][1].value =
+      selisih > 0 ? `Rp. ${formatIdr((selisih / 3).toFixed(0))}` : 0;
+    pasiva[pasiva.length - 3][1].value =
+      selisih > 0 ? `Rp. ${formatIdr(((selisih * 2) / 3).toFixed(0))}` : 0;
+    pasiva[pasiva.length - 2][1].value =
+      selisih > 0 ? `Rp. ${formatIdr(selisih / 3 + (selisih * 2) / 3)}` : 0;
+    pasiva[pasiva.length - 1][1].value =
+      selisih > 0
+        ? `Rp. ${formatIdr(totalPasiva + selisih / 3 + (selisih * 2) / 3)}`
+        : totalPasiva;
 
     console.log(pasiva);
-    
 
     let defLength =
       aktiva.length > pasiva.length ? aktiva.length : pasiva.length;
@@ -276,11 +282,54 @@ const Neraca = () => {
       {
         columns: [
           {
+            title: "Balance Sheet",
+            width: { wch: 50 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+        ],
+        data: [
+          [
+            {
+              value: cp,
+              style: {
+                font: {
+                  sz: "14",
+                  bold: false,
+                },
+                alignment: { horizontal: "left", vertical: "center" },
+              },
+            },
+          ],
+        ],
+      },
+      {
+        columns: [
+          {
+            title: `Per ${formatDate(date)}`,
+            width: { wch: 50 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+        ],
+        data: [[]],
+      },
+      {
+        columns: [
+          {
             title: "Asset",
             width: { wch: 50 },
             style: {
               font: { sz: "14", bold: true },
               alignment: { horizontal: "center", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
             },
           },
           {
@@ -289,6 +338,10 @@ const Neraca = () => {
             style: {
               font: { sz: "14", bold: true },
               alignment: { horizontal: "right", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
             },
           },
           {
@@ -297,6 +350,10 @@ const Neraca = () => {
             style: {
               font: { sz: "14", bold: true },
               alignment: { horizontal: "center", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
             },
           },
           {
@@ -304,13 +361,19 @@ const Neraca = () => {
             width: { wch: 15 },
             style: {
               font: { sz: "14", bold: true },
-              alignment: { horizontal: "tight", vertical: "center" },
+              alignment: { horizontal: "right", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
             },
           },
         ],
         data: data,
       },
     ];
+
+    console.log(final);
 
     if (excel) {
       return final;
@@ -358,7 +421,7 @@ const Neraca = () => {
             >
               <ExcelSheet
                 dataSet={account ? jsonForExcel(account, true) : null}
-                name={`Neraca-${formatDate(new Date())}`}
+                name={"Report"}
               />
             </ExcelFile>
           </div>
@@ -404,13 +467,11 @@ const Neraca = () => {
       <Row>
         <Col>
           <Card className="mb-3">
-            <Card.Body>
-              {renderHeader()}
-            </Card.Body>
+            <Card.Body>{renderHeader()}</Card.Body>
           </Card>
         </Col>
       </Row>
-      <Row className="m-0 justify-content-center" >
+      <Row className="m-0 justify-content-center">
         <Card className="ml-1 mr-1 mt-2">
           <Card.Body className="p-0">
             <CustomeWrapper
@@ -419,139 +480,146 @@ const Neraca = () => {
               page={1}
               body={
                 <DataTable
-                responsiveLayout="scroll"
-                value={
-                  loading
-                    ? dummy
-                    : account
-                    ? jsonForExcel(account, false)
-                    : null
-                }
-                className="display w-150 datatable-wrapper"
-                showGridlines
-                dataKey="id"
-                rowHover
-                emptyMessage="Tidak ada data"
-              >
-                <Column
-                  className="center-header"
-                  header="Asset"
-                  style={{
-                    minWidth: "8rem",
-                  }}
-                  field={(e) => e[0].value}
-                  body={(e) =>
-                    loading ? (
-                      <Skeleton />
-                    ) : (
-                      <Row>
-                        <div className={e[0].type == "D" && "mr-4"}></div>
-                        <div className={e[0].type == "U" && "font-weight-bold"}>
-                          {e[0].value}
+                  responsiveLayout="scroll"
+                  value={
+                    loading
+                      ? dummy
+                      : account
+                      ? jsonForExcel(account, false)
+                      : null
+                  }
+                  className="display w-150 datatable-wrapper"
+                  showGridlines
+                  dataKey="id"
+                  rowHover
+                  emptyMessage="Tidak ada data"
+                >
+                  <Column
+                    className="center-header"
+                    header="Asset"
+                    style={{
+                      minWidth: "8rem",
+                    }}
+                    field={(e) => e[0].value}
+                    body={(e) =>
+                      loading ? (
+                        <Skeleton />
+                      ) : (
+                        <Row>
+                          <div className={e[0].type == "D" && "mr-4"}></div>
+                          <div
+                            className={e[0].type == "U" && "font-weight-bold"}
+                          >
+                            {e[0].value}
+                          </div>
+                        </Row>
+                      )
+                    }
+                  />
+                  <Column
+                    header=" "
+                    field={(e) => e[1].value}
+                    className="text-right border-right"
+                    body={(e) =>
+                      loading ? (
+                        <Skeleton />
+                      ) : (
+                        <div
+                          className={e[1].last && "font-weight-bold"}
+                        >{`${e[1].value}`}</div>
+                      )
+                    }
+                  />
+                  <Column
+                    className="center-header"
+                    header="Liabilities"
+                    style={{
+                      minWidth: "8rem",
+                    }}
+                    field={(e) => e[2].value}
+                    body={(e) =>
+                      loading ? (
+                        <Skeleton />
+                      ) : (
+                        <Row>
+                          <div className={"mr-4"}></div>
+                          <div className={e[2].type == "D" && "mr-4"}></div>
+                          <div
+                            className={e[2].type == "U" && "font-weight-bold"}
+                          >
+                            {e[2].value}
+                          </div>
+                        </Row>
+                      )
+                    }
+                  />
+                  <Column
+                    header=" "
+                    field={(e) => e[3].value}
+                    className="text-right"
+                    body={(e) =>
+                      loading ? (
+                        <Skeleton />
+                      ) : (
+                        <div className={e[3].last && "font-weight-bold"}>
+                          {e[3].value}
                         </div>
-                      </Row>
-                    )
-                  }
-                />
-                <Column
-                  header=" "
-                  field={(e) => e[1].value}
-                  className="text-right border-right"
-                  body={(e) =>
-                    loading ? (
-                      <Skeleton />
-                    ) : (
-                      <div
-                        className={e[1].last && "font-weight-bold"}
-                      >{`${e[1].value}`}</div>
-                    )
-                  }
-                />
-                <Column
-                  className="center-header"
-                  header="Liabilities"
-                  style={{
-                    minWidth: "8rem",
-                  }}
-                  field={(e) => e[2].value}
-                  body={(e) =>
-                    loading ? (
-                      <Skeleton />
-                    ) : (
-                      <Row>
-                        <div className={"mr-4"}></div>
-                        <div className={e[2].type == "D" && "mr-4"}></div>
-                        <div className={e[2].type == "U" && "font-weight-bold"}>
-                          {e[2].value}
-                        </div>
-                      </Row>
-                    )
-                  }
-                />
-                <Column
-                  header=" "
-                  field={(e) => e[3].value}
-                  className="text-right"
-                  body={(e) =>
-                    loading ? (
-                      <Skeleton />
-                    ) : (
-                      <div className={e[3].last && "font-weight-bold"}>
-                        {e[3].value}
-                      </div>
-                    )
-                  }
-                />
-              </DataTable>
+                      )
+                    }
+                  />
+                </DataTable>
               }
             />
           </Card.Body>
         </Card>
       </Row>
-      <Row className="m-0 justify-content-center d-none" >
+      <Row className="m-0 justify-content-center d-none">
         <Card className="ml-1 mr-1 mt-2">
           <Card.Body className="p-0" ref={printPage}>
             <CustomeWrapper
               tittle={"Balance Sheet"}
               subTittle={`Balance Sheet as of ${formatDate(date)}`}
               page={1}
+              onComplete={(cp) => setCp(cp)}
               body={
                 <DataTable
-                responsiveLayout="scroll"
-                value={
-                  loading
-                    ? dummy
-                    : account
-                    ? jsonForExcel(account, false)
-                    : null
-                }
-                className="display w-150 datatable-wrapper"
-                showGridlines
-                dataKey="id"
-                rowHover
-                emptyMessage="Tidak ada data"
-              >
-                <Column
-                  className="center-header"
-                  header="Asset"
-                  style={{
-                    minWidth: "8rem",
-                  }}
-                  field={(e) => e[0].value}
-                  body={(e) =>
-                    loading ? (
-                      <Skeleton />
-                    ) : (
-                      <Row>
-                        <div className={e[0].type == "D" && "mr-4"}></div>
-                        <div className={e[0].type == "U" && "font-weight-bold"}>
-                          {e[0].value}
-                        </div>
-                      </Row>
-                    )
+                  responsiveLayout="scroll"
+                  value={
+                    loading
+                      ? dummy
+                      : account
+                      ? jsonForExcel(account, false)
+                      : null
                   }
-                />
-                {/* <Column
+                  className="display w-150 datatable-wrapper"
+                  showGridlines
+                  dataKey="id"
+                  rowHover
+                  emptyMessage="Tidak ada data"
+                >
+                  <Column
+                    className="center-header"
+                    header="Asset"
+                    style={{
+                      minWidth: "8rem",
+                    }}
+                    field={(e) => e[0].value}
+                    body={(e) =>
+                      loading ? (
+                        <Skeleton />
+                      ) : (
+                        <Row>
+                          <div className={e[0].type == "D" && "mr-4"}></div>
+                          <div
+                            className={e[0].type == "U" && "font-weight-bold"}
+                          >
+                            {e[0].value}
+                          </div>
+                        </Row>
+                      )
+                    }
+                  />
+                  {/* <Column
                   header="May 2022"
                   field={(e) => e[1].value}
                   className="text-right border-right center-header"
@@ -565,56 +633,58 @@ const Neraca = () => {
                     )
                   }
                 /> */}
-                <Column
-                  header=""
-                  field={(e) => e[1].value}
-                  className="text-right border-right center-header"
-                  body={(e) =>
-                    loading ? (
-                      <Skeleton />
-                    ) : (
-                      <div
-                        className={e[1].last && "font-weight-bold"}
-                      >{`${e[1].value}`}</div>
-                    )
-                  }
-                />
-                <Column
-                  className="center-header"
-                  header="Liabilities"
-                  style={{
-                    minWidth: "8rem",
-                  }}
-                  field={(e) => e[2].value}
-                  body={(e) =>
-                    loading ? (
-                      <Skeleton />
-                    ) : (
-                      <Row>
-                        <div className={"mr-4"}></div>
-                        <div className={e[2].type == "D" && "mr-4"}></div>
-                        <div className={e[2].type == "U" && "font-weight-bold"}>
-                          {e[2].value}
+                  <Column
+                    header=""
+                    field={(e) => e[1].value}
+                    className="text-right border-right center-header"
+                    body={(e) =>
+                      loading ? (
+                        <Skeleton />
+                      ) : (
+                        <div
+                          className={e[1].last && "font-weight-bold"}
+                        >{`${e[1].value}`}</div>
+                      )
+                    }
+                  />
+                  <Column
+                    className="center-header"
+                    header="Liabilities"
+                    style={{
+                      minWidth: "8rem",
+                    }}
+                    field={(e) => e[2].value}
+                    body={(e) =>
+                      loading ? (
+                        <Skeleton />
+                      ) : (
+                        <Row>
+                          <div className={"mr-4"}></div>
+                          <div className={e[2].type == "D" && "mr-4"}></div>
+                          <div
+                            className={e[2].type == "U" && "font-weight-bold"}
+                          >
+                            {e[2].value}
+                          </div>
+                        </Row>
+                      )
+                    }
+                  />
+                  <Column
+                    header=""
+                    field={(e) => e[3].value}
+                    className="text-right center-header"
+                    body={(e) =>
+                      loading ? (
+                        <Skeleton />
+                      ) : (
+                        <div className={e[3].last && "font-weight-bold"}>
+                          {e[3].value}
                         </div>
-                      </Row>
-                    )
-                  }
-                />
-                <Column
-                  header=""
-                  field={(e) => e[3].value}
-                  className="text-right center-header"
-                  body={(e) =>
-                    loading ? (
-                      <Skeleton />
-                    ) : (
-                      <div className={e[3].last && "font-weight-bold"}>
-                        {e[3].value}
-                      </div>
-                    )
-                  }
-                />
-              </DataTable>
+                      )
+                    }
+                  />
+                </DataTable>
               }
             />
           </Card.Body>

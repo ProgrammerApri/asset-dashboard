@@ -21,12 +21,13 @@ const ReportJurnal = () => {
   const printPage = useRef(null);
   const [date, setDate] = useState([new Date(), new Date()]);
   const [trans, setTrans] = useState(null);
+  const [cp, setCp] = useState("");
   const chunkSize = 4;
 
   useEffect(() => {
     var d = new Date();
     d.setDate(d.getDate() - 7);
-    setDate([d, new Date()])
+    setDate([d, new Date()]);
     getTrans();
   }, []);
 
@@ -68,7 +69,7 @@ const ReportJurnal = () => {
     );
     let new_trans = [];
     grouped?.forEach((el) => {
-      let trx_date = new Date(`${el?.trx_date}Z`)
+      let trx_date = new Date(`${el?.trx_date}Z`);
       if (trx_date >= date[0] && trx_date <= date[1]) {
         let trx = [];
         trans?.forEach((ek) => {
@@ -128,43 +129,40 @@ const ReportJurnal = () => {
       data.push(val);
     });
 
-    let final = [{
-      columns: [
-        {
-          title: `Period ${formatDate(date[0])} to ${formatDate(date[1])}`,
-          width: { wch: 35 },
+    let final = [
+      {
+        columns: [
+          {
+            title: "Journal Report",
+            width: { wch: 35 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+        ],
+        data: [[{
+          value: cp,
           style: {
             font: { sz: "14", bold: false },
             alignment: { horizontal: "left", vertical: "center" },
           },
-        },
-        {
-          title: "",
-          width: { wch: 15 },
-          style: {
-            font: { sz: "14", bold: true },
-            alignment: { horizontal: "right", vertical: "center" },
+        },]],
+      },
+      {
+        columns: [
+          {
+            title: `Period ${formatDate(date[0])} to ${formatDate(date[1])}`,
+            width: { wch: 35 },
+            style: {
+              font: { sz: "14", bold: false },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
           },
-        },
-        {
-          title: "",
-          width: { wch: 30 },
-          style: {
-            font: { sz: "14", bold: true },
-            alignment: { horizontal: "right", vertical: "center" },
-          },
-        },
-        {
-          title: "",
-          width: { wch: 40 },
-          style: {
-            font: { sz: "14", bold: true },
-            alignment: { horizontal: "left", vertical: "center" },
-          },
-        },
-      ],
-      data: [[]],
-    }];
+        ],
+        data: [[]],
+      },
+    ];
     data.forEach((el) => {
       let item = [];
       el.forEach((ek) => {
@@ -341,7 +339,7 @@ const ReportJurnal = () => {
             >
               <ExcelSheet
                 dataSet={trans ? jsonForExcel(trans, true) : null}
-                name="Jurnal Report"
+                name="Journal Report"
               />
             </ExcelFile>
           </div>
@@ -390,7 +388,10 @@ const ReportJurnal = () => {
                 <Card.Body className="p-0">
                   <CustomeWrapper
                     tittle={"Transaction Journal"}
-                    subTittle={`Transaction Journal for Period ${formatDate(date[0])} to ${formatDate(date[1])}`}
+                    subTittle={`Transaction Journal for Period ${formatDate(
+                      date[0]
+                    )} to ${formatDate(date[1])}`}
+                    onComplete={(cp) => setCp(cp)}
                     page={idx + 1}
                     body={
                       <>

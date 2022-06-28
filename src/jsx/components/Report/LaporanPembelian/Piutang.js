@@ -26,6 +26,7 @@ const ReportPiutang = () => {
   const [selectCus, setSelectCus] = useState(null);
   const [ar, setAr] = useState(null);
   const [total, setTotal] = useState(null);
+  const [cp, setCp] = useState("");
 
   useEffect(() => {
     getCustomer();
@@ -163,7 +164,52 @@ const ReportPiutang = () => {
       // }
     });
 
-    let final = [];
+    let final = [
+      {
+        columns: [
+          {
+            title: "Receivable Report",
+            width: { wch: 30 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "left", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+        ],
+        data: [
+          [
+            {
+              value: cp,
+              style: {
+                font: { sz: "14", bold: false },
+                alignment: { horizontal: "left", vertical: "center" },
+              },
+            },
+          ],
+        ],
+      },
+      {
+        columns: [
+          {
+            title: `Period ${formatDate(filtDate)}`,
+            width: { wch: 30 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "left", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+        ],
+        data: [[]],
+      },
+    ];
     data.forEach((el) => {
       let item = [];
       el.forEach((ek) => {
@@ -574,6 +620,7 @@ const ReportPiutang = () => {
             <CustomeWrapper
               tittle={"Receivable Report"}
               subTittle={`Receivable Report as of ${formatDate(filtDate)}`}
+              onComplete={(cp) => setCp(cp)}
               body={
                 <>
                   {jsonForExcel(ar, false)?.map((v) => {

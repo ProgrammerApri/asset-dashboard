@@ -44,6 +44,7 @@ const SalesReport = () => {
   const [filtersDate, setFiltersDate] = useState([new Date(), new Date()]);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
   const chunkSize = 5;
+  const [cp, setCp] = useState("");
 
   const dummy = Array.from({ length: 10 });
 
@@ -202,77 +203,46 @@ const SalesReport = () => {
       }
     });
 
-    let final = [{
-      columns: [
-        {
-          title: `Period ${formatDate(
-            filtersDate[0]
-          )} to ${formatDate(filtersDate[1])}`,
-          width: { wch: 30 },
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "left", vertical: "center" },
+    let final = [
+      {
+        columns: [
+          {
+            title: "Sales Report",
+            width: { wch: 30 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
           },
-        },
-        {
-          title: "",
-          width: { wch: 15 },
-          style: {
-            font: { sz: "14", bold: true },
-            alignment: { horizontal: "left", vertical: "center" },
+        ],
+        data: [
+          [
+            {
+              value: cp,
+              style: {
+                font: { sz: "14", bold: false },
+                alignment: { horizontal: "left", vertical: "center" },
+              },
+            },
+          ],
+        ],
+      },
+      {
+        columns: [
+          {
+            title: `Period ${formatDate(filtersDate[0])} to ${formatDate(
+              filtersDate[1]
+            )}`,
+            width: { wch: 30 },
+            style: {
+              font: { sz: "14", bold: false },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
           },
-        },
-        {
-          title: "",
-          width: { wch: 30 },
-          style: {
-            font: { sz: "14", bold: true },
-            alignment: { horizontal: "left", vertical: "center" },
-          },
-        },
-        {
-          title: "",
-          width: { wch: 30 },
-          style: {
-            font: { sz: "14", bold: true },
-            alignment: { horizontal: "right", vertical: "center" },
-          },
-        },
-        {
-          title: "",
-          width: { wch: 13 },
-          style: {
-            font: { sz: "14", bold: true },
-            alignment: { horizontal: "right", vertical: "center" },
-          },
-        },
-        {
-          title: "",
-          width: { wch: 12 },
-          style: {
-            font: { sz: "14", bold: true },
-            alignment: { horizontal: "right", vertical: "center" },
-          },
-        },
-        {
-          title: "",
-          width: { wch: 20 },
-          style: {
-            font: { sz: "14", bold: true },
-            alignment: { horizontal: "right", vertical: "center" },
-          },
-        },
-        {
-          title: "",
-          width: { wch: 20 },
-          style: {
-            font: { sz: "14", bold: true },
-            alignment: { horizontal: "right", vertical: "center" },
-          },
-        },
-      ],
-      data: [[]],
-    }];
+        ],
+        data: [[]],
+      },
+    ];
     data.forEach((el) => {
       let item = [];
       el.forEach((ek) => {
@@ -640,6 +610,7 @@ const SalesReport = () => {
                   subTittle={`Sales Report for Period ${formatDate(
                     filtersDate[0]
                   )} to ${formatDate(filtersDate[1])}`}
+                  onComplete={(cp) => setCp(cp)}
                   page={idx + 1}
                   body={
                     <>

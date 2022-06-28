@@ -27,7 +27,7 @@ const ReportKBB = () => {
   const [selectCus, setSelectCus] = useState(null);
   const [account, setAcc] = useState(null);
   const [trans, setTrans] = useState(null);
-  const [total, setTotal] = useState(null);
+  const [cp, setCp] = useState("");
   const chunkSize = 27;
 
   useEffect(() => {
@@ -139,43 +139,34 @@ const ReportKBB = () => {
       {
         columns: [
           {
-            title: `Period ${formatDate(filtDate)}`,
+            title: "General Ledger Card",
             width: { wch: 40 },
             style: {
               font: { sz: "14", bold: true },
               alignment: { horizontal: "left", vertical: "center" },
             },
           },
-          {
-            title: "",
-            width: { wch: 20 },
-            style: {
-              font: { sz: "14", bold: true },
-              alignment: { horizontal: "right", vertical: "center" },
+        ],
+        data: [
+          [
+            {
+              value: cp,
+              style: {
+                font: { sz: "14", bold: false },
+                alignment: { horizontal: "left", vertical: "center" },
+              },
             },
-          },
+          ],
+        ],
+      },
+      {
+        columns: [
           {
-            title: "",
-            width: { wch: 20 },
+            title: `Period ${formatDate(filtDate)}`,
+            width: { wch: 40 },
             style: {
               font: { sz: "14", bold: true },
-              alignment: { horizontal: "right", vertical: "center" },
-            },
-          },
-          {
-            title: "",
-            width: { wch: 20 },
-            style: {
-              font: { sz: "14", bold: true },
-              alignment: { horizontal: "right", vertical: "center" },
-            },
-          },
-          {
-            title: "",
-            width: { wch: 20 },
-            style: {
-              font: { sz: "14", bold: true },
-              alignment: { horizontal: "right", vertical: "center" },
+              alignment: { horizontal: "left", vertical: "center" },
             },
           },
         ],
@@ -508,6 +499,7 @@ const ReportKBB = () => {
                   subTittle={`General Ledger Card as of ${formatDate(
                     filtDate
                   )}`}
+                  onComplete={(cp) => setCp(cp)}
                   page={idx + 1}
                   body={
                     <>

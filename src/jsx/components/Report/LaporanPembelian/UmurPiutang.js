@@ -26,6 +26,7 @@ const UmurPiutang = () => {
   const [selectCus, setSelectCus] = useState(null);
   const [ar, setAr] = useState(null);
   const [total, setTotal] = useState(null);
+  const [cp, setCp] = useState("");
   const chunkSize = 4;
 
   useEffect(() => {
@@ -189,6 +190,29 @@ const UmurPiutang = () => {
       {
         columns: [
           {
+            title: "Due Date Receivable",
+            width: { wch: 20 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+        ],
+        data: [
+          [
+            {
+              value: cp,
+              style: {
+                font: { sz: "14", bold: false },
+                alignment: { horizontal: "left", vertical: "center" },
+              },
+            },
+          ],
+        ],
+      },
+      {
+        columns: [
+          {
             title: `Periode ${formatDate(date)}`,
             width: { wch: 20 },
             style: {
@@ -196,138 +220,8 @@ const UmurPiutang = () => {
               alignment: { horizontal: "left", vertical: "center" },
             },
           },
-          {
-            title: "",
-            width: { wch: 15 },
-            style: {
-              font: { sz: "14", bold: true },
-              alignment: { horizontal: "left", vertical: "center" },
-            },
-          },
-          {
-            title: "",
-            width: { wch: 15 },
-            style: {
-              font: { sz: "14", bold: true },
-              alignment: { horizontal: "left", vertical: "center" },
-            },
-          },
-          {
-            title: "",
-            width: { wch: 15 },
-            style: {
-              font: { sz: "14", bold: true },
-              alignment: { horizontal: "right", vertical: "center" },
-            },
-          },
-          {
-            title: "",
-            width: { wch: 15 },
-            style: {
-              font: { sz: "14", bold: true },
-              alignment: { horizontal: "right", vertical: "center" },
-            },
-          },
-          {
-            title: "",
-            width: { wch: 15 },
-            style: {
-              font: { sz: "14", bold: true },
-              alignment: { horizontal: "right", vertical: "center" },
-            },
-          },
-          {
-            title: "",
-            width: { wch: 15 },
-            style: {
-              font: { sz: "14", bold: true },
-              alignment: { horizontal: "right", vertical: "center" },
-            },
-          },
-          {
-            title: "",
-            width: { wch: 15 },
-            style: {
-              font: { sz: "14", bold: true },
-              alignment: { horizontal: "right", vertical: "center" },
-            },
-          },
-          {
-            title: "",
-            width: { wch: 15 },
-            style: {
-              font: { sz: "14", bold: true },
-              alignment: { horizontal: "right", vertical: "center" },
-            },
-          },
         ],
-        data: [
-          [
-            {
-              value: "",
-              style: {
-                font: { sz: "14", bold: false },
-                alignment: { horizontal: "left", vertical: "center" },
-              },
-            },
-            {
-              value: "",
-              style: {
-                font: { sz: "14", bold: false },
-                alignment: { horizontal: "left", vertical: "center" },
-              },
-            },
-            {
-              value: "",
-              style: {
-                font: { sz: "14", bold: false },
-                alignment: { horizontal: "left", vertical: "center" },
-              },
-            },
-            {
-              value: "",
-              style: {
-                font: { sz: "14", bold: false },
-                alignment: { horizontal: "right", vertical: "center" },
-              },
-            },
-            {
-              value: "",
-              style: {
-                font: { sz: "14", bold: false },
-                alignment: { horizontal: "right", vertical: "center" },
-              },
-            },
-            {
-              value: "",
-              style: {
-                font: { sz: "14", bold: false },
-                alignment: { horizontal: "right", vertical: "center" },
-              },
-            },
-            {
-              value: "",
-              style: {
-                font: { sz: "14", bold: false },
-                alignment: { horizontal: "right", vertical: "center" },
-              },
-            },
-            {
-              value: "",
-              style: {
-                font: { sz: "14", bold: false },
-                alignment: { horizontal: "right", vertical: "center" },
-              },
-            },
-            {
-              value: "",
-              style: {
-                font: { sz: "14", bold: false },
-                alignment: { horizontal: "right", vertical: "center" },
-              },
-            },
-          ],
-        ],
+        data: [[]],
       },
     ];
 
@@ -671,11 +565,7 @@ const UmurPiutang = () => {
                 .replace("-", "")
                 .replace("-", "")}`}
               element={
-                <Button
-                  variant="primary"
-                  onClick={() => {
-                  }}
-                >
+                <Button variant="primary" onClick={() => {}}>
                   EXCEL
                   <span className="btn-icon-right">
                     <i class="bx bx-table"></i>
@@ -734,6 +624,7 @@ const UmurPiutang = () => {
                 <CustomeWrapper
                   tittle={"Due Date Receivable"}
                   subTittle={`Due Date Receivable as of ${formatDate(date)}`}
+                  onComplete={(cp) => setCp(cp)}
                   page={idx + 1}
                   body={
                     <>

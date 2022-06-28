@@ -26,6 +26,7 @@ const ReportHutang = () => {
   const [selectSup, setSelectSup] = useState(null);
   const [ap, setAp] = useState(null);
   const [total, setTotal] = useState(null);
+  const [cp, setCp] = useState("");
 
   useEffect(() => {
     getSupplier();
@@ -167,6 +168,29 @@ const ReportHutang = () => {
       {
         columns: [
           {
+            title: "Payable Report",
+            width: { wch: 30 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+        ],
+        data: [
+          [
+            {
+              value: cp,
+              style: {
+                font: { sz: "14", bold: false },
+                alignment: { horizontal: "left", vertical: "center" },
+              },
+            },
+          ],
+        ],
+      },
+      {
+        columns: [
+          {
             title: `Periode ${formatDate(filtDate)}`,
             width: { wch: 30 },
             style: {
@@ -174,93 +198,8 @@ const ReportHutang = () => {
               alignment: { horizontal: "left", vertical: "center" },
             },
           },
-          {
-            title: "",
-            width: { wch: 15 },
-            style: {
-              font: { sz: "14", bold: true },
-              alignment: { horizontal: "left", vertical: "center" },
-            },
-          },
-          {
-            title: "",
-            width: { wch: 15 },
-            style: {
-              font: { sz: "14", bold: true },
-              alignment: { horizontal: "left", vertical: "center" },
-            },
-          },
-          {
-            title: "",
-            width: { wch: 15 },
-            style: {
-              font: { sz: "14", bold: true },
-              alignment: { horizontal: "right", vertical: "center" },
-            },
-          },
-          {
-            title: "",
-            width: { wch: 15 },
-            style: {
-              font: { sz: "14", bold: true },
-              alignment: { horizontal: "right", vertical: "center" },
-            },
-          },
-          {
-            title: "",
-            width: { wch: 15 },
-            style: {
-              font: { sz: "14", bold: true },
-              alignment: { horizontal: "right", vertical: "center" },
-            },
-          },
         ],
-        data: [
-          [
-            {
-              value: "",
-              style: {
-                font: { sz: "14", bold: false },
-                alignment: { horizontal: "left", vertical: "center" },
-              },
-            },
-            {
-              value: "",
-              style: {
-                font: { sz: "14", bold: false },
-                alignment: { horizontal: "left", vertical: "center" },
-              },
-            },
-            {
-              value: "",
-              style: {
-                font: { sz: "14", bold: false },
-                alignment: { horizontal: "left", vertical: "center" },
-              },
-            },
-            {
-              value: "",
-              style: {
-                font: { sz: "14", bold: false },
-                alignment: { horizontal: "right", vertical: "center" },
-              },
-            },
-            {
-              value: "",
-              style: {
-                font: { sz: "14", bold: false },
-                alignment: { horizontal: "right", vertical: "center" },
-              },
-            },
-            {
-              value: "",
-              style: {
-                font: { sz: "14", bold: false },
-                alignment: { horizontal: "right", vertical: "center" },
-              },
-            },
-          ],
-        ],
+        data: [[]],
       },
     ];
 
@@ -673,6 +612,7 @@ const ReportHutang = () => {
             <CustomeWrapper
               tittle={"Payable Report"}
               subTittle={`Payable Report as of ${formatDate(filtDate)}`}
+              onComplete={(cp) => setCp(cp)}
               body={
                 <>
                   {jsonForExcel(ap, false)?.map((v) => {

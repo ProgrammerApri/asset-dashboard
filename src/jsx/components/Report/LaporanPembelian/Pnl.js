@@ -23,6 +23,7 @@ const Pnl = () => {
   const [date, setDate] = useState([new Date(), new Date()]);
   const [trans, setTrans] = useState(null);
   const [account, setAccount] = useState(null);
+  const [cp, setCp] = useState("");
   const chunkSize = 4;
 
   useEffect(() => {
@@ -107,22 +108,22 @@ const Pnl = () => {
 
     grouped?.forEach((el) => {
       let total = 0;
-      let sub = []
+      let sub = [];
       acc.forEach((ek) => {
         if (ek.account.dou_type === "U") {
           if (el.klasifikasi.id === ek.klasifikasi.id) {
-            let saldo = 0
+            let saldo = 0;
             trans?.forEach((ej) => {
-                if (ej.acc_id.acc_code === ek.account.acc_code){
-                    saldo += ej.trx_amnt
-                }
-            })
+              if (ej.acc_id.acc_code === ek.account.acc_code) {
+                saldo += ej.trx_amnt;
+              }
+            });
             sub.push({
               acc_name: `${ek.account.acc_code}-${ek.account.acc_name}`,
               type: "item",
               saldo: `Rp. ${formatIdr(saldo)}`,
             });
-            total += saldo
+            total += saldo;
           }
         }
       });
@@ -143,40 +144,40 @@ const Pnl = () => {
       {
         columns: [
           {
-            title: `Periode (${formatDate(date[0])}) - (${formatDate(date[1])})`,
+            title: "Profit/Loss Report",
             width: { wch: 50 },
             style: {
               font: { sz: "14", bold: true },
               alignment: { horizontal: "left", vertical: "center" },
             },
           },
-          {
-            title: "",
-            width: { wch: 15 },
-            style: {
-              font: { sz: "14", bold: true },
-              alignment: { horizontal: "left", vertical: "center" },
-            },
-          }
         ],
         data: [
           [
             {
-              value: "",
+              value: cp,
               style: {
                 font: { sz: "14", bold: false },
                 alignment: { horizontal: "left", vertical: "center" },
               },
             },
-            {
-              value: "",
-              style: {
-                font: { sz: "14", bold: false },
-                alignment: { horizontal: "left", vertical: "center" },
-              },
-            }
           ],
         ],
+      },
+      {
+        columns: [
+          {
+            title: `Periode (${formatDate(date[0])}) - (${formatDate(
+              date[1]
+            )})`,
+            width: { wch: 50 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+        ],
+        data: [[]],
       },
     ];
 
@@ -201,7 +202,7 @@ const Pnl = () => {
               font: { sz: "14", bold: ek.type === "header" ? true : false },
               alignment: { horizontal: "right", vertical: "center" },
             },
-          }
+          },
         ]);
       });
 
@@ -247,7 +248,7 @@ const Pnl = () => {
                 fgColor: { rgb: "F3F3F3" },
               },
             },
-          }
+          },
         ],
         data: item,
       });
@@ -352,6 +353,7 @@ const Pnl = () => {
                   <CustomeWrapper
                     tittle={"Profit/Loss Report"}
                     subTittle={`Profit/Loss Report as of 25/06/2022`}
+                    onComplete={(cp) => setCp(cp)}
                     page={idx + 1}
                     body={
                       <>
@@ -372,7 +374,7 @@ const Pnl = () => {
                                 body={(e) => (
                                   <div
                                     className={
-                                        e.type == "footer"
+                                      e.type == "footer"
                                         ? "font-weight-bold"
                                         : "ml-4"
                                     }

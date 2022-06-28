@@ -11,6 +11,7 @@ import Neraca from "../Neraca";
 import Pnl from "./Pnl";
 import ReportKBB from "../KartuBB";
 import SalesReport from "./Penjualan";
+import NeracaPerbandingan from "../NeracaPerbandingan";
 
 const LaporanPembelian = () => {
   const [active, setActive] = useState(0);
@@ -54,6 +55,11 @@ const LaporanPembelian = () => {
       tittle: "Neraca",
       icon: "bx-spreadsheet",
       component: <Neraca />,
+    },
+    {
+      tittle: "Neraca Perbandingan",
+      icon: "bx-spreadsheet",
+      component: <NeracaPerbandingan />,
     },
     {
       tittle: "Laba Rugi",

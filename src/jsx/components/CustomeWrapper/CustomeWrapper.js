@@ -4,7 +4,13 @@ import { DataTable } from "primereact/datatable";
 import { useEffect, useState } from "react";
 import { endpoints, request } from "src/utils";
 
-const CustomeWrapper = ({ body, subTittle, tittle, page }) => {
+const CustomeWrapper = ({
+  body,
+  subTittle,
+  tittle,
+  page,
+  onComplete = () => {},
+}) => {
   const [comp, setComp] = useState(null);
 
   useEffect(() => {
@@ -25,6 +31,7 @@ const CustomeWrapper = ({ body, subTittle, tittle, page }) => {
         const { data } = response;
         console.log(data);
         setComp(data);
+        onComplete(data.cp_name);
       }
     } catch (error) {}
   };

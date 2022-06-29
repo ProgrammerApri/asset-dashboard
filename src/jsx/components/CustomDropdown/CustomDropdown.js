@@ -20,6 +20,23 @@ function useOutsideAlerter(ref, panel, callback = () => {}) {
   }, [ref]);
 }
 
+const useActiveElement = () => {
+  const [active, setActive] = useState(document.activeElement);
+
+  const handleFocusIn = (e) => {
+    setActive(document.activeElement);
+  };
+
+  useEffect(() => {
+    document.addEventListener("focusin", handleFocusIn);
+    return () => {
+      document.removeEventListener("focusin", handleFocusIn);
+    };
+  }, []);
+
+  return active;
+};
+
 // option must array object
 const CustomDropdown = ({
   option,
@@ -37,6 +54,20 @@ const CustomDropdown = ({
   const panel = useRef(null);
   const list = useRef(null);
   const drop = useRef(null);
+  const focusedElement = useActiveElement();
+
+  useEffect(() => {
+    if (drop.current &&
+      !drop.current.contains(focusedElement) &&
+      !panel.current.contains(focusedElement)) {
+      triggerPanel(false);
+    } 
+
+    if (drop.current === focusedElement) {
+      triggerPanel(active);
+    }
+      
+  }, [focusedElement]);
 
   const defaultOptions = [];
   for (let i = 0; i < 10; i++) {
@@ -80,19 +111,21 @@ const CustomDropdown = ({
     let key = label.match(/(?!=\[)[^\][]*(?=])/g);
     let final = label;
     if (option && value) {
-      key?.filter(e => e != "")?.forEach((e) => {
-        if (e.includes(".")) {
-          let subkey = e.split(".");
-          let subValue = value;
-          subkey.forEach((key) => {
-            subValue = subValue[`${key}`];
-          });
-          console.log(subValue);
-          final = final.replace(e, subValue);
-        } else {
-          final = final.replace(e, value[`${e}`]);
-        }
-      });
+      key
+        ?.filter((e) => e != "")
+        ?.forEach((e) => {
+          if (e.includes(".")) {
+            let subkey = e.split(".");
+            let subValue = value;
+            subkey.forEach((key) => {
+              subValue = subValue[`${key}`];
+            });
+            // console.log(subValue);
+            final = final.replace(e, subValue);
+          } else {
+            final = final.replace(e, value[`${e}`]);
+          }
+        });
       final = final.replaceAll("[", "").replaceAll("]", "");
     }
     return final;
@@ -103,9 +136,11 @@ const CustomDropdown = ({
       <div className="row m-0">
         <div
           ref={drop}
+          tabIndex={"0"}
           className="p-dropdown p-component p-inputwrapper w-100"
           onClick={() => {
             triggerPanel(active);
+            drop.current.focus();
           }}
         >
           {value ? (
@@ -127,7 +162,11 @@ const CustomDropdown = ({
           </div>
         </div>
       </div>
-      <div style={{width:`${drop?.current?.offsetWidth}px`, minWidth:"220px"}} ref={panel} className="row mr-3 mt-0 ml-0 c-dropdown-wrapper">
+      <div
+        style={{ width: `${drop?.current?.offsetWidth}px`, minWidth: "220px" }}
+        ref={panel}
+        className="row mr-3 mt-0 ml-0 c-dropdown-wrapper"
+      >
         <div className="c-dropdown-header">
           <span className="p-input-icon-right d-flex justify-content-between">
             <InputText

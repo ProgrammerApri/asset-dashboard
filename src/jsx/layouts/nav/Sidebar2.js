@@ -172,11 +172,11 @@ const SideMenu = () => {
           <PerfectScrollbar className="scroll">
             {renderSidebar()}
           </PerfectScrollbar>
-          <div className="sidebar-footer">
+          {/* <div className="sidebar-footer">
             <p>
               <strong>itungin.id Dashboard</strong> ©All Rights Reserved
             </p>
-          </div>
+          </div> */}
         </div>
       </HashRouter>
     </>

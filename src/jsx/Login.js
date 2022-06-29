@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { request, endpoints } from "src/utils";
 import { Checkbox } from "primereact/checkbox";
 import { Password } from "primereact/password";
@@ -9,7 +9,8 @@ import logo from "../images/logo-large.png";
 const Login = () => {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
-  const [remember, setRemember] = useState(false);
+  const [remember, setRemember] = useState(true);
+  const passRef = useRef(null);
 
   const handleSubmit = async () => {
     if (username && password) {
@@ -38,6 +39,13 @@ const Login = () => {
     }
   };
 
+  const moveToNext = (nextRef) => {
+    if (nextRef) {
+      console.log(document.querySelectorAll(`#${nextRef.current.props.id} input`));
+      document.querySelector(`#${nextRef.current.props.id} input`).focus()
+    }
+  }
+
   return (
     <>
       <Row>
@@ -53,23 +61,37 @@ const Login = () => {
               <div className="col-12 mb-2 mt-6">
                 <span className="p-float-label w-100">
                   <InputText
-                  className="w-100"
+                    className="w-100"
                     id="username"
                     value={username}
+                    onKeyDown={(event) => {
+                      console.log(event);
+                      if (event.key.toLowerCase() === "enter") {
+                        console.log(passRef.element);
+                        moveToNext(passRef)
+                      }
+                    }}
                     onChange={(e) => setUsername(e.target.value)}
                   />
                   <label htmlFor="username">Username</label>
                 </span>
               </div>
               <div className="col-12 mb-2 mt-3">
-              <span className="p-float-label w-100">
+                <span className="p-float-label w-100">
                   <Password
-                  className="w-100"
+                    className="w-100"
                     id="password"
+                    ref={passRef}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     toggleMask
                     feedback={false}
+                    onKeyDown={(event) => {
+                      console.log(event);
+                      if (event.key.toLowerCase() === "enter") {
+                        handleSubmit();
+                      }
+                    }}
                   />
                   <label htmlFor="password">Password</label>
                 </span>

@@ -26,6 +26,7 @@ import {
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 
 const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
+  const enterEvent = useRef()
   const [update, setUpdate] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
@@ -364,6 +365,14 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
               <InputText
                 value={rp.req_code}
                 onChange={(e) => updateRp({ ...rp, req_code: e.target.value })}
+                onKeyDown={(event) => {
+                  // console.log(event);
+                  // if (event.key.toLowerCase() === "enter") {
+                  //   var ev3 = document.createEvent('KeyboardEvent');
+                  //   ev3.initKeyEvent(
+                  //       'keypress', true, true, window, false, false, false, false, 9, 0);
+                  // }
+                }}
                 placeholder="Masukan Kode Referensi"
               />
             </div>

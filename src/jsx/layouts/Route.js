@@ -7,12 +7,12 @@ import Nav from "./nav";
 import Footer from "./Footer";
 
 /// Deshboard
-import Home from "../components/Dashboard/Home/Home";
-import Application from "../components/Dashboard/Application/Application";
-import Profile from "../components/Dashboard/Profile/Profile";
-import Companies from "../components/Dashboard/Companies/Companies";
-import Statistics from "../components/Dashboard/Statistics/Statistics";
-import SearchJobs from "../components/Dashboard/SearchJobs/SearchJobs";
+import Home from "../screen/Dashboard/Home/Home";
+import Application from "../screen/Dashboard/Application/Application";
+import Profile from "../screen/Dashboard/Profile/Profile";
+import Companies from "../screen/Dashboard/Companies/Companies";
+import Statistics from "../screen/Dashboard/Statistics/Statistics";
+import SearchJobs from "../screen/Dashboard/SearchJobs/SearchJobs";
 
 /// Bo
 import UiAlert from "../components/bootstrap/Alert";

@@ -115,6 +115,10 @@
   background: #e9ecef63;
 }
 
+.p-inputnumber.w-100 {
+  border-radius: 6px;
+}
+
 .p-rowgroup-header {
   background: var(--body-bg) !important;
 }
@@ -315,10 +319,10 @@ textarea.p-inputtext {
   padding: 0;
 }
 
-.p-inputgroup .p-inputnumber .p-inputnumber-input {
+/* .p-inputgroup .p-inputnumber .p-inputnumber-input {
   border-bottom-right-radius: 0 !important;
   border-top-right-radius: 0 !important;
-}
+} */
 
 span .btn {
   height: 100%;

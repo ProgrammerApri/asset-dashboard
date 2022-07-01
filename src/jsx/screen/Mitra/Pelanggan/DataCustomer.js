@@ -85,6 +85,11 @@ const defError = [
     email: false,
     cp: false,
   },
+  {
+    ppn: false,
+    ar: false,
+    um: false,
+  },
 ];
 
 const DataCustomer = ({
@@ -560,15 +565,15 @@ const DataCustomer = ({
 
   const onSubmit = () => {
     if (isValid()) {
-      // if (isEdit) {
-      //   setUpdate(true);
-      //   editCustomer();
-      //   setActive(0);
-      // } else {
-      //   setUpdate(true);
-      //   addCustomer();
-      //   setActive(0);
-      // }
+      if (isEdit) {
+        setUpdate(true);
+        editCustomer();
+        setActive(0);
+      } else {
+        setUpdate(true);
+        addCustomer();
+        setActive(0);
+      }
     }
   };
 
@@ -600,6 +605,11 @@ const DataCustomer = ({
           !currentItem.customer.cus_email ||
           currentItem.customer.cus_email === "",
         cp: !currentItem.customer.cus_cp || currentItem.customer.cus_cp === "",
+      },
+      {
+        ppn: !currentItem.customer.cus_pjk,
+        ar: !currentItem.customer.cus_gl,
+        um: !currentItem.customer.cus_uang_muka,
       },
     ];
 
@@ -976,14 +986,14 @@ const DataCustomer = ({
           body={load && <Skeleton />}
         />
         <Column
-          header="Telp"
-          field={(e) => e?.customer?.cus_telp1}
+          header="No. Telepon"
+          field={(e) => e?.customer?.cus_telp1 ?? "-"}
           style={{ minWidth: "8rem" }}
           body={load && <Skeleton />}
         />
         <Column
           header="Limit Kredit"
-          field={(e) => formatIdr(e?.customer?.cus_limit ?? "")}
+          field={(e) => formatIdr(e?.customer?.cus_limit ?? "0")}
           style={{ minWidth: "8rem" }}
           body={load && <Skeleton />}
         />
@@ -1299,7 +1309,6 @@ const DataCustomer = ({
                       setError(newError);
                     }}
                     placeholder="Masukan No. Telepon"
-                    mode="decimal"
                     error={error[1]?.phone}
                   />
                 </div>
@@ -1308,7 +1317,7 @@ const DataCustomer = ({
                   <label className="text-label">No. Telepon 2</label>
                   <div className="p-inputgroup">
                     <span className="p-inputgroup-addon">+62</span>
-                    <InputNumber
+                    <InputText
                       value={`${currentItem?.customer?.cus_telp2 ?? ""}`}
                       onChange={(e) =>
                         setCurrentItem({
@@ -1320,8 +1329,8 @@ const DataCustomer = ({
                         })
                       }
                       placeholder="Masukan No. Telepon"
-                      mode="decimal"
-                      useGrouping={false}
+                      type="number"
+                      // useGrouping={false}
                     />
                   </div>
                 </div>
@@ -1430,31 +1439,34 @@ const DataCustomer = ({
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">PPN</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={
-                        currentItem !== null
-                          ? ppn(currentItem?.customer?.cus_pjk)
-                          : null
-                      }
-                      options={pajak}
-                      onChange={(e) => {
-                        console.log(e.value);
-                        setCurrentItem({
-                          ...currentItem,
-                          customer: {
-                            ...currentItem.customer,
-                            cus_pjk: e.value.id,
-                          },
-                        });
-                      }}
-                      optionLabel="name"
-                      filter
-                      filterBy="name"
-                      placeholder="Pilih Jenis Pajak"
-                    />
-                  </div>
+                  <PrimeDropdown
+                    label={"PPN"}
+                    value={
+                      currentItem !== null
+                        ? ppn(currentItem?.customer?.cus_pjk)
+                        : null
+                    }
+                    options={pajak}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        customer: {
+                          ...currentItem.customer,
+                          cus_pjk: e.value.id,
+                        },
+                      });
+                      let newError = error;
+                      newError[2].ppn = false;
+                      setError(newError);
+                    }}
+                    optionLabel="name"
+                    filter
+                    filterBy="name"
+                    placeholder="Pilih Jenis Pajak"
+                    error={error[2]?.ppn}
+                    errorMessage="Jenis Pajak belum dipilih"
+                  />
                 </div>
               </div>
 
@@ -1486,68 +1498,72 @@ const DataCustomer = ({
 
               <div className="row mr-0 ml-0">
                 <div className="col-6">
-                  <label className="text-label">Kode Distribusi AR</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={
-                        currentItem !== null &&
-                        currentItem.customer.cus_gl !== null
-                          ? gl(currentItem.customer.cus_gl)
-                          : null
-                      }
-                      options={account}
-                      onChange={(e) => {
-                        console.log(e.value);
-                        setCurrentItem({
-                          ...currentItem,
-                          customer: {
-                            ...currentItem.customer,
-                            cus_gl: e.value?.id ?? null,
-                          },
-                        });
-                      }}
-                      optionLabel="account.acc_name"
-                      valueTemplate={clear}
-                      itemTemplate={glTemplate}
-                      filter
-                      filterBy="account.acc_name"
-                      placeholder="Pilih Kode Distribusi"
-                      showClear
-                    />
-                  </div>
+                  <PrimeDropdown
+                    label={"Kode Distribusi AR"}
+                    value={
+                      currentItem !== null &&
+                      currentItem.customer.cus_gl !== null
+                        ? gl(currentItem.customer.cus_gl)
+                        : null
+                    }
+                    options={account}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        customer: {
+                          ...currentItem.customer,
+                          cus_gl: e.value?.id ?? null,
+                        },
+                      });
+                      let newError = error;
+                      newError[2].gl = false;
+                      setError(newError);
+                    }}
+                    optionLabel="account.acc_name"
+                    valueTemplate={clear}
+                    itemTemplate={glTemplate}
+                    filter
+                    filterBy="account.acc_name"
+                    placeholder="Pilih Kode Distribusi"
+                    showClear
+                    error={error[2]?.gl}
+                    errorMessage="Kode Distribusi AR belum dipilih"
+                  />
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">
-                    Kode Distribusi Uang Muka Penjualan
-                  </label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={
-                        currentItem !== null
-                          ? gl(currentItem?.customer?.cus_uang_muka)
-                          : null
-                      }
-                      options={accU}
-                      onChange={(e) => {
-                        console.log(e.value);
-                        setCurrentItem({
-                          ...currentItem,
-                          customer: {
-                            ...currentItem.customer,
-                            cus_uang_muka: e.value.id,
-                          },
-                        });
-                      }}
-                      optionLabel="account.acc_name"
-                      valueTemplate={clear}
-                      itemTemplate={glTemplate}
-                      filter
-                      filterBy="account.acc_name"
-                      placeholder="Pilih Kode Distribusi Uang Muka Penjualan"
-                      showClear
-                    />
-                  </div>
+                  <PrimeDropdown
+                    label={"Kode Distribusi Uang Muka Penjualan"}
+                    value={
+                      currentItem !== null
+                        ? gl(currentItem?.customer?.cus_uang_muka)
+                        : null
+                    }
+                    options={accU}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        customer: {
+                          ...currentItem.customer,
+                          cus_uang_muka: e.value.id,
+                        },
+                      });
+                      let newError = error;
+                      newError[2].um = false;
+                      setError(newError);
+                    }}
+                    optionLabel="account.acc_name"
+                    valueTemplate={clear}
+                    itemTemplate={glTemplate}
+                    filter
+                    filterBy="account.acc_name"
+                    placeholder="Pilih Kode Distribusi Uang Muka Penjualan"
+                    showClear
+                    error={error[2]?.um}
+                    errorMessage="Kode Uang Muka Penjualan belum dipilih"
+                  />
                 </div>
               </div>
 

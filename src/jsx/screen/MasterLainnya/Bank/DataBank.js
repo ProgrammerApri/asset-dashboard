@@ -13,6 +13,8 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
+import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
+import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 
 const def = {
   bank: {
@@ -40,6 +42,15 @@ const def = {
   },
 };
 
+const defError = {
+  code: false,
+  name: false,
+  jpel: false,
+  induk: false,
+  addrs: false,
+  city: false,
+};
+
 const DataBank = ({
   data,
   load,
@@ -64,6 +75,7 @@ const DataBank = ({
   const [isEdit, setEdit] = useState(def);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+  const [error, setError] = useState(defError);
 
   useEffect(() => {
     getAccount();
@@ -268,12 +280,14 @@ const DataBank = ({
   };
 
   const onSubmit = () => {
-    if (isEdit) {
-      setLoading(true);
-      editBank();
-    } else {
-      setLoading(true);
-      addBank();
+    if (isValid()) {
+      if (isEdit) {
+        setLoading(true);
+        editBank();
+      } else {
+        setLoading(true);
+        addBank();
+      }
     }
   };
 
@@ -283,7 +297,7 @@ const DataBank = ({
         <PButton
           label="Batal"
           onClick={() => {
-            setLoading(false)
+            setLoading(false);
             onHideInput();
             onInput(false);
           }}
@@ -444,6 +458,19 @@ const DataBank = ({
     setShowInput(false);
   };
 
+  const isValid = () => {
+    let valid = false;
+    let errors = {
+      code: !currentItem.bank.BANK_CODE || currentItem.bank.BANK_CODE === "",
+      name: !currentItem.bank.BANK_NAME || currentItem.bank.BANK_NAME === "",
+      acc_id: !currentItem.account.id,
+    };
+
+    setError(errors);
+
+    return valid;
+  };
+
   const renderBody = () => {
     return (
       <>
@@ -478,24 +505,24 @@ const DataBank = ({
             style={{
               minWidth: "8rem",
             }}
-            field={(e) => e.bank.BANK_CODE}
+            field={(e) => e.bank?.BANK_CODE}
             body={load && <Skeleton />}
           />
           <Column
-            header="Nama"
-            field={(e) => e.bank.BANK_NAME}
+            header="Nama Bank"
+            field={(e) => e.bank?.BANK_NAME}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
           <Column
-            header="GL"
-            field={(e) => e.account.acc_name}
+            header="Akun GL"
+            field={(e) => e.account?.acc_name}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
           <Column
             header="Keterangan"
-            field={(e) => e.bank.BANK_DESC}
+            field={(e) => e.bank?.BANK_DESC ?? "-"}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
@@ -527,64 +554,71 @@ const DataBank = ({
         >
           <div className="row ml-0 mt-0">
             <div className="col-6">
-              <label className="text-label">Kode Bank</label>
-              <div className="p-inputgroup">
-                <InputText
-                  value={
-                    currentItem !== null ? `${currentItem.bank.BANK_CODE}` : ""
-                  }
-                  onChange={(e) =>
-                    setCurrentItem({
-                      ...currentItem,
-                      bank: { ...currentItem.bank, BANK_CODE: e.target.value },
-                    })
-                  }
-                  placeholder="Masukan Kode Bank"
-                />
-              </div>
+              <PrimeInput
+                label={"Kode Bank"}
+                value={
+                  currentItem !== null ? `${currentItem.bank.BANK_CODE}` : ""
+                }
+                onChange={(e) => {
+                  setCurrentItem({
+                    ...currentItem,
+                    bank: { ...currentItem.bank, BANK_CODE: e.target.value },
+                  });
+                  let newError = error;
+                  newError.code = false;
+                  setError(newError);
+                }}
+                placeholder="Masukan Kode Bank"
+                error={error?.code}
+              />
             </div>
 
             <div className="col-6">
-              <label className="text-label">Nama</label>
-              <div className="p-inputgroup">
-                <InputText
-                  value={
-                    currentItem !== null ? `${currentItem.bank.BANK_NAME}` : ""
-                  }
-                  onChange={(e) =>
-                    setCurrentItem({
-                      ...currentItem,
-                      bank: { ...currentItem.bank, BANK_NAME: e.target.value },
-                    })
-                  }
-                  placeholder="Masukan Nama Akun"
-                />
-              </div>
+              <PrimeInput
+                label={"Nama Bank"}
+                value={
+                  currentItem !== null ? `${currentItem.bank.BANK_NAME}` : ""
+                }
+                onChange={(e) => {
+                  setCurrentItem({
+                    ...currentItem,
+                    bank: { ...currentItem.bank, BANK_NAME: e.target.value },
+                  });
+                  let newError = error;
+                  newError.name = false;
+                  setError(newError);
+                }}
+                placeholder="Masukan Nama Akun"
+                error={error?.name}
+              />
             </div>
           </div>
 
           <div className="row ml-0 mt-0">
             <div className="col-12">
-              <label className="text-label">Akun Distribusi GL</label>
-              <div className="p-inputgroup">
-                <Dropdown
-                  value={currentItem !== null ? currentItem.account : null}
-                  options={account && account}
-                  onChange={(e) => {
-                    console.log(e.value);
-                    setCurrentItem({
-                      ...currentItem,
-                      account: e.value,
-                    });
-                  }}
-                  optionLabel="acc_name"
-                  filter
-                  filterBy="acc_name"
-                  placeholder="Pilih Akun GL"
-                  itemTemplate={glTemplate}
-                  valueTemplate={valueTemp}
-                />
-              </div>
+              <PrimeDropdown
+                label={"Akun Distribusi GL"}
+                value={currentItem !== null ? currentItem.account : null}
+                options={account && account}
+                onChange={(e) => {
+                  console.log(e.value);
+                  setCurrentItem({
+                    ...currentItem,
+                    account: e.value,
+                  });
+                  let newError = error;
+                  newError.acc_id = false;
+                  setError(newError);
+                }}
+                optionLabel="acc_name"
+                filter
+                filterBy="acc_name"
+                placeholder="Pilih Akun GL"
+                itemTemplate={glTemplate}
+                valueTemplate={valueTemp}
+                errorMessage="Akun Distribusi GL Belum Dipilih"
+                error={error?.acc_id}
+              />
             </div>
           </div>
 

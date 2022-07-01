@@ -16,6 +16,8 @@ import { Badge } from "primereact/badge";
 import { InputNumber } from "primereact/inputnumber";
 import { TabPanel, TabView } from "primereact/tabview";
 import { Tooltip } from "primereact/tooltip";
+import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
+import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 
 const def = {
   id: null,
@@ -48,6 +50,20 @@ const metode = [
   { name: "Average", id: 2 },
 ];
 
+const defError = [
+  {
+    code: false,
+    name: false,
+    group: false,
+    type: false,
+    sat: false,
+    sup: false,
+  },
+  {
+    hpp: false,
+  },
+];
+
 const DataProduk = ({
   data,
   load,
@@ -75,6 +91,7 @@ const DataProduk = ({
   const [active, setActive] = useState(0);
   const picker = useRef(null);
   const [file, setFile] = useState(null);
+  const [error, setError] = useState(defError);
 
   useEffect(() => {
     initFilters1();
@@ -370,8 +387,10 @@ const DataProduk = ({
   };
 
   const onSubmit = () => {
-    setUpdate(true);
-    uploadImage();
+    if (isValid()) {
+      setUpdate(true);
+      uploadImage();
+    }
   };
 
   const renderFooter = () => {
@@ -591,6 +610,44 @@ const DataProduk = ({
     return met;
   };
 
+  const isValid = () => {
+    let valid = false;
+    let active = 1;
+    let errors = [
+      {
+        code: !currentItem.code || currentItem.code === "",
+        name: !currentItem.name || currentItem.name === "",
+        group: !currentItem.group?.id,
+        type: !currentItem.type,
+        sat: !currentItem.unit?.id,
+        sup: !currentItem.suplier?.id,
+      },
+      {
+        hpp: !currentItem.metode,
+      },
+    ];
+
+    setError(errors);
+
+    errors.forEach((el, i) => {
+      for (var key in el) {
+        valid = !el[key];
+        if (el[key] && i < active) {
+          active = i;
+        }
+      }
+    });
+
+    console.log(active);
+    console.log(valid);
+
+    if (!valid) {
+      setActive(active);
+    }
+
+    return valid;
+  };
+
   const renderBody = () => {
     return (
       <>
@@ -635,7 +692,7 @@ const DataProduk = ({
             style={{
               minWidth: "8rem",
             }}
-            field={(e) => e?.barcode ?? ""}
+            field={(e) => e?.barcode ?? "-"}
             body={load && <Skeleton />}
           />
           <Column
@@ -658,7 +715,7 @@ const DataProduk = ({
         /> */}
           <Column
             header="Informasi Stock"
-            field={(e) => e?.max_stock ?? ""}
+            field={(e) => e?.max_stock ?? "-"}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
@@ -698,77 +755,87 @@ const DataProduk = ({
             >
               <div className="row mr-0 ml-0">
                 <div className="col-6">
-                  <label className="text-label">Kode Barang</label>
-                  <div className="p-inputgroup">
-                    <InputText
-                      value={`${currentItem?.code ?? ""}`}
-                      onChange={(e) =>
-                        setCurrentItem({ ...currentItem, code: e.target.value })
-                      }
-                      placeholder="Masukan Kode Produk"
-                    />
-                  </div>
+                  <PrimeInput
+                    label={"Kode Produk"}
+                    value={`${currentItem?.code ?? ""}`}
+                    onChange={(e) => {
+                      setCurrentItem({ ...currentItem, code: e.target.value });
+                      let newError = error;
+                      newError[0].code = false;
+                      setError(newError);
+                    }}
+                    placeholder="Masukan Kode Produk"
+                    error={error[0]?.code}
+                  />
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">Nama Barang</label>
-                  <div className="p-inputgroup">
-                    <InputText
-                      value={`${currentItem?.name ?? ""}`}
-                      onChange={(e) =>
-                        setCurrentItem({ ...currentItem, name: e.target.value })
-                      }
-                      placeholder="Masukan Nama Barang"
-                    />
-                  </div>
+                  <PrimeInput
+                    label={"Nama Produk"}
+                    value={`${currentItem?.name ?? ""}`}
+                    onChange={(e) => {
+                      setCurrentItem({ ...currentItem, name: e.target.value });
+                      let newError = error;
+                      newError[0].name = false;
+                      setError(newError);
+                    }}
+                    placeholder="Masukan Nama Produk"
+                    error={error[0]?.name}
+                  />
                 </div>
               </div>
 
               <div className="row mr-0 ml-0">
                 <div className="col-6">
-                  <label className="text-label">Group Barang</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={currentItem !== null ? currentItem.group : null}
-                      options={group}
-                      onChange={(e) => {
-                        console.log(e.value);
-                        setCurrentItem({
-                          ...currentItem,
-                          group: e.target.value,
-                        });
-                      }}
-                      optionLabel="name"
-                      filter
-                      filterBy="name"
-                      placeholder="Pilih Group Barang"
-                    />
-                  </div>
+                  <PrimeDropdown
+                    label={"Grup Produk"}
+                    value={currentItem !== null ? currentItem.group : null}
+                    options={group}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        group: e.target.value,
+                      });
+                      let newError = error;
+                      newError[0].group = false;
+                      setError(newError);
+                    }}
+                    optionLabel="name"
+                    filter
+                    filterBy="name"
+                    placeholder="Pilih Grup Produk"
+                    errorMessage="Grup Produk Belum Dipilih"
+                    error={error[0]?.group}
+                  />
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">Type Barang</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={
-                        currentItem !== null && currentItem.type !== null
-                          ? getType(currentItem.type)
-                          : null
-                      }
-                      options={type}
-                      onChange={(e) => {
-                        console.log(e.value);
-                        setCurrentItem({
-                          ...currentItem,
-                          type: e.value.id,
-                        });
-                      }}
-                      optionLabel="name"
-                      filter
-                      filterBy="name"
-                      placeholder="Pilih Type Barang"
-                    />
-                  </div>
+                  <PrimeDropdown
+                    label={"Tipe Produk"}
+                    value={
+                      currentItem !== null && currentItem.type !== null
+                        ? getType(currentItem.type)
+                        : null
+                    }
+                    options={type}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        type: e.value.id,
+                      });
+                      let newError = error;
+                      newError[0].type = false;
+                      setError(newError);
+                    }}
+                    optionLabel="name"
+                    filter
+                    filterBy="name"
+                    placeholder="Pilih Tipe Produk"
+                    errorMessage="Tipe Produk Belum Dipilih"
+                    error={error[0]?.type}
+                  />
                 </div>
               </div>
 
@@ -792,45 +859,51 @@ const DataProduk = ({
 
               <div className="row mr-0 ml-0">
                 <div className="col-6">
-                  <label className="text-label">Satuan</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={currentItem !== null ? currentItem.unit : null}
-                      options={unit}
-                      onChange={(e) => {
-                        console.log(e.value);
-                        setCurrentItem({
-                          ...currentItem,
-                          unit: e.target.value,
-                        });
-                      }}
-                      optionLabel="name"
-                      filter
-                      filterBy="name"
-                      placeholder="Pilih Satuan Barang"
-                    />
-                  </div>
+                  <PrimeDropdown
+                    label={"Satuan"}
+                    value={currentItem !== null ? currentItem.unit : null}
+                    options={unit}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        unit: e.target.value,
+                      });
+                      let newError = error;
+                      newError[0].sat = false;
+                      setError(newError);
+                    }}
+                    optionLabel="name"
+                    filter
+                    filterBy="name"
+                    placeholder="Pilih Satuan Produk"
+                    errorMessage="Satuan Produk Belum Dipilih"
+                    error={error[0]?.sat}
+                  />
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">Pemasok</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={currentItem !== null ? currentItem.suplier : null}
-                      options={suplier}
-                      onChange={(e) => {
-                        console.log(e.value);
-                        setCurrentItem({
-                          ...currentItem,
-                          suplier: e.target.value,
-                        });
-                      }}
-                      optionLabel="sup_name"
-                      filter
-                      filterBy="sup_name"
-                      placeholder="Pilih Pemasok"
-                    />
-                  </div>
+                  <PrimeDropdown
+                    label={"Pemasok"}
+                    value={currentItem !== null ? currentItem.suplier : null}
+                    options={suplier}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        suplier: e.target.value,
+                      });
+                      let newError = error;
+                      newError[0].sup = false;
+                      setError(newError);
+                    }}
+                    optionLabel="sup_name"
+                    filter
+                    filterBy="sup_name"
+                    placeholder="Pilih Pemasok"
+                    errorMessage="Pemasok Belum Dipilih"
+                    error={error[0]?.sup}
+                  />
                 </div>
               </div>
 
@@ -885,28 +958,31 @@ const DataProduk = ({
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">Metode HPP</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={
-                        currentItem !== null && currentItem.metode !== null
-                          ? getMetodeHPP(currentItem.metode)
-                          : null
-                      }
-                      options={metode}
-                      onChange={(e) => {
-                        console.log(e.value);
-                        setCurrentItem({
-                          ...currentItem,
-                          metode: e.value.id,
-                        });
-                      }}
-                      optionLabel="name"
-                      filter
-                      filterBy="name"
-                      placeholder="Pilih Metode HPP"
-                    />
-                  </div>
+                  <PrimeDropdown
+                    label={"Metode HPP"}
+                    value={
+                      currentItem !== null && currentItem.metode !== null
+                        ? getMetodeHPP(currentItem.metode)
+                        : null
+                    }
+                    options={metode}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        metode: e.value.id,
+                      });
+                      let newError = error;
+                      newError[1].hpp = false;
+                      setError(newError);
+                    }}
+                    optionLabel="name"
+                    filter
+                    filterBy="name"
+                    placeholder="Pilih Metode HPP"
+                    errorMessage="Metode HPP Belum Dipilih"
+                    error={error[1]?.hpp}
+                  />
                 </div>
               </div>
 

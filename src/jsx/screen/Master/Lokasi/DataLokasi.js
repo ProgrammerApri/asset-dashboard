@@ -14,6 +14,7 @@ import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { classNames } from "primereact/utils";
+import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 
 const def = {
   id: 1,
@@ -21,6 +22,12 @@ const def = {
   name: "",
   address: "",
   desc: "",
+};
+
+const defError = {
+  code: false,
+  name: false,
+  addr: false,
 };
 
 const DataLokasi = ({
@@ -47,6 +54,7 @@ const DataLokasi = ({
   const [showDelete, setShowDelete] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+  const [error, setError] = useState(defError);
 
   useEffect(() => {
     initFilters1();
@@ -221,12 +229,14 @@ const DataLokasi = ({
   };
 
   const onSubmit = () => {
-    if (isEdit) {
-      setUpdate(true);
-      editLokasi();
-    } else {
-      setUpdate(true);
-      addLokasi();
+    if (isValid()) {
+      if (isEdit) {
+        setUpdate(true);
+        editLokasi();
+      } else {
+        setUpdate(true);
+        addLokasi();
+      }
     }
   };
 
@@ -368,6 +378,19 @@ const DataLokasi = ({
     setRows2(event.rows);
   };
 
+  const isValid = () => {
+    let valid = false;
+    let errors = {
+      code: !currentItem.code || currentItem.code === "",
+      name: !currentItem.name || currentItem.name === "",
+      addr: !currentItem.address || currentItem.address === "",
+    };
+
+    setError(errors);
+
+    return valid;
+  };
+
   const renderBody = () => {
     return (
       <>
@@ -419,7 +442,7 @@ const DataLokasi = ({
           />
           <Column
             header="Keterangan"
-            field={(e) => e.desc}
+            field={(e) => e?.desc ?? "-"}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
@@ -451,44 +474,50 @@ const DataLokasi = ({
         >
           <div className="row ml-0 mt-0">
             <div className="col-6">
-              <label className="text-label">Kode Lokasi</label>
-              <div className="p-inputgroup">
-                <InputText
-                  value={currentItem !== null ? `${currentItem.code}` : ""}
-                  onChange={(e) =>
-                    setCurrentItem({ ...currentItem, code: e.target.value })
-                  }
-                  placeholder="Masukan Kode Lokasi"
-                />
-              </div>
+              <PrimeInput
+                label={"Kode Lokasi"}
+                value={currentItem !== null ? `${currentItem.code}` : ""}
+                onChange={(e) => {
+                  setCurrentItem({ ...currentItem, code: e.target.value });
+                  let newError = error;
+                  newError.code = false;
+                  setError(newError);
+                }}
+                placeholder="Masukan Kode Lokasi"
+                error={error?.code}
+              />
             </div>
 
             <div className="col-6">
-              <label className="text-label">Nama Lokasi</label>
-              <div className="p-inputgroup">
-                <InputText
-                  value={currentItem !== null ? `${currentItem.name}` : ""}
-                  onChange={(e) =>
-                    setCurrentItem({ ...currentItem, name: e.target.value })
-                  }
-                  placeholder="Masukan Nama Lokasi"
-                />
-              </div>
+              <PrimeInput
+                label={"Nama Lokasi"}
+                value={currentItem !== null ? `${currentItem.name}` : ""}
+                onChange={(e) => {
+                  setCurrentItem({ ...currentItem, name: e.target.value });
+                  let newError = error;
+                  newError.name = false;
+                  setError(newError);
+                }}
+                placeholder="Masukan Nama Lokasi"
+                error={error?.name}
+              />
             </div>
           </div>
 
           <div className="row ml-0 mt-0">
             <div className="col-12">
-              <label className="text-label">Alamat</label>
-              <div className="p-inputgroup">
-                <InputTextarea
-                  value={currentItem !== null ? `${currentItem.address}` : ""}
-                  onChange={(e) =>
-                    setCurrentItem({ ...currentItem, address: e.target.value })
-                  }
-                  placeholder="Masukan Alamat"
-                />
-              </div>
+              <PrimeInput
+                label={"Alamat Lengkap"}
+                value={currentItem !== null ? `${currentItem.address}` : ""}
+                onChange={(e) => {
+                  setCurrentItem({ ...currentItem, address: e.target.value });
+                  let newError = error;
+                  newError.addr = false;
+                  setError(newError);
+                }}
+                placeholder="Masukan Alamat"
+                error={error?.addr}
+              />
             </div>
           </div>
 

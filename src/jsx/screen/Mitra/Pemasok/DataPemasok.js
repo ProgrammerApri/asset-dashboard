@@ -17,6 +17,8 @@ import { InputNumber } from "primereact/inputnumber";
 import { Divider } from "@material-ui/core";
 import { TabPanel, TabView } from "primereact/tabview";
 import { Badge } from "primereact/badge";
+import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
+import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 
 const def = {
   supplier: {
@@ -63,6 +65,25 @@ const def = {
   },
 };
 
+const defError = [
+  {
+    code: false,
+    name: false,
+    jpem: false,
+    addrs: false,
+    city: false,
+  },
+  {
+    phone: false,
+    cp: false,
+  },
+  {
+    ppn: false,
+    ap: false,
+    um: false,
+  },
+];
+
 const pajak = [
   { name: "Include", code: "I" },
   { name: "Exclude", code: "E" },
@@ -98,6 +119,7 @@ const DataSupplier = ({
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const [active, setActive] = useState(0);
+  const [error, setError] = useState(defError);
 
   useEffect(() => {
     getJpem();
@@ -514,14 +536,16 @@ const DataSupplier = ({
   };
 
   const onSubmit = () => {
-    if (isEdit) {
-      setLoading(true);
-      editSupplier();
-      setActive(0);
-    } else {
-      setLoading(true);
-      addSupplier();
-      setActive(0);
+    if (isValid()) {
+      if (isEdit) {
+        setLoading(true);
+        editSupplier();
+        setActive(0);
+      } else {
+        setLoading(true);
+        addSupplier();
+        setActive(0);
+      }
     }
   };
 
@@ -759,26 +783,6 @@ const DataSupplier = ({
     return <span>{props.placeholder}</span>;
   };
 
-  // const glTemp = (option) => {
-  //   return (
-  //     <div>
-  //       {option !== null ? `${option.acc_name} - (${option.acc_code})` : ""}
-  //     </div>
-  //   );
-  // };
-
-  // const value = (option, props) => {
-  //   if (option) {
-  //     return (
-  //       <div>
-  //         {option !== null ? `${option?.acc_name} - (${option?.acc_code})` : ""}
-  //       </div>
-  //     );
-  //   }
-
-  //   return <span>{props.placeholder}</span>;
-  // };
-
   const renderTabHeader = (options) => {
     return (
       <button
@@ -806,6 +810,57 @@ const DataSupplier = ({
     setCurrentItem(def);
     setEdit(false);
     setShowInput(false);
+  };
+
+  const isValid = () => {
+    let valid = false;
+    let active = 2;
+    let errors = [
+      {
+        code:
+          !currentItem.supplier.sup_code ||
+          currentItem.supplier.sup_code === "",
+        name:
+          !currentItem.supplier.sup_name ||
+          currentItem.supplier.sup_name === "",
+        jpem: !currentItem.jpem?.id,
+        addrs:
+          !currentItem.supplier.sup_address ||
+          currentItem.supplier.sup_address === "",
+        city: !currentItem.supplier.sup_kota,
+      },
+      {
+        phone:
+          !currentItem.supplier.sup_telp1 ||
+          currentItem.supplier.sup_telp1 === "0",
+        cp: !currentItem.supplier.sup_cp || currentItem.supplier.sup_cp === "",
+      },
+      {
+        ppn: !currentItem.supplier.sup_ppn,
+        ap: !currentItem.supplier.sup_hutang,
+        um: !currentItem.supplier.sup_uang_muka,
+      },
+    ];
+
+    setError(errors);
+
+    errors.forEach((el, i) => {
+      for (var key in el) {
+        valid = !el[key];
+        if (el[key] && i < active) {
+          active = i;
+        }
+      }
+    });
+
+    console.log(active);
+    console.log(valid);
+
+    if (!valid) {
+      setActive(active);
+    }
+
+    return valid;
   };
 
   const renderBody = () => {
@@ -857,14 +912,14 @@ const DataSupplier = ({
           body={load && <Skeleton />}
         />
         <Column
-          header="Telp"
-          field={(e) => e.supplier?.sup_telp1}
+          header="No. Telepon"
+          field={(e) => e.supplier?.sup_telp1 ?? "-"}
           style={{ minWidth: "8rem" }}
           body={load && <Skeleton />}
         />
         <Column
           header="Limit Kredit"
-          field={(e) => formatIdr(e.supplier?.sup_limit ?? "")}
+          field={(e) => formatIdr(e.supplier?.sup_limit ?? "0")}
           style={{ minWidth: "8rem" }}
           body={load && <Skeleton />}
         />
@@ -901,72 +956,79 @@ const DataSupplier = ({
             >
               <div className="row ml-0 mt-0">
                 <div className="col-6 mt-0">
-                  <label className="text-label">Kode Pemasok</label>
-                  <div className="p-inputgroup">
-                    <InputText
-                      value={
-                        currentItem !== null
-                          ? currentItem?.supplier?.sup_code
-                          : null
-                      }
-                      onChange={(e) =>
-                        setCurrentItem({
-                          ...currentItem,
-                          supplier: {
-                            ...currentItem.supplier,
-                            sup_code: e.target.value,
-                          },
-                        })
-                      }
-                      placeholder="Masukan Kode Pemasok"
-                    />
-                  </div>
+                  <PrimeInput
+                    label={"Kode Pemasok"}
+                    value={
+                      currentItem !== null
+                        ? currentItem?.supplier?.sup_code
+                        : null
+                    }
+                    onChange={(e) => {
+                      setCurrentItem({
+                        ...currentItem,
+                        supplier: {
+                          ...currentItem.supplier,
+                          sup_code: e.target.value,
+                        },
+                      });
+                      let newError = error;
+                      newError[0].code = false;
+                      setError(newError);
+                    }}
+                    placeholder="Masukan Kode Pemasok"
+                    error={error[0]?.code}
+                  />
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">Nama Pemasok</label>
-                  <div className="p-inputgroup">
-                    <InputText
-                      value={
-                        currentItem !== null
-                          ? `${currentItem?.supplier?.sup_name ?? ""}`
-                          : ""
-                      }
-                      onChange={(e) =>
-                        setCurrentItem({
-                          ...currentItem,
-                          supplier: {
-                            ...currentItem.supplier,
-                            sup_name: e.target.value,
-                          },
-                        })
-                      }
-                      placeholder="Masukan Nama Pemasok"
-                    />
-                  </div>
+                  <PrimeInput
+                    label={"Nama Pemasok"}
+                    value={
+                      currentItem !== null
+                        ? `${currentItem?.supplier?.sup_name ?? ""}`
+                        : ""
+                    }
+                    onChange={(e) => {
+                      setCurrentItem({
+                        ...currentItem,
+                        supplier: {
+                          ...currentItem.supplier,
+                          sup_name: e.target.value,
+                        },
+                      });
+                      let newError = error;
+                      newError[0].name = false;
+                      setError(newError);
+                    }}
+                    placeholder="Masukan Nama Pemasok"
+                    error={error[0]?.name}
+                  />
                 </div>
               </div>
 
               <div className="row ml-0 mt-0">
                 <div className="col-6 mt-0">
-                  <label className="text-label">Jenis Pemasok</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={currentItem !== null ? currentItem.jpem : null}
-                      options={jpem}
-                      onChange={(e) => {
-                        console.log(e.value);
-                        setCurrentItem({
-                          ...currentItem,
-                          jpem: e.value,
-                        });
-                      }}
-                      optionLabel="jpem_name"
-                      filter
-                      filterBy="jpem_name"
-                      placeholder="Pilih Jenis Pemasok"
-                    />
-                  </div>
+                  <PrimeDropdown
+                    label={"Jenis Pemasok"}
+                    value={currentItem !== null ? currentItem.jpem : null}
+                    options={jpem}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        jpem: e.value,
+                      });
+                      let newError = error;
+                      newError[0].jpem = false;
+                      setError(newError);
+                    }}
+                    optionLabel="jpem_name"
+                    filter
+                    filterBy="jpem_name"
+                    placeholder="Pilih Jenis Pemasok"
+                    errorMessage="Jenis Pemasok Belum Dipilih"
+                    error={error[0]?.jpem}
+                  />
                 </div>
 
                 <div className="col-6">
@@ -1001,63 +1063,68 @@ const DataSupplier = ({
 
               <div className="row ml-0 mt-0">
                 <div className="col-12">
-                  <label className="text-label">Alamat</label>
-                  <div className="p-inputgroup">
-                    <InputText
-                      value={
-                        currentItem !== null
-                          ? `${currentItem?.supplier?.sup_address ?? ""}`
-                          : ""
-                      }
-                      onChange={(e) =>
-                        setCurrentItem({
-                          ...currentItem,
-                          supplier: {
-                            ...currentItem.supplier,
-                            sup_address: e.target.value,
-                          },
-                        })
-                      }
-                      placeholder="Masukan Alamat"
-                    />
-                  </div>
+                  <PrimeInput
+                    label={"Alamat Pemasok"}
+                    value={
+                      currentItem !== null
+                        ? `${currentItem?.supplier?.sup_address ?? ""}`
+                        : ""
+                    }
+                    onChange={(e) => {
+                      setCurrentItem({
+                        ...currentItem,
+                        supplier: {
+                          ...currentItem.supplier,
+                          sup_address: e.target.value,
+                        },
+                      });
+                      let newError = error;
+                      newError[0].addrs = false;
+                      setError(newError);
+                    }}
+                    placeholder="Masukan Alamat"
+                    error={error[0]?.addrs}
+                  />
                 </div>
               </div>
 
               <div className="row ml-0 mt-0">
                 <div className="col-6 mt-0">
-                  <label className="text-label">Kota</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={
-                        currentItem !== null &&
-                        currentItem.supplier.sup_kota !== null
-                          ? kota(currentItem.supplier.sup_kota)
-                          : null
-                      }
-                      options={city}
-                      onChange={(e) => {
-                        console.log(e.value);
-                        setCurrentItem({
-                          ...currentItem,
-                          supplier: {
-                            ...currentItem.supplier,
-                            sup_kota: e.value.city_id,
-                          },
-                        });
-                      }}
-                      optionLabel="city_name"
-                      filter
-                      filterBy="city_name"
-                      placeholder="Pilih Kota"
-                    />
-                  </div>
+                  <PrimeDropdown
+                    label={"Kota"}
+                    value={
+                      currentItem !== null &&
+                      currentItem.supplier.sup_kota !== null
+                        ? kota(currentItem.supplier.sup_kota)
+                        : null
+                    }
+                    options={city}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        supplier: {
+                          ...currentItem.supplier,
+                          sup_kota: e.value.city_id,
+                        },
+                      });
+                      let newError = error;
+                      newError[0].city = false;
+                      setError(newError);
+                    }}
+                    optionLabel="city_name"
+                    filter
+                    filterBy="city_name"
+                    placeholder="Pilih Kota"
+                    errorMessage="Kota Belum Dipilih"
+                    error={error[0]?.city}
+                  />
                 </div>
 
                 <div className="col-6">
                   <label className="text-label">Kode Pos</label>
                   <div className="p-inputgroup">
-                    <InputNumber
+                    <InputText
                       value={
                         currentItem !== null
                           ? `${currentItem?.supplier?.sup_kpos ?? ""}`
@@ -1073,8 +1140,7 @@ const DataSupplier = ({
                         })
                       }
                       placeholder="Masukan Kode Pos"
-                      mode="decimal"
-                      useGrouping={false}
+                      type="number"
                     />
                   </div>
                 </div>
@@ -1087,34 +1153,36 @@ const DataSupplier = ({
             >
               <div className="row ml-0 mt-0">
                 <div className="col-6 mt-0">
-                  <label className="text-label">No. Telepon 1</label>
-                  <div className="p-inputgroup">
-                    <InputNumber
-                      value={
-                        currentItem !== null
-                          ? `${currentItem?.supplier?.sup_telp1 ?? ""}`
-                          : ""
-                      }
-                      onChange={(e) =>
-                        setCurrentItem({
-                          ...currentItem,
-                          supplier: {
-                            ...currentItem.supplier,
-                            sup_telp1: e.value,
-                          },
-                        })
-                      }
-                      placeholder="Masukan No. Telepon"
-                      mode="decimal"
-                      useGrouping={false}
-                    />
-                  </div>
+                  <PrimeInput
+                    label={"No. Telepon 1"}
+                    value={
+                      currentItem !== null
+                        ? `${currentItem?.supplier?.sup_telp1 ?? ""}`
+                        : ""
+                    }
+                    onChange={(e) => {
+                      setCurrentItem({
+                        ...currentItem,
+                        supplier: {
+                          ...currentItem.supplier,
+                          sup_telp1: e.value,
+                        },
+                      });
+                      let newError = error;
+                      newError[1].phone = false;
+                      setError(newError);
+                    }}
+                    placeholder="Masukan No. Telepon"
+                    isNumber
+                    error={error[1]?.phone}
+                  />
                 </div>
 
                 <div className="col-6">
                   <label className="text-label">No. Telepon 2</label>
                   <div className="p-inputgroup">
-                    <InputNumber
+                    <span className="p-inputgroup-addon">+62</span>
+                    <InputText
                       value={
                         currentItem !== null
                           ? `${currentItem?.supplier?.sup_telp2 ?? ""}`
@@ -1130,8 +1198,7 @@ const DataSupplier = ({
                         })
                       }
                       placeholder="Masukan No. Telepon"
-                      mode="decimal"
-                      useGrouping={false}
+                      type="number"
                     />
                   </div>
                 </div>
@@ -1162,26 +1229,28 @@ const DataSupplier = ({
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">Contact Person</label>
-                  <div className="p-inputgroup">
-                    <InputText
-                      value={
-                        currentItem !== null
-                          ? `${currentItem?.supplier?.sup_cp ?? ""}`
-                          : ""
-                      }
-                      onChange={(e) =>
-                        setCurrentItem({
-                          ...currentItem,
-                          supplier: {
-                            ...currentItem.supplier,
-                            sup_cp: e.target.value,
-                          },
-                        })
-                      }
-                      placeholder="Masukan Contact Person"
-                    />
-                  </div>
+                  <PrimeInput
+                    label={"Contact Person"}
+                    value={
+                      currentItem !== null
+                        ? `${currentItem?.supplier?.sup_cp ?? ""}`
+                        : ""
+                    }
+                    onChange={(e) => {
+                      setCurrentItem({
+                        ...currentItem,
+                        supplier: {
+                          ...currentItem.supplier,
+                          sup_cp: e.target.value,
+                        },
+                      });
+                      let newError = error;
+                      newError[1].cp = false;
+                      setError(newError);
+                    }}
+                    placeholder="Masukan Contact Person"
+                    error={error[1]?.cp}
+                  />
                 </div>
               </div>
             </TabPanel>
@@ -1218,31 +1287,34 @@ const DataSupplier = ({
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">PPN</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={
-                        currentItem !== null
-                          ? ppn(currentItem?.supplier?.sup_ppn)
-                          : null
-                      }
-                      options={pajak}
-                      onChange={(e) => {
-                        console.log(e.value);
-                        setCurrentItem({
-                          ...currentItem,
-                          supplier: {
-                            ...currentItem.supplier,
-                            sup_ppn: e.value.id,
-                          },
-                        });
-                      }}
-                      optionLabel="name"
-                      filter
-                      filterBy="name"
-                      placeholder="Pilih Jenis Pajak"
-                    />
-                  </div>
+                  <PrimeDropdown
+                    label={"PPN"}
+                    value={
+                      currentItem !== null
+                        ? ppn(currentItem?.supplier?.sup_ppn)
+                        : null
+                    }
+                    options={pajak}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        supplier: {
+                          ...currentItem.supplier,
+                          sup_ppn: e.value.id,
+                        },
+                      });
+                      let newError = error;
+                      newError[2].ppn = false;
+                      setError(newError);
+                    }}
+                    optionLabel="name"
+                    filter
+                    filterBy="name"
+                    placeholder="Pilih Jenis Pajak"
+                    errorMessage="Jenis Pajak Belum Dipilih"
+                    error={error[2]?.ppn}
+                  />
                 </div>
               </div>
 
@@ -1278,68 +1350,72 @@ const DataSupplier = ({
 
               <div className="row ml-0 mt-0">
                 <div className="col-6">
-                  <label className="text-label">Hutang</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={
-                        currentItem !== null &&
-                        currentItem.supplier.sup_hutang !== null
-                          ? hut(currentItem.supplier.sup_hutang)
-                          : null
-                      }
-                      options={accHut}
-                      onChange={(e) => {
-                        console.log(e.value);
-                        setCurrentItem({
-                          ...currentItem,
-                          supplier: {
-                            ...currentItem.supplier,
-                            sup_hutang: e.value?.id ?? null,
-                          },
-                        });
-                      }}
-                      optionLabel="account.acc_name"
-                      valueTemplate={clear}
-                      itemTemplate={glTemplate}
-                      filter
-                      filterBy="account.acc_name"
-                      placeholder="Kode Distribusi Hutang"
-                      showClear
-                      // disabled
-                    />
-                  </div>
+                  <PrimeDropdown
+                    label={"Kode Distribusi AP"}
+                    value={
+                      currentItem !== null &&
+                      currentItem.supplier.sup_hutang !== null
+                        ? hut(currentItem.supplier.sup_hutang)
+                        : null
+                    }
+                    options={accHut}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        supplier: {
+                          ...currentItem.supplier,
+                          sup_hutang: e.value?.id ?? null,
+                        },
+                      });
+                      let newError = error;
+                      newError[2].ap = false;
+                      setError(newError);
+                    }}
+                    optionLabel="account.acc_name"
+                    valueTemplate={clear}
+                    itemTemplate={glTemplate}
+                    filter
+                    filterBy="account.acc_name"
+                    placeholder="Kode Distribusi Hutang"
+                    showClear
+                    errorMessage="Kode Distribusi AP Belum Dipilih"
+                    error={error[2]?.ap}
+                  />
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">Uang Muka Pembelian</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={
-                        currentItem !== null 
-                          ? hut(currentItem?.supplier?.sup_uang_muka)
-                          : null
-                      }
-                      options={accHut}
-                      onChange={(e) => {
-                        console.log(e.value);
-                        setCurrentItem({
-                          ...currentItem,
-                          supplier: {
-                            ...currentItem.supplier,
-                            sup_uang_muka: e.value?.id ?? null,
-                          },
-                        });
-                      }}
-                      optionLabel="account.acc_name"
-                      valueTemplate={clear}
-                      itemTemplate={glTemplate}
-                      filter
-                      filterBy="account.acc_name"
-                      placeholder="Kode Distribusi Uang Muka"
-                      showClear
-                      // disabled
-                    />
-                  </div>
+                  <PrimeDropdown
+                    label={"Uang Muka Pembelian"}
+                    value={
+                      currentItem !== null
+                        ? hut(currentItem?.supplier?.sup_uang_muka)
+                        : null
+                    }
+                    options={accHut}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        supplier: {
+                          ...currentItem.supplier,
+                          sup_uang_muka: e.value?.id ?? null,
+                        },
+                      });
+                      let newError = error;
+                      newError[2].um = false;
+                      setError(newError);
+                    }}
+                    optionLabel="account.acc_name"
+                    valueTemplate={clear}
+                    itemTemplate={glTemplate}
+                    filter
+                    filterBy="account.acc_name"
+                    placeholder="Kode Distribusi Uang Muka"
+                    showClear
+                    errorMessage="Uang Muka Pembelian Belum Dipilih"
+                    error={error[2]?.um}
+                  />
                 </div>
               </div>
 

@@ -15,6 +15,8 @@ import { Dropdown } from "primereact/dropdown";
 import { Badge } from "primereact/badge";
 import { Divider } from "@material-ui/core";
 import { TabPanel, TabView } from "primereact/tabview";
+import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
+import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 
 const def = {
   groupPro: {
@@ -39,6 +41,23 @@ const def = {
     desc: null,
   },
 };
+
+const defError = [
+  {
+    code: false,
+    name: false,
+  },
+  {
+    acc_1: false,
+    acc_2: false,
+    acc_3: false,
+    acc_4: false,
+    acc_5: false,
+    acc_6: false,
+    acc_7: false,
+    acc_8: false,
+  },
+];
 
 const DataGroupProduk = ({
   data,
@@ -67,7 +86,7 @@ const DataGroupProduk = ({
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const [active, setActive] = useState(0);
-
+  const [error, setError] = useState(defError);
 
   useEffect(() => {
     getDivisi();
@@ -322,14 +341,16 @@ const DataGroupProduk = ({
   };
 
   const onSubmit = () => {
-    if (isEdit) {
-      setUpdate(true);
-      editGroupProduk();
-      setActive(0);
-    } else {
-      setUpdate(true);
-      addGroupProduk();
-      setActive(0);
+    if (isValid()) {
+      if (isEdit) {
+        setUpdate(true);
+        editGroupProduk();
+        setActive(0);
+      } else {
+        setUpdate(true);
+        addGroupProduk();
+        setActive(0);
+      }
     }
   };
 
@@ -571,6 +592,47 @@ const DataGroupProduk = ({
     return <span>{props.placeholder}</span>;
   };
 
+  const isValid = () => {
+    let valid = false;
+    let active = 1;
+    let errors = [
+      {
+        code: !currentItem.groupPro.code || currentItem.groupPro.code === "",
+        name: !currentItem.groupPro.name || currentItem.groupPro.name === "",
+      },
+      {
+        acc_1: !currentItem.groupPro?.acc_sto,
+        acc_2: !currentItem.groupPro?.acc_send,
+        acc_3: !currentItem.groupPro?.acc_terima,
+        acc_4: !currentItem.groupPro?.hrg_pokok,
+        acc_5: !currentItem.groupPro?.acc_penj,
+        acc_6: !currentItem.groupPro?.potongan,
+        acc_7: !currentItem.groupPro?.pengembalian,
+        acc_8: !currentItem.groupPro?.selisih,
+      },
+    ];
+
+    setError(errors);
+
+    errors.forEach((el, i) => {
+      for (var key in el) {
+        valid = !el[key];
+        if (el[key] && i < active) {
+          active = i;
+        }
+      }
+    });
+
+    console.log(active);
+    console.log(valid);
+
+    if (!valid) {
+      setActive(active);
+    }
+
+    return valid;
+  };
+
   const renderBody = () => {
     return (
       <>
@@ -617,7 +679,7 @@ const DataGroupProduk = ({
           />
           <Column
             header="Divisi"
-            field={(e) => e.divisi?.name}
+            field={(e) => e.divisi?.name ?? "-"}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
@@ -658,41 +720,45 @@ const DataGroupProduk = ({
             >
               <div className="row mr-0 ml-0">
                 <div className="col-6">
-                  <label className="text-label">Kode Kelompok</label>
-                  <div className="p-inputgroup">
-                    <InputText
-                      value={`${currentItem?.groupPro?.code ?? ""}`}
-                      onChange={(e) =>
-                        setCurrentItem({
-                          ...currentItem,
-                          groupPro: {
-                            ...currentItem.groupPro,
-                            code: e.target.value,
-                          },
-                        })
-                      }
-                      placeholder="Masukan Kode Kelompok"
-                    />
-                  </div>
+                  <PrimeInput
+                    label={"Nama Grup"}
+                    value={`${currentItem?.groupPro?.code ?? ""}`}
+                    onChange={(e) => {
+                      setCurrentItem({
+                        ...currentItem,
+                        groupPro: {
+                          ...currentItem.groupPro,
+                          code: e.target.value,
+                        },
+                      });
+                      let newError = error;
+                      newError[0].code = false;
+                      setError(newError);
+                    }}
+                    placeholder="Masukan Kode Grup"
+                    error={error[0]?.code}
+                  />
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">Nama Kelompok</label>
-                  <div className="p-inputgroup">
-                    <InputText
-                      value={`${currentItem?.groupPro?.name ?? ""}`}
-                      onChange={(e) =>
-                        setCurrentItem({
-                          ...currentItem,
-                          groupPro: {
-                            ...currentItem.groupPro,
-                            name: e.target.value,
-                          },
-                        })
-                      }
-                      placeholder="Masukan Nama Kelompok"
-                    />
-                  </div>
+                  <PrimeInput
+                    label={"Nama Grup"}
+                    value={`${currentItem?.groupPro?.name ?? ""}`}
+                    onChange={(e) => {
+                      setCurrentItem({
+                        ...currentItem,
+                        groupPro: {
+                          ...currentItem.groupPro,
+                          name: e.target.value,
+                        },
+                      });
+                      let newError = error;
+                      newError[0].name = false;
+                      setError(newError);
+                    }}
+                    placeholder="Masukan Nama Grup"
+                    error={error[0]?.name}
+                  />
                 </div>
               </div>
               <div className="row mr-0 ml-0">
@@ -725,104 +791,110 @@ const DataGroupProduk = ({
             >
               <div className="row mr-0 ml-0">
                 <div className="col-6">
-                  <label className="text-label">Akun Persediaan</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={
-                        currentItem !== null &&
-                        currentItem.groupPro.acc_sto !== null
-                          ? gl(currentItem.groupPro.acc_sto)
-                          : null
-                      }
-                      options={account}
-                      onChange={(e) => {
-                        console.log(e.value);
-                        setCurrentItem({
-                          ...currentItem,
-                          groupPro: {
-                            ...currentItem.groupPro,
-                            acc_sto: e.value?.account?.id ?? null,
-                          },
-                        });
-                      }}
-                      optionLabel="account.acc_name"
-                      valueTemplate={clear}
-                      itemTemplate={glTemplate}
-                      filter
-                      filterBy="account.acc_name"
-                      placeholder="Pilih Akun Persediaan"
-                      showClear
-                      // disabled
-                    />
-                  </div>
+                  <PrimeDropdown
+                    label={"Akun Persediaan"}
+                    value={
+                      currentItem !== null &&
+                      currentItem.groupPro.acc_sto !== null
+                        ? gl(currentItem.groupPro.acc_sto)
+                        : null
+                    }
+                    options={account}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        groupPro: {
+                          ...currentItem.groupPro,
+                          acc_sto: e.value?.account?.id ?? null,
+                        },
+                      });
+                      let newError = error;
+                      newError[1].acc_1 = false;
+                      setError(newError);
+                    }}
+                    optionLabel="account.acc_name"
+                    valueTemplate={clear}
+                    itemTemplate={glTemplate}
+                    filter
+                    filterBy="account.acc_name"
+                    placeholder="Pilih Akun Persediaan"
+                    showClear
+                    errorMessage="Akun Persediaan Belum Dipilih"
+                    error={error[1]?.acc_1}
+                  />
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">Akun Pengiriman Barang</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={
-                        currentItem !== null &&
-                        currentItem.groupPro.acc_send !== null
-                          ? gl(currentItem.groupPro.acc_send)
-                          : null
-                      }
-                      options={account}
-                      onChange={(e) => {
-                        console.log(e.value);
-                        setCurrentItem({
-                          ...currentItem,
-                          groupPro: {
-                            ...currentItem.groupPro,
-                            acc_send: e.value?.account?.id ?? null,
-                          },
-                        });
-                      }}
-                      optionLabel="account.acc_name"
-                      valueTemplate={clear}
-                      itemTemplate={glTemplate}
-                      filter
-                      filterBy="account.acc_name"
-                      placeholder="Pilih Akun Pengiriman"
-                      showClear
-                      // disabled
-                    />
-                  </div>
+                  <PrimeDropdown
+                    label={"Akun Pengiriman Barang"}
+                    value={
+                      currentItem !== null &&
+                      currentItem.groupPro.acc_send !== null
+                        ? gl(currentItem.groupPro.acc_send)
+                        : null
+                    }
+                    options={account}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        groupPro: {
+                          ...currentItem.groupPro,
+                          acc_send: e.value?.account?.id ?? null,
+                        },
+                      });
+                      let newError = error;
+                      newError[1].acc_2 = false;
+                      setError(newError);
+                    }}
+                    optionLabel="account.acc_name"
+                    valueTemplate={clear}
+                    itemTemplate={glTemplate}
+                    filter
+                    filterBy="account.acc_name"
+                    placeholder="Pilih Akun Pengiriman"
+                    showClear
+                    errorMessage="Akun Pengiriman Belum Dipilih"
+                    error={error[1]?.acc_2}
+                  />
                 </div>
               </div>
 
               <div className="row mr-0 ml-0">
                 <div className="col-12">
-                  <label className="text-label">Akun Penerimaan Barang</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={
-                        currentItem !== null &&
-                        currentItem.groupPro.acc_terima !== null
-                          ? gl(currentItem.groupPro.acc_terima)
-                          : null
-                      }
-                      options={account}
-                      onChange={(e) => {
-                        console.log(e.value);
-                        setCurrentItem({
-                          ...currentItem,
-                          groupPro: {
-                            ...currentItem.groupPro,
-                            acc_terima: e.value?.account?.id ?? null,
-                          },
-                        });
-                      }}
-                      optionLabel="account.acc_name"
-                      valueTemplate={clear}
-                      itemTemplate={glTemplate}
-                      filter
-                      filterBy="account.acc_name"
-                      placeholder="Pilih Akun Penerimaan"
-                      showClear
-                      // disabled
-                    />
-                  </div>
+                  <PrimeDropdown
+                    label={"Akun Penerimaan Barang"}
+                    value={
+                      currentItem !== null &&
+                      currentItem.groupPro.acc_terima !== null
+                        ? gl(currentItem.groupPro.acc_terima)
+                        : null
+                    }
+                    options={account}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        groupPro: {
+                          ...currentItem.groupPro,
+                          acc_terima: e.value?.account?.id ?? null,
+                        },
+                      });
+                      let newError = error;
+                      newError[1].acc_3 = false;
+                      setError(newError);
+                    }}
+                    optionLabel="account.acc_name"
+                    valueTemplate={clear}
+                    itemTemplate={glTemplate}
+                    filter
+                    filterBy="account.acc_name"
+                    placeholder="Pilih Akun Penerimaan"
+                    showClear
+                    errorMessage="Akun Penerimaan Belum Dipilih"
+                    error={error[1]?.acc_3}
+                  />
                 </div>
               </div>
 
@@ -833,168 +905,182 @@ const DataGroupProduk = ({
 
               <div className="row mr-0 ml-0">
                 <div className="col-6">
-                  <label className="text-label">Harga Pokok Penjualan</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={
-                        currentItem !== null &&
-                        currentItem.groupPro.hrg_pokok !== null
-                          ? gl(currentItem.groupPro.hrg_pokok)
-                          : null
-                      }
-                      options={account}
-                      onChange={(e) => {
-                        console.log(e.value);
-                        setCurrentItem({
-                          ...currentItem,
-                          groupPro: {
-                            ...currentItem.groupPro,
-                            hrg_pokok: e.value?.account?.id ?? null,
-                          },
-                        });
-                      }}
-                      optionLabel="account.acc_name"
-                      valueTemplate={clear}
-                      itemTemplate={glTemplate}
-                      filter
-                      filterBy="account.acc_name"
-                      placeholder="Pilih Harga Pokok Penjualan"
-                      showClear
-                      // disabled
-                    />
-                  </div>
+                  <PrimeDropdown
+                    label={"Harga Pokok Penjualan"}
+                    value={
+                      currentItem !== null &&
+                      currentItem.groupPro.hrg_pokok !== null
+                        ? gl(currentItem.groupPro.hrg_pokok)
+                        : null
+                    }
+                    options={account}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        groupPro: {
+                          ...currentItem.groupPro,
+                          hrg_pokok: e.value?.account?.id ?? null,
+                        },
+                      });
+                      let newError = error;
+                      newError[1].acc_4 = false;
+                      setError(newError);
+                    }}
+                    optionLabel="account.acc_name"
+                    valueTemplate={clear}
+                    itemTemplate={glTemplate}
+                    filter
+                    filterBy="account.acc_name"
+                    placeholder="Pilih Harga Pokok Penjualan"
+                    showClear
+                    errorMessage="Akun HPP Belum Dipilih"
+                    error={error[1]?.acc_4}
+                  />
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">Penjualan</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={
-                        currentItem !== null &&
-                        currentItem.groupPro.acc_penj !== null
-                          ? gl(currentItem.groupPro.acc_penj)
-                          : null
-                      }
-                      options={account}
-                      onChange={(e) => {
-                        console.log(e.account);
-                        setCurrentItem({
-                          ...currentItem,
-                          groupPro: {
-                            ...currentItem.groupPro,
-                            acc_penj: e.value?.account?.id ?? null,
-                          },
-                        });
-                      }}
-                      optionLabel="account.acc_name"
-                      valueTemplate={clear}
-                      itemTemplate={glTemplate}
-                      filter
-                      filterBy="account.acc_name"
-                      placeholder="Pilih Akun Penjualan"
-                      showClear
-                    />
-                  </div>
+                  <PrimeDropdown
+                    label={"Penjualan"}
+                    value={
+                      currentItem !== null &&
+                      currentItem.groupPro.acc_penj !== null
+                        ? gl(currentItem.groupPro.acc_penj)
+                        : null
+                    }
+                    options={account}
+                    onChange={(e) => {
+                      console.log(e.account);
+                      setCurrentItem({
+                        ...currentItem,
+                        groupPro: {
+                          ...currentItem.groupPro,
+                          acc_penj: e.value?.account?.id ?? null,
+                        },
+                      });
+                      let newError = error;
+                      newError[1].acc_5 = false;
+                      setError(newError);
+                    }}
+                    optionLabel="account.acc_name"
+                    valueTemplate={clear}
+                    itemTemplate={glTemplate}
+                    filter
+                    filterBy="account.acc_name"
+                    placeholder="Pilih Akun Penjualan"
+                    showClear
+                    errorMessage="Akun Penjualan Belum Dipilih"
+                    error={error[1]?.acc_5}
+                  />
                 </div>
               </div>
 
               <div className="row mr-0 ml-0 mt-2">
                 <div className="col-6">
-                  <label className="text-label">Potongan Penjualan</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={
-                        currentItem !== null &&
-                        currentItem.groupPro.potongan !== null
-                          ? gl(currentItem.groupPro.potongan)
-                          : null
-                      }
-                      options={account}
-                      onChange={(e) => {
-                        console.log(e.value);
-                        setCurrentItem({
-                          ...currentItem,
-                          groupPro: {
-                            ...currentItem.groupPro,
-                            potongan: e.value?.account?.id ?? null,
-                          },
-                        });
-                      }}
-                      optionLabel="account.acc_name"
-                      valueTemplate={clear}
-                      itemTemplate={glTemplate}
-                      filter
-                      filterBy="account.acc_name"
-                      placeholder="Pilih Akun Potongan Penjualan"
-                      showClear
-                    />
-                  </div>
+                  <PrimeDropdown
+                    label={"Potongan Penjualan"}
+                    value={
+                      currentItem !== null &&
+                      currentItem.groupPro.potongan !== null
+                        ? gl(currentItem.groupPro.potongan)
+                        : null
+                    }
+                    options={account}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        groupPro: {
+                          ...currentItem.groupPro,
+                          potongan: e.value?.account?.id ?? null,
+                        },
+                      });
+                      let newError = error;
+                      newError[1].acc_6 = false;
+                      setError(newError);
+                    }}
+                    optionLabel="account.acc_name"
+                    valueTemplate={clear}
+                    itemTemplate={glTemplate}
+                    filter
+                    filterBy="account.acc_name"
+                    placeholder="Pilih Akun Potongan Penjualan"
+                    showClear
+                    errorMessage="Akun Potongan Penjualan Belum Dipilih"
+                    error={error[1]?.acc_6}
+                  />
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">Pengembalian Penjualan</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={
-                        currentItem !== null &&
-                        currentItem.groupPro.pengembalian !== null
-                          ? gl(currentItem.groupPro.pengembalian)
-                          : null
-                      }
-                      options={account}
-                      onChange={(e) => {
-                        console.log(e.value);
-                        setCurrentItem({
-                          ...currentItem,
-                          groupPro: {
-                            ...currentItem.groupPro,
-                            pengembalian: e.value?.account?.id ?? null,
-                          },
-                        });
-                      }}
-                      optionLabel="account.acc_name"
-                      valueTemplate={clear}
-                      itemTemplate={glTemplate}
-                      filter
-                      filterBy="account.acc_name"
-                      placeholder="Pilih Akun Pengembalian"
-                      showClear
-                    />
-                  </div>
+                  <PrimeDropdown
+                    label={"Pengembalian Penjualan"}
+                    value={
+                      currentItem !== null &&
+                      currentItem.groupPro.pengembalian !== null
+                        ? gl(currentItem.groupPro.pengembalian)
+                        : null
+                    }
+                    options={account}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        groupPro: {
+                          ...currentItem.groupPro,
+                          pengembalian: e.value?.account?.id ?? null,
+                        },
+                      });
+                      let newError = error;
+                      newError[1].acc_7 = false;
+                      setError(newError);
+                    }}
+                    optionLabel="account.acc_name"
+                    valueTemplate={clear}
+                    itemTemplate={glTemplate}
+                    filter
+                    filterBy="account.acc_name"
+                    placeholder="Pilih Akun Pengembalian"
+                    showClear
+                    errorMessage="Akun Pengembalian Belum Dipilih"
+                    error={error[1]?.acc_7}
+                  />
                 </div>
               </div>
 
               <div className="row mr-0 ml-0">
                 <div className="col-12">
-                  <label className="text-label">Selisih Harga Pokok</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={
-                        currentItem !== null &&
-                        currentItem.groupPro.selisih !== null
-                          ? gl(currentItem.groupPro.selisih)
-                          : null
-                      }
-                      options={account}
-                      onChange={(e) => {
-                        console.log(e.value);
-                        setCurrentItem({
-                          ...currentItem,
-                          groupPro: {
-                            ...currentItem.groupPro,
-                            selisih: e.value?.account?.id ?? null,
-                          },
-                        });
-                      }}
-                      optionLabel="account.acc_name"
-                      valueTemplate={clear}
-                      itemTemplate={glTemplate}
-                      filter
-                      filterBy="account.acc_name"
-                      placeholder="Pilih Akun Selisih Harga Pokok"
-                      showClear
-                    />
-                  </div>
+                  <PrimeDropdown
+                    label={"Selisih Harga Pokok"}
+                    value={
+                      currentItem !== null &&
+                      currentItem.groupPro.selisih !== null
+                        ? gl(currentItem.groupPro.selisih)
+                        : null
+                    }
+                    options={account}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        groupPro: {
+                          ...currentItem.groupPro,
+                          selisih: e.value?.account?.id ?? null,
+                        },
+                      });
+                      let newError = error;
+                      newError[1].acc_8 = false;
+                      setError(newError);
+                    }}
+                    optionLabel="account.acc_name"
+                    valueTemplate={clear}
+                    itemTemplate={glTemplate}
+                    filter
+                    filterBy="account.acc_name"
+                    placeholder="Pilih Akun Selisih Harga Pokok"
+                    showClear
+                    errorMessage="Akun Selisih Harga Belum Dipilih"
+                    error={error[1]?.acc_8}
+                  />
                 </div>
               </div>
             </TabPanel>

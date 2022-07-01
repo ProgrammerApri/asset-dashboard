@@ -52,12 +52,17 @@ const NeracaPerbandingan = () => {
   const [account, setAccount] = useState(null);
   const [trans, setTrans] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [date, setDate] = useState(new Date());
+  const [month1, setMonth1] = useState(new Date());
+  const [month2, setMonth2] = useState(new Date());
+  const [cp, setCp] = useState(null)
   const printPage = useRef(null);
   const toast = useRef(null);
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
+    var d = new Date();
+    d.setDate(d.getDate() - 30);
+    setMonth2(d);
     getAccount();
   }, []);
 
@@ -144,6 +149,7 @@ const NeracaPerbandingan = () => {
         kat_id: el.id,
         name: el.name,
         sub: [],
+        sub2: [],
       });
     });
 
@@ -153,6 +159,7 @@ const NeracaPerbandingan = () => {
         kat_id: el.id,
         name: el.name,
         sub: [],
+        sub2: [],
       });
     });
 
@@ -163,8 +170,8 @@ const NeracaPerbandingan = () => {
             let saldo = 0;
             trans?.forEach((ej) => {
               let trx_date = new Date(`${ej.trx_date}Z`);
-              if (trx_date <= date) {
-                if (ek.account.acc_code == ej.acc_id.umm_code) {
+              if (trx_date.getMonth()+1 === month2.getMonth() + 1) {
+                if (ek.account.acc_code === ej.acc_id.umm_code) {
                   saldo += ej.trx_amnt;
                 }
               }
@@ -179,50 +186,111 @@ const NeracaPerbandingan = () => {
       });
     });
 
+    datum.forEach((el) => {
+      el.kat_id.forEach((e) => {
+        account.forEach((ek) => {
+          if (ek.account.dou_type === "U" && ek.kategory.id === e) {
+            let saldo = 0;
+            trans?.forEach((ej) => {
+              let trx_date = new Date(`${ej.trx_date}Z`);
+              if (trx_date.getMonth() + 1 === month1.getMonth() + 1) {
+                if (ek.account.acc_code === ej.acc_id.umm_code) {
+                  saldo += ej.trx_amnt;
+                }
+              }
+            });
+            el.sub2.push({
+              acc_code: ek.account.acc_code,
+              acc_name: ek.account.acc_name,
+              saldo: saldo,
+            });
+          }
+        });
+      });
+    });
+
     console.log(datum);
 
     let totalAktiva = 0;
+    let totalAktiva2 = 0;
     let totalPasiva = 0;
+    let totalPasiva2 = 0;
     datum.forEach((el) => {
       if (el.type === "aktiva") {
         if (el.sub.length > 0) {
-          aktiva.push([{ ...umum, value: el.name }, { value: "" }]);
+          aktiva.push([
+            { ...umum, value: el.name },
+            { value: "" },
+            { value: "" },
+          ]);
           let total = 0;
-          el.sub.forEach((sub) => {
+          let total2 = 0;
+          el.sub.forEach((sub, i) => {
             aktiva.push([
               { ...detail, value: `${sub.acc_name}` },
               {
                 ...saldo,
                 value: sub.saldo > 0 ? `Rp. ${formatIdr(sub.saldo)}` : 0,
               },
+              {
+                ...saldo,
+                value:
+                  el.sub2[i].saldo > 0
+                    ? `Rp. ${formatIdr(el.sub2[i].saldo)}`
+                    : 0,
+              },
             ]);
             total += sub.saldo;
+            total2 += el.sub2[i].saldo;
           });
           aktiva.push([
             { ...umum, value: `Total ${el.name}` },
             { ...lastSaldo, value: total > 0 ? `Rp. ${formatIdr(total)}` : 0 },
+            {
+              ...lastSaldo,
+              value: total2 > 0 ? `Rp. ${formatIdr(total2)}` : 0,
+            },
           ]);
           totalAktiva += total;
+          totalAktiva2 += total2;
         }
       } else {
         if (el.sub.length > 0) {
-          pasiva.push([{ ...umum, value: el.name }, { value: "" }]);
+          pasiva.push([
+            { ...umum, value: el.name },
+            { value: "" },
+            { value: "" },
+          ]);
           let total = 0;
-          el.sub.forEach((sub) => {
+          let total2 = 0;
+          el.sub.forEach((sub, i) => {
             pasiva.push([
               { ...detail, value: `${sub.acc_name}` },
               {
                 ...saldo,
                 value: sub.saldo > 0 ? `Rp. ${formatIdr(sub.saldo)}` : 0,
               },
+              {
+                ...saldo,
+                value:
+                  el.sub2[i].saldo > 0
+                    ? `Rp. ${formatIdr(el.sub2[i].saldo)}`
+                    : 0,
+              },
             ]);
             total += sub.saldo;
+            total2 += el.sub2[i].saldo;
           });
           pasiva.push([
             { ...umum, value: `Total ${el.name}` },
             { ...lastSaldo, value: total > 0 ? `Rp. ${formatIdr(total)}` : 0 },
+            {
+              ...lastSaldo,
+              value: total2 > 0 ? `Rp. ${formatIdr(total2)}` : 0,
+            },
           ]);
           totalPasiva += total;
+          totalPasiva2 += total2;
         }
       }
     });
@@ -232,12 +300,20 @@ const NeracaPerbandingan = () => {
         ...lastSaldo,
         value: totalAktiva > 0 ? `Rp. ${formatIdr(totalAktiva)}` : 0,
       },
+      {
+        ...lastSaldo,
+        value: totalAktiva2 > 0 ? `Rp. ${formatIdr(totalAktiva2)}` : 0,
+      },
     ]);
     pasiva.push([
       { ...umum, value: "Liabilities Total" },
       {
         ...lastSaldo,
         value: totalPasiva > 0 ? `Rp. ${formatIdr(totalPasiva)}` : 0,
+      },
+      {
+        ...lastSaldo,
+        value: totalPasiva2 > 0 ? `Rp. ${formatIdr(totalPasiva2)}` : 0,
       },
     ]);
 
@@ -253,14 +329,26 @@ const NeracaPerbandingan = () => {
         ? `Rp. ${formatIdr(totalPasiva + selisih / 3 + (selisih * 2) / 3)}`
         : totalPasiva;
 
+    let selisih2 = totalAktiva2 - totalPasiva2;
+    pasiva[pasiva.length - 4][2].value =
+      selisih2 > 0 ? `Rp. ${formatIdr((selisih2 / 3).toFixed(0))}` : 0;
+    pasiva[pasiva.length - 3][2].value =
+      selisih2 > 0 ? `Rp. ${formatIdr(((selisih2 * 2) / 3).toFixed(0))}` : 0;
+    pasiva[pasiva.length - 2][2].value =
+      selisih2 > 0 ? `Rp. ${formatIdr(selisih2 / 3 + (selisih2 * 2) / 3)}` : 0;
+    pasiva[pasiva.length - 1][2].value =
+      selisih2 > 0
+        ? `Rp. ${formatIdr(totalPasiva2 + selisih2 / 3 + (selisih2 * 2) / 3)}`
+        : totalPasiva2;
+
     console.log(pasiva);
 
     let defLength =
       aktiva.length > pasiva.length ? aktiva.length : pasiva.length;
 
     for (let i = 0; i < defLength - 1; i++) {
-      let ak = [{ value: "" }, { value: "" }];
-      let pas = [{ value: "" }, { value: "" }];
+      let ak = [{ value: "" }, { value: "" }, { value: "" }];
+      let pas = [{ value: "" }, { value: "" }, { value: "" }];
       if (i < aktiva.length - 1) {
         ak = aktiva[i];
       }
@@ -268,16 +356,57 @@ const NeracaPerbandingan = () => {
         pas = pasiva[i];
       }
 
-      data.push([ak[0], ak[1], pas[0], pas[1]]);
+      data.push([ak[0], ak[1], ak[2], pas[0], pas[1], pas[2]]);
     }
     data.push([
       aktiva[aktiva.length - 1][0],
       aktiva[aktiva.length - 1][1],
+      aktiva[aktiva.length - 1][2],
       pasiva[pasiva.length - 1][0],
       pasiva[pasiva.length - 1][1],
+      pasiva[pasiva.length - 1][2],
     ]);
 
     let final = [
+      {
+        columns: [
+          {
+            title: "Balance Sheet Comparison",
+            width: { wch: 50 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+        ],
+        data: [
+          [
+            {
+              value: cp,
+              style: {
+                font: {
+                  sz: "14",
+                  bold: false,
+                },
+                alignment: { horizontal: "left", vertical: "center" },
+              },
+            },
+          ],
+        ],
+      },
+      {
+        columns: [
+          {
+            title: `${formatDate(month2)} and ${formatDate(month1)}`,
+            width: { wch: 50 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+        ],
+        data: [[]],
+      },
       {
         columns: [
           {
@@ -286,22 +415,34 @@ const NeracaPerbandingan = () => {
             style: {
               font: { sz: "14", bold: true },
               alignment: { horizontal: "center", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
             },
           },
           {
-            title: "",
+            title: formatDate(month2),
             width: { wch: 15 },
             style: {
               font: { sz: "14", bold: true },
-              alignment: { horizontal: "right", vertical: "center" },
+              alignment: { horizontal: "center", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
             },
           },
           {
-            title: "",
+            title: formatDate(month1),
             width: { wch: 15 },
             style: {
               font: { sz: "14", bold: true },
-              alignment: { horizontal: "right", vertical: "center" },
+              alignment: { horizontal: "center", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
             },
           },
           {
@@ -310,22 +451,34 @@ const NeracaPerbandingan = () => {
             style: {
               font: { sz: "14", bold: true },
               alignment: { horizontal: "center", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
             },
           },
           {
-            title: "",
+            title: formatDate(month2),
             width: { wch: 15 },
             style: {
               font: { sz: "14", bold: true },
-              alignment: { horizontal: "right", vertical: "center" },
+              alignment: { horizontal: "center", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
             },
           },
           {
-            title: "",
+            title: formatDate(month1),
             width: { wch: 15 },
             style: {
               font: { sz: "14", bold: true },
-              alignment: { horizontal: "right", vertical: "center" },
+              alignment: { horizontal: "center", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
             },
           },
         ],
@@ -343,28 +496,47 @@ const NeracaPerbandingan = () => {
   const renderHeader = () => {
     return (
       <div className="flex justify-content-between mb-3">
-        <div className="col-3 ml-0 mr-0 pl-0">
-          <div className="p-inputgroup">
-            <span className="p-inputgroup-addon">
-              <i className="pi pi-calendar" />
-            </span>
-            <Calendar
-              value={date}
-              onChange={(e) => {
-                console.log(e.value);
-                setDate(e.value);
-              }}
-              // selectionMode="range"
-              placeholder="Pilih Tanggal"
-              dateFormat="dd-mm-yy"
-            />
+        <Row className="m-0">
+          <div className="col-6 ml-0 mr-0 pl-0">
+            <div className="p-inputgroup">
+              <span className="p-inputgroup-addon">
+                <i className="pi pi-calendar" />
+              </span>
+              <Calendar
+                value={month2}
+                onChange={(e) => {
+                  console.log(e.value);
+                  setMonth2(e.value);
+                }}
+                view="month"
+                placeholder="Pilih Bulan"
+                dateFormat="mm/yy"
+              />
+            </div>
           </div>
-        </div>
+          <div className="col-6 ml-0 mr-0 pl-0">
+            <div className="p-inputgroup">
+              <span className="p-inputgroup-addon">
+                <i className="pi pi-calendar" />
+              </span>
+              <Calendar
+                value={month1}
+                onChange={(e) => {
+                  console.log(e.value);
+                  setMonth1(e.value);
+                }}
+                view="month"
+                placeholder="Pilih Bulan"
+                dateFormat="mm/yy"
+              />
+            </div>
+          </div>
+        </Row>
         <div style={{ height: "1rem" }}></div>
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
             <ExcelFile
-              filename={`neraca_export_${formatDate(new Date()).replace(
+              filename={`balancesheet_comparison_export_${formatDate(new Date()).replaceAll(
                 "/",
                 ""
               )}`}
@@ -379,7 +551,7 @@ const NeracaPerbandingan = () => {
             >
               <ExcelSheet
                 dataSet={account ? jsonForExcel(account, true) : null}
-                name={`Neraca-${formatDate(new Date())}`}
+                name={`Report`}
               />
             </ExcelFile>
           </div>
@@ -410,7 +582,7 @@ const NeracaPerbandingan = () => {
     if (month.length < 2) month = "0" + month;
     if (day.length < 2) day = "0" + day;
 
-    return [day, month, year].join("/");
+    return [month, year].join("/");
   };
 
   const formatIdr = (value) => {
@@ -433,8 +605,9 @@ const NeracaPerbandingan = () => {
         <Card className="ml-1 mr-1 mt-2">
           <Card.Body className="p-0">
             <CustomeWrapper
-              tittle={"Balance Sheet"}
-              subTittle={`Balance Sheet as of ${formatDate(date)}`}
+              tittle={"Balance Sheet Comparison"}
+              subTittle={`Balance Sheet Comparison ${formatDate(month2)} and ${formatDate(month1)}`}
+              onComplete={(cp) => setCp(cp)}
               page={1}
               body={
                 <DataTable
@@ -453,7 +626,7 @@ const NeracaPerbandingan = () => {
                   emptyMessage="Tidak ada data"
                 >
                   <Column
-                    className="center-header"
+                    className="center-header border-left border-right"
                     header="Asset"
                     style={{
                       minWidth: "8rem",
@@ -475,9 +648,9 @@ const NeracaPerbandingan = () => {
                     }
                   />
                   <Column
-                    header=" "
+                    header={formatDate(month2)}
                     field={(e) => e[1].value}
-                    className="text-right border-right"
+                    className="center-header text-right border-right"
                     body={(e) =>
                       loading ? (
                         <Skeleton />
@@ -489,38 +662,66 @@ const NeracaPerbandingan = () => {
                     }
                   />
                   <Column
-                    className="center-header"
+                    header={formatDate(month1)}
+                    field={(e) => e[2].value}
+                    className="center-header text-right border-right"
+                    body={(e) =>
+                      loading ? (
+                        <Skeleton />
+                      ) : (
+                        <div
+                          className={e[2].last && "font-weight-bold"}
+                        >{`${e[2].value}`}</div>
+                      )
+                    }
+                  />
+                  <Column
+                    className="center-header border-right"
                     header="Liabilities"
                     style={{
                       minWidth: "8rem",
                     }}
-                    field={(e) => e[2].value}
+                    field={(e) => e[3].value}
                     body={(e) =>
                       loading ? (
                         <Skeleton />
                       ) : (
                         <Row>
                           <div className={"mr-4"}></div>
-                          <div className={e[2].type == "D" && "mr-4"}></div>
+                          <div className={e[3].type == "D" && "mr-4"}></div>
                           <div
-                            className={e[2].type == "U" && "font-weight-bold"}
+                            className={e[3].type == "U" && "font-weight-bold"}
                           >
-                            {e[2].value}
+                            {e[3].value}
                           </div>
                         </Row>
                       )
                     }
                   />
                   <Column
-                    header=" "
-                    field={(e) => e[3].value}
-                    className="text-right"
+                    header={formatDate(month2)}
+                    field={(e) => e[4].value}
+                    className="center-header text-right border-right"
                     body={(e) =>
                       loading ? (
                         <Skeleton />
                       ) : (
-                        <div className={e[3].last && "font-weight-bold"}>
-                          {e[3].value}
+                        <div className={e[4].last && "font-weight-bold"}>
+                          {e[4].value}
+                        </div>
+                      )
+                    }
+                  />
+                  <Column
+                    header={formatDate(month1)}
+                    field={(e) => e[5].value}
+                    className="center-header text-right border-right"
+                    body={(e) =>
+                      loading ? (
+                        <Skeleton />
+                      ) : (
+                        <div className={e[5].last && "font-weight-bold"}>
+                          {e[5].value}
                         </div>
                       )
                     }
@@ -534,9 +735,9 @@ const NeracaPerbandingan = () => {
       <Row className="m-0 justify-content-center d-none">
         <Card className="ml-1 mr-1 mt-2">
           <Card.Body className="p-0" ref={printPage}>
-            <CustomeWrapper
-              tittle={"Balance Sheet"}
-              subTittle={`Balance Sheet as of ${formatDate(date)}`}
+          <CustomeWrapper
+              tittle={"Balance Sheet Comparison"}
+              subTittle={`Balance Sheet Comparison ${formatDate(month2)} and ${formatDate(month1)}`}
               page={1}
               body={
                 <DataTable
@@ -555,7 +756,7 @@ const NeracaPerbandingan = () => {
                   emptyMessage="Tidak ada data"
                 >
                   <Column
-                    className="center-header"
+                    className="center-header border-left border-right"
                     header="Asset"
                     style={{
                       minWidth: "8rem",
@@ -576,24 +777,10 @@ const NeracaPerbandingan = () => {
                       )
                     }
                   />
-                  {/* <Column
-                  header="May 2022"
-                  field={(e) => e[1].value}
-                  className="text-right border-right center-header"
-                  body={(e) =>
-                    loading ? (
-                      <Skeleton />
-                    ) : (
-                      <div
-                        className={e[1].last && "font-weight-bold"}
-                      >{`${e[1].value}`}</div>
-                    )
-                  }
-                /> */}
                   <Column
-                    header=""
+                    header={formatDate(month2)}
                     field={(e) => e[1].value}
-                    className="text-right border-right center-header"
+                    className="center-header text-right border-right"
                     body={(e) =>
                       loading ? (
                         <Skeleton />
@@ -605,38 +792,66 @@ const NeracaPerbandingan = () => {
                     }
                   />
                   <Column
-                    className="center-header"
+                    header={formatDate(month1)}
+                    field={(e) => e[2].value}
+                    className="center-header text-right border-right"
+                    body={(e) =>
+                      loading ? (
+                        <Skeleton />
+                      ) : (
+                        <div
+                          className={e[2].last && "font-weight-bold"}
+                        >{`${e[2].value}`}</div>
+                      )
+                    }
+                  />
+                  <Column
+                    className="center-header border-right"
                     header="Liabilities"
                     style={{
                       minWidth: "8rem",
                     }}
-                    field={(e) => e[2].value}
+                    field={(e) => e[3].value}
                     body={(e) =>
                       loading ? (
                         <Skeleton />
                       ) : (
                         <Row>
                           <div className={"mr-4"}></div>
-                          <div className={e[2].type == "D" && "mr-4"}></div>
+                          <div className={e[3].type == "D" && "mr-4"}></div>
                           <div
-                            className={e[2].type == "U" && "font-weight-bold"}
+                            className={e[3].type == "U" && "font-weight-bold"}
                           >
-                            {e[2].value}
+                            {e[3].value}
                           </div>
                         </Row>
                       )
                     }
                   />
                   <Column
-                    header=""
-                    field={(e) => e[3].value}
-                    className="text-right center-header"
+                    header={formatDate(month2)}
+                    field={(e) => e[4].value}
+                    className="center-header text-right border-right"
                     body={(e) =>
                       loading ? (
                         <Skeleton />
                       ) : (
-                        <div className={e[3].last && "font-weight-bold"}>
-                          {e[3].value}
+                        <div className={e[4].last && "font-weight-bold"}>
+                          {e[4].value}
+                        </div>
+                      )
+                    }
+                  />
+                  <Column
+                    header={formatDate(month1)}
+                    field={(e) => e[5].value}
+                    className="center-header text-right border-right"
+                    body={(e) =>
+                      loading ? (
+                        <Skeleton />
+                      ) : (
+                        <div className={e[5].last && "font-weight-bold"}>
+                          {e[5].value}
                         </div>
                       )
                     }

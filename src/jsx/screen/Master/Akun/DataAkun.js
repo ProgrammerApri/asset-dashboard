@@ -18,6 +18,7 @@ import { InputNumber } from "primereact/inputnumber";
 import { Badge } from "react-bootstrap";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
+import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 
 const def = {
   account: {
@@ -562,20 +563,17 @@ const DataAkun = ({
           />
         </span>
         <Row className="mr-1">
-          <Button
+          <PrimeSingleButton
             className="mr-3"
-            variant="primary"
+            label="Export"
+            icon={<i className="pi pi-file-excel px-2"></i>}
             onClick={() => {
               exportExcel();
             }}
-          >
-            Export{" "}
-            <span className="btn-icon-right">
-              <i class="bx bx-plus"></i>
-            </span>
-          </Button>
-          <Button
-            variant="primary"
+          />
+          <PrimeSingleButton
+            label="Tambah"
+            icon={<i class="bx bx-plus px-2"></i>}
             onClick={() => {
               setShowInput(true);
               setEdit(false);
@@ -583,12 +581,7 @@ const DataAkun = ({
               setCurrentItem(def);
               onInput(true);
             }}
-          >
-            Tambah{" "}
-            <span className="btn-icon-right">
-              <i class="bx bx-plus"></i>
-            </span>
-          </Button>
+          />
         </Row>
       </div>
     );
@@ -713,8 +706,8 @@ const DataAkun = ({
     setCurrentItem(def);
     setEdit(false);
     setShowInput(false);
-    setEkat(false)
-    setEname(false)
+    setEkat(false);
+    setEname(false);
   };
 
   const renderBody = () => {
@@ -926,7 +919,7 @@ const DataAkun = ({
             </div>
 
             <div className="col-4">
-              <PrimeDropdown 
+              <PrimeDropdown
                 label={"Kategori"}
                 value={
                   currentItem !== null
@@ -939,7 +932,7 @@ const DataAkun = ({
                 options={kategori}
                 onChange={(e) => {
                   console.log(e.value);
-                  setEkat(false)
+                  setEkat(false);
                   if (
                     isEdit &&
                     e.value.kategory.id === firstKat &&

@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_SO, SET_EDIT_SO, SET_SO } from "src/redux/actions";
 import ReactToPrint from "react-to-print";
 import { Divider } from "@material-ui/core";
+import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 
 const data = {
   id: null,
@@ -305,8 +306,9 @@ const DataSalesOrder = ({ onAdd, onEdit }) => {
             placeholder="Cari disini"
           />
         </span>
-        <Button
-          variant="primary"
+        <PrimeSingleButton
+          label="Tambah"
+          icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
             dispatch({
@@ -347,12 +349,7 @@ const DataSalesOrder = ({ onAdd, onEdit }) => {
               },
             });
           }}
-        >
-          Tambah{" "}
-          <span className="btn-icon-right">
-            <i class="bx bx-plus"></i>
-          </span>
-        </Button>
+        />
       </div>
     );
   };

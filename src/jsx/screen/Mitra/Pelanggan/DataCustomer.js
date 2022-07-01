@@ -71,6 +71,22 @@ const def = {
   },
 };
 
+const defError = [
+  {
+    code: false,
+    name: false,
+    jpel: false,
+    induk: false,
+    addrs: false,
+    city: false,
+  },
+  {
+    phone: false,
+    email: false,
+    cp: false,
+  },
+];
+
 const DataCustomer = ({
   data,
   load,
@@ -107,7 +123,7 @@ const DataCustomer = ({
   const [showJenisPelanggan, setShowJenisPelanggan] = useState(false);
   const [showPajak, setShowPajak] = useState(false);
   const [doubleClick, setDoubleClick] = useState(false);
-  const [error, setError] = useState([]);
+  const [error, setError] = useState(defError);
 
   useEffect(() => {
     getCustomer();
@@ -888,7 +904,7 @@ const DataCustomer = ({
     setCurrentItem(def);
     setEdit(false);
     setShowInput(false);
-    setError([]);
+    setError(defError);
   };
 
   const formatIdr = (value) => {
@@ -1360,24 +1376,24 @@ const DataCustomer = ({
 
               <div className="row mr-0 ml-0">
                 <div className="col-12">
-                <PrimeInput
-                      label={"Contact Person"}
-                      value={`${currentItem?.customer?.cus_cp ?? ""}`}
-                      onChange={(e) => {
-                        setCurrentItem({
-                          ...currentItem,
-                          customer: {
-                            ...currentItem.customer,
-                            cus_cp: e.target.value,
-                          },
-                        });
-                        let newError = error;
-                        newError[1].cp = false;
-                        setError(newError);
-                      }}
-                      placeholder="Masukan Contact Person"
-                      error={error[1]?.cp}
-                    />
+                  <PrimeInput
+                    label={"Contact Person"}
+                    value={`${currentItem?.customer?.cus_cp ?? ""}`}
+                    onChange={(e) => {
+                      setCurrentItem({
+                        ...currentItem,
+                        customer: {
+                          ...currentItem.customer,
+                          cus_cp: e.target.value,
+                        },
+                      });
+                      let newError = error;
+                      newError[1].cp = false;
+                      setError(newError);
+                    }}
+                    placeholder="Masukan Contact Person"
+                    error={error[1]?.cp}
+                  />
                 </div>
               </div>
             </TabPanel>

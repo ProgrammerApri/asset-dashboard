@@ -22,6 +22,7 @@ import { InputSwitch } from "primereact/inputswitch";
 import DataPajak from "../../Master/Pajak/DataPajak";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
+import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 
 const def = {
   customer: {
@@ -745,8 +746,9 @@ const DataCustomer = ({
             placeholder="Cari disini"
           />
         </span>
-        <Button
-          variant="primary"
+        <PrimeSingleButton
+          label="Tambah"
+          icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             setShowInput(true);
             setEdit(false);
@@ -761,12 +763,7 @@ const DataCustomer = ({
             });
             onInput(true);
           }}
-        >
-          Tambah{" "}
-          <span className="btn-icon-right">
-            <i class="bx bx-plus"></i>
-          </span>
-        </Button>
+        />
       </div>
     );
   };

@@ -17,6 +17,7 @@ import { Divider } from "@material-ui/core";
 import ReactToPrint from "react-to-print";
 import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 import Wrapper from "src/jsx/components/CustomeWrapper/Wrapper";
+import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 
 const data = {
   id: null,
@@ -464,8 +465,9 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
             placeholder="Cari disini"
           />
         </span>
-        <Button
-          variant="primary"
+        <PrimeSingleButton
+          label="Tambah"
+          icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
             dispatch({
@@ -481,12 +483,7 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
               },
             });
           }}
-        >
-          Tambah{" "}
-          <span className="btn-icon-right">
-            <i class="bx bx-plus"></i>
-          </span>
-        </Button>
+        />
       </div>
     );
   };

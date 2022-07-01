@@ -42,7 +42,6 @@ import RulesPay from "./screen/MasterLainnya/RulesPay/DataRulesPay";
 import Setup from "./screen/Setup";
 import Divisi from "./screen/MasterLainnya/Divisi/Divisi";
 import PPN from "./screen/Master/Pajak/DataPajak";
-import SubCustomer from "./screen/Master/SubCustomer";
 import SetupKhusus from "./screen/Master/SetupKhusus";
 import Mitra from "./screen/Mitra/Mitra";
 import TransaksiPembelian from "./screen/Transaksi/TransaksiPembelian/TransaksiPembelian";
@@ -96,7 +95,7 @@ const Markup = ({ width }) => {
     { url: "syarat-pembayaran", component: RulesPay },
     { url: "divisi", component: Divisi },
     { url: "non-stok", component: PPN },
-    { url: "sub-pelanggan", component: SubCustomer },
+    // { url: "sub-pelanggan", component: SubCustomer },
     { url: "setup-perkiraan", component: SetupKhusus },
     { url: "satuan", component: Satuan },
     { url: "group-produk", component: GroupProduk },

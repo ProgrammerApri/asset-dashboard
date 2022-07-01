@@ -17,6 +17,7 @@ import { Badge } from "primereact/badge";
 import { Divider } from "@material-ui/core";
 import ReactToPrint from "react-to-print";
 import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
+import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 
 const data = {
   id: null,
@@ -302,8 +303,9 @@ const DataFaktur = ({ onAdd, onDetail }) => {
             placeholder="Cari disini"
           />
         </span>
-        <Button
-          variant="primary"
+        <PrimeSingleButton
+          label="Tambah"
+          icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
             dispatch({
@@ -345,12 +347,7 @@ const DataFaktur = ({ onAdd, onDetail }) => {
               },
             });
           }}
-        >
-          Tambah{" "}
-          <span className="btn-icon-right">
-            <i class="bx bx-plus"></i>
-          </span>
-        </Button>
+        />
       </div>
     );
   };

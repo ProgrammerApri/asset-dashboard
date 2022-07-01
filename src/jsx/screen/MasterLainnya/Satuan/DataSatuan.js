@@ -19,6 +19,7 @@ import { InputSwitch } from "primereact/inputswitch";
 import { Divider } from "@material-ui/core";
 import { Badge } from "react-bootstrap";
 import { Badge as PBadge } from "primereact/badge";
+import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 
 const def = {
   id: 0,
@@ -388,8 +389,9 @@ const DataSatuan = ({
             placeholder="Cari disini"
           />
         </span>
-        <Button
-          variant="primary"
+        <PrimeSingleButton
+          label="Tambah"
+          icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             setEdit(false);
             setCurrentItem(def);
@@ -405,12 +407,7 @@ const DataSatuan = ({
             onInput(true);
             setLoading(false);
           }}
-        >
-          Tambah{" "}
-          <span className="btn-icon-right">
-            <i class="bx bx-plus"></i>
-          </span>
-        </Button>
+        />
       </div>
     );
   };

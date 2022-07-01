@@ -110,9 +110,9 @@ const Detail = ({ onCancel }) => {
     return (
       <Row>
         <Col>
-          <Card>
-            <div className="flex col-12">
-              <div className="col-2 fs-12 ml-0">
+          <Card className="px-4 py-3">
+            <div className="flex justify-content-between align-items-center">
+              <div className="">
                 <img
                   style={{
                     height: "50px",
@@ -127,7 +127,7 @@ const Detail = ({ onCancel }) => {
                 </span>
               </div>
 
-              <div className="col-2 fs-12 ml-0 mt-3">
+              <div className="">
                 <label className="text-label">No. Pesanan Pembelian</label>
                 <br></br>
                 <span className="ml-0 fs-14">
@@ -135,7 +135,7 @@ const Detail = ({ onCancel }) => {
                 </span>
               </div>
 
-              <div className="col-2 fs-12 ml-0 mt-3">
+              <div className="">
                 <label className="text-label">Departemen</label>
                 <br></br>
                 <span className="ml-0 fs-14">
@@ -143,7 +143,7 @@ const Detail = ({ onCancel }) => {
                 </span>
               </div>
 
-              <div className="col-2 fs-12 ml-0 mt-3">
+              <div className="">
                 <label className="text-label">Supplier</label>
                 <br></br>
                 <span className="ml-0 fs-14">
@@ -151,7 +151,7 @@ const Detail = ({ onCancel }) => {
                 </span>
               </div>
 
-              <div className="col-4 ml-0 mt-3 text-center">
+              <div className="">
                 <span className="p-buttonset">
                   <ReactToPrint
                     trigger={() => {
@@ -182,7 +182,6 @@ const Detail = ({ onCancel }) => {
                   />
                 </span>
               </div>
-              <div style={{ height: "1rem" }}></div>
             </div>
           </Card>
         </Col>

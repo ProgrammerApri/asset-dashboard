@@ -35,9 +35,9 @@ const data = {
   rjasa: [],
 };
 
-const KoreksiPersediaanList = ({onAdd}) => {
+
+const PenerimaanList = ({onAdd}) => {
   const dispatch = useDispatch();
-   
   
 
     const renderHeader = () => {
@@ -68,7 +68,6 @@ const KoreksiPersediaanList = ({onAdd}) => {
                         id: 0,
                         prod_id: null,
                         unit_id: null,
-                        type: null,
                         location: null,
                         order: null,
                       },
@@ -160,26 +159,20 @@ const KoreksiPersediaanList = ({onAdd}) => {
                    // body={loading && <Skeleton />}
                   />
                   <Column
-                    header="Nomor Koreksi Persediaan"
+                    header="Nomor Referensi"
                    // field={(e) => e.customer.cus_name}
                     style={{ minWidth: "8rem" }}
                   //  body={loading && <Skeleton />}
                   />
                   <Column
-                    header="Kode Akun"
+                    header="Nomor Pemakaian Bahan"
+                   // field={(e) => e.customer.cus_name}
+                    style={{ minWidth: "8rem" }}
+                  //  body={loading && <Skeleton />}
+                  />
+                  <Column
+                    header="Keterangan"
                    // field={(e) => e.customer.cus_address}
-                    style={{ minWidth: "8rem" }}
-                    // body={loading && <Skeleton />}
-                  />
-                  <Column
-                    header="Departemen"
-                   // field={(e) => e.customer.cus_name}
-                    style={{ minWidth: "8rem" }}
-                    // body={loading && <Skeleton />}
-                  />
-                  <Column
-                    header="Project"
-                   // field={(e) => e.customer.cus_name}
                     style={{ minWidth: "8rem" }}
                     // body={loading && <Skeleton />}
                   />
@@ -191,4 +184,4 @@ const KoreksiPersediaanList = ({onAdd}) => {
     );
   };
   
-  export default KoreksiPersediaanList;
+  export default PenerimaanList;

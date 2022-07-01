@@ -9,6 +9,7 @@ import { Dropdown } from "primereact/dropdown";
 import { Divider } from "@material-ui/core";
 import { Calendar } from "primereact/calendar";
 import { InputSwitch } from "primereact/inputswitch";
+import CustomAccordion from "src/jsx/components/Accordion/Accordion";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_PO } from "src/redux/actions";
 import DataPusatBiaya from "../../../MasterLainnya/PusatBiaya/DataPusatBiaya";
@@ -17,9 +18,8 @@ import DataRulesPay from "src/jsx/screen/MasterLainnya/RulesPay/DataRulesPay";
 import DataPajak from "src/jsx/screen/Master/Pajak/DataPajak";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import CustomAccordion from "src/jsx/components/Accordion/Accordion";
 
-const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
+const PemakaianInput = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
@@ -38,10 +38,9 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
   const [showRulesPay, setShowRulesPay] = useState(false);
   const [showPpn, setShowPpn] = useState(false);
   const [product, setProduct] = useState(null);
-  const [proj, setProj] = useState(null);
+  const [account, setAcc] = useState(null);
   const [satuan, setSatuan] = useState(null);
   const [lokasi, setLokasi] = useState(null);
-  const [acc, setAcc] = useState(null);
   const [accor, setAccor] = useState({
     produk: true,
     jasa: false,
@@ -59,18 +58,15 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
       behavior: "smooth",
     });
     getPusatBiaya();
-    getSupplier();
-    getProj();
-    getAcc();
-    getRp();
-    getProduct();
     getLokasi();
+    getProduct();
+    getAcc();
     getSatuan();
   }, []);
 
-  const getSupplier = async () => {
+  const getLokasi = async () => {
     const config = {
-      ...endpoints.supplier,
+      ...endpoints.lokasi,
       data: {},
     };
     let response = null;
@@ -79,7 +75,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        setSupplier(data);
+        setLokasi(data);
       }
     } catch (error) {}
   };
@@ -102,88 +98,6 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
-  const getProj = async () => {
-    const config = {
-      ...endpoints.project,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setProj(data);
-      }
-    } catch (error) {}
-  };
-
-  const getAcc = async () => {
-    const config = {
-      ...endpoints.account,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setAcc(data);
-      }
-    } catch (error) {}
-  };
-
-  const getRp = async () => {
-    const config = {
-      ...endpoints.rPurchase,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        let filt = [];
-        data.forEach((elem) => {
-          if (elem.status === 0) {
-            filt.push(elem);
-            elem.rprod.forEach((el) => {
-              el.order = el.order ?? 0;
-              if (el.order === 0 || el.request - el.order !== 0) {
-                el.prod_id = el.prod_id.id;
-                el.unit_id = el.unit_id.id;
-              }
-            });
-            elem.rjasa.forEach((element) => {
-              element.jasa_id = element.jasa_id.id;
-              element.unit_id = element.unit_id.id;
-            });
-            elem.rjasa.push({
-              id: 0,
-              preq_id: elem.id,
-              sup_id: null,
-              jasa_id: null,
-              unit_id: null,
-              qty: null,
-              price: null,
-              disc: null,
-              total: null,
-            });
-          }
-        });
-        console.log(data);
-        setRequest(filt);
-      }
-    } catch (error) {}
-  };
-
   const getProduct = async () => {
     const config = {
       ...endpoints.product,
@@ -202,9 +116,9 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
-  const getLokasi = async () => {
+  const getAcc = async () => {
     const config = {
-      ...endpoints.lokasi,
+      ...endpoints.account,
       data: {},
     };
     let response = null;
@@ -213,7 +127,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        setLokasi(data);
+        setAcc(data);
       }
     } catch (error) {}
   };
@@ -379,6 +293,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
+
   const onSubmit = () => {
     if (isEdit) {
       setUpdate(true);
@@ -445,48 +360,6 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
     return <span>{props.placeholder}</span>;
   };
 
-  const suppTemp = (option) => {
-    return (
-      <div>
-        {option !== null
-          ? `${option.supplier.sup_code} (${option.supplier.sup_name})`
-          : ""}
-      </div>
-    );
-  };
-
-  const valueSupTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null
-            ? `${option.supplier.sup_code} (${option.supplier.sup_name})`
-            : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const projTemp = (option) => {
-    return (
-      <div>{option !== null ? `${option.proj_name} (${option.proj_code})` : ""}</div>
-    );
-  };
-
-  const valueProjTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null ? `${option.proj_name} (${option.proj_code})` : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
   const prodTemp = (option) => {
     return (
       <div>{option !== null ? `${option.name} (${option.code})` : ""}</div>
@@ -503,26 +376,6 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
     return <span>{props.placeholder}</span>;
   };
 
-  const jasTemp = (option) => {
-    return (
-      <div>
-        {option !== null ? `${option.jasa.name} (${option.jasa.code})` : ""}
-      </div>
-    );
-  };
-
-  const valueJasTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null ? `${option.jasa.name} (${option.jasa.code})` : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
   const updatePo = (e) => {
     dispatch({
       type: SET_CURRENT_PO,
@@ -533,7 +386,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
   const header = () => {
     return (
       <h4 className="mb-5">
-        <b>Koreksi Persediaan</b>
+        <b>Pemakaian Bahan Baku</b>
       </h4>
     );
   };
@@ -545,7 +398,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
         <Toast ref={toast} />
 
         <Row className="mb-4">
-          <div className="col-4">
+          <div className="col-6">
             <label className="text-label">Tanggal</label>
             <div className="p-inputgroup">
               <Calendar
@@ -560,7 +413,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-4">
+          <div className="col-6">
             <label className="text-label">Kode Referensi</label>
             <div className="p-inputgroup">
               <InputText
@@ -570,13 +423,14 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
               />
             </div>
           </div>
+          {/* <div className="col-4"></div>  */}
 
-          <div className="col-4">
-            <label className="text-label">Kode Akun</label>
+          <div className="col-12">
+            <label className="text-label">Kode Akun WIP</label>
             <div className="p-inputgroup">
               <Dropdown
                 value={null}
-                options={acc}
+                options={account}
                 onChange={(e) => {
                   // console.log(e.value.rprod);
                   // let result = null;
@@ -595,71 +449,11 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                   // });
                 }}
                 optionLabel="acc_name"
-                placeholder="Pilih Kode Akun"
+                placeholder="Pilih Kode Akun WIP"
                 itemTemplate={accTemp}
                 valueTemplate={valueAccTemp}
-              />
-            </div>
-          </div>
-
-          <div className="col-6">
-            <label className="text-label">Kode Departemen</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={null}
-                options={pusatBiaya}
-                onChange={(e) => {
-                  // console.log(e.value.rprod);
-                  // let result = null;
-                  // if (po.top) {
-                  //   result = new Date(`${req_pur(e.value.id).req_date}Z`);
-                  //   result.setDate(result.getDate() + rulPay(po?.top)?.day);
-                  //   console.log(result);
-                  // }
-                  // updatePo({
-                  //   ...po,
-                  //   preq_id: e.value.id,
-                  //   due_date: result,
-                  //   sup_id: e.value?.ref_sup?.id ?? null,
-                  //   rprod: e.value.rprod,
-                  //   rjasa: e.value.rjasa,
-                  // });
-                }}
-                optionLabel="req_code"
-                placeholder="Pilih Kode Departemen"
-                itemTemplate={deptTemp}
-                valueTemplate={valueDeptTemp}
-              />
-            </div>
-          </div>
-
-          <div className="col-6">
-            <label className="text-label">Kode Project</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={null}
-                options={proj}
-                onChange={(e) => {
-                  // console.log(e.value.rprod);
-                  // let result = null;
-                  // if (po.top) {
-                  //   result = new Date(`${req_pur(e.value.id).req_date}Z`);
-                  //   result.setDate(result.getDate() + rulPay(po?.top)?.day);
-                  //   console.log(result);
-                  // }
-                  // updatePo({
-                  //   ...po,
-                  //   preq_id: e.value.id,
-                  //   due_date: result,
-                  //   sup_id: e.value?.ref_sup?.id ?? null,
-                  //   rprod: e.value.rprod,
-                  //   rjasa: e.value.rjasa,
-                  // });
-                }}
-                optionLabel="req_code"
-                placeholder="Pilih Kode Project"
-                itemTemplate={projTemp}
-                valueTemplate={valueProjTemp}
+                filter
+                filterBy="acc_name"
               />
             </div>
           </div>
@@ -667,7 +461,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
         </Row>
 
         <CustomAccordion
-          tittle={"Koreksi Produk"}
+          tittle={"Pemakaian Produk"}
           defaultActive={true}
           active={accor.produk}
           onClick={() => {
@@ -748,7 +542,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
-                  header="D/K"
+                  header="Ending Stok"
                   style={{
                     width: "10rem",
                   }}
@@ -757,7 +551,9 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                     <div className="p-inputgroup">
                       <InputText
                         value={
-                          po.rprod[e.index].type ? po.rprod[e.index].type : null
+                          po.rprod[e.index].end
+                            ? po.rprod[e.index].end
+                            : null
                         }
                         onChange={(a) => {
                           // let temp = [...po.rprod];
@@ -766,7 +562,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                           // temp[e.index].order = a.target.value;
                           // updatePo({ ...po, rprod: temp });
                         }}
-                        placeholder="D/K"
+                        placeholder="Ending Stok"
                         // type="number"
                       />
                     </div>
@@ -842,9 +638,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                                 id: 0,
                                 prod_id: null,
                                 unit_id: null,
-                                type: null,
-                                location: null,
-                                order: null,
+                                request: null,
                               },
                             ],
                           });
@@ -932,36 +726,8 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
           }, 2000);
         }}
       />
-
-      <DataSupplier
-        data={supplier}
-        loading={false}
-        popUp={true}
-        show={showSupplier}
-        onHide={() => {
-          setShowSupplier(false);
-        }}
-        onInput={(e) => {
-          setShowSupplier(!e);
-        }}
-        onSuccessInput={(e) => {
-          getSupplier();
-        }}
-        onRowSelect={(e) => {
-          if (doubleClick) {
-            setShowSupplier(false);
-            updatePo({ ...rp, req_dep: e.data.id });
-          }
-
-          setDoubleClick(true);
-
-          setTimeout(() => {
-            setDoubleClick(false);
-          }, 2000);
-        }}
-      />
     </>
   );
 };
 
-export default KoreksiPersediaanInput;
+export default PemakaianInput;

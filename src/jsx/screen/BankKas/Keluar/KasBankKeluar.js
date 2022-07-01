@@ -12,7 +12,7 @@ const KasBankKeluar = () => {
       <TabPanel header="Pengeluaran">
           <PelunasanHutang/>
       </TabPanel>
-      <TabPanel header="Pencairan Giro">
+      <TabPanel header="Pencairan Giro Keluar">
           <PencairanGiroMundurList/>
       </TabPanel>
       <TabPanel header="Koreksi Hutang">

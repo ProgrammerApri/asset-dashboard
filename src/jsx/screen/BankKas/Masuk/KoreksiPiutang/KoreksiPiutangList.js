@@ -15,28 +15,10 @@ import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { InputNumber } from "primereact/inputnumber";
 import { Divider } from "@material-ui/core";
-import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_PO, SET_EDIT_PO, SET_PO } from "src/redux/actions";
 
-const data = {
-  id: null,
-  po_code: null,
-  po_date: null,
-  preq_id: null,
-  sup_id: null,
-  ppn_type: null,
-  top: null,
-  due_date: false,
-  split_PO: null,
-  prod_disc: null,
-  jasa_disc: null,
-  total_disc: null,
-  rprod: [],
-  rjasa: [],
-};
 
-const KoreksiPersediaanList = ({onAdd}) => {
-  const dispatch = useDispatch();
+
+const KoreksiARList = ({onAdd}) => {
    
   
 
@@ -54,27 +36,7 @@ const KoreksiPersediaanList = ({onAdd}) => {
             <Button
               variant="primary"
               onClick={() => {
-                onAdd();
-                dispatch({
-                  type: SET_EDIT_PO,
-                  payload: false,
-                });
-                dispatch({
-                  type: SET_CURRENT_PO,
-                  payload: {
-                    ...data,
-                    rprod: [
-                      {
-                        id: 0,
-                        prod_id: null,
-                        unit_id: null,
-                        type: null,
-                        location: null,
-                        order: null,
-                      },
-                    ],
-                  },
-                });
+                onAdd()
               }}
             >
               Tambah{" "}
@@ -160,29 +122,42 @@ const KoreksiPersediaanList = ({onAdd}) => {
                    // body={loading && <Skeleton />}
                   />
                   <Column
-                    header="Nomor Koreksi Persediaan"
+                    header="Nomor Referensi"
                    // field={(e) => e.customer.cus_name}
                     style={{ minWidth: "8rem" }}
                   //  body={loading && <Skeleton />}
                   />
                   <Column
-                    header="Kode Akun"
+                    header="Pelanggan"
+                   // field={(e) => e.customer.cus_name}
+                    style={{ minWidth: "8rem" }}
+                  //  body={loading && <Skeleton />}
+                  />
+                  <Column
+                    header="Akun"
                    // field={(e) => e.customer.cus_address}
                     style={{ minWidth: "8rem" }}
                     // body={loading && <Skeleton />}
                   />
                   <Column
-                    header="Departemen"
-                   // field={(e) => e.customer.cus_name}
+                    header="Akun Lawan"
+                   // field={(e) => e.customer.cus_address}
                     style={{ minWidth: "8rem" }}
                     // body={loading && <Skeleton />}
                   />
                   <Column
-                    header="Project"
+                    header="Type"
+                   // field={(e) => e.customer.cus_address}
+                    style={{ minWidth: "8rem" }}
+                    // body={loading && <Skeleton />}
+                  />
+                  <Column
+                    header="Nilai"
                    // field={(e) => e.customer.cus_name}
                     style={{ minWidth: "8rem" }}
                     // body={loading && <Skeleton />}
                   />
+                  
                 </DataTable>
             
           </Col>
@@ -191,4 +166,4 @@ const KoreksiPersediaanList = ({onAdd}) => {
     );
   };
   
-  export default KoreksiPersediaanList;
+  export default KoreksiARList;

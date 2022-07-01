@@ -11,7 +11,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { Divider } from "@material-ui/core";
 import { Calendar } from "primereact/calendar";
 import { InputSwitch } from "primereact/inputswitch";
-import CustomAccordion from "../../../Accordion/Accordion";
+import CustomAccordion from "src/jsx/components/Accordion/Accordion";
 import DataPusatBiaya from "../../../MasterLainnya/PusatBiaya/DataPusatBiaya";
 import DataProduk from "../../../Master/Produk/DataProduk";
 import DataJasa from "../../../Master/Jasa/DataJasa";

@@ -14,7 +14,6 @@ import { Calendar } from "primereact/calendar";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_GIRO, SET_GIRO } from "src/redux/actions";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
-import DataBank from "src/jsx/components/MasterLainnya/Bank/DataBank";
 
 const data = {
   id: null,

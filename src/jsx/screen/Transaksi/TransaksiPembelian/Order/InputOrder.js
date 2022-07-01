@@ -12,19 +12,19 @@ import { Calendar } from "primereact/calendar";
 import { InputSwitch } from "primereact/inputswitch";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import CustomAccordion from "../../../Accordion/Accordion";
+import CustomAccordion from "src/jsx/components/Accordion/Accordion";
 import { SET_CURRENT_ODR } from "src/redux/actions";
-import DataSupplier from "src/jsx/components/Mitra/Pemasok/DataPemasok";
-import DataRulesPay from "src/jsx/components/MasterLainnya/RulesPay/DataRulesPay";
-import DataPusatBiaya from "src/jsx/components/MasterLainnya/PusatBiaya/DataPusatBiaya";
+import DataSupplier from "src/jsx/screen/Mitra/Pemasok/DataPemasok";
+import DataRulesPay from "src/jsx/screen/MasterLainnya/RulesPay/DataRulesPay";
 import DataProduk from "src/jsx/screen/Master/Produk/DataProduk";
 import DataJasa from "src/jsx/screen/Master/Jasa/DataJasa";
-import DataSatuan from "src/jsx/components/MasterLainnya/Satuan/DataSatuan";
+import DataSatuan from "src/jsx/screen/MasterLainnya/Satuan/DataSatuan";
 import { SelectButton } from "primereact/selectbutton";
 import { el } from "date-fns/locale";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import PesananPO from "../PO/PesananPembelian";
 import DataLokasi from "src/jsx/screen/Master/Lokasi/DataLokasi";
+import DataPusatBiaya from "src/jsx/screen/MasterLainnya/PusatBiaya/DataPusatBiaya";
 
 const InputOrder = ({ onCancel, onSuccess }) => {
   const order = useSelector((state) => state.order.current);

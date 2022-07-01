@@ -16,7 +16,7 @@ import { id } from "chartjs-plugin-streaming";
 import ReactExport from "react-data-export";
 import ReactToPrint from "react-to-print";
 import { Calendar } from "primereact/calendar";
-import CustomeWrapper from "../CustomeWrapper/CustomeWrapper";
+import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;

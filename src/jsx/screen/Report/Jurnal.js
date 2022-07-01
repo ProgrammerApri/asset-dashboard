@@ -10,7 +10,7 @@ import { Skeleton } from "primereact/skeleton";
 
 import ReactExport from "react-data-export";
 import ReactToPrint from "react-to-print";
-import CustomeWrapper from "../CustomeWrapper/CustomeWrapper";
+import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -141,13 +141,17 @@ const ReportJurnal = () => {
             },
           },
         ],
-        data: [[{
-          value: cp,
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "left", vertical: "center" },
-          },
-        },]],
+        data: [
+          [
+            {
+              value: cp,
+              style: {
+                font: { sz: "14", bold: false },
+                alignment: { horizontal: "left", vertical: "center" },
+              },
+            },
+          ],
+        ],
       },
       {
         columns: [

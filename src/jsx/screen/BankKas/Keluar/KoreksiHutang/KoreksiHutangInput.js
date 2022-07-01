@@ -12,12 +12,12 @@ import { InputSwitch } from "primereact/inputswitch";
 import CustomAccordion from "../../../../components/Accordion/Accordion";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_PO } from "src/redux/actions";
-import DataPusatBiaya from "../../../../components/MasterLainnya/PusatBiaya/DataPusatBiaya";
-import DataSupplier from "../../../../components/Mitra/Pemasok/DataPemasok";
-import DataRulesPay from "src/jsx/components/MasterLainnya/RulesPay/DataRulesPay";
+import DataSupplier from "src/jsx/screen/Mitra/Pemasok/DataPemasok";
+import DataRulesPay from "src/jsx/screen/MasterLainnya/RulesPay/DataRulesPay";
 import DataPajak from "src/jsx/screen/Master/Pajak/DataPajak";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
+import DataPusatBiaya from "src/jsx/screen/MasterLainnya/PusatBiaya/DataPusatBiaya";
 
 const KoreksiAPInput = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);

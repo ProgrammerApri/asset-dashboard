@@ -4,7 +4,7 @@ import { Dropdown } from "primereact/dropdown";
 import { endpoints, request } from "src/utils";
 import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
-import CustomAccordion from "../Accordion/Accordion";
+import CustomAccordion from "src/jsx/components/Accordion/Accordion";
 
 const set = {
   id: null,

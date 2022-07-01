@@ -7,14 +7,14 @@ import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
 import { Divider } from "@material-ui/core";
 import { Calendar } from "primereact/calendar";
-import CustomAccordion from "../../../Accordion/Accordion";
+import CustomAccordion from "src/jsx/components/Accordion/Accordion";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_SR } from "src/redux/actions";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import DataCustomer from "src/jsx/components/Mitra/Pelanggan/DataCustomer";
+import DataCustomer from "src/jsx/screen/Mitra/Pelanggan/DataCustomer";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
-import DataSatuan from "src/jsx/components/MasterLainnya/Satuan/DataSatuan";
+import DataSatuan from "src/jsx/screen/MasterLainnya/Satuan/DataSatuan";
 
 const ReturJualInput = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);

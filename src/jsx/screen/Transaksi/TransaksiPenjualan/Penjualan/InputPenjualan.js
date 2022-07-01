@@ -8,20 +8,20 @@ import { Toast } from "primereact/toast";
 import { Divider } from "@material-ui/core";
 import { Calendar } from "primereact/calendar";
 import { InputSwitch } from "primereact/inputswitch";
-import CustomAccordion from "../../../Accordion/Accordion";
+import CustomAccordion from "src/jsx/components/Accordion/Accordion";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_SL } from "src/redux/actions";
 import DataSupplier from "../../../Mitra/Pemasok/DataPemasok";
-import DataRulesPay from "src/jsx/components/MasterLainnya/RulesPay/DataRulesPay";
+import DataRulesPay from "src/jsx/screen/MasterLainnya/RulesPay/DataRulesPay";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { el } from "date-fns/locale";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
-import DataCustomer from "src/jsx/components/Mitra/Pelanggan/DataCustomer";
-import DataSatuan from "src/jsx/components/MasterLainnya/Satuan/DataSatuan";
+import DataCustomer from "src/jsx/screen/Mitra/Pelanggan/DataCustomer";
+import DataSatuan from "src/jsx/screen/MasterLainnya/Satuan/DataSatuan";
 import DataProduk from "src/jsx/screen/Master/Produk/DataProduk";
 import DataJasa from "src/jsx/screen/Master/Jasa/DataJasa";
-import DataSalesman from "src/jsx/components/MasterLainnya/Salesman/DataSalesman";
+import DataSalesman from "src/jsx/screen/MasterLainnya/Salesman/DataSalesman";
 import DataLokasi from "src/jsx/screen/Master/Lokasi/DataLokasi";
 
 const InputPenjualan = ({ onCancel, onSuccess }) => {

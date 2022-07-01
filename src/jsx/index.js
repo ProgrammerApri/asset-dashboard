@@ -1,5 +1,5 @@
 import React from "react";
-// import Login from "./components/Login";
+// import Login from "./screen/Login";
 
 /// React router dom
 import {
@@ -28,39 +28,39 @@ import Login from "./Login";
 import { withResizeDetector } from "react-resize-detector";
 import KategoriAkun from "./screen/Master/KategoriAkun";
 import Akun from "./screen/Master/Akun/DataAkun";
-import Project from "./components/MasterLainnya/Project/DataProject";
-import Bank from "./components/MasterLainnya/Bank/DataBank";
-import JenisPemasok from "./components/MasterLainnya/JenisPemasok/DataJenisPemasok";
-import Salesman from "./components/MasterLainnya/Salesman/DataSalesman";
+import Project from "./screen/MasterLainnya/Project/DataProject";
+import Bank from "./screen/MasterLainnya/Bank/DataBank";
+import JenisPemasok from "./screen/MasterLainnya/JenisPemasok/DataJenisPemasok";
+import Salesman from "./screen/MasterLainnya/Salesman/DataSalesman";
 import AreaPenjualan from "./screen/Master/AreaPenjualan";
 import SubArea from "./screen/Master/SubArea/SubArea";
-import Neraca from "./components/Report/Neraca";
-import Perusahaan from "./components/Setup/Perusahaan";
+import Neraca from "./screen/Report/Neraca";
+import Perusahaan from "./screen/Setup/Perusahaan";
 import Currency from "./screen/Master/Currency";
 import Lokasi from "./screen/Master/Lokasi/DataLokasi";
-import RulesPay from "./components/MasterLainnya/RulesPay/DataRulesPay";
-import Setup from "./components/Setup";
-import Divisi from "./components/MasterLainnya/Divisi/Divisi";
+import RulesPay from "./screen/MasterLainnya/RulesPay/DataRulesPay";
+import Setup from "./screen/Setup";
+import Divisi from "./screen/MasterLainnya/Divisi/Divisi";
 import PPN from "./screen/Master/Pajak/DataPajak";
 import SubCustomer from "./screen/Master/SubCustomer";
 import SetupKhusus from "./screen/Master/SetupKhusus";
-import Mitra from "./components/Mitra/Mitra";
-import TransaksiPembelian from "./components/Transaksi/TransaksiPembelian/TransaksiPembelian";
+import Mitra from "./screen/Mitra/Mitra";
+import TransaksiPembelian from "./screen/Transaksi/TransaksiPembelian/TransaksiPembelian";
 import GroupProduk from "./screen/Master/GroupProduk";
-import Satuan from "./components/MasterLainnya/Satuan";
+import Satuan from "./screen/MasterLainnya/Satuan";
 import Master from "./screen/Master";
-import MasterLainnya from "./components/MasterLainnya";
+import MasterLainnya from "./screen/MasterLainnya";
 import JenisPelanggan from "./screen/Master/JenisPelanggan";
 import Pajak from "./screen/Master/Pajak/DataPajak";
 import Jasa from "./screen/Master/Jasa/DataJasa";
-import PusatBiaya from "./components/MasterLainnya/PusatBiaya/DataPusatBiaya";
-import Transaksi from "./components/Transaksi";
+import PusatBiaya from "./screen/MasterLainnya/PusatBiaya/DataPusatBiaya";
+import Transaksi from "./screen/Transaksi";
 import BankKas from "./screen/BankKas";
-import TransaksiPersediaan from "./components/TransaksiPersediaan";
-import LaporanPembelian from "./components/Report/LaporanPembelian";
-import ReportGRA from "./components/Report/LaporanPembelian/Gra";
-import ReportJurnal from "./components/Report/Jurnal";
-import ReportKBB from "./components/Report/KartuBB";
+import TransaksiPersediaan from "./screen/TransaksiPersediaan";
+import LaporanPembelian from "./screen/Report/LaporanPembelian";
+import ReportGRA from "./screen/Report/LaporanPembelian/Gra";
+import ReportJurnal from "./screen/Report/Jurnal";
+import ReportKBB from "./screen/Report/KartuBB";
 
 const Markup = ({ width }) => {
   const routes = [

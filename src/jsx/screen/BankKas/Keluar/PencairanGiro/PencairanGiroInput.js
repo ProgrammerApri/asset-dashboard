@@ -8,7 +8,7 @@ import { Calendar } from "primereact/calendar";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_GIRO } from "src/redux/actions";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
-import DataBank from "src/jsx/components/MasterLainnya/Bank/DataBank";
+import DataBank from "src/jsx/screen/MasterLainnya/Bank/DataBank";
 
 const PencairanGiroMundurInput = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);

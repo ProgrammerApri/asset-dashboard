@@ -9,15 +9,15 @@ import { Calendar } from "primereact/calendar";
 import CustomAccordion from "../../../../components/Accordion/Accordion";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_EXP } from "src/redux/actions";
-import DataPusatBiaya from "../../../../components/MasterLainnya/PusatBiaya/DataPusatBiaya";
-import DataSupplier from "../../../../components/Mitra/Pemasok/DataPemasok";
+import DataSupplier from "src/jsx/screen/Mitra/Pemasok/DataPemasok";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { SelectButton } from "primereact/selectbutton";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
-import DataProject from "src/jsx/components/MasterLainnya/Project/DataProject";
-import DataBank from "src/jsx/components/MasterLainnya/Bank/DataBank";
 import DataAkun from "src/jsx/screen/Master/Akun/DataAkun";
+import DataPusatBiaya from "src/jsx/screen/MasterLainnya/PusatBiaya/DataPusatBiaya";
+import DataBank from "src/jsx/screen/MasterLainnya/Bank/DataBank";
+import DataProject from "src/jsx/screen/MasterLainnya/Project/DataProject";
 
 const KasBankOutInput = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);

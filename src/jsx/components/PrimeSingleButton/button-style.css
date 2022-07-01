@@ -1,0 +1,28 @@
+
+/* .p-button {
+    margin-right: 0.5rem;
+} */
+.p-buttonset .p-button {
+    margin-right: 0;
+}
+.template .p-button i {
+    line-height: 2.65rem;
+}
+
+.template .p-button.single {
+    background: linear-gradient(to left, var(--primary-button) 50%, var(--blue-500) 50%);
+    background-size: 200% 100%;
+    background-position: right bottom;
+    transition: background-position 0.5s ease-out;
+    color: #fff;
+    border-color: transparent;
+}
+.template .p-button.single:hover {
+    background-position: left bottom;
+}
+.template .p-button.single i {
+    background-color: var(--blue-500);
+}
+.template .p-button.single:focus {
+    box-shadow: 0 0 0 1px var(--blue-200);
+}

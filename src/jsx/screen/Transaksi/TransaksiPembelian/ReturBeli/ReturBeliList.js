@@ -12,6 +12,7 @@ import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_PR, SET_EDIT_PR, SET_PR } from "src/redux/actions";
 import { formatDate } from "@fullcalendar/core";
+import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 
 const data = {
   id: null,
@@ -75,9 +76,10 @@ const ReturBeliList = ({ onAdd }) => {
             placeholder="Cari disini"
           />
         </span>
-        <Button
-          variant="primary"
-          onClick={() => {
+        <PrimeSingleButton
+          label="Tambah"
+          icon={<i class="bx bx-plus px-2"></i>}
+           onClick={() => {
             onAdd();
             dispatch({
               type: SET_EDIT_PR,
@@ -102,12 +104,7 @@ const ReturBeliList = ({ onAdd }) => {
               },
             });
           }}
-        >
-          Tambah{" "}
-          <span className="btn-icon-right">
-            <i class="bx bx-plus"></i>
-          </span>
-        </Button>
+        />
       </div>
     );
   };

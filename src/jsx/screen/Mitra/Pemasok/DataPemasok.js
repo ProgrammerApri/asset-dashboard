@@ -19,6 +19,7 @@ import { TabPanel, TabView } from "primereact/tabview";
 import { Badge } from "primereact/badge";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
+import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 
 const def = {
   supplier: {
@@ -660,8 +661,9 @@ const DataSupplier = ({
             placeholder="Cari disini"
           />
         </span>
-        <Button
-          variant="primary"
+        <PrimeSingleButton
+          label="Tambah"
+          icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             setShowInput(true);
             setEdit(false);
@@ -676,12 +678,7 @@ const DataSupplier = ({
             });
             onInput(true);
           }}
-        >
-          Tambah{" "}
-          <span className="btn-icon-right">
-            <i class="bx bx-plus"></i>
-          </span>
-        </Button>
+        />
       </div>
     );
   };

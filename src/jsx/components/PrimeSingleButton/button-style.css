@@ -10,7 +10,7 @@
 }
 
 .template .p-button.single {
-    background: linear-gradient(to left, var(--primary-button) 50%, var(--blue-500) 50%);
+    background: linear-gradient(to left, var(--primary-button) 50%, #3098ff 50%);
     background-size: 200% 100%;
     background-position: right bottom;
     transition: background-position 0.5s ease-out;
@@ -21,7 +21,7 @@
     background-position: left bottom;
 }
 .template .p-button.single i {
-    background-color: var(--blue-500);
+    background-color: #3098ff;
 }
 .template .p-button.single:focus {
     box-shadow: 0 0 0 1px var(--blue-200);

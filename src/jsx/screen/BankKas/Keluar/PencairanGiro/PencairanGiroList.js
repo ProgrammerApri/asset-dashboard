@@ -344,7 +344,7 @@ const PencairanGiroMundurList = ({ onSuccess }) => {
                 />
                 <Column
                   header="Kode Pembayaran"
-                  field={(e) => e.pay_code?.exp_code}
+                  field={(e) => e.pay_code?.exp_code ?? "-"}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />

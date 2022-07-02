@@ -5,6 +5,7 @@ import { Password } from "primereact/password";
 import { InputText } from "primereact/inputtext";
 import { Button, Image, Row } from "react-bootstrap";
 import logo from "../images/logo-large.png";
+import ilustration from "../images/header-mobile.png";
 
 const Login = () => {
   const [password, setPassword] = useState("");
@@ -41,10 +42,12 @@ const Login = () => {
 
   const moveToNext = (nextRef) => {
     if (nextRef) {
-      console.log(document.querySelectorAll(`#${nextRef.current.props.id} input`));
-      document.querySelector(`#${nextRef.current.props.id} input`).focus()
+      console.log(
+        document.querySelectorAll(`#${nextRef.current.props.id} input`)
+      );
+      document.querySelector(`#${nextRef.current.props.id} input`).focus();
     }
-  }
+  };
 
   return (
     <>
@@ -68,7 +71,7 @@ const Login = () => {
                       console.log(event);
                       if (event.key.toLowerCase() === "enter") {
                         console.log(passRef.element);
-                        moveToNext(passRef)
+                        moveToNext(passRef);
                       }
                     }}
                     onChange={(e) => setUsername(e.target.value)}
@@ -123,7 +126,9 @@ const Login = () => {
           </div>
         </div>
 
-        <div className="w-100 vh-100 login-right col-lg-8 col-md-6"></div>
+        <div className="w-100 vh-100 login-right col-lg-8 col-md-6 flex align-items-center justify-content-center">
+          <img src={ilustration} alt="" />
+        </div>
       </Row>
     </>
   );

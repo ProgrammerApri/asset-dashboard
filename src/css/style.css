@@ -47381,6 +47381,10 @@ html[dir="rtl"]
   background-color: var(--primary-button);
 }
 
+.login-right img {
+  max-width: 90%;
+}
+
 .cp-logo {
   max-width: 70px;
 }

@@ -14,6 +14,7 @@ import ReactToPrint from "react-to-print";
 // import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import { el } from "date-fns/locale";
 import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
+import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -343,12 +344,10 @@ const ReportKBB = () => {
             <ExcelFile
               filename={`gl_card_report_export_${new Date().getTime()}`}
               element={
-                <Button variant="primary" onClick={() => {}}>
-                  EXCEL
-                  <span className="btn-icon-right">
-                    <i class="bx bx-table"></i>
-                  </span>
-                </Button>
+                <PrimeSingleButton
+                  label="Excel"
+                  icon={<i class="pi pi-file-excel px-2"></i>}
+                />
               }
             >
               <ExcelSheet
@@ -360,12 +359,10 @@ const ReportKBB = () => {
           <ReactToPrint
             trigger={() => {
               return (
-                <Button variant="primary" onClick={() => {}}>
-                  PDF{" "}
-                  <span className="btn-icon-right">
-                    <i class="bx bxs-file-pdf"></i>
-                  </span>
-                </Button>
+                <PrimeSingleButton
+                  label="PDF"
+                  icon={<i class="pi pi-file-pdf px-2"></i>}
+                />
               );
             }}
             content={() => printPage.current}

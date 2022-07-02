@@ -13,6 +13,7 @@ import ReactExport from "react-data-export";
 import ReactToPrint from "react-to-print";
 import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 import { Dropdown } from "primereact/dropdown";
+import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 
 const data = {
   id: 0,
@@ -538,12 +539,10 @@ const ReportGRA = () => {
             <ExcelFile
               filename={`purchase_report_export_${new Date().getTime()}`}
               element={
-                <Button variant="primary" onClick={() => {}}>
-                  EXCEL
-                  <span className="btn-icon-right">
-                    <i class="bx bx-table"></i>
-                  </span>
-                </Button>
+                <PrimeSingleButton
+                  label="Excel"
+                  icon={<i class="pi pi-file-excel px-2"></i>}
+                />
               }
             >
               <ExcelSheet
@@ -555,12 +554,10 @@ const ReportGRA = () => {
           <ReactToPrint
             trigger={() => {
               return (
-                <Button variant="primary" onClick={() => {}}>
-                  PDF{" "}
-                  <span className="btn-icon-right">
-                    <i class="bx bxs-file-pdf"></i>
-                  </span>
-                </Button>
+                <PrimeSingleButton
+                  label="PDF"
+                  icon={<i class="pi pi-file-pdf px-2"></i>}
+                />
               );
             }}
             content={() => printPage.current}

@@ -40,15 +40,12 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
   const [product, setProduct] = useState(null);
   const [jasa, setJasa] = useState(null);
   const [satuan, setSatuan] = useState(null);
+  const [lokasi, setLokasi] = useState(null);
+  const [proj, setProj] = useState(null);
   const [accor, setAccor] = useState({
     produk: true,
     jasa: false,
   });
-
-  const type = [
-    { name: "%", code: "P" },
-    { name: "Rp", code: "R" },
-  ];
 
   useEffect(() => {
     window.scrollTo({
@@ -58,11 +55,10 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
     });
     getPusatBiaya();
     getSupplier();
-    getRulesPay();
-    getPpn();
+    getLokasi();
+    getProj();
     getRp();
     getProduct();
-    getJasa();
     getSatuan();
   }, []);
 
@@ -100,27 +96,25 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
-  const getRulesPay = async () => {
+  const getLokasi = async () => {
     const config = {
-      ...endpoints.rules_pay,
+      ...endpoints.lokasi,
       data: {},
     };
-    console.log(config.data);
     let response = null;
     try {
       response = await request(null, config);
       console.log(response);
       if (response.status) {
         const { data } = response;
-        console.log(data);
-        setRulesPay(data);
+        setLokasi(data);
       }
     } catch (error) {}
   };
 
-  const getPpn = async () => {
+  const getProj = async () => {
     const config = {
-      ...endpoints.pajak,
+      ...endpoints.project,
       data: {},
     };
     console.log(config.data);
@@ -131,7 +125,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        setPpn(data);
+        setProj(data);
       }
     } catch (error) {}
   };
@@ -196,22 +190,6 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
         setProduct(data);
         console.log("jsdj");
         console.log(data);
-      }
-    } catch (error) {}
-  };
-
-  const getJasa = async () => {
-    const config = {
-      ...endpoints.jasa,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setJasa(data);
       }
     } catch (error) {}
   };
@@ -320,39 +298,6 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
-  const pjk = (value) => {
-    let selected = {};
-    ppn?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const supp = (value) => {
-    let selected = {};
-    supplier?.forEach((element) => {
-      if (value === element.supplier.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const rulPay = (value) => {
-    let selected = {};
-    rulesPay?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
   const checkProd = (value) => {
     let selected = {};
     product?.forEach((element) => {
@@ -370,17 +315,6 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
     let selected = {};
     satuan?.forEach((element) => {
       if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const checkjasa = (value) => {
-    let selected = {};
-    jasa?.forEach((element) => {
-      if (value === element.jasa.id) {
         selected = element;
       }
     });
@@ -410,30 +344,6 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
     return [year, month, day].join("-");
   };
 
-  const reqTemp = (option) => {
-    return (
-      <div>
-        {option !== null
-          ? `${option.req_code} (${option.req_dep.ccost_name})`
-          : ""}
-      </div>
-    );
-  };
-
-  const valueReqTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null
-            ? `${option.req_code} (${option.req_dep.ccost_name})`
-            : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
   const deptTemp = (option) => {
     return (
       <div>
@@ -454,41 +364,17 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
     return <span>{props.placeholder}</span>;
   };
 
-  const suppTemp = (option) => {
+  const lokTemp = (option) => {
     return (
-      <div>
-        {option !== null
-          ? `${option.supplier.sup_code} (${option.supplier.sup_name})`
-          : ""}
-      </div>
+      <div>{option !== null ? `${option.name} (${option.code})` : ""}</div>
     );
   };
 
-  const valueSupTemp = (option, props) => {
+  const valueLokTemp = (option, props) => {
     if (option) {
       return (
         <div>
-          {option !== null
-            ? `${option.supplier.sup_code} (${option.supplier.sup_name})`
-            : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const rulTemp = (option) => {
-    return (
-      <div>{option !== null ? `${option.name} (${option.day} Hari)` : ""}</div>
-    );
-  };
-
-  const valueRulTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null ? `${option.name} (${option.day} Hari)` : ""}
+          {option !== null ? `${option.name} (${option.code})` : ""}
         </div>
       );
     }
@@ -512,19 +398,19 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
     return <span>{props.placeholder}</span>;
   };
 
-  const jasTemp = (option) => {
+  const projTemp = (option) => {
     return (
       <div>
-        {option !== null ? `${option.jasa.name} (${option.jasa.code})` : ""}
+        {option !== null ? `${option.proj_name} (${option.proj_code})` : ""}
       </div>
     );
   };
 
-  const valueJasTemp = (option, props) => {
+  const valueProjTemp = (option, props) => {
     if (option) {
       return (
         <div>
-          {option !== null ? `${option.jasa.name} (${option.jasa.code})` : ""}
+          {option !== null ? `${option.proj_name} (${option.proj_code})` : ""}
         </div>
       );
     }
@@ -554,7 +440,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
         <Toast ref={toast} />
 
         <Row className="mb-4">
-          <div className="col-4">
+          <div className="col-6">
             <label className="text-label">Tanggal</label>
             <div className="p-inputgroup">
               <Calendar
@@ -569,7 +455,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-4">
+          <div className="col-6">
             <label className="text-label">Kode Referensi</label>
             <div className="p-inputgroup">
               <InputText
@@ -579,127 +465,135 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
               />
             </div>
           </div>
-          <div className="col-4"></div>       
-          <div className="col-4">
+          {/* <div className="col-6"></div>        */}
+          <div className="col-6">
             <label className="text-label">Kode Asal</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={po.preq_id && req_pur(po.preq_id)}
-                options={rp}
+                value={null}
+                options={lokasi}
                 onChange={(e) => {
-                  console.log(e.value.rprod);
-                  let result = null;
-                  if (po.top) {
-                    result = new Date(`${req_pur(e.value.id).req_date}Z`);
-                    result.setDate(result.getDate() + rulPay(po?.top)?.day);
-                    console.log(result);
-                  }
-                  updatePo({
-                    ...po,
-                    preq_id: e.value.id,
-                    due_date: result,
-                    sup_id: e.value?.ref_sup?.id ?? null,
-                    rprod: e.value.rprod,
-                    rjasa: e.value.rjasa,
-                  });
+                  // console.log(e.value.rprod);
+                  // let result = null;
+                  // if (po.top) {
+                  //   result = new Date(`${req_pur(e.value.id).req_date}Z`);
+                  //   result.setDate(result.getDate() + rulPay(po?.top)?.day);
+                  //   console.log(result);
+                  // }
+                  // updatePo({
+                  //   ...po,
+                  //   preq_id: e.value.id,
+                  //   due_date: result,
+                  //   sup_id: e.value?.ref_sup?.id ?? null,
+                  //   rprod: e.value.rprod,
+                  //   rjasa: e.value.rjasa,
+                  // });
                 }}
-                optionLabel="req_code"
-                placeholder="kode Lokasi Asal"
-                itemTemplate={reqTemp}
-                valueTemplate={valueReqTemp}
+                optionLabel="name"
+                placeholder="Kode Lokasi Asal"
+                filter
+                filterBy="name"
+                itemTemplate={lokTemp}
+                valueTemplate={valueLokTemp}
               />
             </div>
           </div>
 
-          <div className="col-4">
+          <div className="col-6">
             <label className="text-label">Kode Tujuan</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={po.preq_id && req_pur(po.preq_id)}
-                options={rp}
+                value={null}
+                options={lokasi}
                 onChange={(e) => {
-                  console.log(e.value.rprod);
-                  let result = null;
-                  if (po.top) {
-                    result = new Date(`${req_pur(e.value.id).req_date}Z`);
-                    result.setDate(result.getDate() + rulPay(po?.top)?.day);
-                    console.log(result);
-                  }
-                  updatePo({
-                    ...po,
-                    preq_id: e.value.id,
-                    due_date: result,
-                    sup_id: e.value?.ref_sup?.id ?? null,
-                    rprod: e.value.rprod,
-                    rjasa: e.value.rjasa,
-                  });
+                  // console.log(e.value.rprod);
+                  // let result = null;
+                  // if (po.top) {
+                  //   result = new Date(`${req_pur(e.value.id).req_date}Z`);
+                  //   result.setDate(result.getDate() + rulPay(po?.top)?.day);
+                  //   console.log(result);
+                  // }
+                  // updatePo({
+                  //   ...po,
+                  //   preq_id: e.value.id,
+                  //   due_date: result,
+                  //   sup_id: e.value?.ref_sup?.id ?? null,
+                  //   rprod: e.value.rprod,
+                  //   rjasa: e.value.rjasa,
+                  // });
                 }}
-                optionLabel="req_code"
-                placeholder="kode Lokasi Tujuan"
-                itemTemplate={reqTemp}
-                valueTemplate={valueReqTemp}
+                optionLabel="name"
+                placeholder="Kode Lokasi Tujuan"
+                filter
+                filterBy="name"
+                itemTemplate={lokTemp}
+                valueTemplate={valueLokTemp}
               />
             </div>
           </div>
-          <div className="col-4"></div> 
-          <div className="col-4">
+          {/* <div className="col-6"></div>  */}
+          <div className="col-6">
             <label className="text-label">Kode Departemen</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={po.preq_id && req_pur(po.preq_id)}
-                options={rp}
+                value={null}
+                options={pusatBiaya}
                 onChange={(e) => {
-                  console.log(e.value.rprod);
-                  let result = null;
-                  if (po.top) {
-                    result = new Date(`${req_pur(e.value.id).req_date}Z`);
-                    result.setDate(result.getDate() + rulPay(po?.top)?.day);
-                    console.log(result);
-                  }
-                  updatePo({
-                    ...po,
-                    preq_id: e.value.id,
-                    due_date: result,
-                    sup_id: e.value?.ref_sup?.id ?? null,
-                    rprod: e.value.rprod,
-                    rjasa: e.value.rjasa,
-                  });
+                  // console.log(e.value.rprod);
+                  // let result = null;
+                  // if (po.top) {
+                  //   result = new Date(`${req_pur(e.value.id).req_date}Z`);
+                  //   result.setDate(result.getDate() + rulPay(po?.top)?.day);
+                  //   console.log(result);
+                  // }
+                  // updatePo({
+                  //   ...po,
+                  //   preq_id: e.value.id,
+                  //   due_date: result,
+                  //   sup_id: e.value?.ref_sup?.id ?? null,
+                  //   rprod: e.value.rprod,
+                  //   rjasa: e.value.rjasa,
+                  // });
                 }}
-                optionLabel="req_code"
+                optionLabel="ccost_name"
                 placeholder="Pilih Kode Departemen"
-                itemTemplate={reqTemp}
-                valueTemplate={valueReqTemp}
+                filter
+                filterBy="ccost_name"
+                itemTemplate={deptTemp}
+                valueTemplate={valueDeptTemp}
               />
             </div>
           </div>
 
-          <div className="col-4">
+          <div className="col-6">
             <label className="text-label">Kode Project</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={po.preq_id && req_pur(po.preq_id)}
-                options={rp}
+                value={null}
+                options={proj}
                 onChange={(e) => {
-                  console.log(e.value.rprod);
-                  let result = null;
-                  if (po.top) {
-                    result = new Date(`${req_pur(e.value.id).req_date}Z`);
-                    result.setDate(result.getDate() + rulPay(po?.top)?.day);
-                    console.log(result);
-                  }
-                  updatePo({
-                    ...po,
-                    preq_id: e.value.id,
-                    due_date: result,
-                    sup_id: e.value?.ref_sup?.id ?? null,
-                    rprod: e.value.rprod,
-                    rjasa: e.value.rjasa,
-                  });
+                  // console.log(e.value.rprod);
+                  // let result = null;
+                  // if (po.top) {
+                  //   result = new Date(`${req_pur(e.value.id).req_date}Z`);
+                  //   result.setDate(result.getDate() + rulPay(po?.top)?.day);
+                  //   console.log(result);
+                  // }
+                  // updatePo({
+                  //   ...po,
+                  //   preq_id: e.value.id,
+                  //   due_date: result,
+                  //   sup_id: e.value?.ref_sup?.id ?? null,
+                  //   rprod: e.value.rprod,
+                  //   rjasa: e.value.rjasa,
+                  // });
                 }}
-                optionLabel="req_code"
+                optionLabel="proj_name"
                 placeholder="Pilih Kode Project"
-                itemTemplate={reqTemp}
-                valueTemplate={valueReqTemp}
+                filter
+                filterBy="proj_name"
+                itemTemplate={projTemp}
+                valueTemplate={valueProjTemp}
               />
             </div>
           </div>
@@ -709,7 +603,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
         </Row>
 
         <CustomAccordion
-          tittle={"Koreksi Produk"}
+          tittle={"Mutasi Produk"}
           defaultActive={true}
           active={accor.produk}
           onClick={() => {
@@ -723,7 +617,12 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
             <>
               <DataTable
                 responsiveLayout="none"
-                value={null}
+                value={po.rprod?.map((v, i) => {
+                  return {
+                    ...v,
+                    index: i,
+                  };
+                })}
                 className="display w-150 datatable-wrapper header-white no-border"
                 showGridlines={false}
                 emptyMessage={() => <div></div>}
@@ -784,8 +683,6 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                   )}
                 />
 
-            
-
                 <Column
                   header="Jumlah Mutasi"
                   style={{
@@ -807,7 +704,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                           temp[e.index].order = a.target.value
                           updatePo({ ...po, rprod: temp });
                         }}
-                        placeholder="D"
+                        placeholder="Jumlah"
                        // type="number"
                       />
                     </div>
@@ -827,7 +724,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                                 id: 0,
                                 prod_id: null,
                                 unit_id: null,
-                                request: null,
+                                order: null,
                               },
                             ],
                           });
@@ -918,34 +815,6 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
         }}
       />
 
-      <DataRulesPay
-        data={rulesPay}
-        loading={false}
-        popUp={true}
-        show={showRulesPay}
-        onHide={() => {
-          setShowRulesPay(false);
-        }}
-        onInput={(e) => {
-          setShowRulesPay(!e);
-        }}
-        onSuccessInput={(e) => {
-          getRulesPay();
-        }}
-        onRowSelect={(e) => {
-          if (doubleClick) {
-            setShowRulesPay(false);
-            updatePo({ ...rp, req_dep: e.data.id });
-          }
-
-          setDoubleClick(true);
-
-          setTimeout(() => {
-            setDoubleClick(false);
-          }, 2000);
-        }}
-      />
-
       <DataSupplier
         data={supplier}
         loading={false}
@@ -963,34 +832,6 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowSupplier(false);
-            updatePo({ ...rp, req_dep: e.data.id });
-          }
-
-          setDoubleClick(true);
-
-          setTimeout(() => {
-            setDoubleClick(false);
-          }, 2000);
-        }}
-      />
-
-      <DataPajak
-        data={ppn}
-        loading={false}
-        popUp={true}
-        show={showPpn}
-        onHide={() => {
-          setShowPpn(false);
-        }}
-        onInput={(e) => {
-          setShowPpn(!e);
-        }}
-        onSuccessInput={(e) => {
-          getPpn();
-        }}
-        onRowSelect={(e) => {
-          if (doubleClick) {
-            setShowPpn(false);
             updatePo({ ...rp, req_dep: e.data.id });
           }
 

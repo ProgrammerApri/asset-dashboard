@@ -35,10 +35,10 @@ const data = {
   rjasa: [],
 };
 
-const KoreksiPersediaanList = ({onAdd}) => {
+const PemakaianList = ({onAdd}) => {
+
   const dispatch = useDispatch();
    
-  
 
     const renderHeader = () => {
         return (
@@ -68,7 +68,7 @@ const KoreksiPersediaanList = ({onAdd}) => {
                         id: 0,
                         prod_id: null,
                         unit_id: null,
-                        type: null,
+                        end: null,
                         location: null,
                         order: null,
                       },
@@ -160,20 +160,14 @@ const KoreksiPersediaanList = ({onAdd}) => {
                    // body={loading && <Skeleton />}
                   />
                   <Column
-                    header="Nomor Koreksi Persediaan"
+                    header="Kode Pemakaian"
                    // field={(e) => e.customer.cus_name}
                     style={{ minWidth: "8rem" }}
                   //  body={loading && <Skeleton />}
                   />
                   <Column
-                    header="Kode Akun"
+                    header="Akun WIP"
                    // field={(e) => e.customer.cus_address}
-                    style={{ minWidth: "8rem" }}
-                    // body={loading && <Skeleton />}
-                  />
-                  <Column
-                    header="Departemen"
-                   // field={(e) => e.customer.cus_name}
                     style={{ minWidth: "8rem" }}
                     // body={loading && <Skeleton />}
                   />
@@ -191,4 +185,4 @@ const KoreksiPersediaanList = ({onAdd}) => {
     );
   };
   
-  export default KoreksiPersediaanList;
+  export default PemakaianList;

@@ -9,6 +9,7 @@ import { Dropdown } from "primereact/dropdown";
 import { Divider } from "@material-ui/core";
 import { Calendar } from "primereact/calendar";
 import { InputSwitch } from "primereact/inputswitch";
+import CustomAccordion from "src/jsx/components/Accordion/Accordion";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_PO } from "src/redux/actions";
 import DataPusatBiaya from "../../../MasterLainnya/PusatBiaya/DataPusatBiaya";
@@ -17,9 +18,9 @@ import DataRulesPay from "src/jsx/screen/MasterLainnya/RulesPay/DataRulesPay";
 import DataPajak from "src/jsx/screen/Master/Pajak/DataPajak";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import CustomAccordion from "src/jsx/components/Accordion/Accordion";
+import { InputTextarea } from "primereact/inputtextarea";
 
-const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
+const PenerimaanInput = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
@@ -38,10 +39,9 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
   const [showRulesPay, setShowRulesPay] = useState(false);
   const [showPpn, setShowPpn] = useState(false);
   const [product, setProduct] = useState(null);
-  const [proj, setProj] = useState(null);
+  const [jasa, setJasa] = useState(null);
   const [satuan, setSatuan] = useState(null);
   const [lokasi, setLokasi] = useState(null);
-  const [acc, setAcc] = useState(null);
   const [accor, setAccor] = useState({
     produk: true,
     jasa: false,
@@ -60,11 +60,9 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
     });
     getPusatBiaya();
     getSupplier();
-    getProj();
-    getAcc();
+    getLokasi();
     getRp();
     getProduct();
-    getLokasi();
     getSatuan();
   }, []);
 
@@ -102,9 +100,9 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
-  const getProj = async () => {
+  const getLokasi = async () => {
     const config = {
-      ...endpoints.project,
+      ...endpoints.lokasi,
       data: {},
     };
     console.log(config.data);
@@ -115,25 +113,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        setProj(data);
-      }
-    } catch (error) {}
-  };
-
-  const getAcc = async () => {
-    const config = {
-      ...endpoints.account,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setAcc(data);
+        setLokasi(data);
       }
     } catch (error) {}
   };
@@ -198,22 +178,6 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
         setProduct(data);
         console.log("jsdj");
         console.log(data);
-      }
-    } catch (error) {}
-  };
-
-  const getLokasi = async () => {
-    const config = {
-      ...endpoints.lokasi,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setLokasi(data);
       }
     } catch (error) {}
   };
@@ -379,6 +343,17 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
+  const checkjasa = (value) => {
+    let selected = {};
+    jasa?.forEach((element) => {
+      if (value === element.jasa.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
   const onSubmit = () => {
     if (isEdit) {
       setUpdate(true);
@@ -401,22 +376,22 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
     return [year, month, day].join("-");
   };
 
-  const accTemp = (option) => {
+  const reqTemp = (option) => {
     return (
       <div>
         {option !== null
-          ? `${option.account.acc_name} (${option.account.acc_code})`
+          ? `${option.req_code} (${option.req_dep.ccost_name})`
           : ""}
       </div>
     );
   };
 
-  const valueAccTemp = (option, props) => {
+  const valueReqTemp = (option, props) => {
     if (option) {
       return (
         <div>
           {option !== null
-            ? `${option.account.acc_name} (${option.account.acc_code})`
+            ? `${option.req_code} (${option.req_dep.ccost_name})`
             : ""}
         </div>
       );
@@ -469,17 +444,17 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
     return <span>{props.placeholder}</span>;
   };
 
-  const projTemp = (option) => {
+  const rulTemp = (option) => {
     return (
-      <div>{option !== null ? `${option.proj_name} (${option.proj_code})` : ""}</div>
+      <div>{option !== null ? `${option.name} (${option.day} Hari)` : ""}</div>
     );
   };
 
-  const valueProjTemp = (option, props) => {
+  const valueRulTemp = (option, props) => {
     if (option) {
       return (
         <div>
-          {option !== null ? `${option.proj_name} (${option.proj_code})` : ""}
+          {option !== null ? `${option.name} (${option.day} Hari)` : ""}
         </div>
       );
     }
@@ -533,7 +508,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
   const header = () => {
     return (
       <h4 className="mb-5">
-        <b>Koreksi Persediaan</b>
+        <b>Penerimaan Hasil Jadi</b>
       </h4>
     );
   };
@@ -545,7 +520,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
         <Toast ref={toast} />
 
         <Row className="mb-4">
-          <div className="col-4">
+          <div className="col-6">
             <label className="text-label">Tanggal</label>
             <div className="p-inputgroup">
               <Calendar
@@ -560,7 +535,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-4">
+          <div className="col-6">
             <label className="text-label">Kode Referensi</label>
             <div className="p-inputgroup">
               <InputText
@@ -570,44 +545,43 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
               />
             </div>
           </div>
-
-          <div className="col-4">
-            <label className="text-label">Kode Akun</label>
+          {/* <div className="col-4"></div>        */}
+          <div className="col-6">
+            <label className="text-label">Kode Pemakaian</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={null}
-                options={acc}
+                value={po.preq_id && req_pur(po.preq_id)}
+                options={rp}
                 onChange={(e) => {
-                  // console.log(e.value.rprod);
-                  // let result = null;
-                  // if (po.top) {
-                  //   result = new Date(`${req_pur(e.value.id).req_date}Z`);
-                  //   result.setDate(result.getDate() + rulPay(po?.top)?.day);
-                  //   console.log(result);
-                  // }
-                  // updatePo({
-                  //   ...po,
-                  //   preq_id: e.value.id,
-                  //   due_date: result,
-                  //   sup_id: e.value?.ref_sup?.id ?? null,
-                  //   rprod: e.value.rprod,
-                  //   rjasa: e.value.rjasa,
-                  // });
+                  console.log(e.value.rprod);
+                  let result = null;
+                  if (po.top) {
+                    result = new Date(`${req_pur(e.value.id).req_date}Z`);
+                    result.setDate(result.getDate() + rulPay(po?.top)?.day);
+                    console.log(result);
+                  }
+                  updatePo({
+                    ...po,
+                    preq_id: e.value.id,
+                    due_date: result,
+                    sup_id: e.value?.ref_sup?.id ?? null,
+                    rprod: e.value.rprod,
+                    rjasa: e.value.rjasa,
+                  });
                 }}
-                optionLabel="acc_name"
-                placeholder="Pilih Kode Akun"
-                itemTemplate={accTemp}
-                valueTemplate={valueAccTemp}
+                optionLabel="req_code"
+                placeholder="Kode Pemakaian Bahan"
+                itemTemplate={reqTemp}
+                valueTemplate={valueReqTemp}
               />
             </div>
           </div>
 
           <div className="col-6">
-            <label className="text-label">Kode Departemen</label>
+            <label className="text-label">Keterangan</label>
             <div className="p-inputgroup">
-              <Dropdown
+              <InputTextarea
                 value={null}
-                options={pusatBiaya}
                 onChange={(e) => {
                   // console.log(e.value.rprod);
                   // let result = null;
@@ -625,49 +599,17 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                   //   rjasa: e.value.rjasa,
                   // });
                 }}
-                optionLabel="req_code"
-                placeholder="Pilih Kode Departemen"
-                itemTemplate={deptTemp}
-                valueTemplate={valueDeptTemp}
+                placeholder="Keterangan"
               />
             </div>
           </div>
-
-          <div className="col-6">
-            <label className="text-label">Kode Project</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={null}
-                options={proj}
-                onChange={(e) => {
-                  // console.log(e.value.rprod);
-                  // let result = null;
-                  // if (po.top) {
-                  //   result = new Date(`${req_pur(e.value.id).req_date}Z`);
-                  //   result.setDate(result.getDate() + rulPay(po?.top)?.day);
-                  //   console.log(result);
-                  // }
-                  // updatePo({
-                  //   ...po,
-                  //   preq_id: e.value.id,
-                  //   due_date: result,
-                  //   sup_id: e.value?.ref_sup?.id ?? null,
-                  //   rprod: e.value.rprod,
-                  //   rjasa: e.value.rjasa,
-                  // });
-                }}
-                optionLabel="req_code"
-                placeholder="Pilih Kode Project"
-                itemTemplate={projTemp}
-                valueTemplate={valueProjTemp}
-              />
-            </div>
-          </div>
-          {/* kode suplier otomatis keluar, karena sudah melekat di faktur pembelian  */}
+            {/* kode suplier otomatis keluar, karena sudah melekat di faktur pembelian  */}
+            
+          
         </Row>
 
         <CustomAccordion
-          tittle={"Koreksi Produk"}
+          tittle={"Penerimaan Produk"}
           defaultActive={true}
           active={accor.produk}
           onClick={() => {
@@ -748,32 +690,6 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
-                  header="D/K"
-                  style={{
-                    width: "10rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={
-                          po.rprod[e.index].type ? po.rprod[e.index].type : null
-                        }
-                        onChange={(a) => {
-                          // let temp = [...po.rprod];
-                          // let result = temp[e.index]?.request - a.target.value;
-                          // temp[e.index].remain = result;
-                          // temp[e.index].order = a.target.value;
-                          // updatePo({ ...po, rprod: temp });
-                        }}
-                        placeholder="D/K"
-                        // type="number"
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
                   header="Lokasi"
                   style={{
                     maxWidth: "15rem",
@@ -842,9 +758,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                                 id: 0,
                                 prod_id: null,
                                 unit_id: null,
-                                type: null,
-                                location: null,
-                                order: null,
+                                request: null,
                               },
                             ],
                           });
@@ -874,6 +788,8 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
             </>
           }
         />
+
+      
       </>
     );
   };
@@ -964,4 +880,4 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
   );
 };
 
-export default KoreksiPersediaanInput;
+export default PenerimaanInput;

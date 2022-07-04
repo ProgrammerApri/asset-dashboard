@@ -110,10 +110,15 @@
   color: var(--text-color);
   padding: 0.7rem 1rem;
 }
+
 .p-datatable.p-datatable-hoverable-rows
   .p-datatable-tbody
   > tr:not(.p-highlight):not(.p-datatable-emptymessage):hover {
   background: #e9ecef63;
+}
+
+.p-dropdown.p-dropdown-clearable .p-dropdown-label {
+  padding-right: 2.75rem;
 }
 
 .p-inputnumber.w-100 {

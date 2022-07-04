@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { request, endpoints } from "src/utils";
-import { Row } from "react-bootstrap";
+import { Row, Card, Col } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
@@ -577,7 +577,6 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
       <>
         {/* Put content body here */}
         <Toast ref={toast} />
-
         <Row className="mb-4">
           <div className="col-4">
             <label className="text-label">Tanggal</label>
@@ -1665,9 +1664,17 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
 
   return (
     <>
-      {header()}
-      {body()}
-      {footer()}
+      <Row>
+        <Col className="pt-0">
+          <Card>
+            <Card.Body>
+              {header()}
+              {body()}
+              {footer()}
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
 
       <DataProduk
         data={product}

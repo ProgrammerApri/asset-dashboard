@@ -14,6 +14,8 @@ import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
+import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 
 const def = {
   jasa: {
@@ -35,6 +37,12 @@ const def = {
     connect: true,
     sld_awal: 0,
   },
+};
+
+const defError = {
+  code: false,
+  name: false,
+  acc1: false,
 };
 
 const DataJasa = ({
@@ -59,6 +67,7 @@ const DataJasa = ({
   const [isEdit, setEdit] = useState(false);
   const [showInput, setShowInput] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
+  const [error, setError] = useState(defError);
 
   useEffect(() => {
     getAccount();
@@ -277,10 +286,12 @@ const DataJasa = ({
           label="Simpan"
           icon="pi pi-check"
           onClick={() => {
-            if (isEdit) {
-              editJasa();
-            } else {
-              addJasa();
+            if (isValid()) {
+              if (isEdit) {
+                editJasa();
+              } else {
+                addJasa();
+              }
             }
           }}
           autoFocus
@@ -434,6 +445,19 @@ const DataJasa = ({
     setShowInput(false);
   };
 
+  const isValid = () => {
+    let valid = false;
+    let errors = {
+      code: !currentItem.jasa.code || currentItem.jasa.code === "",
+      name: !currentItem.jasa.name || currentItem.jasa.name === "",
+      acc1: !currentItem?.account?.id,
+    };
+
+    setError(errors);
+
+    return valid;
+  };
+
   const renderBody = () => {
     return (
       <>
@@ -485,7 +509,7 @@ const DataJasa = ({
           />
           <Column
             header="Keterangan"
-            field={(e) => e.jasa.desc}
+            field={(e) => e.jasa?.desc ?? "-"}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
@@ -517,69 +541,72 @@ const DataJasa = ({
         >
           <div className="row ml-0 mt-0">
             <div className="col-6">
-              <label className="text-label">Kode Jasa</label>
-              <div className="p-inputgroup">
-                <InputText
-                  value={
-                    currentItem !== null
-                      ? `${currentItem?.jasa?.code ?? ""}`
-                      : ""
-                  }
-                  onChange={(e) =>
-                    setCurrentItem({
-                      ...currentItem,
-                      jasa: { ...currentItem.jasa, code: e.target.value },
-                    })
-                  }
-                  placeholder="Masukan Kode Jasa"
-                />
-              </div>
+              <PrimeInput
+                label={"Kode Jasa"}
+                value={
+                  currentItem !== null ? `${currentItem?.jasa?.code ?? ""}` : ""
+                }
+                onChange={(e) => {
+                  setCurrentItem({
+                    ...currentItem,
+                    jasa: { ...currentItem.jasa, code: e.target.value },
+                  });
+                  let newError = error;
+                  newError.code = false;
+                  setError(newError);
+                }}
+                placeholder="Masukan Kode Jasa"
+                error={error?.code}
+              />
             </div>
 
             <div className="col-6">
-              <label className="text-label">Nama Jasa</label>
-              <div className="p-inputgroup">
-                <InputText
-                  value={
-                    currentItem !== null
-                      ? `${currentItem?.jasa?.name ?? ""}`
-                      : ""
-                  }
-                  onChange={(e) =>
-                    setCurrentItem({
-                      ...currentItem,
-                      jasa: { ...currentItem.jasa, name: e.target.value },
-                    })
-                  }
-                  placeholder="Masukan Nama Jasa"
-                />
-              </div>
+              <PrimeInput
+                label={"Nama Jasa"}
+                value={
+                  currentItem !== null ? `${currentItem?.jasa?.name ?? ""}` : ""
+                }
+                onChange={(e) => {
+                  setCurrentItem({
+                    ...currentItem,
+                    jasa: { ...currentItem.jasa, name: e.target.value },
+                  });
+                  let newError = error;
+                  newError.name = false;
+                  setError(newError);
+                }}
+                placeholder="Masukan Nama Jasa"
+                error={error?.name}
+              />
             </div>
           </div>
 
           <div className="row ml-0 mt-0">
             <div className="col-12">
-              <label className="text-label">Akun Distribusi GL</label>
-              <div className="p-inputgroup">
-                <Dropdown
-                  value={currentItem !== null ? currentItem.account : null}
-                  options={account}
-                  onChange={(e) => {
-                    console.log(e.value);
-                    setCurrentItem({
-                      ...currentItem,
-                      account: e.value,
-                    });
-                  }}
-                  optionLabel="acc_name"
-                  valueTemplate={clear}
-                  itemTemplate={glTemplate}
-                  filter
-                  filterBy="acc_name"
-                  placeholder="Pilih Akun Distribusi GL"
-                  // showClear
-                />
-              </div>
+              <PrimeDropdown
+                label={"Akun Distribusi GL"}
+                value={currentItem !== null ? currentItem.account : null}
+                options={account}
+                onChange={(e) => {
+                  console.log(e.value);
+                  setCurrentItem({
+                    ...currentItem,
+                    account: e.value,
+                  });
+                  let newError = error;
+                  newError.acc1 = false;
+                  setError(newError);
+                }}
+                optionLabel="acc_name"
+                valueTemplate={clear}
+                itemTemplate={glTemplate}
+                filter
+                filterBy="acc_name"
+                placeholder="Pilih Akun Distribusi GL"
+                errorMessage="Akun Distribusi Belum Dipilih"
+                error={error?.acc1}
+                // showClear
+              />
             </div>
           </div>
 

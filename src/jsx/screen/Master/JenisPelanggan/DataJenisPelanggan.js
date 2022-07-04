@@ -13,12 +13,18 @@ import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 
 const def = {
   id: 0,
   jpel_code: "",
   jpel_name: "",
   jpel_ket: "",
+};
+
+const defError = {
+  code: false,
+  name: false,
 };
 
 const DataJenisPelanggan = ({
@@ -41,6 +47,7 @@ const DataJenisPelanggan = ({
   const [isEdit, setEdit] = useState(false);
   const [showInput, setShowInput] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
+  const [error, setError] = useState(defError);
 
   useEffect(() => {
     initFilters1();
@@ -283,12 +290,14 @@ const DataJenisPelanggan = ({
           label="Simpan"
           icon="pi pi-check"
           onClick={() => {
-            if (isEdit) {
-              editJenisPel();
-              setLoading(true)
-            } else {
-              addJenisPel();
-              setLoading(true)
+            if (isValid()) {
+              if (isEdit) {
+                editJenisPel();
+                setLoading(true);
+              } else {
+                addJenisPel();
+                setLoading(true);
+              }
             }
           }}
           autoFocus
@@ -404,7 +413,7 @@ const DataJenisPelanggan = ({
           />
           <Column
             header="Keterangan"
-            field={(e) => (e.jpel_ket != "" ? e.jpel_ket : "-")}
+            field={(e) => (e.jpel_ket !== "" ? e.jpel_ket : "-")}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
@@ -428,6 +437,18 @@ const DataJenisPelanggan = ({
     onInput(false);
   };
 
+  const isValid = () => {
+    let valid = false;
+    let errors = {
+      code: !currentItem.jpel_code || currentItem.jpel_code === "",
+      name: !currentItem.jpel_name || currentItem.jpel_name === "",
+    };
+
+    setError(errors);
+
+    return valid;
+  };
+
   const renderDialog = () => {
     return (
       <>
@@ -441,35 +462,39 @@ const DataJenisPelanggan = ({
         >
           <div className="row mr-0 ml-0">
             <div className="col-6">
-              <label className="text-label">Kode</label>
-              <div className="p-inputgroup">
-                <InputText
-                  value={`${currentItem?.jpel_code}`}
-                  onChange={(e) =>
-                    setCurrentItem({
-                      ...currentItem,
-                      jpel_code: e.target.value,
-                    })
-                  }
-                  placeholder="Masukan Kode"
-                />
-              </div>
+              <PrimeInput
+                label={"Kode Jenis Pelanggan"}
+                value={`${currentItem?.jpel_code}`}
+                onChange={(e) => {
+                  setCurrentItem({
+                    ...currentItem,
+                    jpel_code: e.target.value,
+                  });
+                  let newError = error;
+                  newError.code = false;
+                  setError(newError);
+                }}
+                placeholder="Masukan Kode"
+                error={error?.code}
+              />
             </div>
 
             <div className="col-6">
-              <label className="text-label">Nama</label>
-              <div className="p-inputgroup">
-                <InputText
-                  value={`${currentItem?.jpel_name}`}
-                  onChange={(e) =>
-                    setCurrentItem({
-                      ...currentItem,
-                      jpel_name: e.target.value,
-                    })
-                  }
-                  placeholder="Masukan Nama Akun"
-                />
-              </div>
+              <PrimeInput
+                label={"Nama Jenis Pelanggan"}
+                value={`${currentItem?.jpel_name}`}
+                onChange={(e) => {
+                  setCurrentItem({
+                    ...currentItem,
+                    jpel_name: e.target.value,
+                  });
+                  let newError = error;
+                  newError.name = false;
+                  setError(newError);
+                }}
+                placeholder="Masukan Nama Jenis Pelanggan"
+                error={error?.name}
+              />
             </div>
           </div>
 

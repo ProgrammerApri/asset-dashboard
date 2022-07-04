@@ -14,12 +14,18 @@ import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 
 const def = {
   id: 1,
   ccost_code: "",
   ccost_name: "",
   ccost_ket: "",
+};
+
+const defError = {
+  code: false,
+  name: false,
 };
 
 const DataPusatBiaya = ({
@@ -42,6 +48,7 @@ const DataPusatBiaya = ({
   const [isEdit, setEdit] = useState(def);
   const [showInput, setShowInput] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
+  const [error, setError] = useState(defError);
 
   useEffect(() => {
     initFilters1();
@@ -232,10 +239,12 @@ const DataPusatBiaya = ({
           label="Simpan"
           icon="pi pi-check"
           onClick={() => {
-            if (isEdit) {
-              editPusatBiaya();
-            } else {
-              addPusatBiaya();
+            if (isValid()) {
+              if (isEdit) {
+                editPusatBiaya();
+              } else {
+                addPusatBiaya();
+              }
             }
           }}
           autoFocus
@@ -357,6 +366,17 @@ const DataPusatBiaya = ({
     setRows2(event.rows);
   };
 
+  const isValid = () => {
+    let valid = false;
+    let errors = {
+      code: !currentItem.ccost_code || currentItem.ccost_code === "",
+      name: !currentItem.ccost_name || currentItem.ccost_name === "",
+    };
+    setError(errors);
+
+    return valid;
+  };
+
   const renderBody = () => {
     return (
       <>
@@ -401,7 +421,7 @@ const DataPusatBiaya = ({
           />
           <Column
             header="Keterangan"
-            field={(e) => e.ccost_ket}
+            field={(e) => (e?.ccost_ket !== "" ? e.ccost_ket : "-")}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
@@ -433,39 +453,39 @@ const DataPusatBiaya = ({
         >
           <div className="row mr-0 mt-0">
             <div className="col-6">
-              <label className="text-label">Kode</label>
-              <div className="p-inputgroup">
-                <InputText
-                  value={
-                    currentItem !== null ? `${currentItem.ccost_code}` : ""
-                  }
-                  onChange={(e) =>
-                    setCurrentItem({
-                      ...currentItem,
-                      ccost_code: e.target.value,
-                    })
-                  }
-                  placeholder="Masukan Kode"
-                />
-              </div>
+              <PrimeInput
+                label={"Kode Departemen"}
+                value={currentItem !== null ? `${currentItem.ccost_code}` : ""}
+                onChange={(e) => {
+                  setCurrentItem({
+                    ...currentItem,
+                    ccost_code: e.target.value,
+                  });
+                  let newError = error;
+                  newError.code = false;
+                  setError(newError);
+                }}
+                placeholder="Masukan Kode Departemen"
+                error={error?.code}
+              />
             </div>
 
             <div className="col-6">
-              <label className="text-label">Nama</label>
-              <div className="p-inputgroup">
-                <InputText
-                  value={
-                    currentItem !== null ? `${currentItem.ccost_name}` : ""
-                  }
-                  onChange={(e) =>
-                    setCurrentItem({
-                      ...currentItem,
-                      ccost_name: e.target.value,
-                    })
-                  }
-                  placeholder="Masukan Nama Akun"
-                />
-              </div>
+              <PrimeInput
+                label={"Nama Departemen"}
+                value={currentItem !== null ? `${currentItem.ccost_name}` : ""}
+                onChange={(e) => {
+                  setCurrentItem({
+                    ...currentItem,
+                    ccost_name: e.target.value,
+                  });
+                  let newError = error;
+                  newError.name = false;
+                  setError(newError);
+                }}
+                placeholder="Masukan Nama Departemen"
+                error={error?.name}
+              />
             </div>
           </div>
 

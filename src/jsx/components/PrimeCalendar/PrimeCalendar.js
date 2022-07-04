@@ -1,45 +1,34 @@
-import { Dropdown } from "primereact/dropdown";
+import { Calendar } from "primereact/calendar";
 import React from "react";
 
-const PrimeDropdown = ({
+const PrimeCalendar = ({
   label,
   value,
-  options,
   onChange = () => {},
-  optionLabel,
-  filter = false,
-  filterBy,
   placeholder,
   error,
-  errorMessage,
   disabled = false,
-  valueTemplate,
-  itemTemplate, 
+  showIcon,
 }) => {
   return (
     <div>
       <label className="text-label">{label}</label>
       <div className="p-inputgroup">
-        <Dropdown
+        <Calendar
           value={value}
-          options={options}
           onChange={(e) => onChange(e)}
-          optionLabel={optionLabel}
-          filter={filter}
-          filterBy={filterBy}
           placeholder={placeholder}
           disabled={disabled}
-          itemTemplate={itemTemplate}
-          valueTemplate={valueTemplate}
+          showIcon={showIcon}
         />
       </div>
       {error && (
         <small id="name-error" className="p-error block">
-          <i class="bx bxs-error-circle ml-1"></i> {errorMessage}
+          <i class="bx bxs-error-circle ml-1"></i> Tanggal Belum Dipilih
         </small>
       )}
     </div>
   );
 };
 
-export default PrimeDropdown;
+export default PrimeCalendar;

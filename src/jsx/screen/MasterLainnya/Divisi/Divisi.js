@@ -14,12 +14,18 @@ import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 
 const def = {
   id: 1,
   code: "",
   name: "",
   desc: "",
+};
+
+const defError = {
+  code: false,
+  name: false,
 };
 
 const DataDivisi = ({
@@ -45,6 +51,7 @@ const DataDivisi = ({
   const [isEdit, setEdit] = useState(def);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+  const [error, setError] = useState(defError);
 
   const dummy = Array.from({ length: 10 });
 
@@ -230,12 +237,14 @@ const DataDivisi = ({
   };
 
   const onSubmit = () => {
-    if (isEdit) {
-      setUpdate(true);
-      editDivisi();
-    } else {
-      setUpdate(true);
-      addDivisi();
+    if (isValid()) {
+      if (isEdit) {
+        setUpdate(true);
+        editDivisi();
+      } else {
+        setUpdate(true);
+        addDivisi();
+      }
     }
   };
 
@@ -315,7 +324,7 @@ const DataDivisi = ({
           label="Tambah"
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
-           setEdit(false);
+            setEdit(false);
             setCurrentItem(def);
             setDisplayData(true);
             onInput(true);
@@ -371,6 +380,18 @@ const DataDivisi = ({
     setRows2(event.rows);
   };
 
+  const isValid = () => {
+    let valid = false;
+    let errors = {
+      code: !currentItem.code || currentItem.code === "",
+      name: !currentItem.name || currentItem.name === "",
+    };
+
+    setError(errors);
+
+    return valid;
+  };
+
   const renderBody = () => {
     return (
       <>
@@ -411,7 +432,7 @@ const DataDivisi = ({
           />
           <Column
             header="Keterangan"
-            field={(e) => e.desc}
+            field={(e) => (e?.desc !== "" ? e.desc : "-")}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
@@ -444,29 +465,33 @@ const DataDivisi = ({
         >
           <div className="row ml-0 mt-0">
             <div className="col-6">
-              <label className="text-label">Kode Group</label>
-              <div className="p-inputgroup">
-                <InputText
-                  value={currentItem !== null ? `${currentItem.code}` : ""}
-                  onChange={(e) =>
-                    setCurrentItem({ ...currentItem, code: e.target.value })
-                  }
-                  placeholder="Masukan Kode Group"
-                />
-              </div>
+              <PrimeInput
+                label={"Kode Grup"}
+                value={currentItem !== null ? `${currentItem.code}` : ""}
+                onChange={(e) => {
+                  setCurrentItem({ ...currentItem, code: e.target.value });
+                  let newError = error;
+                  newError.code = false;
+                  setError(newError);
+                }}
+                placeholder="Masukan Kode Grup"
+                error={error?.code}
+              />
             </div>
 
             <div className="col-6">
-              <label className="text-label">Nama Group</label>
-              <div className="p-inputgroup">
-                <InputText
-                  value={currentItem !== null ? `${currentItem.name}` : ""}
-                  onChange={(e) =>
-                    setCurrentItem({ ...currentItem, name: e.target.value })
-                  }
-                  placeholder="Masukan Nama Group"
-                />
-              </div>
+              <PrimeInput
+                label={"Nama Grup"}
+                value={currentItem !== null ? `${currentItem.name}` : ""}
+                onChange={(e) => {
+                  setCurrentItem({ ...currentItem, name: e.target.value });
+                  let newError = error;
+                  newError.name = false;
+                  setError(newError);
+                }}
+                placeholder="Masukan Nama Group"
+                error={error?.name}
+              />
             </div>
           </div>
 

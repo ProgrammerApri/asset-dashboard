@@ -89,7 +89,7 @@ const defError = [
   {
     ppn: false,
     ar: false,
-    um: false,
+    // um: false,
   },
 ];
 
@@ -610,7 +610,7 @@ const DataCustomer = ({
       {
         ppn: !currentItem.customer.cus_pjk,
         ar: !currentItem.customer.cus_gl,
-        um: !currentItem.customer.cus_uang_muka,
+        // um: !currentItem.customer.cus_uang_muka,
       },
     ];
 
@@ -1547,9 +1547,9 @@ const DataCustomer = ({
                           cus_uang_muka: e.value.id,
                         },
                       });
-                      let newError = error;
-                      newError[2].um = false;
-                      setError(newError);
+                      // let newError = error;
+                      // newError[2].um = false;
+                      // setError(newError);
                     }}
                     optionLabel="account.acc_name"
                     valueTemplate={clear}
@@ -1558,8 +1558,8 @@ const DataCustomer = ({
                     filterBy="account.acc_name"
                     placeholder="Pilih Kode Distribusi Uang Muka Penjualan"
                     showClear
-                    error={error[2]?.um}
-                    errorMessage="Kode Uang Muka Penjualan belum dipilih"
+                    // error={error[2]?.um}
+                    // errorMessage="Kode Uang Muka Penjualan belum dipilih"
                   />
                 </div>
               </div>

@@ -15,6 +15,7 @@ import { Dropdown } from "primereact/dropdown";
 import { InputNumber } from "primereact/inputnumber";
 import { Calendar } from "primereact/calendar";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 
 const data = {
   id: 1,
@@ -22,6 +23,12 @@ const data = {
   name: "",
   date: "",
   rate: 0,
+};
+
+const defError = {
+  code: false,
+  name: false,
+  rate: false,
 };
 
 const Currency = () => {
@@ -38,7 +45,7 @@ const Currency = () => {
   const [isEdit, setEdit] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
-  // const [rate, setRate] = useState(0);
+  const [error, setError] = useState(defError);
 
   const dummy = Array.from({ length: 10 });
 
@@ -247,12 +254,14 @@ const Currency = () => {
   };
 
   const onSubmit = () => {
-    if (isEdit) {
-      setUpdate(true);
-      editCurrency();
-    } else {
-      setUpdate(true);
-      addCurrency();
+    if (isValid()) {
+      if (isEdit) {
+        setUpdate(true);
+        editCurrency();
+      } else {
+        setUpdate(true);
+        addCurrency();
+      }
     }
   };
 
@@ -381,6 +390,19 @@ const Currency = () => {
     setRows2(event.rows);
   };
 
+  const isValid = () => {
+    let valid = false;
+    let errors = {
+      code: !currentItem.code || currentItem.code === "",
+      name: !currentItem.name || currentItem.name === "",
+      rate: !currentItem.rate || currentItem.rate === "",
+    };
+
+    setError(errors);
+
+    return valid;
+  };
+
   return (
     <>
       <Toast ref={toast} />
@@ -462,29 +484,33 @@ const Currency = () => {
       >
         <div className="row mr-0 ml-0">
           <div className="col-6">
-            <label className="text-label">Kode Currency</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={currentItem !== null ? `${currentItem.code}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, code: e.target.value })
-                }
-                placeholder="Masukan Kode"
-              />
-            </div>
+            <PrimeInput
+              label={"Kode Currency"}
+              value={currentItem !== null ? `${currentItem.code}` : ""}
+              onChange={(e) => {
+                setCurrentItem({ ...currentItem, code: e.target.value });
+                let newError = error;
+                newError.code = false;
+                setError(newError);
+              }}
+              placeholder="Masukan Kode Currency"
+              error={error?.code}
+            />
           </div>
 
           <div className="col-6">
-            <label className="text-label">Nama Currency</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={currentItem !== null ? `${currentItem.name}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, name: e.target.value })
-                }
-                placeholder="Masukan Nama"
-              />
-            </div>
+            <PrimeInput
+              label={"Nama Currency"}
+              value={currentItem !== null ? `${currentItem.name}` : ""}
+              onChange={(e) => {
+                setCurrentItem({ ...currentItem, name: e.target.value });
+                let newError = error;
+                newError.name = false;
+                setError(newError);
+              }}
+              placeholder="Masukan Nama Currency"
+              error={error?.name}
+            />
           </div>
         </div>
 
@@ -508,16 +534,19 @@ const Currency = () => {
           </div>
 
           <div className="col-6">
-            <label className="text-label">Rate Currency</label>
-            <div className="p-inputgroup">
-              <InputNumber
-                value={currentItem !== null ? `${currentItem.rate}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, rate: e.value })
-                }
-                placeholder="Masukan Rate"
-              />
-            </div>
+            <PrimeInput
+              label={"Rate Currency"}
+              number
+              value={currentItem !== null ? `${currentItem.rate}` : "0"}
+              onChange={(e) => {
+                setCurrentItem({ ...currentItem, rate: e.value });
+                let newError = error;
+                newError.rate = false;
+                setError(newError);
+              }}
+              placeholder="Masukan Rate"
+              error={error?.rate}
+            />
           </div>
         </div>
       </Dialog>

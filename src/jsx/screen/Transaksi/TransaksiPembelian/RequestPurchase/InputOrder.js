@@ -24,9 +24,19 @@ import {
   UPDATE_CURRENT_RP,
 } from "src/redux/actions";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
+import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
+import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
+import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
+
+const defError = {
+  code: false,
+  date: false,
+  prod: false,
+  jum: false,
+};
 
 const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
-  const enterEvent = useRef()
+  const enterEvent = useRef();
   const [update, setUpdate] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
@@ -41,8 +51,9 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
   const [satuan, setSatuan] = useState(null);
   const [supplier, setSupplier] = useState(null);
   const [doubleClick, setDoubleClick] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
   const rp = useSelector((state) => state.rp.current);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [error, setError] = useState(defError);
   const isEdit = useSelector((state) => state.rp.editRp);
   const dispatch = useDispatch();
   const [accor, setAccor] = useState({
@@ -120,12 +131,14 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
   };
 
   const onSubmit = () => {
-    if (isEdit) {
-      setUpdate(true);
-      editRp();
-    } else {
-      setUpdate(true);
-      addRp();
+    if (isValid()) {
+      if (isEdit) {
+        setUpdate(true);
+        editRp();
+      } else {
+        setUpdate(true);
+        addRp();
+      }
     }
   };
 
@@ -339,6 +352,20 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
     });
   };
 
+  const isValid = () => {
+    let valid = false;
+    let errors = {
+      code: !rp.req_code || rp.req_code === "",
+      date: !rp.req_date || rp.req_date === "",
+      prod: !rp.rprod?.prod_id?.id,
+      jum: !rp.rprod?.request,
+    };
+
+    setError(errors);
+
+    return valid;
+  };
+
   const body = () => {
     return (
       <>
@@ -346,36 +373,42 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
         {/* Put content body here */}
         <Row className="mb-4">
           <div className="col-4">
-            <label className="text-label">Tanggal</label>
-            <div className="p-inputgroup">
-              <Calendar
-                value={new Date(`${rp.req_date}Z`)}
-                onChange={(e) => {
-                  updateRp({ ...rp, req_date: e.value });
-                }}
-                placeholder="Pilih Tanggal"
-                showIcon
-              />
-            </div>
+            <PrimeCalendar
+              label={"Tanggal"}
+              value={new Date(`${rp.req_date}Z`)}
+              onChange={(e) => {
+                updateRp({ ...rp, req_date: e.value });
+                let newError = error;
+                newError.date = false;
+                setError(newError);
+              }}
+              placeholder="Pilih Tanggal"
+              error={error?.date}
+              showIcon
+            />
           </div>
 
           <div className="col-4">
-            <label className="text-label">Kode Referensi</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={rp.req_code}
-                onChange={(e) => updateRp({ ...rp, req_code: e.target.value })}
-                onKeyDown={(event) => {
-                  // console.log(event);
-                  // if (event.key.toLowerCase() === "enter") {
-                  //   var ev3 = document.createEvent('KeyboardEvent');
-                  //   ev3.initKeyEvent(
-                  //       'keypress', true, true, window, false, false, false, false, 9, 0);
-                  // }
-                }}
-                placeholder="Masukan Kode Referensi"
-              />
-            </div>
+            <PrimeInput
+              label={"Kode Referensi"}
+              value={rp.req_code}
+              onChange={(e) => {
+                updateRp({ ...rp, req_code: e.target.value });
+                let newError = error;
+                newError.code = false;
+                setError(newError);
+              }}
+              onKeyDown={(event) => {
+                // console.log(event);
+                // if (event.key.toLowerCase() === "enter") {
+                //   var ev3 = document.createEvent('KeyboardEvent');
+                //   ev3.initKeyEvent(
+                //       'keypress', true, true, window, false, false, false, false, 9, 0);
+                // }
+              }}
+              placeholder="Masukan Kode Referensi"
+              error={error?.code}
+            />
           </div>
 
           <div className="col-4">
@@ -473,26 +506,34 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                           temp[i].prod_id = e.id;
                           temp[i].unit_id = e.unit?.id;
                           updateRp({ ...rp, rprod: temp });
+
+                          let newError = error;
+                          newError.prod = false;
+                          setError(newError);
                         }}
                         label={"[name] ([code])"}
                         placeholder="Pilih Produk"
+                        errorMessage="Produk Belum Dipilih"
+                        error={error?.prod}
                       />
                     </div>
 
                     <div className="col-3">
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={v.request && v.request}
-                          onChange={(e) => {
-                            let temp = [...rp.rprod];
-                            temp[i].request = e.target.value;
-                            updateRp({ ...rp, rprod: temp });
-                            console.log(temp);
-                          }}
-                          placeholder="Masukan Jumlah"
-                          type="number"
-                        />
-                      </div>
+                      <PrimeNumber
+                        value={v.request && v.request}
+                        onChange={(e) => {
+                          let temp = [...rp.rprod];
+                          temp[i].request = e.value;
+                          updateRp({ ...rp, rprod: temp });
+
+                          let newError = error;
+                          newError.jum = false;
+                          setError(newError);
+                        }}
+                        placeholder="Masukan Jumlah"
+                        type="number"
+                        error={error?.jum}
+                      />
                     </div>
 
                     <div className="col-4">

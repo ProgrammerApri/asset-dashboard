@@ -45,6 +45,8 @@ const CustomDropdown = ({
   label,
   placeholder,
   value,
+  error,
+  errorMessage,
   onChange = () => {},
   disabled = false,
 }) => {
@@ -249,6 +251,11 @@ const CustomDropdown = ({
           />
         )}
       </div>
+      {error && (
+        <small id="name-error" className="p-error block">
+          <i class="bx bxs-error-circle ml-1"></i> {errorMessage}
+        </small>
+      )}
     </>
   );
 };

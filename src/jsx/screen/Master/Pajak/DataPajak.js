@@ -17,6 +17,8 @@ import { Checkbox } from "primereact/checkbox";
 import { SelectButton } from "primereact/selectbutton";
 import { MultiSelect } from "primereact/multiselect";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
+import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 
 const def = {
   id: null,
@@ -27,6 +29,13 @@ const def = {
   acc_sls_tax: null,
   acc_pur_tax: null,
   combined: null,
+};
+
+const defError = {
+  name: false,
+  nilai: false,
+  acc1: false,
+  acc2: false,
 };
 
 const type = [
@@ -56,6 +65,7 @@ const DataPajak = ({
   const [isEdit, setEdit] = useState(def);
   const [showInput, setShowInput] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
+  const [error, setError] = useState(defError);
 
   useEffect(() => {
     getPajak();
@@ -118,8 +128,7 @@ const DataPajak = ({
     const config = {
       ...endpoints.editPajak,
       endpoint: endpoints.editPajak.endpoint + currentItem.id,
-      data: 
-        currentItem,
+      data: currentItem,
     };
     console.log(config.data);
     let response = null;
@@ -192,7 +201,7 @@ const DataPajak = ({
   };
 
   const delPajak = async (id) => {
-    setLoading(true)
+    setLoading(true);
     const config = {
       ...endpoints.delPajak,
       endpoint: endpoints.delPajak.endpoint + currentItem.id,
@@ -263,12 +272,14 @@ const DataPajak = ({
   };
 
   const onSubmit = () => {
-    if (isEdit) {
-      setLoading(true);
-      editPajak();
-    } else {
-      setLoading(true);
-      addPajak();
+    if (isValid()) {
+      if (isEdit) {
+        setLoading(true);
+        editPajak();
+      } else {
+        setLoading(true);
+        addPajak();
+      }
     }
   };
 
@@ -443,6 +454,20 @@ const DataPajak = ({
     setShowInput(false);
   };
 
+  const isValid = () => {
+    let valid = false;
+    let errors = {
+      name: !currentItem.name || currentItem.name === "",
+      nilai: !currentItem.nilai || currentItem.nilai === "",
+      acc1: !currentItem?.acc_sls_tax,
+      acc2: !currentItem?.acc_pur_tax,
+    };
+
+    setError(errors);
+
+    return valid;
+  };
+
   const renderBody = () => {
     return (
       <>
@@ -513,11 +538,13 @@ const DataPajak = ({
                 <div>
                   {e.cutting === false ? (
                     <Badge variant="danger light">
-                      <i className="bx bxs-circle text-danger mr-1"></i> Bukan Pemotongan
+                      <i className="bx bxs-circle text-danger mr-1"></i> Bukan
+                      Pemotongan
                     </Badge>
                   ) : (
                     <Badge variant="info light">
-                      <i className="bx bxs-circle text-info mr-1"></i> Pemotongan
+                      <i className="bx bxs-circle text-info mr-1"></i>{" "}
+                      Pemotongan
                     </Badge>
                   )}
                 </div>
@@ -526,7 +553,7 @@ const DataPajak = ({
           />
           <Column
             header="Gabungan Dari"
-            field={(e) => e?.combined ?? ""}
+            field={(e) => (e?.combined ?? "-")}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
@@ -582,36 +609,41 @@ const DataPajak = ({
             <>
               <div className="row ml-0 mt-0">
                 <div className="col-6">
-                  <label className="text-label">Nama Pajak</label>
-                  <div className="p-inputgroup">
-                    <InputText
-                      value={
-                        currentItem !== null ? `${currentItem?.name ?? ""}` : ""
-                      }
-                      onChange={(e) =>
-                        setCurrentItem({ ...currentItem, name: e.target.value })
-                      }
-                      placeholder="Masukan Nama Pajak"
-                    />
-                  </div>
+                  <PrimeInput
+                    label={"Nama Pajak"}
+                    value={
+                      currentItem !== null ? `${currentItem?.name ?? ""}` : ""
+                    }
+                    onChange={(e) => {
+                      setCurrentItem({ ...currentItem, name: e.target.value });
+                      let newError = error;
+                      newError.name = false;
+                      setError(newError);
+                    }}
+                    placeholder="Masukan Nama Pajak"
+                    error={error?.name}
+                  />
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">Nilai</label>
-                  <div className="p-inputgroup">
-                    <InputNumber
-                      value={
-                        currentItem !== null
-                          ? `${currentItem?.nilai ?? ""}`
-                          : ""
-                      }
-                      onChange={(e) =>
-                        setCurrentItem({ ...currentItem, nilai: e.value })
-                      }
-                      placeholder="Masukan Nilai"
-                    />
-                    <span className="p-inputgroup-addon">%</span>
-                  </div>
+                  {/* <div className="p-inputgroup"> */}
+                  <PrimeInput
+                    label={"Nilai"}
+                    number
+                    value={
+                      currentItem !== null ? `${currentItem?.nilai ?? ""}` : ""
+                    }
+                    onChange={(e) => {
+                      setCurrentItem({ ...currentItem, nilai: e.value });
+                      let newError = error;
+                      newError.nilai = false;
+                      setError(newError);
+                    }}
+                    placeholder="Masukan Nilai"
+                    error={error?.nilai}
+                  />
+                  {/* <span className="p-inputgroup-addon">%</span>
+                  </div> */}
                 </div>
               </div>
 
@@ -633,9 +665,8 @@ const DataPajak = ({
 
               <div className="row ml-0 mt-0">
                 <div className="col-6">
-                  <label className="text-label">Akun Pajak Pembelian</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
+                    <PrimeDropdown
+                      label={"Akun Pajak Pembelian"}
                       value={
                         currentItem !== null && currentItem.acc_sls_tax !== null
                           ? acc(currentItem.acc_sls_tax)
@@ -648,6 +679,9 @@ const DataPajak = ({
                           ...currentItem,
                           acc_sls_tax: e.value?.id,
                         });
+                        let newError = error;
+                        newError.acc1 = false;
+                        setError(newError);
                       }}
                       optionLabel="account.acc_name"
                       valueTemplate={clear}
@@ -655,14 +689,14 @@ const DataPajak = ({
                       filter
                       filterBy="acc_name"
                       placeholder="Pilih Ppn Masukan"
+                      errorMessage="Akun Pajak Pembelian Belum Dipilih"
+                      error={error?.acc1}
                     />
-                  </div>
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">Akun Pajak Penjualan</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
+                    <PrimeDropdown
+                    label={"Akun Pajak Penjualan"}
                       value={
                         currentItem !== null && currentItem.acc_pur_tax !== null
                           ? acc(currentItem.acc_pur_tax)
@@ -675,6 +709,9 @@ const DataPajak = ({
                           ...currentItem,
                           acc_pur_tax: e.value?.id,
                         });
+                        let newError = error;
+                      newError.acc2 = false;
+                      setError(newError);
                       }}
                       optionLabel="account.acc_name"
                       valueTemplate={clear}
@@ -682,16 +719,16 @@ const DataPajak = ({
                       filter
                       filterBy="acc_name"
                       placeholder="Pilih Ppn Keluaran"
+                      errorMessage="Akun Pajak Penjualan Belum Dipilih"
+                      error={error?.acc2}
                     />
-                  </div>
                 </div>
               </div>
             </>
           ) : (
-
             // currentItem.type === "G" ? (
             <>
-            {" "}
+              {" "}
               <div className="row ml-0 mt-0">
                 <div className="col-6">
                   <label className="text-label">Nama Pajak</label>
@@ -730,16 +767,21 @@ const DataPajak = ({
                   </div>
                 </div>
               </div>
-
-             <div className="row ml-0 mr-0 mb-0 mt-6 justify-content-between">
+              <div className="row ml-0 mr-0 mb-0 mt-6 justify-content-between">
                 <div className="row justify-content-right col-6">
-                <div className="col-4">
+                  <div className="col-4">
                     <label className="text-label">Detail :</label>
                   </div>
 
                   <div className="col-6">
                     <label className="text-label">
-                      <b>1. {currentItem.pajak !== null ? currentItem.pajak?.nilai : ""}%</b>
+                      <b>
+                        1.{" "}
+                        {currentItem.pajak !== null
+                          ? currentItem.pajak?.nilai
+                          : ""}
+                        %
+                      </b>
                     </label>
                   </div>
 

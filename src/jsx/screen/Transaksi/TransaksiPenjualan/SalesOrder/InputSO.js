@@ -23,6 +23,21 @@ import DataJasa from "src/jsx/screen/Master/Jasa/DataJasa";
 import DataCustomer from "src/jsx/screen/Mitra/Pelanggan/DataCustomer";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import DataLokasi from "src/jsx/screen/Master/Lokasi/DataLokasi";
+import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
+import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
+import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
+
+const defError = {
+  code: false,
+  date: false,
+  pel: false,
+  tgl: false,
+  rul: false,
+  prod: false,
+  jum: false,
+  lok: false,
+  prc: false,
+};
 
 const InputSO = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
@@ -52,6 +67,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
   const [ppn, setPpn] = useState(null);
   const [customer, setCustomer] = useState(null);
   const [subCus, setSubCus] = useState(null);
+  const [error, setError] = useState(defError);
   const [accor, setAccor] = useState({
     produk: true,
     jasa: false,
@@ -73,6 +89,25 @@ const InputSO = ({ onCancel, onSuccess }) => {
     getSubCus();
     getloct();
   }, []);
+
+  const isValid = () => {
+    let valid = false;
+    let errors = {
+      code: !so.so_code || so.so_code === "",
+      date: !so.so_date || so.so_date === "",
+      pel: !so.pel_id?.id,
+      tgl: !so.req_date || so.req_date === "",
+      rul: !so.top?.id,
+      prod: !so.sprod?.prod_id?.id,
+      jum: !so.sprod?.request,
+      lok: !so.sprod?.location?.id,
+      prc: !so.sprod?.price,
+    };
+
+    setError(errors);
+
+    return valid;
+  };
 
   const editSO = async () => {
     const config = {
@@ -141,12 +176,14 @@ const InputSO = ({ onCancel, onSuccess }) => {
   };
 
   const onSubmit = () => {
-    if (isEdit) {
-      setUpdate(true);
-      editSO();
-    } else {
-      setUpdate(true);
-      addSO();
+    if (isValid()) {
+      if (isEdit) {
+        setUpdate(true);
+        editSO();
+      } else {
+        setUpdate(true);
+        addSO();
+      }
     }
   };
 
@@ -594,29 +631,36 @@ const InputSO = ({ onCancel, onSuccess }) => {
         {/* Put content body here */}
         <Row className="mb-6">
           <div className="col-6">
-            <label className="text-black fs-15">Tanggal</label>
-            <div className="p-inputgroup">
-              <Calendar
-                value={new Date(`${so.so_date}Z`)}
-                onChange={(e) => {
-                  updateSo({ ...so, so_date: e.value });
-                }}
-                placeholder="Pilih Tanggal"
-                showIcon
-                dateFormat="dd/mm/yy"
-              />
-            </div>
+            <PrimeCalendar
+              label={"Tanggal"}
+              value={new Date(`${so.so_date}Z`)}
+              onChange={(e) => {
+                updateSo({ ...so, so_date: e.value });
+
+                let newError = error;
+                newError.date = false;
+                setError(newError);
+              }}
+              placeholder="Pilih Tanggal"
+              showIcon
+              dateFormat="dd-mm-yy"
+              error={error?.date}
+            />
           </div>
 
           <div className="col-6">
-            <label className="text-black fs-14">Kode Referensi</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={so.so_code}
-                onChange={(e) => updateSo({ ...so, so_code: e.target.value })}
-                placeholder="Masukan Kode Referensi"
-              />
-            </div>
+            <PrimeInput
+              label={"Kode Referensi"}
+              value={so.so_code}
+              onChange={(e) => {
+                updateSo({ ...so, so_code: e.target.value });
+                let newError = error;
+                newError.code = false;
+                setError(newError);
+              }}
+              placeholder="Masukan Kode Referensi"
+              error={error?.code}
+            />
           </div>
 
           <div className="col-3">
@@ -631,11 +675,17 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   ...so,
                   pel_id: e.id,
                 });
+
+                let newError = error;
+                newError.pel = false;
+                setError(newError);
               }}
               label={"[cus_name] ([cus_code])"}
               placeholder="Pilih Pelanggan"
               detail
               onDetail={() => setShowCustomer(true)}
+              errorMessage="Pelanggan Belum Dipilih"
+              error={error?.pel}
             />
           </div>
 
@@ -680,23 +730,26 @@ const InputSO = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-4">
-            <label className="text-black fs-14">Tanggal Permintaan</label>
-            <div className="p-inputgroup mt-2">
-              <Calendar
-                value={new Date(`${so.req_date}Z`)}
-                onChange={(e) => {
-                  updateSo({ ...so, req_date: e.value });
-                }}
-                placeholder="Pilih Tanggal Pemintaan"
-                showIcon
-                dateFormat="dd/mm/yy"
-              />
-            </div>
+            <PrimeCalendar
+              label={"Tanggal Permintaan"}
+              value={new Date(`${so.req_date}Z`)}
+              onChange={(e) => {
+                updateSo({ ...so, req_date: e.value });
+
+                let newError = error;
+                newError.tgl = false;
+                setError(newError);
+              }}
+              placeholder="Pilih Tanggal Pemintaan"
+              showIcon
+              dateFormat="dd-mm-yy"
+              error={error?.tgl}
+            />
           </div>
 
           <div className="col-4">
             <label className="text-black fs-14">Jangka Pembayaran</label>
-            <div className="p-inputgroup mt-2"></div>
+            <div className="p-inputgroup mt-0"></div>
             <CustomDropdown
               value={so.top !== null ? checkRules(so.top) : null}
               option={rulesPay}
@@ -706,17 +759,23 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 console.log(result);
 
                 updateSo({ ...so, top: e.id, due_date: result });
+
+                let newError = error;
+                newError.rul = false;
+                setError(newError);
               }}
               label={"[name] ([day] Hari)"}
               placeholder="Pilih Jangka Waktu"
               detail
               onDetail={() => setShowRulesPay(true)}
+              errorMessage="Waktu Pembayaran Belum Dipilih"
+              error={error?.tgl}
             />
           </div>
 
           <div className="col-4">
             <label className="text-black fs-14">Tanggal Jatuh Tempo</label>
-            <div className="p-inputgroup mt-2">
+            <div className="p-inputgroup mt-0">
               <Calendar
                 value={new Date(`${so?.due_date}Z`)}
                 onChange={(e) => {}}
@@ -844,6 +903,10 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         temp[e.index].prod_id = u.id;
                         temp[e.index].unit_id = u.unit?.id;
                         updateSo({ ...so, sprod: temp });
+
+                        let newError = error;
+                        newError.prod = false;
+                        setError(newError);
                       }}
                       placeholder="Pilih Produk"
                       label={"[name] ([code])"}
@@ -852,6 +915,8 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         setCurrentIndex(e.index);
                         setShowProduk(true);
                       }}
+                      errorMessage="Produk Belum Dipilih"
+                      error={error?.prod}
                     />
                   )}
                 />
@@ -889,6 +954,10 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         let temp = [...so.sprod];
                         temp[e.index].location = u.id;
                         updateSo({ ...so, sprod: temp });
+
+                        let newError = error;
+                        newError.lok = false;
+                        setError(newError);
                       }}
                       option={lokasi}
                       label={"[name]"}
@@ -898,6 +967,8 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         setCurrentIndex(e.index);
                         setShowLok(true);
                       }}
+                      errorMessage="Lokasi Belum Dipilih"
+                      error={error?.lok}
                     />
                   )}
                 />
@@ -910,7 +981,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
-                      <InputText
+                      <PrimeNumber
                         value={e.order && e.order}
                         onChange={(u) => {
                           let temp = [...so.sprod];
@@ -919,10 +990,14 @@ const InputSO = ({ onCancel, onSuccess }) => {
                             temp[e.index].order * temp[e.index].price;
                           updateSo({ ...so, sprod: temp });
                           console.log(temp);
+                          let newError = error;
+                          newError.jum = false;
+                          setError(newError);
                         }}
                         placeholder="0"
                         type="number"
                         min={0}
+                        error={error?.jum}
                       />
                     </div>
                   )}
@@ -933,7 +1008,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
-                      <InputText
+                      <PrimeNumber
                         value={e.price && e.price}
                         onChange={(u) => {
                           let temp = [...so.sprod];
@@ -942,10 +1017,14 @@ const InputSO = ({ onCancel, onSuccess }) => {
                             temp[e.index].order * temp[e.index].price;
                           updateSo({ ...so, sprod: temp });
                           console.log(temp);
+                          let newError = error;
+                          newError.prc = false;
+                          setError(newError);
                         }}
                         placeholder="0"
                         type="number"
                         min={0}
+                        error={error?.prc}
                       />
                     </div>
                   )}
@@ -1166,7 +1245,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                       placeholder="Pilih Satuan"
                       detail
                       onDetail={() => {
-                        setCurrentIndex(e.index)
+                        setCurrentIndex(e.index);
                         setShowSatuan(true);
                       }}
                     />

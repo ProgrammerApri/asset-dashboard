@@ -15,6 +15,15 @@ import { Column } from "primereact/column";
 import DataCustomer from "src/jsx/screen/Mitra/Pelanggan/DataCustomer";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import DataSatuan from "src/jsx/screen/MasterLainnya/Satuan/DataSatuan";
+import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
+import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
+import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
+
+const defError = {
+  code: false,
+  date: false,
+  ret: false,
+};
 
 const ReturJualInput = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
@@ -31,6 +40,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
   const [showSatuan, setShowSatuan] = useState(false);
   const [product, setProduct] = useState(null);
   const [satuan, setSatuan] = useState(null);
+  const [error, setError] = useState(defError);
   const [accor, setAccor] = useState({
     produk: true,
     jasa: false,
@@ -48,6 +58,19 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
     getProduct();
     getSatuan();
   }, []);
+
+  const isValid = () => {
+    let valid = false;
+    let errors = {
+      code: !sr.ret_code || sr.ret_code === "",
+      date: !sr.ret_date || sr.ret_date === "",
+      ret: !sr.product?.retur,
+    };
+
+    setError(errors);
+
+    return valid;
+  };
 
   const getCustomer = async () => {
     const config = {
@@ -280,12 +303,14 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
   };
 
   const onSubmit = () => {
-    if (isEdit) {
-      setUpdate(true);
-      editSR();
-    } else {
-      setUpdate(true);
-      addSR();
+    if (isValid()) {
+      if (isEdit) {
+        setUpdate(true);
+        editSR();
+      } else {
+        setUpdate(true);
+        addSR();
+      }
     }
   };
 
@@ -343,29 +368,36 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
 
         <Row className="mb-4">
           <div className="col-4">
-            <label className="text-label">Tanggal</label>
-            <div className="p-inputgroup">
-              <Calendar
-                value={new Date(`${sr.ret_date}Z`)}
-                onChange={(e) => {
-                  updateSr({ ...sr, ret_date: e.value });
-                }}
-                placeholder="Pilih Tanggal"
-                showIcon
-                dateFormat="dd/mm/yy"
-              />
-            </div>
+            <PrimeCalendar
+              label={"Tanggal"}
+              value={new Date(`${sr.ret_date}Z`)}
+              onChange={(e) => {
+                updateSr({ ...sr, ret_date: e.value });
+
+                let newError = error;
+                newError.date = false;
+                setError(newError);
+              }}
+              placeholder="Pilih Tanggal"
+              showIcon
+              dateFormat="dd-mm-yy"
+              error={error?.date}
+            />
           </div>
 
           <div className="col-4">
-            <label className="text-label">Kode Referensi</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={sr.ret_code}
-                onChange={(e) => updateSr({ ...sr, ret_code: e.target.value })}
-                placeholder="Masukan Kode Referensi"
-              />
-            </div>
+            <PrimeInput
+              label={"Kode Referensi"}
+              value={sr.ret_code}
+              onChange={(e) => {
+                updateSr({ ...sr, ret_code: e.target.value });
+                let newError = error;
+                newError.code = false;
+                setError(newError);
+              }}
+              placeholder="Masukan Kode Referensi"
+              error={error?.code}
+            />
           </div>
 
           <div className="col-4">
@@ -449,7 +481,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                   sr.sale_id !== null
                     ? checkPjk(
                         checkCus(checkSale(sr.sale_id)?.so_id?.pel_id).customer
-                          .cus_pjk
+                          ?.cus_pjk
                       )?.name
                     : null
                 }
@@ -549,7 +581,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                     field={""}
                     body={(e) => (
                       <div className="p-inputgroup">
-                        <InputText
+                        <PrimeNumber
                           value={e.retur && e.retur}
                           onChange={(u) => {
                             let temp = [...sr.product];
@@ -557,10 +589,15 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                             temp[e.index].total =
                               temp[e.index].retur * temp[e.index].price;
                             updateSr({ ...sr, product: temp });
+
+                            let newError = error;
+                            newError.ret = false;
+                            setError(newError);
                           }}
                           placeholder="0"
                           type="number"
                           min={0}
+                          error={error?.ret}
                         />
                       </div>
                     )}

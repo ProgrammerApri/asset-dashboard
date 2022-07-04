@@ -16,6 +16,13 @@ import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import { el } from "date-fns/locale";
 import { InputSwitch } from "primereact/inputswitch";
 import DataOrder from "../Order/DataOrder";
+import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
+import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
+
+const defError = {
+  code: false,
+  date: false,
+};
 
 const BuatFaktur = ({ onCancel, onSuccess }) => {
   const inv = useSelector((state) => state.inv.current);
@@ -36,6 +43,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
   const [isRpJasa, setRpJasa] = useState(false);
   const [showOrder, SetShowOrder] = useState(false);
   const [doubleClick, setDoubleClick] = useState(false);
+  const [error, setError] = useState(defError);
   const dispatch = useDispatch();
   const [accor, setAccor] = useState({
     produk: true,
@@ -319,12 +327,14 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
   };
 
   const onSubmit = () => {
-    if (isEdit) {
-      setUpdate(true);
-      editinv();
-    } else {
-      setUpdate(true);
-      addinv();
+    if (isValid()) {
+      if (isEdit) {
+        setUpdate(true);
+        editinv();
+      } else {
+        setUpdate(true);
+        addinv();
+      }
     }
   };
 
@@ -459,6 +469,18 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
     );
   };
 
+  const isValid = () => {
+    let valid = false;
+    let errors = {
+      code: !inv.fk_code || inv.fk_code === "",
+      date: !inv.fk_date || inv.fk_date === "",
+    };
+
+    setError(errors);
+
+    return valid;
+  };
+
   const body = () => {
     return (
       <>
@@ -467,29 +489,36 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
 
         <Row className="mb-4">
           <div className="col-4">
-            <label className="text-label">Tanggal</label>
-            <div className="p-inputgroup">
-              <Calendar
-                value={new Date(`${inv.fk_date}Z`)}
-                onChange={(e) => {
-                  updateINV({ ...inv, fk_date: e.value });
-                }}
-                placeholder="Pilih Tanggal"
-                showIcon
-                dateFormat="dd/mm/yy"
-              />
-            </div>
+            <PrimeCalendar
+              label={"Tanggal"}
+              value={new Date(`${inv.fk_date}Z`)}
+              onChange={(e) => {
+                updateINV({ ...inv, fk_date: e.value });
+
+                let newError = error;
+                newError.date = false;
+                setError(newError);
+              }}
+              placeholder="Pilih Tanggal"
+              showIcon
+              dateFormat="dd-mm-yy"
+              error={error?.date}
+            />
           </div>
 
           <div className="col-4">
-            <label className="text-label">No. Faktur Pembelian</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={inv.fk_code}
-                onChange={(e) => updateINV({ ...inv, fk_code: e.target.value })}
-                placeholder="Masukan No. Faktur"
-              />
-            </div>
+            <PrimeInput
+              label={"No. Faktur Pembelian"}
+              value={inv.fk_code}
+              onChange={(e) => {
+                updateINV({ ...inv, fk_code: e.target.value });
+                let newError = error;
+                newError.code = false;
+                setError(newError);
+              }}
+              placeholder="Masukan No. Faktur"
+              error={error?.code}
+            />
           </div>
 
           <div className="col-4">
@@ -837,10 +866,12 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        value={e.sup_id &&
+                        value={
+                          e.sup_id &&
                           `${checkSupp(e.sup_id).supplier.sup_name} (${
                             checkSupp(e.sup_id).supplier.sup_code
-                          })`}
+                          })`
+                        }
                         placeholder="Supplier"
                         disabled
                       />

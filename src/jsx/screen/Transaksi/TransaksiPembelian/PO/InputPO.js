@@ -23,6 +23,17 @@ import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import DataJasa from "src/jsx/screen/Master/Jasa/DataJasa";
 import DataProduk from "src/jsx/screen/Master/Produk/DataProduk";
 import DataSatuan from "src/jsx/screen/MasterLainnya/Satuan/DataSatuan";
+import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
+import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
+import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
+
+const defError = {
+  code: false,
+  date: false,
+  rul: false,
+  jum: false,
+  prc: false,
+};
 
 const InputPO = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
@@ -48,6 +59,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
   const [product, setProduct] = useState(null);
   const [jasa, setJasa] = useState(null);
   const [satuan, setSatuan] = useState(null);
+  const [error, setError] = useState(defError);
   const [accor, setAccor] = useState({
     produk: true,
     jasa: false,
@@ -454,12 +466,14 @@ const InputPO = ({ onCancel, onSuccess }) => {
   };
 
   const onSubmit = () => {
-    if (isEdit) {
-      setUpdate(true);
-      editPO();
-    } else {
-      setUpdate(true);
-      addPO();
+    if (isValid()) {
+      if (isEdit) {
+        setUpdate(true);
+        editPO();
+      } else {
+        setUpdate(true);
+        addPO();
+      }
     }
   };
 
@@ -644,6 +658,21 @@ const InputPO = ({ onCancel, onSuccess }) => {
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
 
+  const isValid = () => {
+    let valid = false;
+    let errors = {
+      code: !po.po_code || po.po_code === "",
+      date: !po.po_date || po.po_date === "",
+      rul: !po.top?.id,
+      jum: !po.pprod.order || po.pprod.order === "",
+      prc: !po.pprod.price || po.pprod.price === "",
+    };
+
+    setError(errors);
+
+    return valid;
+  };
+
   const body = () => {
     return (
       <>
@@ -652,29 +681,35 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
         <Row className="mb-4">
           <div className="col-4">
-            <label className="text-label">Tanggal</label>
-            <div className="p-inputgroup">
-              <Calendar
-                value={new Date(`${po.po_date}Z`)}
-                onChange={(e) => {
-                  updatePo({ ...po, po_date: e.value });
-                }}
-                placeholder="Pilih Tanggal"
-                showIcon
-                dateFormat="dd/mm/yy"
-              />
-            </div>
+            <PrimeCalendar
+              label={"Tanggal"}
+              value={new Date(`${po.po_date}Z`)}
+              onChange={(e) => {
+                updatePo({ ...po, po_date: e.value });
+                let newError = error;
+                newError.date = false;
+                setError(newError);
+              }}
+              placeholder="Pilih Tanggal"
+              showIcon
+              dateFormat="dd-mm-yy"
+              error={error?.date}
+            />
           </div>
 
           <div className="col-4">
-            <label className="text-label">Kode Referensi</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={po.po_code}
-                onChange={(e) => updatePo({ ...po, po_code: e.target.value })}
-                placeholder="Masukan Kode Referensi"
-              />
-            </div>
+            <PrimeInput
+              label={"Kode Referensi"}
+              value={po.po_code}
+              onChange={(e) => {
+                updatePo({ ...po, po_code: e.target.value });
+                let newError = error;
+                newError.code = false;
+                setError(newError);
+              }}
+              placeholder="Masukan Kode Referensi"
+              error={error?.code}
+            />
           </div>
 
           <div className="col-4">
@@ -793,11 +828,17 @@ const InputPO = ({ onCancel, onSuccess }) => {
                 console.log(result);
 
                 updatePo({ ...po, top: e.id, due_date: result });
+
+                let newError = error;
+                newError.rul = false;
+                setError(newError);
               }}
               label={"[name] ([day] Hari)"}
               placeholder="Pilih Syarat Pembayaran"
               detail
               onDetail={() => setShowRulesPay(true)}
+              errorMessage="Syarat Pembayaran Belum Dipilih"
+              error={error?.rul}
             />
           </div>
 
@@ -951,29 +992,32 @@ const InputPO = ({ onCancel, onSuccess }) => {
                       minWidth: "7rem",
                     }}
                     body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.order ? e.order : 0}
-                          onChange={(t) => {
-                            let temp = [...po.pprod];
-                            let val =
-                              t.target.value > e.r_remain
-                                ? e.r_remain
-                                : t.target.value;
-                            let result =
-                              temp[e.index].order - val + temp[e.index].remain;
-                            temp[e.index].order = val;
+                      <PrimeNumber
+                        value={e.order ? e.order : 0}
+                        onChange={(t) => {
+                          let temp = [...po.pprod];
+                          let val =
+                            t.target.value > e.r_remain
+                              ? e.r_remain
+                              : t.target.value;
+                          let result =
+                            temp[e.index].order - val + temp[e.index].remain;
+                          temp[e.index].order = val;
 
-                            temp[e.index].total =
-                              temp[e.index].price * temp[e.index].order;
-                            temp[e.index].remain = result;
-                            updatePo({ ...po, pprod: temp });
-                          }}
-                          min={0}
-                          placeholder="0"
-                          type="number"
-                        />
-                      </div>
+                          temp[e.index].total =
+                            temp[e.index].price * temp[e.index].order;
+                          temp[e.index].remain = result;
+                          updatePo({ ...po, pprod: temp });
+
+                          let newError = error;
+                          newError.jum = false;
+                          setError(newError);
+                        }}
+                        min={0}
+                        placeholder="0"
+                        type="number"
+                        error={error?.jum}
+                      />
                     )}
                   />
 
@@ -1002,21 +1046,24 @@ const InputPO = ({ onCancel, onSuccess }) => {
                       minWidth: "10rem",
                     }}
                     body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.price ? e.price : 0}
-                          onChange={(t) => {
-                            let temp = [...po.pprod];
-                            temp[e.index].price = t.target.value;
-                            temp[e.index].total =
-                              temp[e.index].price * temp[e.index].order;
-                            updatePo({ ...po, pprod: temp });
-                          }}
-                          min={0}
-                          placeholder="0"
-                          type="number"
-                        />
-                      </div>
+                      <PrimeNumber
+                        value={e.price ? e.price : 0}
+                        onChange={(t) => {
+                          let temp = [...po.pprod];
+                          temp[e.index].price = t.target.value;
+                          temp[e.index].total =
+                            temp[e.index].price * temp[e.index].order;
+                          updatePo({ ...po, pprod: temp });
+
+                          let newError = error;
+                          newError.prc = false;
+                          setError(newError);
+                        }}
+                        min={0}
+                        placeholder="0"
+                        type="number"
+                        error={error?.prc}
+                      />
                     )}
                   />
 
@@ -1692,13 +1739,13 @@ const InputPO = ({ onCancel, onSuccess }) => {
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">
+                  <label className="text-label fs-13">
                     <b>Total Pembayaran</b>
                   </label>
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label fs-16">
+                  <label className="text-label fs-13">
                     <b>
                       Rp.{" "}
                       {formatIdr(

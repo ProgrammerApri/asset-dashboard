@@ -25,6 +25,20 @@ import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import PesananPO from "../PO/PesananPembelian";
 import DataLokasi from "src/jsx/screen/Master/Lokasi/DataLokasi";
 import DataPusatBiaya from "src/jsx/screen/MasterLainnya/PusatBiaya/DataPusatBiaya";
+import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
+import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
+import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
+
+const defError = {
+  code: false,
+  date: false,
+  sup: false,
+  rul: false,
+  prod: false,
+  jum: false,
+  lok: false,
+  prc: false,
+};
 
 const InputOrder = ({ onCancel, onSuccess }) => {
   const order = useSelector((state) => state.order.current);
@@ -51,6 +65,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
   const [doubleClick, setDoubleClick] = useState(false);
   const [isRp, setRp] = useState(true);
   const [isRpJasa, setRpJasa] = useState(true);
+  const [error, setError] = useState(defError);
   const dispatch = useDispatch();
   const [accor, setAccor] = useState({
     produk: true,
@@ -437,12 +452,14 @@ const InputOrder = ({ onCancel, onSuccess }) => {
   };
 
   const onSubmit = () => {
-    if (isEdit) {
-      setUpdate(true);
-      editODR();
-    } else {
-      setUpdate(true);
-      addODR();
+    if (isValid()) {
+      if (isEdit) {
+        setUpdate(true);
+        editODR();
+      } else {
+        setUpdate(true);
+        addODR();
+      }
     }
   };
 
@@ -501,6 +518,24 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     );
   };
 
+  const isValid = () => {
+    let valid = false;
+    let errors = {
+      code: !order.ord_code || order.ord_code === "",
+      date: !order.ord_date || order.ord_date === "",
+      sup: !order.sup_id?.id,
+      rul: !order.top?.id,
+      prod: !order.dprod?.prod_id?.id,
+      jum: !order.dprod?.order,
+      prc: !order.dprod?.price,
+      lok: !order.dprod?.location?.id,
+    };
+
+    setError(errors);
+
+    return valid;
+  };
+
   const body = () => {
     return (
       <>
@@ -509,39 +544,44 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
         <Row className="mb-4">
           <div className="col-6">
-            <label className="text-label">Tanggal</label>
-            <div className="p-inputgroup">
-              <Calendar
-                value={new Date(`${order.ord_date}Z`)}
-                onChange={(e) => {
-                  let result = null;
-                  if (order.top) {
-                    result = new Date(e.value);
-                    result.setDate(
-                      result.getDate() + checRulPay(order?.top)?.day
-                    );
-                    console.log(result);
-                  }
-                  updateORD({ ...order, ord_date: e.value, due_date: result });
-                }}
-                placeholder="Pilih Tanggal"
-                showIcon
-                dateFormat="dd/mm/yy"
-              />
-            </div>
+            <PrimeCalendar
+              label={"Tanggal"}
+              value={new Date(`${order.ord_date}Z`)}
+              onChange={(e) => {
+                let result = null;
+                if (order.top) {
+                  result = new Date(e.value);
+                  result.setDate(
+                    result.getDate() + checRulPay(order?.top)?.day
+                  );
+                  console.log(result);
+                }
+                updateORD({ ...order, ord_date: e.value, due_date: result });
+
+                let newError = error;
+                newError.date = false;
+                setError(newError);
+              }}
+              placeholder="Pilih Tanggal"
+              showIcon
+              dateFormat="dd-mm-yy"
+              error={error?.date}
+            />
           </div>
 
           <div className="col-6">
-            <label className="text-label">Kode Pembelian</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={order.ord_code}
-                onChange={(e) =>
-                  updateORD({ ...order, ord_code: e.target.value })
-                }
-                placeholder="Masukan Kode Pembelian"
-              />
-            </div>
+            <PrimeInput
+              label={"Kode Pembelian"}
+              value={order.ord_code}
+              onChange={(e) => {
+                updateORD({ ...order, ord_code: e.target.value });
+                let newError = error;
+                newError.code = false;
+                setError(newError);
+              }}
+              placeholder="Masukan Kode Pembelian"
+              error={error?.code}
+            />
           </div>
 
           <div className="col-6">
@@ -595,12 +635,17 @@ const InputOrder = ({ onCancel, onSuccess }) => {
               option={supplier}
               onChange={(e) => {
                 updateORD({ ...order, sup_id: e.supplier.id });
+                let newError = error;
+                newError.sup = false;
+                setError(newError);
               }}
               placeholder="Pilih Supplier"
               detail
               onDetail={() => setShowSupplier(true)}
               label={"[supplier.sup_code] ([supplier.sup_name])"}
               disabled={order && order.po_id !== null}
+              errorMessage="Supplier Belum Dipilih"
+              error={error?.sup}
             />
           </div>
 
@@ -661,11 +706,17 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                 console.log(result);
 
                 updateORD({ ...order, top: e.id, due_date: result });
+
+                let newError = error;
+                newError.rul = false;
+                setError(newError);
               }}
               placeholder="Pilih Syarat Pembayaran"
               detail
               onDetail={() => setShowRulesPay(true)}
               label={"[name] ([day] Hari)"}
+              errorMessage="Syarat Pembayaran Belum Dipilih"
+              error={error?.rul}
               disabled={order && order.po_id !== null}
             />
           </div>
@@ -761,6 +812,10 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                         temp[e.index].prod_id = u.id;
                         temp[e.index].unit_id = u.unit?.id;
                         updateORD({ ...order, dprod: temp });
+
+                        let newError = error;
+                        newError.prod = false;
+                        setError(newError);
                       }}
                       detail
                       onDetail={() => {
@@ -769,6 +824,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                       }}
                       label={"[name]"}
                       placeholder="Pilih Produk"
+                      errorMessage="Produk Belum Dipilih"
+                      error={error?.prod}
                       disabled={order && order.po_id !== null}
                     />
                   )}
@@ -802,24 +859,28 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                   header="Lokasi"
                   field={""}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <CustomDropdown
-                        value={e.location && checkLoc(e.location)}
-                        onChange={(u) => {
-                          let temp = [...order.dprod];
-                          temp[e.index].location = u.id;
-                          updateORD({ ...order, dprod: temp });
-                        }}
-                        option={lokasi}
-                        label={"[name]"}
-                        placeholder="Lokasi"
-                        detail
-                        onDetail={() => {
-                          setCurrentIndex(e.index);
-                          setShowLok(true);
-                        }}
-                      />
-                    </div>
+                    <CustomDropdown
+                      value={e.location && checkLoc(e.location)}
+                      onChange={(u) => {
+                        let temp = [...order.dprod];
+                        temp[e.index].location = u.id;
+                        updateORD({ ...order, dprod: temp });
+
+                        let newError = error;
+                        newError.lok = false;
+                        setError(newError);
+                      }}
+                      option={lokasi}
+                      label={"[name]"}
+                      placeholder="Lokasi"
+                      detail
+                      onDetail={() => {
+                        setCurrentIndex(e.index);
+                        setShowLok(true);
+                      }}
+                      errorMessage="Lokasi Belum Dipilih"
+                      error={error?.lok}
+                    />
                   )}
                 />
 
@@ -827,23 +888,26 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                   header="Jumlah"
                   field={""}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={e.order && e.order}
-                        onChange={(u) => {
-                          let temp = [...order.dprod];
-                          temp[e.index].order = u.target.value;
-                          temp[e.index].total =
-                            temp[e.index].order * temp[e.index].price;
-                          updateORD({ ...order, dprod: temp });
-                          console.log(temp);
-                        }}
-                        placeholder="0"
-                        type="number"
-                        min={0}
-                        disabled={order && order.po_id !== null}
-                      />
-                    </div>
+                    <PrimeNumber
+                      value={e.order && e.order}
+                      onChange={(u) => {
+                        let temp = [...order.dprod];
+                        temp[e.index].order = u.target.value;
+                        temp[e.index].total =
+                          temp[e.index].order * temp[e.index].price;
+                        updateORD({ ...order, dprod: temp });
+
+                        let newError = error;
+                        newError.jum = false;
+                        setError(newError);
+                        console.log(temp);
+                      }}
+                      placeholder="0"
+                      type="number"
+                      min={0}
+                      error={error?.jum}
+                      disabled={order && order.po_id !== null}
+                    />
                   )}
                 />
 
@@ -854,23 +918,26 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                   // }}
                   field={""}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={e.price && e.price}
-                        onChange={(u) => {
-                          let temp = [...order.dprod];
-                          temp[e.index].price = u.target.value;
-                          temp[e.index].total =
-                            temp[e.index].order * temp[e.index].price;
-                          updateORD({ ...order, dprod: temp });
-                          console.log(temp);
-                        }}
-                        placeholder="0"
-                        type="number"
-                        min={0}
-                        disabled={order && order.po_id !== null}
-                      />
-                    </div>
+                    <PrimeNumber
+                      value={e.price && e.price}
+                      onChange={(u) => {
+                        let temp = [...order.dprod];
+                        temp[e.index].price = u.target.value;
+                        temp[e.index].total =
+                          temp[e.index].order * temp[e.index].price;
+                        updateORD({ ...order, dprod: temp });
+
+                        let newError = error;
+                        newError.prc = false;
+                        setError(newError);
+                        console.log(temp);
+                      }}
+                      placeholder="0"
+                      type="number"
+                      min={0}
+                      error={error?.prc}
+                      disabled={order && order.po_id !== null}
+                    />
                   )}
                 />
 
@@ -1089,7 +1156,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                       placeholder="Pilih Satuan"
                       detail
                       onDetail={() => {
-                        setCurrentIndex(e.index)
+                        setCurrentIndex(e.index);
                         setShowSatuan(true);
                       }}
                       disabled={order && order.po_id !== null}

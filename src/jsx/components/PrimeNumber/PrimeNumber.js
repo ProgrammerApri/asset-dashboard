@@ -7,6 +7,7 @@ const PrimeNumber = ({
   placeholder,
   error,
   disabled = false,
+  min,
   type,
 }) => {
   return (
@@ -19,6 +20,7 @@ const PrimeNumber = ({
           aria-describedby="name-error"
           className={error ? "p-invalid" : ""}
           disabled={disabled}
+          min={min}
           type={type}
         />
       </div>

@@ -23,6 +23,21 @@ import DataProduk from "src/jsx/screen/Master/Produk/DataProduk";
 import DataJasa from "src/jsx/screen/Master/Jasa/DataJasa";
 import DataSalesman from "src/jsx/screen/MasterLainnya/Salesman/DataSalesman";
 import DataLokasi from "src/jsx/screen/Master/Lokasi/DataLokasi";
+import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
+import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
+import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
+
+const defError = {
+  code: false,
+  date: false,
+  pel: false,
+  rul: false,
+  sls: false,
+  prod: false,
+  jum: false,
+  lok: false,
+  prc: false,
+};
 
 const InputPenjualan = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
@@ -54,6 +69,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
   const [jasa, setJasa] = useState(null);
   const [satuan, setSatuan] = useState(null);
   const [lokasi, setLoc] = useState(null);
+  const [error, setError] = useState(defError);
   const [accor, setAccor] = useState({
     produk: true,
     jasa: false,
@@ -77,6 +93,25 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     getLoct();
     getSalesman();
   }, []);
+
+  const isValid = () => {
+    let valid = false;
+    let errors = {
+      code: !sale.ord_code || sale.ord_code === "",
+      date: !sale.ord_date || sale.ord_date === "",
+      pel: !sale.pel_id?.id,
+      rul: !sale.top?.id,
+      sls: !sale.slsm_id?.id,
+      prod: !sale.jprod?.prod_id?.id,
+      jum: !sale.jprod?.order,
+      prc: !sale.jprod?.price,
+      lok: !sale.jprod?.location?.id,
+    };
+
+    setError(errors);
+
+    return valid;
+  };
 
   const getCustomer = async () => {
     const config = {
@@ -508,12 +543,14 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
   };
 
   const onSubmit = () => {
-    if (isEdit) {
-      setUpdate(true);
-      editSale();
-    } else {
-      setUpdate(true);
-      addSale();
+    if (isValid()) {
+      if (isEdit) {
+        setUpdate(true);
+        editSale();
+      } else {
+        setUpdate(true);
+        addSale();
+      }
     }
   };
 
@@ -579,43 +616,49 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
         <Toast ref={toast} />
         <Row className="mb-4">
           <div className="col-4">
-            <label className="text-label">Tanggal</label>
-            <div className="p-inputgroup">
-              <Calendar
-                value={new Date(`${sale.ord_date}Z`)}
-                onChange={(e) => {
-                  let result = null;
-                  if (sale.top) {
-                    result = e.value;
-                    result.setDate(
-                      result.getDate() + checkRulesP(sale?.top)?.day
-                    );
-                    console.log(result);
-                  }
-                  updateSL({
-                    ...sale,
-                    ord_date: e.target.value,
-                    due_date: result,
-                  });
-                }}
-                placeholder="Pilih Tanggal"
-                showIcon
-                dateFormat="dd/mm/yy"
-              />
-            </div>
+            <PrimeCalendar
+              label={"Tanggal"}
+              value={new Date(`${sale.ord_date}Z`)}
+              onChange={(e) => {
+                let result = null;
+                if (sale.top) {
+                  result = new Date(e.value);
+                  result.setDate(
+                    result.getDate() + checkRulesP(sale?.top)?.day
+                  );
+                  console.log(result);
+                }
+                updateSL({
+                  ...sale,
+                  ord_date: e.value,
+                  due_date: result,
+                });
+
+                let newError = error;
+                newError.date = false;
+                setError(newError);
+              }}
+              placeholder="Pilih Tanggal"
+              showIcon
+              dateFormat="dd-mm-yy"
+              error={error?.date}
+            />
           </div>
 
           <div className="col-4">
-            <label className="text-label">No. Penjualan</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={sale.ord_code}
-                onChange={(e) =>
-                  updateSL({ ...sale, ord_code: e.target.value })
-                }
-                placeholder="Masukan No. Penjualan"
-              />
-            </div>
+            <PrimeInput
+              label={"No. Penjualan"}
+              value={sale.ord_code}
+              onChange={(e) => {
+                updateSL({ ...sale, ord_code: e.target.value });
+
+                let newError = error;
+                newError.code = false;
+                setError(newError);
+              }}
+              placeholder="Masukan No. Penjualan"
+              error={error?.code}
+            />
           </div>
 
           <div className="col-4">
@@ -661,11 +704,17 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
               option={customer}
               onChange={(e) => {
                 updateSL({ ...sale, pel_id: e.customer.id });
+
+                let newError = error;
+                newError.pel = false;
+                setError(newError);
               }}
               placeholder="Pilih Pelanggan"
               detail
               onDetail={() => setShowCustomer(true)}
               label={"[customer.cus_code] ([customer.cus_name])"}
+              errorMessage="Pelanggan Belum Dipilih"
+              error={error?.pel}
               disabled={sale && sale.so_id}
             />
           </div>
@@ -717,7 +766,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
 
           <div className="col-4">
             <label className="text-label">Syarat Pembayaran</label>
-            <div className="p-inputgroup mt-2"></div>
+            <div className="p-inputgroup mt-0"></div>
             <CustomDropdown
               value={sale.top !== null ? checkRulesP(sale.top) : null}
               option={rulesPay}
@@ -727,18 +776,24 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                 console.log(result);
 
                 updateSL({ ...sale, top: e.id, due_date: result });
+
+                let newError = error;
+                newError.rul = false;
+                setError(newError);
               }}
               placeholder="Pilih Syarat Pembayaran"
               detail
               onDetail={() => setShowRulesPay(true)}
               label={"[name] ([day] Hari)"}
+              errorMessage="Syarat Pembayaran Belum Dipilih"
+              error={error?.rul}
               disabled={sale && sale.so_id}
             />
           </div>
 
           <div className="col-4">
             <label className="text-label">Tanggal Jatuh Tempo</label>
-            <div className="p-inputgroup mt-2">
+            <div className="p-inputgroup mt-0">
               <Calendar
                 value={new Date(`${sale?.due_date}Z`)}
                 onChange={(e) => {}}
@@ -757,11 +812,17 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
               option={salesman}
               onChange={(e) => {
                 updateSL({ ...sale, slsm_id: e.id });
+
+                let newError = error;
+                newError.sls = false;
+                setError(newError);
               }}
               placeholder="Pilih Salesman"
               detail
               onDetail={() => setShowSalesman(true)}
               label={"[sales_name] ([sales_code])"}
+              errorMessage="Salesman Belum Dipilih"
+              error={error?.sls}
             />
           </div>
 
@@ -883,6 +944,10 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         temp[e.index].prod_id = u.id;
                         temp[e.index].unit_id = u.unit?.id;
                         updateSL({ ...sale, jprod: temp });
+
+                        let newError = error;
+                        newError.prod = false;
+                        setError(newError);
                       }}
                       placeholder="Pilih Produk"
                       label={"[name]"}
@@ -891,6 +956,8 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         setCurrentIndex(e.index);
                         setShowProduk(true);
                       }}
+                      errorMessage="Produk Belum Dipilih"
+                      error={error?.prod}
                       disabled={sale && sale.so_id}
                     />
                   )}
@@ -930,6 +997,10 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         let temp = [...sale.jprod];
                         temp[e.index].location = u.id;
                         updateSL({ ...sale, jprod: temp });
+
+                        let newError = error;
+                        newError.lok = false;
+                        setError(newError);
                       }}
                       option={lokasi}
                       label={"[name]"}
@@ -939,6 +1010,8 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         setCurrentIndex(e.index);
                         setShowLok(true);
                       }}
+                      errorMessage="Lokasi Belum Dipilih"
+                      error={error?.lok}
                       disabled={sale && sale.so_id}
                     />
                   )}
@@ -952,7 +1025,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
-                      <InputText
+                      <PrimeNumber
                         value={e.order && e.order}
                         onChange={(u) => {
                           let temp = [...sale.jprod];
@@ -961,10 +1034,15 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                             temp[e.index].order * temp[e.index].price;
                           updateSL({ ...sale, jprod: temp });
                           console.log(temp);
+
+                          let newError = error;
+                          newError.jum = false;
+                          setError(newError);
                         }}
                         placeholder="0"
                         type="number"
                         min={0}
+                        error={error?.jum}
                         disabled={sale && sale.so_id}
                       />
                     </div>
@@ -979,7 +1057,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
-                      <InputText
+                      <PrimeNumber
                         value={e.price && e.price}
                         onChange={(u) => {
                           let temp = [...sale.jprod];
@@ -988,10 +1066,15 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                             temp[e.index].order * temp[e.index].price;
                           updateSL({ ...sale, jprod: temp });
                           console.log(temp);
+
+                          let newError = error;
+                          newError.prc = false;
+                          setError(newError);
                         }}
                         placeholder="0"
                         type="number"
                         min={0}
+                        error={error?.prc}
                         disabled={sale && sale.so_id}
                       />
                     </div>

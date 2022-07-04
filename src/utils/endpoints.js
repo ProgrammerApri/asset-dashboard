@@ -884,6 +884,12 @@ const endpoints = {
     method: "GET",
     data: {},
   },
+
+  st_card: {
+    endpoint: "/v1/api/stcard",
+    method: "GET",
+    data: {},
+  },
 };
 
 export default endpoints;

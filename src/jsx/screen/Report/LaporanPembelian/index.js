@@ -12,6 +12,7 @@ import Pnl from "./Pnl";
 import ReportKBB from "../KartuBB";
 import SalesReport from "./Penjualan";
 import NeracaPerbandingan from "../NeracaPerbandingan";
+import KartuStock from "../KartuStock";
 
 const LaporanPembelian = () => {
   const [active, setActive] = useState(0);
@@ -70,6 +71,11 @@ const LaporanPembelian = () => {
       tittle: "Kartu Buku Besar",
       icon: "bx-spreadsheet",
       component: <ReportKBB />,
+    },
+    {
+      tittle: "Kartu Stock",
+      icon: "bx-spreadsheet",
+      component: <KartuStock />,
     },
   ]);
 

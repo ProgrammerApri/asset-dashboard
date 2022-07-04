@@ -14,12 +14,18 @@ import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 
 const def = {
   id: 1,
   sales_code: "",
   sales_name: "",
   sales_ket: "",
+};
+
+const defError = {
+  code: false,
+  name: false,
 };
 
 const DataSalesman = ({
@@ -47,6 +53,7 @@ const DataSalesman = ({
   const [rows2, setRows2] = useState(20);
   const [showInput, setShowInput] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
+  const [error, setError] = useState(defError);
 
   const dummy = Array.from({ length: 10 });
 
@@ -220,12 +227,14 @@ const DataSalesman = ({
   };
 
   const onSubmit = () => {
-    if (isEdit) {
-      setLoading(true);
-      editSalesman();
-    } else {
-      setLoading(true);
-      addSalesman();
+    if (isValid()) {
+      if (isEdit) {
+        setLoading(true);
+        editSalesman();
+      } else {
+        setLoading(true);
+        addSalesman();
+      }
     }
   };
 
@@ -312,7 +321,7 @@ const DataSalesman = ({
             setCurrentItem(def);
             onInput(true);
           }}
-        />        
+        />
       </div>
     );
   };
@@ -370,6 +379,18 @@ const DataSalesman = ({
     setShowInput(false);
   };
 
+  const isValid = () => {
+    let valid = false;
+    let errors = {
+      code: !currentItem.code || currentItem.code === "",
+      name: !currentItem.name || currentItem.name === "",
+    };
+
+    setError(errors);
+
+    return valid;
+  };
+
   const renderBody = () => {
     return (
       <>
@@ -414,7 +435,7 @@ const DataSalesman = ({
           />
           <Column
             header="Keterangan"
-            field={(e) => e.sales_ket}
+            field={(e) => (e?.sales_ket !== "" ? e.sales_ket : "-")}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
@@ -444,29 +465,39 @@ const DataSalesman = ({
           }}
         >
           <div className="col-12">
-            <label className="text-label">Kode</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={currentItem !== null ? `${currentItem.sales_code}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, sales_code: e.target.value })
-                }
-                placeholder="Masukan Kode"
-              />
-            </div>
+            <PrimeInput
+              label={"Kode Salesman"}
+              value={currentItem !== null ? `${currentItem.sales_code}` : ""}
+              onChange={(e) => {
+                setCurrentItem({
+                  ...currentItem,
+                  sales_code: e.target.value,
+                });
+                let newError = error;
+                newError.code = false;
+                setError(newError);
+              }}
+              placeholder="Masukan Kode Salesman"
+              error={error?.code}
+            />
           </div>
 
           <div className="col-12">
-            <label className="text-label">Nama</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={currentItem !== null ? `${currentItem.sales_name}` : ""}
-                onChange={(e) =>
-                  setCurrentItem({ ...currentItem, sales_name: e.target.value })
-                }
-                placeholder="Masukan Nama Akun"
-              />
-            </div>
+            <PrimeInput
+              label={"Nama Salesman"}
+              value={currentItem !== null ? `${currentItem.sales_name}` : ""}
+              onChange={(e) => {
+                setCurrentItem({
+                  ...currentItem,
+                  sales_name: e.target.value,
+                });
+                let newError = error;
+                newError.name = false;
+                setError(newError);
+              }}
+              placeholder="Masukan Nama Salesman"
+              error={error?.name}
+            />
           </div>
 
           <div className="col-12">

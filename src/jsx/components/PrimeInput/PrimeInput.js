@@ -10,6 +10,7 @@ const PrimeInput = ({
   error,
   disabled = false,
   isNumber = false,
+  number = false,
   mode,
   useGrouping = false,
   isEmail = false,
@@ -29,6 +30,19 @@ const PrimeInput = ({
         {isNumber ? (
           <>
             <span className="p-inputgroup-addon">+62</span>
+            <InputNumber
+              value={value}
+              onChange={onChange}
+              placeholder={placeholder}
+              aria-describedby="name-error"
+              className={error ? "p-invalid" : ""}
+              disabled={disabled}
+              mode={mode}
+              useGrouping={useGrouping}
+            />
+          </>
+        ) : number ? (
+          <>
             <InputNumber
               value={value}
               onChange={onChange}

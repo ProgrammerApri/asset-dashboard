@@ -15,12 +15,18 @@ import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { InputNumber } from "primereact/inputnumber";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 
 const def = {
   id: 1,
   name: "",
   day: 0,
   ket: "",
+};
+
+const defError = {
+  name: false,
+  day: false,
 };
 
 const DataRulesPay = ({
@@ -43,6 +49,7 @@ const DataRulesPay = ({
   const [isEdit, setEdit] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+  const [error, setError] = useState(defError);
 
   useEffect(() => {
     initFilters1();
@@ -218,12 +225,14 @@ const DataRulesPay = ({
   };
 
   const onSubmit = () => {
-    if (isEdit) {
-      setLoading(true);
-      editRulesPay();
-    } else {
-      setLoading(true);
-      addRulesPay();
+    if (isValid()) {
+      if (isEdit) {
+        setLoading(true);
+        editRulesPay();
+      } else {
+        setLoading(true);
+        addRulesPay();
+      }
     }
   };
 
@@ -368,6 +377,18 @@ const DataRulesPay = ({
     setShowInput(false);
   };
 
+  const isValid = () => {
+    let valid = false;
+    let errors = {
+      name: !currentItem.code || currentItem.code === "",
+      day: !currentItem.day || currentItem.day === "",
+    };
+
+    setError(errors);
+
+    return valid;
+  };
+
   const renderBody = () => {
     return (
       <>
@@ -410,7 +431,7 @@ const DataRulesPay = ({
           />
           <Column
             header="Keterangan"
-            field={(e) => e.ket}
+            field={(e) => (e?.ket !== "" ? e.ket : "-")}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
@@ -443,30 +464,34 @@ const DataRulesPay = ({
         >
           <div className="row mr-0 mt-0">
             <div className="col-6">
-              <label className="text-label">Nama</label>
-              <div className="p-inputgroup">
-                <InputText
-                  value={currentItem !== null ? `${currentItem.name}` : ""}
-                  onChange={(e) =>
-                    setCurrentItem({ ...currentItem, name: e.target.value })
-                  }
-                  placeholder="Masukan Nama"
-                />
-              </div>
+              <PrimeInput
+                label={"Nama"}
+                value={currentItem !== null ? `${currentItem.name}` : ""}
+                onChange={(e) => {
+                  setCurrentItem({ ...currentItem, name: e.target.value });
+                  let newError = error;
+                  newError.name = false;
+                  setError(newError);
+                }}
+                placeholder="Masukan Nama"
+                error={error?.name}
+              />
             </div>
 
             <div className="col-6">
-              <label className="text-label">Jumlah Hari</label>
-              <div className="p-inputgroup">
-                <InputNumber
-                  value={currentItem !== null ? `${currentItem.day}` : ""}
-                  onChange={(e) =>
-                    setCurrentItem({ ...currentItem, day: e.value })
-                  }
-                  placeholder="Masukan Jumlah Hari"
-                  showButtons
-                />
-              </div>
+              <PrimeInput
+                label={"Jumlah Hari"}
+                number
+                value={currentItem !== null ? `${currentItem.day}` : "0"}
+                onChange={(e) => {
+                  setCurrentItem({ ...currentItem, day: e.value });
+                  let newError = error;
+                  newError.day = false;
+                  setError(newError);
+                }}
+                placeholder="Masukan Jumlah Hari"
+                error={error?.day}
+              />
             </div>
           </div>
 

@@ -15,12 +15,18 @@ import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { classNames } from "primereact/utils";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 
 const def = {
   id: 1,
   proj_code: "",
   proj_name: "",
   proj_ket: "",
+};
+
+const defError = {
+  code: false,
+  name: false,
 };
 
 const DataProject = ({
@@ -44,7 +50,7 @@ const DataProject = ({
   const [showDelete, setShowDelete] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
-
+  const [error, setError] = useState(defError);
 
   useEffect(() => {
     initFilters1();
@@ -218,12 +224,14 @@ const DataProject = ({
   };
 
   const onSubmit = () => {
-    if (isEdit) {
-      setUpdate(true);
-      editProject();
-    } else {
-      setUpdate(true);
-      addProject();
+    if (isValid()) {
+      if (isEdit) {
+        setUpdate(true);
+        editProject();
+      } else {
+        setUpdate(true);
+        addProject();
+      }
     }
   };
 
@@ -361,6 +369,18 @@ const DataProject = ({
     setRows2(event.rows);
   };
 
+  const isValid = () => {
+    let valid = false;
+    let errors = {
+      code: !currentItem.proj_code || currentItem.proj_code === "",
+      name: !currentItem.proj_name || currentItem.proj_name === "",
+    };
+
+    setError(errors);
+
+    return valid;
+  };
+
   const renderBody = () => {
     return (
       <>
@@ -405,7 +425,7 @@ const DataProject = ({
           />
           <Column
             header="Keterangan"
-            field={(e) => e.proj_ket}
+            field={(e) => (e?.proj_ket !== "" ? e.proj_ket : "-")}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
@@ -437,35 +457,39 @@ const DataProject = ({
         >
           <div className="row ml-0 mt-0">
             <div className="col-6">
-              <label className="text-label">Kode</label>
-              <div className="p-inputgroup">
-                <InputText
-                  value={currentItem !== null ? `${currentItem.proj_code}` : ""}
-                  onChange={(e) =>
-                    setCurrentItem({
-                      ...currentItem,
-                      proj_code: e.target.value,
-                    })
-                  }
-                  placeholder="Masukan Kode"
-                />
-              </div>
+              <PrimeInput
+                label={"Kode Project"}
+                value={currentItem !== null ? `${currentItem.proj_code}` : ""}
+                onChange={(e) => {
+                  setCurrentItem({
+                    ...currentItem,
+                    proj_code: e.target.value,
+                  });
+                  let newError = error;
+                  newError.code = false;
+                  setError(newError);
+                }}
+                placeholder="Masukan Kode Project"
+                error={error?.code}
+              />
             </div>
 
             <div className="col-6">
-              <label className="text-label">Nama</label>
-              <div className="p-inputgroup">
-                <InputText
-                  value={currentItem !== null ? `${currentItem.proj_name}` : ""}
-                  onChange={(e) =>
-                    setCurrentItem({
-                      ...currentItem,
-                      proj_name: e.target.value,
-                    })
-                  }
-                  placeholder="Masukan Nama Project"
-                />
-              </div>
+              <PrimeInput
+                label={"Nama Project"}
+                value={currentItem !== null ? `${currentItem.proj_name}` : ""}
+                onChange={(e) => {
+                  setCurrentItem({
+                    ...currentItem,
+                    proj_name: e.target.value,
+                  });
+                  let newError = error;
+                  newError.name = false;
+                  setError(newError);
+                }}
+                placeholder="Masukan Nama Project"
+                error={error?.name}
+              />
             </div>
           </div>
 

@@ -14,6 +14,7 @@ import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_EXP, SET_EDIT_EXP, SET_EXP } from "src/redux/actions";
 import { Skeleton } from "primereact/skeleton";
+import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 
 const data = {
   id: null,
@@ -239,8 +240,9 @@ const KasBankOutList = ({ onAdd, onEdit }) => {
             placeholder="Cari disini"
           />
         </span>
-        <Button
-          variant="primary"
+        <PrimeSingleButton
+          label="Tambah"
+          icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
             dispatch({
@@ -273,12 +275,7 @@ const KasBankOutList = ({ onAdd, onEdit }) => {
               },
             });
           }}
-        >
-          Tambah{" "}
-          <span className="btn-icon-right">
-            <i class="bx bx-plus"></i>
-          </span>
-        </Button>
+        />
       </div>
     );
   };

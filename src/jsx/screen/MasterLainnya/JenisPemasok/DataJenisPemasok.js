@@ -14,12 +14,18 @@ import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 
 const def = {
   id: 1,
   jpem_code: "",
   jpem_name: "",
   jpem_ket: "",
+};
+
+const defError = {
+  code: false,
+  name: false,
 };
 
 const DataJenisPemasok = ({
@@ -47,6 +53,7 @@ const DataJenisPemasok = ({
   const [rows2, setRows2] = useState(20);
   const [showInput, setShowInput] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
+  const [error, setError] = useState(defError);
 
   useEffect(() => {
     initFilters1();
@@ -227,12 +234,14 @@ const DataJenisPemasok = ({
   };
 
   const onSubmit = () => {
-    if (isEdit) {
-      setLoading(true);
-      editJenisPemasok();
-    } else {
-      setLoading(true);
-      addJenisPemasok();
+    if (isValid()) {
+      if (isEdit) {
+        setLoading(true);
+        editJenisPemasok();
+      } else {
+        setLoading(true);
+        addJenisPemasok();
+      }
     }
   };
 
@@ -319,7 +328,7 @@ const DataJenisPemasok = ({
             setCurrentItem(def);
             onInput(true);
           }}
-        />        
+        />
       </div>
     );
   };
@@ -370,6 +379,18 @@ const DataJenisPemasok = ({
     setRows2(event.rows);
   };
 
+  const isValid = () => {
+    let valid = false;
+    let errors = {
+      code: !currentItem.jpem_code || currentItem.jpem_code === "",
+      name: !currentItem.jpem_name || currentItem.jpem_name === "",
+    };
+
+    setError(errors);
+
+    return valid;
+  };
+
   const renderBody = () => {
     return (
       <>
@@ -414,7 +435,7 @@ const DataJenisPemasok = ({
           />
           <Column
             header="Keterangan"
-            field={(e) => e.jpem_ket}
+            field={(e) => (e?.jpem_ket !== "" ? e?.jpem_ket : "-")}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
@@ -446,35 +467,39 @@ const DataJenisPemasok = ({
         >
           <div className="row mr-0 ml-0">
             <div className="col-6">
-              <label className="text-label">Kode</label>
-              <div className="p-inputgroup">
-                <InputText
-                  value={currentItem !== null ? `${currentItem.jpem_code}` : ""}
-                  onChange={(e) =>
-                    setCurrentItem({
-                      ...currentItem,
-                      jpem_code: e.target.value,
-                    })
-                  }
-                  placeholder="Masukan Kode"
-                />
-              </div>
+              <PrimeInput
+                label={"Kode Jenis Pemasok"}
+                value={currentItem !== null ? `${currentItem.jpem_code}` : ""}
+                onChange={(e) => {
+                  setCurrentItem({
+                    ...currentItem,
+                    jpem_code: e.target.value,
+                  });
+                  let newError = error;
+                  newError.code = false;
+                  setError(newError);
+                }}
+                placeholder="Masukan Kode"
+                error={error?.code}
+              />
             </div>
 
             <div className="col-6">
-              <label className="text-label">Nama</label>
-              <div className="p-inputgroup">
-                <InputText
-                  value={currentItem !== null ? `${currentItem.jpem_name}` : ""}
-                  onChange={(e) =>
-                    setCurrentItem({
-                      ...currentItem,
-                      jpem_name: e.target.value,
-                    })
-                  }
-                  placeholder="Masukan Nama Akun"
-                />
-              </div>
+              <PrimeInput
+                label={"Nama Jenis Pemasok"}
+                value={currentItem !== null ? `${currentItem.jpem_name}` : ""}
+                onChange={(e) => {
+                  setCurrentItem({
+                    ...currentItem,
+                    jpem_name: e.target.value,
+                  });
+                  let newError = error;
+                  newError.name = false;
+                  setError(newError);
+                }}
+                placeholder="Masukan Nama Jenis Pemasok"
+                error={error?.name}
+              />
             </div>
           </div>
 

@@ -3,7 +3,7 @@ import { request, endpoints } from "src/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Button, Row, Card } from "react-bootstrap";
+import { Button, Row, Card, Col } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { Dialog } from "primereact/dialog";
@@ -39,7 +39,7 @@ const data = {
   jjasa: [],
 };
 
-const DataPenjualan = ({ onAdd, onEdit }) => {
+const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayDel, setDisplayDel] = useState(false);
@@ -131,54 +131,53 @@ const DataPenjualan = ({ onAdd, onEdit }) => {
     return (
       // <React.Fragment>
       <div className="d-flex">
+        <Link
+          onClick={() => {
+            onDetail();
+            let jprod = data.jprod;
+            let jjasa = data.jjasa;
 
-      <Link
-        onClick={() => {
-          setDisplayData(data);
-          let jprod = data.jprod;
-          let jjasa = data.jjasa;
+            if (!jprod.length) {
+              jprod.push({
+                id: 0,
+                prod_id: null,
+                unit_id: null,
+                location: null,
+                order: null,
+                price: null,
+                disc: null,
+                nett_price: null,
+                total: null,
+              });
+            }
 
-          if (!jprod.length) {
-            jprod.push({
-              id: 0,
-              prod_id: null,
-              unit_id: null,
-              location: null,
-              order: null,
-              price: null,
-              disc: null,
-              nett_price: null,
-              total: null,
+            if (!jjasa.length) {
+              jjasa.push({
+                id: 0,
+                sup_id: null,
+                jasa_id: null,
+                unit_id: null,
+                order: null,
+                price: null,
+                disc: null,
+                nett_price: null,
+                total: null,
+              });
+            }
+
+            dispatch({
+              type: SET_CURRENT_SL,
+              payload: {
+                ...data,
+                jprod: jprod,
+                jjasa: jjasa,
+              },
             });
-          }
-
-          if (!jjasa.length) {
-            jjasa.push({
-              id: 0,
-              sup_id: null,
-              jasa_id: null,
-              unit_id: null,
-              order: null,
-              price: null,
-              disc: null,
-              nett_price: null,
-              total: null,
-            });
-          }
-
-          dispatch({
-            type: SET_CURRENT_SL,
-            payload: {
-              ...data,
-              jprod: jprod,
-              jjasa: jjasa,
-            },
-          });
-        }}
-        className="btn btn-info shadow btn-xs sharp ml-1"
-      >
-        <i className="bx bx-show mt-1"></i>
-      </Link>
+          }}
+          className="btn btn-info shadow btn-xs sharp ml-1"
+        >
+          <i className="bx bx-show mt-1"></i>
+        </Link>
 
         <Link
           onClick={() => {
@@ -311,7 +310,7 @@ const DataPenjualan = ({ onAdd, onEdit }) => {
         <PrimeSingleButton
           label="Tambah"
           icon={<i class="bx bx-plus px-2"></i>}
-           onClick={() => {
+          onClick={() => {
             onAdd();
             dispatch({
               type: SET_EDIT_SL,
@@ -470,65 +469,74 @@ const DataPenjualan = ({ onAdd, onEdit }) => {
   return (
     <>
       <Toast ref={toast} />
-      <DataTable
-        responsiveLayout="scroll"
-        value={loading ? dummy : sale}
-        className="display w-150 datatable-wrapper"
-        showGridlines
-        dataKey="id"
-        rowHover
-        header={renderHeader}
-        filters={filters1}
-        globalFilterFields={[
-          "ord_code",
-          "formatDate(ord_date)",
-          "so_id.so_code",
-          "pel_id.cus_name",
-        ]}
-        emptyMessage="Tidak ada data"
-        paginator
-        paginatorTemplate={template2}
-        first={first2}
-        rows={rows2}
-        onPage={onCustomPage2}
-        paginatorClassName="justify-content-end mt-3"
-      >
-        <Column
-          header="Tanggal"
-          style={{
-            minWidth: "10rem",
-          }}
-          field={(e) => formatDate(e.ord_date)}
-          body={loading && <Skeleton />}
-        />
-        <Column
-          header="No. Penjualan"
-          field={(e) => e.ord_code}
-          style={{ minWidth: "10rem" }}
-          body={loading && <Skeleton />}
-        />
-        <Column
-          header="No. Pesanan Penjualan"
-          field={(e) => e.so_id?.so_code}
-          style={{ minWidth: "10rem" }}
-          body={loading && <Skeleton />}
-        />
-        <Column
-          header="Pelanggan"
-          field={(e) => e.pel_id?.cus_name}
-          style={{ minWidth: "10rem" }}
-          body={loading && <Skeleton />}
-        />
-        <Column
-          header="Action"
-          dataType="boolean"
-          bodyClassName="text-center"
-          style={{ minWidth: "2rem" }}
-          body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
-        />
-      </DataTable>
 
-      <Dialog
+      <Row>
+        <Col className="pt-0">
+          <Card>
+            <Card.Body>
+              <DataTable
+                responsiveLayout="scroll"
+                value={loading ? dummy : sale}
+                className="display w-150 datatable-wrapper"
+                showGridlines
+                dataKey="id"
+                rowHover
+                header={renderHeader}
+                filters={filters1}
+                globalFilterFields={[
+                  "ord_code",
+                  "formatDate(ord_date)",
+                  "so_id.so_code",
+                  "pel_id.cus_name",
+                ]}
+                emptyMessage="Tidak ada data"
+                paginator
+                paginatorTemplate={template2}
+                first={first2}
+                rows={rows2}
+                onPage={onCustomPage2}
+                paginatorClassName="justify-content-end mt-3"
+              >
+                <Column
+                  header="Tanggal"
+                  style={{
+                    minWidth: "10rem",
+                  }}
+                  field={(e) => formatDate(e.ord_date)}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="No. Penjualan"
+                  field={(e) => e.ord_code}
+                  style={{ minWidth: "10rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="No. Pesanan Penjualan"
+                  field={(e) => e.so_id?.so_code}
+                  style={{ minWidth: "10rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Pelanggan"
+                  field={(e) => e.pel_id?.cus_name}
+                  style={{ minWidth: "10rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Action"
+                  dataType="boolean"
+                  bodyClassName="text-center"
+                  style={{ minWidth: "2rem" }}
+                  body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
+                />
+              </DataTable>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+
+      {/* <Dialog
         header={"Detail Pembelian"}
         visible={displayData}
         style={{ width: "40vw" }}
@@ -754,7 +762,9 @@ const DataPenjualan = ({ onAdd, onEdit }) => {
               </div>
 
               <div className="col-7 text-right">
-                <label className="text-label"><b>Rp. {show.total_disc !== null ? show.total_disc : 0}</b></label>
+                <label className="text-label">
+                  <b>Rp. {show.total_disc !== null ? show.total_disc : 0}</b>
+                </label>
               </div>
 
               <div className="col-12">
@@ -791,7 +801,7 @@ const DataPenjualan = ({ onAdd, onEdit }) => {
             </div>
           </Row>
         </Row>
-      </Dialog>
+      </Dialog> */}
 
       <Dialog
         header={"Hapus Data"}

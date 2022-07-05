@@ -17,6 +17,15 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import { el } from "date-fns/locale";
+import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
+import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
+import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
+
+const defError = {
+  code: false,
+  date: false,
+  ret: false,
+};
 
 const ReturBeliInput = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
@@ -33,6 +42,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
   const [showSupplier, setShowSupplier] = useState(false);
   const [product, setProduct] = useState(null);
   const [satuan, setSatuan] = useState(null);
+  const [error, setError] = useState(defError);
   const [accor, setAccor] = useState({
     produk: true,
     jasa: false,
@@ -50,6 +60,19 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
     getProduct();
     getSatuan();
   }, []);
+
+  const isValid = () => {
+    let valid = false;
+    let errors = {
+      code: !pr.ret_code || pr.ret_code === "",
+      date: !pr.ret_date || pr.ret_date === "",
+      ret: !pr.product?.retur,
+    };
+
+    setError(errors);
+
+    return valid;
+  };
 
   const getSupplier = async () => {
     const config = {
@@ -282,12 +305,14 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
   };
 
   const onSubmit = () => {
-    if (isEdit) {
-      setUpdate(true);
-      editPr();
-    } else {
-      setUpdate(true);
-      addPr();
+    if (isValid()) {
+      if (isEdit) {
+        setUpdate(true);
+        editPr();
+      } else {
+        setUpdate(true);
+        addPr();
+      }
     }
   };
 
@@ -345,29 +370,37 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
 
         <Row className="mb-4">
           <div className="col-4">
-            <label className="text-label">Tanggal</label>
-            <div className="p-inputgroup">
-              <Calendar
-                value={new Date(`${pr.ret_date}Z`)}
-                onChange={(e) => {
-                  updatePr({ ...pr, ret_date: e.target.value });
-                }}
-                placeholder="Pilih Tanggal"
-                showIcon
-                dateFormat="dd/mm/yy"
-              />
-            </div>
+            <PrimeCalendar
+              label={"Tanggal"}
+              value={new Date(`${pr.ret_date}Z`)}
+              onChange={(e) => {
+                updatePr({ ...pr, ret_date: e.target.value });
+
+                let newError = error;
+                newError.date = false;
+                setError(newError);
+              }}
+              placeholder="Pilih Tanggal"
+              showIcon
+              dateFormat="dd-mm-yy"
+              error={error?.date}
+            />
           </div>
 
           <div className="col-4">
-            <label className="text-label">Kode Referensi</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={pr.ret_code}
-                onChange={(e) => updatePr({ ...pr, ret_code: e.target.value })}
-                placeholder="Masukan Kode Referensi"
-              />
-            </div>
+            <PrimeInput
+              label={"Kode Referensi"}
+              value={pr.ret_code}
+              onChange={(e) => {
+                updatePr({ ...pr, ret_code: e.target.value });
+
+                let newError = error;
+                newError.code = false;
+                setError(newError);
+              }}
+              placeholder="Masukan Kode Referensi"
+              error={error?.code}
+            />
           </div>
 
           <div className="col-4">
@@ -426,18 +459,17 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-3">
-            <label className="text-label">Kontak Person</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={
-                  pr.fk_id !== null
-                    ? supp(checkFK(pr.fk_id)?.ord_id.sup_id).supplier.sup_telp1
-                    : ""
-                }
-                placeholder="Kontak Person"
-                disabled
-              />
-            </div>
+            <PrimeInput
+              label={"No. Telepon"}
+              isNumber
+              value={
+                pr.fk_id !== null
+                  ? supp(checkFK(pr.fk_id)?.ord_id.sup_id).supplier.sup_telp1
+                  : ""
+              }
+              placeholder="No. Telepon"
+              disabled
+            />
           </div>
 
           <div className="col-3">
@@ -458,241 +490,247 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
           </div>
         </Row>
 
-        <CustomAccordion
-          tittle={"Produk Retur"}
-          defaultActive={true}
-          active={accor.produk}
-          onClick={() => {
-            setAccor({
-              ...accor,
-              produk: !accor.produk,
-            });
-          }}
-          key={1}
-          body={
-            <>
-              <DataTable
-                responsiveLayout="none"
-                value={pr.product?.map((v, i) => {
-                  return {
-                    ...v,
-                    index: i,
-                    price: v?.price ?? 0,
-                    disc: v?.disc ?? 0,
-                    nett_price: v?.nett_price ?? 0,
-                    total: v?.total ?? 0,
-                  };
-                })}
-                className="display w-150 datatable-wrapper header-white no-border"
-                showGridlines={false}
-                emptyMessage={() => <div></div>}
-              >
-                <Column
-                  header="Produk"
-                  field={""}
-                  body={(e) => (
-                    <CustomDropdown
-                      value={e.prod_id && checkProd(e.prod_id)}
-                      option={product}
-                      onChange={(u) => {
-                        let sat = [];
-                        satuan.forEach((element) => {
-                          if (element.id === u.unit.id) {
-                            sat.push(element);
-                          } else {
-                            if (element.u_from?.id === u.unit.id) {
+        {pr.product?.length ? (
+          <CustomAccordion
+            tittle={"Produk Retur"}
+            defaultActive={true}
+            active={accor.produk}
+            onClick={() => {
+              setAccor({
+                ...accor,
+                produk: !accor.produk,
+              });
+            }}
+            key={1}
+            body={
+              <>
+                <DataTable
+                  responsiveLayout="none"
+                  value={pr.product?.map((v, i) => {
+                    return {
+                      ...v,
+                      index: i,
+                      price: v?.price ?? 0,
+                      disc: v?.disc ?? 0,
+                      nett_price: v?.nett_price ?? 0,
+                      total: v?.total ?? 0,
+                    };
+                  })}
+                  className="display w-150 datatable-wrapper header-white no-border"
+                  showGridlines={false}
+                  emptyMessage={() => <div></div>}
+                >
+                  <Column
+                    header="Produk"
+                    field={""}
+                    body={(e) => (
+                      <CustomDropdown
+                        value={e.prod_id && checkProd(e.prod_id)}
+                        option={product}
+                        onChange={(u) => {
+                          let sat = [];
+                          satuan.forEach((element) => {
+                            if (element.id === u.unit.id) {
                               sat.push(element);
+                            } else {
+                              if (element.u_from?.id === u.unit.id) {
+                                sat.push(element);
+                              }
                             }
-                          }
-                        });
-                        setSatuan(sat);
-                        
-                        let temp = [...pr.product];
-                        temp[e.index].prod_id = u.id;
-                        temp[e.index].unit_id = u.unit?.id;
-                        updatePr({ ...pr, product: temp });
-                      }}
-                      placeholder="Pilih Kode Produk"
-                      label={"[name]"}
-                      detail
-                      // onDetail={() => setShowProduk(true)}
-                    />
-                  )}
-                />
-
-                <Column
-                  header="Satuan"
-                  field={""}
-                  body={(e) => (
-                    <CustomDropdown
-                      value={e.unit_id && checkUnit(e.unit_id)}
-                      onChange={(t) => {
-                        let temp = [...pr.product];
-                        temp[e.index].unit_id = t.id;
-                        updatePr({ ...pr, product: temp });
-                      }}
-                      option={satuan}
-                      label={"[name]"}
-                      placeholder="Pilih Satuan"
-                      detail
-                      // onDetail={() => setShowSatuan(true)}
-                    />
-                  )}
-                />
-
-                <Column
-                  header="Retur"
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={e.retur && e.retur}
-                        onChange={(u) => {
-                          let temp = [...pr.product];
-                          temp[e.index].retur = u.target.value;
-                          temp[e.index].total =
-                            temp[e.index].retur * temp[e.index].price;
-                          updatePr({ ...pr, product: temp });
-                        }}
-                        placeholder="0"
-                        type="number"
-                        min={0}
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header="Harga Satuan"
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={e.price && e.price}
-                        onChange={(u) => {
-                          let temp = [...pr.product];
-                          temp[e.index].price = u.target.value;
-                          temp[e.index].total =
-                            temp[e.index].retur * temp[e.index].price;
-                          updatePr({ ...pr, product: temp });
-                          console.log(temp);
-                        }}
-                        placeholder="0"
-                        type="number"
-                        min={0}
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header="Diskon"
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={e.disc && e.disc}
-                        onChange={(u) => {
-                          let temp = [...pr.product];
-                          temp[e.index].disc = u.target.value;
-                          updatePr({ ...pr, product: temp });
-                          console.log(temp);
-                        }}
-                        placeholder="0"
-                        type="number"
-                        min={0}
-                      />
-                      <span className="p-inputgroup-addon">%</span>
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header="Harga Nett"
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={e.nett_price && e.nett_price}
-                        onChange={(u) => {
-                          let temp = [...pr.product];
-                          temp[e.index].nett_price = u.target.value;
-                          updatePr({ ...pr, product: temp });
-                          console.log(temp);
-                        }}
-                        placeholder="0"
-                        type="number"
-                        min={0}
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header="Total"
-                  field={""}
-                  body={(e) => (
-                    <label className="text-nowrap">
-                      <b>
-                        Rp.{" "}
-                        {formatIdr(getSubTotalBarang())}
-                      </b>
-                    </label>
-                  )}
-                />
-
-                <Column
-                  body={(e) =>
-                    e.index === pr.product.length - 1 ? (
-                      <Link
-                        onClick={() => {
-                          updatePr({
-                            ...pr,
-                            product: [
-                              ...pr.product,
-                              {
-                                id: 0,
-                                prod_id: null,
-                                unit_id: null,
-                                retur: null,
-                                price: null,
-                                disc: null,
-                                nett_price: null,
-                                total: null,
-                              },
-                            ],
                           });
-                        }}
-                        className="btn btn-primary shadow btn-xs sharp ml-1"
-                      >
-                        <i className="fa fa-plus"></i>
-                      </Link>
-                    ) : (
-                      <Link
-                        onClick={() => {
-                          let temp = [...pr.product];
-                          temp.splice(e.index, 1);
-                          updatePr({
-                            ...pr,
-                            product: temp,
-                          });
-                        }}
-                        className="btn btn-danger shadow btn-xs sharp ml-1"
-                      >
-                        <i className="fa fa-trash"></i>
-                      </Link>
-                    )
-                  }
-                />
-              </DataTable>
-            </>
-          }
-        />
+                          setSatuan(sat);
 
-        <div className="row ml-0 mr-0 mb-0 mt-6 justify-content-between">
-          <div>
-            <div className="row ml-1">
-              {/* <div className="d-flex col-12 align-items-center">
+                          let temp = [...pr.product];
+                          temp[e.index].prod_id = u.id;
+                          temp[e.index].unit_id = u.unit?.id;
+                          updatePr({ ...pr, product: temp });
+                        }}
+                        placeholder="Pilih Kode Produk"
+                        label={"[name]"}
+                        disabled={pr.fk_id !== null}
+                        // onDetail={() => setShowProduk(true)}
+                      />
+                    )}
+                  />
+
+                  <Column
+                    header="Satuan"
+                    field={""}
+                    body={(e) => (
+                      <CustomDropdown
+                        value={e.unit_id && checkUnit(e.unit_id)}
+                        onChange={(t) => {
+                          let temp = [...pr.product];
+                          temp[e.index].unit_id = t.id;
+                          updatePr({ ...pr, product: temp });
+                        }}
+                        option={satuan}
+                        label={"[name]"}
+                        placeholder="Pilih Satuan"
+                        disabled={pr.fk_id !== null}
+                      />
+                    )}
+                  />
+
+                  <Column
+                    header="Retur"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <PrimeNumber
+                          value={e.retur && e.retur}
+                          onChange={(u) => {
+                            let temp = [...pr.product];
+                            temp[e.index].retur = u.target.value;
+                            temp[e.index].total =
+                              temp[e.index].retur * temp[e.index].price;
+                            updatePr({ ...pr, product: temp });
+
+                            let newError = error;
+                            newError.ret = false;
+                            setError(newError);
+                          }}
+                          placeholder="0"
+                          type="number"
+                          min={0}
+                          error={error?.ret}
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header="Harga Satuan"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.price && e.price}
+                          onChange={(u) => {
+                            let temp = [...pr.product];
+                            temp[e.index].price = u.target.value;
+                            temp[e.index].total =
+                              temp[e.index].retur * temp[e.index].price;
+                            updatePr({ ...pr, product: temp });
+                            console.log(temp);
+                          }}
+                          placeholder="0"
+                          type="number"
+                          min={0}
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header="Diskon"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.disc && e.disc}
+                          onChange={(u) => {
+                            let temp = [...pr.product];
+                            temp[e.index].disc = u.target.value;
+                            updatePr({ ...pr, product: temp });
+                            console.log(temp);
+                          }}
+                          placeholder="0"
+                          type="number"
+                          min={0}
+                        />
+                        <span className="p-inputgroup-addon">%</span>
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header="Harga Nett"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.nett_price && e.nett_price}
+                          onChange={(u) => {
+                            let temp = [...pr.product];
+                            temp[e.index].nett_price = u.target.value;
+                            updatePr({ ...pr, product: temp });
+                            console.log(temp);
+                          }}
+                          placeholder="0"
+                          type="number"
+                          min={0}
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header="Total"
+                    field={""}
+                    body={(e) => (
+                      <label className="text-nowrap">
+                        <b>Rp. {formatIdr(getSubTotalBarang())}</b>
+                      </label>
+                    )}
+                  />
+
+                  <Column
+                    body={(e) =>
+                      e.index === pr.product.length - 1 ? (
+                        <Link
+                          onClick={() => {
+                            updatePr({
+                              ...pr,
+                              product: [
+                                ...pr.product,
+                                {
+                                  id: 0,
+                                  prod_id: null,
+                                  unit_id: null,
+                                  retur: null,
+                                  price: null,
+                                  disc: null,
+                                  nett_price: null,
+                                  total: null,
+                                },
+                              ],
+                            });
+                          }}
+                          className="btn btn-primary shadow btn-xs sharp ml-1"
+                        >
+                          <i className="fa fa-plus"></i>
+                        </Link>
+                      ) : (
+                        <Link
+                          onClick={() => {
+                            let temp = [...pr.product];
+                            temp.splice(e.index, 1);
+                            updatePr({
+                              ...pr,
+                              product: temp,
+                            });
+                          }}
+                          className="btn btn-danger shadow btn-xs sharp ml-1"
+                        >
+                          <i className="fa fa-trash"></i>
+                        </Link>
+                      )
+                    }
+                  />
+                </DataTable>
+              </>
+            }
+          />
+        ) : (
+          <></>
+        )}
+
+        {pr.product?.length ? (
+          <div className="row ml-0 mr-0 mb-0 mt-6 justify-content-between">
+            <div>
+              <div className="row ml-1">
+                {/* <div className="d-flex col-12 align-items-center">
                 <label className="mt-1">{"Pisah Faktur"}</label>
                 <InputSwitch
                   className="ml-4"
@@ -705,108 +743,111 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                   }}
                 />
               </div> */}
-            </div>
-          </div>
-
-          <div className="row justify-content-right col-6">
-            <div className="col-6">
-              <label className="text-label">Sub Total Barang</label>
-            </div>
-
-            <div className="col-6">
-              <label className="text-label">
-                <b>Rp. {formatIdr(getSubTotalBarang())}</b>
-              </label>
-            </div>
-
-            <div className="col-6">
-              <label className="text-label">DPP Barang</label>
-            </div>
-
-            <div className="col-6">
-              <label className="text-label">
-                <b>Rp. {formatIdr(getSubTotalBarang())}</b>
-              </label>
-            </div>
-
-            <div className="col-6">
-              <label className="text-label">Pajak Atas Barang (11%)</label>
-            </div>
-
-            <div className="col-6">
-              <label className="text-label">
-                <b>Rp. {formatIdr((getSubTotalBarang() * 11) / 100)}</b>
-              </label>
-            </div>
-
-            <div className="col-6 mt-3">
-              <label className="text-label">Diskon Tambahan</label>
-            </div>
-
-            <div className="col-6">
-              <div className="p-inputgroup">
-                <PButton
-                  label="Rp."
-                  className={`${isRp ? "" : "p-button-outlined"}`}
-                  onClick={() => setRp(true)}
-                />
-                <InputText
-                  value={
-                    isRp
-                      ? (getSubTotalBarang() * pr.prod_disc) / 100
-                      : pr.prod_disc
-                  }
-                  placeholder="Diskon"
-                  type="number"
-                  min={0}
-                  onChange={(e) => {
-                    let disc = 0;
-                    if (isRp) {
-                      disc = (e.target.value / getSubTotalBarang()) * 100;
-                    } else {
-                      disc = e.target.value;
-                    }
-                    updatePr({ ...pr, prod_disc: disc });
-                  }}
-                />
-                <PButton
-                  className={`${isRp ? "p-button-outlined" : ""}`}
-                  onClick={() => setRp(false)}
-                >
-                  {" "}
-                  <b>%</b>{" "}
-                </PButton>
               </div>
             </div>
 
-            <div className="col-12">
-              <Divider className="ml-12"></Divider>
-            </div>
+            <div className="row justify-content-right col-6">
+              <div className="col-6">
+                <label className="text-label">Sub Total Barang</label>
+              </div>
 
-            <div className="col-6">
-              <label className="text-label">
-                <b>Total Pembayaran</b>
-              </label>
-            </div>
+              <div className="col-6">
+                <label className="text-label">
+                  <b>Rp. {formatIdr(getSubTotalBarang())}</b>
+                </label>
+              </div>
 
-            <div className="col-6">
-              <label className="text-label fs-16">
-                <b>
-                  Rp.{" "}
-                  {formatIdr(
-                    getSubTotalBarang() + (getSubTotalBarang() * 11) / 100
-                  )}
-                </b>
-              </label>
-            </div>
+              <div className="col-6">
+                <label className="text-label">DPP Barang</label>
+              </div>
 
-            <div className="col-12">
-              <Divider className="ml-12"></Divider>
-            </div>
+              <div className="col-6">
+                <label className="text-label">
+                  <b>Rp. {formatIdr(getSubTotalBarang())}</b>
+                </label>
+              </div>
 
-            {/*  */}
+              <div className="col-6">
+                <label className="text-label">Pajak Atas Barang (11%)</label>
+              </div>
+
+              <div className="col-6">
+                <label className="text-label">
+                  <b>Rp. {formatIdr((getSubTotalBarang() * 11) / 100)}</b>
+                </label>
+              </div>
+
+              <div className="col-6 mt-3">
+                <label className="text-label">Diskon Tambahan</label>
+              </div>
+
+              <div className="col-6">
+                <div className="p-inputgroup">
+                  <PButton
+                    label="Rp."
+                    className={`${isRp ? "" : "p-button-outlined"}`}
+                    onClick={() => setRp(true)}
+                  />
+                  <InputText
+                    value={
+                      isRp
+                        ? (getSubTotalBarang() * pr.prod_disc) / 100
+                        : pr.prod_disc
+                    }
+                    placeholder="Diskon"
+                    type="number"
+                    min={0}
+                    onChange={(e) => {
+                      let disc = 0;
+                      if (isRp) {
+                        disc = (e.target.value / getSubTotalBarang()) * 100;
+                      } else {
+                        disc = e.target.value;
+                      }
+                      updatePr({ ...pr, prod_disc: disc });
+                    }}
+                  />
+                  <PButton
+                    className={`${isRp ? "p-button-outlined" : ""}`}
+                    onClick={() => setRp(false)}
+                  >
+                    {" "}
+                    <b>%</b>{" "}
+                  </PButton>
+                </div>
+              </div>
+
+              <div className="col-12">
+                <Divider className="ml-12"></Divider>
+              </div>
+
+              <div className="col-6">
+                <label className="text-label">
+                  <b>Total Pembayaran</b>
+                </label>
+              </div>
+
+              <div className="col-6">
+                <label className="text-label fs-16">
+                  <b>
+                    Rp.{" "}
+                    {formatIdr(
+                      getSubTotalBarang() + (getSubTotalBarang() * 11) / 100
+                    )}
+                  </b>
+                </label>
+              </div>
+
+              <div className="col-12">
+                <Divider className="ml-12"></Divider>
+              </div>
+
+              {/*  */}
+            </div>
           </div>
-        </div>
+        ) : (
+          <></>
+        )}
       </>
     );
   };

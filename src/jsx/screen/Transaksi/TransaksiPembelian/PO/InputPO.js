@@ -30,6 +30,7 @@ import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 const defError = {
   code: false,
   date: false,
+  req: false,
   rul: false,
   jum: false,
   prc: false,
@@ -663,6 +664,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
     let errors = {
       code: !po.po_code || po.po_code === "",
       date: !po.po_date || po.po_date === "",
+      req: !po.preq_id?.id,
       rul: !po.top?.id,
       jum: !po.pprod.order || po.pprod.order === "",
       prc: !po.pprod.price || po.pprod.price === "",
@@ -735,14 +737,20 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   pprod: e.rprod ?? null,
                   pjasa: e.rjasa ?? null,
                 });
+
+                let newError = error;
+                newError.req = false;
+                setError(newError);
               }}
               label={"[req_code]"}
               placeholder="Pilih Kode Permintaan"
+              errorMessage="No. Permintaan Belum Dipilih"
+              error={error?.req}
               disabled={isEdit}
             />
           </div>
 
-          <div className="col-3">
+          <div className="col-4">
             <label className="text-label">Supplier</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
@@ -774,16 +782,15 @@ const InputPO = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-4">
-            <label className="text-label">Kontak Person</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={
-                  po.sup_id !== null ? supp(po.sup_id)?.supplier?.sup_telp1 : ""
-                }
-                placeholder="Kontak Person"
-                disabled
-              />
-            </div>
+            <PrimeInput
+              label={"No. Telepon"}
+              isNumber
+              value={
+                po.sup_id !== null ? supp(po.sup_id)?.supplier?.sup_telp1 : ""
+              }
+              placeholder="No. Telepon"
+              disabled
+            />
           </div>
 
           <div className="col-4">
@@ -792,7 +799,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
               <InputText
                 value={
                   po.sup_id !== null
-                    ? pjk(supp(po.sup_id)?.supplier?.id).name
+                    ? pjk(supp(po.sup_id)?.supplier?.sup_ppn).name
                     : null
                 }
                 placeholder="Jenis Pajak"
@@ -849,7 +856,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                 value={new Date(`${req_pur(po.preq_id)?.req_date}Z`)}
                 placeholder="Tanggal Permintaan"
                 disabled
-                dateFormat="dd/mm/yy"
+                dateFormat="dd-mm-yy"
               />
             </div>
           </div>
@@ -862,7 +869,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                 onChange={(e) => {}}
                 placeholder="Tanggal Jatuh Tempo"
                 disabled
-                dateFormat="dd/mm/yy"
+                dateFormat="dd-mm-yy"
               />
             </div>
           </div>
@@ -1477,292 +1484,296 @@ const InputPO = ({ onCancel, onSuccess }) => {
           <></>
         )}
 
-        <div className="row ml-0 mr-0 mb-0 mt-6 justify-content-between">
-          <div>
-            <div className="row ml-1">
-              {po.pjasa?.length > 0 && po.pprod?.length > 0 && (
-                <div className="d-flex col-12 align-items-center">
-                  <label className="mt-1">{"Pisah Faktur"}</label>
-                  <InputSwitch
-                    className="ml-4"
-                    checked={po.split_inv}
-                    onChange={(e) => {
-                      if (e.value) {
-                        updatePo({
-                          ...po,
-                          split_inv: e.value,
-                          total_disc: null,
-                        });
-                      } else {
-                        updatePo({
-                          ...po,
-                          split_inv: e.value,
-                          prod_disc: null,
-                          jasa_disc: null,
-                        });
-                      }
-                    }}
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="row justify-content-right col-6">
-            <div className="col-6">
-              <label className="text-label">
-                {po.split_inv ? "Sub Total Barang" : "Sub Total"}
-              </label>
-            </div>
-
-            <div className="col-6">
-              <label className="text-label">
-                {po.split_inv ? (
-                  <b>Rp. {formatIdr(getSubTotalBarang())}</b>
-                ) : (
-                  <b>
-                    Rp. {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
-                  </b>
+        {po?.pprod?.length ? (
+          <div className="row ml-0 mr-0 mb-0 mt-6 justify-content-between">
+            <div>
+              <div className="row ml-1">
+                {po.pjasa?.length > 0 && po.pprod?.length > 0 && (
+                  <div className="d-flex col-12 align-items-center">
+                    <label className="mt-1">{"Pisah Faktur"}</label>
+                    <InputSwitch
+                      className="ml-4"
+                      checked={po.split_inv}
+                      onChange={(e) => {
+                        if (e.value) {
+                          updatePo({
+                            ...po,
+                            split_inv: e.value,
+                            total_disc: null,
+                          });
+                        } else {
+                          updatePo({
+                            ...po,
+                            split_inv: e.value,
+                            prod_disc: null,
+                            jasa_disc: null,
+                          });
+                        }
+                      }}
+                    />
+                  </div>
                 )}
-              </label>
-            </div>
-
-            <div className="col-6">
-              <label className="text-label">
-                {po.split_inv ? "DPP Barang" : "DPP"}
-              </label>
-            </div>
-
-            <div className="col-6">
-              <label className="text-label">
-                {po.split_inv ? (
-                  <b>Rp. {formatIdr(getSubTotalBarang())}</b>
-                ) : (
-                  <b>
-                    Rp. {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
-                  </b>
-                )}
-              </label>
-            </div>
-
-            <div className="col-6">
-              <label className="text-label">
-                {po.split_inv ? "Pajak Atas Barang (11%)" : "Pajak (11%)"}
-              </label>
-            </div>
-
-            <div className="col-6">
-              <label className="text-label">
-                {po.split_inv ? (
-                  <b>Rp. {formatIdr((getSubTotalBarang() * 11) / 100)}</b>
-                ) : (
-                  <b>
-                    Rp.{" "}
-                    {formatIdr(
-                      ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
-                    )}
-                  </b>
-                )}
-              </label>
-            </div>
-
-            <div className="col-6 mt-3">
-              <label className="text-label">Diskon Tambahan</label>
-            </div>
-
-            <div className="col-6">
-              <div className="p-inputgroup">
-                <PButton
-                  label="Rp."
-                  className={`${isRp ? "" : "p-button-outlined"}`}
-                  onClick={() => setRp(true)}
-                />
-                <InputText
-                  value={
-                    po.split_inv
-                      ? isRp
-                        ? (getSubTotalBarang() * po.prod_disc) / 100
-                        : po.prod_disc
-                      : isRp
-                      ? ((getSubTotalBarang() + getSubTotalJasa()) *
-                          po.total_disc) /
-                        100
-                      : po.total_disc
-                  }
-                  placeholder="Diskon"
-                  type="number"
-                  min={0}
-                  onChange={(e) => {
-                    if (po.split_inv) {
-                      let disc = 0;
-                      if (isRp) {
-                        disc = (e.target.value / getSubTotalBarang()) * 100;
-                      } else {
-                        disc = e.target.value;
-                      }
-                      updatePo({ ...po, prod_disc: disc });
-                    } else {
-                      let disc = 0;
-                      if (isRp) {
-                        disc =
-                          (e.target.value /
-                            (getSubTotalBarang() + getSubTotalJasa())) *
-                          100;
-                      } else {
-                        disc = e.target.value;
-                      }
-                      updatePo({ ...po, total_disc: disc });
-                    }
-                  }}
-                />
-                <PButton
-                  className={`${isRp ? "p-button-outlined" : ""}`}
-                  onClick={() => setRp(false)}
-                >
-                  {" "}
-                  <b>%</b>{" "}
-                </PButton>
               </div>
             </div>
 
-            <div className="col-12">
-              <Divider className="ml-12"></Divider>
-            </div>
+            <div className="row justify-content-right col-6">
+              <div className="col-6">
+                <label className="text-label">
+                  {po.split_inv ? "Sub Total Barang" : "Sub Total"}
+                </label>
+              </div>
 
-            <div className="col-6">
-              <label className="text-label">
-                <b>Total Pembayaran</b>
-              </label>
-            </div>
+              <div className="col-6">
+                <label className="text-label">
+                  {po.split_inv ? (
+                    <b>Rp. {formatIdr(getSubTotalBarang())}</b>
+                  ) : (
+                    <b>
+                      Rp. {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
+                    </b>
+                  )}
+                </label>
+              </div>
 
-            <div className="col-6">
-              <label className="text-label fs-16">
-                {po.split_inv ? (
-                  <b>
-                    Rp.{" "}
-                    {formatIdr(
-                      getSubTotalBarang() + (getSubTotalBarang() * 11) / 100
-                    )}
-                  </b>
-                ) : (
-                  <b>
-                    Rp.{" "}
-                    {formatIdr(
-                      getSubTotalBarang() +
-                        getSubTotalJasa() +
-                        ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
-                    )}
-                  </b>
-                )}
-              </label>
-            </div>
+              <div className="col-6">
+                <label className="text-label">
+                  {po.split_inv ? "DPP Barang" : "DPP"}
+                </label>
+              </div>
 
-            <div className="col-12">
-              <Divider className="ml-12"></Divider>
-            </div>
+              <div className="col-6">
+                <label className="text-label">
+                  {po.split_inv ? (
+                    <b>Rp. {formatIdr(getSubTotalBarang())}</b>
+                  ) : (
+                    <b>
+                      Rp. {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
+                    </b>
+                  )}
+                </label>
+              </div>
 
-            {po.split_inv ? (
-              <>
-                {/* <div className="row justify-content-right col-12 mt-4"> */}
-                <div className="col-6 mt-4">
-                  <label className="text-label">Sub Total Jasa</label>
-                </div>
+              <div className="col-6">
+                <label className="text-label">
+                  {po.split_inv ? "Pajak Atas Barang (11%)" : "Pajak (11%)"}
+                </label>
+              </div>
 
-                <div className="col-6 mt-4">
-                  <label className="text-label">
-                    <b>Rp. {formatIdr(getSubTotalJasa())}</b>
-                  </label>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label">DPP Jasa</label>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label">
-                    <b>Rp. {formatIdr(getSubTotalJasa())}</b>
-                  </label>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label">Pajak Atas Jasa (2%)</label>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label">
-                    <b>Rp. {formatIdr((getSubTotalJasa() * 2) / 100)}</b>
-                  </label>
-                </div>
-
-                <div className="col-6 mt-3">
-                  <label className="text-label">Diskon Tambahan</label>
-                </div>
-
-                <div className="col-6">
-                  <div className="p-inputgroup">
-                    <PButton
-                      label="Rp."
-                      className={`${isRpJasa ? "" : "p-button-outlined"}`}
-                      onClick={() => setRpJasa(true)}
-                    />
-                    <InputText
-                      value={
-                        isRpJasa
-                          ? (getSubTotalJasa() * po.jasa_disc) / 100
-                          : po.jasa_disc
-                      }
-                      placeholder="Diskon"
-                      type="number"
-                      min={0}
-                      onChange={(e) => {
-                        let disc = 0;
-                        if (isRpJasa) {
-                          disc = (e.target.value / getSubTotalJasa()) * 100;
-                        } else {
-                          disc = e.target.value;
-                        }
-                        updatePo({ ...po, jasa_disc: disc });
-                      }}
-                    />
-                    <PButton
-                      className={`${isRpJasa ? "p-button-outlined" : ""}`}
-                      onClick={() => setRpJasa(false)}
-                    >
-                      {" "}
-                      <b>%</b>{" "}
-                    </PButton>
-                  </div>
-                </div>
-
-                <div className="col-12">
-                  <Divider className="ml-12"></Divider>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label fs-13">
-                    <b>Total Pembayaran</b>
-                  </label>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label fs-13">
+              <div className="col-6">
+                <label className="text-label">
+                  {po.split_inv ? (
+                    <b>Rp. {formatIdr((getSubTotalBarang() * 11) / 100)}</b>
+                  ) : (
                     <b>
                       Rp.{" "}
                       {formatIdr(
-                        getSubTotalJasa() + (getSubTotalJasa() * 2) / 100
+                        ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
                       )}
                     </b>
-                  </label>
-                </div>
+                  )}
+                </label>
+              </div>
 
-                <div className="col-12">
-                  <Divider className="ml-12"></Divider>
+              <div className="col-6 mt-3">
+                <label className="text-label">Diskon Tambahan</label>
+              </div>
+
+              <div className="col-6">
+                <div className="p-inputgroup">
+                  <PButton
+                    label="Rp."
+                    className={`${isRp ? "" : "p-button-outlined"}`}
+                    onClick={() => setRp(true)}
+                  />
+                  <InputText
+                    value={
+                      po.split_inv
+                        ? isRp
+                          ? (getSubTotalBarang() * po.prod_disc) / 100
+                          : po.prod_disc
+                        : isRp
+                        ? ((getSubTotalBarang() + getSubTotalJasa()) *
+                            po.total_disc) /
+                          100
+                        : po.total_disc
+                    }
+                    placeholder="Diskon"
+                    type="number"
+                    min={0}
+                    onChange={(e) => {
+                      if (po.split_inv) {
+                        let disc = 0;
+                        if (isRp) {
+                          disc = (e.target.value / getSubTotalBarang()) * 100;
+                        } else {
+                          disc = e.target.value;
+                        }
+                        updatePo({ ...po, prod_disc: disc });
+                      } else {
+                        let disc = 0;
+                        if (isRp) {
+                          disc =
+                            (e.target.value /
+                              (getSubTotalBarang() + getSubTotalJasa())) *
+                            100;
+                        } else {
+                          disc = e.target.value;
+                        }
+                        updatePo({ ...po, total_disc: disc });
+                      }
+                    }}
+                  />
+                  <PButton
+                    className={`${isRp ? "p-button-outlined" : ""}`}
+                    onClick={() => setRp(false)}
+                  >
+                    {" "}
+                    <b>%</b>{" "}
+                  </PButton>
                 </div>
-                {/* </div> */}
-              </>
-            ) : null}
+              </div>
+
+              <div className="col-12">
+                <Divider className="ml-12"></Divider>
+              </div>
+
+              <div className="col-6">
+                <label className="text-label">
+                  <b>Total Pembayaran</b>
+                </label>
+              </div>
+
+              <div className="col-6">
+                <label className="text-label fs-16">
+                  {po.split_inv ? (
+                    <b>
+                      Rp.{" "}
+                      {formatIdr(
+                        getSubTotalBarang() + (getSubTotalBarang() * 11) / 100
+                      )}
+                    </b>
+                  ) : (
+                    <b>
+                      Rp.{" "}
+                      {formatIdr(
+                        getSubTotalBarang() +
+                          getSubTotalJasa() +
+                          ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
+                      )}
+                    </b>
+                  )}
+                </label>
+              </div>
+
+              <div className="col-12">
+                <Divider className="ml-12"></Divider>
+              </div>
+
+              {po.split_inv ? (
+                <>
+                  {/* <div className="row justify-content-right col-12 mt-4"> */}
+                  <div className="col-6 mt-4">
+                    <label className="text-label">Sub Total Jasa</label>
+                  </div>
+
+                  <div className="col-6 mt-4">
+                    <label className="text-label">
+                      <b>Rp. {formatIdr(getSubTotalJasa())}</b>
+                    </label>
+                  </div>
+
+                  <div className="col-6">
+                    <label className="text-label">DPP Jasa</label>
+                  </div>
+
+                  <div className="col-6">
+                    <label className="text-label">
+                      <b>Rp. {formatIdr(getSubTotalJasa())}</b>
+                    </label>
+                  </div>
+
+                  <div className="col-6">
+                    <label className="text-label">Pajak Atas Jasa (2%)</label>
+                  </div>
+
+                  <div className="col-6">
+                    <label className="text-label">
+                      <b>Rp. {formatIdr((getSubTotalJasa() * 2) / 100)}</b>
+                    </label>
+                  </div>
+
+                  <div className="col-6 mt-3">
+                    <label className="text-label">Diskon Tambahan</label>
+                  </div>
+
+                  <div className="col-6">
+                    <div className="p-inputgroup">
+                      <PButton
+                        label="Rp."
+                        className={`${isRpJasa ? "" : "p-button-outlined"}`}
+                        onClick={() => setRpJasa(true)}
+                      />
+                      <InputText
+                        value={
+                          isRpJasa
+                            ? (getSubTotalJasa() * po.jasa_disc) / 100
+                            : po.jasa_disc
+                        }
+                        placeholder="Diskon"
+                        type="number"
+                        min={0}
+                        onChange={(e) => {
+                          let disc = 0;
+                          if (isRpJasa) {
+                            disc = (e.target.value / getSubTotalJasa()) * 100;
+                          } else {
+                            disc = e.target.value;
+                          }
+                          updatePo({ ...po, jasa_disc: disc });
+                        }}
+                      />
+                      <PButton
+                        className={`${isRpJasa ? "p-button-outlined" : ""}`}
+                        onClick={() => setRpJasa(false)}
+                      >
+                        {" "}
+                        <b>%</b>{" "}
+                      </PButton>
+                    </div>
+                  </div>
+
+                  <div className="col-12">
+                    <Divider className="ml-12"></Divider>
+                  </div>
+
+                  <div className="col-6">
+                    <label className="text-label fs-13">
+                      <b>Total Pembayaran</b>
+                    </label>
+                  </div>
+
+                  <div className="col-6">
+                    <label className="text-label fs-13">
+                      <b>
+                        Rp.{" "}
+                        {formatIdr(
+                          getSubTotalJasa() + (getSubTotalJasa() * 2) / 100
+                        )}
+                      </b>
+                    </label>
+                  </div>
+
+                  <div className="col-12">
+                    <Divider className="ml-12"></Divider>
+                  </div>
+                  {/* </div> */}
+                </>
+              ) : null}
+            </div>
           </div>
-        </div>
+        ) : (
+          <></>
+        )}
       </>
     );
   };

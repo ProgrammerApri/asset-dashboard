@@ -526,8 +526,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
       sup: !order.sup_id?.id,
       rul: !order.top?.id,
       prod: !order.dprod?.prod_id?.id,
-      jum: !order.dprod?.order,
-      prc: !order.dprod?.price,
+      jum: !order.dprod?.order || order.dprod.jum === "",
+      prc: !order.dprod?.price || order.dprod.prc === "",
       lok: !order.dprod?.location?.id,
     };
 
@@ -665,18 +665,17 @@ const InputOrder = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-3">
-            <label className="text-label">Kontak Person</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={
-                  order.sup_id !== null
-                    ? checkSupp(order.sup_id)?.supplier?.sup_telp1
-                    : ""
-                }
-                placeholder="Kontak Person"
-                disabled
-              />
-            </div>
+            <PrimeInput
+              label={"No. Telepon"}
+              isNumber
+              value={
+                order.sup_id !== null
+                  ? checkSupp(order.sup_id)?.supplier?.sup_telp1
+                  : ""
+              }
+              placeholder="No. Telepon"
+              disabled
+            />
           </div>
 
           <div className="col-3">
@@ -833,6 +832,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Satuan"
+                  className="flex align-items-top"
                   field={""}
                   body={(e) => (
                     <CustomDropdown
@@ -886,6 +886,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Jumlah"
+                  className="align-items-top"
                   field={""}
                   body={(e) => (
                     <PrimeNumber

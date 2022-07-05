@@ -3,7 +3,7 @@ import { request, endpoints } from "src/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Button } from "react-bootstrap";
+import { Button as PButton } from "primereact/button";
 import { Row, Col } from "react-bootstrap";
 import { InputText } from "primereact/inputtext";
 import { Skeleton } from "primereact/skeleton";
@@ -13,6 +13,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_PR, SET_EDIT_PR, SET_PR } from "src/redux/actions";
 import { formatDate } from "@fullcalendar/core";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import { Link } from "react-router-dom";
+import { Dialog } from "primereact/dialog";
 
 const data = {
   id: null,
@@ -22,13 +24,16 @@ const data = {
   product: [],
 };
 
-const ReturBeliList = ({ onAdd }) => {
+const ReturBeliList = ({ onAdd, onDetail }) => {
   const [loading, setLoading] = useState(true);
+  const [update, setUpdate] = useState(false);
   const [filters1, setFilters1] = useState(null);
-  const [globalFilterValue1, setGlobalFilterValue1] = useState("");
-  const [isEdit, setEdit] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+  const [globalFilterValue1, setGlobalFilterValue1] = useState("");
+  const [displayDel, setDisplayDel] = useState(false);
+  const [currentItem, setCurrentItem] = useState(null);
+  const toast = useRef(null);
   const dispatch = useDispatch();
   const pr = useSelector((state) => state.pr.pr);
 
@@ -65,6 +70,44 @@ const ReturBeliList = ({ onAdd }) => {
     }
   };
 
+  const delRet = async (id) => {
+    const config = {
+      ...endpoints.delPr,
+      endpoint: endpoints.delPr.endpoint + currentItem.id,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setTimeout(() => {
+          setUpdate(false);
+          setDisplayDel(false);
+          getPR(true);
+          toast.current.show({
+            severity: "info",
+            summary: "Berhasil",
+            detail: "Data Berhasil Dihapus",
+            life: 3000,
+          });
+        }, 500);
+      }
+    } catch (error) {
+      console.log(error);
+      setTimeout(() => {
+        setUpdate(false);
+        setDisplayDel(false);
+        toast.current.show({
+          severity: "error",
+          summary: "Gagal",
+          detail: `Tidak Dapat Menghapus Data`,
+          life: 3000,
+        });
+      }, 500);
+    }
+  };
+
   const renderHeader = () => {
     return (
       <div className="flex justify-content-between">
@@ -89,21 +132,58 @@ const ReturBeliList = ({ onAdd }) => {
               type: SET_CURRENT_PR,
               payload: {
                 ...data,
-                product: [
-                  {
-                    id: 0,
-                    prod_id: null,
-                    unit_id: null,
-                    retur: null,
-                    price: null,
-                    disc: null,
-                    nett_price: null,
-                    total: 0,
-                  },
-                ],
+                product: [],
               },
             });
           }}
+        />
+      </div>
+    );
+  };
+
+  const actionBodyTemplate = (data) => {
+    return (
+      // <React.Fragment>
+      <div className="d-flex">
+        <Link
+          onClick={() => {
+            onDetail();
+          }}
+          className="btn btn-info shadow btn-xs sharp ml-1"
+        >
+          <i className="bx bx-show mt-1"></i>
+        </Link>
+
+        <Link
+          onClick={() => {
+            setDisplayDel(true);
+            setCurrentItem(data);
+          }}
+          className="btn btn-danger shadow btn-xs sharp ml-1"
+        >
+          <i className="fa fa-trash"></i>
+        </Link>
+      </div>
+      // </React.Fragment>
+    );
+  };
+
+  const renderFooterDel = () => {
+    return (
+      <div>
+        <PButton
+          label="Batal"
+          onClick={() => setDisplayDel(false)}
+          className="p-button-text btn-primary"
+        />
+        <PButton
+          label="Hapus"
+          icon="pi pi-trash"
+          onClick={() => {
+            delRet();
+          }}
+          autoFocus
+          loading={update}
         />
       </div>
     );
@@ -184,6 +264,7 @@ const ReturBeliList = ({ onAdd }) => {
 
   return (
     <>
+    <Toast ref={toast} />
       <DataTable
         responsiveLayout="scroll"
         value={loading ? dummy : pr}
@@ -222,13 +303,32 @@ const ReturBeliList = ({ onAdd }) => {
           field={(e) => e.fk_id.fk_code}
           body={loading && <Skeleton />}
         />
-        {/* <Column
-          header="Nama Supplier"
-          style={{ minWidth: "8rem" }}
-          field={(e) => e.fk_id?.sup_id?.sup_name}
-          body={loading && <Skeleton />}
-        /> */}
+        <Column
+          header="Action"
+          dataType="boolean"
+          bodyClassName="text-center"
+          style={{ minWidth: "2rem" }}
+          body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
+        />
       </DataTable>
+
+      <Dialog
+        header={"Hapus Data"}
+        visible={displayDel}
+        style={{ width: "30vw" }}
+        footer={renderFooterDel("displayDel")}
+        onHide={() => {
+          setDisplayDel(false);
+        }}
+      >
+        <div className="ml-3 mr-3">
+          <i
+            className="pi pi-exclamation-triangle mr-3 align-middle"
+            style={{ fontSize: "2rem" }}
+          />
+          <span>Apakah anda yakin ingin menghapus data ?</span>
+        </div>
+      </Dialog>
     </>
   );
 };

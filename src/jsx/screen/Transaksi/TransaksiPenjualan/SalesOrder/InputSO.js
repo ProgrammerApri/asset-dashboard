@@ -703,14 +703,13 @@ const InputSO = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-3">
-            <label className="text-black fs-14">Kontak Person</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={so.pel_id !== null ? checkCus(so.pel_id)?.cus_telp1 : ""}
-                placeholder="Kontak Person"
-                disabled
-              />
-            </div>
+            <PrimeInput
+              label={"No. Telepon"}
+              isNumber
+              value={so.pel_id !== null ? checkCus(so.pel_id)?.cus_telp1 : ""}
+              placeholder="No. Telepon"
+              disabled
+            />
           </div>
 
           <div className="col-3">

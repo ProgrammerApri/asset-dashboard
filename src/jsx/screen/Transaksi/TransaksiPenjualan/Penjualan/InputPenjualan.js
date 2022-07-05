@@ -735,18 +735,17 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-3">
-            <label className="text-label">Kontak Person</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={
-                  sale.pel_id !== null
-                    ? checkCus(sale.pel_id)?.customer?.cus_telp1
-                    : ""
-                }
-                placeholder="Kontak Person"
-                disabled
-              />
-            </div>
+            <PrimeInput
+              label={"No. Telepon"}
+              isNumber
+              value={
+                sale.pel_id !== null
+                  ? checkCus(sale.pel_id)?.customer?.cus_telp1
+                  : ""
+              }
+              placeholder="No. Telepon"
+              disabled
+            />
           </div>
 
           <div className="col-3">
@@ -799,7 +798,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                 onChange={(e) => {}}
                 placeholder="Tanggal Jatuh Tempo"
                 disabled
-                dateFormat="dd/mm/yy"
+                dateFormat="dd-mm-yy"
               />
             </div>
           </div>

@@ -581,19 +581,18 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-3">
-            <label className="text-label">Kontak Person</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={
-                  inv.ord_id !== null
-                    ? checkSupp(checkOrd(inv.ord_id)?.sup_id?.id).supplier
-                        ?.sup_telp1
-                    : ""
-                }
-                placeholder="Kontak Person"
-                disabled
-              />
-            </div>
+            <PrimeInput
+              label={"No. Telepon"}
+              isNumber
+              value={
+                inv.ord_id !== null
+                  ? checkSupp(checkOrd(inv.ord_id)?.sup_id?.id).supplier
+                      ?.sup_telp1
+                  : ""
+              }
+              placeholder="No. Telepon"
+              disabled
+            />
           </div>
 
           <div className="col-3">

@@ -458,19 +458,18 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-3">
-            <label className="text-label">Kontak Person</label>
-            <div className="p-inputgroup mt-2">
-              <InputText
-                value={
-                  sr.sale_id !== null
-                    ? checkCus(checkSale(sr.sale_id)?.so_id.pel_id)?.customer
-                        .cus_telp1
-                    : ""
-                }
-                placeholder="Kontak Person"
-                disabled
-              />
-            </div>
+            <PrimeInput
+              label={"No. Telepon"}
+              isNumber
+              value={
+                sr.sale_id !== null
+                  ? checkCus(checkSale(sr.sale_id)?.so_id.pel_id)?.customer
+                      .cus_telp1
+                  : ""
+              }
+              placeholder="No. Telepon"
+              disabled
+            />
           </div>
 
           <div className="col-3">

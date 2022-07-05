@@ -546,7 +546,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
           <div className="col-6">
             <PrimeCalendar
               label={"Tanggal"}
-              value={new Date(`${order.ord_date}Z`)}
+              value={new Date(`${order.ord_date}Z`) }
               onChange={(e) => {
                 let result = null;
                 if (order.top) {
@@ -788,6 +788,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
               >
                 <Column
                   header="Produk"
+                  className="align-text-top"
                   field={""}
                   body={(e) => (
                     <CustomDropdown
@@ -811,10 +812,6 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                         temp[e.index].prod_id = u.id;
                         temp[e.index].unit_id = u.unit?.id;
                         updateORD({ ...order, dprod: temp });
-
-                        let newError = error;
-                        newError.prod = false;
-                        setError(newError);
                       }}
                       detail
                       onDetail={() => {
@@ -823,8 +820,6 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                       }}
                       label={"[name]"}
                       placeholder="Pilih Produk"
-                      errorMessage="Produk Belum Dipilih"
-                      error={error?.prod}
                       disabled={order && order.po_id !== null}
                     />
                   )}
@@ -832,7 +827,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Satuan"
-                  className="flex align-items-top"
+                  className="align-text-top"
                   field={""}
                   body={(e) => (
                     <CustomDropdown
@@ -857,6 +852,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Lokasi"
+                  className="align-text-top"
                   field={""}
                   body={(e) => (
                     <CustomDropdown
@@ -886,7 +882,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Jumlah"
-                  className="align-items-top"
+                  className="align-text-top"
                   field={""}
                   body={(e) => (
                     <PrimeNumber
@@ -897,16 +893,11 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                         temp[e.index].total =
                           temp[e.index].order * temp[e.index].price;
                         updateORD({ ...order, dprod: temp });
-
-                        let newError = error;
-                        newError.jum = false;
-                        setError(newError);
                         console.log(temp);
                       }}
                       placeholder="0"
                       type="number"
                       min={0}
-                      error={error?.jum}
                       disabled={order && order.po_id !== null}
                     />
                   )}
@@ -914,9 +905,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Harga Satuan"
-                  // style={{
-                  //   minWidth: "10rem",
-                  // }}
+                  className="align-text-top"
                   field={""}
                   body={(e) => (
                     <PrimeNumber
@@ -927,16 +916,10 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                         temp[e.index].total =
                           temp[e.index].order * temp[e.index].price;
                         updateORD({ ...order, dprod: temp });
-
-                        let newError = error;
-                        newError.prc = false;
-                        setError(newError);
-                        console.log(temp);
                       }}
                       placeholder="0"
                       type="number"
                       min={0}
-                      error={error?.prc}
                       disabled={order && order.po_id !== null}
                     />
                   )}
@@ -944,9 +927,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Diskon"
-                  // style={{
-                  //   maxWidth: "10rem",
-                  // }}
+                  className="align-text-top"
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
@@ -970,9 +951,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Harga Nett"
-                  // style={{
-                  //   minWidth: "10rem",
-                  // }}
+                  className="align-text-top"
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
@@ -995,9 +974,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Total"
-                  // style={{
-                  //   minWidth: "12rem",
-                  // }}
+                  className="align-text-top"
                   body={(e) => (
                     <label className="text-nowrap">
                       <b>
@@ -1014,9 +991,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header=""
-                  // style={{
-                  //   maxWidth: "10rem",
-                  // }}
+                  className="align-text-top"
                   field={""}
                   body={(e) =>
                     e.index === order.dprod.length - 1 ? (

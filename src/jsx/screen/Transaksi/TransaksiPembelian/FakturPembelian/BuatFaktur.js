@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { request, endpoints } from "src/utils";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Row } from "react-bootstrap";
+import { Row, Col, Card } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
@@ -1306,9 +1306,17 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
 
   return (
     <>
-      {header()}
-      {body()}
-      {footer()}
+      <Row>
+        <Col className="pt-0">
+          <Card>
+            <Card.Body>
+              {header()}
+              {body()}
+              {footer()}
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
 
       {/* <DataOrder
         data={order}

@@ -159,7 +159,7 @@ const DataFaktur = ({ onAdd, onDetail }) => {
       <div className="d-flex">
         <Link
           onClick={() => {
-            setDisplayData(data);
+            onDetail();
             let product = data.product;
             let jasa = data.jasa;
             dispatch({
@@ -441,57 +441,65 @@ const DataFaktur = ({ onAdd, onDetail }) => {
   return (
     <>
       <Toast ref={toast} />
-      <DataTable
-        responsiveLayout="scroll"
-        value={loading ? dummy : inv}
-        className="display w-150 datatable-wrapper"
-        showGridlines
-        dataKey="id"
-        rowHover
-        header={renderHeader}
-        filters={filters1}
-        globalFilterFields={[
-          "fk_code",
-          "ord_id.ord_code",
-          "formatDate(fk_date)",
-        ]}
-        emptyMessage="Tidak ada data"
-        paginator
-        paginatorTemplate={template2}
-        first={first2}
-        rows={rows2}
-        onPage={onCustomPage2}
-        paginatorClassName="justify-content-end mt-3"
-      >
-        <Column
-          header="Tanggal"
-          style={{
-            minWidth: "8rem",
-          }}
-          field={(e) => formatDate(e.fk_date)}
-          body={loading && <Skeleton />}
-        />
-        <Column
-          header="Nomor Faktur"
-          field={(e) => e.fk_code}
-          style={{ minWidth: "8rem" }}
-          body={loading && <Skeleton />}
-        />
-        <Column
-          header="Nomor Pembelian"
-          field={(e) => e.ord_id.ord_code}
-          style={{ minWidth: "8rem" }}
-          body={loading && <Skeleton />}
-        />
-        <Column
-          header="Action"
-          field={actionBodyTemplate}
-          style={{ minWidth: "6rem" }}
-          body={loading && <Skeleton />}
-        />
-      </DataTable>
+      <Row>
+        <Col className="pt-0">
+          <Card>
+            <Card.Body>
+              <DataTable
+                responsiveLayout="scroll"
+                value={loading ? dummy : inv}
+                className="display w-150 datatable-wrapper"
+                showGridlines
+                dataKey="id"
+                rowHover
+                header={renderHeader}
+                filters={filters1}
+                globalFilterFields={[
+                  "fk_code",
+                  "ord_id.ord_code",
+                  "formatDate(fk_date)",
+                ]}
+                emptyMessage="Tidak ada data"
+                paginator
+                paginatorTemplate={template2}
+                first={first2}
+                rows={rows2}
+                onPage={onCustomPage2}
+                paginatorClassName="justify-content-end mt-3"
+              >
+                <Column
+                  header="Tanggal"
+                  style={{
+                    minWidth: "8rem",
+                  }}
+                  field={(e) => formatDate(e.fk_date)}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Nomor Faktur"
+                  field={(e) => e.fk_code}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Nomor Pembelian"
+                  field={(e) => e.ord_id.ord_code}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Action"
+                  field={actionBodyTemplate}
+                  style={{ minWidth: "6rem" }}
+                  body={loading && <Skeleton />}
+                />
+              </DataTable>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
 
-      <Dialog
+      {/* <Dialog
         header={"Detail Faktur"}
         visible={displayData}
         style={{ width: "41vw" }}
@@ -1027,7 +1035,7 @@ const DataFaktur = ({ onAdd, onDetail }) => {
             </Card>
           </Col>
         </Row>
-      </Dialog>
+      </Dialog> */}
 
       <Dialog
         header={"Hapus Data"}

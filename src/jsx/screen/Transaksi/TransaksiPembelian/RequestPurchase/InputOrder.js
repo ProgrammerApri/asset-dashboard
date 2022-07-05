@@ -31,8 +31,12 @@ import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 const defError = {
   code: false,
   date: false,
-  prod: false,
-  jum: false,
+  prod: [
+    {
+      id: false,
+      jum: false,
+    },
+  ],
 };
 
 const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
@@ -357,9 +361,34 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
     let errors = {
       code: !rp.req_code || rp.req_code === "",
       date: !rp.req_date || rp.req_date === "",
-      prod: !rp.rprod?.prod_id?.id,
-      jum: !rp.rprod?.request,
+      prod: [],
     };
+
+    rp?.rprod.forEach((element, i) => {
+      console.log("kjdhdhjk");
+      console.log(!element.request ||
+        element.request !== "0" ||
+        element.request !== "");
+      if (i > 0) {
+        if (element.prod_id || element.request) {
+          errors.prod[i] = {
+            id: !element.prod_id,
+            jum:
+              !element.request ||
+              element.request !== "0" ||
+              element.request !== "",
+          };
+        }
+      } else {
+        errors.prod[i] = {
+          id: !element.prod_id,
+          jum:
+              !element.request ||
+              element.request !== "0" ||
+              element.request !== "",
+        };
+      }
+    });
 
     setError(errors);
 
@@ -508,13 +537,13 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                           updateRp({ ...rp, rprod: temp });
 
                           let newError = error;
-                          newError.prod = false;
+                          newError.prod[i].id = false;
                           setError(newError);
                         }}
                         label={"[name] ([code])"}
                         placeholder="Pilih Produk"
                         errorMessage="Produk Belum Dipilih"
-                        error={error?.prod}
+                        error={error?.prod[i]?.id}
                       />
                     </div>
 
@@ -522,17 +551,18 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                       <PrimeNumber
                         value={v.request && v.request}
                         onChange={(e) => {
+                          console.log(e);
                           let temp = [...rp.rprod];
-                          temp[i].request = e.value;
+                          temp[i].request = e.target.value;
                           updateRp({ ...rp, rprod: temp });
 
                           let newError = error;
-                          newError.jum = false;
+                          newError.prod[i].jum = false;
                           setError(newError);
                         }}
                         placeholder="Masukan Jumlah"
                         type="number"
-                        error={error?.jum}
+                        error={error?.prod[i]?.jum}
                       />
                     </div>
 
@@ -557,7 +587,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
 
                     <div className="col-1 d-flex ml-0 mr-0">
                       <div className="mt-2">
-                        {i == rp.rprod.length - 1 ? (
+                        {i === rp.rprod.length - 1 ? (
                           <Link
                             onClick={() => {
                               updateRp({
@@ -572,6 +602,12 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                                   },
                                 ],
                               });
+
+                              let newError = error;
+                              newError.prod.push({ id: false, jum: false });
+                              setError(newError);
+                              console.log("shjsfj");
+                              console.log(error);
                             }}
                             className="btn btn-primary shadow btn-xs sharp ml-1"
                           >
@@ -586,6 +622,9 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                                 ...rp,
                                 rprod: temp,
                               });
+                              let newError = error;
+                              newError.prod.splice(i, 1);
+                              setError(newError);
                             }}
                             className="btn btn-danger shadow btn-xs sharp ml-1"
                           >

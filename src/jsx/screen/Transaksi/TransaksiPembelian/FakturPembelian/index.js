@@ -35,21 +35,13 @@ const FakturPembelian = () => {
       }}
     />,
 
-    <Detail
-      onCancel={() => setActive(0)}
-    />,
+    <Detail onCancel={() => setActive(0)} />,
   ]);
 
   return (
     <>
       <Toast ref={toast} />
-      <Row>
-        <Col className="pt-0">
-          <Card>
-            <Card.Body>{view[active]}</Card.Body>
-          </Card>
-        </Col>
-      </Row>
+      {view[active]}
     </>
   );
 };

@@ -151,13 +151,6 @@ const DataSupplier = ({
         setJpem(data);
       }
     } catch (error) {}
-    if (isUpdate) {
-      setLoading(false);
-    } else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1500);
-    }
   };
 
   const getCurrency = async (isUpdate = false) => {
@@ -177,13 +170,6 @@ const DataSupplier = ({
         setCurrency(data);
       }
     } catch (error) {}
-    if (isUpdate) {
-      setLoading(false);
-    } else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1500);
-    }
   };
 
   const getCity = async (isUpdate = false) => {
@@ -203,13 +189,6 @@ const DataSupplier = ({
         setCity(data);
       }
     } catch (error) {}
-    if (isUpdate) {
-      setLoading(false);
-    } else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1500);
-    }
   };
 
   const getSetup = async (isUpdate = false) => {
@@ -229,13 +208,6 @@ const DataSupplier = ({
         setSetup(data);
       }
     } catch (error) {}
-    if (isUpdate) {
-      setLoading(false);
-    } else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1500);
-    }
   };
 
   const getAccHut = async () => {
@@ -306,13 +278,6 @@ const DataSupplier = ({
         setComp(data);
       }
     } catch (error) {}
-    if (isUpdate) {
-      setLoading(false);
-    } else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1500);
-    }
   };
 
   const getPajak = async (isUpdate = false) => {
@@ -332,13 +297,6 @@ const DataSupplier = ({
         setPajak(data);
       }
     } catch (error) {}
-    if (isUpdate) {
-      setLoading(false);
-    } else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1500);
-    }
   };
 
   const editSupplier = async () => {

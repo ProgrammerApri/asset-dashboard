@@ -666,8 +666,8 @@ const InputPO = ({ onCancel, onSuccess }) => {
       date: !po.po_date || po.po_date === "",
       req: !po.preq_id?.id,
       rul: !po.top?.id,
-      jum: !po.pprod.order || po.pprod.order === "",
-      prc: !po.pprod.price || po.pprod.price === "",
+      jum: !po.pprod?.order,
+      prc: !po.pprod?.price,
     };
 
     setError(errors);
@@ -906,6 +906,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                 >
                   <Column
                     header="Produk"
+                    className="align-text-top"
                     field={""}
                     style={{
                       width: "12rem",
@@ -945,6 +946,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
                   <Column
                     header="Satuan"
+                    className="align-text-top"
                     field={""}
                     style={{
                       width: "8rem",
@@ -971,6 +973,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
                   <Column
                     header="Permintaan"
+                    className="align-text-top"
                     field={""}
                     style={{
                       width: "5rem",
@@ -994,6 +997,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
                   <Column
                     header="Pesanan"
+                    className="align-text-top"
                     field={""}
                     style={{
                       minWidth: "7rem",
@@ -1030,6 +1034,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
                   <Column
                     header="Sisa"
+                    className="align-text-top"
                     field={""}
                     style={{
                       minWidth: "7rem",
@@ -1048,6 +1053,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
                   <Column
                     header="Harga Satuan"
+                    className="align-text-top"
                     field={""}
                     style={{
                       minWidth: "10rem",
@@ -1076,6 +1082,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
                   <Column
                     header="Diskon"
+                    className="align-text-top"
                     field={""}
                     style={{
                       minWidth: "10rem",
@@ -1104,6 +1111,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
                   <Column
                     header="Harga Nett"
+                    className="align-text-top"
                     field={""}
                     style={{
                       minWidth: "10rem",
@@ -1127,6 +1135,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
                   <Column
                     header="Total"
+                    className="align-text-top"
                     body={(e) => (
                       <label className="text-nowrap">
                         <b>
@@ -1142,6 +1151,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
+                    className="align-text-top"
                     body={(e) =>
                       e.index === po.pprod.length - 1 ? (
                         <Link

@@ -3,7 +3,7 @@ import { request, endpoints } from "src/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Badge, Button, Card, Row } from "react-bootstrap";
+import { Badge, Button, Card, Row, Col } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { Dialog } from "primereact/dialog";
@@ -35,7 +35,7 @@ const data = {
   djasa: [],
 };
 
-const DataOrder = ({ onAdd, onEdit }) => {
+const DataOrder = ({ onAdd, onEdit, onDetail }) => {
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayDel, setDisplayDel] = useState(false);
@@ -129,7 +129,7 @@ const DataOrder = ({ onAdd, onEdit }) => {
       <div className="d-flex">
         <Link
           onClick={() => {
-            setDisplayData(data);
+            onDetail();
             let dprod = data.dprod;
             let djasa = data.djasa;
             dispatch({
@@ -470,83 +470,92 @@ const DataOrder = ({ onAdd, onEdit }) => {
   return (
     <>
       <Toast ref={toast} />
-      <DataTable
-        responsiveLayout="scroll"
-        value={loading ? dummy : order}
-        className="display w-150 datatable-wrapper"
-        showGridlines
-        dataKey="id"
-        rowHover
-        header={renderHeader}
-        filters={filters1}
-        globalFilterFields={["ord_code"]}
-        emptyMessage="Tidak ada data"
-        paginator
-        paginatorTemplate={template2}
-        first={first2}
-        rows={rows2}
-        onPage={onCustomPage2}
-        paginatorClassName="justify-content-end mt-3"
-      >
-        <Column
-          header="Tanggal Pembelian"
-          style={{
-            minWidth: "8rem",
-          }}
-          field={(e) => formatDate(e.ord_date)}
-          body={loading && <Skeleton />}
-        />
-        <Column
-          header="No. Pembelian"
-          field={(e) => e.ord_code}
-          style={{ minWidth: "8rem" }}
-          body={loading && <Skeleton />}
-        />
-        {/* <Column
+      <Row>
+        <Col className="pt-0">
+          <Card>
+            <Card.Body>
+              <DataTable
+                responsiveLayout="scroll"
+                value={loading ? dummy : order}
+                className="display w-150 datatable-wrapper"
+                showGridlines
+                dataKey="id"
+                rowHover
+                header={renderHeader}
+                filters={filters1}
+                globalFilterFields={["ord_code"]}
+                emptyMessage="Tidak ada data"
+                paginator
+                paginatorTemplate={template2}
+                first={first2}
+                rows={rows2}
+                onPage={onCustomPage2}
+                paginatorClassName="justify-content-end mt-3"
+              >
+                <Column
+                  header="Tanggal Pembelian"
+                  style={{
+                    minWidth: "8rem",
+                  }}
+                  field={(e) => formatDate(e.ord_date)}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="No. Pembelian"
+                  field={(e) => e.ord_code}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                {/* <Column
           header="No. Pesanan Pembelian"
           field={(e) => e.po_id}
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
         /> */}
-        <Column
-          header="Departemen"
-          field={(e) => e.dep_id.ccost_name}
-          style={{ minWidth: "8rem" }}
-          body={loading && <Skeleton />}
-        />
-        <Column
-          header="Faktur"
-          field={(e) => e.faktur}
-          style={{ minWidth: "8rem" }}
-          body={(e) =>
-            loading ? (
-              <Skeleton />
-            ) : (
-              <div>
-                {e.faktur === true ? (
-                  <Badge variant="info light">
-                    <i className="bx bxs-circle text-info mr-1"></i> Faktur
-                  </Badge>
-                ) : (
-                  <Badge variant="warning light">
-                    <i className="bx bxs-circle text-warning mr-1"></i> Non
-                    Faktur
-                  </Badge>
-                )}
-              </div>
-            )
-          }
-        />
-        <Column
-          header="Action"
-          dataType="boolean"
-          bodyClassName="text-center"
-          style={{ minWidth: "2rem" }}
-          body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
-        />
-      </DataTable>
+                <Column
+                  header="Departemen"
+                  field={(e) => e.dep_id.ccost_name}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Faktur"
+                  field={(e) => e.faktur}
+                  style={{ minWidth: "8rem" }}
+                  body={(e) =>
+                    loading ? (
+                      <Skeleton />
+                    ) : (
+                      <div>
+                        {e.faktur === true ? (
+                          <Badge variant="info light">
+                            <i className="bx bxs-circle text-info mr-1"></i>{" "}
+                            Faktur
+                          </Badge>
+                        ) : (
+                          <Badge variant="warning light">
+                            <i className="bx bxs-circle text-warning mr-1"></i>{" "}
+                            Non Faktur
+                          </Badge>
+                        )}
+                      </div>
+                    )
+                  }
+                />
+                <Column
+                  header="Action"
+                  dataType="boolean"
+                  bodyClassName="text-center"
+                  style={{ minWidth: "2rem" }}
+                  body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
+                />
+              </DataTable>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
 
-      <Dialog
+      {/* <Dialog
         header={"Detail Pembelian"}
         visible={displayData}
         style={{ width: "40vw" }}
@@ -831,7 +840,7 @@ const DataOrder = ({ onAdd, onEdit }) => {
             </div>
           </Row>
         </Row>
-      </Dialog>
+      </Dialog> */}
 
       <Dialog
         header={"Hapus Data"}

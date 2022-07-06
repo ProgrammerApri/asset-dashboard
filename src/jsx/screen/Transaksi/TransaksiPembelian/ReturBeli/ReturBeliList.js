@@ -4,7 +4,7 @@ import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button as PButton } from "primereact/button";
-import { Row, Col } from "react-bootstrap";
+import { Row, Col, Card } from "react-bootstrap";
 import { InputText } from "primereact/inputtext";
 import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
@@ -122,7 +122,7 @@ const ReturBeliList = ({ onAdd, onDetail }) => {
         <PrimeSingleButton
           label="Tambah"
           icon={<i class="bx bx-plus px-2"></i>}
-           onClick={() => {
+          onClick={() => {
             onAdd();
             dispatch({
               type: SET_EDIT_PR,
@@ -148,6 +148,28 @@ const ReturBeliList = ({ onAdd, onDetail }) => {
         <Link
           onClick={() => {
             onDetail();
+            let product = data.product;
+
+            if (!product.length) {
+              product.push({
+                id: 0,
+                prod_id: null,
+                unit_id: null,
+                retur: null,
+                price: null,
+                disc: null,
+                nett_price: null,
+                total: null,
+              });
+            }
+
+            dispatch({
+              type: SET_CURRENT_PR,
+              payload: {
+                ...data,
+                product: product,
+              },
+            });
           }}
           className="btn btn-info shadow btn-xs sharp ml-1"
         >
@@ -259,58 +281,70 @@ const ReturBeliList = ({ onAdd, onDetail }) => {
     if (month.length < 2) month = "0" + month;
     if (day.length < 2) day = "0" + day;
 
-    return [year, month, day].join("-");
+    return [day, month, year].join("-");
   };
 
   return (
     <>
-    <Toast ref={toast} />
-      <DataTable
-        responsiveLayout="scroll"
-        value={loading ? dummy : pr}
-        className="display w-150 datatable-wrapper"
-        showGridlines
-        dataKey="id"
-        rowHover
-        header={renderHeader}
-        filters={null}
-        globalFilterFields={["ret_code", "formatDate(ret_date)", "fk_id.fk_code"]}
-        emptyMessage="Tidak ada data"
-        paginator
-        paginatorTemplate={template2}
-        first={first2}
-        rows={rows2}
-        onPage={onCustomPage2}
-        paginatorClassName="justify-content-end mt-3"
-      >
-        <Column
-          header="Tanggal"
-          style={{
-            minWidth: "8rem",
-          }}
-          field={(e) => formatDate(e.ret_date)}
-          body={loading && <Skeleton />}
-        />
-        <Column
-          header="Nomor Retur Pembelian"
-          style={{ minWidth: "8rem" }}
-          field={(e) => e.ret_code}
-           body={loading && <Skeleton />}
-        />
-        <Column
-          header="Nomor Faktur"
-          style={{ minWidth: "8rem" }}
-          field={(e) => e.fk_id.fk_code}
-          body={loading && <Skeleton />}
-        />
-        <Column
-          header="Action"
-          dataType="boolean"
-          bodyClassName="text-center"
-          style={{ minWidth: "2rem" }}
-          body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
-        />
-      </DataTable>
+      <Toast ref={toast} />
+      <Row>
+        <Col>
+          <Card>
+            <Card.Body>
+              <DataTable
+                responsiveLayout="scroll"
+                value={loading ? dummy : pr}
+                className="display w-150 datatable-wrapper"
+                showGridlines
+                dataKey="id"
+                rowHover
+                header={renderHeader}
+                filters={null}
+                globalFilterFields={[
+                  "ret_code",
+                  "formatDate(ret_date)",
+                  "fk_id.fk_code",
+                ]}
+                emptyMessage="Tidak ada data"
+                paginator
+                paginatorTemplate={template2}
+                first={first2}
+                rows={rows2}
+                onPage={onCustomPage2}
+                paginatorClassName="justify-content-end mt-3"
+              >
+                <Column
+                  header="Tanggal"
+                  style={{
+                    minWidth: "8rem",
+                  }}
+                  field={(e) => formatDate(e.ret_date)}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Nomor Retur Pembelian"
+                  style={{ minWidth: "8rem" }}
+                  field={(e) => e.ret_code}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Nomor Faktur"
+                  style={{ minWidth: "8rem" }}
+                  field={(e) => e.fk_id.fk_code}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Action"
+                  dataType="boolean"
+                  bodyClassName="text-center"
+                  style={{ minWidth: "2rem" }}
+                  body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
+                />
+              </DataTable>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
 
       <Dialog
         header={"Hapus Data"}

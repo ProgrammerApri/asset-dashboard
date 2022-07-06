@@ -118,6 +118,7 @@ const UmurPiutang = () => {
           type: "header",
           value: {
             ref: "Code",
+            tgl: "Date",
             jt: "Before Due",
             day1: "7 Day",
             day2: "14 Day",
@@ -146,6 +147,7 @@ const UmurPiutang = () => {
           type: "item",
           value: {
             ref: ek.trx_code,
+            tgl: formatDate(ek.trx_date),
             jt: diff <= 0 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
             day1: diff <= 7 && diff > 0 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
             day2:
@@ -174,6 +176,7 @@ const UmurPiutang = () => {
         type: "footer",
         value: {
           ref: "Total",
+          tgl: "",
           jt: `Rp. ${formatIdr(t_jt)}`,
           day1: `Rp. ${formatIdr(t_day1)}`,
           day2: `Rp. ${formatIdr(t_day2)}`,
@@ -232,6 +235,17 @@ const UmurPiutang = () => {
         item.push([
           {
             value: `${ek.value.ref}`,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.value.tgl}`,
             style: {
               font: {
                 sz: "14",
@@ -358,6 +372,13 @@ const UmurPiutang = () => {
           value: "",
           style: {
             font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
             alignment: { horizontal: "right", vertical: "center" },
           },
         },
@@ -405,6 +426,18 @@ const UmurPiutang = () => {
             width: { wch: 20 },
             style: {
               font: { sz: "14", bold: false },
+              alignment: { horizontal: "left", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
               alignment: { horizontal: "left", vertical: "center" },
               fill: {
                 paternType: "solid",
@@ -617,7 +650,7 @@ const UmurPiutang = () => {
         {chunk(jsonForExcel(ar, false) ?? [], chunkSize)?.map((val, idx) => {
           return (
             <Card>
-              <Card.Body>
+              <Card.Body className="p-0 m-0">
                 <CustomeWrapper
                   tittle={"Due Date Receivable"}
                   subTittle={`Due Date Receivable as of ${formatDate(date)}`}
@@ -650,6 +683,22 @@ const UmurPiutang = () => {
                                   }
                                 >
                                   {e.value.ref}
+                                </div>
+                              )}
+                            />
+                            <Column
+                              className="header-center border-right"
+                              header=""
+                              style={{ widht: "10rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header"
+                                      ? "font-weight-bold"
+                                      : ""
+                                  }
+                                >
+                                  {e.value.tgl}
                                 </div>
                               )}
                             />

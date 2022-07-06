@@ -3,6 +3,7 @@ import { Toast } from "primereact/toast";
 import DataSalesOrder from "./DataSalesOrder";
 import InputSO from "./InputSO";
 import { Row, Col, Card } from "react-bootstrap";
+import Detail from "./Detail";
 
 const SalesOrder = () => {
   const [active, setActive] = useState(0);
@@ -14,6 +15,9 @@ const SalesOrder = () => {
       }}
       onEdit={() => {
         setActive(1);
+      }}
+      onDetail={() => {
+        setActive(2);
       }}
     />,
     <InputSO
@@ -31,18 +35,13 @@ const SalesOrder = () => {
         }, 500);
       }}
     />,
+    <Detail onCancel={() => setActive(0)} />,
   ]);
 
- return (
+  return (
     <>
-    <Toast ref={toast} />
-    <Row>
-      <Col className="pt-0">
-        <Card>
-          <Card.Body>{view[active]}</Card.Body>
-        </Card>
-      </Col>
-    </Row>
+      <Toast ref={toast} />
+      {view[active]}
     </>
   );
 };

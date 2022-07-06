@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_SO } from "src/redux/actions";
 import { request, endpoints } from "src/utils";
-import { Row } from "react-bootstrap";
+import { Row, Col, Card } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
@@ -1703,9 +1703,17 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
   return (
     <>
-      {header()}
-      {body()}
-      {footer()}
+      <Row>
+        <Col className="pt-0">
+          <Card>
+            <Card.Body>
+              {header()}
+              {body()}
+              {footer()}
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
 
       <DataRulesPay
         data={rulesPay}

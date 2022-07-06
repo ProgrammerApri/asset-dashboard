@@ -3,6 +3,7 @@ import { Toast } from "primereact/toast";
 import { Row, Col, Card } from "react-bootstrap";
 import ReturJualList from "./RetuJualList";
 import ReturJualInput from "./ReturJualInput";
+import Detail from "./Detail";
 
 const ReturJual = () => {
   const [active, setActive] = useState(0);
@@ -12,8 +13,11 @@ const ReturJual = () => {
       onAdd={() => {
         setActive(1);
       }}
+      onDetail={() => {
+        setActive(2);
+      }}
     />,
-    
+
     <ReturJualInput
       onCancel={() => setActive(0)}
       onSuccess={() => {
@@ -28,18 +32,13 @@ const ReturJual = () => {
         }, 500);
       }}
     />,
+    <Detail onCancel={() => setActive(0)} />,
   ]);
 
   return (
     <>
-    <Toast ref={toast} />
-    <Row>
-      <Col className="pt-0">
-        <Card>
-          <Card.Body>{view[active]}</Card.Body>
-        </Card>
-      </Col>
-    </Row>
+      <Toast ref={toast} />
+      {view[active]}
     </>
   );
 };

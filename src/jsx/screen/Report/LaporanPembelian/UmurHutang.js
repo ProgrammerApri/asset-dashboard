@@ -120,6 +120,7 @@ const UmurHutang = () => {
           type: "header",
           value: {
             fk: "Invoice",
+            tgl: "Date",
             jt: "Before Due",
             day1: "7 Day",
             day2: "14 Day",
@@ -149,6 +150,7 @@ const UmurHutang = () => {
           type: "item",
           value: {
             fk: ek.ord_id.fk_code,
+            tgl: formatDate(ek.ord_id.fk_date),
             jt: diff <= 0 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
             day1: diff <= 7 && diff > 0 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
             day2:
@@ -177,6 +179,7 @@ const UmurHutang = () => {
         type: "footer",
         value: {
           fk: "Total",
+          tgl: "",
           jt: `Rp. ${formatIdr(t_jt)}`,
           day1: `Rp. ${formatIdr(t_day1)}`,
           day2: `Rp. ${formatIdr(t_day2)}`,
@@ -236,6 +239,17 @@ const UmurHutang = () => {
         item.push([
           {
             value: `${ek.value.fk}`,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.value.tgl}`,
             style: {
               font: {
                 sz: "14",
@@ -362,6 +376,13 @@ const UmurHutang = () => {
           value: "",
           style: {
             font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
             alignment: { horizontal: "right", vertical: "center" },
           },
         },
@@ -409,6 +430,18 @@ const UmurHutang = () => {
             width: { wch: 20 },
             style: {
               font: { sz: "14", bold: false },
+              alignment: { horizontal: "left", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
               alignment: { horizontal: "left", vertical: "center" },
               fill: {
                 paternType: "solid",
@@ -653,6 +686,22 @@ const UmurHutang = () => {
                                   }
                                 >
                                   {e.value.fk}
+                                </div>
+                              )}
+                            />
+                            <Column
+                              className="header-center border-right"
+                              header=""
+                              style={{ minWidht: "13rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header"
+                                      ? "font-weight-bold"
+                                      : ""
+                                  }
+                                >
+                                  {e.value.tgl}
                                 </div>
                               )}
                             />

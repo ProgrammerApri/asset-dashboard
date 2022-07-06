@@ -58,25 +58,18 @@ const CustomDropdown = ({
   const drop = useRef(null);
   const focusedElement = useActiveElement();
 
-  useEffect(() => {
-    if (drop.current &&
-      !drop.current.contains(focusedElement) &&
-      !panel.current.contains(focusedElement)) {
-      triggerPanel(false);
-    } 
+  // useEffect(() => {
+  //   if (drop.current &&
+  //     !drop.current.contains(focusedElement) &&
+  //     !panel.current.contains(focusedElement)) {
+  //     triggerPanel(false);
+  //   } 
 
-    if (drop.current === focusedElement) {
-      triggerPanel(active);
-    }
+  //   if (drop.current === focusedElement) {
+  //     triggerPanel(active);
+  //   }
       
-  }, [focusedElement]);
-
-  const defaultOptions = [];
-  for (let i = 0; i < 10; i++) {
-    defaultOptions.push(`option ${i}`);
-    defaultOptions.push(`suggesstion ${i}`);
-    defaultOptions.push(`advice ${i}`);
-  }
+  // }, [focusedElement]);
 
   const [matches, setMatches] = useState(null);
 
@@ -141,8 +134,12 @@ const CustomDropdown = ({
           tabIndex={"0"}
           className="p-dropdown p-component p-inputwrapper w-100"
           onClick={() => {
-            triggerPanel(active);
-            drop.current.focus();
+            triggerPanel(active)
+            // drop.current.focus();
+            // console.log(active);
+            // if (active) {
+            //   triggerPanel(active);
+            // }
           }}
         >
           {value ? (

@@ -31,7 +31,14 @@ import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 const defError = {
   code: false,
   date: false,
+  sup: false,
   prod: [
+    {
+      id: false,
+      jum: false,
+    },
+  ],
+  jasa: [
     {
       id: false,
       jum: false,
@@ -361,36 +368,97 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
     let errors = {
       code: !rp.req_code || rp.req_code === "",
       date: !rp.req_date || rp.req_date === "",
+      sup: rp.refrence ? !rp.ref_sup : false,
       prod: [],
+      jasa: [],
     };
 
     rp?.rprod.forEach((element, i) => {
-      console.log("kjdhdhjk");
-      console.log(!element.request ||
-        element.request !== "0" ||
-        element.request !== "");
       if (i > 0) {
         if (element.prod_id || element.request) {
           errors.prod[i] = {
             id: !element.prod_id,
             jum:
               !element.request ||
-              element.request !== "0" ||
-              element.request !== "",
+              element.request === "" ||
+              element.request === "0",
           };
         }
       } else {
         errors.prod[i] = {
           id: !element.prod_id,
           jum:
-              !element.request ||
-              element.request !== "0" ||
-              element.request !== "",
+            !element.request ||
+            element.request === "" ||
+            element.request === "0",
         };
       }
     });
 
+    rp?.rjasa.forEach((element, i) => {
+      if (i > 0) {
+        if (element.jasa_id || element.request) {
+          errors.jasa[i] = {
+            id: !element.jasa_id,
+            jum:
+              !element.request ||
+              element.request === "" ||
+              element.request === "0",
+          };
+        }
+      } else {
+        errors.jasa[i] = {
+          id: !element.jasa_id,
+          jum:
+            !element.request ||
+            element.request === "" ||
+            element.request === "0",
+        };
+      }
+    });
+
+    if (!errors.prod[0].id && !errors.prod[0].jum) {
+      errors.jasa.forEach(e => {
+        for (var key in e) {
+          e[key] = false
+        }
+      })
+    }
+
+    if (!errors.jasa[0].id && !errors.jasa[0].jum) {
+      errors.prod.forEach(e => {
+        for (var key in e) {
+          e[key] = false
+        }
+      })
+    }
+
+    let validProduct = false
+    let validJasa = false
+    errors.prod.forEach((el) => {
+      for (var k in el) {
+        validProduct = !el[k];
+      }
+    });
+    if (!validProduct) {
+      errors.jasa.forEach((el) => {
+        for (var k in el) {
+          validJasa = !el[k];
+        }
+      });
+    }
+
+    valid = !errors.code &&  !errors.date && (validProduct || validJasa)
+
     setError(errors);
+
+    if (!valid) {
+      window.scrollTo({
+        top:180,
+        left: 0,
+        behavior: "smooth",
+      });
+    }
 
     return valid;
   };
@@ -688,25 +756,32 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                           let temp = [...rp.rjasa];
                           temp[i].jasa_id = e.jasa.id;
                           updateRp({ ...rp, rjasa: temp });
+                          let newError = error;
+                          newError.jasa[i].id = false;
+                          setError(newError);
                         }}
                         label={"[jasa.name] ([jasa.code])"}
                         placeholder="Pilih Jasa"
+                        errorMessage="Jasa Belum Dipilih"
+                        error={error?.jasa[i]?.id}
                       />
                     </div>
 
                     <div className="col-3">
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={v.qty && v.qty}
-                          onChange={(e) => {
-                            let temp = [...rp.rjasa];
-                            temp[i].request = e.target.value;
-                            updateRp({ ...rp, rjasa: temp });
-                          }}
-                          placeholder="Masukan Jumlah"
-                          type="number"
-                        />
-                      </div>
+                      <PrimeNumber
+                        value={v.qty && v.qty}
+                        onChange={(e) => {
+                          let temp = [...rp.rjasa];
+                          temp[i].request = e.target.value;
+                          updateRp({ ...rp, rjasa: temp });
+                          let newError = error;
+                          newError.jasa[i].jum = false;
+                          setError(newError);
+                        }}
+                        placeholder="Masukan Jumlah"
+                        type="number"
+                        error={error?.jasa[i]?.jum}
+                      />
                     </div>
 
                     <div className="col-4">
@@ -746,6 +821,11 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                                   },
                                 ],
                               });
+                              let newError = error;
+                              newError.jasa.push({ id: false, jum: false });
+                              setError(newError);
+                              console.log("shjsfj");
+                              console.log(error);
                             }}
                             className="btn btn-primary shadow btn-xs sharp ml-1"
                           >
@@ -757,6 +837,9 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                               let temp = [...rp.rjasa];
                               temp.splice(i, 1);
                               updateRp({ ...rp, rjasa: temp });
+                              let newError = error;
+                              newError.prod.splice(i, 1);
+                              setError(newError);
                             }}
                             className="btn btn-danger shadow btn-xs sharp ml-1"
                           >
@@ -791,6 +874,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
               value={rp.ref_sup !== null ? supp(rp.ref_sup) : null}
               onChange={(e) => {
                 updateRp({ ...rp, ref_sup: e.supplier.id });
+                setError({ ...error, sup: false });
               }}
               option={supplier}
               detail
@@ -798,6 +882,8 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
               label={"[supplier.sup_name]"}
               placeholder="Pilih Supplier"
               disabled={rp && !rp.refrence}
+              errorMessage="Supplier Belum Dipilih"
+              error={error?.sup}
             />
           </div>
 

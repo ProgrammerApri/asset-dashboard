@@ -298,10 +298,17 @@ const Detail = ({ onCancel }) => {
                 <Divider></Divider>
 
                 <Row className="ml-0 mr-0 mb-0 mt-1 justify-content-between fs-12">
-                  <div></div>
-                  <div className="row justify-content-right col-12">
+                  <div className="row justify-content-left col-6">
+                    <div className="col-12 mt-0 fs-14 text-left">
+                      <label className="text-label">
+                        <b>Kartu Penjualan</b>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="row justify-content-right col-6">
                     <div className="col-12 mt-0 fs-12 text-right">
-                      <label className="text-label">Tanggal Pesanan : </label>
+                      <label className="text-label">Tanggal Penjualan : </label>
                       <span className="ml-1">
                         <b>{formatDate(show.ord_date)}</b>
                       </span>

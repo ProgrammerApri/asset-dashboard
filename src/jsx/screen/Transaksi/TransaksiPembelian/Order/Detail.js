@@ -3,24 +3,27 @@ import { request, endpoints } from "src/utils";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
-import { Card, Col, Row } from "react-bootstrap";
-import { SET_CURRENT_INV, SET_INV, SET_PO } from "src/redux/actions";
+import { Card, Col, Row, Badge } from "react-bootstrap";
+import { SET_CURRENT_INV, SET_INV } from "src/redux/actions";
 import { useDispatch, useSelector } from "react-redux";
 import { InputText } from "primereact/inputtext";
 import { Divider } from "@material-ui/core";
-import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 import ReactToPrint from "react-to-print";
 import Wrapper from "src/jsx/components/CustomeWrapper/Wrapper";
 
 const Detail = ({ onCancel }) => {
+  const show = useSelector((state) => state.order.current);
   const dispatch = useDispatch();
-  const PO = useSelector((state) => state.po.po);
-  const show = useSelector((state) => state.po.current);
-  const [comp, setComp] = useState(null);
-  const [city, setCity] = useState(null);
-  const [supp, setSupp] = useState(null);
-  const [date, setDate] = useState(new Date());
   const printPage = useRef(null);
+  const [comp, setComp] = useState(null);
+  const [order, setOrder] = useState(null);
+  const [city, setCity] = useState(null);
+  const [supplier, setSupplier] = useState(null);
+  const [jas, setJas] = useState(null);
+  const [prod, setProd] = useState(null);
+  const [unit, setUnit] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [date, setDate] = useState(new Date());
 
   useEffect(() => {
     window.scrollTo({
@@ -28,15 +31,54 @@ const Detail = ({ onCancel }) => {
       left: 0,
       behavior: "smooth",
     });
-    getPO();
+    getORD();
+    getSupplier();
+    getProduct();
+    getJasa();
+    getSatuan();
     getComp();
-    getSupp();
+    getCity();
   }, []);
 
-  const getPO = async () => {
+  const getORD = async () => {
     const config = {
-      ...endpoints.po,
-      data: PO,
+      ...endpoints.order,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setOrder(data);
+      }
+    } catch (error) {
+      console.log("------");
+      console.log(error);
+    }
+  };
+
+  const getSupplier = async () => {
+    const config = {
+      ...endpoints.supplier,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setSupplier(data);
+      }
+    } catch (error) {}
+  };
+
+  const getProduct = async () => {
+    const config = {
+      ...endpoints.product,
+      data: {},
     };
     console.log(config.data);
     let response = null;
@@ -46,8 +88,43 @@ const Detail = ({ onCancel }) => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        dispatch({ type: SET_PO, payload: data });
-        getCity();
+        setProd(data);
+      }
+    } catch (error) {}
+  };
+
+  const getJasa = async () => {
+    const config = {
+      ...endpoints.jasa,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setJas(data);
+      }
+    } catch (error) {}
+  };
+
+  const getSatuan = async () => {
+    const config = {
+      ...endpoints.getSatuan,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setUnit(data);
       }
     } catch (error) {}
   };
@@ -88,22 +165,36 @@ const Detail = ({ onCancel }) => {
     } catch (error) {}
   };
 
-  const getSupp = async () => {
-    const config = {
-      ...endpoints.supplier,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setSupp(data);
+  const jasa = (value) => {
+    let selected = {};
+    jas?.forEach((element) => {
+      if (value === element.jasa.id) {
+        selected = element;
       }
-    } catch (error) {}
+    });
+
+    return selected;
+  };
+
+  const supp = (value) => {
+    let selected = {};
+    supplier?.forEach((element) => {
+      if (value === element.supplier.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const kota = (value) => {
+    let selected = {};
+    city?.forEach((element) => {
+      if (element.city_id === `${value}`) {
+        selected = element;
+      }
+    });
+    return selected;
   };
 
   const renderHeader = () => {
@@ -128,18 +219,10 @@ const Detail = ({ onCancel }) => {
               </div>
 
               <div className="">
-                <label className="text-label">No. Pesanan Pembelian</label>
+                <label className="text-label">No. Pembelian</label>
                 <br></br>
                 <span className="ml-0 fs-14">
-                  <b>{show?.po_code}</b>
-                </span>
-              </div>
-
-              <div className="">
-                <label className="text-label">Departemen</label>
-                <br></br>
-                <span className="ml-0 fs-14">
-                  <b>{`${show?.preq_id?.req_dep?.ccost_name} (${show?.preq_id?.req_dep?.ccost_code})`}</b>
+                  <b>{show?.ord_code}</b>
                 </span>
               </div>
 
@@ -147,7 +230,29 @@ const Detail = ({ onCancel }) => {
                 <label className="text-label">Supplier</label>
                 <br></br>
                 <span className="ml-0 fs-14">
-                  <b>{`${show?.sup_id?.sup_name} (${show?.sup_id?.sup_code})`}</b>
+                  <b>{`${show?.sup_id?.sup_name} (${
+                    show?.sup_id?.sup_code
+                  })`}</b>
+                </span>
+              </div>
+
+              <div className="">
+                <span className="ml-0">
+                  {
+                    <div>
+                      {show?.faktur === true ? (
+                        <Badge variant="info light" className="fs-14">
+                          <i className="bx bxs-plus-circle text-info mr-0 fs-14"></i>{" "}
+                          Faktur
+                        </Badge>
+                      ) : (
+                        <Badge variant="warning light" className="fs-14">
+                          <i className="bx bxs-minus-circle text-warning mr-0 fs-14"></i>{" "}
+                          Non Faktur
+                        </Badge>
+                      )}
+                    </div>
+                  }
                 </span>
               </div>
 
@@ -161,7 +266,7 @@ const Detail = ({ onCancel }) => {
                           label="Cetak"
                           onClick={() => {}}
                           icon="bx bxs-printer"
-                          disabled={show?.apprv === false}
+                          // disabled={show?.apprv === false}
                         />
                       );
                     }}
@@ -172,7 +277,7 @@ const Detail = ({ onCancel }) => {
                     label="Kirim"
                     icon="bx bxs-paper-plane"
                     onClick={() => {}}
-                    disabled={show?.apprv === false}
+                    // disabled={show?.apprv === false}
                   />
                   <Button
                     label="Batal"
@@ -188,8 +293,6 @@ const Detail = ({ onCancel }) => {
       </Row>
     );
   };
-
-  const renderFooter = () => {};
 
   const formatDate = (date) => {
     var d = new Date(`${date}Z`),
@@ -211,7 +314,7 @@ const Detail = ({ onCancel }) => {
 
   const getSubTotalBarang = () => {
     let total = 0;
-    show?.pprod?.forEach((el) => {
+    show?.dprod?.forEach((el) => {
       if (el.nett_price && el.nett_price > 0) {
         total += parseInt(el.nett_price);
       } else {
@@ -224,32 +327,14 @@ const Detail = ({ onCancel }) => {
 
   const getSubTotalJasa = () => {
     let total = 0;
-    show?.pjasa?.forEach((el) => {
+    show?.djasa?.forEach((el) => {
       total += el.total - (el.total * el.disc) / 100;
     });
 
     return total;
   };
 
-  const kota = (value) => {
-    let selected = {};
-    city?.forEach((element) => {
-      if (element.city_id === `${value}`) {
-        selected = element;
-      }
-    });
-    return selected;
-  };
 
-  const spl = (value) => {
-    let selected = {};
-    supp?.forEach((element) => {
-      if (element.supplier?.id === `${value}`) {
-        selected = element;
-      }
-    });
-    return selected;
-  };
 
   const body = () => {
     return (
@@ -258,7 +343,6 @@ const Detail = ({ onCancel }) => {
           {/* <Card>
             <Card.Body> */}
           <Wrapper
-            // tittle={"Informasi PO"}
             body={
               <>
                 <Row className="ml-0 mr-0 mb-0 mt-0 justify-content-between">
@@ -301,16 +385,16 @@ const Detail = ({ onCancel }) => {
                   <div className="row justify-content-left col-6">
                     <div className="col-12 mt-0 fs-14 text-left">
                       <label className="text-label">
-                        <b>Pesanan Pembelian (PO)</b>
+                        <b>Kartu Pembelian</b>
                       </label>
                     </div>
                   </div>
 
                   <div className="row justify-content-right col-6">
                     <div className="col-12 mt-0 fs-12 text-right">
-                      <label className="text-label">Tanggal Pesanan : </label>
+                      <label className="text-label">Tanggal Pembelian : </label>
                       <span className="ml-1">
-                        <b>{formatDate(show.po_date)}</b>
+                        <b>{formatDate(show.ord_date)}</b>
                       </span>
                     </div>
                   </div>
@@ -320,45 +404,67 @@ const Detail = ({ onCancel }) => {
                   <div className="row col-12">
                     <div className="col-6 fs-12 ml-0">
                       <label className="text-label">
-                        <b>Informasi Pesanan</b>
+                        <b>Informasi Pembelian</b>
                       </label>
                     </div>
 
                     <div className="col-6 fs-12 ml-0 text-right">
                       <label className="text-label">
-                        <b>Informasi Penerima</b>
+                        <b>Informasi Supplier</b>
                       </label>
                     </div>
 
                     <div className="col-6 fs-12 ml-0">
                       <span className="ml-0 fs-14">
-                        <b>{show?.po_code}</b>
+                        <b>{show?.ord_code}</b>
                       </span>
                       <br></br>
                       <span className="ml-0">
-                        No. Request : <b>{show?.preq_id?.req_code}</b>
+                        Nomor PO : <b>{show?.po_id?.po_code}</b>
                       </span>
                       <br></br>
                       <span className="ml-0">
                         Jatuh Tempo : <b>{formatDate(show?.due_date)}</b>
                       </span>
+                      <br></br>
+                      <br></br>
+                      <span className="ml-0">
+                        {
+                          <div>
+                            {show?.faktur === true ? (
+                              <Badge variant="info light" className="fs-12">
+                                <i className="bx bxs-plus-circle text-info mr-0"></i>{" "}
+                                Faktur
+                              </Badge>
+                            ) : (
+                              <Badge variant="warning light" className="fs-12">
+                                <i className="bx bxs-minus-circle text-warning mr-0"></i>{" "}
+                                Non Faktur
+                              </Badge>
+                            )}
+                          </div>
+                        }
+                      </span>
                     </div>
 
                     <div className="col-6 fs-12 ml-0 text-right">
                       <span className="ml-0 fs-14">
-                        <b>{show?.sup_id.sup_name}</b>
+                        <b>{show?.sup_id?.sup_name}</b>
                       </span>
                       <br></br>
                       <span className="ml-0">
-                        Cp : <b>{show?.sup_id.sup_cp}</b>
+                        Cp : <b>{show?.sup_id?.sup_cp}</b>
                       </span>
                       <br></br>
                       <span className="ml-0">
-                        {show?.sup_id.sup_address},
-                        {kota(show?.sup_id.sup_kota)?.city_name}
+                        {show?.sup_id?.sup_address}
                       </span>
                       <br></br>
-                      <span className="ml-0">{show?.sup_id.sup_kpos}</span>
+                      <span className="ml-0">
+                        {kota(show?.sup_id?.sup_kota)?.city_name},
+                        {show?.sup_id?.sup_kpos}
+                      </span>
+                      <br></br>
                       <br></br>
                       <span className="ml-0">
                         (+62)
@@ -370,7 +476,7 @@ const Detail = ({ onCancel }) => {
 
                 <Row className="ml-1 mt-0">
                   <DataTable
-                    value={show.pprod?.map((v, i) => {
+                    value={show.dprod?.map((v, i) => {
                       return {
                         ...v,
                         index: i,
@@ -391,9 +497,15 @@ const Detail = ({ onCancel }) => {
                       // body={loading && <Skeleton />}
                     />
                     <Column
+                      header="Lokasi"
+                      field={(e) => e.location?.name}
+                      style={{ minWidth: "9rem" }}
+                      // body={loading && <Skeleton />}
+                    />
+                    <Column
                       header="Jumlah"
                       field={(e) => e.order}
-                      style={{ minWidth: "9rem" }}
+                      style={{ minWidth: "6rem" }}
                       // body={loading && <Skeleton />}
                     />
                     <Column
@@ -405,23 +517,23 @@ const Detail = ({ onCancel }) => {
                     <Column
                       header="Harga Satuan"
                       field={(e) => `Rp. ${formatIdr(e.price)}`}
-                      style={{ minWidth: "13rem" }}
+                      style={{ minWidth: "10rem" }}
                       // body={loading && <Skeleton />}
                     />
                     <Column
                       header="Total"
                       field={(e) => `Rp. ${formatIdr(e.total)}`}
-                      style={{ minWidth: "13rem" }}
+                      style={{ minWidth: "10rem" }}
                       // body={loading && <Skeleton />}
                     />
                   </DataTable>
                 </Row>
 
-                {PO.pjasa?.length ? (
+                {order?.djasa?.length ? (
                   <Row className="ml-1 mt-6">
                     <>
                       <DataTable
-                        value={show.pjasa?.map((v, i) => {
+                        value={show.djasa?.map((v, i) => {
                           return {
                             ...v,
                             index: i,
@@ -547,7 +659,7 @@ const Detail = ({ onCancel }) => {
                     <div className="col-7 text-right">
                       <label className="text-label">
                         <b>
-                          Rp. {show.total_disc !== null ? show.total_disc : 0}
+                          Rp. {show?.total_disc !== null ? show?.total_disc : 0}
                         </b>
                       </label>
                     </div>
@@ -608,11 +720,13 @@ const Detail = ({ onCancel }) => {
     );
   };
 
+  const footer = () => {};
+
   return (
     <>
       {renderHeader()}
       {body()}
-      {renderFooter()}
+      {footer()}
     </>
   );
 };

@@ -3,7 +3,7 @@ import { request, endpoints } from "src/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Button, Card, Row, Badge } from "react-bootstrap";
+import { Button, Card, Row, Col } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { Dialog } from "primereact/dialog";
@@ -36,7 +36,7 @@ const data = {
   sjasa: [],
 };
 
-const DataSalesOrder = ({ onAdd, onEdit }) => {
+const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
   const [so, setSO] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
@@ -131,7 +131,7 @@ const DataSalesOrder = ({ onAdd, onEdit }) => {
       <div className="d-flex">
         <Link
           onClick={() => {
-            setDisplayData(data);
+            onDetail();
             let sprod = data.sprod;
             let sjasa = data.sjasa;
             dispatch({
@@ -434,7 +434,7 @@ const DataSalesOrder = ({ onAdd, onEdit }) => {
     if (month.length < 2) month = "0" + month;
     if (day.length < 2) day = "0" + day;
 
-    return [year, month, day].join("-");
+    return [day, month, year].join("-");
   };
 
   const formatIdr = (value) => {
@@ -468,58 +468,70 @@ const DataSalesOrder = ({ onAdd, onEdit }) => {
   return (
     <>
       <Toast ref={toast} />
-      <DataTable
-        responsiveLayout="scroll"
-        value={loading ? dummy : So}
-        className="display w-150 datatable-wrapper"
-        showGridlines
-        dataKey="id"
-        rowHover
-        header={renderHeader}
-        filters={filters1}
-        globalFilterFields={["so.so_code", "so.so_date", "pel_id.cus_name"]}
-        emptyMessage="Tidak ada data"
-        paginator
-        paginatorTemplate={template2}
-        first={first2}
-        rows={rows2}
-        onPage={onCustomPage2}
-        paginatorClassName="justify-content-end mt-3"
-      >
-        <Column
-          header="Tanggal"
-          style={{
-            minWidth: "10rem",
-          }}
-          field={(e) => formatDate(e.so_date)}
-          body={loading && <Skeleton />}
-        />
-        <Column
-          header="Kode Referensi"
-          field={(e) => e.so_code}
-          style={{ minWidth: "10rem" }}
-          body={loading && <Skeleton />}
-        />
-        <Column
-          header="Pelanggan"
-          field={(e) => e.pel_id.cus_name}
-          style={{ minWidth: "10rem" }}
-          body={loading && <Skeleton />}
-        />
-        <Column
-          header="Tanggal Jatuh Tempo"
-          field={(e) => formatDate(e.due_date)}
-          style={{ minWidth: "10rem" }}
-          body={loading && <Skeleton />}
-        />
-        <Column
-          header="Action"
-          dataType="boolean"
-          bodyClassName="text-center"
-          style={{ minWidth: "2rem" }}
-          body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
-        />
-      </DataTable>
+      <Row>
+        <Col className="pt-0">
+          <Card>
+            <Card.Body>
+              <DataTable
+                responsiveLayout="scroll"
+                value={loading ? dummy : So}
+                className="display w-150 datatable-wrapper"
+                showGridlines
+                dataKey="id"
+                rowHover
+                header={renderHeader}
+                filters={filters1}
+                globalFilterFields={[
+                  "so.so_code",
+                  "so.so_date",
+                  "pel_id.cus_name",
+                ]}
+                emptyMessage="Tidak ada data"
+                paginator
+                paginatorTemplate={template2}
+                first={first2}
+                rows={rows2}
+                onPage={onCustomPage2}
+                paginatorClassName="justify-content-end mt-3"
+              >
+                <Column
+                  header="Tanggal"
+                  style={{
+                    minWidth: "10rem",
+                  }}
+                  field={(e) => formatDate(e.so_date)}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Kode Referensi"
+                  field={(e) => e.so_code}
+                  style={{ minWidth: "10rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Pelanggan"
+                  field={(e) => e.pel_id.cus_name}
+                  style={{ minWidth: "10rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Tanggal Jatuh Tempo"
+                  field={(e) => formatDate(e.due_date)}
+                  style={{ minWidth: "10rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Action"
+                  dataType="boolean"
+                  bodyClassName="text-center"
+                  style={{ minWidth: "2rem" }}
+                  body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
+                />
+              </DataTable>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
 
       <Dialog
         header={"Detail Pembelian"}

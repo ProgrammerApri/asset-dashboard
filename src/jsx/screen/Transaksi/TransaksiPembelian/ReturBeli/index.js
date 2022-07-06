@@ -3,6 +3,7 @@ import { Button, Card, Col, Row } from "react-bootstrap";
 import { Toast } from "primereact/toast";
 import ReturBeliList from "./ReturBeliList";
 import ReturBeliInput from "./ReturBeliInput";
+import Detail from "./Detail";
 
 const ReturBeli = () => {
   const [active, setActive] = useState(0);
@@ -12,8 +13,11 @@ const ReturBeli = () => {
       onAdd={() => {
         setActive(1);
       }}
+      onDetail={() => {
+        setActive(2);
+      }}
     />,
-    
+
     <ReturBeliInput
       onCancel={() => setActive(0)}
       onSuccess={() => {
@@ -28,18 +32,13 @@ const ReturBeli = () => {
         }, 500);
       }}
     />,
+    <Detail onCancel={() => setActive(0)} />,
   ]);
 
   return (
     <>
-    <Toast ref={toast} />
-    <Row>
-      <Col className="pt-0">
-        <Card>
-          <Card.Body>{view[active]}</Card.Body>
-        </Card>
-      </Col>
-    </Row>
+      <Toast ref={toast} />
+      {view[active]}
     </>
   );
 };

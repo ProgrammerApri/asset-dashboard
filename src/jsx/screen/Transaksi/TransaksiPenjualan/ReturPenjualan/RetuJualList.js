@@ -4,7 +4,7 @@ import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button as PButton } from "primereact/button";
-import { Row, Col } from "react-bootstrap";
+import { Row, Col, Card } from "react-bootstrap";
 import { InputText } from "primereact/inputtext";
 import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
@@ -146,6 +146,28 @@ const ReturJualList = ({ onAdd, onDetail }) => {
         <Link
           onClick={() => {
             onDetail();
+            let product = data.product;
+
+            if (!product.length) {
+              product.push({
+                id: 0,
+                prod_id: null,
+                unit_id: null,
+                retur: null,
+                price: null,
+                disc: null,
+                nett_price: null,
+                total: null,
+              });
+            }
+
+            dispatch({
+              type: SET_CURRENT_SR,
+              payload: {
+                ...data,
+                product: product,
+              },
+            });
           }}
           className="btn btn-info shadow btn-xs sharp ml-1"
         >
@@ -248,57 +270,65 @@ const ReturJualList = ({ onAdd, onDetail }) => {
     if (month.length < 2) month = "0" + month;
     if (day.length < 2) day = "0" + day;
 
-    return [year, month, day].join("-");
+    return [day, month, year].join("-");
   };
 
   return (
     <>
-      <DataTable
-        responsiveLayout="scroll"
-        value={loading ? dummy : sr}
-        className="display w-150 datatable-wrapper"
-        showGridlines
-        dataKey="id"
-        rowHover
-        header={renderHeader}
-        filters={null}
-        globalFilterFields={["ret_code", "sale_id.ord_code"]}
-        emptyMessage="Tidak ada data"
-        paginator
-        paginatorTemplate={template2}
-        first={first2}
-        rows={rows2}
-        onPage={onCustomPage2}
-        paginatorClassName="justify-content-end mt-3"
-      >
-        <Column
-          header="Tanggal"
-          style={{
-            minWidth: "8rem",
-          }}
-          field={(e) => formatDate(e.ret_date)}
-          body={loading && <Skeleton />}
-        />
-        <Column
-          header="Nomor Retur Penjualan"
-          field={(e) => e.ret_code}
-          style={{ minWidth: "8rem" }}
-          body={loading && <Skeleton />}
-        />
-        <Column
-          header="Nomor Penjualan"
-          field={(e) => e.sale_id.ord_code}
-          style={{ minWidth: "8rem" }}
-          body={loading && <Skeleton />}
-        />
-        <Column
-          header="Action"
-          dataType="boolean"
-          bodyClassName="text-center"
-          style={{ minWidth: "2rem" }}
-          body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
-        />
-      </DataTable>
+      <Row>
+        <Col className="pt-0">
+          <Card>
+            <Card.Body>
+              <DataTable
+                responsiveLayout="scroll"
+                value={loading ? dummy : sr}
+                className="display w-150 datatable-wrapper"
+                showGridlines
+                dataKey="id"
+                rowHover
+                header={renderHeader}
+                filters={null}
+                globalFilterFields={["ret_code", "sale_id.ord_code"]}
+                emptyMessage="Tidak ada data"
+                paginator
+                paginatorTemplate={template2}
+                first={first2}
+                rows={rows2}
+                onPage={onCustomPage2}
+                paginatorClassName="justify-content-end mt-3"
+              >
+                <Column
+                  header="Tanggal"
+                  style={{
+                    minWidth: "8rem",
+                  }}
+                  field={(e) => formatDate(e.ret_date)}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Nomor Retur Penjualan"
+                  field={(e) => e.ret_code}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Nomor Penjualan"
+                  field={(e) => e.sale_id.ord_code}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Action"
+                  dataType="boolean"
+                  bodyClassName="text-center"
+                  style={{ minWidth: "2rem" }}
+                  body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
+                />
+              </DataTable>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
 
       <Dialog
         header={"Hapus Data"}

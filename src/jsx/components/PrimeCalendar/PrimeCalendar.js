@@ -9,6 +9,7 @@ const PrimeCalendar = ({
   error,
   disabled = false,
   showIcon,
+  dateFormat,
 }) => {
   return (
     <div>
@@ -20,6 +21,7 @@ const PrimeCalendar = ({
           placeholder={placeholder}
           disabled={disabled}
           showIcon={showIcon}
+          dateFormat={dateFormat}
         />
       </div>
       {error && (

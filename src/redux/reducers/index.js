@@ -12,6 +12,8 @@ import SLReducer from "./SLReducer";
 import EXPReducer from "./EXPReducer";
 import GIROReducer from "./GIROReducer";
 import DashboardReducer from "./DashboardReducer";
+import KHReducer from "./KHReducer";
+import KPReducer from "./KPReducer";
 
 
 const rootReducer = combineReducers({
@@ -28,6 +30,8 @@ const rootReducer = combineReducers({
   exp: EXPReducer,
   giro: GIROReducer,
   dash: DashboardReducer,
+  kh: KHReducer,
+  kp: KPReducer,
 });
 
 export default rootReducer;

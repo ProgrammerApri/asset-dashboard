@@ -664,13 +664,21 @@ const InputPO = ({ onCancel, onSuccess }) => {
     let errors = {
       code: !po.po_code || po.po_code === "",
       date: !po.po_date || po.po_date === "",
-      req: !po.preq_id?.id,
-      rul: !po.top?.id,
-      jum: !po.pprod?.order,
-      prc: !po.pprod?.price,
+      req: !po?.preq_id,
+      rul: !po?.top,
+      // jum: !po.pprod?.order,
+      // prc: !po.pprod?.price,
     };
 
     setError(errors);
+
+    if (!valid) {
+      window.scrollTo({
+        top: 180,
+        left: 0,
+        behavior: "smooth",
+      });
+    }
 
     return valid;
   };
@@ -687,7 +695,11 @@ const InputPO = ({ onCancel, onSuccess }) => {
               label={"Tanggal"}
               value={new Date(`${po.po_date}Z`)}
               onChange={(e) => {
-                updatePo({ ...po, po_date: e.value });
+                let result = new Date(e.value);
+                result.setDate(result.getDate() + e.day);
+                console.log(result);
+
+                updatePo({ ...po, po_date: e.value, due_date: result });
                 let newError = error;
                 newError.date = false;
                 setError(newError);
@@ -1020,14 +1032,14 @@ const InputPO = ({ onCancel, onSuccess }) => {
                           temp[e.index].remain = result;
                           updatePo({ ...po, pprod: temp });
 
-                          let newError = error;
-                          newError.jum = false;
-                          setError(newError);
+                          // let newError = error;
+                          // newError.jum = false;
+                          // setError(newError);
                         }}
                         min={0}
                         placeholder="0"
                         type="number"
-                        error={error?.jum}
+                        // error={error?.jum}
                       />
                     )}
                   />
@@ -1068,14 +1080,14 @@ const InputPO = ({ onCancel, onSuccess }) => {
                             temp[e.index].price * temp[e.index].order;
                           updatePo({ ...po, pprod: temp });
 
-                          let newError = error;
-                          newError.prc = false;
-                          setError(newError);
+                          // let newError = error;
+                          // newError.prc = false;
+                          // setError(newError);
                         }}
                         min={0}
                         placeholder="0"
                         type="number"
-                        error={error?.prc}
+                        // error={error?.prc}
                       />
                     )}
                   />

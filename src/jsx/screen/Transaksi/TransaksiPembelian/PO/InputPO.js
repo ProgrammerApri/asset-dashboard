@@ -34,6 +34,7 @@ const defError = {
   rul: false,
   jum: false,
   prc: false,
+  sup: false,
 };
 
 const InputPO = ({ onCancel, onSuccess }) => {
@@ -666,8 +667,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
       date: !po.po_date || po.po_date === "",
       req: !po?.preq_id,
       rul: !po?.top,
-      // jum: !po.pprod?.order,
-      // prc: !po.pprod?.price,
+      sup: !po.sup_id,
     };
 
     setError(errors);
@@ -690,7 +690,22 @@ const InputPO = ({ onCancel, onSuccess }) => {
         <Toast ref={toast} />
 
         <Row className="mb-4">
-          <div className="col-4">
+          <div className="col-3">
+            <PrimeInput
+              label={"Kode Referensi"}
+              value={po.po_code}
+              onChange={(e) => {
+                updatePo({ ...po, po_code: e.target.value });
+                let newError = error;
+                newError.code = false;
+                setError(newError);
+              }}
+              placeholder="Masukan Kode Referensi"
+              error={error?.code}
+            />
+          </div>
+
+          <div className="col-2">
             <PrimeCalendar
               label={"Tanggal"}
               value={new Date(`${po.po_date}Z`)}
@@ -711,20 +726,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-4">
-            <PrimeInput
-              label={"Kode Referensi"}
-              value={po.po_code}
-              onChange={(e) => {
-                updatePo({ ...po, po_code: e.target.value });
-                let newError = error;
-                newError.code = false;
-                setError(newError);
-              }}
-              placeholder="Masukan Kode Referensi"
-              error={error?.code}
-            />
-          </div>
+          <div className="col-7"></div>
 
           <div className="col-4">
             <label className="text-label">No. Permintaan Pembelian</label>
@@ -761,8 +763,24 @@ const InputPO = ({ onCancel, onSuccess }) => {
               disabled={isEdit}
             />
           </div>
-
           <div className="col-4">
+            <label className="text-label">Departemen</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={
+                  po.preq_id !== null
+                    ? dept(req_pur(po.preq_id)?.req_dep)?.ccost_code
+                    : null
+                }
+                placeholder="Departemen"
+                disabled
+              />
+            </div>
+          </div>
+
+          <div className="col-4"/>
+
+          <div className="col-3">
             <label className="text-label">Supplier</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
@@ -770,11 +788,14 @@ const InputPO = ({ onCancel, onSuccess }) => {
               option={supplier}
               onChange={(e) => {
                 updatePo({ ...po, sup_id: e.supplier.id });
+                setError({ ...error, sup: false });
               }}
               placeholder="Pilih Supplier"
               detail
               onDetail={() => setShowSupplier(true)}
               label={"[supplier.sup_code] ([supplier.sup_name])"}
+              errorMessage="Supplier Belum Dipilih"
+              error={error?.sup}
             />
           </div>
 
@@ -793,7 +814,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-4">
+          <div className="col-3">
             <PrimeInput
               label={"No. Telepon"}
               isNumber
@@ -805,9 +826,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-4">
+          <div className="col-2">
             <label className="text-label">Ppn</label>
-            <div className="p-inputgroup mt-2">
+            <div className="p-inputgroup">
               <InputText
                 value={
                   po.sup_id !== null
@@ -815,21 +836,6 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     : null
                 }
                 placeholder="Jenis Pajak"
-                disabled
-              />
-            </div>
-          </div>
-
-          <div className="col-4">
-            <label className="text-label">Departemen</label>
-            <div className="p-inputgroup mt-2">
-              <InputText
-                value={
-                  po.preq_id !== null
-                    ? dept(req_pur(po.preq_id)?.req_dep)?.ccost_code
-                    : null
-                }
-                placeholder="Departemen"
                 disabled
               />
             </div>
@@ -861,7 +867,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-6">
+          <div className="col-4">
             <label className="text-label">Tanggal Permintaan</label>
             <div className="p-inputgroup mt-2">
               <Calendar
@@ -873,7 +879,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-6">
+          <div className="col-4">
             <label className="text-label">Tanggal Jatuh Tempo</label>
             <div className="p-inputgroup mt-2">
               <Calendar

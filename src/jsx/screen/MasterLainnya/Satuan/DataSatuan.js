@@ -20,6 +20,8 @@ import { Divider } from "@material-ui/core";
 import { Badge } from "react-bootstrap";
 import { Badge as PBadge } from "primereact/badge";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
+import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 
 const def = {
   id: 0,
@@ -33,7 +35,17 @@ const def = {
   u_to: null,
 };
 
-const addKonversi = [];
+const defError = {
+  code: false,
+  name: false,
+  konv: [
+    {
+      qty: false,
+      s_big: false,
+      s_small: false,
+    },
+  ],
+};
 
 const DataSatuan = ({
   data,
@@ -59,6 +71,7 @@ const DataSatuan = ({
   const [rows2, setRows2] = useState(20);
   const [showInput, setShowInput] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
+  const [error, setError] = useState(defError);
   const [konversi, setKonversi] = useState([
     {
       id: 0,
@@ -95,8 +108,6 @@ const DataSatuan = ({
           }
         });
         setSatuanDasar(dasar);
-
-        
       }
     } catch (error) {}
     if (isUpdate) {
@@ -107,8 +118,6 @@ const DataSatuan = ({
       }, 500);
     }
   };
-
-
 
   const editSatuan = async () => {
     // setLoading(true);
@@ -306,13 +315,70 @@ const DataSatuan = ({
   };
 
   const onSubmit = () => {
-    if (isEdit) {
-      setLoading(true);
-      editSatuan();
-    } else {
-      setLoading(true);
-      addSatuan();
+    if (isValid()) {
+      if (isEdit) {
+        setLoading(true);
+        editSatuan();
+      } else {
+        setLoading(true);
+        addSatuan();
+      }
     }
+  };
+
+  const isValid = () => {
+    let valid = false;
+
+    let errors = {
+      code: !currentItem.code || currentItem.code === "",
+      name: !currentItem.name || currentItem.name === "",
+      konv: [],
+    };
+
+    if (currentItem.type === "k") {
+      konversi.forEach((el, i) => {
+        console.log(el);
+        if (i > 0) {
+          if (el.u_to || el.u_from) {
+            errors.konv.push({
+              qty: !el.qty || el.qty <= 0,
+              s_big: !el.u_to,
+              s_small: !el.u_from,
+            });
+          } else {
+            errors.konv[i] = error.konv[i]
+          }
+        } else {
+          errors.konv.push({
+            qty: !el.qty || el.qty <= 0,
+            s_big: !el.u_to,
+            s_small: !el.u_from,
+          });
+        }
+      });
+    } else {
+      errors.konv = error.konv;
+    }
+
+    for (var key in errors) {
+      if (key !== "konv") {
+        valid = !errors[key]
+      }
+    }
+
+    let validKonv = false;
+
+    errors.konv.forEach(el => {
+      for (var k in el) {
+        validKonv = !el[k]
+      }
+    });
+
+    valid = valid && validKonv
+
+    setError(errors);
+
+    return valid;
   };
 
   const renderFooter = () => {
@@ -474,6 +540,7 @@ const DataSatuan = ({
     setCurrentItem(def);
     setEdit(false);
     setShowInput(false);
+    setError(defError)
   };
 
   const renderBody = () => {
@@ -578,7 +645,7 @@ const DataSatuan = ({
         <Dialog
           header={isEdit ? "Edit Satuan" : "Tambah Satuan"}
           visible={showInput}
-          style={{ width: "40vw" }}
+          style={{ width: "50vw" }}
           footer={renderFooter()}
           onHide={() => {
             onHideInput();
@@ -587,29 +654,29 @@ const DataSatuan = ({
         >
           <div className="row mr-0 ml-0">
             <div className="col-6">
-              <label className="text-label">Kode Satuan</label>
-              <div className="p-inputgroup">
-                <InputText
-                  value={currentItem !== null ? currentItem.code : ""}
-                  onChange={(e) =>
-                    setCurrentItem({ ...currentItem, code: e.target.value })
-                  }
-                  placeholder="Masukan Kode Satuan"
-                />
-              </div>
+              <PrimeInput
+                label={"Kode Satuan"}
+                value={currentItem !== null ? currentItem.code : ""}
+                onChange={(e) => {
+                  setCurrentItem({ ...currentItem, code: e.target.value });
+                  setError({ ...error, code: false });
+                }}
+                placeholder="Masukan Kode Satuan"
+                error={error.code}
+              />
             </div>
 
             <div className="col-6">
-              <label className="text-label">Nama Satuan</label>
-              <div className="p-inputgroup">
-                <InputText
-                  value={currentItem !== null ? currentItem.name : ""}
-                  onChange={(e) => {
-                    setCurrentItem({ ...currentItem, name: e.target.value });
-                  }}
-                  placeholder="Masukan Nama Satuan"
-                />
-              </div>
+              <PrimeInput
+                label={"Nama Satuan"}
+                value={currentItem !== null ? currentItem.name : ""}
+                onChange={(e) => {
+                  setCurrentItem({ ...currentItem, name: e.target.value });
+                  setError({ ...error, code: false });
+                }}
+                placeholder="Masukan Nama Satuan"
+                error={error.name}
+              />
             </div>
           </div>
 
@@ -701,50 +768,64 @@ const DataSatuan = ({
                         <InputNumber
                           value={v.qty}
                           onChange={(e) => {
-                            let temp = [...konversi];
+                            let temp = konversi;
                             temp[i].qty = e.value;
                             setKonversi(temp);
+                            let newKonv = error.konv;
+                            newKonv[i].qty = false;
+                            setError({ ...error, konv: newKonv });
                           }}
                           placeholder="Masukan Nilai"
                           showButtons
                         />
                       </div>
+                      {error.konv[i].qty && (
+                        <small id="name-error" className="p-error block">
+                          <i class="bx bxs-error-circle ml-1"></i> Kuantitas Tidak Sesuai
+                        </small>
+                      )}
                     </div>
 
                     <div className="col-4">
-                      <div className="p-inputgroup">
-                        <Dropdown
-                          value={v.u_to && checkUnit(konversi[i].u_to)}
-                          options={satuanDasar}
-                          onChange={(e) => {
-                            let temp = [...konversi];
-                            temp[i].u_to = e.value.id;
-                            setKonversi(temp);
-                          }}
-                          placeholder="Pilih Satuan"
-                          optionLabel="name"
-                          filter
-                          filterBy="name"
-                        />
-                      </div>
+                      <PrimeDropdown
+                        value={v.u_to && checkUnit(konversi[i].u_to)}
+                        options={satuanDasar}
+                        onChange={(e) => {
+                          let temp = [...konversi];
+                          temp[i].u_to = e.value.id;
+                          setKonversi(temp);
+                          let newKonv = error.konv;
+                          newKonv[i].s_big = false;
+                          setError({ ...error, konv: newKonv });
+                        }}
+                        placeholder="Pilih Satuan"
+                        optionLabel="name"
+                        filter
+                        filterBy="name"
+                        error={error.konv[i].s_big}
+                        errorMessage="Satuan Besar Belum Dipilih"
+                      />
                     </div>
 
                     <div className="col-4">
-                      <div className="p-inputgroup">
-                        <Dropdown
-                          value={v.u_from && checkUnit(konversi[i].u_from)}
-                          options={satuanDasar}
-                          onChange={(e) => {
-                            let temp = [...konversi];
-                            temp[i].u_from = e.value.id;
-                            setKonversi(temp);
-                          }}
-                          placeholder="Pilih Satuan"
-                          optionLabel="name"
-                          filter
-                          filterBy="name"
-                        />
-                      </div>
+                      <PrimeDropdown
+                        value={v.u_from && checkUnit(konversi[i].u_from)}
+                        options={satuanDasar}
+                        onChange={(e) => {
+                          let temp = [...konversi];
+                          temp[i].u_from = e.value.id;
+                          setKonversi(temp);
+                          let newKonv = error.konv;
+                          newKonv[i].s_small = false;
+                          setError({ ...error, konv: newKonv });
+                        }}
+                        placeholder="Pilih Satuan"
+                        optionLabel="name"
+                        filter
+                        filterBy="name"
+                        error={error.konv[i].s_small}
+                        errorMessage="Satuan Kecil Belum Dipilih"
+                      />
                     </div>
 
                     <div className="d-flex">
@@ -761,6 +842,13 @@ const DataSatuan = ({
                                   u_to: null,
                                 },
                               ]);
+                              setError({
+                                ...error,
+                                konv: [
+                                  ...error.konv,
+                                  { qty: false, s_big: false, s_small: false },
+                                ],
+                              });
                             }}
                             className="btn btn-primary shadow btn-xs sharp ml-1"
                           >
@@ -774,6 +862,9 @@ const DataSatuan = ({
                               let temp = [...konversi];
                               temp.splice(i, 1);
                               setKonversi(temp);
+                              let newKonv = error.konv;
+                              newKonv.splice(i, 1);
+                              setError({ ...error, konv: newKonv });
                             }}
                             className="btn btn-danger shadow btn-xs sharp ml-1"
                           >

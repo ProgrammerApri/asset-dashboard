@@ -12,10 +12,9 @@ import { InputText } from "primereact/inputtext";
 import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
-import { InputTextarea } from "primereact/inputtextarea";
-import { InputNumber } from "primereact/inputnumber";
-import { Divider } from "@material-ui/core";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import { useDispatch } from "react-redux";
+import { SET_CURRENT_LM, SET_EDIT_LM } from "src/redux/actions";
 
 const data = {
   data: [
@@ -51,6 +50,8 @@ const MutasiAntarList = ({ onAdd }) => {
   const [loading, setLoading] = useState(true);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+  const dispatch = useDispatch();
+  const toast = useRef(null);
 
   useEffect(() => {
     console.log(data);
@@ -73,6 +74,24 @@ const MutasiAntarList = ({ onAdd }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
+            dispatch({
+              type: SET_EDIT_LM,
+              payload: false,
+            });
+            dispatch({
+              type: SET_CURRENT_LM,
+              payload: {
+                ...data,
+                product: [
+                  {
+                    id: 0,
+                    prod_id: null,
+                    unit_id: null,
+                    order: null,
+                  },
+                ],
+              },
+            });
           }}
         />
       </div>
@@ -127,6 +146,7 @@ const MutasiAntarList = ({ onAdd }) => {
 
   return (
     <>
+    <Toast ref={toast} />
       <Row>
         <Col className="pt-0">
           <DataTable

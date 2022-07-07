@@ -1,0 +1,5 @@
+export const SET_CURRENT_LM = "lm.SET_CURRENT_LM"
+export const SET_LM = "lm.SET_LM"
+export const RESET_CURRENT_LM = "lm.RESET_CURRENT_LM"
+export const UPDATE_CURRENT_LM = "lm.UPDATE_CURRENT_LM"
+export const SET_EDIT_LM = "lm.SET_EDIT_LM"

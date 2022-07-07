@@ -5,51 +5,37 @@ import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
-import { Dropdown } from "primereact/dropdown";
-import { Divider } from "@material-ui/core";
 import { Calendar } from "primereact/calendar";
-import { InputSwitch } from "primereact/inputswitch";
 import CustomAccordion from "src/jsx/components/Accordion/Accordion";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_PO } from "src/redux/actions";
-import DataPusatBiaya from "../../../MasterLainnya/PusatBiaya/DataPusatBiaya";
-import DataSupplier from "../../../Mitra/Pemasok/DataPemasok";
-import DataRulesPay from "src/jsx/screen/MasterLainnya/RulesPay/DataRulesPay";
-import DataPajak from "src/jsx/screen/Master/Pajak/DataPajak";
+import { SET_CURRENT_PB } from "src/redux/actions";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
+import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
+import DataAkun from "src/jsx/screen/Master/Akun/DataAkun";
+import DataProduk from "src/jsx/screen/Master/Produk/DataProduk";
+import DataSatuan from "src/jsx/screen/MasterLainnya/Satuan/DataSatuan";
+import DataLokasi from "src/jsx/screen/Master/Lokasi/DataLokasi";
 
 const PemakaianInput = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
-  const [currentItem, setCurrentItem] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const toast = useRef(null);
   const [doubleClick, setDoubleClick] = useState(false);
-  const po = useSelector((state) => state.po.current);
-  const isEdit = useSelector((state) => state.po.editpo);
+  const pb = useSelector((state) => state.pb.current);
+  const isEdit = useSelector((state) => state.pb.editPb);
   const dispatch = useDispatch();
-  const [isRp, setRp] = useState(true);
-  const [pusatBiaya, setPusatBiaya] = useState(null);
-  const [supplier, setSupplier] = useState(null);
-  const [rulesPay, setRulesPay] = useState(null);
-  const [ppn, setPpn] = useState(null);
-  const [rp, setRequest] = useState(null);
-  const [showSupplier, setShowSupplier] = useState(false);
-  const [showDepartemen, setShowDept] = useState(false);
-  const [showRulesPay, setShowRulesPay] = useState(false);
-  const [showPpn, setShowPpn] = useState(false);
+  const [showAcc, setShowAcc] = useState(false);
+  const [showProd, setShowProd] = useState(false);
+  const [showSat, setShowSat] = useState(false);
+  const [showLok, setShowLok] = useState(false);
   const [product, setProduct] = useState(null);
-  const [account, setAcc] = useState(null);
   const [satuan, setSatuan] = useState(null);
   const [lokasi, setLokasi] = useState(null);
+  const [acc, setAcc] = useState(null);
   const [accor, setAccor] = useState({
     produk: true,
-    jasa: false,
   });
-
-  const type = [
-    { name: "%", code: "P" },
-    { name: "Rp", code: "R" },
-  ];
 
   useEffect(() => {
     window.scrollTo({
@@ -57,7 +43,6 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
       left: 0,
       behavior: "smooth",
     });
-    getPusatBiaya();
     getLokasi();
     getProduct();
     getAcc();
@@ -76,24 +61,6 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
       if (response.status) {
         const { data } = response;
         setLokasi(data);
-      }
-    } catch (error) {}
-  };
-
-  const getPusatBiaya = async () => {
-    const config = {
-      ...endpoints.pusatBiaya,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setPusatBiaya(data);
       }
     } catch (error) {}
   };
@@ -148,11 +115,11 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
-  const editPO = async () => {
+  const editPB = async () => {
     const config = {
-      ...endpoints.editPO,
-      endpoint: endpoints.editPO.endpoint + po.id,
-      data: po,
+      ...endpoints.editPB,
+      endpoint: endpoints.editPB.endpoint + pb.id,
+      data: pb,
     };
     console.log(config.data);
     let response = null;
@@ -175,10 +142,10 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
     }
   };
 
-  const addPO = async () => {
+  const addPB = async () => {
     const config = {
-      ...endpoints.addPO,
-      data: po,
+      ...endpoints.addPB,
+      data: pb,
     };
     console.log(config.data);
     let response = null;
@@ -196,7 +163,7 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${po.po_code} Sudah Digunakan`,
+            detail: `Kode ${pb.pb_code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -212,61 +179,6 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
         }, 500);
       }
     }
-  };
-
-  const req_pur = (value) => {
-    let selected = {};
-    rp?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const dept = (value) => {
-    let selected = {};
-    pusatBiaya?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const pjk = (value) => {
-    let selected = {};
-    ppn?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const supp = (value) => {
-    let selected = {};
-    supplier?.forEach((element) => {
-      if (value === element.supplier.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const rulPay = (value) => {
-    let selected = {};
-    rulesPay?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
   };
 
   const checkProd = (value) => {
@@ -293,14 +205,35 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
+  const checkLok = (value) => {
+    let selected = {};
+    lokasi?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkAcc = (value) => {
+    let selected = {};
+    acc?.forEach((element) => {
+      if (value === element.account.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
 
   const onSubmit = () => {
     if (isEdit) {
       setUpdate(true);
-      editPO();
+      editPB();
     } else {
       setUpdate(true);
-      addPO();
+      addPB();
     }
   };
 
@@ -316,69 +249,9 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
     return [year, month, day].join("-");
   };
 
-  const accTemp = (option) => {
-    return (
-      <div>
-        {option !== null
-          ? `${option.account.acc_name} (${option.account.acc_code})`
-          : ""}
-      </div>
-    );
-  };
-
-  const valueAccTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null
-            ? `${option.account.acc_name} (${option.account.acc_code})`
-            : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const deptTemp = (option) => {
-    return (
-      <div>
-        {option !== null ? `${option.ccost_code} (${option.ccost_name})` : ""}
-      </div>
-    );
-  };
-
-  const valueDeptTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null ? `${option.ccost_code} (${option.ccost_name})` : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const prodTemp = (option) => {
-    return (
-      <div>{option !== null ? `${option.name} (${option.code})` : ""}</div>
-    );
-  };
-
-  const valueProd = (option, props) => {
-    if (option) {
-      return (
-        <div>{option !== null ? `${option.name} (${option.code})` : ""}</div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const updatePo = (e) => {
+  const updatePB = (e) => {
     dispatch({
-      type: SET_CURRENT_PO,
+      type: SET_CURRENT_PB,
       payload: e,
     });
   };
@@ -398,64 +271,49 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
         <Toast ref={toast} />
 
         <Row className="mb-4">
-          <div className="col-6">
-            <label className="text-label">Tanggal</label>
-            <div className="p-inputgroup">
-              <Calendar
-                value={new Date(`${po.po_date}Z`)}
-                onChange={(e) => {
-                  updatePo({ ...po, po_date: e.value });
-                }}
-                placeholder="Pilih Tanggal"
-                showIcon
-                dateFormat="dd/mm/yy"
-              />
-            </div>
-          </div>
-
-          <div className="col-6">
+          <div className="col-4">
             <label className="text-label">Kode Referensi</label>
             <div className="p-inputgroup">
               <InputText
-                value={po.po_code}
-                onChange={(e) => updatePo({ ...po, po_code: e.target.value })}
+                value={pb.pb_code}
+                onChange={(e) => updatePB({ ...pb, pb_code: e.target.value })}
                 placeholder="Masukan Kode Referensi"
               />
             </div>
           </div>
-          {/* <div className="col-4"></div>  */}
-
-          <div className="col-12">
-            <label className="text-label">Kode Akun WIP</label>
+          
+          <div className="col-3">
+            <label className="text-label">Tanggal</label>
             <div className="p-inputgroup">
-              <Dropdown
-                value={null}
-                options={account}
+              <Calendar
+                value={new Date(`${pb.pb_date}Z`)}
                 onChange={(e) => {
-                  // console.log(e.value.rprod);
-                  // let result = null;
-                  // if (po.top) {
-                  //   result = new Date(`${req_pur(e.value.id).req_date}Z`);
-                  //   result.setDate(result.getDate() + rulPay(po?.top)?.day);
-                  //   console.log(result);
-                  // }
-                  // updatePo({
-                  //   ...po,
-                  //   preq_id: e.value.id,
-                  //   due_date: result,
-                  //   sup_id: e.value?.ref_sup?.id ?? null,
-                  //   rprod: e.value.rprod,
-                  //   rjasa: e.value.rjasa,
-                  // });
+                  updatePB({ ...pb, pb_date: e.value });
                 }}
-                optionLabel="acc_name"
-                placeholder="Pilih Kode Akun WIP"
-                itemTemplate={accTemp}
-                valueTemplate={valueAccTemp}
-                filter
-                filterBy="acc_name"
+                placeholder="Pilih Tanggal"
+                showIcon
+                dateFormat="dd-mm-yy"
               />
             </div>
+          </div>
+
+          <div className="col-5">
+            <label className="text-label">Kode Akun WIP</label>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
+              value={pb.acc_id ? checkAcc(pb?.acc_id) : null}
+              option={acc}
+              onChange={(e) => {
+                updatePB({
+                  ...pb,
+                  acc_id: e.account.id,
+                });
+              }}
+              label={"[account.acc_name] ([account.acc_code])"}
+              placeholder="Pilih Kode Akun WIP"
+              detail
+              onDetail={() => setShowAcc(true)}
+            />
           </div>
           {/* kode suplier otomatis keluar, karena sudah melekat di faktur pembelian  */}
         </Row>
@@ -475,7 +333,7 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
             <>
               <DataTable
                 responsiveLayout="none"
-                value={po.rprod?.map((v, i) => {
+                value={pb.product?.map((v, i) => {
                   return {
                     ...v,
                     index: i,
@@ -488,110 +346,85 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
                 <Column
                   header="Produk"
                   style={{
-                    maxWidth: "15rem",
+                    width: "30rem",
                   }}
                   field={""}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={
-                          po.rprod[e.index].prod_id &&
-                          checkProd(po.rprod[e.index].prod_id)
-                        }
-                        options={product}
-                        onChange={(e) => {
-                          console.log(e.value);
-                        }}
-                        placeholder="Pilih Kode Produk"
-                        optionLabel="name"
-                        filter
-                        filterBy="name"
-                        valueTemplate={valueProd}
-                        itemTemplate={prodTemp}
-                      />
-                    </div>
-                  )}
-                />
+                    <CustomDropdown
+                      value={pb.prod_id && checkProd(pb.prod_id)}
+                      option={product}
+                      onChange={(e) => {
+                        let sat = [];
+                        satuan.forEach((element) => {
+                          if (element.id === e.unit.id) {
+                            sat.push(element);
+                          } else {
+                            if (element.u_from?.id === e.unit.id) {
+                              sat.push(element);
+                            }
+                          }
+                        });
+                        setSatuan(sat);
 
-                <Column
-                  header="Satuan"
-                  style={{
-                    maxWidth: "15rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <Dropdown
-                        value={
-                          po.rprod[e.index].unit_id &&
-                          checkUnit(po.rprod[e.index].unit_id)
-                        }
-                        onChange={(e) => {
-                          let temp = [...po.rprod];
-                          temp[e.index].unit_id = e.value.id;
-                          updatePo({ ...po, rprod: temp });
-                        }}
-                        options={satuan}
-                        optionLabel="name"
-                        placeholder="Pilih Satuan"
-                        filter
-                        filterBy="name"
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header="Ending Stok"
-                  style={{
-                    width: "10rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={
-                          po.rprod[e.index].end
-                            ? po.rprod[e.index].end
-                            : null
-                        }
-                        onChange={(a) => {
-                          // let temp = [...po.rprod];
-                          // let result = temp[e.index]?.request - a.target.value;
-                          // temp[e.index].remain = result;
-                          // temp[e.index].order = a.target.value;
-                          // updatePo({ ...po, rprod: temp });
-                        }}
-                        placeholder="Ending Stok"
-                        // type="number"
-                      />
-                    </div>
+                        let temp = [...pb.product];
+                        temp[e.index].prod_id = e.id;
+                        temp[e.index].unit_id = e.unit?.id;
+                        updatePB({ ...pb, product: temp });
+                      }}
+                      placeholder="Pilih Produk"
+                      label={"[name] ([code])"}
+                      detail
+                      onDetail={() => {
+                        setShowProd(true);
+                        setCurrentIndex(e.index);
+                      }}
+                    />
                   )}
                 />
 
                 <Column
                   header="Lokasi"
                   style={{
-                    maxWidth: "15rem",
+                    width: "15rem",
+                  }}
+                  field={""}
+                  body={(e) => (
+                    <CustomDropdown
+                      value={pb.location && checkLok(pb.location)}
+                      onChange={(e) => {
+                        let temp = [...pb.product];
+                        temp[e.index].location = e.id;
+                        updatePB({ ...pb, product: temp });
+                      }}
+                      option={lokasi}
+                      label={"[name] ([code])"}
+                      placeholder="Pilih Lokasi"
+                      detail
+                      onDetail={() => {
+                        setShowLok(true);
+                        setCurrentIndex(e.index);
+                      }}
+                    />
+                  )}
+                />
+
+                <Column
+                  header="Ending Stok"
+                  style={{
+                    width: "8rem",
                   }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
-                      <Dropdown
-                        value={
-                          po.rprod[e.index].location &&
-                          checkUnit(po.rprod[e.index].location)
-                        }
-                        onChange={(e) => {
-                          let temp = [...po.rprod];
-                          temp[e.index].location = e.value.id;
-                          updatePo({ ...po, rprod: temp });
+                      <InputText
+                        value={pb.end ? pb.end : null}
+                        onChange={(a) => {
+                          let temp = [...pb.product];
+                          temp[e.index].end = a.target.value;
+                          updatePB({ ...pb, product: temp });
                         }}
-                        options={lokasi}
-                        optionLabel="name"
-                        placeholder="Pilih Lokasi"
-                        filter
-                        filterBy="name"
+                        placeholder="0"
+                        type="number"
                       />
                     </div>
                   )}
@@ -600,45 +433,71 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
                 <Column
                   header="Jumlah"
                   style={{
-                    width: "10rem",
+                    width: "7rem",
                   }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
                         value={
-                          po.rprod[e.index].order
-                            ? po.rprod[e.index].order
+                          pb.order
+                            ? pb.order
                             : null
                         }
                         onChange={(a) => {
-                          let temp = [...po.rprod];
-                          let result = temp[e.index]?.request - a.target.value;
-                          temp[e.index].remain = result;
+                          let temp = [...pb.product];
                           temp[e.index].order = a.target.value;
-                          updatePo({ ...po, rprod: temp });
+                          updatePB({ ...pb, product: temp });
                         }}
-                        placeholder="Jumlah"
-                        // type="number"
+                        placeholder="0"
+                        type="number"
                       />
                     </div>
                   )}
                 />
 
                 <Column
+                  header="Satuan"
+                  style={{
+                    width: "10rem",
+                  }}
+                  field={""}
+                  body={(e) => (
+                    <CustomDropdown
+                      value={pb.unit_id && checkUnit(pb.unit_id)}
+                      onChange={(e) => {
+                        let temp = [...pb.product];
+                        temp[e.index].unit_id = e.id;
+                        updatePB({ ...pb, product: temp });
+                      }}
+                      option={satuan}
+                      label={"[name] ([code])"}
+                      placeholder="Pilih Satuan"
+                      detail
+                      onDetail={() => {
+                        setShowSat(true);
+                        setCurrentIndex(e.index);
+                      }}
+                    />
+                  )}
+                />
+
+                <Column
                   body={(e) =>
-                    e.index === po.rprod.length - 1 ? (
+                    e.index === pb.product.length - 1 ? (
                       <Link
                         onClick={() => {
-                          updatePo({
-                            ...po,
-                            rprod: [
-                              ...po.rprod,
+                          updatePB({
+                            ...pb,
+                            product: [
+                              ...pb.product,
                               {
                                 id: 0,
                                 prod_id: null,
                                 unit_id: null,
-                                request: null,
+                                end: null,
+                                location: null,
+                                order: null,
                               },
                             ],
                           });
@@ -650,11 +509,11 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
                     ) : (
                       <Link
                         onClick={() => {
-                          let temp = [...po.rprod];
+                          let temp = [...pb.product];
                           temp.splice(e.index, 1);
-                          updatePo({
-                            ...po,
-                            rprod: temp,
+                          updatePB({
+                            ...pb,
+                            product: temp,
                           });
                         }}
                         className="btn btn-danger shadow btn-xs sharp ml-1"
@@ -699,24 +558,127 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
       {body()}
       {footer()}
 
-      <DataPusatBiaya
-        data={pusatBiaya}
+      <DataAkun
+        data={acc}
         loading={false}
         popUp={true}
-        show={showDepartemen}
+        show={showAcc}
         onHide={() => {
-          setShowDept(false);
+          setShowAcc(false);
         }}
         onInput={(e) => {
-          setShowDept(!e);
+          setShowAcc(!e);
         }}
         onSuccessInput={(e) => {
-          getPusatBiaya();
+          getAcc();
         }}
         onRowSelect={(e) => {
           if (doubleClick) {
-            setShowDept(false);
-            updatePo({ ...rp, req_dep: e.data.id });
+            setShowAcc(false);
+            updatePB({ ...pb, acc_id: e.data.account.id });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataProduk
+        data={product}
+        loading={false}
+        popUp={true}
+        show={showProd}
+        onHide={() => {
+          setShowProd(false);
+        }}
+        onInput={(e) => {
+          setShowProd(!e);
+        }}
+        onSuccessInput={(e) => {
+          getProduct();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowProd(false);
+            let sat = [];
+            satuan.forEach((element) => {
+              if (element.id === e.data.unit.id) {
+                sat.push(element);
+              } else {
+                if (element.u_from?.id === e.data.unit.id) {
+                  sat.push(element);
+                }
+              }
+            });
+            setSatuan(sat);
+
+            let temp = [...pb.product];
+            temp[currentIndex].prod_id = e.data?.id;
+            temp[currentIndex].unit_id = e.data.id;
+            updatePB({ ...pb, product: temp });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataSatuan
+        data={satuan}
+        loading={false}
+        popUp={true}
+        show={showSat}
+        onHide={() => {
+          setShowSat(false);
+        }}
+        onInput={(e) => {
+          setShowSat(!e);
+        }}
+        onSuccessInput={(e) => {
+          getSatuan();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowSat(false);
+            let temp = [...pb.product];
+            temp[currentIndex].unit_id = e.data.id;
+            updatePB({ ...pb, product: temp });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataLokasi
+        data={lokasi}
+        loading={false}
+        popUp={true}
+        show={showLok}
+        onHide={() => {
+          setShowLok(false);
+        }}
+        onInput={(e) => {
+          setShowLok(!e);
+        }}
+        onSuccessInput={(e) => {
+          getLokasi();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowLok(false);
+            let temp = [...pb.product];
+            temp[currentIndex].location = e.data.id;
+            updatePB({ ...pb, product: temp });
           }
 
           setDoubleClick(true);

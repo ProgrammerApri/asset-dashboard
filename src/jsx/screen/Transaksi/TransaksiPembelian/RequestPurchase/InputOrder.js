@@ -372,7 +372,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
       prod: [],
       jasa: [],
     };
-
+ 
     rp?.rprod.forEach((element, i) => {
       if (i > 0) {
         if (element.prod_id || element.request) {

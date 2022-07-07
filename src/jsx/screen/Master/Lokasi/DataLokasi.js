@@ -433,13 +433,13 @@ const DataLokasi = ({
           />
           <Column
             header="Alamat"
-            field={(e) => e.address}
+            field={(e) => e.address !== "" ? e.address : "-"}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
           <Column
             header="Keterangan"
-            field={(e) => e?.desc ?? "-"}
+            field={(e) => e?.desc !== "" ? e.desc : "-"}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />

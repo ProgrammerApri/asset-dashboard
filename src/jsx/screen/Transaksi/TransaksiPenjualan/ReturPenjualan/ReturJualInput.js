@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { request, endpoints } from "src/utils";
-import { Row } from "react-bootstrap";
+import { Card, Col, Row } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
@@ -367,7 +367,22 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
         <Toast ref={toast} />
 
         <Row className="mb-4">
-          <div className="col-4">
+          <div className="col-3">
+            <PrimeInput
+              label={"Kode Referensi"}
+              value={sr.ret_code}
+              onChange={(e) => {
+                updateSr({ ...sr, ret_code: e.target.value });
+                let newError = error;
+                newError.code = false;
+                setError(newError);
+              }}
+              placeholder="Masukan Kode Referensi"
+              error={error?.code}
+            />
+          </div>
+
+          <div className="col-3">
             <PrimeCalendar
               label={"Tanggal"}
               value={new Date(`${sr.ret_date}Z`)}
@@ -385,22 +400,16 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-4">
-            <PrimeInput
-              label={"Kode Referensi"}
-              value={sr.ret_code}
-              onChange={(e) => {
-                updateSr({ ...sr, ret_code: e.target.value });
-                let newError = error;
-                newError.code = false;
-                setError(newError);
-              }}
-              placeholder="Masukan Kode Referensi"
-              error={error?.code}
-            />
+          <div className="col-12 mt-3">
+            <h6>
+              <b>Informasi Penjualan</b>
+            </h6>
+            {/* </div>
+          <div className="col-12"> */}
+            <Divider className=""></Divider>
           </div>
 
-          <div className="col-4">
+          <div className="col-3">
             <label className="text-label">No. Penjualan</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
@@ -418,6 +427,8 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
               detail
             />
           </div>
+
+          <div className="col-9"></div>
           {/* kode suplier otomatis keluar, karena sudah melekat di faktur pembelian  */}
 
           <div className="col-3">
@@ -555,27 +566,6 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Satuan"
-                    field={""}
-                    body={(e) => (
-                      <CustomDropdown
-                        value={e.unit_id && checkUnit(e.unit_id)}
-                        onChange={(t) => {
-                          let temp = [...sr.product];
-                          temp[e.index].unit_id = t.id;
-                          updateSr({ ...sr, product: temp });
-                        }}
-                        option={satuan}
-                        label={"[name]"}
-                        placeholder="Pilih Satuan"
-                        detail
-                        onDetail={() => setShowSatuan(true)}
-                        disabled={sr.sale_id !== null}
-                      />
-                    )}
-                  />
-
-                  <Column
                     header="Retur"
                     field={""}
                     body={(e) => (
@@ -599,6 +589,27 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                           error={error?.ret}
                         />
                       </div>
+                    )}
+                  />
+
+                  <Column
+                    header="Satuan"
+                    field={""}
+                    body={(e) => (
+                      <CustomDropdown
+                        value={e.unit_id && checkUnit(e.unit_id)}
+                        onChange={(t) => {
+                          let temp = [...sr.product];
+                          temp[e.index].unit_id = t.id;
+                          updateSr({ ...sr, product: temp });
+                        }}
+                        option={satuan}
+                        label={"[name]"}
+                        placeholder="Pilih Satuan"
+                        detail
+                        onDetail={() => setShowSatuan(true)}
+                        disabled={sr.sale_id !== null}
+                      />
                     )}
                   />
 
@@ -878,9 +889,17 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
 
   return (
     <>
-      {header()}
-      {body()}
-      {footer()}
+      <Row>
+        <Col>
+          <Card>
+            <Card.Body>
+              {header()}
+              {body()}
+              {footer()}
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
 
       <DataCustomer
         data={customer}

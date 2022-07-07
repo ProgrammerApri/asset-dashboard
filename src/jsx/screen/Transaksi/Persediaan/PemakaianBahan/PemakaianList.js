@@ -16,7 +16,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { InputNumber } from "primereact/inputnumber";
 import { Divider } from "@material-ui/core";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_PO, SET_EDIT_PO, SET_PO } from "src/redux/actions";
+import { SET_CURRENT_PB, SET_EDIT_PB, SET_PB } from "src/redux/actions";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 
 const data = {
@@ -76,14 +76,14 @@ const PemakaianList = ({ onAdd }) => {
           onClick={() => {
             onAdd();
             dispatch({
-              type: SET_EDIT_PO,
+              type: SET_EDIT_PB,
               payload: false,
             });
             dispatch({
-              type: SET_CURRENT_PO,
+              type: SET_CURRENT_PB,
               payload: {
                 ...data,
-                rprod: [
+                product: [
                   {
                     id: 0,
                     prod_id: null,

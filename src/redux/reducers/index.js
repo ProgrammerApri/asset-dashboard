@@ -14,6 +14,10 @@ import GIROReducer from "./GIROReducer";
 import DashboardReducer from "./DashboardReducer";
 import KHReducer from "./KHReducer";
 import KPReducer from "./KPReducer";
+import ICReducer from "./ICReducer";
+import LMReducer from "./LMReducer";
+import PBReducer from "./PBReducer";
+import PHJReducer from "./PHJReducer";
 
 
 const rootReducer = combineReducers({
@@ -32,6 +36,10 @@ const rootReducer = combineReducers({
   dash: DashboardReducer,
   kh: KHReducer,
   kp: KPReducer,
+  ic: ICReducer,
+  lm: LMReducer,
+  pb: PBReducer,
+  phj: PHJReducer,
 });
 
 export default rootReducer;

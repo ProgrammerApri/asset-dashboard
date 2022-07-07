@@ -16,7 +16,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { InputNumber } from "primereact/inputnumber";
 import { Divider } from "@material-ui/core";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_PO, SET_EDIT_PO, SET_PO } from "src/redux/actions";
+import { SET_CURRENT_IC, SET_EDIT_IC } from "src/redux/actions";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 // import data from "src/jsx/data";
 
@@ -55,6 +55,7 @@ const KoreksiPersediaanList = ({ onAdd }) => {
   const [loading, setLoading] = useState(true);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+  const toast = useRef(null);
 
   const dummy = Array.from({ length: 10 });
 
@@ -80,14 +81,14 @@ const KoreksiPersediaanList = ({ onAdd }) => {
           onClick={() => {
             onAdd();
             dispatch({
-              type: SET_EDIT_PO,
+              type: SET_EDIT_IC,
               payload: false,
             });
             dispatch({
-              type: SET_CURRENT_PO,
+              type: SET_CURRENT_IC,
               payload: {
                 ...data,
-                rprod: [
+                product: [
                   {
                     id: 0,
                     prod_id: null,
@@ -153,6 +154,7 @@ const KoreksiPersediaanList = ({ onAdd }) => {
 
   return (
     <>
+      <Toast ref={toast} />
       <Row>
         <Col className="pt-0">
           <DataTable

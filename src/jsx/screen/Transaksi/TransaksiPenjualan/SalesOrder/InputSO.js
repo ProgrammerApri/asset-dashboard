@@ -590,7 +590,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
   const header = () => {
     return (
-      <h4 className="mb-5">
+      <h4 className="mb-4">
         <b>Sales Order</b>
       </h4>
     );
@@ -629,8 +629,23 @@ const InputSO = ({ onCancel, onSuccess }) => {
       <>
         <Toast ref={toast} />
         {/* Put content body here */}
-        <Row className="mb-6">
-          <div className="col-6">
+        <Row className="mb-4">
+          <div className="col-3">
+            <PrimeInput
+              label={"Kode Referensi"}
+              value={so.so_code}
+              onChange={(e) => {
+                updateSo({ ...so, so_code: e.target.value });
+                let newError = error;
+                newError.code = false;
+                setError(newError);
+              }}
+              placeholder="Masukan Kode Referensi"
+              error={error?.code}
+            />
+          </div>
+
+          <div className="col-3">
             <PrimeCalendar
               label={"Tanggal"}
               value={new Date(`${so.so_date}Z`)}
@@ -648,23 +663,17 @@ const InputSO = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-6">
-            <PrimeInput
-              label={"Kode Referensi"}
-              value={so.so_code}
-              onChange={(e) => {
-                updateSo({ ...so, so_code: e.target.value });
-                let newError = error;
-                newError.code = false;
-                setError(newError);
-              }}
-              placeholder="Masukan Kode Referensi"
-              error={error?.code}
-            />
+          <div className="col-12 mt-3">
+            <span className="fs-12">
+              <b>Informasi Pelanggan</b>
+            </span>
+            {/* </div>
+          <div className="col-12"> */}
+            <Divider className="mt-2"></Divider>
           </div>
 
           <div className="col-3">
-            <label className="text-black fs-14">Pelanggan</label>
+            <label>Pelanggan</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
               value={so.pel_id !== null ? checkCus(so.pel_id) : null}
@@ -690,7 +699,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-3">
-            <label className="text-black fs-14">Alamat Pelanggan</label>
+            <label>Alamat Pelanggan</label>
             <div className="p-inputgroup">
               <InputText
                 value={
@@ -713,7 +722,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-3">
-            <label className="text-black fs-14">Ppn</label>
+            <label>Ppn</label>
             <div className="p-inputgroup">
               <InputText
                 value={
@@ -728,7 +737,16 @@ const InputSO = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-4">
+          <div className="col-12 mt-3">
+            <span className="fs-12">
+              <b>Informasi Pembayaran</b>
+            </span>
+            {/* </div>
+          <div className="col-12"> */}
+            <Divider className="mt-2"></Divider>
+          </div>
+
+          <div className="col-3">
             <PrimeCalendar
               label={"Tanggal Permintaan"}
               value={new Date(`${so.req_date}Z`)}
@@ -739,7 +757,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 newError.tgl = false;
                 setError(newError);
               }}
-              placeholder="Pilih Tanggal Pemintaan"
+              placeholder="Tanggal Pemintaan"
               showIcon
               dateFormat="dd-mm-yy"
               error={error?.tgl}
@@ -747,7 +765,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-4">
-            <label className="text-black fs-14">Jangka Pembayaran</label>
+            <label>Jangka Pembayaran</label>
             <div className="p-inputgroup mt-0"></div>
             <CustomDropdown
               value={so.top !== null ? checkRules(so.top) : null}
@@ -772,21 +790,21 @@ const InputSO = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-4">
-            <label className="text-black fs-14">Tanggal Jatuh Tempo</label>
+          <div className="col-3">
+            <label>Tanggal Jatuh Tempo</label>
             <div className="p-inputgroup mt-0">
               <Calendar
                 value={new Date(`${so?.due_date}Z`)}
                 onChange={(e) => {}}
                 placeholder="Tanggal Jatuh Tempo"
                 disabled
-                dateFormat="dd/mm/yy"
+                dateFormat="dd-mm-yy"
               />
             </div>
           </div>
 
           <div className="d-flex col-12 align-items-center mt-4">
-            <label className="ml-0 mt-1 text-black fs-14">
+            <label className="ml-0 mt-1 fs-12">
               <b>{"Kirim Ke Sub Pelanggan"}</b>
             </label>
             <InputSwitch
@@ -801,7 +819,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
           {so && so.sub_addr === true && (
             <>
               <div className="col-4">
-                <label className="text-black fs-14">Sub Pelanggan</label>
+                <label>Sub Pelanggan</label>
                 <div className="p-inputgroup"></div>
                 <CustomDropdown
                   value={so.sub_id ? checkSubCus(so.sub_id) : null}
@@ -818,7 +836,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
               </div>
 
               <div className="col-4">
-                <label className="text-black fs-14">Alamat Sub Pelanggan</label>
+                <label>Alamat Sub Pelanggan</label>
                 <div className="p-inputgroup">
                   <InputText
                     value={
@@ -833,7 +851,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
               </div>
 
               <div className="col-4">
-                <label className="text-black fs-14">Kontak Person</label>
+                <label>Kontak Person</label>
                 <div className="p-inputgroup">
                   <InputText
                     value={
@@ -921,29 +939,6 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
-                  header="Satuan"
-                  field={""}
-                  body={(e) => (
-                    <CustomDropdown
-                      value={e.unit_id && checkUnit(e.unit_id)}
-                      onChange={(u) => {
-                        let temp = [...so.sprod];
-                        temp[e.index].unit_id = u.id;
-                        updateSo({ ...so, sprod: temp });
-                      }}
-                      option={satuan}
-                      label={"[name]"}
-                      detail
-                      onDetail={() => {
-                        setCurrentIndex(e.index);
-                        setShowSatuan(true);
-                      }}
-                      placeholder="Pilih Satuan"
-                    />
-                  )}
-                />
-
-                <Column
                   header="Lokasi"
                   field={""}
                   body={(e) => (
@@ -999,6 +994,29 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         error={error?.jum}
                       />
                     </div>
+                  )}
+                />
+
+                <Column
+                  header="Satuan"
+                  field={""}
+                  body={(e) => (
+                    <CustomDropdown
+                      value={e.unit_id && checkUnit(e.unit_id)}
+                      onChange={(u) => {
+                        let temp = [...so.sprod];
+                        temp[e.index].unit_id = u.id;
+                        updateSo({ ...so, sprod: temp });
+                      }}
+                      option={satuan}
+                      label={"[name]"}
+                      detail
+                      onDetail={() => {
+                        setCurrentIndex(e.index);
+                        setShowSatuan(true);
+                      }}
+                      placeholder="Pilih Satuan"
+                    />
                   )}
                 />
 
@@ -1225,9 +1243,35 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
+                  header="Jumlah"
+                  field={""}
+                  style={{
+                    width: "8rem",
+                  }}
+                  body={(e) => (
+                    <div className="p-inputgroup">
+                      <InputText
+                        value={e.qty && e.qty}
+                        onChange={(u) => {
+                          let temp = [...so.sjasa];
+                          temp[e.index].qty = u.target.value;
+                          temp[e.index].total =
+                            temp[e.index].qty * temp[e.index].price;
+                          updateSo({ ...so, sjasa: temp });
+                          console.log(temp);
+                        }}
+                        placeholder="0"
+                        type="number"
+                        min={0}
+                      />
+                    </div>
+                  )}
+                />
+
+                <Column
                   header="Satuan"
                   style={{
-                    maxWidth: "12rem",
+                    width: "13rem",
                   }}
                   field={""}
                   body={(e) => (
@@ -1248,29 +1292,6 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         setShowSatuan(true);
                       }}
                     />
-                  )}
-                />
-
-                <Column
-                  header="Jumlah"
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={e.qty && e.qty}
-                        onChange={(u) => {
-                          let temp = [...so.sjasa];
-                          temp[e.index].qty = u.target.value;
-                          temp[e.index].total =
-                            temp[e.index].qty * temp[e.index].price;
-                          updateSo({ ...so, sjasa: temp });
-                          console.log(temp);
-                        }}
-                        placeholder="0"
-                        type="number"
-                        min={0}
-                      />
-                    </div>
                   )}
                 />
 
@@ -1303,7 +1324,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 <Column
                   header="Diskon"
                   style={{
-                    width: "25rem",
+                    width: "13rem",
                   }}
                   field={""}
                   body={(e) => (
@@ -1541,13 +1562,13 @@ const InputSO = ({ onCancel, onSuccess }) => {
             </div>
 
             <div className="col-6">
-              <label className="text-black fs-15">
+              <label className="fs-14">
                 <b>Total Pembayaran</b>
               </label>
             </div>
 
             <div className="col-6">
-              <label className="text-label fs-16">
+              <label className="fs-14">
                 {so?.split_inv ? (
                   <b>
                     Rp.{" "}
@@ -1652,13 +1673,13 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 </div>
 
                 <div className="col-6">
-                  <label className="text-black fs-15">
+                  <label className="fs-14">
                     <b>Total Pembayaran</b>
                   </label>
                 </div>
 
                 <div className="col-6">
-                  <label className="text-black fs-15">
+                  <label className="fs-14">
                     <b>
                       Rp.{" "}
                       {formatIdr(

@@ -576,7 +576,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
   const header = () => {
     return (
       <h4 className="mb-5">
-        <b>{isEdit ? "Edit" : "Buat"} Penjualan</b>
+        <b>Penjualan</b>
       </h4>
     );
   };
@@ -615,7 +615,23 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
         {/* Put content body here */}
         <Toast ref={toast} />
         <Row className="mb-4">
-          <div className="col-4">
+          <div className="col-3">
+            <PrimeInput
+              label={"No. Penjualan"}
+              value={sale.ord_code}
+              onChange={(e) => {
+                updateSL({ ...sale, ord_code: e.target.value });
+
+                let newError = error;
+                newError.code = false;
+                setError(newError);
+              }}
+              placeholder="Masukan No. Penjualan"
+              error={error?.code}
+            />
+          </div>
+
+          <div className="col-3">
             <PrimeCalendar
               label={"Tanggal"}
               value={new Date(`${sale.ord_date}Z`)}
@@ -645,23 +661,16 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-4">
-            <PrimeInput
-              label={"No. Penjualan"}
-              value={sale.ord_code}
-              onChange={(e) => {
-                updateSL({ ...sale, ord_code: e.target.value });
-
-                let newError = error;
-                newError.code = false;
-                setError(newError);
-              }}
-              placeholder="Masukan No. Penjualan"
-              error={error?.code}
-            />
+          <div className="col-12 mt-3">
+            <span className="fs-14">
+              <b>Informasi Pesanan</b>
+            </span>
+            {/* </div>
+          <div className="col-12"> */}
+            <Divider className="mt-2"></Divider>
           </div>
 
-          <div className="col-4">
+          <div className="col-3">
             <label className="text-label">No. Pesanan Penjualan</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
@@ -695,6 +704,8 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
               //   onDetail={() => setShowr(true)}
             />
           </div>
+
+          <div className="col-9"></div>
 
           <div className="col-3">
             <label className="text-label">Pelanggan</label>
@@ -763,6 +774,15 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
+          <div className="col-12 mt-3">
+            <span className="fs-14">
+              <b>Informasi Waktu Pembayaran</b>
+            </span>
+            {/* </div>
+          <div className="col-12"> */}
+            <Divider className="mt-2"></Divider>
+          </div>
+
           <div className="col-4">
             <label className="text-label">Syarat Pembayaran</label>
             <div className="p-inputgroup mt-0"></div>
@@ -826,7 +846,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="d-flex col-12 align-items-center mt-4">
-            <label className="ml-0 mt-1 text-black fs-14">
+            <label className="ml-0 mt-1 fs-12">
               <b>{"Kirim Ke Sub Pelanggan"}</b>
             </label>
             <InputSwitch
@@ -922,6 +942,9 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                 <Column
                   header="Produk"
                   field={""}
+                  style={{
+                    width: "20rem",
+                  }}
                   body={(e) => (
                     <CustomDropdown
                       value={e.prod_id && checkProd(e.prod_id)}
@@ -963,32 +986,11 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
-                  header="Satuan"
-                  field={""}
-                  body={(e) => (
-                    <CustomDropdown
-                      value={e.unit_id && checkUnit(e.unit_id)}
-                      onChange={(t) => {
-                        let temp = [...sale.jprod];
-                        temp[e.index].unit_id = t.id;
-                        updateSL({ ...sale, jprod: temp });
-                      }}
-                      option={satuan}
-                      label={"[name]"}
-                      placeholder="Pilih Satuan"
-                      detail
-                      onDetail={() => {
-                        setCurrentIndex(e.index);
-                        setShowSatuan(true);
-                      }}
-                      disabled={sale && sale.so_id}
-                    />
-                  )}
-                />
-
-                <Column
                   header="Lokasi"
                   field={""}
+                  style={{
+                    width: "10rem",
+                  }}
                   body={(e) => (
                     <CustomDropdown
                       value={e.location && checkLoc(e.location)}
@@ -1018,9 +1020,9 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Jumlah"
-                  // style={{
-                  //   maxWidth: "10rem",
-                  // }}
+                  style={{
+                    width: "8rem",
+                  }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
@@ -1049,10 +1051,37 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
+                  header="Satuan"
+                  field={""}
+                  style={{
+                    width: "10rem",
+                  }}
+                  body={(e) => (
+                    <CustomDropdown
+                      value={e.unit_id && checkUnit(e.unit_id)}
+                      onChange={(t) => {
+                        let temp = [...sale.jprod];
+                        temp[e.index].unit_id = t.id;
+                        updateSL({ ...sale, jprod: temp });
+                      }}
+                      option={satuan}
+                      label={"[name]"}
+                      placeholder="Pilih Satuan"
+                      detail
+                      onDetail={() => {
+                        setCurrentIndex(e.index);
+                        setShowSatuan(true);
+                      }}
+                      disabled={sale && sale.so_id}
+                    />
+                  )}
+                />
+
+                <Column
                   header="Harga Satuan"
-                  // style={{
-                  //   minWidth: "10rem",
-                  // }}
+                  style={{
+                    width: "10rem",
+                  }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
@@ -1083,6 +1112,9 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                 <Column
                   header="Diskon"
                   field={""}
+                  style={{
+                    width: "15rem",
+                  }}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
@@ -1109,6 +1141,9 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                 <Column
                   header="Harga Nett"
                   field={""}
+                  style={{
+                    width: "10rem",
+                  }}
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
@@ -1586,13 +1621,13 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
             </div>
 
             <div className="col-6">
-              <label className="text-label">
+              <label className="text-label fs-14">
                 <b>Total Pembayaran</b>
               </label>
             </div>
 
             <div className="col-6">
-              <label className="text-label fs-16">
+              <label className="text-label fs-14">
                 {sale.split_inv ? (
                   <b>
                     Rp.{" "}
@@ -1695,13 +1730,13 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">
+                  <label className="text-label fs-14">
                     <b>Total Pembayaran</b>
                   </label>
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label fs-16">
+                  <label className="fs-14">
                     <b>
                       Rp.{" "}
                       {formatIdr(

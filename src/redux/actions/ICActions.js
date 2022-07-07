@@ -1,0 +1,5 @@
+export const SET_CURRENT_IC = "ic.SET_CURRENT_IC"
+export const SET_IC = "ic.SET_IC"
+export const RESET_CURRENT_IC = "ic.RESET_CURRENT_IC"
+export const UPDATE_CURRENT_IC = "ic.UPDATE_CURRENT_IC"
+export const SET_EDIT_IC = "ic.SET_EDIT_IC"

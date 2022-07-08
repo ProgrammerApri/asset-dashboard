@@ -350,7 +350,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-3">
+          <div className="col-2">
             <label className="text-label">Tanggal</label>
             <div className="p-inputgroup">
               <Calendar
@@ -366,23 +366,26 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-4"></div>
-          <div className="col-4">
+          <div className="col-4 mt-2">
             <label className="text-label">Kode Akun</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
               value={ic.acc_id ? acco(ic?.acc_id) : null}
               option={acc}
               onChange={(e) => {
-                updateIC({ ...ic, acc_id: e.account?.id });
+                updateIC({
+                  ...ic,
+                  acc_id: e.account?.id,
+                });
               }}
               placeholder="Pilih Kode Akun"
-              label={"[account.acc_name] ([account.acc_code])"}
+              label={"[account.acc_name] - [account.acc_code]"}
               detail
               onDetail={() => setShowAcc(true)}
             />
           </div>
 
-          <div className="col-4">
+          <div className="col-4 mt-2">
             <label className="text-label">Departemen</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
@@ -391,14 +394,14 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
               onChange={(e) => {
                 updateIC({ ...ic, dep_id: e.id });
               }}
-              label={"[ccost_name] ([ccost_code])"}
+              label={"[ccost_name] - [ccost_code]"}
               placeholder="Pilih Departemen"
               detail
               onDetail={() => setShowDept(true)}
             />
           </div>
 
-          <div className="col-4">
+          <div className="col-4 mt-2">
             <label className="text-label">Project</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
@@ -410,7 +413,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                   proj_id: e.id,
                 });
               }}
-              label={"[proj_name] ([proj_code])"}
+              label={"[proj_name] - [proj_code]"}
               placeholder="Pilih Project"
               detail
               onDetail={() => setShowProj(true)}
@@ -472,7 +475,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                         updateIC({ ...ic, product: temp });
                       }}
                       placeholder="Pilih Kode Produk"
-                      label={"[name] ([code])"}
+                      label={"[name]"}
                       detail
                       onDetail={() => {
                         setShowProd(true);
@@ -497,7 +500,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                         updateIC({ ...ic, product: temp });
                       }}
                       option={lokasi}
-                      label={"[name] ([code])"}
+                      label={"[name]"}
                       placeholder="Pilih Lokasi"
                       detail
                       onDetail={() => {
@@ -525,6 +528,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                         }}
                         placeholder="0"
                         type="number"
+                        min={0}
                       />
                     </div>
                   )}
@@ -545,7 +549,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                         updateIC({ ...ic, product: temp });
                       }}
                       option={satuan}
-                      label={"[name] ([code])"}
+                      label={"[name]"}
                       placeholder="Pilih Satuan"
                       detail
                       onDetail={() => {
@@ -565,7 +569,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        value={e.acc_id && acco(e.acc_id).account.sld_type}
+                        value={e.acc_id && acco(e.acc_id)?.account?.sld_type}
                         onChange={(a) => {}}
                         placeholder="D/K"
                         // type="number"
@@ -646,7 +650,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
 
   return (
     <>
-      {header()}
+      {/* {header()} */}
       {body()}
       {footer()}
 

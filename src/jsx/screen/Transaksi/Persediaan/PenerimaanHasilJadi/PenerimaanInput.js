@@ -303,7 +303,8 @@ const PenerimaanInput = ({ onCancel, onSuccess }) => {
         <Toast ref={toast} />
 
         <Row className="mb-4">
-          <div className="col-4">
+          <div className="col-5"></div>
+          <div className="col-5">
             <label className="text-label">Kode Referensi</label>
             <div className="p-inputgroup">
               <InputText
@@ -316,7 +317,7 @@ const PenerimaanInput = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-3">
+          <div className="col-2">
             <label className="text-label">Tanggal</label>
             <div className="p-inputgroup">
               <Calendar
@@ -329,7 +330,16 @@ const PenerimaanInput = ({ onCancel, onSuccess }) => {
                 dateFormat="dd-mm-yy"
               />
             </div>
-          </div>    
+          </div>
+
+          <div className="col-12">
+            <span className="fs-14">
+              <b>Informasi Pemakaian Bahan Baku</b>
+            </span>
+            {/* </div>
+          <div className="col-12"> */}
+            <Divider className="mt-2"></Divider>
+          </div>
 
           <div className="col-5">
             <label className="text-label">Kode Pemakaian</label>
@@ -420,7 +430,7 @@ const PenerimaanInput = ({ onCancel, onSuccess }) => {
                         updatePhj({ ...phj, product: temp });
                       }}
                       placeholder="Pilih Kode Produk"
-                      label={"[name] ([code])"}
+                      label={"[name]"}
                       detail
                       onDetail={() => {
                         setShowProd(true);
@@ -445,7 +455,7 @@ const PenerimaanInput = ({ onCancel, onSuccess }) => {
                         updatePhj({ ...phj, product: temp });
                       }}
                       option={lokasi}
-                      label={"[name] ([code])"}
+                      label={"[name]"}
                       placeholder="Pilih Lokasi"
                       detail
                       onDetail={() => {
@@ -465,11 +475,7 @@ const PenerimaanInput = ({ onCancel, onSuccess }) => {
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        value={
-                          phj.order
-                            ? phj.order
-                            : null
-                        }
+                        value={phj.order ? phj.order : null}
                         onChange={(a) => {
                           let temp = [...phj.product];
                           temp[e.index].order = a.target.value;
@@ -477,6 +483,7 @@ const PenerimaanInput = ({ onCancel, onSuccess }) => {
                         }}
                         placeholder="0"
                         type="number"
+                        min={0}
                       />
                     </div>
                   )}
@@ -497,7 +504,7 @@ const PenerimaanInput = ({ onCancel, onSuccess }) => {
                         updatePhj({ ...phj, product: temp });
                       }}
                       option={satuan}
-                      label={"[name] ([code])"}
+                      label={"[name]"}
                       placeholder="Pilih Satuan"
                       detail
                       onDetail={() => {
@@ -579,7 +586,7 @@ const PenerimaanInput = ({ onCancel, onSuccess }) => {
 
   return (
     <>
-      {header()}
+      {/* {header()} */}
       {body()}
       {footer()}
 

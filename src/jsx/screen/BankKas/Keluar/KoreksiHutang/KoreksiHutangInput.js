@@ -8,47 +8,25 @@ import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { Divider } from "@material-ui/core";
 import { Calendar } from "primereact/calendar";
-import { InputSwitch } from "primereact/inputswitch";
-import CustomAccordion from "../../../../components/Accordion/Accordion";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_PO } from "src/redux/actions";
+import { SET_CURRENT_KH, SET_CURRENT_PO } from "src/redux/actions";
 import DataSupplier from "src/jsx/screen/Mitra/Pemasok/DataPemasok";
-import DataRulesPay from "src/jsx/screen/MasterLainnya/RulesPay/DataRulesPay";
-import DataPajak from "src/jsx/screen/Master/Pajak/DataPajak";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import DataPusatBiaya from "src/jsx/screen/MasterLainnya/PusatBiaya/DataPusatBiaya";
+import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
+import DataAkun from "src/jsx/screen/Master/Akun/DataAkun";
 
 const KoreksiAPInput = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
   const [doubleClick, setDoubleClick] = useState(false);
-  const po = useSelector((state) => state.po.current);
-  const isEdit = useSelector((state) => state.po.editpo);
+  const kh = useSelector((state) => state.kh.current);
+  const isEdit = useSelector((state) => state.kh.editKh);
   const dispatch = useDispatch();
-  const [isRp, setRp] = useState(true);
-  const [pusatBiaya, setPusatBiaya] = useState(null);
   const [supplier, setSupplier] = useState(null);
-  const [rulesPay, setRulesPay] = useState(null);
-  const [ppn, setPpn] = useState(null);
   const [rp, setRequest] = useState(null);
+  const [acc, setAcc] = useState(null);
   const [showSupplier, setShowSupplier] = useState(false);
-  const [showDepartemen, setShowDept] = useState(false);
-  const [showRulesPay, setShowRulesPay] = useState(false);
-  const [showPpn, setShowPpn] = useState(false);
-  const [product, setProduct] = useState(null);
-  const [jasa, setJasa] = useState(null);
-  const [satuan, setSatuan] = useState(null);
-  const [accor, setAccor] = useState({
-    produk: true,
-    jasa: false,
-  });
-
-  const type = [
-    { name: "%", code: "P" },
-    { name: "Rp", code: "R" },
-  ];
+  const [showAcc, setShowAcc] = useState(false);
 
   useEffect(() => {
     window.scrollTo({
@@ -56,14 +34,8 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
       left: 0,
       behavior: "smooth",
     });
-    getPusatBiaya();
     getSupplier();
-    getRulesPay();
-    getPpn();
-    getRp();
-    getProduct();
-    getJasa();
-    getSatuan();
+    getAcc();
   }, []);
 
   const getSupplier = async () => {
@@ -82,56 +54,18 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
-  const getPusatBiaya = async () => {
+  const getAcc = async () => {
     const config = {
-      ...endpoints.pusatBiaya,
+      ...endpoints.account,
       data: {},
     };
-    console.log(config.data);
     let response = null;
     try {
       response = await request(null, config);
       console.log(response);
       if (response.status) {
         const { data } = response;
-        console.log(data);
-        setPusatBiaya(data);
-      }
-    } catch (error) {}
-  };
-
-  const getRulesPay = async () => {
-    const config = {
-      ...endpoints.rules_pay,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setRulesPay(data);
-      }
-    } catch (error) {}
-  };
-
-  const getPpn = async () => {
-    const config = {
-      ...endpoints.pajak,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setPpn(data);
+        setAcc(data);
       }
     } catch (error) {}
   };
@@ -182,61 +116,11 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
-  const getProduct = async () => {
+  const editKH = async () => {
     const config = {
-      ...endpoints.product,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-
-      if (response.status) {
-        const { data } = response;
-        setProduct(data);
-        console.log("jsdj");
-        console.log(data);
-      }
-    } catch (error) {}
-  };
-
-  const getJasa = async () => {
-    const config = {
-      ...endpoints.jasa,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setJasa(data);
-      }
-    } catch (error) {}
-  };
-
-  const getSatuan = async () => {
-    const config = {
-      ...endpoints.getSatuan,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setSatuan(data);
-      }
-    } catch (error) {}
-  };
-
-  const editPO = async () => {
-    const config = {
-      ...endpoints.editPO,
-      endpoint: endpoints.editPO.endpoint + po.id,
-      data: po,
+      ...endpoints.editKH,
+      endpoint: endpoints.editKH.endpoint + kh.id,
+      data: kh,
     };
     console.log(config.data);
     let response = null;
@@ -259,10 +143,10 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
     }
   };
 
-  const addPO = async () => {
+  const addKH = async () => {
     const config = {
-      ...endpoints.addPO,
-      data: po,
+      ...endpoints.addKH,
+      data: kh,
     };
     console.log(config.data);
     let response = null;
@@ -280,7 +164,7 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${po.po_code} Sudah Digunakan`,
+            detail: `Kode ${kh.kh_code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -298,32 +182,10 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
     }
   };
 
-  const req_pur = (value) => {
+  const acco = (value) => {
     let selected = {};
-    rp?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const dept = (value) => {
-    let selected = {};
-    pusatBiaya?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const pjk = (value) => {
-    let selected = {};
-    ppn?.forEach((element) => {
-      if (value === element.id) {
+    acc?.forEach((element) => {
+      if (value === element.account.id) {
         selected = element;
       }
     });
@@ -334,53 +196,7 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
   const supp = (value) => {
     let selected = {};
     supplier?.forEach((element) => {
-      if (value === element.supplier.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const rulPay = (value) => {
-    let selected = {};
-    rulesPay?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const checkProd = (value) => {
-    let selected = {};
-    product?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-        console.log("SELEC");
-        console.log(selected);
-      }
-    });
-
-    return selected;
-  };
-
-  const checkUnit = (value) => {
-    let selected = {};
-    satuan?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const checkjasa = (value) => {
-    let selected = {};
-    jasa?.forEach((element) => {
-      if (value === element.jasa.id) {
+      if (value === element.supplier?.id) {
         selected = element;
       }
     });
@@ -391,10 +207,10 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
   const onSubmit = () => {
     if (isEdit) {
       setUpdate(true);
-      editPO();
+      editKH();
     } else {
       setUpdate(true);
-      addPO();
+      addKH();
     }
   };
 
@@ -407,141 +223,19 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
     if (month.length < 2) month = "0" + month;
     if (day.length < 2) day = "0" + day;
 
-    return [year, month, day].join("-");
+    return [day, month, year].join("-");
   };
 
-  const reqTemp = (option) => {
-    return (
-      <div>
-        {option !== null
-          ? `${option.req_code} (${option.req_dep.ccost_name})`
-          : ""}
-      </div>
-    );
-  };
-
-  const valueReqTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null
-            ? `${option.req_code} (${option.req_dep.ccost_name})`
-            : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const deptTemp = (option) => {
-    return (
-      <div>
-        {option !== null ? `${option.ccost_code} (${option.ccost_name})` : ""}
-      </div>
-    );
-  };
-
-  const valueDeptTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null ? `${option.ccost_code} (${option.ccost_name})` : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const suppTemp = (option) => {
-    return (
-      <div>
-        {option !== null
-          ? `${option.supplier.sup_code} (${option.supplier.sup_name})`
-          : ""}
-      </div>
-    );
-  };
-
-  const valueSupTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null
-            ? `${option.supplier.sup_code} (${option.supplier.sup_name})`
-            : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const rulTemp = (option) => {
-    return (
-      <div>{option !== null ? `${option.name} (${option.day} Hari)` : ""}</div>
-    );
-  };
-
-  const valueRulTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null ? `${option.name} (${option.day} Hari)` : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const prodTemp = (option) => {
-    return (
-      <div>{option !== null ? `${option.name} (${option.code})` : ""}</div>
-    );
-  };
-
-  const valueProd = (option, props) => {
-    if (option) {
-      return (
-        <div>{option !== null ? `${option.name} (${option.code})` : ""}</div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const jasTemp = (option) => {
-    return (
-      <div>
-        {option !== null ? `${option.jasa.name} (${option.jasa.code})` : ""}
-      </div>
-    );
-  };
-
-  const valueJasTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null ? `${option.jasa.name} (${option.jasa.code})` : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const updatePo = (e) => {
+  const updateKH = (e) => {
     dispatch({
-      type: SET_CURRENT_PO,
+      type: SET_CURRENT_KH,
       payload: e,
     });
   };
 
   const header = () => {
     return (
-      <h4 className="mb-5">
+      <h4 className="mb-4">
         <b>Koreksi Hutang</b>
       </h4>
     );
@@ -555,171 +249,122 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
 
         <Row className="mb-4">
           <div className="col-4">
-            <label className="text-label">Tanggal</label>
-            <div className="p-inputgroup">
-              <Calendar
-                value={new Date(`${po.po_date}Z`)}
-                onChange={(e) => {
-                  updatePo({ ...po, po_date: e.value });
-                }}
-                placeholder="Tanggal Pencairan"
-                showIcon
-                dateFormat="dd/mm/yy"
-              />
-            </div>
-          </div>
-
-          <div className="col-4">
             <label className="text-label">Nomer Referensi Koreksi</label>
             <div className="p-inputgroup">
               <InputText
-                value={po.po_code}
-                onChange={(e) => updatePo({ ...po, po_code: e.target.value })}
-                placeholder="Nomer Giro"
+                value={kh.kh_code}
+                onChange={(e) => updateKH({ ...kh, kh_code: e.target.value })}
+                placeholder="Nomer Referensi"
               />
             </div>
           </div>
 
-
-          <div className="col-4">
-            <label className="text-label">Tanggal J/T</label>
+          <div className="col-2">
+            <label className="text-label">Tanggal</label>
             <div className="p-inputgroup">
               <Calendar
-                value={new Date(`${po.po_date}Z`)}
+                value={new Date(`${kh.kh_date}Z`)}
                 onChange={(e) => {
-                  updatePo({ ...po, po_date: e.value });
+                  updateKH({ ...kh, kh_date: e.value });
                 }}
-                placeholder="Tanggal Jatuh Tempo"
+                placeholder="Tanggal"
                 showIcon
-                dateFormat="dd/mm/yy"
+                dateFormat="dd-mm-yy"
               />
             </div>
           </div>
-
-          <div className="col-4">
+          <div className="col-6"></div>
+          <div className="col-4 mt-3">
             <label className="text-label">Pemasok</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={po.preq_id && req_pur(po.preq_id)}
-                options={rp}
-                onChange={(e) => {
-                  console.log(e.value.rprod);
-                  let result = null;
-                  if (po.top) {
-                    result = new Date(`${req_pur(e.value.id).req_date}Z`);
-                    result.setDate(result.getDate() + rulPay(po?.top)?.day);
-                    console.log(result);
-                  }
-                  updatePo({
-                    ...po,
-                    preq_id: e.value.id,
-                    due_date: result,
-                    sup_id: e.value?.ref_sup?.id ?? null,
-                    rprod: e.value.rprod,
-                    rjasa: e.value.rjasa,
-                  });
-                }}
-                optionLabel="req_code"
-                placeholder="Pilih Kode Bank"
-                itemTemplate={reqTemp}
-                valueTemplate={valueReqTemp}
-              />
-            </div>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
+              value={kh.sup_id ? supp(kh.sup_id) : null}
+              option={supplier}
+              onChange={(e) => {
+                updateKH({
+                  ...kh,
+                  sup_id: e.supplier?.id,
+                });
+              }}
+              label={"[supplier.sup_name]"}
+              placeholder="Pilih Pemasok"
+              detail
+              onDetail={() => setShowSupplier(true)}
+            />
           </div>
-
-          
-
-          <div className="col-4">
+          <div className="col-4 mt-3">
             <label className="text-label">Type Koreksi</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={po.preq_id && req_pur(po.preq_id)}
+                value={kh.type && kh.type}
                 options={rp}
                 onChange={(e) => {
-                  console.log(e.value.rprod);
-                  let result = null;
-                  if (po.top) {
-                    result = new Date(`${req_pur(e.value.id).req_date}Z`);
-                    result.setDate(result.getDate() + rulPay(po?.top)?.day);
-                    console.log(result);
-                  }
-                  updatePo({
-                    ...po,
-                    preq_id: e.value.id,
-                    due_date: result,
-                    sup_id: e.value?.ref_sup?.id ?? null,
-                    rprod: e.value.rprod,
-                    rjasa: e.value.rjasa,
+                  updateKH({
+                    ...kh,
+                    type: e.value.id,
                   });
                 }}
-                optionLabel="req_code"
-                placeholder="Pilih Type"
-                itemTemplate={reqTemp}
-                valueTemplate={valueReqTemp}
+                optionLabel="name"
+                placeholder="Pilih Type Koreksi"
               />
             </div>
           </div>
-          
-          <div className="col-4">
+          <div className="col-4 mt-3">
             <label className="text-label">Akun Lawan</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={po.preq_id && req_pur(po.preq_id)}
-                options={rp}
-                onChange={(e) => {
-                  console.log(e.value.rprod);
-                  let result = null;
-                  if (po.top) {
-                    result = new Date(`${req_pur(e.value.id).req_date}Z`);
-                    result.setDate(result.getDate() + rulPay(po?.top)?.day);
-                    console.log(result);
-                  }
-                  updatePo({
-                    ...po,
-                    preq_id: e.value.id,
-                    due_date: result,
-                    sup_id: e.value?.ref_sup?.id ?? null,
-                    rprod: e.value.rprod,
-                    rjasa: e.value.rjasa,
-                  });
-                }}
-                optionLabel="req_code"
-                placeholder="Akun Lawan"
-                itemTemplate={reqTemp}
-                valueTemplate={valueReqTemp}
-              />
-            </div>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
+              value={kh.acc_lwn && acco(kh.acc_lwn)}
+              option={acc}
+              onChange={(e) => {
+                updateKH({
+                  ...kh,
+                  acc_lwn: e.account?.id,
+                });
+              }}
+              label={"[account.acc_name] - [account.acc_code]"}
+              placeholder="Akun Lawan"
+              detail
+              onDetail={() => setShowAcc(true)}
+            />
           </div>
-          
           <div className="col-4">
             <label className="text-label">Nilai </label>
             <div className="p-inputgroup">
               <InputText
-                value={po.po_code}
-                onChange={(e) => updatePo({ ...po, po_code: e.target.value })}
-                placeholder="Nilai"
+                value={kh.nilai}
+                onChange={(e) => updateKH({ ...kh, nilai: e.target.value })}
+                placeholder="0"
+                type="number"
+                min={0}
               />
             </div>
           </div>
-          
+          <div className="col-4">
+            <label className="text-label">Tanggal J/T</label>
+            <div className="p-inputgroup">
+              <Calendar
+                value={new Date(`${kh.due_date}Z`)}
+                onChange={(e) => {
+                  updateKH({ ...kh, due_date: e.value });
+                }}
+                placeholder="Tanggal Jatuh Tempo"
+                showIcon
+                dateFormat="dd-mm-yy"
+              />
+            </div>
+          </div>
           <div className="col-4">
             <label className="text-label">Keterangan </label>
             <div className="p-inputgroup">
               <InputText
-                value={po.po_code}
-                onChange={(e) => updatePo({ ...po, po_code: e.target.value })}
+                value={kh.ket}
+                onChange={(e) => updateKH({ ...kh, ket: e.target.value })}
                 placeholder="Keterangan"
               />
             </div>
           </div>
-            {/* kode suplier otomatis keluar, karena sudah melekat di faktur pembelian  */}
-            
-          
+          {/* kode suplier otomatis keluar, karena sudah melekat di faktur pembelian  */}
         </Row>
-
-       
-
-      
       </>
     );
   };
@@ -747,65 +392,9 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
 
   return (
     <>
-      {header()}
+      {/* {header()} */}
       {body()}
       {footer()}
-
-      <DataPusatBiaya
-        data={pusatBiaya}
-        loading={false}
-        popUp={true}
-        show={showDepartemen}
-        onHide={() => {
-          setShowDept(false);
-        }}
-        onInput={(e) => {
-          setShowDept(!e);
-        }}
-        onSuccessInput={(e) => {
-          getPusatBiaya();
-        }}
-        onRowSelect={(e) => {
-          if (doubleClick) {
-            setShowDept(false);
-            updatePo({ ...rp, req_dep: e.data.id });
-          }
-
-          setDoubleClick(true);
-
-          setTimeout(() => {
-            setDoubleClick(false);
-          }, 2000);
-        }}
-      />
-
-      <DataRulesPay
-        data={rulesPay}
-        loading={false}
-        popUp={true}
-        show={showRulesPay}
-        onHide={() => {
-          setShowRulesPay(false);
-        }}
-        onInput={(e) => {
-          setShowRulesPay(!e);
-        }}
-        onSuccessInput={(e) => {
-          getRulesPay();
-        }}
-        onRowSelect={(e) => {
-          if (doubleClick) {
-            setShowRulesPay(false);
-            updatePo({ ...rp, req_dep: e.data.id });
-          }
-
-          setDoubleClick(true);
-
-          setTimeout(() => {
-            setDoubleClick(false);
-          }, 2000);
-        }}
-      />
 
       <DataSupplier
         data={supplier}
@@ -824,7 +413,7 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowSupplier(false);
-            updatePo({ ...rp, req_dep: e.data.id });
+            updateKH({ ...rp, req_dep: e.data.id });
           }
 
           setDoubleClick(true);
@@ -835,24 +424,24 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
         }}
       />
 
-      <DataPajak
-        data={ppn}
+      <DataAkun
+        data={acc}
         loading={false}
         popUp={true}
-        show={showPpn}
+        show={showAcc}
         onHide={() => {
-          setShowPpn(false);
+          setShowAcc(false);
         }}
         onInput={(e) => {
-          setShowPpn(!e);
+          setShowAcc(!e);
         }}
         onSuccessInput={(e) => {
-          getPpn();
+          getAcc();
         }}
         onRowSelect={(e) => {
           if (doubleClick) {
-            setShowPpn(false);
-            updatePo({ ...rp, req_dep: e.data.id });
+            setShowAcc(false);
+            updateKH({ ...kh, sup_id: e.data.supplier.id });
           }
 
           setDoubleClick(true);

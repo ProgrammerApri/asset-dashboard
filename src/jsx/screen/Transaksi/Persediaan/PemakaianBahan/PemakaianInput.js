@@ -309,7 +309,7 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
                   acc_id: e.account.id,
                 });
               }}
-              label={"[account.acc_name] ([account.acc_code])"}
+              label={"[account.acc_name] - [account.acc_code]"}
               placeholder="Pilih Kode Akun WIP"
               detail
               onDetail={() => setShowAcc(true)}
@@ -372,7 +372,7 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
                         updatePB({ ...pb, product: temp });
                       }}
                       placeholder="Pilih Produk"
-                      label={"[name] ([code])"}
+                      label={"[name]"}
                       detail
                       onDetail={() => {
                         setShowProd(true);
@@ -397,7 +397,7 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
                         updatePB({ ...pb, product: temp });
                       }}
                       option={lokasi}
-                      label={"[name] ([code])"}
+                      label={"[name]"}
                       placeholder="Pilih Lokasi"
                       detail
                       onDetail={() => {
@@ -425,6 +425,7 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
                         }}
                         placeholder="0"
                         type="number"
+                        min={0}
                       />
                     </div>
                   )}
@@ -451,6 +452,7 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
                         }}
                         placeholder="0"
                         type="number"
+                        min={0}
                       />
                     </div>
                   )}
@@ -471,7 +473,7 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
                         updatePB({ ...pb, product: temp });
                       }}
                       option={satuan}
-                      label={"[name] ([code])"}
+                      label={"[name]"}
                       placeholder="Pilih Satuan"
                       detail
                       onDetail={() => {
@@ -554,7 +556,7 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
 
   return (
     <>
-      {header()}
+      {/* {header()} */}
       {body()}
       {footer()}
 

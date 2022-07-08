@@ -13,6 +13,9 @@ const ReturJual = () => {
       onAdd={() => {
         setActive(1);
       }}
+      onEdit={() => {
+        setActive(1);
+      }}
       onDetail={() => {
         setActive(2);
       }}

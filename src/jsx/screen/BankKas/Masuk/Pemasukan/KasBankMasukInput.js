@@ -18,6 +18,7 @@ import DataAkun from "src/jsx/screen/Master/Akun/DataAkun";
 import DataPusatBiaya from "src/jsx/screen/MasterLainnya/PusatBiaya/DataPusatBiaya";
 import DataBank from "src/jsx/screen/MasterLainnya/Bank/DataBank";
 import DataProject from "src/jsx/screen/MasterLainnya/Project/DataProject";
+import { Divider } from "@material-ui/core";
 
 const KasBankInInput = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
@@ -456,21 +457,6 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
 
         <Row className="mb-4">
           <div className="col-4">
-            <label className="text-label">Tanggal</label>
-            <div className="p-inputgroup">
-              <Calendar
-                value={new Date(`${exp.exp_date}Z`)}
-                onChange={(e) => {
-                  updateExp({ ...exp, exp_date: e.value });
-                }}
-                placeholder="Pilih Tanggal"
-                showIcon
-                dateFormat="dd/mm/yy"
-              />
-            </div>
-          </div>
-
-          <div className="col-4">
             <label className="text-label">Kode Referensi</label>
             <div className="p-inputgroup">
               <InputText
@@ -483,8 +469,32 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
+          <div className="col-2">
+            <label className="text-label">Tanggal</label>
+            <div className="p-inputgroup">
+              <Calendar
+                value={new Date(`${exp.exp_date}Z`)}
+                onChange={(e) => {
+                  updateExp({ ...exp, exp_date: e.value });
+                }}
+                placeholder="Pilih Tanggal"
+                showIcon
+                dateFormat="dd-mm-yy"
+              />
+            </div>
+          </div>
+
+          <div className="col-12 mt-2">
+            <span className="fs-14">
+              <b>Informasi Pemasukan</b>
+            </span>
+            {/* </div>
+          <div className="col-12"> */}
+            <Divider className="mt-2"></Divider>
+          </div>
+
           <div className="col-4 mb-2">
-            <label className="text-label">Jenis Pemasukan</label>
+            <label className="text-label">Tipe Pemasukan</label>
             <div className="p-inputgroup">
               <SelectButton
                 value={
@@ -507,6 +517,8 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
               />
             </div>
           </div>
+
+          <div className="col-8"></div>
 
           {/* Type Pembayaran */}
           {exp !== null && exp.exp_type === 1 ? (
@@ -590,11 +602,11 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                       onChange={(e) => {
                         updateExp({
                           ...exp,
-                          bank_id: e.bank.id,
-                          bank_acc: e.bank.acc_id,
+                          bank_id: e.bank?.id,
+                          bank_acc: e.bank?.acc_id,
                         });
                       }}
-                      label={"[bank.BANK_NAME] ([bank.BANK_CODE])"}
+                      label={"[bank.BANK_NAME] - [bank.BANK_CODE]"}
                       placeholder="Pilih Kode Bank"
                       detail
                       onDetail={() => setShowBank(true)}
@@ -640,7 +652,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                         }}
                         placeholder="Pilih Tanggal"
                         showIcon
-                        dateFormat="dd/mm/yy"
+                        dateFormat="dd-mm-yy"
                       />
                     </div>
                   </div>
@@ -658,7 +670,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                           bank_acc: e.bank.acc_id,
                         });
                       }}
-                      label={"[bank.BANK_NAME] ([bank.BANK_CODE])"}
+                      label={"[bank.BANK_NAME] - [bank.BANK_CODE]"}
                       placeholder="Pilih Kode Bank"
                       onDetail={() => setShowBankG(true)}
                       detail
@@ -729,7 +741,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                                 }
                                 onChange={(e) => {}}
                                 placeholder="Tanggal Jatuh Tempo"
-                                dateFormat="dd/mm/yy"
+                                dateFormat="dd-mm-yy"
                                 disabled
                               />
                             </div>
@@ -841,7 +853,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                       exp_acc: e.account.id,
                     });
                   }}
-                  label={"[account.acc_name] ([account.acc_code])"}
+                  label={"[account.acc_name] - [account.acc_code]"}
                   placeholder="Pilih Kode Akun"
                   detail
                   onDetail={() => setShowAcc(true)}
@@ -859,7 +871,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                       exp_dep: e.id,
                     });
                   }}
-                  label={"[ccost_name] ([ccost_code])"}
+                  label={"[ccost_name] - [ccost_code]"}
                   placeholder="Pilih Departemen"
                   detail
                   onDetail={() => setShowDept(true)}
@@ -877,7 +889,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                       exp_prj: e.id,
                     });
                   }}
-                  label={"[proj_name] ([proj_code])"}
+                  label={"[proj_name] - [proj_code]"}
                   placeholder="Pilih Project"
                   detail
                   onDetail={() => setShowProj(true)}
@@ -885,7 +897,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
               </div>
               <CustomAccordion
                 className="col-12 mt-4"
-                tittle={"Pengeluaran Kas / Bank"}
+                tittle={"Pengeluaran Kas/Bank"}
                 defaultActive={true}
                 active={accor.keluar}
                 onClick={() => {
@@ -926,7 +938,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                               temp[e.index].acc_code = u.account.id;
                               updateExp({ ...exp, exp: temp });
                             }}
-                            label={"[account.acc_name] ([account.acc_code])"}
+                            label={"[account.acc_name] - [account.acc_code]"}
                             placeholder="Pilih Kode Akun"
                             detail
                           />
@@ -935,9 +947,9 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
 
                       <Column
                         header="D/K"
-                        style={{
-                          width: "6rem",
-                        }}
+                        // style={{
+                        //   width: "6rem",
+                        // }}
                         field={""}
                         body={(e) => (
                           <div className="p-inputgroup">
@@ -1070,7 +1082,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
 
   return (
     <>
-      {header()}
+      {/* {header()} */}
       {body()}
       {footer()}
 

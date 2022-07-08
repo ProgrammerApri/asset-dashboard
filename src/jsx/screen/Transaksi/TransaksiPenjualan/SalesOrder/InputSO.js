@@ -33,10 +33,10 @@ const defError = {
   pel: false,
   tgl: false,
   rul: false,
-  prod: false,
-  jum: false,
-  lok: false,
-  prc: false,
+  // prod: false,
+  // jum: false,
+  // lok: false,
+  // prc: false,
 };
 
 const InputSO = ({ onCancel, onSuccess }) => {
@@ -95,17 +95,24 @@ const InputSO = ({ onCancel, onSuccess }) => {
     let errors = {
       code: !so.so_code || so.so_code === "",
       date: !so.so_date || so.so_date === "",
-      pel: !so.pel_id?.id,
+      pel: !checkCus(so.pel_id),
       tgl: !so.req_date || so.req_date === "",
-      rul: !so.top?.id,
-      prod: !so.sprod?.prod_id?.id,
-      jum: !so.sprod?.request,
-      lok: !so.sprod?.location?.id,
-      prc: !so.sprod?.price,
+      rul: !checkRules(so.top),
+      // prod: !so.sprod?.prod_id?.id,
+      // jum: !so.sprod?.request,
+      // lok: !so.sprod?.location?.id,
+      // prc: !so.sprod?.price,
     };
 
     setError(errors);
 
+    if (!valid) {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: "smooth",
+      });
+    }
     return valid;
   };
 
@@ -451,124 +458,6 @@ const InputSO = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
-  const suppTemp = (option) => {
-    return (
-      <div>
-        {option !== null
-          ? `${option.supplier.sup_code} (${option.supplier.sup_name})`
-          : ""}
-      </div>
-    );
-  };
-
-  const valueSupTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null
-            ? `${option.supplier.sup_code} (${option.supplier.sup_name})`
-            : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const rulTemp = (option) => {
-    return (
-      <div>{option !== null ? `${option.name} (${option.day} Hari)` : ""}</div>
-    );
-  };
-
-  const valueRulTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null ? `${option.name} (${option.day} Hari)` : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const prodTemp = (option) => {
-    return (
-      <div>{option !== null ? `${option.name} (${option.code})` : ""}</div>
-    );
-  };
-
-  const valueProd = (option, props) => {
-    if (option) {
-      return (
-        <div>{option !== null ? `${option.name} (${option.code})` : ""}</div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const jasTemp = (option) => {
-    return (
-      <div>
-        {option !== null ? `${option.jasa.name} (${option.jasa.code})` : ""}
-      </div>
-    );
-  };
-
-  const valueJasTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null ? `${option.jasa.name} (${option.jasa.code})` : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const cusTemp = (option) => {
-    return (
-      <div>
-        {option !== null ? `${option.cus_name} (${option.cus_code})` : ""}
-      </div>
-    );
-  };
-
-  const valueCusTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null ? `${option.cus_name} (${option.cus_code})` : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const SubcusTemp = (option) => {
-    return (
-      <div>
-        {option !== null ? `${option.cus_name} (${option.cus_code})` : ""}
-      </div>
-    );
-  };
-
-  const valueSubCusTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null ? `${option.cus_name} (${option.cus_code})` : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
   const formatDate = (date) => {
     var d = new Date(`${date}Z`),
       month = "" + (d.getMonth() + 1),
@@ -630,6 +519,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
         <Toast ref={toast} />
         {/* Put content body here */}
         <Row className="mb-4">
+          <div className="col-7"></div>
           <div className="col-3">
             <PrimeInput
               label={"Kode Referensi"}
@@ -645,7 +535,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-3">
+          <div className="col-2">
             <PrimeCalendar
               label={"Tanggal"}
               value={new Date(`${so.so_date}Z`)}
@@ -663,8 +553,8 @@ const InputSO = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-12 mt-3">
-            <span className="fs-12">
+          <div className="col-12 mt-0">
+            <span className="fs-14">
               <b>Informasi Pelanggan</b>
             </span>
             {/* </div>
@@ -689,7 +579,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 newError.pel = false;
                 setError(newError);
               }}
-              label={"[cus_name] ([cus_code])"}
+              label={"[cus_name]"}
               placeholder="Pilih Pelanggan"
               detail
               onDetail={() => setShowCustomer(true)}
@@ -738,7 +628,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-12 mt-3">
-            <span className="fs-12">
+            <span className="fs-14">
               <b>Informasi Pembayaran</b>
             </span>
             {/* </div>
@@ -786,7 +676,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
               detail
               onDetail={() => setShowRulesPay(true)}
               errorMessage="Waktu Pembayaran Belum Dipilih"
-              error={error?.tgl}
+              error={error?.rul}
             />
           </div>
 
@@ -827,7 +717,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   onChange={(e) => {
                     updateSo({ ...so, sub_id: e.id });
                   }}
-                  label={"[cus_name] ([cus_code])"}
+                  label={"[cus_name]"}
                   placeholder="Pilih Sub Pelanggan"
                   detail
                   onDetail={() => setShowSub(true)}
@@ -921,19 +811,19 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         temp[e.index].unit_id = u.unit?.id;
                         updateSo({ ...so, sprod: temp });
 
-                        let newError = error;
-                        newError.prod = false;
-                        setError(newError);
+                        // let newError = error;
+                        // newError.prod = false;
+                        // setError(newError);
                       }}
                       placeholder="Pilih Produk"
-                      label={"[name] ([code])"}
+                      label={"[name]"}
                       detail
                       onDetail={() => {
                         setCurrentIndex(e.index);
                         setShowProduk(true);
                       }}
-                      errorMessage="Produk Belum Dipilih"
-                      error={error?.prod}
+                      // errorMessage="Produk Belum Dipilih"
+                      // error={error?.prod}
                     />
                   )}
                 />
@@ -949,9 +839,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         temp[e.index].location = u.id;
                         updateSo({ ...so, sprod: temp });
 
-                        let newError = error;
-                        newError.lok = false;
-                        setError(newError);
+                        // let newError = error;
+                        // newError.lok = false;
+                        // setError(newError);
                       }}
                       option={lokasi}
                       label={"[name]"}
@@ -961,8 +851,8 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         setCurrentIndex(e.index);
                         setShowLok(true);
                       }}
-                      errorMessage="Lokasi Belum Dipilih"
-                      error={error?.lok}
+                      // errorMessage="Lokasi Belum Dipilih"
+                      // error={error?.lok}
                     />
                   )}
                 />
@@ -984,14 +874,14 @@ const InputSO = ({ onCancel, onSuccess }) => {
                             temp[e.index].order * temp[e.index].price;
                           updateSo({ ...so, sprod: temp });
                           console.log(temp);
-                          let newError = error;
-                          newError.jum = false;
-                          setError(newError);
+                          // let newError = error;
+                          // newError.jum = false;
+                          // setError(newError);
                         }}
                         placeholder="0"
                         type="number"
                         min={0}
-                        error={error?.jum}
+                        // error={error?.jum}
                       />
                     </div>
                   )}
@@ -1034,14 +924,14 @@ const InputSO = ({ onCancel, onSuccess }) => {
                             temp[e.index].order * temp[e.index].price;
                           updateSo({ ...so, sprod: temp });
                           console.log(temp);
-                          let newError = error;
-                          newError.prc = false;
-                          setError(newError);
+                          // let newError = error;
+                          // newError.prc = false;
+                          // setError(newError);
                         }}
                         placeholder="0"
                         type="number"
                         min={0}
-                        error={error?.prc}
+                        // error={error?.prc}
                       />
                     </div>
                   )}
@@ -1207,7 +1097,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         temp[e.index].sup_id = u.supplier.id;
                         updateSo({ ...so, sjasa: temp });
                       }}
-                      label={"[supplier.sup_name] ([supplier.sup_code])"}
+                      label={"[supplier.sup_name]"}
                       placeholder="Pilih Supplier"
                       detail
                       onDetail={() => {
@@ -1231,7 +1121,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         temp[e.index].jasa_id = u.jasa.id;
                         updateSo({ ...so, sjasa: temp });
                       }}
-                      label={"[jasa.name] ([jasa.code])"}
+                      label={"[jasa.name]"}
                       placeholder="Pilih Jasa"
                       detail
                       onDetail={() => {
@@ -1728,7 +1618,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
         <Col className="pt-0">
           <Card>
             <Card.Body>
-              {header()}
+              {/* {header()} */}
               {body()}
               {footer()}
             </Card.Body>

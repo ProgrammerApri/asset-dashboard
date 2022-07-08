@@ -347,7 +347,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                   lok_asl: e.id,
                 });
               }}
-              label={"[name] ([code])"}
+              label={"[name] - [code]"}
               placeholder="Lokasi Asal"
               detail
               onDetail={() => setShowLok(true)}
@@ -366,7 +366,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                   lok_tjn: e.id,
                 });
               }}
-              label={"[name] ([code])"}
+              label={"[name] - [code]"}
               placeholder="Lokasi Tujuan"
               detail
               onDetail={() => setShowLoks(true)}
@@ -382,7 +382,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
               onChange={(e) => {
                 updateLM({ ...lm, dep_id: e.id });
               }}
-              label={"[ccost_name] ([ccost_code])"}
+              label={"[ccost_name] - [ccost_code]"}
               placeholder="Pilih Departemen"
               detail
               onDetail={() => setShowDept(true)}
@@ -401,7 +401,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                   proj_id: e.id,
                 });
               }}
-              label={"[proj_name] ([proj_code])"}
+              label={"[proj_name] - [proj_code]"}
               placeholder="Pilih Project"
               detail
               onDetail={() => setShowProj(true)}
@@ -464,7 +464,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                         updateLM({ ...lm, product: temp });
                       }}
                       placeholder="Pilih Produk"
-                      label={"[name] ([code])"}
+                      label={"[name]"}
                       detail
                       onDetail={() => {
                         setShowProd(true);
@@ -489,8 +489,9 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                           temp[e.index].order = a.target.value;
                           updateLM({ ...lm, product: temp });
                         }}
-                        placeholder="Jumlah"
+                        placeholder="0"
                         type="number"
+                        min={0}
                       />
                     </div>
                   )}
@@ -511,7 +512,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                         updateLM({ ...lm, product: temp });
                       }}
                       option={satuan}
-                      label={"[name] ([code])"}
+                      label={"[name]"}
                       placeholder="Pilih Satuan"
                       detail
                       onDetail={() => {
@@ -592,7 +593,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
 
   return (
     <>
-      {header()}
+      {/* {header()} */}
       {body()}
       {footer()}
 

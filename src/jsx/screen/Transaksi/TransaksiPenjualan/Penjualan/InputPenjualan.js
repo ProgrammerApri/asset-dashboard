@@ -26,6 +26,7 @@ import DataLokasi from "src/jsx/screen/Master/Lokasi/DataLokasi";
 import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
+import { Dropdown } from "primereact/dropdown";
 
 const defError = {
   code: false,
@@ -575,7 +576,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
 
   const header = () => {
     return (
-      <h4 className="mb-5">
+      <h4 className="mb-4">
         <b>Penjualan</b>
       </h4>
     );
@@ -609,12 +610,37 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
 
+  const soTemplate = (option) => {
+    return (
+      <div>
+        {option !== null
+          ? `${option.so_code} - ${option.pel_id.cus_name}`
+          : ""}
+      </div>
+    );
+  };
+
+  const valTemp = (option, props) => {
+    if (option) {
+      return (
+        <div>
+          {option !== null
+            ? `${option.so_code}`
+            : ""}
+        </div>
+      );
+    }
+
+    return <span>{props.placeholder}</span>;
+  };
+
   const body = () => {
     return (
       <>
         {/* Put content body here */}
         <Toast ref={toast} />
         <Row className="mb-4">
+          <div className="col-7"></div>
           <div className="col-3">
             <PrimeInput
               label={"No. Penjualan"}
@@ -631,7 +657,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-3">
+          <div className="col-2">
             <PrimeCalendar
               label={"Tanggal"}
               value={new Date(`${sale.ord_date}Z`)}
@@ -661,7 +687,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-12 mt-3">
+          <div className="col-12 mt-0">
             <span className="fs-14">
               <b>Informasi Pesanan</b>
             </span>
@@ -672,10 +698,10 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
 
           <div className="col-3">
             <label className="text-label">No. Pesanan Penjualan</label>
-            <div className="p-inputgroup"></div>
-            <CustomDropdown
+            <div className="p-inputgroup">
+            <Dropdown
               value={sale.so_id && checkSO(sale.so_id)}
-              option={so}
+              options={so}
               onChange={(e) => {
                 let result = null;
                 if (sale.top != null) {
@@ -687,22 +713,25 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                 }
                 updateSL({
                   ...sale,
-                  so_id: e.id,
+                  so_id: e.value.id,
                   due_date: result,
-                  top: e.top.id ?? null,
-                  pel_id: e.pel_id?.id ?? null,
-                  sub_id: e.sub_id?.id ?? null,
-                  jprod: e.sprod,
-                  jjasa: e.sjasa.map((v) => {
+                  top: e.value.top.id ?? null,
+                  pel_id: e.value.pel_id?.id ?? null,
+                  sub_id: e.value.sub_id?.id ?? null,
+                  jprod: e.value.sprod,
+                  jjasa: e.value.sjasa.map((v) => {
                     return { ...v, order: v.qty };
                   }),
                 });
               }}
-              label={"[so_code] ([pel_id.cus_name])"}
+              optionLabel={"[so_code] ([pel_id.cus_name])"}
               placeholder="Pilih No. Pesanan"
-              // detail
-              //   onDetail={() => setShowr(true)}
+              filter
+              filterBy="so_code"
+              itemTemplate={soTemplate}
+              valueTemplate={valTemp}
             />
+            </div>
           </div>
 
           <div className="col-9"></div>
@@ -723,7 +752,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
               placeholder="Pilih Pelanggan"
               detail
               onDetail={() => setShowCustomer(true)}
-              label={"[customer.cus_code] ([customer.cus_name])"}
+              label={"[customer.cus_name]"}
               errorMessage="Pelanggan Belum Dipilih"
               error={error?.pel}
               disabled={sale && sale.so_id}
@@ -776,7 +805,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
 
           <div className="col-12 mt-3">
             <span className="fs-14">
-              <b>Informasi Waktu Pembayaran</b>
+              <b>Informasi Pembayaran</b>
             </span>
             {/* </div>
           <div className="col-12"> */}
@@ -839,7 +868,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
               placeholder="Pilih Salesman"
               detail
               onDetail={() => setShowSalesman(true)}
-              label={"[sales_name] ([sales_code])"}
+              label={"[sales_name]"}
               errorMessage="Salesman Belum Dipilih"
               error={error?.sls}
             />
@@ -871,7 +900,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                     updateSL({ ...sale, sub_id: e.customer.id });
                   }}
                   placeholder="Pilih Sub Pelanggan"
-                  label={"[customer.cus_code] ([customer.cus_name])"}
+                  label={"[customer.cus_name]"}
                   detail
                   onDetail={() => setShowSub(true)}
                   disabled={sale && sale.so_id}
@@ -1268,7 +1297,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         updateSL({ ...sale, jjasa: temp });
                         console.log(temp);
                       }}
-                      label={"[supplier.sup_name] ([supplier.sup_code])"}
+                      label={"[supplier.sup_name]"}
                       placeholder="Pilih Supplier"
                       detail
                       onDetail={() => {
@@ -1292,7 +1321,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         updateSL({ ...sale, jjasa: temp });
                       }}
                       option={jasa}
-                      label={"[jasa.name] ([jasa.code])"}
+                      label={"[jasa.name]"}
                       placeholder="Pilih Kode Jasa"
                       detail
                       onDetail={() => {
@@ -1785,7 +1814,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
         <Col className="pt-0">
           <Card>
             <Card.Body>
-              {header()}
+              {/* {header()} */}
               {body()}
               {footer()}
             </Card.Body>

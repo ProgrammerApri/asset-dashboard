@@ -23,7 +23,7 @@ const data = {
   product: [],
 };
 
-const ReturJualList = ({ onAdd, onDetail }) => {
+const ReturJualList = ({ onAdd, onDetail, onEdit }) => {
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [filters1, setFilters1] = useState(null);
@@ -176,6 +176,49 @@ const ReturJualList = ({ onAdd, onDetail }) => {
 
         <Link
           onClick={() => {
+            onEdit();
+            dispatch({
+              type: SET_EDIT_SR,
+              payload: true,
+            });
+
+            let product = data.product;
+            product.forEach((el) => {
+              el.prod_id = el.prod_id.id;
+              el.unit_id = el.unit_id.id;
+              // el.location = el.location?.id;
+            });
+
+            if (!product.length) {
+              product.push({
+                id: 0,
+                prod_id: null,
+                unit_id: null,
+                retur: null,
+                price: null,
+                disc: null,
+                nett_price: null,
+                total: null,
+              });
+            }
+
+            dispatch({
+              type: SET_CURRENT_SR,
+              payload: {
+                ...data,
+                sale_id: data?.sale_id?.id,
+                // pel_id: data?.pel_id?.id ?? null,
+                product: product,
+              },
+            });
+          }}
+          className="btn btn-primary shadow btn-xs sharp ml-1"
+        >
+          <i className="fa fa-pencil"></i>
+        </Link>
+
+        <Link
+          onClick={() => {
             setDisplayDel(true);
             setCurrentItem(data);
           }}
@@ -275,6 +318,7 @@ const ReturJualList = ({ onAdd, onDetail }) => {
 
   return (
     <>
+    <Toast ref={toast} />
       <Row>
         <Col className="pt-0">
           <Card>

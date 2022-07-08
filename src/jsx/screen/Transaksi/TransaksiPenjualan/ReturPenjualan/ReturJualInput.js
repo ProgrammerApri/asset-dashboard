@@ -18,6 +18,7 @@ import DataSatuan from "src/jsx/screen/MasterLainnya/Satuan/DataSatuan";
 import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
+import { Dropdown } from "primereact/dropdown";
 
 const defError = {
   code: false,
@@ -303,7 +304,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
   };
 
   const onSubmit = () => {
-    if (isValid()) {
+    // if (isValid()) {
       if (isEdit) {
         setUpdate(true);
         editSR();
@@ -311,7 +312,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
         setUpdate(true);
         addSR();
       }
-    }
+    // }
   };
 
   const formatDate = (date) => {
@@ -352,6 +353,24 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
     });
   };
 
+  const slTemplate = (option) => {
+    return (
+      <div>
+        {option !== null
+          ? `${option.ord_code} - ${option.pel_id.cus_name}`
+          : ""}
+      </div>
+    );
+  };
+
+  const valTemp = (option, props) => {
+    if (option) {
+      return <div>{option !== null ? `${option.ord_code}` : ""}</div>;
+    }
+
+    return <span>{props.placeholder}</span>;
+  };
+
   const header = () => {
     return (
       <h4 className="mb-5">
@@ -367,6 +386,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
         <Toast ref={toast} />
 
         <Row className="mb-4">
+          <div className="col-7"></div>
           <div className="col-3">
             <PrimeInput
               label={"Kode Referensi"}
@@ -382,7 +402,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-3">
+          <div className="col-2">
             <PrimeCalendar
               label={"Tanggal"}
               value={new Date(`${sr.ret_date}Z`)}
@@ -400,32 +420,37 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-12 mt-3">
-            <h6>
+          <div className="col-12 mt-0">
+            <span className="fs-14">
               <b>Informasi Penjualan</b>
-            </h6>
+            </span>
             {/* </div>
           <div className="col-12"> */}
-            <Divider className=""></Divider>
+            <Divider className="mt-2"></Divider>
           </div>
 
           <div className="col-3">
             <label className="text-label">No. Penjualan</label>
-            <div className="p-inputgroup"></div>
-            <CustomDropdown
-              value={sr.sale_id && checkSale(sr.sale_id)}
-              option={sale}
-              onChange={(e) => {
-                updateSr({
-                  ...sr,
-                  sale_id: e.id,
-                  product: e.jprod,
-                });
-              }}
-              label={"[ord_code] ([pel_id.cus_name])"}
-              placeholder="Pilih No. Penjualan"
-              detail
-            />
+            <div className="p-inputgroup">
+              <Dropdown
+                value={sr.sale_id && checkSale(sr.sale_id)}
+                options={sale}
+                onChange={(e) => {
+                  updateSr({
+                    ...sr,
+                    sale_id: e.value.id,
+                    pel_id: e.value?.pel_id?.id,
+                    product: e.value.jprod,
+                  });
+                }}
+                optionLabel={"[ord_code] - [pel_id.cus_name]"}
+                placeholder="Pilih No. Penjualan"
+                filter
+                filterBy="ord_code"
+                itemTemplate={slTemplate}
+                valueTemplate={valTemp}
+              />
+            </div>
           </div>
 
           <div className="col-9"></div>
@@ -438,12 +463,9 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                 value={
                   sr.sale_id !== null
                     ? `${
-                        checkCus(checkSale(sr.sale_id)?.so_id.pel_id)?.customer
-                          .cus_name
-                      } (${
-                        checkCus(checkSale(sr.sale_id)?.so_id.pel_id)?.customer
-                          .cus_code
-                      })`
+                        checkCus(checkSale(sr.sale_id)?.so_id?.pel_id)?.customer
+                          ?.cus_name
+                      }`
                     : null
                 }
                 placeholder="Pelanggan"
@@ -458,8 +480,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
               <InputText
                 value={
                   sr.sale_id !== null
-                    ? checkCus(checkSale(sr.sale_id)?.so_id.pel_id)?.customer
-                        .cus_address
+                    ? checkCus(checkSale(sr.sale_id)?.so_id?.pel_id)?.customer?.cus_address
                     : ""
                 }
                 placeholder="Alamat Pelanggan"
@@ -474,8 +495,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
               isNumber
               value={
                 sr.sale_id !== null
-                  ? checkCus(checkSale(sr.sale_id)?.so_id.pel_id)?.customer
-                      .cus_telp1
+                  ? checkCus(checkSale(sr.sale_id)?.so_id?.pel_id)?.customer?.cus_telp1
                   : ""
               }
               placeholder="No. Telepon"
@@ -490,7 +510,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                 value={
                   sr.sale_id !== null
                     ? checkPjk(
-                        checkCus(checkSale(sr.sale_id)?.so_id?.pel_id).customer
+                        checkCus(checkSale(sr.sale_id)?.so_id?.pel_id)?.customer
                           ?.cus_pjk
                       )?.name
                     : null
@@ -684,7 +704,14 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                     field={""}
                     body={(e) => (
                       <label className="text-nowrap">
-                        <b>Rp. {formatIdr(getSubTotalBarang())}</b>
+                        <b>
+                          Rp.{" "}
+                          {formatIdr(
+                            e.nett_price && e.nett_price != 0
+                              ? e.nett_price
+                              : e.total - (e.total * e.disc) / 100
+                          )}
+                        </b>
                       </label>
                     )}
                   />
@@ -893,7 +920,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
         <Col>
           <Card>
             <Card.Body>
-              {header()}
+              {/* {header()} */}
               {body()}
               {footer()}
             </Card.Body>

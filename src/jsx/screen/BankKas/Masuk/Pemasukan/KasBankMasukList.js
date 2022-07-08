@@ -47,6 +47,7 @@ const KasBankInList = ({ onAdd }) => {
   const [loading, setLoading] = useState(true);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+  const dispatch = useDispatch();
 
   const dummy = Array.from({ length: 10 });
 
@@ -71,6 +72,35 @@ const KasBankInList = ({ onAdd }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
+            dispatch({
+              type: SET_EDIT_EXP,
+              payload: false,
+            });
+            dispatch({
+              type: SET_CURRENT_EXP,
+              payload: {
+                ...data,
+                exp_type: 1,
+                acq_pay: 1,
+                acq: [
+                  // {
+                  //   id: null,
+                  //   exp_id: null,
+                  //   fk_id: null,
+                  //   value: null,
+                  //   payment: null,
+                  // },
+                ],
+                exp: [
+                  {
+                    id: null,
+                    acc_code: null,
+                    value: null,
+                    desc: null,
+                  },
+                ],
+              },
+            });
           }}
         />
       </div>

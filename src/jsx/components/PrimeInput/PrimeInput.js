@@ -25,7 +25,7 @@ const PrimeInput = ({
 
   return (
     <div>
-      <label className="text-label">{label}</label>
+      {label && <label className="text-label">{label}</label>}
       <div className="p-inputgroup">
         {isNumber ? (
           <>

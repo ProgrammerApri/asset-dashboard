@@ -35,6 +35,7 @@ const defError = {
   jum: false,
   prc: false,
   sup: false,
+  prod: []
 };
 
 const InputPO = ({ onCancel, onSuccess }) => {
@@ -340,9 +341,16 @@ const InputPO = ({ onCancel, onSuccess }) => {
   };
 
   const addPO = async () => {
+    let d = po
+    d.pprod.forEach(el => {
+      el.order = el.order === "" ? 0 : el.order
+      el.nett_price = el.nett_price === "" ? 0 : el.nett_price
+      el.price = el.order === "" ? 0 : el.price
+      el.disc = el.disc === "" ? 0 : el.disc
+    }) 
     const config = {
       ...endpoints.addPO,
-      data: po,
+      data: d,
     };
     console.log(config.data);
     let response = null;
@@ -627,7 +635,8 @@ const InputPO = ({ onCancel, onSuccess }) => {
   const header = () => {
     return (
       <h4 className="mb-5">
-        <b>{isEdit ? "Edit" : "Buat"} Pembelian (PO)</b>
+        <b>Pembelian (PO)</b>
+        {/* <b>{isEdit ? "Edit" : "Buat"} Pembelian (PO)</b> */}
       </h4>
     );
   };
@@ -728,7 +737,14 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
           <div className="col-7"></div>
 
-          <div className="col-4">
+          <div className="col-12 p-0">
+            <div className="mt-4 ml-3 mr-3 fs-14">
+              <b>Informasi Pembelian</b>
+            </div>
+            <Divider className="mb-2 ml-3 mr-3"></Divider>
+          </div>
+
+          <div className="col-3">
             <label className="text-label">No. Permintaan Pembelian</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
@@ -752,9 +768,12 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   pjasa: e.rjasa ?? null,
                 });
 
-                let newError = error;
-                newError.req = false;
-                setError(newError);
+                let prod = []
+                e.rprod.forEach((_) => {
+                  prod.push({order: false, price: false})
+                })
+
+                setError({...error, req: false, sup: !e.ref_sup.id, prod: prod});
               }}
               label={"[req_code]"}
               placeholder="Pilih Kode Permintaan"
@@ -763,7 +782,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
               disabled={isEdit}
             />
           </div>
-          <div className="col-4">
+          <div className="col-3">
             <label className="text-label">Departemen</label>
             <div className="p-inputgroup">
               <InputText
@@ -778,7 +797,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-4"/>
+          <div className="col-6" />
 
           <div className="col-3">
             <label className="text-label">Supplier</label>
@@ -841,7 +860,14 @@ const InputPO = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-4">
+          <div className="col-12 p-0">
+            <div className="mt-4 ml-3 mr-3 fs-14">
+              <b>Informasi Pembelian</b>
+            </div>
+            <Divider className="mb-2 ml-3 mr-3"></Divider>
+          </div>
+
+          <div className="col-3">
             <label className="text-label">Syarat Pembayaran</label>
             <div className="p-inputgroup mt-2"></div>
             <CustomDropdown
@@ -867,7 +893,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-4">
+          <div className="col-2">
             <label className="text-label">Tanggal Permintaan</label>
             <div className="p-inputgroup mt-2">
               <Calendar
@@ -879,7 +905,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-4">
+          <div className="col-2">
             <label className="text-label">Tanggal Jatuh Tempo</label>
             <div className="p-inputgroup mt-2">
               <Calendar
@@ -952,7 +978,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                           updatePo({ ...po, pprod: temp });
                         }}
                         placeholder="Pilih Kode Produk"
-                        label={"[name] ([code])"}
+                        label={"[name]"}
                         detail
                         onDetail={() => {
                           setCurrentIndex(e.index);
@@ -1021,8 +1047,32 @@ const InputPO = ({ onCancel, onSuccess }) => {
                       minWidth: "7rem",
                     }}
                     body={(e) => (
+                      // <PrimeInput
+                      //   number
+                      //   // value={e.order ? e.order : 0}
+                      //   value={10}
+                      //   onChange={(t) => {
+                      //     console.log(parseInt(t.value));
+                      //     let temp = [...po.pprod];
+                      //     let val = parseInt(t.value) > e.r_remain ? e.r_remain : parseInt(t.value);
+                      //     let result =
+                      //       temp[e.index].order - val + temp[e.index].remain;
+                      //     temp[e.index].order = val;
+
+                      //     temp[e.index].total =
+                      //       temp[e.index].price * temp[e.index].order;
+                      //     temp[e.index].remain = result;
+                      //     updatePo({ ...po, pprod: temp });
+
+                      //     // let newError = error;
+                      //     // newError.jum = false;
+                      //     // setError(newError);
+                      //   }}
+                      //   placeholder="0"
+                      //   error={true}
+                      // />
                       <PrimeNumber
-                        value={e.order ? e.order : 0}
+                        value={e.order ? e.order : ""}
                         onChange={(t) => {
                           let temp = [...po.pprod];
                           let val =
@@ -1038,14 +1088,14 @@ const InputPO = ({ onCancel, onSuccess }) => {
                           temp[e.index].remain = result;
                           updatePo({ ...po, pprod: temp });
 
-                          // let newError = error;
-                          // newError.jum = false;
-                          // setError(newError);
+                          let newError = error.prod;
+                          newError[e.index].order = false;
+                          setError({...error, prod: newError});
                         }}
                         min={0}
                         placeholder="0"
                         type="number"
-                        // error={error?.jum}
+                        error={error.prod[e.index].order}
                       />
                     )}
                   />
@@ -1077,8 +1127,21 @@ const InputPO = ({ onCancel, onSuccess }) => {
                       minWidth: "10rem",
                     }}
                     body={(e) => (
+                      // <PrimeInput
+                      //   number
+                      //   value={`${e.price ? e.price : 0}`}
+                      //   onChange={(t) => {
+                      //     let temp = [...po.pprod];
+                      //     temp[e.index].price = t.value;
+                      //     temp[e.index].total =
+                      //       temp[e.index].price * temp[e.index].order;
+                      //     updatePo({ ...po, pprod: temp });
+                      //   }}
+                      //   placeholder="0"
+                      //   error={true}
+                      // />
                       <PrimeNumber
-                        value={e.price ? e.price : 0}
+                        value={e.price ? e.price : ""}
                         onChange={(t) => {
                           let temp = [...po.pprod];
                           temp[e.index].price = t.target.value;
@@ -1086,14 +1149,14 @@ const InputPO = ({ onCancel, onSuccess }) => {
                             temp[e.index].price * temp[e.index].order;
                           updatePo({ ...po, pprod: temp });
 
-                          // let newError = error;
-                          // newError.prc = false;
-                          // setError(newError);
+                          let newError = error.prod;
+                          newError[e.index].price = false;
+                          setError({...error, prod: newError});
                         }}
                         min={0}
                         placeholder="0"
                         type="number"
-                        // error={error?.prc}
+                        error={error.prod[e.index].order}
                       />
                     )}
                   />
@@ -1108,7 +1171,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     body={(e) => (
                       <div className="p-inputgroup">
                         <InputText
-                          value={e.disc ? e.disc : 0}
+                          value={e.disc ? e.disc : ""}
                           onChange={(t) => {
                             let temp = [...po.pprod];
                             temp[e.index].disc = t.target.value;
@@ -1137,7 +1200,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     body={(e) => (
                       <div className="p-inputgroup">
                         <InputText
-                          value={e.nett_price ? e.nett_price : 0}
+                          value={e.nett_price ? e.nett_price : ""}
                           onChange={(t) => {
                             let temp = [...po.pprod];
                             temp[e.index].nett_price = t.target.value;

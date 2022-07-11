@@ -91,7 +91,8 @@ const ReportJurnal = () => {
     new_trans.forEach((el) => {
       let val = [
         {
-          trx_code: `(${el.trx_code})  ${el.trx_date}`,
+          trx_code: `${el.trx_code}`,
+          trx_date: `${el.trx_date}`,
           type: "header",
           value: {
             acc: "Account",
@@ -105,10 +106,11 @@ const ReportJurnal = () => {
       let d = 0;
       el.trx.forEach((ek) => {
         val.push({
-          trx_code: `(${el.trx_code}) ${el.trx_date}`,
+          trx_code: `${el.trx_code}`,
+          trx_date: `${el.trx_date}`,
           type: "item",
           value: {
-            acc: `(${ek?.acc_id?.acc_code}) ${ek?.acc_id?.acc_name}`,
+            acc: `${ek?.acc_id?.acc_code}-${ek?.acc_id?.acc_name}`,
             debit: ek.trx_dbcr === "D" ? `Rp. ${formatIdr(ek.trx_amnt)}` : 0,
             kredit: ek.trx_dbcr === "K" ? `Rp. ${formatIdr(ek.trx_amnt)}` : 0,
             desc: ek.trx_desc,
@@ -118,7 +120,8 @@ const ReportJurnal = () => {
         d += ek.trx_dbcr === "D" ? ek.trx_amnt : 0;
       });
       val.push({
-        trx_code: `(${el.trx_code}) ${el.trx_date}`,
+        trx_code: `${el.trx_code}`,
+        trx_date: `${el.trx_date}`,
         type: "footer",
         value: {
           acc: "Total",
@@ -168,8 +171,55 @@ const ReportJurnal = () => {
         data: [[]],
       },
     ];
+
     data.forEach((el) => {
       let item = [];
+      item.push([
+        {
+          value: `${el[0].trx_date}`,
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+      ]);
       el.forEach((ek) => {
         item.push([
           {
@@ -177,24 +227,29 @@ const ReportJurnal = () => {
             style: {
               font: {
                 sz: "14",
-                bold:
-                  ek.type === "header" || ek.type === "footer" ? true : false,
+                bold: ek.type === "header" || ek.type === "footer",
               },
               alignment: { horizontal: "left", vertical: "center" },
             },
           },
           {
-            value: `${ek.value.debit}`,
+            value: ek.value.debit,
             style: {
-              font: { sz: "14", bold: ek.type === "header" ? true : false },
-              alignment: { horizontal: "left", vertical: "center" },
+              font: {
+                sz: "14",
+                bold: ek.type === "header" || ek.type === "footer",
+              },
+              alignment: { horizontal: "right", vertical: "center" },
             },
           },
           {
-            value: `${ek.value.kredit}`,
+            value: ek.value.kredit,
             style: {
-              font: { sz: "14", bold: ek.type === "header" ? true : false },
-              alignment: { horizontal: "left", vertical: "center" },
+              font: {
+                sz: "14",
+                bold: ek.type === "header" || ek.type === "footer",
+              },
+              alignment: { horizontal: "right", vertical: "center" },
             },
           },
           {
@@ -205,7 +260,7 @@ const ReportJurnal = () => {
                 bold:
                   ek.type === "header" || ek.type === "footer" ? true : false,
               },
-              alignment: { horizontal: "right", vertical: "center" },
+              alignment: { horizontal: "left", vertical: "center" },
             },
           },
         ]);
@@ -258,7 +313,7 @@ const ReportJurnal = () => {
           },
           {
             title: "",
-            width: { wch: 15 },
+            width: { wch: 20 },
             style: {
               font: { sz: "14", bold: true },
               alignment: { horizontal: "right", vertical: "center" },
@@ -270,7 +325,7 @@ const ReportJurnal = () => {
           },
           {
             title: "",
-            width: { wch: 30 },
+            width: { wch: 20 },
             style: {
               font: { sz: "14", bold: true },
               alignment: { horizontal: "right", vertical: "center" },
@@ -282,7 +337,7 @@ const ReportJurnal = () => {
           },
           {
             title: "",
-            width: { wch: 40 },
+            width: { wch: 50 },
             style: {
               font: { sz: "14", bold: true },
               alignment: { horizontal: "left", vertical: "center" },

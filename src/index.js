@@ -7,12 +7,12 @@ import { Provider } from "react-redux";
 import store from "./redux/store";
 
 ReactDOM.render(
-   <Provider store={store}>
-      <React.StrictMode>
+  <Provider store={store}>
+    {/* <React.StrictMode> */}
       <SimpleReactLightbox>
-         <App />
+        <App />
       </SimpleReactLightbox>
-   </React.StrictMode>
-   </Provider>,
-   document.getElementById("root")
+    {/* </React.StrictMode> */}
+  </Provider>,
+  document.getElementById("root")
 );

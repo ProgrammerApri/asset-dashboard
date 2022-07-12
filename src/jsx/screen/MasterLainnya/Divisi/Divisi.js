@@ -117,6 +117,7 @@ const DataDivisi = ({
       console.log(response);
       if (response.status) {
         setTimeout(() => {
+          setUpdate(false);
           setLoading(false);
           setDisplayData(false);
           onSuccessInput();
@@ -156,6 +157,7 @@ const DataDivisi = ({
   };
 
   const delDivisi = async (id) => {
+    setUpdate(true)
     const config = {
       ...endpoints.delDivisi,
       endpoint: endpoints.delDivisi.endpoint + currentItem.id,
@@ -389,6 +391,8 @@ const DataDivisi = ({
 
     setError(errors);
 
+    valid = !errors.code && !errors.name;
+    
     return valid;
   };
 

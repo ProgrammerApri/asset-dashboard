@@ -378,6 +378,8 @@ const DataProject = ({
 
     setError(errors);
 
+    valid = !errors.code && !errors.name;
+
     return valid;
   };
 

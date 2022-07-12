@@ -386,6 +386,8 @@ const DataRulesPay = ({
 
     setError(errors);
 
+    valid = !errors.day && !errors.name;
+
     return valid;
   };
 

@@ -372,7 +372,9 @@ const DataPusatBiaya = ({
       code: !currentItem.ccost_code || currentItem.ccost_code === "",
       name: !currentItem.ccost_name || currentItem.ccost_name === "",
     };
+    
     setError(errors);
+    valid = !errors.code && !errors.name;
 
     return valid;
   };

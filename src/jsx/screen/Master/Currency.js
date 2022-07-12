@@ -400,6 +400,8 @@ const Currency = () => {
 
     setError(errors);
 
+    valid = !errors.code && !errors.name && !errors.rate;
+
     return valid;
   };
 

@@ -465,6 +465,8 @@ const DataPajak = ({
 
     setError(errors);
 
+    valid = !errors.name && !errors.nilai && !errors.acc1 && !errors.acc2;
+
     return valid;
   };
 

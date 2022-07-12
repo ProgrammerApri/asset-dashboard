@@ -455,6 +455,8 @@ const DataJasa = ({
 
     setError(errors);
 
+    valid = !errors.code && !errors.name && !errors.acc1;
+
     return valid;
   };
 

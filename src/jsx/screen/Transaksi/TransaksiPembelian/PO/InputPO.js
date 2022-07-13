@@ -32,10 +32,19 @@ const defError = {
   date: false,
   req: false,
   rul: false,
-  jum: false,
-  prc: false,
   sup: false,
-  prod: []
+  prod: [
+    {
+      jum: false,
+      prc: false,
+    },
+  ],
+  jasa: [
+    {
+      jum: false,
+      prc: false,
+    },
+  ],
 };
 
 const InputPO = ({ onCancel, onSuccess }) => {
@@ -341,13 +350,13 @@ const InputPO = ({ onCancel, onSuccess }) => {
   };
 
   const addPO = async () => {
-    let d = po
-    d.pprod.forEach(el => {
-      el.order = el.order === "" ? 0 : el.order
-      el.nett_price = el.nett_price === "" ? 0 : el.nett_price
-      el.price = el.order === "" ? 0 : el.price
-      el.disc = el.disc === "" ? 0 : el.disc
-    }) 
+    let d = po;
+    d.pprod.forEach((el) => {
+      el.order = el.order === "" ? 0 : el.order;
+      el.nett_price = el.nett_price === "" ? 0 : el.nett_price;
+      el.price = el.order === "" ? 0 : el.price;
+      el.disc = el.disc === "" ? 0 : el.disc;
+    });
     const config = {
       ...endpoints.addPO,
       data: d,
@@ -499,132 +508,6 @@ const InputPO = ({ onCancel, onSuccess }) => {
     return [year, month, day].join("-");
   };
 
-  const reqTemp = (option) => {
-    return (
-      <div>
-        {option !== null
-          ? `${option.req_code} ${
-              option.req_dep ? ` (${option.req_dep?.ccost_name})` : ""
-            }`
-          : ""}
-      </div>
-    );
-  };
-
-  const valueReqTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null
-            ? `${option.req_code} ${
-                option.req_dep ? ` (${option.req_dep?.ccost_name})` : ""
-              }`
-            : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const deptTemp = (option) => {
-    return (
-      <div>
-        {option !== null ? `${option.ccost_code} (${option.ccost_name})` : ""}
-      </div>
-    );
-  };
-
-  const valueDeptTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null ? `${option.ccost_code} (${option.ccost_name})` : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const suppTemp = (option) => {
-    return (
-      <div>
-        {option !== null
-          ? `${option.supplier?.sup_code} (${option.supplier?.sup_name})`
-          : ""}
-      </div>
-    );
-  };
-
-  const valueSupTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null
-            ? `${option.supplier?.sup_code} (${option.supplier?.sup_name})`
-            : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const rulTemp = (option) => {
-    return (
-      <div>{option !== null ? `${option.name} (${option.day} Hari)` : ""}</div>
-    );
-  };
-
-  const valueRulTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null ? `${option.name} (${option.day} Hari)` : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const prodTemp = (option) => {
-    return (
-      <div>{option !== null ? `${option.name} (${option.code})` : ""}</div>
-    );
-  };
-
-  const valueProd = (option, props) => {
-    if (option) {
-      return (
-        <div>{option !== null ? `${option.name} (${option.code})` : ""}</div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const jasTemp = (option) => {
-    return (
-      <div>
-        {option !== null ? `${option.jasa.name} (${option.jasa.code})` : ""}
-      </div>
-    );
-  };
-
-  const valueJasTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null ? `${option.jasa.name} (${option.jasa.code})` : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
   const updatePo = (e) => {
     dispatch({
       type: SET_CURRENT_PO,
@@ -677,7 +560,84 @@ const InputPO = ({ onCancel, onSuccess }) => {
       req: !po?.preq_id,
       rul: !po?.top,
       sup: !po.sup_id,
+      prod: [],
+      jasa: [],
     };
+
+    po?.pprod?.forEach((element, i) => {
+      if (i > 0) {
+        if (element.order || element.price) {
+          errors.prod[i] = {
+            jum:
+              !element.order || element.order === "" || element.order === "0",
+            prc:
+              !element.price || element.price === "" || element.price === "0",
+          };
+        }
+      } else {
+        errors.prod[i] = {
+          jum: !element.order || element.order === "" || element.order === "0",
+          prc: !element.price || element.price === "" || element.price === "0",
+        };
+      }
+    });
+
+    po?.pjasa?.forEach((element, i) => {
+      if (i > 0) {
+        if (element.order || element.price) {
+          errors.jasa[i] = {
+            jum:
+              !element.order || element.order === "" || element.order === "0",
+            prc:
+              !element.price || element.price === "" || element.price === "0",
+          };
+        }
+      } else {
+        errors.jasa[i] = {
+          jum: !element.order || element.order === "" || element.order === "0",
+          prc: !element.price || element.price === "" || element.price === "0",
+        };
+      }
+    });
+
+    if (!errors.prod[0]?.jum && !errors.prod[0]?.prc) {
+      errors.jasa?.forEach((e) => {
+        for (var key in e) {
+          e[key] = false;
+        }
+      });
+    }
+
+    if (!errors.jasa[0]?.jum && !errors.jasa[0]?.prc) {
+      errors.prod?.forEach((e) => {
+        for (var key in e) {
+          e[key] = false;
+        }
+      });
+    }
+
+    let validProduct = false;
+    let validJasa = false;
+    errors.prod?.forEach((el) => {
+      for (var k in el) {
+        validProduct = !el[k];
+      }
+    });
+    if (!validProduct) {
+      errors.jasa?.forEach((el) => {
+        for (var k in el) {
+          validJasa = !el[k];
+        }
+      });
+    }
+
+    valid =
+      !errors.code &&
+      !errors.date &&
+      !errors.req &&
+      !errors.sup &&
+      !errors.rul &&
+      (validProduct || validJasa);
 
     setError(errors);
 
@@ -768,12 +728,10 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   pjasa: e.rjasa ?? null,
                 });
 
-                let prod = []
-                e.rprod.forEach((_) => {
-                  prod.push({order: false, price: false})
-                })
-
-                setError({...error, req: false, sup: !e.ref_sup.id, prod: prod});
+                let newError = error;
+                newError.req = false;
+                newError.sup = false;
+                setError(newError);
               }}
               label={"[req_code]"}
               placeholder="Pilih Kode Permintaan"
@@ -807,7 +765,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
               option={supplier}
               onChange={(e) => {
                 updatePo({ ...po, sup_id: e.supplier.id });
-                setError({ ...error, sup: false });
+                let newError = error;
+                newError.sup = false;
+                setError(newError);
               }}
               placeholder="Pilih Supplier"
               detail
@@ -934,11 +894,12 @@ const InputPO = ({ onCancel, onSuccess }) => {
             body={
               <>
                 <DataTable
-                  responsiveLayout="scroll"
+                  responsiveLayout="none"
                   value={po.pprod?.map((v, i) => {
                     return {
                       ...v,
                       index: i,
+                      order: v?.order ?? 0,
                       price: v?.price ?? 0,
                       disc: v?.disc ?? 0,
                       total: v?.total ?? 0,
@@ -952,9 +913,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     header="Produk"
                     className="align-text-top"
                     field={""}
-                    style={{
-                      width: "12rem",
-                    }}
+                    // style={{
+                    //   width: "12rem",
+                    // }}
                     body={(e) => (
                       <CustomDropdown
                         value={e.prod_id && checkProd(e.prod_id)}
@@ -992,9 +953,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     header="Satuan"
                     className="align-text-top"
                     field={""}
-                    style={{
-                      width: "8rem",
-                    }}
+                    // style={{
+                    //   width: "8rem",
+                    // }}
                     body={(e) => (
                       <CustomDropdown
                         value={e.unit_id && checkUnit(e.unit_id)}
@@ -1019,9 +980,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     header="Permintaan"
                     className="align-text-top"
                     field={""}
-                    style={{
-                      width: "5rem",
-                    }}
+                    // style={{
+                    //   width: "5rem",
+                    // }}
                     body={(e) => (
                       <div className="p-inputgroup">
                         <InputText
@@ -1043,36 +1004,12 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     header="Pesanan"
                     className="align-text-top"
                     field={""}
-                    style={{
-                      minWidth: "7rem",
-                    }}
+                    // style={{
+                    //   minWidth: "7rem",
+                    // }}
                     body={(e) => (
-                      // <PrimeInput
-                      //   number
-                      //   // value={e.order ? e.order : 0}
-                      //   value={10}
-                      //   onChange={(t) => {
-                      //     console.log(parseInt(t.value));
-                      //     let temp = [...po.pprod];
-                      //     let val = parseInt(t.value) > e.r_remain ? e.r_remain : parseInt(t.value);
-                      //     let result =
-                      //       temp[e.index].order - val + temp[e.index].remain;
-                      //     temp[e.index].order = val;
-
-                      //     temp[e.index].total =
-                      //       temp[e.index].price * temp[e.index].order;
-                      //     temp[e.index].remain = result;
-                      //     updatePo({ ...po, pprod: temp });
-
-                      //     // let newError = error;
-                      //     // newError.jum = false;
-                      //     // setError(newError);
-                      //   }}
-                      //   placeholder="0"
-                      //   error={true}
-                      // />
                       <PrimeNumber
-                        value={e.order ? e.order : ""}
+                        value={e.order && e.order}
                         onChange={(t) => {
                           let temp = [...po.pprod];
                           let val =
@@ -1088,14 +1025,14 @@ const InputPO = ({ onCancel, onSuccess }) => {
                           temp[e.index].remain = result;
                           updatePo({ ...po, pprod: temp });
 
-                          let newError = error.prod;
-                          newError[e.index].order = false;
-                          setError({...error, prod: newError});
+                          let newError = error;
+                          newError.prod[e.index].jum = false;
+                          setError(newError);
                         }}
                         min={0}
                         placeholder="0"
                         type="number"
-                        error={error.prod[e.index].order}
+                        error={error?.prod[e.index]?.jum}
                       />
                     )}
                   />
@@ -1104,9 +1041,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     header="Sisa"
                     className="align-text-top"
                     field={""}
-                    style={{
-                      minWidth: "7rem",
-                    }}
+                    // style={{
+                    //   minWidth: "7rem",
+                    // }}
                     body={(e) => (
                       <div className="p-inputgroup">
                         <InputText
@@ -1123,23 +1060,10 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     header="Harga Satuan"
                     className="align-text-top"
                     field={""}
-                    style={{
-                      minWidth: "10rem",
-                    }}
+                    // style={{
+                    //   minWidth: "10rem",
+                    // }}
                     body={(e) => (
-                      // <PrimeInput
-                      //   number
-                      //   value={`${e.price ? e.price : 0}`}
-                      //   onChange={(t) => {
-                      //     let temp = [...po.pprod];
-                      //     temp[e.index].price = t.value;
-                      //     temp[e.index].total =
-                      //       temp[e.index].price * temp[e.index].order;
-                      //     updatePo({ ...po, pprod: temp });
-                      //   }}
-                      //   placeholder="0"
-                      //   error={true}
-                      // />
                       <PrimeNumber
                         value={e.price ? e.price : ""}
                         onChange={(t) => {
@@ -1149,14 +1073,14 @@ const InputPO = ({ onCancel, onSuccess }) => {
                             temp[e.index].price * temp[e.index].order;
                           updatePo({ ...po, pprod: temp });
 
-                          let newError = error.prod;
-                          newError[e.index].price = false;
-                          setError({...error, prod: newError});
+                          let newError = error;
+                          newError.prod[e.index].prc = false;
+                          setError(newError);
                         }}
                         min={0}
                         placeholder="0"
                         type="number"
-                        error={error.prod[e.index].order}
+                        error={error?.prod[e.index]?.prc}
                       />
                     )}
                   />
@@ -1165,9 +1089,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     header="Diskon"
                     className="align-text-top"
                     field={""}
-                    style={{
-                      minWidth: "10rem",
-                    }}
+                    // style={{
+                    //   minWidth: "10rem",
+                    // }}
                     body={(e) => (
                       <div className="p-inputgroup">
                         <InputText
@@ -1194,9 +1118,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     header="Harga Nett"
                     className="align-text-top"
                     field={""}
-                    style={{
-                      minWidth: "10rem",
-                    }}
+                    // style={{
+                    //   minWidth: "10rem",
+                    // }}
                     body={(e) => (
                       <div className="p-inputgroup">
                         <InputText
@@ -1433,10 +1357,15 @@ const InputPO = ({ onCancel, onSuccess }) => {
                               temp[e.index].price * temp[e.index].order;
                             temp[e.index].remain = result;
                             updatePo({ ...po, pjasa: temp });
+
+                            let newError = error;
+                            newError.jasa[e.index].jum = false;
+                            setError(newError);
                           }}
                           min={0}
                           placeholder="0"
                           type="number"
+                          error={error?.jasa[e.index]?.jum}
                         />
                       </div>
                     )}
@@ -1477,10 +1406,14 @@ const InputPO = ({ onCancel, onSuccess }) => {
                               temp[e.index].order * temp[e.index].price;
                             updatePo({ ...po, pjasa: temp });
                             console.log(temp);
+                            let newError = error;
+                            newError.jasa[e.index].prc = false;
+                            setError(newError);
                           }}
                           placeholder="0"
                           type="number"
                           min={0}
+                          error={error?.jasa[e.index]?.prc}
                         />
                       </div>
                     )}
@@ -1729,13 +1662,13 @@ const InputPO = ({ onCancel, onSuccess }) => {
               </div>
 
               <div className="col-6">
-                <label className="text-label">
+                <label className="text-label fs-14">
                   <b>Total Pembayaran</b>
                 </label>
               </div>
 
               <div className="col-6">
-                <label className="text-label fs-16">
+                <label className="text-label fs-14">
                   {po.split_inv ? (
                     <b>
                       Rp.{" "}
@@ -1896,7 +1829,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
         <Col className="pt-0">
           <Card>
             <Card.Body>
-              {header()}
+              {/* {header()} */}
               {body()}
               {footer()}
             </Card.Body>

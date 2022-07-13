@@ -21,7 +21,8 @@ import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 
 const defError = {
   code: false,
-  date: false,
+  // date: false,
+  // sale: false,
 };
 
 const BuatFaktur = ({ onCancel, onSuccess }) => {
@@ -474,9 +475,20 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
     let errors = {
       code: !inv.fk_code || inv.fk_code === "",
       date: !inv.fk_date || inv.fk_date === "",
+      sale: !inv.ord_id,
     };
 
     setError(errors);
+
+    valid = !errors.code && !errors.date && !errors.sale;
+
+    if (!valid) {
+      window.scrollTo({
+        top: 180,
+        left: 0,
+        behavior: "smooth",
+      });
+    }
 
     return valid;
   };
@@ -489,15 +501,28 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
 
         <Row className="mb-4">
           <div className="col-4">
+            <PrimeInput
+              label={"No. Faktur Pembelian"}
+              value={inv.fk_code}
+              onChange={(e) => {
+                updateINV({ ...inv, fk_code: e.target?.value });
+                let newError = error;
+                newError.code = false;
+                setError(newError);
+              }}
+              placeholder="Masukan No. Faktur"
+              error={error?.code}
+            />
+          </div>
+
+          <div className="col-2">
             <PrimeCalendar
               label={"Tanggal"}
               value={new Date(`${inv.fk_date}Z`)}
               onChange={(e) => {
                 updateINV({ ...inv, fk_date: e.value });
 
-                let newError = error;
-                newError.date = false;
-                setError(newError);
+                setError({ ...error, date: false });
               }}
               placeholder="Pilih Tanggal"
               showIcon
@@ -506,19 +531,11 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-4">
-            <PrimeInput
-              label={"No. Faktur Pembelian"}
-              value={inv.fk_code}
-              onChange={(e) => {
-                updateINV({ ...inv, fk_code: e.target.value });
-                let newError = error;
-                newError.code = false;
-                setError(newError);
-              }}
-              placeholder="Masukan No. Faktur"
-              error={error?.code}
-            />
+          <div className="col-12 mt-2">
+            <span className="fs-14">
+              <b>Informasi Pembelian</b>
+            </span>
+            <Divider className="mt-1"></Divider>
           </div>
 
           <div className="col-4">
@@ -534,16 +551,23 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                   product: e?.dprod ?? null,
                   jasa: e?.djasa ?? null,
                 });
+                let newError = error;
+                newError.sale = false;
+                setError(newError);
               }}
               option={order}
               // detail
               // onDetail={() => SetShowOrder(true)}
               label={"[ord_code]"}
               placeholder="No. Pembelian"
+              errorMessage="Nomor Pembelian Belum Dipilih"
+              error={error?.sale}
             />
           </div>
 
-          <div className="col-3">
+          <div className="col-6" />
+
+          <div className="col-4">
             <label className="text-label">Supplier</label>
             <div className="p-inputgroup">
               <InputText
@@ -564,7 +588,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-3">
+          <div className="col-5">
             <label className="text-label">Alamat Supplier</label>
             <div className="p-inputgroup">
               <InputText
@@ -595,7 +619,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-3">
+          <div className="col-4">
             <label className="text-label">Jenis Pajak</label>
             <div className="p-inputgroup">
               <InputText
@@ -610,9 +634,9 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-6">
+          <div className="col-2">
             <label className="text-label">Ppn (%)</label>
-            <div className="p-inputgroup mt-2">
+            <div className="p-inputgroup">
               <InputText
                 value={
                   inv.ord_id !== null
@@ -625,660 +649,677 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-6">
+          <div className="col-12 mt-2">
+            <span className="fs-14">
+              <b>Informasi Faktur Pajak</b>
+            </span>
+            <Divider className="mt-1"></Divider>
+          </div>
+
+          <div className="col-4">
             <label className="text-label">Faktur Pajak</label>
             <div className="p-inputgroup mt-2">
               <InputText
-                // value={
-                //   Do.sup_id !== null
-                //     ? checkpjk(checkSupp(Do.sup_id)?.supplier?.sup_ppn).name
-                //     : null
-                // }
+                value={inv.fk_tax}
+                onChange={(e) => {
+                  updateINV({ ...inv, fk_tax: e.target.value });
+                }}
                 placeholder="Masukan Faktur Pajak"
               />
             </div>
           </div>
 
-          <div className="col-12">
+          <div className="col-8">
             <label className="text-label">Keterangan</label>
             <div className="p-inputgroup mt-2">
-              <InputTextarea
-                // value={
-                //   Do.sup_id !== null
-                //     ? checkpjk(checkSupp(Do.sup_id)?.supplier?.sup_ppn).name
-                //     : null
-                // }
+              <InputText
+                value={inv.fk_desc}
+                onChange={(e) => {
+                  updateINV({ ...inv, fk_desc: e.target.value });
+                }}
                 placeholder="Masukan Keterangan"
               />
             </div>
           </div>
         </Row>
 
-        <CustomAccordion
-          tittle={"Detail Pembelian Produk"}
-          defaultActive={true}
-          active={accor.produk}
-          onClick={() => {
-            setAccor({
-              ...accor,
-              produk: !accor.produk,
-            });
-          }}
-          key={1}
-          body={
-            <>
-              <DataTable
-                responsiveLayout="scroll"
-                value={inv.product?.map((v, i) => {
-                  return {
-                    ...v,
-                    index: i,
-                    price: v?.price ?? 0,
-                    disc: v?.disc ?? 0,
-                    total: v?.total ?? 0,
-                  };
-                })}
-                className="display w-150 datatable-wrapper header-white no-border"
-                showGridlines={false}
-                emptyMessage={() => <div></div>}
-              >
-                <Column
-                  header="Barcode"
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={e.prod_id && checkProd(e.prod_id).barcode}
-                        placeholder="Barcode Produk"
-                        disabled
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header="Produk"
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={
-                          e.prod_id &&
-                          `${checkProd(e.prod_id).name} (${
-                            checkProd(e.prod_id).code
-                          })`
-                        }
-                        placeholder="Produk"
-                        disabled
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header="Satuan"
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={e.unit_id && checkUnit(e.unit_id).name}
-                        placeholder="Satuan Produk"
-                        disabled
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header="Jumlah"
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={e.order && e.order}
-                        placeholder="0"
-                        type="number"
-                        min={0}
-                        disabled
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header="Harga Satuan"
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={e.price && e.price}
-                        placeholder="0"
-                        type="number"
-                        min={0}
-                        disabled
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header="Lokasi"
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={e.location && checkLoc(e.location).name}
-                        placeholder="Lokasi"
-                        disabled
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header="Diskon"
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={e.disc && e.disc}
-                        placeholder="0"
-                        type="number"
-                        min={0}
-                        disabled
-                      />
-                      <span className="p-inputgroup-addon">%</span>
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header="Harga Nett"
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={e.nett_price && e.nett_price}
-                        placeholder="0"
-                        type="number"
-                        min={0}
-                        disabled
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header="Total"
-                  // style={{
-                  //   minWidth: "12rem",
-                  // }}
-                  body={(e) => (
-                    <label className="text-nowrap">
-                      <b>
-                        Rp.{" "}
-                        {`${
-                          e.nett_price && e.nett_price !== 0
-                            ? e.nett_price
-                            : e.total - (e.total * e.disc) / 100
-                        }`.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.")}
-                      </b>
-                    </label>
-                  )}
-                />
-              </DataTable>
-            </>
-          }
-        />
-
-        <CustomAccordion
-          tittle={"Detail Pembelian Jasa"}
-          defaultActive={false}
-          active={accor.jasa}
-          onClick={() => {
-            setAccor({
-              ...accor,
-              jasa: !accor.jasa,
-            });
-          }}
-          key={1}
-          body={
-            <>
-              <DataTable
-                responsiveLayout="scroll"
-                value={inv.jasa?.map((v, i) => {
-                  return {
-                    ...v,
-                    index: i,
-                    price: v?.price ?? 0,
-                    disc: v?.disc ?? 0,
-                    total: v?.total ?? 0,
-                  };
-                })}
-                className="display w-170 datatable-wrapper header-white no-border"
-                showGridlines={false}
-                emptyMessage={() => <div></div>}
-              >
-                <Column
-                  header="Supplier"
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={
-                          e.sup_id &&
-                          `${checkSupp(e.sup_id).supplier.sup_name} (${
-                            checkSupp(e.sup_id).supplier.sup_code
-                          })`
-                        }
-                        placeholder="Supplier"
-                        disabled
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header="Jasa"
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={
-                          e.jasa_id &&
-                          `${checkJasa(e.jasa_id).jasa.name} (${
-                            checkJasa(e.jasa_id).jasa.code
-                          })`
-                        }
-                        placeholder="Jasa"
-                        disabled
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header="Satuan"
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={e.unit_id && checkUnit(e.unit_id).name}
-                        placeholder="Satuan"
-                        disabled
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header="Jumlah"
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={e.order && e.order}
-                        placeholder="0"
-                        type="number"
-                        min={0}
-                        disabled
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header="Harga Satuan"
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={e.price && e.price}
-                        onChange={(u) => {}}
-                        placeholder="0"
-                        type="number"
-                        min={0}
-                        disabled
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header="Diskon"
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={e.disc && e.disc}
-                        placeholder="0"
-                        type="number"
-                        min={0}
-                        disabled
-                      />
-                      <span className="p-inputgroup-addon">%</span>
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header="Total"
-                  // style={{
-                  //   minWidth: "12rem",
-                  // }}
-                  body={(e) => (
-                    <label className="text-nowrap">
-                      <b>
-                        {`Rp. ${e.total - (e.total * e.disc) / 100}`.replace(
-                          /(\d)(?=(\d{3})+(?!\d))/g,
-                          "$1."
-                        )}
-                      </b>
-                    </label>
-                  )}
-                />
-              </DataTable>
-            </>
-          }
-        />
-
-        <div className="row ml-0 mr-0 mb-0 mt-6 justify-content-between">
-          <div>
-            <div className="row ml-1">
-              {inv.jasa.length > 0 && inv.product.length > 0 && (
-                <div className="d-flex col-12 align-items-center">
-                  <label className="mt-1"></label>
-                  <InputSwitch
-                    className="ml-4"
-                    checked={inv.split_inv}
-                    disabled
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="row justify-content-right col-6">
-            <div className="col-6">
-              <label className="text-label">
-                {inv.split_inv ? "Sub Total Barang" : "Sub Total"}
-              </label>
-            </div>
-
-            <div className="col-6">
-              <label className="text-label">
-                {inv.split_inv ? (
-                  <b>
-                    Rp.
-                    {formatIdr(getSubTotalBarang())}
-                  </b>
-                ) : (
-                  <b>
-                    Rp.
-                    {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
-                  </b>
-                )}
-              </label>
-            </div>
-
-            <div className="col-6">
-              <label className="text-label">
-                {inv.split_inv ? "DPP Barang" : "DPP"}
-              </label>
-            </div>
-
-            <div className="col-6">
-              <label className="text-label">
-                {inv.split_inv ? (
-                  <b>
-                    Rp.
-                    {formatIdr(getSubTotalBarang())}
-                  </b>
-                ) : (
-                  <b>
-                    Rp.
-                    {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
-                  </b>
-                )}
-              </label>
-            </div>
-
-            <div className="col-6">
-              <label className="text-label">
-                {inv.split_inv ? "Pajak Atas Barang (11%)" : "Pajak (11%)"}
-              </label>
-            </div>
-
-            <div className="col-6">
-              <label className="text-label">
-                {inv.split_inv ? (
-                  <b>
-                    Rp.
-                    {formatIdr((getSubTotalBarang() * 11) / 100)}
-                  </b>
-                ) : (
-                  <b>
-                    Rp.{" "}
-                    {formatIdr(
-                      ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
-                    )}
-                  </b>
-                )}
-              </label>
-            </div>
-
-            <div className="col-6 mt-3">
-              <label className="text-label">Diskon Tambahan</label>
-            </div>
-
-            <div className="col-6">
-              <div className="p-inputgroup">
-                <PButton
-                  label="Rp."
-                  className={`${isRp ? "" : "p-button-outlined"}`}
-                  onClick={() => setRp(true)}
-                  disabled
-                />
-                <InputText
-                  // value={
-                  //   inv.split_inv
-                  //     ? isRp
-                  //       ? (getSubTotalBarang() * Do.prod_disc) / 100
-                  //       : inv.prod_disc
-                  //     : isRp
-                  //     ? ((getSubTotalBarang() + getSubTotalJasa()) *
-                  //         Do.total_disc) /
-                  //       100
-                  //     : Do.total_disc
-                  // }
-                  placeholder="Diskon"
-                  type="number"
-                  min={0}
-                  disabled
-                  onChange={(e) => {
-                    // if (Do.split_inv) {
-                    //   let disc = 0;
-                    //   if (isRp) {
-                    //     disc = (e.target.value / getSubTotalBarang()) * 100;
-                    //   } else {
-                    //     disc = e.target.value;
-                    //   }
-                    //   updateINV({ ...Do, prod_disc: disc });
-                    // } else {
-                    //   let disc = 0;
-                    //   if (isRp) {
-                    //     disc =
-                    //       (e.target.value /
-                    //         (getSubTotalBarang() + getSubTotalJasa())) *
-                    //       100;
-                    //   } else {
-                    //     disc = e.target.value;
-                    //   }
-                    //   updateINV({ ...Do, total_disc: disc });
-                    // }
-                  }}
-                />
-                <PButton
-                  className={`${isRp ? "p-button-outlined" : ""}`}
-                  onClick={() => setRp(false)}
-                  disabled
+        {inv.product?.length ? (
+          <CustomAccordion
+            tittle={"Detail Pembelian Produk"}
+            defaultActive={true}
+            active={accor.produk}
+            onClick={() => {
+              setAccor({
+                ...accor,
+                produk: !accor.produk,
+              });
+            }}
+            key={1}
+            body={
+              <>
+                <DataTable
+                  responsiveLayout="scroll"
+                  value={inv.product?.map((v, i) => {
+                    return {
+                      ...v,
+                      index: i,
+                      price: v?.price ?? 0,
+                      disc: v?.disc ?? 0,
+                      total: v?.total ?? 0,
+                    };
+                  })}
+                  className="display w-150 datatable-wrapper header-white no-border"
+                  showGridlines={false}
+                  emptyMessage={() => <div></div>}
                 >
-                  {" "}
-                  <b>%</b>{" "}
-                </PButton>
+                  <Column
+                    header="Barcode"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.prod_id && checkProd(e.prod_id).barcode}
+                          placeholder="Barcode Produk"
+                          disabled
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header="Produk"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={
+                            e.prod_id &&
+                            `${checkProd(e.prod_id).name} (${
+                              checkProd(e.prod_id).code
+                            })`
+                          }
+                          placeholder="Produk"
+                          disabled
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header="Satuan"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.unit_id && checkUnit(e.unit_id).name}
+                          placeholder="Satuan Produk"
+                          disabled
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header="Jumlah"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.order && e.order}
+                          placeholder="0"
+                          type="number"
+                          min={0}
+                          disabled
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header="Harga Satuan"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.price && e.price}
+                          placeholder="0"
+                          type="number"
+                          min={0}
+                          disabled
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header="Lokasi"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.location && checkLoc(e.location).name}
+                          placeholder="Lokasi"
+                          disabled
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header="Diskon"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.disc && e.disc}
+                          placeholder="0"
+                          type="number"
+                          min={0}
+                          disabled
+                        />
+                        <span className="p-inputgroup-addon">%</span>
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header="Harga Nett"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.nett_price && e.nett_price}
+                          placeholder="0"
+                          type="number"
+                          min={0}
+                          disabled
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header="Total"
+                    // style={{
+                    //   minWidth: "12rem",
+                    // }}
+                    body={(e) => (
+                      <label className="text-nowrap">
+                        <b>
+                          Rp.{" "}
+                          {`${
+                            e.nett_price && e.nett_price !== 0
+                              ? e.nett_price
+                              : e.total - (e.total * e.disc) / 100
+                          }`.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.")}
+                        </b>
+                      </label>
+                    )}
+                  />
+                </DataTable>
+              </>
+            }
+          />
+        ) : (
+          <></>
+        )}
+
+        {inv.jasa?.length ? (
+          <CustomAccordion
+            tittle={"Detail Pembelian Jasa"}
+            defaultActive={false}
+            active={accor.jasa}
+            onClick={() => {
+              setAccor({
+                ...accor,
+                jasa: !accor.jasa,
+              });
+            }}
+            key={1}
+            body={
+              <>
+                <DataTable
+                  responsiveLayout="scroll"
+                  value={inv.jasa?.map((v, i) => {
+                    return {
+                      ...v,
+                      index: i,
+                      price: v?.price ?? 0,
+                      disc: v?.disc ?? 0,
+                      total: v?.total ?? 0,
+                    };
+                  })}
+                  className="display w-170 datatable-wrapper header-white no-border"
+                  showGridlines={false}
+                  emptyMessage={() => <div></div>}
+                >
+                  <Column
+                    header="Supplier"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={
+                            e.sup_id &&
+                            `${checkSupp(e.sup_id).supplier.sup_name} (${
+                              checkSupp(e.sup_id).supplier.sup_code
+                            })`
+                          }
+                          placeholder="Supplier"
+                          disabled
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header="Jasa"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={
+                            e.jasa_id &&
+                            `${checkJasa(e.jasa_id).jasa.name} (${
+                              checkJasa(e.jasa_id).jasa.code
+                            })`
+                          }
+                          placeholder="Jasa"
+                          disabled
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header="Satuan"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.unit_id && checkUnit(e.unit_id).name}
+                          placeholder="Satuan"
+                          disabled
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header="Jumlah"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.order && e.order}
+                          placeholder="0"
+                          type="number"
+                          min={0}
+                          disabled
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header="Harga Satuan"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.price && e.price}
+                          onChange={(u) => {}}
+                          placeholder="0"
+                          type="number"
+                          min={0}
+                          disabled
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header="Diskon"
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.disc && e.disc}
+                          placeholder="0"
+                          type="number"
+                          min={0}
+                          disabled
+                        />
+                        <span className="p-inputgroup-addon">%</span>
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header="Total"
+                    // style={{
+                    //   minWidth: "12rem",
+                    // }}
+                    body={(e) => (
+                      <label className="text-nowrap">
+                        <b>
+                          {`Rp. ${e.total - (e.total * e.disc) / 100}`.replace(
+                            /(\d)(?=(\d{3})+(?!\d))/g,
+                            "$1."
+                          )}
+                        </b>
+                      </label>
+                    )}
+                  />
+                </DataTable>
+              </>
+            }
+          />
+        ) : (
+          <></>
+        )}
+
+        {inv.product?.length ? (
+          <div className="row ml-0 mr-0 mb-0 mt-6 justify-content-between">
+            <div>
+              <div className="row ml-1">
+                {inv.jasa.length > 0 && inv.product.length > 0 && (
+                  <div className="d-flex col-12 align-items-center">
+                    <label className="mt-1"></label>
+                    <InputSwitch
+                      className="ml-4"
+                      checked={inv.split_inv}
+                      disabled
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
-            <div className="col-12">
-              <Divider className="ml-12"></Divider>
-            </div>
+            <div className="row justify-content-right col-6">
+              <div className="col-6">
+                <label className="text-label">
+                  {inv.split_inv ? "Sub Total Barang" : "Sub Total"}
+                </label>
+              </div>
 
-            <div className="col-6">
-              <label className="text-label">
-                <b>Total Pembayaran</b>
-              </label>
-            </div>
+              <div className="col-6">
+                <label className="text-label">
+                  {inv.split_inv ? (
+                    <b>
+                      Rp.
+                      {formatIdr(getSubTotalBarang())}
+                    </b>
+                  ) : (
+                    <b>
+                      Rp.
+                      {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
+                    </b>
+                  )}
+                </label>
+              </div>
 
-            <div className="col-6">
-              <label className="text-label fs-16">
-                {inv.split_inv ? (
-                  <b>
-                    Rp.{" "}
-                    {formatIdr(
-                      getSubTotalBarang() + (getSubTotalBarang() * 11) / 100
-                    )}
-                  </b>
-                ) : (
-                  <b>
-                    Rp.{" "}
-                    {formatIdr(
-                      getSubTotalBarang() +
-                        getSubTotalJasa() +
+              <div className="col-6">
+                <label className="text-label">
+                  {inv.split_inv ? "DPP Barang" : "DPP"}
+                </label>
+              </div>
+
+              <div className="col-6">
+                <label className="text-label">
+                  {inv.split_inv ? (
+                    <b>
+                      Rp.
+                      {formatIdr(getSubTotalBarang())}
+                    </b>
+                  ) : (
+                    <b>
+                      Rp.
+                      {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
+                    </b>
+                  )}
+                </label>
+              </div>
+
+              <div className="col-6">
+                <label className="text-label">
+                  {inv.split_inv ? "Pajak Atas Barang (11%)" : "Pajak (11%)"}
+                </label>
+              </div>
+
+              <div className="col-6">
+                <label className="text-label">
+                  {inv.split_inv ? (
+                    <b>
+                      Rp.
+                      {formatIdr((getSubTotalBarang() * 11) / 100)}
+                    </b>
+                  ) : (
+                    <b>
+                      Rp.{" "}
+                      {formatIdr(
                         ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
-                    )}
-                  </b>
-                )}
-              </label>
-            </div>
+                      )}
+                    </b>
+                  )}
+                </label>
+              </div>
 
-            <div className="col-12">
-              <Divider className="ml-12"></Divider>
-            </div>
+              <div className="col-6 mt-3">
+                <label className="text-label">Diskon Tambahan</label>
+              </div>
 
-            {inv.split_inv ? (
-              <>
-                <div className="row justify-content-right col-12 mt-4">
-                  <div className="col-6 mt-4">
-                    <label className="text-label">Sub Total Jasa</label>
-                  </div>
+              <div className="col-6">
+                <div className="p-inputgroup">
+                  <PButton
+                    label="Rp."
+                    className={`${isRp ? "" : "p-button-outlined"}`}
+                    onClick={() => setRp(true)}
+                    disabled
+                  />
+                  <InputText
+                    // value={
+                    //   inv.split_inv
+                    //     ? isRp
+                    //       ? (getSubTotalBarang() * Do.prod_disc) / 100
+                    //       : inv.prod_disc
+                    //     : isRp
+                    //     ? ((getSubTotalBarang() + getSubTotalJasa()) *
+                    //         Do.total_disc) /
+                    //       100
+                    //     : Do.total_disc
+                    // }
+                    placeholder="Diskon"
+                    type="number"
+                    min={0}
+                    disabled
+                    onChange={(e) => {
+                      // if (Do.split_inv) {
+                      //   let disc = 0;
+                      //   if (isRp) {
+                      //     disc = (e.target.value / getSubTotalBarang()) * 100;
+                      //   } else {
+                      //     disc = e.target.value;
+                      //   }
+                      //   updateINV({ ...Do, prod_disc: disc });
+                      // } else {
+                      //   let disc = 0;
+                      //   if (isRp) {
+                      //     disc =
+                      //       (e.target.value /
+                      //         (getSubTotalBarang() + getSubTotalJasa())) *
+                      //       100;
+                      //   } else {
+                      //     disc = e.target.value;
+                      //   }
+                      //   updateINV({ ...Do, total_disc: disc });
+                      // }
+                    }}
+                  />
+                  <PButton
+                    className={`${isRp ? "p-button-outlined" : ""}`}
+                    onClick={() => setRp(false)}
+                    disabled
+                  >
+                    {" "}
+                    <b>%</b>{" "}
+                  </PButton>
+                </div>
+              </div>
 
-                  <div className="col-6 mt-4">
-                    <label className="text-label">
-                      <b>
-                        Rp.
-                        {formatIdr(getSubTotalJasa())}
-                      </b>
-                    </label>
-                  </div>
+              <div className="col-12">
+                <Divider className="ml-12"></Divider>
+              </div>
 
-                  <div className="col-6">
-                    <label className="text-label">DPP Jasa</label>
-                  </div>
+              <div className="col-6">
+                <label className="text-label">
+                  <b>Total Pembayaran</b>
+                </label>
+              </div>
 
-                  <div className="col-6">
-                    <label className="text-label">
-                      <b>
-                        Rp.
-                        {formatIdr(getSubTotalJasa())}
-                      </b>
-                    </label>
-                  </div>
+              <div className="col-6">
+                <label className="text-label fs-16">
+                  {inv.split_inv ? (
+                    <b>
+                      Rp.{" "}
+                      {formatIdr(
+                        getSubTotalBarang() + (getSubTotalBarang() * 11) / 100
+                      )}
+                    </b>
+                  ) : (
+                    <b>
+                      Rp.{" "}
+                      {formatIdr(
+                        getSubTotalBarang() +
+                          getSubTotalJasa() +
+                          ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
+                      )}
+                    </b>
+                  )}
+                </label>
+              </div>
 
-                  <div className="col-6">
-                    <label className="text-label">Pajak Atas Jasa (2%)</label>
-                  </div>
+              <div className="col-12">
+                <Divider className="ml-12"></Divider>
+              </div>
 
-                  <div className="col-6">
-                    <label className="text-label">
-                      <b>
-                        Rp.
-                        {formatIdr((getSubTotalJasa() * 2) / 100)}
-                      </b>
-                    </label>
-                  </div>
+              {inv.split_inv ? (
+                <>
+                  <div className="row justify-content-right col-12 mt-4">
+                    <div className="col-6 mt-4">
+                      <label className="text-label">Sub Total Jasa</label>
+                    </div>
 
-                  <div className="col-6 mt-3">
-                    <label className="text-label">Diskon Tambahan</label>
-                  </div>
+                    <div className="col-6 mt-4">
+                      <label className="text-label">
+                        <b>
+                          Rp.
+                          {formatIdr(getSubTotalJasa())}
+                        </b>
+                      </label>
+                    </div>
 
-                  <div className="col-6">
-                    <div className="p-inputgroup">
-                      <PButton
-                        label="Rp."
-                        className={`${isRpJasa ? "" : "p-button-outlined"}`}
-                        onClick={() => setRpJasa(true)}
-                        disabled
-                      />
-                      <InputText
-                        value={
-                          isRpJasa
-                            ? (getSubTotalJasa() * inv.jasa_disc) / 100
-                            : inv.jasa_disc
-                        }
-                        placeholder="Diskon"
-                        type="number"
-                        min={0}
-                        disabled
-                        onChange={(e) => {
-                          // let disc = 0;
-                          // if (isRpJasa) {
-                          //   disc = (e.target.value / getSubTotalJasa()) * 100;
-                          // } else {
-                          //   disc = e.target.value;
-                          // }
-                          // updateINV({ ...Do, jasa_disc: disc });
-                        }}
-                      />
-                      <PButton
-                        className={`${isRpJasa ? "p-button-outlined" : ""}`}
-                        onClick={() => setRpJasa(false)}
-                        disabled
-                      >
-                        {" "}
-                        <b>%</b>{" "}
-                      </PButton>
+                    <div className="col-6">
+                      <label className="text-label">DPP Jasa</label>
+                    </div>
+
+                    <div className="col-6">
+                      <label className="text-label">
+                        <b>
+                          Rp.
+                          {formatIdr(getSubTotalJasa())}
+                        </b>
+                      </label>
+                    </div>
+
+                    <div className="col-6">
+                      <label className="text-label">Pajak Atas Jasa (2%)</label>
+                    </div>
+
+                    <div className="col-6">
+                      <label className="text-label">
+                        <b>
+                          Rp.
+                          {formatIdr((getSubTotalJasa() * 2) / 100)}
+                        </b>
+                      </label>
+                    </div>
+
+                    <div className="col-6 mt-3">
+                      <label className="text-label">Diskon Tambahan</label>
+                    </div>
+
+                    <div className="col-6">
+                      <div className="p-inputgroup">
+                        <PButton
+                          label="Rp."
+                          className={`${isRpJasa ? "" : "p-button-outlined"}`}
+                          onClick={() => setRpJasa(true)}
+                          disabled
+                        />
+                        <InputText
+                          value={
+                            isRpJasa
+                              ? (getSubTotalJasa() * inv.jasa_disc) / 100
+                              : inv.jasa_disc
+                          }
+                          placeholder="Diskon"
+                          type="number"
+                          min={0}
+                          disabled
+                          onChange={(e) => {
+                            // let disc = 0;
+                            // if (isRpJasa) {
+                            //   disc = (e.target.value / getSubTotalJasa()) * 100;
+                            // } else {
+                            //   disc = e.target.value;
+                            // }
+                            // updateINV({ ...Do, jasa_disc: disc });
+                          }}
+                        />
+                        <PButton
+                          className={`${isRpJasa ? "p-button-outlined" : ""}`}
+                          onClick={() => setRpJasa(false)}
+                          disabled
+                        >
+                          {" "}
+                          <b>%</b>{" "}
+                        </PButton>
+                      </div>
+                    </div>
+
+                    <div className="col-12">
+                      <Divider className="ml-12"></Divider>
+                    </div>
+
+                    <div className="col-6">
+                      <label className="text-label">
+                        <b>Total Pembayaran</b>
+                      </label>
+                    </div>
+
+                    <div className="col-6">
+                      <label className="text-label fs-16">
+                        <b>
+                          Rp.{" "}
+                          {formatIdr(
+                            getSubTotalJasa() + (getSubTotalJasa() * 2) / 100
+                          )}
+                        </b>
+                      </label>
+                    </div>
+
+                    <div className="col-12">
+                      <Divider className="ml-12"></Divider>
                     </div>
                   </div>
-
-                  <div className="col-12">
-                    <Divider className="ml-12"></Divider>
-                  </div>
-
-                  <div className="col-6">
-                    <label className="text-label">
-                      <b>Total Pembayaran</b>
-                    </label>
-                  </div>
-
-                  <div className="col-6">
-                    <label className="text-label fs-16">
-                      <b>
-                        Rp.{" "}
-                        {formatIdr(
-                          getSubTotalJasa() + (getSubTotalJasa() * 2) / 100
-                        )}
-                      </b>
-                    </label>
-                  </div>
-
-                  <div className="col-12">
-                    <Divider className="ml-12"></Divider>
-                  </div>
-                </div>
-              </>
-            ) : null}
+                </>
+              ) : null}
+            </div>
           </div>
-        </div>
+        ) : (
+          <></>
+        )}
       </>
     );
   };
@@ -1310,7 +1351,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
         <Col className="pt-0">
           <Card>
             <Card.Body>
-              {header()}
+              {/* {header()} */}
               {body()}
               {footer()}
             </Card.Body>

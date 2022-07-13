@@ -27,6 +27,7 @@ import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 import { Dropdown } from "primereact/dropdown";
+import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 
 const defError = {
   code: false,
@@ -34,10 +35,21 @@ const defError = {
   pel: false,
   rul: false,
   sls: false,
-  prod: false,
-  jum: false,
-  lok: false,
-  prc: false,
+  prod: [
+    {
+      id: false,
+      lok: false,
+      jum: false,
+      prc: false,
+    },
+  ],
+  jasa: [
+    {
+      id: false,
+      jum: false,
+      prc: false,
+    },
+  ],
 };
 
 const InputPenjualan = ({ onCancel, onSuccess }) => {
@@ -100,16 +112,113 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     let errors = {
       code: !sale.ord_code || sale.ord_code === "",
       date: !sale.ord_date || sale.ord_date === "",
-      pel: !sale.pel_id?.id,
-      rul: !sale.top?.id,
-      sls: !sale.slsm_id?.id,
-      prod: !sale.jprod?.prod_id?.id,
-      jum: !sale.jprod?.order,
-      prc: !sale.jprod?.price,
-      lok: !sale.jprod?.location?.id,
+      pel: !sale.pel_id,
+      rul: !sale.top,
+      sls: !sale.slsm_id,
+      prod: [],
+      jasa: [],
     };
 
+    sale?.jprod.forEach((element, i) => {
+      if (i > 0) {
+        if (
+          element.prod_id ||
+          element.location ||
+          element.order ||
+          element.price
+        ) {
+          errors.prod[i] = {
+            id: !element.prod_id,
+            lok: !element.location,
+            prc:
+              !element.price || element.price === "" || element.price === "0",
+            jum:
+              !element.order || element.order === "" || element.order === "0",
+          };
+        }
+      } else {
+        errors.prod[i] = {
+          id: !element.prod_id,
+          lok: !element.location,
+          prc: !element.price || element.price === "" || element.price === "0",
+          jum: !element.order || element.order === "" || element.order === "0",
+        };
+      }
+    });
+
+    sale?.jjasa.forEach((element, i) => {
+      if (i > 0) {
+        if (element.jasa_id || element.order || element.price) {
+          errors.jasa[i] = {
+            id: !element.jasa_id,
+            jum:
+              !element.order || element.order === "" || element.order === "0",
+            prc:
+              !element.price || element.price === "" || element.price === "0",
+          };
+        }
+      } else {
+        errors.jasa[i] = {
+          id: !element.jasa_id,
+          jum: !element.order || element.order === "" || element.order === "0",
+          prc: !element.price || element.price === "" || element.price === "0",
+        };
+      }
+    });
+
+    if (
+      !errors.prod[0].id &&
+      !errors.prod[0].jum &&
+      !errors.prod[0].lok &&
+      !errors.prod[0].prc
+    ) {
+      errors.jasa?.forEach((e) => {
+        for (var key in e) {
+          e[key] = false;
+        }
+      });
+    }
+
+    if (!errors.jasa[0]?.id && !errors.jasa[0]?.jum && !errors.jasa[0]?.prc) {
+      errors.prod?.forEach((e) => {
+        for (var key in e) {
+          e[key] = false;
+        }
+      });
+    }
+
+    let validProduct = false;
+    let validJasa = false;
+    errors.prod?.forEach((el) => {
+      for (var k in el) {
+        validProduct = !el[k];
+      }
+    });
+    if (!validProduct) {
+      errors.jasa.forEach((el) => {
+        for (var k in el) {
+          validJasa = !el[k];
+        }
+      });
+    }
+
+    valid =
+      !errors.code &&
+      !errors.date &&
+      !errors.pel &&
+      !errors.rul &&
+      !errors.sls &&
+      (validProduct || validJasa);
+
     setError(errors);
+
+    if (!valid) {
+      window.scrollTo({
+        top: 180,
+        left: 0,
+        behavior: "smooth",
+      });
+    }
 
     return valid;
   };
@@ -613,22 +722,14 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
   const soTemplate = (option) => {
     return (
       <div>
-        {option !== null
-          ? `${option.so_code} - ${option.pel_id.cus_name}`
-          : ""}
+        {option !== null ? `${option.so_code} - ${option.pel_id.cus_name}` : ""}
       </div>
     );
   };
 
   const valTemp = (option, props) => {
     if (option) {
-      return (
-        <div>
-          {option !== null
-            ? `${option.so_code}`
-            : ""}
-        </div>
-      );
+      return <div>{option !== null ? `${option.so_code}` : ""}</div>;
     }
 
     return <span>{props.placeholder}</span>;
@@ -640,7 +741,6 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
         {/* Put content body here */}
         <Toast ref={toast} />
         <Row className="mb-4">
-          <div className="col-7"></div>
           <div className="col-3">
             <PrimeInput
               label={"No. Penjualan"}
@@ -697,15 +797,14 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-3">
-            <label className="text-label">No. Pesanan Penjualan</label>
-            <div className="p-inputgroup">
-            <Dropdown
+            <PrimeDropdown
+              label={"No. Pesanan Penjualan"}
               value={sale.so_id && checkSO(sale.so_id)}
               options={so}
               onChange={(e) => {
                 let result = null;
-                if (sale.top != null) {
-                  result = new Date(`${sale.ord_date}Z`);
+                if (sale.top) {
+                  result = new Date(`${sale?.ord_date}Z`);
                   result.setDate(
                     result.getDate() + checkRulesP(sale?.top)?.day
                   );
@@ -717,12 +816,24 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   due_date: result,
                   top: e.value.top.id ?? null,
                   pel_id: e.value.pel_id?.id ?? null,
+                  sub_addr: e.value.sub_addr ?? null,
                   sub_id: e.value.sub_id?.id ?? null,
                   jprod: e.value.sprod,
                   jjasa: e.value.sjasa.map((v) => {
                     return { ...v, order: v.qty };
                   }),
                 });
+                let newError = error;
+                newError.pel = false;
+                newError.rul = false;
+                newError.prod[0].id = false;
+                newError.prod[0].lok = false;
+                newError.prod[0].jum = false;
+                newError.prod[0].prc = false;
+                newError.jasa[0].id = false;
+                newError.jasa[0].jum = false;
+                newError.jasa[0].prc = false;
+                setError(newError);
               }}
               optionLabel={"[so_code] ([pel_id.cus_name])"}
               placeholder="Pilih No. Pesanan"
@@ -731,7 +842,6 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
               itemTemplate={soTemplate}
               valueTemplate={valTemp}
             />
-            </div>
           </div>
 
           <div className="col-9"></div>
@@ -959,6 +1069,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   return {
                     ...v,
                     index: i,
+                    order: v?.order ?? 0,
                     price: v?.price ?? 0,
                     disc: v?.disc ?? 0,
                     total: v?.total ?? 0,
@@ -997,7 +1108,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         updateSL({ ...sale, jprod: temp });
 
                         let newError = error;
-                        newError.prod = false;
+                        newError.prod[e.index].id = false;
                         setError(newError);
                       }}
                       placeholder="Pilih Produk"
@@ -1008,7 +1119,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         setShowProduk(true);
                       }}
                       errorMessage="Produk Belum Dipilih"
-                      error={error?.prod}
+                      error={error?.prod[e.index]?.id}
                       disabled={sale && sale.so_id}
                     />
                   )}
@@ -1029,7 +1140,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         updateSL({ ...sale, jprod: temp });
 
                         let newError = error;
-                        newError.lok = false;
+                        newError.prod[e.index].lok = false;
                         setError(newError);
                       }}
                       option={lokasi}
@@ -1041,7 +1152,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         setShowLok(true);
                       }}
                       errorMessage="Lokasi Belum Dipilih"
-                      error={error?.lok}
+                      error={error?.prod[e.index]?.lok}
                       disabled={sale && sale.so_id}
                     />
                   )}
@@ -1054,7 +1165,6 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   }}
                   field={""}
                   body={(e) => (
-                    <div className="p-inputgroup">
                       <PrimeNumber
                         value={e.order && e.order}
                         onChange={(u) => {
@@ -1066,16 +1176,15 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                           console.log(temp);
 
                           let newError = error;
-                          newError.jum = false;
+                          newError.prod[e.index].jum = false;
                           setError(newError);
                         }}
                         placeholder="0"
                         type="number"
                         min={0}
-                        error={error?.jum}
+                        error={error?.prod[e.index]?.jum}
                         disabled={sale && sale.so_id}
                       />
-                    </div>
                   )}
                 />
 
@@ -1113,7 +1222,6 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   }}
                   field={""}
                   body={(e) => (
-                    <div className="p-inputgroup">
                       <PrimeNumber
                         value={e.price && e.price}
                         onChange={(u) => {
@@ -1125,16 +1233,15 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                           console.log(temp);
 
                           let newError = error;
-                          newError.prc = false;
+                          newError.prod[e.index].prc = false;
                           setError(newError);
                         }}
                         placeholder="0"
                         type="number"
                         min={0}
-                        error={error?.prc}
+                        error={error?.prod[e.index]?.prc}
                         disabled={sale && sale.so_id}
                       />
-                    </div>
                   )}
                 />
 
@@ -1275,6 +1382,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   return {
                     ...v,
                     index: i,
+                    order: v?.order ?? 0,
                     price: v?.price ?? 0,
                     disc: v?.disc ?? 0,
                     total: v?.total ?? 0,
@@ -1319,6 +1427,10 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         let temp = [...sale.jjasa];
                         temp[e.index].jasa_id = t.jasa.id;
                         updateSL({ ...sale, jjasa: temp });
+
+                        let newError = error;
+                        newError.jasa[e.index].id = false;
+                        setError(newError);
                       }}
                       option={jasa}
                       label={"[jasa.name]"}
@@ -1329,6 +1441,8 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         setShowJasa(true);
                       }}
                       disabled={sale && sale.so_id}
+                      errorMessage="Jasa Belum Dipilih"
+                      error={error?.jasa[e.index]?.id}
                     />
                   )}
                 />
@@ -1361,28 +1475,30 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   header="Jumlah"
                   field={""}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={e.order && e.order}
-                        onChange={(u) => {
-                          let temp = [
-                            ...sale.jjasa.map((v) => {
-                              v.order = v.qty;
-                              return v;
-                            }),
-                          ];
-                          temp[e.index].order = u.target.value;
-                          temp[e.index].total =
-                            temp[e.index].order * temp[e.index].price;
-                          updateSL({ ...sale, jjasa: temp });
-                          console.log(temp);
-                        }}
-                        placeholder="0"
-                        type="number"
-                        min={0}
-                        disabled={sale && sale.so_id}
-                      />
-                    </div>
+                    <PrimeNumber
+                      value={e.order && e.order}
+                      onChange={(u) => {
+                        let temp = [
+                          ...sale.jjasa.map((v) => {
+                            v.order = v.qty;
+                            return v;
+                          }),
+                        ];
+                        temp[e.index].order = u.target.value;
+                        temp[e.index].total =
+                          temp[e.index].order * temp[e.index].price;
+                        updateSL({ ...sale, jjasa: temp });
+                        console.log(temp);
+                        let newError = error;
+                        newError.jasa[e.index].jum = false;
+                        setError(newError);
+                      }}
+                      placeholder="0"
+                      type="number"
+                      min={0}
+                      disabled={sale && sale.so_id}
+                      error={error?.jasa[e.index]?.jum}
+                    />
                   )}
                 />
 
@@ -1393,8 +1509,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                     minWidth: "10rem",
                   }}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
+                      <PrimeNumber
                         value={e.price && e.price}
                         onChange={(t) => {
                           let temp = [...sale.jjasa];
@@ -1403,13 +1518,16 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                             temp[e.index].order * temp[e.index].price;
                           updateSL({ ...sale, jjasa: temp });
                           console.log(temp);
+                          let newError = error;
+                          newError.jasa[e.index].prc = false;
+                          setError(newError);
                         }}
                         placeholder="0"
                         type="number"
                         min={0}
                         disabled={sale && sale.so_id}
+                        error={error?.jasa[e.index]?.prc}
                       />
-                    </div>
                   )}
                 />
 

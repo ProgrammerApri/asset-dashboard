@@ -24,7 +24,10 @@ import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 const defError = {
   code: false,
   date: false,
-  ret: false,
+  fk: false,
+  prod: [{
+    ret: false
+  }],
 };
 
 const ReturBeliInput = ({ onCancel, onSuccess }) => {
@@ -66,10 +69,54 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
     let errors = {
       code: !pr.ret_code || pr.ret_code === "",
       date: !pr.ret_date || pr.ret_date === "",
-      ret: !pr.product?.retur,
+      fk: !pr.fk_id,
+      prod: [],
     };
 
+    pr?.product.forEach((element, i) => {
+        if (element.retur) {
+          errors.prod[i] = {
+            ret:
+              !element.retur ||
+              element.retur === "" ||
+              element.retur === "0",
+          };
+        }else {
+        errors.prod[i] = {
+          ret:
+            !element.retur ||
+            element.retur === "" ||
+            element.retur === "0",
+        };
+      }
+    });
+
+    if (!errors.prod[0].ret) {
+      errors.prod.forEach((e) => {
+        for (var key in e) {
+          e[key] = false;
+        }
+      });
+    }
+
+    let validProduct = false;
+    errors.prod.forEach((el) => {
+      for (var k in el) {
+        validProduct = !el[k];
+      }
+    });
+
     setError(errors);
+
+    valid = !errors.code && !errors.date && !errors.fk && (validProduct);
+
+    if (!valid) {
+      window.scrollTo({
+        top: 180,
+        left: 0,
+        behavior: "smooth",
+      });
+    }
 
     return valid;
   };
@@ -370,6 +417,22 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
 
         <Row className="mb-4">
           <div className="col-4">
+            <PrimeInput
+              label={"Kode Referensi"}
+              value={pr.ret_code}
+              onChange={(e) => {
+                updatePr({ ...pr, ret_code: e.target.value });
+
+                let newError = error;
+                newError.code = false;
+                setError(newError);
+              }}
+              placeholder="Masukan Kode Referensi"
+              error={error?.code}
+            />
+          </div>
+
+          <div className="col-2">
             <PrimeCalendar
               label={"Tanggal"}
               value={new Date(`${pr.ret_date}Z`)}
@@ -387,23 +450,12 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-4">
-            <PrimeInput
-              label={"Kode Referensi"}
-              value={pr.ret_code}
-              onChange={(e) => {
-                updatePr({ ...pr, ret_code: e.target.value });
-
-                let newError = error;
-                newError.code = false;
-                setError(newError);
-              }}
-              placeholder="Masukan Kode Referensi"
-              error={error?.code}
-            />
+          <div className="col-12 mt-2">
+            <span className="fs-14"><b>Informasi Retur</b></span>
+            <Divider className="mt-1"></Divider>
           </div>
 
-          <div className="col-4">
+          <div className="col-3">
             <label className="text-label">No. Faktur Pembelian</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
@@ -415,13 +467,17 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                   fk_id: e.id,
                   product: e.product,
                 });
+                let newError = error;
+                newError.fk = false;
+                setError(newError);
               }}
               label={"[fk_code]"}
               placeholder="Pilih No. Faktur Pembelian"
-              detail
+              error={error?.fk}
             />
           </div>
           {/* kode suplier otomatis keluar, karena sudah melekat di faktur pembelian  */}
+          <div className="col-9"/>
 
           <div className="col-3">
             <label className="text-label">Supplier</label>
@@ -510,6 +566,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                     return {
                       ...v,
                       index: i,
+                      retur: v?.retur ?? 0,
                       price: v?.price ?? 0,
                       disc: v?.disc ?? 0,
                       nett_price: v?.nett_price ?? 0,
@@ -587,13 +644,13 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                             updatePr({ ...pr, product: temp });
 
                             let newError = error;
-                            newError.ret = false;
+                            newError.prod[e.index].ret = false;
                             setError(newError);
                           }}
                           placeholder="0"
                           type="number"
                           min={0}
-                          error={error?.ret}
+                          error={error?.prod[e.index]?.ret}
                         />
                       </div>
                     )}
@@ -675,7 +732,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                     )}
                   />
 
-                  <Column
+                  {/* <Column
                     body={(e) =>
                       e.index === pr.product.length - 1 ? (
                         <Link
@@ -717,7 +774,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                         </Link>
                       )
                     }
-                  />
+                  /> */}
                 </DataTable>
               </>
             }
@@ -879,7 +936,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
         <Col className="pt-0">
           <Card>
             <Card.Body>
-              {header()}
+              {/* {header()} */}
               {body()}
               {footer()}
             </Card.Body>

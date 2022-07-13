@@ -317,33 +317,8 @@ const DataFaktur = ({ onAdd, onDetail }) => {
               payload: {
                 ...data,
                 // fk_code: fkCode,
-                product: [
-                  {
-                    id: 0,
-                    ord_id: null,
-                    prod_id: null,
-                    unit_id: null,
-                    order: null,
-                    price: null,
-                    disc: null,
-                    location: null,
-                    nett_price: null,
-                    total: null,
-                  },
-                ],
-                jasa: [
-                  {
-                    id: 0,
-                    ord_id: null,
-                    jasa_id: null,
-                    sup_id: null,
-                    unit_id: null,
-                    order: null,
-                    price: null,
-                    disc: null,
-                    total: null,
-                  },
-                ],
+                product: [],
+                jasa: [],
               },
             });
           }}

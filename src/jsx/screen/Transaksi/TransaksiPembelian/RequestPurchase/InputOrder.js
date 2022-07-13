@@ -372,7 +372,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
       prod: [],
       jasa: [],
     };
- 
+
     rp?.rprod.forEach((element, i) => {
       if (i > 0) {
         if (element.prod_id || element.request) {
@@ -418,23 +418,23 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
     });
 
     if (!errors.prod[0].id && !errors.prod[0].jum) {
-      errors.jasa.forEach(e => {
+      errors.jasa.forEach((e) => {
         for (var key in e) {
-          e[key] = false
+          e[key] = false;
         }
-      })
+      });
     }
 
     if (!errors.jasa[0].id && !errors.jasa[0].jum) {
-      errors.prod.forEach(e => {
+      errors.prod.forEach((e) => {
         for (var key in e) {
-          e[key] = false
+          e[key] = false;
         }
-      })
+      });
     }
 
-    let validProduct = false
-    let validJasa = false
+    let validProduct = false;
+    let validJasa = false;
     errors.prod.forEach((el) => {
       for (var k in el) {
         validProduct = !el[k];
@@ -448,13 +448,13 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
       });
     }
 
-    valid = !errors.code &&  !errors.date && (validProduct || validJasa)
+    valid = !errors.code && !errors.date && (validProduct || validJasa);
 
     setError(errors);
 
     if (!valid) {
       window.scrollTo({
-        top:180,
+        top: 180,
         left: 0,
         behavior: "smooth",
       });
@@ -469,22 +469,6 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
         <Toast ref={toast} />
         {/* Put content body here */}
         <Row className="mb-4">
-          <div className="col-4">
-            <PrimeCalendar
-              label={"Tanggal"}
-              value={new Date(`${rp.req_date}Z`)}
-              onChange={(e) => {
-                updateRp({ ...rp, req_date: e.value });
-                let newError = error;
-                newError.date = false;
-                setError(newError);
-              }}
-              placeholder="Pilih Tanggal"
-              error={error?.date}
-              showIcon
-            />
-          </div>
-
           <div className="col-4">
             <PrimeInput
               label={"Kode Referensi"}
@@ -508,6 +492,24 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
             />
           </div>
 
+          <div className="col-2">
+            <PrimeCalendar
+              label={"Tanggal"}
+              value={new Date(`${rp.req_date}Z`)}
+              onChange={(e) => {
+                updateRp({ ...rp, req_date: e.value });
+                let newError = error;
+                newError.date = false;
+                setError(newError);
+              }}
+              placeholder="Pilih Tanggal"
+              error={error?.date}
+              showIcon
+            />
+          </div>
+
+          <div className="col-6"></div>
+
           <div className="col-4">
             <label className="text-label">Departemen</label>
             <div className="p-inputgroup"></div>
@@ -524,10 +526,10 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
             />
           </div>
 
-          <div className="col-12">
+          <div className="col-8">
             <label className="text-label">Keterangan</label>
             <div className="p-inputgroup">
-              <InputTextarea
+              <InputText
                 value={`${rp?.req_ket ?? ""}`}
                 onChange={(e) => {
                   setCurrentItem({
@@ -890,7 +892,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
           <div className="col-6">
             <label className="text-label">Keterangan</label>
             <div className="p-inputgroup">
-              <InputTextarea
+              <InputText
                 value={rp.ref_ket}
                 onChange={(e) => updateRp({ ...rp, ref_ket: e.target.value })}
                 placeholder="Masukan Keterangan"

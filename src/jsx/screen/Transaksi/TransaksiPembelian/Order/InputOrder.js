@@ -34,10 +34,20 @@ const defError = {
   date: false,
   sup: false,
   rul: false,
-  prod: false,
-  jum: false,
-  lok: false,
-  prc: false,
+  prod: [
+    {
+      id: false,
+      lok: false,
+      jum: false,
+      prc: false,
+    },
+  ],
+  jasa: [
+    {
+      id: false,
+      jum: false,
+    },
+  ],
 };
 
 const InputOrder = ({ onCancel, onSuccess }) => {
@@ -523,15 +533,103 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     let errors = {
       code: !order.ord_code || order.ord_code === "",
       date: !order.ord_date || order.ord_date === "",
-      sup: !order.sup_id?.id,
-      rul: !order.top?.id,
-      prod: !order.dprod?.prod_id?.id,
-      jum: !order.dprod?.order || order.dprod.jum === "",
-      prc: !order.dprod?.price || order.dprod.prc === "",
-      lok: !order.dprod?.location?.id,
+      sup: !order.sup_id,
+      rul: !order.top,
+      prod: [],
+      jasa: [],
     };
 
+    order?.dprod.forEach((element, i) => {
+      if (i > 0) {
+        if (element.prod_id || element.order || element.location) {
+          errors.prod[i] = {
+            id: !element.prod_id,
+            lok: !element.location,
+            prc:
+              !element.price || element.price === "" || element.price === "0",
+            jum:
+              !element.order || element.order === "" || element.order === "0",
+          };
+        }
+      } else {
+        errors.prod[i] = {
+          id: !element.prod_id,
+          lok: !element.location,
+          prc: !element.price || element.price === "" || element.price === "0",
+          jum: !element.order || element.order === "" || element.order === "0",
+        };
+      }
+    });
+
+    order?.djasa.forEach((element, i) => {
+      if (i > 0) {
+        if (element.jasa_id || element.order) {
+          errors.jasa[i] = {
+            id: !element.jasa_id,
+            jum:
+              !element.order || element.order === "" || element.order === "0",
+          };
+        }
+      } else {
+        errors.jasa[i] = {
+          id: !element.jasa_id,
+          jum: !element.order || element.order === "" || element.order === "0",
+        };
+      }
+    });
+
+    if (
+      !errors.prod[0].id &&
+      !errors.prod[0].jum &&
+      !errors.prod[0].lok &&
+      !errors.prod[0].prc
+    ) {
+      errors.jasa?.forEach((e) => {
+        for (var key in e) {
+          e[key] = false;
+        }
+      });
+    }
+
+    if (!errors.jasa[0]?.id && !errors.jasa[0]?.jum) {
+      errors.prod?.forEach((e) => {
+        for (var key in e) {
+          e[key] = false;
+        }
+      });
+    }
+
+    let validProduct = false;
+    let validJasa = false;
+    errors.prod?.forEach((el) => {
+      for (var k in el) {
+        validProduct = !el[k];
+      }
+    });
+    if (!validProduct) {
+      errors.jasa.forEach((el) => {
+        for (var k in el) {
+          validJasa = !el[k];
+        }
+      });
+    }
+
+    valid =
+      !errors.code &&
+      !errors.date &&
+      !errors.sup &&
+      !errors.rul &&
+      (validProduct || validJasa);
+
     setError(errors);
+
+    if (!valid) {
+      window.scrollTo({
+        top: 180,
+        left: 0,
+        behavior: "smooth",
+      });
+    }
 
     return valid;
   };
@@ -543,7 +641,22 @@ const InputOrder = ({ onCancel, onSuccess }) => {
         <Toast ref={toast} />
 
         <Row className="mb-4">
-          <div className="col-6">
+          <div className="col-4">
+            <PrimeInput
+              label={"Kode Pembelian"}
+              value={order.ord_code}
+              onChange={(e) => {
+                updateORD({ ...order, ord_code: e.target.value });
+                let newError = error;
+                newError.code = false;
+                setError(newError);
+              }}
+              placeholder="Masukan Kode Pembelian"
+              error={error?.code}
+            />
+          </div>
+
+          <div className="col-2">
             <PrimeCalendar
               label={"Tanggal"}
               value={new Date(`${order.ord_date}Z`)}
@@ -569,19 +682,11 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-6">
-            <PrimeInput
-              label={"Kode Pembelian"}
-              value={order.ord_code}
-              onChange={(e) => {
-                updateORD({ ...order, ord_code: e.target.value });
-                let newError = error;
-                newError.code = false;
-                setError(newError);
-              }}
-              placeholder="Masukan Kode Pembelian"
-              error={error?.code}
-            />
+          <div className="col-12 mt-2">
+            <span className="fs-14">
+              <b>Informasi PO</b>
+            </span>
+            <Divider className="mt-1"></Divider>
           </div>
 
           <div className="col-6">
@@ -603,6 +708,15 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                   dprod: e.pprod,
                   djasa: e.pjasa,
                 });
+                let newError = error;
+                newError.sup = false;
+                newError.rul = false;
+                newError.prod[0].id = false;
+                newError.prod[0].jum = false;
+                newError.prod[0].prc = false;
+                newError.jasa[0].id = false;
+                newError.jasa[0].jum = false;
+                setError(newError);
               }}
               placeholder="Pilih No. Pesanan Pembelian"
               option={po}
@@ -625,6 +739,13 @@ const InputOrder = ({ onCancel, onSuccess }) => {
               label={"[ccost_code] ([ccost_name])"}
               disabled={order && order.po_id !== null}
             />
+          </div>
+
+          <div className="col-12 mt-2">
+            <span className="fs-14">
+              <b>Informasi Supplier</b>
+            </span>
+            <Divider className="mt-1"></Divider>
           </div>
 
           <div className="col-3">
@@ -693,6 +814,13 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
+          <div className="col-12 mt-2">
+            <span className="fs-14">
+              <b>Informasi Pembayaran</b>
+            </span>
+            <Divider className="mt-1"></Divider>
+          </div>
+
           <div className="col-4">
             <label className="text-label">Syarat Pembayaran</label>
             <div className="p-inputgroup mt-2"></div>
@@ -705,7 +833,6 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                 console.log(result);
 
                 updateORD({ ...order, top: e.id, due_date: result });
-
                 let newError = error;
                 newError.rul = false;
                 setError(newError);
@@ -728,7 +855,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                 onChange={(e) => {}}
                 placeholder="Tanggal Jatuh Tempo"
                 disabled
-                dateFormat="dd/mm/yy"
+                dateFormat="dd-mm-yy"
               />
             </div>
           </div>
@@ -777,6 +904,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                   return {
                     ...v,
                     index: i,
+                    order: v?.order ?? 0,
                     price: v?.price ?? 0,
                     disc: v?.disc ?? 0,
                     total: v?.total ?? 0,
@@ -812,6 +940,10 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                         temp[e.index].prod_id = u.id;
                         temp[e.index].unit_id = u.unit?.id;
                         updateORD({ ...order, dprod: temp });
+
+                        let newError = error;
+                        newError.prod[e.index].id = false;
+                        setError(newError);
                       }}
                       detail
                       onDetail={() => {
@@ -821,6 +953,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                       label={"[name]"}
                       placeholder="Pilih Produk"
                       disabled={order && order.po_id !== null}
+                      errorMessage="Produk Belum Dipilih"
+                      error={error?.prod[e.index]?.id}
                     />
                   )}
                 />
@@ -863,7 +997,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                         updateORD({ ...order, dprod: temp });
 
                         let newError = error;
-                        newError.lok = false;
+                        newError.prod[e.index].lok = false;
                         setError(newError);
                       }}
                       option={lokasi}
@@ -875,7 +1009,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                         setShowLok(true);
                       }}
                       errorMessage="Lokasi Belum Dipilih"
-                      error={error?.lok}
+                      error={error?.prod[e.index]?.lok}
                     />
                   )}
                 />
@@ -893,12 +1027,16 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                         temp[e.index].total =
                           temp[e.index].order * temp[e.index].price;
                         updateORD({ ...order, dprod: temp });
-                        console.log(temp);
+
+                        let newError = error;
+                        newError.prod[e.index].jum = false;
+                        setError(newError);
                       }}
                       placeholder="0"
                       type="number"
                       min={0}
                       disabled={order && order.po_id !== null}
+                      error={error?.prod[e.index]?.jum}
                     />
                   )}
                 />
@@ -916,11 +1054,16 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                         temp[e.index].total =
                           temp[e.index].order * temp[e.index].price;
                         updateORD({ ...order, dprod: temp });
+
+                        let newError = error;
+                        newError.prod[e.index].prc = false;
+                        setError(newError);
                       }}
                       placeholder="0"
                       type="number"
                       min={0}
                       disabled={order && order.po_id !== null}
+                      error={error?.prod[e.index]?.prc}
                     />
                   )}
                 />
@@ -1059,6 +1202,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                   return {
                     ...v,
                     index: i,
+                    order: v?.order ?? 0,
                     price: v?.price ?? 0,
                     disc: v?.disc ?? 0,
                     total: v?.total ?? 0,
@@ -1070,6 +1214,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
               >
                 <Column
                   header="Supplier"
+                  className="align-text-top"
                   field={""}
                   body={(e) => (
                     <CustomDropdown
@@ -1092,6 +1237,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Jasa"
+                  className="align-text-top"
                   field={""}
                   body={(e) => (
                     <CustomDropdown
@@ -1102,6 +1248,9 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                         let temp = [...order.djasa];
                         temp[e.index].jasa_id = u.jasa.id;
                         updateORD({ ...order, djasa: temp });
+                        let newError = error;
+                        newError.jasa[e.index].id = false;
+                        setError(newError);
                       }}
                       label={"[jasa.name] ([jasa.code])"}
                       placeholder="Pilih Jasa"
@@ -1111,12 +1260,15 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                         setShowJasa(true);
                       }}
                       disabled={order && order.po_id !== null}
+                      errorMessage="Jasa Belum Dipilih"
+                      error={error?.jasa[e.index]?.id}
                     />
                   )}
                 />
 
                 <Column
                   header="Satuan"
+                  className="align-text-top"
                   field={""}
                   body={(e) => (
                     <CustomDropdown
@@ -1142,10 +1294,10 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Pesanan"
+                  className="align-text-top"
                   field={""}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
+                      <PrimeNumber
                         value={e.order && e.order}
                         onChange={(u) => {
                           let temp = [...order.djasa];
@@ -1153,22 +1305,24 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                           temp[e.index].total =
                             temp[e.index].order * temp[e.index].price;
                           updateORD({ ...order, djasa: temp });
+
+                          let newError = error;
+                          newError.jasa[e.index].jum = false;
+                          setError(newError);
                           console.log(temp);
                         }}
                         placeholder="0"
                         type="number"
                         min={0}
                         disabled={order && order.po_id !== null}
+                        error={error?.jasa[e.index]?.jum}
                       />
-                    </div>
                   )}
                 />
 
                 <Column
                   header="Harga Satuan"
-                  // style={{
-                  //   width: "25rem",
-                  // }}
+                  className="align-text-top"
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
@@ -1193,9 +1347,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Diskon"
-                  // style={{
-                  //   width: "25rem",
-                  // }}
+                  className="align-text-top"
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
@@ -1219,9 +1371,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Total"
-                  // style={{
-                  //   minWidth: "12rem",
-                  // }}
+                  className="align-text-top"
                   body={(e) => (
                     <label className="text-nowrap">
                       <b>
@@ -1236,9 +1386,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header=""
-                  // style={{
-                  //   maxWidth: "10rem",
-                  // }}
+                  className="align-text-top"
                   field={""}
                   body={(e) =>
                     e.index === order.djasa?.length - 1 ? (
@@ -1438,13 +1586,13 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             </div>
 
             <div className="col-6">
-              <label className="text-label">
+              <label className="text-label fs-14">
                 <b>Total Pembayaran</b>
               </label>
             </div>
 
             <div className="col-6">
-              <label className="text-label fs-16">
+              <label className="text-label fs-14">
                 {order.split_inv ? (
                   <b>
                     Rp.{" "}
@@ -1469,7 +1617,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
               <Divider className="ml-12"></Divider>
             </div>
 
-            {order.split_inv ? (
+            {order?.split_inv ? (
               <>
                 {/* <div className="row justify-content-right col-12 mt-4"> */}
                 <div className="col-6 mt-4">
@@ -1547,13 +1695,13 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">
+                  <label className="text-label fs-14">
                     <b>Total Pembayaran</b>
                   </label>
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label fs-16">
+                  <label className="text-label fs-14">
                     <b>
                       Rp.{" "}
                       {formatIdr(
@@ -1602,7 +1750,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
         <Col className="pt-0">
           <Card>
             <Card.Body>
-              {header()}
+              {/* {header()} */}
               {body()}
               {footer()}
             </Card.Body>

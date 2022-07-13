@@ -465,6 +465,8 @@ const DataBank = ({
 
     setError(errors);
 
+    valid = !errors.code && !errors.name && !errors.acc_id;
+
     return valid;
   };
 

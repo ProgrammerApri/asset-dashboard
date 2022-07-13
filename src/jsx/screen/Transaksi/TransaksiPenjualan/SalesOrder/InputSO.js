@@ -31,12 +31,24 @@ const defError = {
   code: false,
   date: false,
   pel: false,
-  tgl: false,
   rul: false,
-  // prod: false,
-  // jum: false,
-  // lok: false,
-  // prc: false,
+  tgl: false,
+  sub: false,
+  prod: [
+    {
+      id: false,
+      lok: false,
+      jum: false,
+      prc: false,
+    },
+  ],
+  jasa: [
+    {
+      id: false,
+      jum: false,
+      prc: false,
+    },
+  ],
 };
 
 const InputSO = ({ onCancel, onSuccess }) => {
@@ -95,24 +107,114 @@ const InputSO = ({ onCancel, onSuccess }) => {
     let errors = {
       code: !so.so_code || so.so_code === "",
       date: !so.so_date || so.so_date === "",
-      pel: !checkCus(so.pel_id),
+      pel: !so.pel_id,
+      rul: !so.top,
       tgl: !so.req_date || so.req_date === "",
-      rul: !checkRules(so.top),
-      // prod: !so.sprod?.prod_id?.id,
-      // jum: !so.sprod?.request,
-      // lok: !so.sprod?.location?.id,
-      // prc: !so.sprod?.price,
+      sub: so.sub_addr ? !so.sub_id : false,
+      prod: [],
+      jasa: [],
     };
+
+    so?.sprod.forEach((element, i) => {
+      if (i > 0) {
+        if (
+          element.prod_id ||
+          element.location ||
+          element.order ||
+          element.price
+        ) {
+          errors.prod[i] = {
+            id: !element.prod_id,
+            lok: !element.location,
+            prc:
+              !element.price || element.price === "" || element.price === "0",
+            jum:
+              !element.order || element.order === "" || element.order === "0",
+          };
+        }
+      } else {
+        errors.prod[i] = {
+          id: !element.prod_id,
+          lok: !element.location,
+          prc: !element.price || element.price === "" || element.price === "0",
+          jum: !element.order || element.order === "" || element.order === "0",
+        };
+      }
+    });
+
+    so?.sjasa.forEach((element, i) => {
+      if (i > 0) {
+        if (element.jasa_id || element.qty || element.price) {
+          errors.jasa[i] = {
+            id: !element.jasa_id,
+            jum: !element.qty || element.qty === "" || element.qty === "0",
+            prc:
+              !element.price || element.price === "" || element.price === "0",
+          };
+        }
+      } else {
+        errors.jasa[i] = {
+          id: !element.jasa_id,
+          jum: !element.qty || element.qty === "" || element.qty === "0",
+          prc: !element.price || element.price === "" || element.price === "0",
+        };
+      }
+    });
+
+    if (
+      !errors.prod[0].id &&
+      !errors.prod[0].jum &&
+      !errors.prod[0].lok &&
+      !errors.prod[0].prc
+    ) {
+      errors.jasa?.forEach((e) => {
+        for (var key in e) {
+          e[key] = false;
+        }
+      });
+    }
+
+    if (!errors.jasa[0]?.id && !errors.jasa[0]?.jum && !errors.jasa[0]?.prc) {
+      errors.prod?.forEach((e) => {
+        for (var key in e) {
+          e[key] = false;
+        }
+      });
+    }
+
+    let validProduct = false;
+    let validJasa = false;
+    errors.prod?.forEach((el) => {
+      for (var k in el) {
+        validProduct = !el[k];
+      }
+    });
+    if (!validProduct) {
+      errors.jasa.forEach((el) => {
+        for (var k in el) {
+          validJasa = !el[k];
+        }
+      });
+    }
+
+    valid =
+      !errors.code &&
+      !errors.date &&
+      !errors.pel &&
+      !errors.rul &&
+      !errors.tgl &&
+      (validProduct || validJasa);
 
     setError(errors);
 
     if (!valid) {
       window.scrollTo({
-        top: 0,
+        top: 180,
         left: 0,
         behavior: "smooth",
       });
     }
+
     return valid;
   };
 
@@ -519,7 +621,6 @@ const InputSO = ({ onCancel, onSuccess }) => {
         <Toast ref={toast} />
         {/* Put content body here */}
         <Row className="mb-4">
-          <div className="col-7"></div>
           <div className="col-3">
             <PrimeInput
               label={"Kode Referensi"}
@@ -716,12 +817,17 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   option={subCus}
                   onChange={(e) => {
                     updateSo({ ...so, sub_id: e.id });
+                    let newError = error;
+                    newError.sub = false;
+                    setError(newError);
                   }}
                   label={"[cus_name]"}
                   placeholder="Pilih Sub Pelanggan"
                   detail
                   onDetail={() => setShowSub(true)}
                   disabled={so && !so.sub_addr}
+                  errorMessage="Sub Pelanggan Belum Dipilih"
+                  error={error?.sub}
                 />
               </div>
 
@@ -777,6 +883,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   return {
                     ...v,
                     index: i,
+                    order: v?.order ?? 0,
                     price: v?.price ?? 0,
                     disc: v?.disc ?? 0,
                     total: v?.total ?? 0,
@@ -788,6 +895,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
               >
                 <Column
                   header="Produk"
+                  className="align-text-top"
                   field={""}
                   body={(e) => (
                     <CustomDropdown
@@ -811,9 +919,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         temp[e.index].unit_id = u.unit?.id;
                         updateSo({ ...so, sprod: temp });
 
-                        // let newError = error;
-                        // newError.prod = false;
-                        // setError(newError);
+                        let newError = error;
+                        newError.prod[e.index].id = false;
+                        setError(newError);
                       }}
                       placeholder="Pilih Produk"
                       label={"[name]"}
@@ -822,14 +930,15 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         setCurrentIndex(e.index);
                         setShowProduk(true);
                       }}
-                      // errorMessage="Produk Belum Dipilih"
-                      // error={error?.prod}
+                      errorMessage="Produk Belum Dipilih"
+                      error={error?.prod[e.index]?.id}
                     />
                   )}
                 />
 
                 <Column
                   header="Lokasi"
+                  className="align-text-top"
                   field={""}
                   body={(e) => (
                     <CustomDropdown
@@ -839,9 +948,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         temp[e.index].location = u.id;
                         updateSo({ ...so, sprod: temp });
 
-                        // let newError = error;
-                        // newError.lok = false;
-                        // setError(newError);
+                        let newError = error;
+                        newError.prod[e.index].lok = false;
+                        setError(newError);
                       }}
                       option={lokasi}
                       label={"[name]"}
@@ -851,17 +960,15 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         setCurrentIndex(e.index);
                         setShowLok(true);
                       }}
-                      // errorMessage="Lokasi Belum Dipilih"
-                      // error={error?.lok}
+                      errorMessage="Lokasi Belum Dipilih"
+                      error={error?.prod[e.index]?.lok}
                     />
                   )}
                 />
 
                 <Column
                   header="Jumlah"
-                  // style={{
-                  //   maxWidth: "10rem",
-                  // }}
+                  className="align-text-top"
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
@@ -874,14 +981,14 @@ const InputSO = ({ onCancel, onSuccess }) => {
                             temp[e.index].order * temp[e.index].price;
                           updateSo({ ...so, sprod: temp });
                           console.log(temp);
-                          // let newError = error;
-                          // newError.jum = false;
-                          // setError(newError);
+                          let newError = error;
+                          newError.prod[e.index].jum = false;
+                          setError(newError);
                         }}
                         placeholder="0"
                         type="number"
                         min={0}
-                        // error={error?.jum}
+                        error={error?.prod[e.index]?.jum}
                       />
                     </div>
                   )}
@@ -889,6 +996,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Satuan"
+                  className="align-text-top"
                   field={""}
                   body={(e) => (
                     <CustomDropdown
@@ -912,6 +1020,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Harga Satuan"
+                  className="align-text-top"
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
@@ -924,14 +1033,14 @@ const InputSO = ({ onCancel, onSuccess }) => {
                             temp[e.index].order * temp[e.index].price;
                           updateSo({ ...so, sprod: temp });
                           console.log(temp);
-                          // let newError = error;
-                          // newError.prc = false;
-                          // setError(newError);
+                          let newError = error;
+                          newError.prod[e.index].prc = false;
+                          setError(newError);
                         }}
                         placeholder="0"
                         type="number"
                         min={0}
-                        // error={error?.prc}
+                        error={error?.prod[e.index]?.prc}
                       />
                     </div>
                   )}
@@ -939,9 +1048,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Diskon"
-                  // style={{
-                  //   maxWidth: "10rem",
-                  // }}
+                  className="align-text-top"
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
@@ -964,9 +1071,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Harga Nett"
-                  // style={{
-                  //   minWidth: "10rem",
-                  // }}
+                  className="align-text-top"
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
@@ -988,9 +1093,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Total"
-                  // style={{
-                  //   minWidth: "12rem",
-                  // }}
+                  className="align-text-top"
                   body={(e) => (
                     <label className="text-nowrap">
                       <b>
@@ -1007,9 +1110,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header=""
-                  // style={{
-                  //   maxWidth: "10rem",
-                  // }}
+                  className="align-text-top"
                   field={""}
                   body={(e) =>
                     e.index === so.sprod.length - 1 ? (
@@ -1076,6 +1177,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   return {
                     ...v,
                     index: i,
+                    order: v?.order ?? 0,
                     price: v?.price ?? 0,
                     disc: v?.disc ?? 0,
                     total: v?.total ?? 0,
@@ -1087,6 +1189,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
               >
                 <Column
                   header="Supplier"
+                  className="align-text-top"
                   field={""}
                   body={(e) => (
                     <CustomDropdown
@@ -1110,6 +1213,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Jasa"
+                  className="align-text-top"
                   field={""}
                   body={(e) => (
                     <CustomDropdown
@@ -1120,6 +1224,10 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         let temp = [...so.sjasa];
                         temp[e.index].jasa_id = u.jasa.id;
                         updateSo({ ...so, sjasa: temp });
+
+                        let newError = error;
+                        newError.jasa[e.index].id = false;
+                        setError(newError);
                       }}
                       label={"[jasa.name]"}
                       placeholder="Pilih Jasa"
@@ -1128,38 +1236,44 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         setCurrentIndex(e.index);
                         setShowJasa(true);
                       }}
+                      errorMessage="Jasa Belum Dipilih"
+                      error={error?.jasa[e.index]?.id}
                     />
                   )}
                 />
 
                 <Column
                   header="Jumlah"
+                  className="align-text-top"
                   field={""}
                   style={{
                     width: "8rem",
                   }}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={e.qty && e.qty}
-                        onChange={(u) => {
-                          let temp = [...so.sjasa];
-                          temp[e.index].qty = u.target.value;
-                          temp[e.index].total =
-                            temp[e.index].qty * temp[e.index].price;
-                          updateSo({ ...so, sjasa: temp });
-                          console.log(temp);
-                        }}
-                        placeholder="0"
-                        type="number"
-                        min={0}
-                      />
-                    </div>
+                    <PrimeNumber
+                      value={e.qty && e.qty}
+                      onChange={(u) => {
+                        let temp = [...so.sjasa];
+                        temp[e.index].qty = u.target.value;
+                        temp[e.index].total =
+                          temp[e.index].qty * temp[e.index].price;
+                        updateSo({ ...so, sjasa: temp });
+                        console.log(temp);
+                        let newError = error;
+                        newError.jasa[e.index].jum = false;
+                        setError(newError);
+                      }}
+                      placeholder="0"
+                      type="number"
+                      min={0}
+                      error={error?.jasa[e.index]?.jum}
+                    />
                   )}
                 />
 
                 <Column
                   header="Satuan"
+                  className="align-text-top"
                   style={{
                     width: "13rem",
                   }}
@@ -1187,32 +1301,36 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Harga Satuan"
+                  className="align-text-top"
                   style={{
                     width: "25rem",
                   }}
                   field={""}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={e.price && e.price}
-                        onChange={(u) => {
-                          let temp = [...so.sjasa];
-                          temp[e.index].price = u.target.value;
-                          temp[e.index].total =
-                            temp[e.index].qty * temp[e.index].price;
-                          updateSo({ ...so, sjasa: temp });
-                          console.log(temp);
-                        }}
-                        placeholder="0"
-                        type="number"
-                        min={0}
-                      />
-                    </div>
+                    <PrimeNumber
+                      value={e.price && e.price}
+                      onChange={(u) => {
+                        let temp = [...so.sjasa];
+                        temp[e.index].price = u.target.value;
+                        temp[e.index].total =
+                          temp[e.index].qty * temp[e.index].price;
+                        updateSo({ ...so, sjasa: temp });
+                        console.log(temp);
+                        let newError = error;
+                        newError.jasa[e.index].prc = false;
+                        setError(newError);
+                      }}
+                      placeholder="0"
+                      type="number"
+                      min={0}
+                      error={error?.jasa[e.index]?.prc}
+                    />
                   )}
                 />
 
                 <Column
                   header="Diskon"
+                  className="align-text-top"
                   style={{
                     width: "13rem",
                   }}
@@ -1238,9 +1356,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Total"
-                  // style={{
-                  //   minWidth: "12rem",
-                  // }}
+                  className="align-text-top"
                   body={(e) => (
                     <label className="text-nowrap">
                       <b>
@@ -1255,9 +1371,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header=""
-                  // style={{
-                  //   maxWidth: "10rem",
-                  // }}
+                  className="align-text-top"
                   field={""}
                   body={(e) =>
                     e.index === so.sjasa?.length - 1 ? (

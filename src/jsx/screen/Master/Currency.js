@@ -390,6 +390,24 @@ const Currency = () => {
     setRows2(event.rows);
   };
 
+  const formatDate = (date) => {
+    var d = new Date(`${date}Z`),
+      month = "" + (d.getMonth() + 1),
+      day = "" + d.getDate(),
+      year = d.getFullYear();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+
+    return [day, month, year].join("-");
+  };
+
+  const formatIdr = (value) => {
+    return `${value}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
   const isValid = () => {
     let valid = false;
     let errors = {
@@ -450,14 +468,14 @@ const Currency = () => {
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Taggal"
-                  field={(e) => e.date}
+                  header="Tanggal"
+                  field={(e) => formatDate(e.date)}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Rate Currency"
-                  field={(e) => e.rate}
+                  field={(e) => formatIdr(e.rate)}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
@@ -529,7 +547,7 @@ const Currency = () => {
                   setCurrentItem({ ...currentItem, date: e.target.value })
                 }
                 placeholder="Masukan Tanggal"
-                dateFormat="yy-mm-dd"
+                dateFormat="dd-mm-yy"
                 showIcon
               />
             </div>
@@ -546,7 +564,7 @@ const Currency = () => {
                 newError.rate = false;
                 setError(newError);
               }}
-              placeholder="Masukan Rate"
+              placeholder="0"
               error={error?.rate}
             />
           </div>

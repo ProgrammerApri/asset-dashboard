@@ -466,40 +466,42 @@ const DataSalesman = ({
             onInput(false);
           }}
         >
-          <div className="col-12">
-            <PrimeInput
-              label={"Kode Salesman"}
-              value={currentItem !== null ? `${currentItem.sales_code}` : ""}
-              onChange={(e) => {
-                setCurrentItem({
-                  ...currentItem,
-                  sales_code: e.target.value,
-                });
-                let newError = error;
-                newError.code = false;
-                setError(newError);
-              }}
-              placeholder="Masukan Kode Salesman"
-              error={error?.code}
-            />
-          </div>
+          <div className="row ml-0 mr-0">
+            <div className="col-6">
+              <PrimeInput
+                label={"Kode Salesman"}
+                value={currentItem !== null ? `${currentItem.sales_code}` : ""}
+                onChange={(e) => {
+                  setCurrentItem({
+                    ...currentItem,
+                    sales_code: e.target.value,
+                  });
+                  let newError = error;
+                  newError.code = false;
+                  setError(newError);
+                }}
+                placeholder="Masukan Kode Salesman"
+                error={error?.code}
+              />
+            </div>
 
-          <div className="col-12">
-            <PrimeInput
-              label={"Nama Salesman"}
-              value={currentItem !== null ? `${currentItem.sales_name}` : ""}
-              onChange={(e) => {
-                setCurrentItem({
-                  ...currentItem,
-                  sales_name: e.target.value,
-                });
-                let newError = error;
-                newError.name = false;
-                setError(newError);
-              }}
-              placeholder="Masukan Nama Salesman"
-              error={error?.name}
-            />
+            <div className="col-6">
+              <PrimeInput
+                label={"Nama Salesman"}
+                value={currentItem !== null ? `${currentItem.sales_name}` : ""}
+                onChange={(e) => {
+                  setCurrentItem({
+                    ...currentItem,
+                    sales_name: e.target.value,
+                  });
+                  let newError = error;
+                  newError.name = false;
+                  setError(newError);
+                }}
+                placeholder="Masukan Nama Salesman"
+                error={error?.name}
+              />
+            </div>
           </div>
 
           <div className="col-12">

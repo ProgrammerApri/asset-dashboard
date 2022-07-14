@@ -521,7 +521,7 @@ const DataBank = ({
           />
           <Column
             header="Keterangan"
-            field={(e) => e.bank?.BANK_DESC ?? "-"}
+            field={(e) => e.bank?.BANK_DESC !== "" ? e.bank?.BANK_DESC : "-"}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
@@ -544,7 +544,7 @@ const DataBank = ({
         <Dialog
           header={isEdit ? "Edit Bank" : "Tambah Bank"}
           visible={showInput}
-          style={{ width: "60vw" }}
+          style={{ width: "40vw" }}
           footer={renderFooter()}
           onHide={() => {
             onHideInput();

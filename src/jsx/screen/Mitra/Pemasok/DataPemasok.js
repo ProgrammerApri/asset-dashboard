@@ -110,6 +110,7 @@ const DataSupplier = ({
   const [company, setComp] = useState(null);
   const [pajak, setPajak] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [update, setUpdate] = useState(false);
   const [showInput, setShowInput] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
@@ -331,7 +332,7 @@ const DataSupplier = ({
       if (response.status) {
         setTimeout(() => {
           onSuccessInput();
-          setLoading(false);
+          setUpdate(false);
           onHideInput();
           onInput(false);
           toast.current.show({
@@ -344,7 +345,7 @@ const DataSupplier = ({
       }
     } catch (error) {
       setTimeout(() => {
-        setLoading(false);
+        setUpdate(false);
         toast.current.show({
           severity: "error",
           summary: "Gagal",
@@ -386,7 +387,7 @@ const DataSupplier = ({
       if (response.status) {
         setTimeout(() => {
           onSuccessInput();
-          setLoading(false);
+          setUpdate(false);
           onHideInput();
           onInput(false);
           toast.current.show({
@@ -401,7 +402,7 @@ const DataSupplier = ({
       console.log(error);
       if (error.status === 400) {
         setTimeout(() => {
-          setLoading(false);
+          setUpdate(false);
           toast.current.show({
             severity: "error",
             summary: "Gagal",
@@ -411,7 +412,7 @@ const DataSupplier = ({
         }, 500);
       } else {
         setTimeout(() => {
-          setLoading(false);
+          setUpdate(false);
           toast.current.show({
             severity: "error",
             summary: "Gagal",
@@ -436,7 +437,7 @@ const DataSupplier = ({
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setLoading(false);
+          setUpdate(false);
           setShowDelete(false);
           onSuccessInput();
           onInput(false);
@@ -451,7 +452,7 @@ const DataSupplier = ({
     } catch (error) {
       console.log(error);
       setTimeout(() => {
-        setLoading(false);
+        setUpdate(false);
         setShowDelete(false);
         onInput(false);
         toast.current.show({
@@ -497,11 +498,11 @@ const DataSupplier = ({
   const onSubmit = () => {
     if (isValid()) {
       if (isEdit) {
-        setLoading(true);
+        setUpdate(true);
         editSupplier();
         setActive(0);
       } else {
-        setLoading(true);
+        setUpdate(true);
         addSupplier();
         setActive(0);
       }
@@ -540,7 +541,7 @@ const DataSupplier = ({
               }
             }}
             autoFocus
-            loading={loading}
+            loading={update}
           />
         </div>
       );
@@ -562,7 +563,7 @@ const DataSupplier = ({
           icon="pi pi-check"
           onClick={() => onSubmit()}
           autoFocus
-          loading={loading}
+          loading={update}
         />
       </div>
     );
@@ -587,7 +588,7 @@ const DataSupplier = ({
             delSupplier();
           }}
           autoFocus
-          loading={loading}
+          loading={update}
         />
       </div>
     );
@@ -1010,11 +1011,12 @@ const DataSupplier = ({
                 </div>
               </div>
 
-              <h4 className="mt-4">
-                <b>Informasi Alamat</b>
-              </h4>
-
-              <Divider className="mb-2"></Divider>
+              <div className="col-12 p-0">
+                <div className="mt-4 ml-3 mr-3 fs-16 mb-1">
+                  <b>Alamat Pemasok</b>
+                </div>
+                <Divider className="mb-2 ml-3 mr-3"></Divider>
+              </div>
 
               <div className="row ml-0 mt-0">
                 <div className="col-12">
@@ -1081,9 +1083,10 @@ const DataSupplier = ({
                   <div className="p-inputgroup">
                     <InputText
                       value={
-                        currentItem !== null
-                          ? `${currentItem?.supplier?.sup_kpos ?? ""}`
-                          : ""
+                        currentItem !== null &&
+                      currentItem.supplier.sup_kota !== null
+                        ? kota(currentItem.supplier.sup_kota)?.postal_code
+                        : null
                       }
                       onChange={(e) =>
                         setCurrentItem({
@@ -1298,10 +1301,12 @@ const DataSupplier = ({
                 </div>
               </div>
 
-              <h4 className="mt-4">
-                <b>Distribusi GL/AP</b>
-              </h4>
-              <Divider className="mb-3"></Divider>
+              <div className="col-12 p-0">
+                <div className="mt-4 ml-3 mr-3 fs-16 mb-1">
+                  <b>Distribusi GL/AP</b>
+                </div>
+                <Divider className="mb-2 ml-3 mr-3"></Divider>
+              </div>
 
               <div className="row ml-0 mt-0">
                 <div className="col-6">

@@ -513,8 +513,8 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
           body={loading && <Skeleton />}
         /> */}
                 <Column
-                  header="Departemen"
-                  field={(e) => (e?.dep_id?.ccost_name !== "" ? e?.dep_id?.ccost_name : "-")}
+                  header="Supplier"
+                  field={(e) => e?.sup_id?.sup_name}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />

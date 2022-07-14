@@ -19,6 +19,7 @@ import { Tooltip } from "primereact/tooltip";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import { Divider } from "@material-ui/core";
 
 const def = {
   id: null,
@@ -515,7 +516,7 @@ const DataProduk = ({
           label="Tambah"
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
-             setEdit(false);
+            setEdit(false);
             setCurrentItem(def);
             setDisplayData(true);
             onInput(true);
@@ -783,7 +784,7 @@ const DataProduk = ({
               </div>
 
               <div className="row mr-0 ml-0">
-                <div className="col-6">
+                <div className="col-4">
                   <PrimeDropdown
                     label={"Grup Produk"}
                     value={currentItem !== null ? currentItem.group : null}
@@ -807,7 +808,7 @@ const DataProduk = ({
                   />
                 </div>
 
-                <div className="col-6">
+                <div className="col-4">
                   <PrimeDropdown
                     label={"Tipe Produk"}
                     value={
@@ -834,28 +835,8 @@ const DataProduk = ({
                     error={error[0]?.type}
                   />
                 </div>
-              </div>
 
-              <div className="row mr-0 ml-0">
-                <div className="col-12">
-                  <label className="text-label">Kode Sebelumnya</label>
-                  <div className="p-inputgroup">
-                    <InputText
-                      value={`${currentItem?.codeb ?? ""}`}
-                      onChange={(e) =>
-                        setCurrentItem({
-                          ...currentItem,
-                          codeb: e.target.value,
-                        })
-                      }
-                      placeholder="Masukan Kode Sebelumnya"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="row mr-0 ml-0">
-                <div className="col-6">
+                <div className="col-4">
                   <PrimeDropdown
                     label={"Satuan"}
                     value={currentItem !== null ? currentItem.unit : null}
@@ -878,7 +859,16 @@ const DataProduk = ({
                     error={error[0]?.sat}
                   />
                 </div>
+              </div>
 
+              <div className="col-12 p-0">
+                <div className="mt-4 ml-3 mr-3 fs-16 mb-1">
+                  <b>Pemasok</b>
+                </div>
+                <Divider className="mb-2 ml-3 mr-3"></Divider>
+              </div>
+
+              <div className="row mr-0 ml-0">
                 <div className="col-6">
                   <PrimeDropdown
                     label={"Pemasok"}
@@ -901,6 +891,22 @@ const DataProduk = ({
                     errorMessage="Pemasok Belum Dipilih"
                     error={error[0]?.sup}
                   />
+                </div>
+
+                <div className="col-6">
+                  <label className="text-label">Kode Sebelumnya</label>
+                  <div className="p-inputgroup">
+                    <InputText
+                      value={`${currentItem?.codeb ?? ""}`}
+                      onChange={(e) =>
+                        setCurrentItem({
+                          ...currentItem,
+                          codeb: e.target.value,
+                        })
+                      }
+                      placeholder="Masukan Kode Sebelumnya"
+                    />
+                  </div>
                 </div>
               </div>
 

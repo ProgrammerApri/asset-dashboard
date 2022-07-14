@@ -928,7 +928,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
 
   return (
     <>
-      {header()}
+      {/* {header()} */}
       {body()}
       {footer()}
 

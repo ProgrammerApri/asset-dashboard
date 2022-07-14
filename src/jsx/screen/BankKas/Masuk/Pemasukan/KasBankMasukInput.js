@@ -456,7 +456,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
         <Toast ref={toast} />
 
         <Row className="mb-4">
-          <div className="col-4">
+          <div className="col-3">
             <label className="text-label">Kode Referensi</label>
             <div className="p-inputgroup">
               <InputText
@@ -523,8 +523,8 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
           {/* Type Pembayaran */}
           {exp !== null && exp.exp_type === 1 ? (
             <>
-              <div className="col-8">
-                <label className="text-label">Kode Pelanggan</label>
+              <div className="col-4">
+                <label className="text-label">Pelanggan</label>
                 <div className="p-inputgroup"></div>
                 <CustomDropdown
                   value={exp.acq_sup && supp(exp.acq_sup)}
@@ -549,7 +549,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                 />
               </div>
 
-              <div className="col-4 mb-2">
+              <div className="col-8 mb-2">
                 <label className="text-label">Jenis Pemasukan</label>
                 <div className="p-inputgroup">
                   <SelectButton

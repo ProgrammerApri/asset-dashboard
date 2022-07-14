@@ -1199,10 +1199,12 @@ const DataCustomer = ({
                 </div>
               )}
 
-              <h4 className="mt-4 ml-3">
-                <b>Informasi Alamat</b>
-              </h4>
-              <Divider className="mb-2 ml-3 mr-3"></Divider>
+              <div className="col-12 p-0">
+                <div className="mt-4 ml-3 mr-3 fs-16 mb-1">
+                  <b>Alamat Pelanggan</b>
+                </div>
+                <Divider className="mb-2 ml-3 mr-3"></Divider>
+              </div>
 
               <div className="row mr-0 ml-0">
                 <div className="col-12">
@@ -1264,7 +1266,12 @@ const DataCustomer = ({
                   <label className="text-label">Kode Pos</label>
                   <div className="p-inputgroup">
                     <InputNumber
-                      value={`${currentItem?.customer?.cus_kpos ?? ""}`}
+                      value={
+                        currentItem !== null &&
+                        currentItem.customer.cus_kota !== null
+                          ? kota(currentItem.customer.cus_kota)?.postal_code
+                          : null
+                      }
                       onChange={(e) =>
                         setCurrentItem({
                           ...currentItem,
@@ -1488,9 +1495,9 @@ const DataCustomer = ({
                 </div>
               </div>
 
-              <h4 className="mt-4 ml-3 mr-3">
+              <h5 className="mt-4 ml-3 mr-3">
                 <b>Distribusi GL/AR</b>
-              </h4>
+              </h5>
               <Divider className="mb-2 ml-3 mr-3"></Divider>
 
               <div className="row mr-0 ml-0">

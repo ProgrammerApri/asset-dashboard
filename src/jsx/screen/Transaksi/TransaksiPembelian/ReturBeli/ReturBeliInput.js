@@ -25,9 +25,11 @@ const defError = {
   code: false,
   date: false,
   fk: false,
-  prod: [{
-    ret: false
-  }],
+  prod: [
+    {
+      ret: false,
+    },
+  ],
 };
 
 const ReturBeliInput = ({ onCancel, onSuccess }) => {
@@ -74,29 +76,25 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
     };
 
     pr?.product.forEach((element, i) => {
-        if (element.retur) {
-          errors.prod[i] = {
-            ret:
-              !element.retur ||
-              element.retur === "" ||
-              element.retur === "0",
-          };
-        }else {
+      if (element.retur) {
         errors.prod[i] = {
-          ret:
-            !element.retur ||
-            element.retur === "" ||
-            element.retur === "0",
+          ret: !element.retur || element.retur === "" || element.retur === "0",
+        };
+      } else {
+        errors.prod[i] = {
+          ret: !element.retur || element.retur === "" || element.retur === "0",
         };
       }
     });
 
-    if (!errors.prod[0].ret) {
-      errors.prod.forEach((e) => {
-        for (var key in e) {
-          e[key] = false;
-        }
-      });
+    if (pr?.product.length) {
+      if (!errors.prod[0].ret) {
+        errors.prod.forEach((e) => {
+          for (var key in e) {
+            e[key] = false;
+          }
+        });
+      }
     }
 
     let validProduct = false;
@@ -108,7 +106,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
 
     setError(errors);
 
-    valid = !errors.code && !errors.date && !errors.fk && (validProduct);
+    valid = !errors.code && !errors.date && !errors.fk && validProduct;
 
     if (!valid) {
       window.scrollTo({
@@ -451,7 +449,9 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-12 mt-2">
-            <span className="fs-14"><b>Informasi Retur</b></span>
+            <span className="fs-14">
+              <b>Informasi Retur</b>
+            </span>
             <Divider className="mt-1"></Divider>
           </div>
 
@@ -473,11 +473,12 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
               }}
               label={"[fk_code]"}
               placeholder="Pilih No. Faktur Pembelian"
+              errorMessage="Nomor Faktur Belum Dipilih"
               error={error?.fk}
             />
           </div>
           {/* kode suplier otomatis keluar, karena sudah melekat di faktur pembelian  */}
-          <div className="col-9"/>
+          <div className="col-9" />
 
           <div className="col-3">
             <label className="text-label">Supplier</label>
@@ -579,6 +580,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                 >
                   <Column
                     header="Produk"
+                    className="align-text-top"
                     field={""}
                     body={(e) => (
                       <CustomDropdown
@@ -612,6 +614,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
 
                   <Column
                     header="Satuan"
+                    className="align-text-top"
                     field={""}
                     body={(e) => (
                       <CustomDropdown
@@ -631,6 +634,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
 
                   <Column
                     header="Retur"
+                    className="align-text-top"
                     field={""}
                     body={(e) => (
                       <div className="p-inputgroup">
@@ -658,6 +662,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
 
                   <Column
                     header="Harga Satuan"
+                    className="align-text-top"
                     field={""}
                     body={(e) => (
                       <div className="p-inputgroup">
@@ -681,6 +686,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
 
                   <Column
                     header="Diskon"
+                    className="align-text-top"
                     field={""}
                     body={(e) => (
                       <div className="p-inputgroup">
@@ -703,6 +709,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
 
                   <Column
                     header="Harga Nett"
+                    className="align-text-top"
                     field={""}
                     body={(e) => (
                       <div className="p-inputgroup">
@@ -724,6 +731,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
 
                   <Column
                     header="Total"
+                    className="align-text-top"
                     field={""}
                     body={(e) => (
                       <label className="text-nowrap">
@@ -879,13 +887,13 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
               </div>
 
               <div className="col-6">
-                <label className="text-label">
+                <label className="text-label fs-14">
                   <b>Total Pembayaran</b>
                 </label>
               </div>
 
               <div className="col-6">
-                <label className="text-label fs-16">
+                <label className="text-label fs-14">
                   <b>
                     Rp.{" "}
                     {formatIdr(

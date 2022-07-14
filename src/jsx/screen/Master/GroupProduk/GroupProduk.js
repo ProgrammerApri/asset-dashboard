@@ -697,9 +697,7 @@ const DataGroupProduk = ({
       <>
         <Toast ref={toast} />
         <Dialog
-          header={
-            isEdit ? "Edit Data Group Produk" : "Tambah Data Group Produk"
-          }
+          header={isEdit ? "Edit Data" : "Tambah Data"}
           visible={displayData}
           style={{ width: "50vw" }}
           footer={renderFooter()}
@@ -895,10 +893,12 @@ const DataGroupProduk = ({
                 </div>
               </div>
 
-              <h4 className="mt-4">
-                <b>Akun Penjualan</b>
-              </h4>
-              <Divider className="mb-2"></Divider>
+              <div className="col-12 p-0">
+                <div className="mt-4 ml-3 mr-3 fs-16 mb-2">
+                  <b>Informasi Akun Penjualan</b>
+                </div>
+                <Divider className="mb-2 ml-3 mr-3"></Divider>
+              </div>
 
               <div className="row mr-0 ml-0">
                 <div className="col-6">

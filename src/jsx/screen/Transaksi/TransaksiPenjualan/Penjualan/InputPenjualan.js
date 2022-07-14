@@ -35,6 +35,7 @@ const defError = {
   pel: false,
   rul: false,
   sls: false,
+  sub: false,
   prod: [
     {
       id: false,
@@ -115,6 +116,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
       pel: !sale.pel_id,
       rul: !sale.top,
       sls: !sale.slsm_id,
+      sub: sale.sub_addr ? !sale.sub_id : false,
       prod: [],
       jasa: [],
     };
@@ -208,6 +210,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
       !errors.pel &&
       !errors.rul &&
       !errors.sls &&
+      !errors.sub &&
       (validProduct || validJasa);
 
     setError(errors);
@@ -1008,11 +1011,17 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   option={subCus}
                   onChange={(e) => {
                     updateSL({ ...sale, sub_id: e.customer.id });
+
+                    let newError = error;
+                    newError.sub = false;
+                    setError(newError);
                   }}
                   placeholder="Pilih Sub Pelanggan"
                   label={"[customer.cus_name]"}
                   detail
                   onDetail={() => setShowSub(true)}
+                  errorMessage="Sub Pelanggan Belum Dipilih"
+                  error={error?.sub}
                   disabled={sale && sale.so_id}
                 />
               </div>
@@ -1081,6 +1090,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
               >
                 <Column
                   header="Produk"
+                  className="align-text-top"
                   field={""}
                   style={{
                     width: "20rem",
@@ -1127,6 +1137,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Lokasi"
+                  className="align-text-top"
                   field={""}
                   style={{
                     width: "10rem",
@@ -1160,36 +1171,38 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Jumlah"
+                  className="align-text-top"
                   style={{
                     width: "8rem",
                   }}
                   field={""}
                   body={(e) => (
-                      <PrimeNumber
-                        value={e.order && e.order}
-                        onChange={(u) => {
-                          let temp = [...sale.jprod];
-                          temp[e.index].order = u.target.value;
-                          temp[e.index].total =
-                            temp[e.index].order * temp[e.index].price;
-                          updateSL({ ...sale, jprod: temp });
-                          console.log(temp);
+                    <PrimeNumber
+                      value={e.order && e.order}
+                      onChange={(u) => {
+                        let temp = [...sale.jprod];
+                        temp[e.index].order = u.target.value;
+                        temp[e.index].total =
+                          temp[e.index].order * temp[e.index].price;
+                        updateSL({ ...sale, jprod: temp });
+                        console.log(temp);
 
-                          let newError = error;
-                          newError.prod[e.index].jum = false;
-                          setError(newError);
-                        }}
-                        placeholder="0"
-                        type="number"
-                        min={0}
-                        error={error?.prod[e.index]?.jum}
-                        disabled={sale && sale.so_id}
-                      />
+                        let newError = error;
+                        newError.prod[e.index].jum = false;
+                        setError(newError);
+                      }}
+                      placeholder="0"
+                      type="number"
+                      min={0}
+                      error={error?.prod[e.index]?.jum}
+                      disabled={sale && sale.so_id}
+                    />
                   )}
                 />
 
                 <Column
                   header="Satuan"
+                  className="align-text-top"
                   field={""}
                   style={{
                     width: "10rem",
@@ -1217,36 +1230,38 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Harga Satuan"
+                  className="align-text-top"
                   style={{
                     width: "10rem",
                   }}
                   field={""}
                   body={(e) => (
-                      <PrimeNumber
-                        value={e.price && e.price}
-                        onChange={(u) => {
-                          let temp = [...sale.jprod];
-                          temp[e.index].price = u.target.value;
-                          temp[e.index].total =
-                            temp[e.index].order * temp[e.index].price;
-                          updateSL({ ...sale, jprod: temp });
-                          console.log(temp);
+                    <PrimeNumber
+                      value={e.price && e.price}
+                      onChange={(u) => {
+                        let temp = [...sale.jprod];
+                        temp[e.index].price = u.target.value;
+                        temp[e.index].total =
+                          temp[e.index].order * temp[e.index].price;
+                        updateSL({ ...sale, jprod: temp });
+                        console.log(temp);
 
-                          let newError = error;
-                          newError.prod[e.index].prc = false;
-                          setError(newError);
-                        }}
-                        placeholder="0"
-                        type="number"
-                        min={0}
-                        error={error?.prod[e.index]?.prc}
-                        disabled={sale && sale.so_id}
-                      />
+                        let newError = error;
+                        newError.prod[e.index].prc = false;
+                        setError(newError);
+                      }}
+                      placeholder="0"
+                      type="number"
+                      min={0}
+                      error={error?.prod[e.index]?.prc}
+                      disabled={sale && sale.so_id}
+                    />
                   )}
                 />
 
                 <Column
                   header="Diskon"
+                  className="align-text-top"
                   field={""}
                   style={{
                     width: "15rem",
@@ -1276,6 +1291,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Harga Nett"
+                  className="align-text-top"
                   field={""}
                   style={{
                     width: "10rem",
@@ -1300,6 +1316,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Total"
+                  className="align-text-top"
                   body={(e) => (
                     <label className="text-nowrap">
                       <b>
@@ -1315,6 +1332,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
+                  className="align-text-top"
                   body={(e) =>
                     e.index === sale.jprod.length - 1 ? (
                       <Link
@@ -1394,6 +1412,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
               >
                 <Column
                   header="Supplier"
+                  className="align-text-top"
                   field={""}
                   body={(e) => (
                     <CustomDropdown
@@ -1419,6 +1438,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Jasa"
+                  className="align-text-top"
                   field={""}
                   body={(e) => (
                     <CustomDropdown
@@ -1449,6 +1469,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Satuan"
+                  className="align-text-top"
                   field={""}
                   body={(e) => (
                     <CustomDropdown
@@ -1473,6 +1494,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Jumlah"
+                  className="align-text-top"
                   field={""}
                   body={(e) => (
                     <PrimeNumber
@@ -1504,35 +1526,37 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Harga Satuan"
+                  className="align-text-top"
                   field={""}
                   style={{
                     minWidth: "10rem",
                   }}
                   body={(e) => (
-                      <PrimeNumber
-                        value={e.price && e.price}
-                        onChange={(t) => {
-                          let temp = [...sale.jjasa];
-                          temp[e.index].price = t.target.value;
-                          temp[e.index].total =
-                            temp[e.index].order * temp[e.index].price;
-                          updateSL({ ...sale, jjasa: temp });
-                          console.log(temp);
-                          let newError = error;
-                          newError.jasa[e.index].prc = false;
-                          setError(newError);
-                        }}
-                        placeholder="0"
-                        type="number"
-                        min={0}
-                        disabled={sale && sale.so_id}
-                        error={error?.jasa[e.index]?.prc}
-                      />
+                    <PrimeNumber
+                      value={e.price && e.price}
+                      onChange={(t) => {
+                        let temp = [...sale.jjasa];
+                        temp[e.index].price = t.target.value;
+                        temp[e.index].total =
+                          temp[e.index].order * temp[e.index].price;
+                        updateSL({ ...sale, jjasa: temp });
+                        console.log(temp);
+                        let newError = error;
+                        newError.jasa[e.index].prc = false;
+                        setError(newError);
+                      }}
+                      placeholder="0"
+                      type="number"
+                      min={0}
+                      disabled={sale && sale.so_id}
+                      error={error?.jasa[e.index]?.prc}
+                    />
                   )}
                 />
 
                 <Column
                   header="Diskon"
+                  className="align-text-top"
                   field={""}
                   style={{
                     minWidth: "10rem",
@@ -1559,6 +1583,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Total"
+                  className="align-text-top"
                   body={(e) => (
                     <label className="text-nowrap">
                       <b>Rp. {formatIdr(e.total - (e.total * e.disc) / 100)}</b>
@@ -1567,6 +1592,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
+                  className="align-text-top"
                   body={(e) =>
                     e.index === sale.jjasa.length - 1 ? (
                       <Link

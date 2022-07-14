@@ -600,20 +600,24 @@ const InputPO = ({ onCancel, onSuccess }) => {
       }
     });
 
-    if (!errors.prod[0]?.jum && !errors.prod[0]?.prc) {
-      errors.jasa?.forEach((e) => {
-        for (var key in e) {
-          e[key] = false;
-        }
-      });
+    if (po?.pprod.length) {
+      if (!errors.prod[0]?.jum && !errors.prod[0]?.prc) {
+        errors.jasa?.forEach((e) => {
+          for (var key in e) {
+            e[key] = false;
+          }
+        });
+      }
     }
 
-    if (!errors.jasa[0]?.jum && !errors.jasa[0]?.prc) {
-      errors.prod?.forEach((e) => {
-        for (var key in e) {
-          e[key] = false;
-        }
-      });
+    if (po?.pjasa.length) {
+      if (!errors.jasa[0]?.jum && !errors.jasa[0]?.prc) {
+        errors.prod?.forEach((e) => {
+          for (var key in e) {
+            e[key] = false;
+          }
+        });
+      }
     }
 
     let validProduct = false;
@@ -1340,34 +1344,32 @@ const InputPO = ({ onCancel, onSuccess }) => {
                       minWidth: "7rem",
                     }}
                     body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.order ? e.order : 0}
-                          onChange={(t) => {
-                            let temp = [...po.pjasa];
-                            let val =
-                              t.target.value > e.r_remain
-                                ? e.r_remain
-                                : t.target.value;
-                            let result =
-                              temp[e.index].order - val + temp[e.index].remain;
-                            temp[e.index].order = val;
+                      <PrimeNumber
+                        value={e.order && e.order}
+                        onChange={(t) => {
+                          let temp = [...po.pjasa];
+                          let val =
+                            t.target.value > e.r_remain
+                              ? e.r_remain
+                              : t.target.value;
+                          let result =
+                            temp[e.index].order - val + temp[e.index].remain;
+                          temp[e.index].order = val;
 
-                            temp[e.index].total =
-                              temp[e.index].price * temp[e.index].order;
-                            temp[e.index].remain = result;
-                            updatePo({ ...po, pjasa: temp });
+                          temp[e.index].total =
+                            temp[e.index].price * temp[e.index].order;
+                          temp[e.index].remain = result;
+                          updatePo({ ...po, pjasa: temp });
 
-                            let newError = error;
-                            newError.jasa[e.index].jum = false;
-                            setError(newError);
-                          }}
-                          min={0}
-                          placeholder="0"
-                          type="number"
-                          error={error?.jasa[e.index]?.jum}
-                        />
-                      </div>
+                          let newError = error;
+                          newError.jasa[e.index].jum = false;
+                          setError(newError);
+                        }}
+                        min={0}
+                        placeholder="0"
+                        type="number"
+                        error={error?.jasa[e.index]?.jum}
+                      />
                     )}
                   />
 

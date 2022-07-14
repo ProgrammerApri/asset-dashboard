@@ -625,7 +625,7 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
                 />
                 <Column
                   header="Pemasok"
-                  field={(e) => `${e.sup_id?.sup_name} (${e.sup_id?.sup_code})`}
+                  field={(e) => e.sup_id?.sup_name}
                   style={{ minWidth: "10rem" }}
                   body={loading && <Skeleton />}
                 />

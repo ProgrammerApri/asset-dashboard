@@ -582,7 +582,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                       })`
                     : null
                 }
-                placeholder="Pilih Supplier"
+                placeholder="Nama Supplier"
                 disabled
               />
             </div>
@@ -1172,13 +1172,13 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
               </div>
 
               <div className="col-6">
-                <label className="text-label">
+                <label className="text-label fs-14">
                   <b>Total Pembayaran</b>
                 </label>
               </div>
 
               <div className="col-6">
-                <label className="text-label fs-16">
+                <label className="text-label fs-14">
                   {inv.split_inv ? (
                     <b>
                       Rp.{" "}

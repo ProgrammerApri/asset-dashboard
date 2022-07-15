@@ -3,8 +3,7 @@ import { Toast } from "primereact/toast";
 import { Row, Col, Card } from "react-bootstrap";
 import PencairanGiroMundurList from "./PencairanGiroList";
 import PencairanGiroMundurInput from "./PencairanGiroInput";
-
-
+import Detail from "./Detail";
 
 const PencairanGiroMundur = () => {
   const [active, setActive] = useState(0);
@@ -14,8 +13,11 @@ const PencairanGiroMundur = () => {
       onAdd={() => {
         setActive(1);
       }}
+      onDetail={() => {
+        setActive(2);
+      }}
     />,
-    
+
     <PencairanGiroMundurInput
       onCancel={() => setActive(0)}
       onSuccess={() => {
@@ -30,18 +32,19 @@ const PencairanGiroMundur = () => {
         }, 500);
       }}
     />,
+    <Detail onCancel={() => setActive(0)} />,
   ]);
 
   return (
     <>
-    <Toast ref={toast} />
-    <Row>
-      <Col className="pt-0">
-        <Card>
-          <Card.Body>{view[active]}</Card.Body>
-        </Card>
-      </Col>
-    </Row>
+      <Toast ref={toast} />
+      <Row>
+        <Col className="pt-0">
+          <Card>
+            <Card.Body>{view[active]}</Card.Body>
+          </Card>
+        </Col>
+      </Row>
     </>
   );
 };

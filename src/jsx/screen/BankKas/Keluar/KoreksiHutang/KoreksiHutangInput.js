@@ -13,9 +13,21 @@ import { SET_CURRENT_KH, SET_CURRENT_PO } from "src/redux/actions";
 import DataSupplier from "src/jsx/screen/Mitra/Pemasok/DataPemasok";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import DataAkun from "src/jsx/screen/Master/Akun/DataAkun";
+import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
+import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
+import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
+
+const defError = {
+  code: false,
+  date: false,
+  sup: false,
+  akn: false,
+  nil: false,
+};
 
 const KoreksiAPInput = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
+  const [error, setError] = useState(defError);
   const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
   const [doubleClick, setDoubleClick] = useState(false);
@@ -37,6 +49,32 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
     getSupplier();
     getAcc();
   }, []);
+
+  const isValid = () => {
+    let valid = false;
+    let errors = {
+      code: !kh.kh_code || kh.kh_code === "",
+      date: !kh.kh_date || kh.kh_date === "",
+      sup: !kh.sup_id,
+      akn: !kh.acc_lwn,
+      nil: !kh.nilai || kh.nilai === "",
+    };
+
+    setError(errors);
+
+    valid =
+      !errors.code && !errors.date && !errors.sup && !errors.akn && !errors.nil;
+
+    if (!valid) {
+      window.scrollTo({
+        top: 180,
+        left: 0,
+        behavior: "smooth",
+      });
+    }
+
+    return valid;
+  };
 
   const getSupplier = async () => {
     const config = {
@@ -205,12 +243,14 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
   };
 
   const onSubmit = () => {
-    if (isEdit) {
-      setUpdate(true);
-      editKH();
-    } else {
-      setUpdate(true);
-      addKH();
+    if (isValid()) {
+      if (isEdit) {
+        setUpdate(true);
+        editKH();
+      } else {
+        setUpdate(true);
+        addKH();
+      }
     }
   };
 
@@ -249,29 +289,37 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
 
         <Row className="mb-4">
           <div className="col-4">
-            <label className="text-label">Nomer Referensi Koreksi</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={kh.kh_code}
-                onChange={(e) => updateKH({ ...kh, kh_code: e.target.value })}
-                placeholder="Nomer Referensi"
-              />
-            </div>
+            <PrimeInput
+              label={"No. Referensi Koreksi"}
+              value={kh.kh_code}
+              onChange={(e) => {
+                updateKH({ ...kh, kh_code: e.target.value });
+
+                let newError = error;
+                newError.code = false;
+                setError(newError);
+              }}
+              placeholder="Nomer Referensi"
+              error={error?.code}
+            />
           </div>
 
           <div className="col-2">
-            <label className="text-label">Tanggal</label>
-            <div className="p-inputgroup">
-              <Calendar
-                value={new Date(`${kh.kh_date}Z`)}
-                onChange={(e) => {
-                  updateKH({ ...kh, kh_date: e.value });
-                }}
-                placeholder="Tanggal"
-                showIcon
-                dateFormat="dd-mm-yy"
-              />
-            </div>
+            <PrimeCalendar
+              label={"Tanggal"}
+              value={new Date(`${kh.kh_date}Z`)}
+              onChange={(e) => {
+                updateKH({ ...kh, kh_date: e.value });
+
+                let newError = error;
+                newError.date = false;
+                setError(newError);
+              }}
+              placeholder="Tanggal"
+              showIcon
+              dateFormat="dd-mm-yy"
+              error={error?.date}
+            />
           </div>
           <div className="col-6"></div>
           <div className="col-4 mt-3">
@@ -285,11 +333,17 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
                   ...kh,
                   sup_id: e.supplier?.id,
                 });
+
+                let newError = error;
+                newError.sup = false;
+                setError(newError);
               }}
               label={"[supplier.sup_name]"}
               placeholder="Pilih Pemasok"
               detail
               onDetail={() => setShowSupplier(true)}
+              errorMessage="Pemasok Belum Dipilih"
+              error={error?.sup}
             />
           </div>
           <div className="col-4 mt-3">
@@ -320,24 +374,35 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
                   ...kh,
                   acc_lwn: e.account?.id,
                 });
+
+                let newError = error;
+                newError.akn = false;
+                setError(newError);
               }}
               label={"[account.acc_name] - [account.acc_code]"}
               placeholder="Akun Lawan"
               detail
               onDetail={() => setShowAcc(true)}
+              errorMessage="Akun Belum Dipilih"
+              error={error?.akn}
             />
           </div>
           <div className="col-4">
-            <label className="text-label">Nilai </label>
-            <div className="p-inputgroup">
-              <InputText
-                value={kh.nilai}
-                onChange={(e) => updateKH({ ...kh, nilai: e.target.value })}
-                placeholder="0"
-                type="number"
-                min={0}
-              />
-            </div>
+            <PrimeNumber
+              label={"Nilai"}
+              value={kh.nilai}
+              onChange={(e) => {
+                updateKH({ ...kh, nilai: e.target.value });
+
+                let newError = error;
+                newError.nil = false;
+                setError(newError);
+              }}
+              placeholder="0"
+              type="number"
+              min={0}
+              error={error?.nil}
+            />
           </div>
           <div className="col-4">
             <label className="text-label">Tanggal J/T</label>

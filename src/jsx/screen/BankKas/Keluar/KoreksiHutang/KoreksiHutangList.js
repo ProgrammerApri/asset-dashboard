@@ -16,6 +16,8 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { InputNumber } from "primereact/inputnumber";
 import { Divider } from "@material-ui/core";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import { SET_CURRENT_KH, SET_EDIT_KH } from "src/redux/actions";
+import { useDispatch } from "react-redux";
 
 const data = {
   data: [
@@ -54,6 +56,7 @@ const KoreksiAPList = ({ onAdd }) => {
   const [loading, setLoading] = useState(true);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+  const dispatch = useDispatch();
 
   const dummy = Array.from({ length: 10 });
 
@@ -78,6 +81,10 @@ const KoreksiAPList = ({ onAdd }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
+            dispatch({
+              type: SET_EDIT_KH,
+              payload: false,
+            });
           }}
         />
       </div>

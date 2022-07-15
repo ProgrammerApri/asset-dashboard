@@ -14,6 +14,7 @@ import { Calendar } from "primereact/calendar";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_GIRO, SET_GIRO } from "src/redux/actions";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
+import { Link } from "react-router-dom";
 
 const data = {
   id: null,
@@ -27,7 +28,7 @@ const data = {
   status: null,
 };
 
-const PencairanGiroMundurList = ({ onSuccess }) => {
+const PencairanGiroMundurList = ({ onSuccess, onDetail }) => {
   const [update, setUpdate] = useState(false);
   const [loading, setLoading] = useState(true);
   const [doubleClick, setDoubleClick] = useState(false);
@@ -38,6 +39,8 @@ const PencairanGiroMundurList = ({ onSuccess }) => {
   const [bank, setBank] = useState(null);
   const [showBank, setShowBank] = useState(false);
   const [displayData, setDisplayData] = useState(false);
+  const [displayDel, setDisplayDel] = useState(false);
+  const [currentItem, setCurrentItem] = useState(null);
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
   const [first2, setFirst2] = useState(0);
@@ -153,6 +156,38 @@ const PencairanGiroMundurList = ({ onSuccess }) => {
     });
   };
 
+  const actionBodyTemplate = (data) => {
+    return (
+      // <React.Fragment>
+      <div className="d-flex">
+        <Link
+          onClick={() => {
+            onDetail();
+            dispatch({
+              type: SET_CURRENT_GIRO,
+              payload: data,
+            });
+          }}
+          className="btn btn-info shadow btn-xs sharp ml-1"
+        >
+          <i className="bx bx-show mt-1"></i>
+        </Link>
+
+        <Link
+          onClick={() => {
+            isEdit(true);
+            setDisplayDel(true);
+            setCurrentItem(data);
+          }}
+          className="btn btn-danger shadow btn-xs sharp ml-1"
+        >
+          <i className="fa fa-trash"></i>
+        </Link>
+      </div>
+      // </React.Fragment>
+    );
+  };
+
   const renderHeader = () => {
     return (
       <div className="flex justify-content-between">
@@ -213,32 +248,6 @@ const PencairanGiroMundurList = ({ onSuccess }) => {
       </div>
     );
   };
-
-  // const renderHeader = () => {
-  //   return (
-  //     <div className="flex justify-content-between">
-  //       <span className="p-input-icon-left">
-  //         <i className="pi pi-search" />
-  //         <InputText
-  //           // value={globalFilterValue1}
-  //           // onChange={onGlobalFilterChange1}
-  //           placeholder="Cari disini"
-  //         />
-  //       </span>
-  //       <Button
-  //         variant="primary"
-  //         onClick={() => {
-  //           onAdd();
-  //         }}
-  //       >
-  //         Tambah{" "}
-  //         <span className="btn-icon-right">
-  //           <i class="bx bx-plus"></i>
-  //         </span>
-  //       </Button>
-  //     </div>
-  //   );
-  // };
 
   const template2 = {
     layout: "RowsPerPageDropdown CurrentPageReport PrevPageLink NextPageLink",
@@ -313,9 +322,9 @@ const PencairanGiroMundurList = ({ onSuccess }) => {
                   if (doubleClick) {
                     setDisplayData(false);
                   }
-        
+
                   setDoubleClick(true);
-        
+
                   setTimeout(() => {
                     setDoubleClick(false);
                   }, 2000);
@@ -366,13 +375,20 @@ const PencairanGiroMundurList = ({ onSuccess }) => {
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
+                {/* <Column
+                  header="Action"
+                  dataType="boolean"
+                  bodyClassName="text-center"
+                  style={{ minWidth: "2rem" }}
+                  body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
+                /> */}
               </DataTable>
             </Card.Body>
           </Card>
         </Col>
       </Row>
 
-      <Dialog
+      {/* <Dialog
         header={"Pencairan Giro"}
         visible={displayData}
         style={{ width: "40vw" }}
@@ -438,7 +454,7 @@ const PencairanGiroMundurList = ({ onSuccess }) => {
             />
           </div>
         </Row>
-      </Dialog>
+      </Dialog> */}
     </>
   );
 };

@@ -2,6 +2,7 @@ import { InputText } from "primereact/inputtext";
 import React, { useState } from "react";
 
 const PrimeNumber = ({
+  label,
   value,
   onChange = () => {},
   placeholder,
@@ -12,6 +13,7 @@ const PrimeNumber = ({
 }) => {
   return (
     <div>
+      {label && <label className="text-label">{label}</label>}
       <div className="p-inputgroup">
         <InputText
           value={value}

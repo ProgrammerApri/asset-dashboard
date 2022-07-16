@@ -23,9 +23,20 @@ import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import DataLokasi from "src/jsx/screen/Master/Lokasi/DataLokasi";
 import DataSatuan from "src/jsx/screen/MasterLainnya/Satuan/DataSatuan";
 import DataProduk from "src/jsx/screen/Master/Produk/DataProduk";
+import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
+import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
+import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
+
+const defError = {
+  code: false,
+  date: false,
+  pb: false,
+  prod: [{}],
+};
 
 const PenerimaanInput = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
+  const [error, setError] = useState(defError);
   const [currentIndex, setCurrentIndex] = useState(0);
   const toast = useRef(null);
   const [doubleClick, setDoubleClick] = useState(false);
@@ -55,6 +66,64 @@ const PenerimaanInput = ({ onCancel, onSuccess }) => {
     getProduct();
     getSatuan();
   }, []);
+
+  const isValid = () => {
+    let valid = false;
+    let errors = {
+      code: !phj.phj_code || phj.phj_code === "",
+      date: !phj.phj_date || phj.phj_date === "",
+      pb: !phj.pb_id,
+      prod: [],
+    };
+
+    phj?.product.forEach((element, i) => {
+      if (i > 0) {
+        if (element.prod_id || element.location || element.order) {
+          errors.prod[i] = {
+            id: !element.prod_id,
+            lok: !element.location,
+            jum:
+              !element.order || element.order === "" || element.order === "0",
+          };
+        }
+      } else {
+        errors.prod[i] = {
+          id: !element.prod_id,
+          lok: !element.location,
+          jum: !element.order || element.order === "" || element.order === "0",
+        };
+      }
+    });
+
+    if (!errors.prod[0].id && !errors.prod[0].lok && !errors.prod[0].jum) {
+      errors.prod?.forEach((e) => {
+        for (var key in e) {
+          e[key] = false;
+        }
+      });
+    }
+
+    let validProduct = false;
+    errors.prod?.forEach((el) => {
+      for (var k in el) {
+        validProduct = !el[k];
+      }
+    });
+
+    valid = !errors.code && !errors.date && !errors.pb && validProduct;
+
+    setError(errors);
+
+    if (!valid) {
+      window.scrollTo({
+        top: 180,
+        left: 0,
+        behavior: "smooth",
+      });
+    }
+
+    return valid;
+  };
 
   const getLokasi = async () => {
     const config = {
@@ -260,12 +329,14 @@ const PenerimaanInput = ({ onCancel, onSuccess }) => {
   };
 
   const onSubmit = () => {
-    if (isEdit) {
-      setUpdate(true);
-      editPHJ();
-    } else {
-      setUpdate(true);
-      addPHJ();
+    if (isValid()) {
+      if (isEdit) {
+        setUpdate(true);
+        editPHJ();
+      } else {
+        setUpdate(true);
+        addPHJ();
+      }
     }
   };
 
@@ -303,33 +374,38 @@ const PenerimaanInput = ({ onCancel, onSuccess }) => {
         <Toast ref={toast} />
 
         <Row className="mb-4">
-          <div className="col-5"></div>
-          <div className="col-5">
-            <label className="text-label">Kode Referensi</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={phj.phj_code}
-                onChange={(e) =>
-                  updatePhj({ ...phj, phj_code: e.target.value })
-                }
-                placeholder="Masukan Kode Referensi"
-              />
-            </div>
+          <div className="col-4">
+            <PrimeInput
+              label={"Kode Referensi"}
+              value={phj.phj_code}
+              onChange={(e) => {
+                updatePhj({ ...phj, phj_code: e.target.value });
+
+                let newError = error;
+                newError.code = false;
+                setError(newError);
+              }}
+              placeholder="Masukan Kode Referensi"
+              error={error?.code}
+            />
           </div>
 
           <div className="col-2">
-            <label className="text-label">Tanggal</label>
-            <div className="p-inputgroup">
-              <Calendar
-                value={new Date(`${phj.phj_date}Z`)}
-                onChange={(e) => {
-                  updatePhj({ ...phj, phj_date: e.value });
-                }}
-                placeholder="Pilih Tanggal"
-                showIcon
-                dateFormat="dd-mm-yy"
-              />
-            </div>
+            <PrimeCalendar
+              label={"Tanggal"}
+              value={new Date(`${phj.phj_date}Z`)}
+              onChange={(e) => {
+                updatePhj({ ...phj, phj_date: e.value });
+
+                let newError = error;
+                newError.date = false;
+                setError(newError);
+              }}
+              placeholder="Pilih Tanggal"
+              showIcon
+              dateFormat="dd-mm-yy"
+              error={error?.date}
+            />
           </div>
 
           <div className="col-12">
@@ -341,7 +417,7 @@ const PenerimaanInput = ({ onCancel, onSuccess }) => {
             <Divider className="mt-2"></Divider>
           </div>
 
-          <div className="col-5">
+          <div className="col-4">
             <label className="text-label">Kode Pemakaian</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
@@ -353,18 +429,24 @@ const PenerimaanInput = ({ onCancel, onSuccess }) => {
                   pb_id: e.id,
                   product: e.product,
                 });
+
+                let newError = error;
+                newError.pb = false;
+                setError(newError);
               }}
               label={"[pb_code]"}
               placeholder="Kode Pemakaian Bahan"
+              errorMessage="Kode Pemakaian Bahan Belum Dipilih"
+              error={error?.pb}
             />
           </div>
 
           {/* <div className="col-4"></div> */}
 
-          <div className="col-7">
+          <div className="col-8">
             <label className="text-label">Keterangan</label>
             <div className="p-inputgroup">
-              <InputTextarea
+              <InputText
                 value={phj.phj_desc}
                 onChange={(e) =>
                   updatePhj({ ...phj, phj_desc: e.target.value })

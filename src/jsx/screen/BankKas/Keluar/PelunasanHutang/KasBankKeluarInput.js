@@ -30,6 +30,12 @@ const defError = {
   akn: false,
   dep: false,
   proj: false,
+  acco: false,
+  bn_code: false,
+  bn_acc: false,
+  gr: false,
+  tgl: false,
+  bn_id: false,
   exp: [
     {
       acc: false,
@@ -108,6 +114,12 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
       akn: exp.exp_type === 2 ? !exp.exp_acc : false,
       dep: exp.exp_type === 2 ? !exp.exp_dep : false,
       proj: exp.exp_type === 2 ? !exp.exp_prj : false,
+      acco: exp.acq_pay === 1 ? !exp.kas_acc : false,
+      bn_code: exp.acq_pay === 2 ? !exp.bank_ref : false,
+      bn_acc: exp.acq_pay === 2 ? !exp.bank_acc : false,
+      gr: exp.acq_pay === 3 ? !exp.giro_num : false,
+      tgl: exp.acq_pay === 3 ? !exp.giro_date : false,
+      bn_id: exp.acq_pay === 3 ? !exp.bank_id : false,
       exp: [],
       acq: [],
     };
@@ -150,25 +162,25 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
     });
 
     // if (exp !== null && exp.exp_type === 2) {
-      if (!errors.exp[0].acc && !errors.exp[0].nil) {
-        errors.acq?.forEach((e) => {
+    if (!errors.exp[0].acc && !errors.exp[0].nil) {
+      errors.acq?.forEach((e) => {
+        for (var key in e) {
+          e[key] = false;
+        }
+      });
+    }
+    // }
+
+    // if (exp !== null && exp.exp_type === 1) {
+    if (exp?.acq.length) {
+      if (!errors.acq[0]?.pay) {
+        errors.exp?.forEach((e) => {
           for (var key in e) {
             e[key] = false;
           }
         });
       }
-    // }
-
-    // if (exp !== null && exp.exp_type === 1) {
-      if (exp?.acq.length) {
-        if (!errors.acq[0]?.pay) {
-          errors.exp?.forEach((e) => {
-            for (var key in e) {
-              e[key] = false;
-            }
-          });
-        }
-      }
+    }
     // }
 
     let validExp = false;
@@ -195,6 +207,12 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
       !errors.akn &&
       !errors.dep &&
       !errors.proj &&
+      !errors.acco &&
+      !errors.bn_code &&
+      !errors.bn_acc &&
+      !errors.gr &&
+      !errors.tgl &&
+      !errors.bn_id &&
       (validExp || validAcq);
 
     if (!valid) {
@@ -729,11 +747,17 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                       option={accKas}
                       onChange={(e) => {
                         updateExp({ ...exp, kas_acc: e.account.id });
+
+                        let newError = error;
+                        newError.acco = false;
+                        setError(newError);
                       }}
                       label={"[account.acc_name] - [account.acc_code]"}
                       placeholder="Pilih Kode Akun"
                       detail
                       onDetail={() => setShowAccKas(true)}
+                      errorMessage="Akun Belum Dipilih"
+                      error={error?.acco}
                     />
                   </div>
                 </>
@@ -741,7 +765,23 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
               exp !== null && exp.acq_pay === 2 ? (
                 <>
                   <div className="col-4">
-                    <label className="text-label">Kode Bank</label>
+                    <PrimeInput
+                      label={"Kode Referensi Bank"}
+                      value={exp.bank_ref}
+                      onChange={(e) => {
+                        updateExp({ ...exp, bank_ref: e.target.value });
+
+                        let newError = error;
+                        newError.bn_code = false;
+                        setError(newError);
+                      }}
+                      placeholder="Masukan Kode Bank"
+                      error={error?.bn_code}
+                    />
+                  </div>
+
+                  <div className="col-4">
+                    <label className="text-label">Akun Bank</label>
                     <div className="p-inputgroup"></div>
                     <CustomDropdown
                       value={exp.bank_id && checkBank(exp.bank_id)}
@@ -752,56 +792,55 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                           bank_id: e.bank?.id,
                           bank_acc: e.bank?.acc_id,
                         });
+
+                        let newError = error;
+                        newError.bn_acc = false;
+                        setError(newError);
                       }}
                       label={"[bank.BANK_NAME] - [bank.BANK_CODE]"}
-                      placeholder="Pilih Kode Bank"
+                      placeholder="Pilih Akun Bank"
                       detail
                       onDetail={() => setShowBank(true)}
+                      errorMessage="Akun Bank Belum Dipilih"
+                      error={error?.bn_acc}
                     />
-                  </div>
-
-                  <div className="col-4">
-                    <label className="text-label">Kode Referensi Bank</label>
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={exp.bank_ref}
-                        onChange={(e) =>
-                          updateExp({ ...exp, bank_ref: e.target.value })
-                        }
-                        placeholder="Masukan Kode Bank"
-                      />
-                    </div>
                   </div>
                 </>
               ) : (
                 // pembayran giro
                 <>
                   <div className="col-4">
-                    <label className="text-label">Nomor Giro</label>
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={exp.giro_num}
-                        onChange={(e) =>
-                          updateExp({ ...exp, giro_num: e.target.value })
-                        }
-                        placeholder="Nomor Giro"
-                      />
-                    </div>
+                    <PrimeInput
+                      label={"Nomor Giro"}
+                      value={exp.giro_num}
+                      onChange={(e) => {
+                        updateExp({ ...exp, giro_num: e.target.value });
+
+                        let newError = error;
+                        newError.gr = false;
+                        setError(newError);
+                      }}
+                      placeholder="Nomor Giro"
+                      error={error?.gr}
+                    />
                   </div>
 
-                  <div className="col-4">
-                    <label className="text-label">Tanggal Cair</label>
-                    <div className="p-inputgroup">
-                      <Calendar
-                        value={new Date(`${exp.giro_date}Z`)}
-                        onChange={(e) => {
-                          updateExp({ ...exp, giro_date: e.value });
-                        }}
-                        placeholder="Pilih Tanggal"
-                        showIcon
-                        dateFormat="dd-mm-yy"
-                      />
-                    </div>
+                  <div className="col-2">
+                    <PrimeCalendar
+                      label={"Tanggal Cair"}
+                      value={new Date(`${exp.giro_date}Z`)}
+                      onChange={(e) => {
+                        updateExp({ ...exp, giro_date: e.value });
+
+                        let newError = error;
+                        newError.tgl = false;
+                        setError(newError);
+                      }}
+                      placeholder="Pilih Tanggal"
+                      showIcon
+                      dateFormat="dd-mm-yy"
+                      error={error?.tgl}
+                    />
                   </div>
 
                   <div className="col-4">
@@ -816,11 +855,17 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                           bank_id: e.bank?.id,
                           bank_acc: e.bank?.acc_id,
                         });
+
+                        let newError = error;
+                        newError.bn_id = false;
+                        setError(newError);
                       }}
                       label={"[bank.BANK_NAME] - [bank.BANK_CODE]"}
                       placeholder="Pilih Kode Bank"
                       onDetail={() => setShowBankG(true)}
                       detail
+                      errorMessage="Akun Bank Belum Dipilih"
+                      error={error?.bn_id}
                     />
                   </div>
                 </>
@@ -933,13 +978,11 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
 
                         <Column
                           header="Nilai Pembayaran"
-                          style={{
-                            maxWidth: "10rem",
-                          }}
+                          className="align-text-top"
                           field={""}
                           body={(e) => (
                             <PrimeNumber
-                              value={e.payment}
+                              value={e.payment && e.payment}
                               onChange={(u) => {
                                 let temp = [...exp.acq];
                                 temp[e.index].payment = u.target.value;
@@ -1006,7 +1049,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                     newError.akn = false;
                     setError(newError);
                   }}
-                  label={"[account.acc_name] - ([account.acc_code])"}
+                  label={"[account.acc_name] - [account.acc_code]"}
                   placeholder="Pilih Kode Akun"
                   detail
                   onDetail={() => setShowAcc(true)}
@@ -1030,7 +1073,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                     newError.dep = false;
                     setError(newError);
                   }}
-                  label={"[ccost_name] - ([ccost_code])"}
+                  label={"[ccost_name] - [ccost_code]"}
                   placeholder="Pilih Departemen"
                   detail
                   onDetail={() => setShowDept(true)}
@@ -1054,7 +1097,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                     newError.proj = false;
                     setError(newError);
                   }}
-                  label={"[proj_name] - ([proj_code])"}
+                  label={"[proj_name] - [proj_code]"}
                   placeholder="Pilih Project"
                   detail
                   onDetail={() => setShowProj(true)}
@@ -1091,6 +1134,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                     >
                       <Column
                         header="Kode Akun"
+                        className="align-text-top"
                         style={{
                           width: "25rem",
                         }}
@@ -1109,7 +1153,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                               newError.exp[e.index].acc = false;
                               setError(newError);
                             }}
-                            label={"[account.acc_name] - ([account.acc_code])"}
+                            label={"[account.acc_name] - [account.acc_code]"}
                             placeholder="Pilih Kode Akun"
                             detail
                             errorMessage="Akun Belum Dipilih"
@@ -1120,6 +1164,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
 
                       <Column
                         header="D/K"
+                        className="align-text-top"
                         style={{
                           width: "6rem",
                         }}
@@ -1129,7 +1174,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                             <InputText
                               value={
                                 e.acc_code &&
-                                checkAcc(e.acc_code).account.sld_type
+                                checkAcc(e.acc_code)?.account?.sld_type
                               }
                               onChange={(e) => {}}
                               placeholder="D/K"
@@ -1141,6 +1186,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
 
                       <Column
                         header="Nilai"
+                        className="align-text-top"
                         field={""}
                         body={(e) => (
                           <PrimeNumber
@@ -1164,22 +1210,21 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
 
                       <Column
                         header="Keterangan"
+                        className="align-text-top"
                         // style={{
                         //   maxWidth: "15rem",
                         // }}
                         field={""}
                         body={(e) => (
-                          <div className="p-inputgroup">
-                            <InputText
-                              value={e.desc}
-                              onChange={(u) => {
-                                let temp = [...exp.exp];
-                                temp[e.index].desc = u.target.value;
-                                updateExp({ ...exp, exp: temp });
-                              }}
-                              placeholder="Masukan Keterangan"
-                            />
-                          </div>
+                          <PrimeInput
+                            value={e.desc}
+                            onChange={(u) => {
+                              let temp = [...exp.exp];
+                              temp[e.index].desc = u.target.value;
+                              updateExp({ ...exp, exp: temp });
+                            }}
+                            placeholder="Masukan Keterangan"
+                          />
                         )}
                       />
 

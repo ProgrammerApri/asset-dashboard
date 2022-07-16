@@ -16,9 +16,27 @@ import DataAkun from "src/jsx/screen/Master/Akun/DataAkun";
 import DataProduk from "src/jsx/screen/Master/Produk/DataProduk";
 import DataSatuan from "src/jsx/screen/MasterLainnya/Satuan/DataSatuan";
 import DataLokasi from "src/jsx/screen/Master/Lokasi/DataLokasi";
+import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
+import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
+import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
+
+const defError = {
+  code: false,
+  date: false,
+  akn: false,
+  prod: [
+    {
+      id: false,
+      lok: false,
+      sto: false,
+      jum: false,
+    },
+  ],
+};
 
 const PemakaianInput = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
+  const [error, setError] = useState(defError);
   const [currentIndex, setCurrentIndex] = useState(0);
   const toast = useRef(null);
   const [doubleClick, setDoubleClick] = useState(false);
@@ -48,6 +66,76 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
     getAcc();
     getSatuan();
   }, []);
+
+  const isValid = () => {
+    let valid = false;
+    let errors = {
+      code: !pb.pb_code || pb.pb_code === "",
+      date: !pb.pb_date || pb.pb_date === "",
+      akn: !pb.acc_id,
+      prod: [],
+    };
+
+    pb?.product.forEach((element, i) => {
+      if (i > 0) {
+        if (
+          element.prod_id ||
+          element.location ||
+          element.end ||
+          element.order
+        ) {
+          errors.prod[i] = {
+            id: !element.prod_id,
+            lok: !element.location,
+            sto: !element.end || element.end === "" || element.end === "0",
+            jum:
+              !element.order || element.order === "" || element.order === "0",
+          };
+        }
+      } else {
+        errors.prod[i] = {
+          id: !element.prod_id,
+          lok: !element.location,
+          sto: !element.end || element.end === "" || element.end === "0",
+          jum: !element.order || element.order === "" || element.order === "0",
+        };
+      }
+    });
+
+    if (
+      !errors.prod[0].id &&
+      !errors.prod[0].lok &&
+      !errors.prod[0].sto &&
+      !errors.prod[0].jum
+    ) {
+      errors.prod?.forEach((e) => {
+        for (var key in e) {
+          e[key] = false;
+        }
+      });
+    }
+
+    let validProduct = false;
+    errors.prod?.forEach((el) => {
+      for (var k in el) {
+        validProduct = !el[k];
+      }
+    });
+
+    valid = !errors.code && !errors.date && !errors.akn && validProduct;
+
+    setError(errors);
+
+    if (!valid) {
+      window.scrollTo({
+        top: 180,
+        left: 0,
+        behavior: "smooth",
+      });
+    }
+
+    return valid;
+  };
 
   const getLokasi = async () => {
     const config = {
@@ -228,12 +316,14 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
   };
 
   const onSubmit = () => {
-    if (isEdit) {
-      setUpdate(true);
-      editPB();
-    } else {
-      setUpdate(true);
-      addPB();
+    if (isValid()) {
+      if (isEdit) {
+        setUpdate(true);
+        editPB();
+      } else {
+        setUpdate(true);
+        addPB();
+      }
     }
   };
 
@@ -272,29 +362,37 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
 
         <Row className="mb-4">
           <div className="col-4">
-            <label className="text-label">Kode Referensi</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={pb.pb_code}
-                onChange={(e) => updatePB({ ...pb, pb_code: e.target.value })}
-                placeholder="Masukan Kode Referensi"
-              />
-            </div>
+            <PrimeInput
+              label={"Kode Referensi"}
+              value={pb.pb_code}
+              onChange={(e) => {
+                updatePB({ ...pb, pb_code: e.target.value });
+
+                let newError = error;
+                newError.code = false;
+                setError(newError);
+              }}
+              placeholder="Masukan Kode Referensi"
+              error={error?.code}
+            />
           </div>
-          
+
           <div className="col-3">
-            <label className="text-label">Tanggal</label>
-            <div className="p-inputgroup">
-              <Calendar
-                value={new Date(`${pb.pb_date}Z`)}
-                onChange={(e) => {
-                  updatePB({ ...pb, pb_date: e.value });
-                }}
-                placeholder="Pilih Tanggal"
-                showIcon
-                dateFormat="dd-mm-yy"
-              />
-            </div>
+            <PrimeCalendar
+              label={"Tanggal"}
+              value={new Date(`${pb.pb_date}Z`)}
+              onChange={(e) => {
+                updatePB({ ...pb, pb_date: e.value });
+
+                let newError = error;
+                newError.date = false;
+                setError(newError);
+              }}
+              placeholder="Pilih Tanggal"
+              showIcon
+              dateFormat="dd-mm-yy"
+              error={error?.date}
+            />
           </div>
 
           <div className="col-5">
@@ -308,11 +406,17 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
                   ...pb,
                   acc_id: e.account.id,
                 });
+
+                let newError = error;
+                newError.akn = false;
+                setError(newError);
               }}
               label={"[account.acc_name] - [account.acc_code]"}
               placeholder="Pilih Kode Akun WIP"
               detail
               onDetail={() => setShowAcc(true)}
+              errorMessage="Akun Belum Dipilih"
+              error={error?.akn}
             />
           </div>
           {/* kode suplier otomatis keluar, karena sudah melekat di faktur pembelian  */}
@@ -337,6 +441,8 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
                   return {
                     ...v,
                     index: i,
+                    end: v?.end ?? 0,
+                    order: v?.order ?? 0
                   };
                 })}
                 className="display w-150 datatable-wrapper header-white no-border"
@@ -345,6 +451,7 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
               >
                 <Column
                   header="Produk"
+                  className="align-text-top"
                   style={{
                     width: "30rem",
                   }}
@@ -370,6 +477,10 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
                         temp[e.index].prod_id = e.id;
                         temp[e.index].unit_id = e.unit?.id;
                         updatePB({ ...pb, product: temp });
+
+                        let newError = error;
+                        newError.prod[e.index].id = false;
+                        setError(newError);
                       }}
                       placeholder="Pilih Produk"
                       label={"[name]"}
@@ -378,12 +489,15 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
                         setShowProd(true);
                         setCurrentIndex(e.index);
                       }}
+                      errorMessage="Produk Belum Dipilih"
+                      error={error?.prod[e.index]?.id}
                     />
                   )}
                 />
 
                 <Column
                   header="Lokasi"
+                  className="align-text-top"
                   style={{
                     width: "15rem",
                   }}
@@ -395,6 +509,10 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
                         let temp = [...pb.product];
                         temp[e.index].location = e.id;
                         updatePB({ ...pb, product: temp });
+
+                        let newError = error;
+                        newError.prod[e.index].lok = false;
+                        setError(newError);
                       }}
                       option={lokasi}
                       label={"[name]"}
@@ -404,28 +522,36 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
                         setShowLok(true);
                         setCurrentIndex(e.index);
                       }}
+                      errorMessage="Lokasi Belum Dipilih"
+                      error={error?.prod[e.index]?.lok}
                     />
                   )}
                 />
 
                 <Column
                   header="Ending Stok"
+                  className="align-text-top"
                   style={{
                     width: "8rem",
                   }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
-                      <InputText
+                      <PrimeNumber
                         value={pb.end ? pb.end : null}
                         onChange={(a) => {
                           let temp = [...pb.product];
                           temp[e.index].end = a.target.value;
                           updatePB({ ...pb, product: temp });
+
+                          let newError = error;
+                          newError.prod[e.index].sto = false;
+                          setError(newError);
                         }}
                         placeholder="0"
                         type="number"
                         min={0}
+                        error={error?.prod[e.index]?.sto}
                       />
                     </div>
                   )}
@@ -433,26 +559,28 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Jumlah"
+                  className="align-text-top"
                   style={{
                     width: "7rem",
                   }}
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
-                      <InputText
-                        value={
-                          pb.order
-                            ? pb.order
-                            : null
-                        }
+                      <PrimeNumber
+                        value={pb.order ? pb.order : null}
                         onChange={(a) => {
                           let temp = [...pb.product];
                           temp[e.index].order = a.target.value;
                           updatePB({ ...pb, product: temp });
+
+                          let newError = error;
+                          newError.prod[e.index].jum = false;
+                          setError(newError);
                         }}
                         placeholder="0"
                         type="number"
                         min={0}
+                        error={error?.prod[e.index]?.jum}
                       />
                     </div>
                   )}
@@ -460,6 +588,7 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Satuan"
+                  className="align-text-top"
                   style={{
                     width: "10rem",
                   }}
@@ -485,6 +614,7 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
+                className="align-text-top"
                   body={(e) =>
                     e.index === pb.product.length - 1 ? (
                       <Link

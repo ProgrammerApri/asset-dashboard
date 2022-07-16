@@ -10,28 +10,28 @@ const PencairanGiroMundur = () => {
   const toast = useRef(null);
   const [view, setView] = useState([
     <PencairanGiroMundurList
-      onAdd={() => {
-        setActive(1);
-      }}
+      // onAdd={() => {
+      //   setActive(1);
+      // }}
       onDetail={() => {
-        setActive(2);
+        setActive(1);
       }}
     />,
 
-    <PencairanGiroMundurInput
-      onCancel={() => setActive(0)}
-      onSuccess={() => {
-        setTimeout(() => {
-          setActive(0);
-          toast.current.show({
-            severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
-            life: 3000,
-          });
-        }, 500);
-      }}
-    />,
+    // <PencairanGiroMundurInput
+    //   onCancel={() => setActive(0)}
+    //   onSuccess={() => {
+    //     setTimeout(() => {
+    //       setActive(0);
+    //       toast.current.show({
+    //         severity: "info",
+    //         summary: "Berhasil",
+    //         detail: "Data Berhasil Diperbarui",
+    //         life: 3000,
+    //       });
+    //     }, 500);
+    //   }}
+    // />,
     <Detail onCancel={() => setActive(0)} />,
   ]);
 

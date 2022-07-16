@@ -702,7 +702,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
           <div className="col-7"></div>
 
           <div className="col-12 p-0">
-            <div className="mt-4 ml-3 mr-3 fs-14">
+            <div className="mt-4 mb-2 ml-3 mr-3 fs-14">
               <b>Informasi Pembelian</b>
             </div>
             <Divider className="mb-2 ml-3 mr-3"></Divider>
@@ -825,7 +825,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-12 p-0">
-            <div className="mt-4 ml-3 mr-3 fs-14">
+            <div className="mt-4 mb-2 ml-3 mr-3 fs-14">
               <b>Informasi Pembelian</b>
             </div>
             <Divider className="mb-2 ml-3 mr-3"></Divider>
@@ -1013,7 +1013,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     // }}
                     body={(e) => (
                       <PrimeNumber
-                        value={e.order && e.order}
+                        value={e.order && e.order} 
                         onChange={(t) => {
                           let temp = [...po.pprod];
                           let val =

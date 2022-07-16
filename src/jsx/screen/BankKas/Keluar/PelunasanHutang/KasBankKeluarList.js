@@ -125,7 +125,7 @@ const KasBankOutList = ({ onAdd, onEdit }) => {
     return (
       // <React.Fragment>
       <div className="d-flex">
-        <Link
+        {/* <Link
           onClick={() => {
             onEdit(data);
             let acq = data.acq;
@@ -176,7 +176,7 @@ const KasBankOutList = ({ onAdd, onEdit }) => {
           className="btn btn-primary shadow btn-xs sharp ml-1"
         >
           <i className="fa fa-pencil"></i>
-        </Link>
+        </Link> */}
 
         <Link
           onClick={() => {
@@ -374,39 +374,64 @@ const KasBankOutList = ({ onAdd, onEdit }) => {
           body={loading && <Skeleton />}
         />
         <Column
-            header="Tipe Pengeluaran"
-            field={(e) => e?.exp_type ?? ""}
-            style={{ minWidth: "8rem" }}
-            body={(e) =>
-              loading ? (
-                <Skeleton />
-              ) : (
-                <div>
-                  {e.exp_type === 1 ? (
-                    <Badge variant="info light">
-                      <i className="bx bxs-circle text-info mr-1"></i> Pelunasan
-                    </Badge>
-                  ) : (
-                    <Badge variant="warning light">
-                      <i className="bx bxs-circle text-warning mr-1"></i> Pengeluaran Kas/Bank
-                    </Badge>
-                  )}
-                </div>
-              )
-            }
-          />
-        {/* <Column
-          header="Pemasok"
-          field={(e) => e.acq_sup?.sup_name}
+          header="Tipe Pengeluaran"
+          field={(e) => e?.exp_type ?? ""}
           style={{ minWidth: "8rem" }}
-          body={loading && <Skeleton />}
-        /> */}
-        {/* <Column
-          header="Nilai"
-          field={(e) => e.acq.value}
+          body={(e) =>
+            loading ? (
+              <Skeleton />
+            ) : (
+              <div>
+                {e.exp_type === 1 ? (
+                  <Badge variant="info light">
+                    <i className="bx bxs-circle text-info mr-1"></i> Pelunasan
+                  </Badge>
+                ) : (
+                  <Badge variant="warning light">
+                    <i className="bx bxs-circle text-warning mr-1"></i>{" "}
+                    Pengeluaran Kas/Bank
+                  </Badge>
+                )}
+              </div>
+            )
+          }
+        />
+        <Column
+          header="Jenis Pengeluaran"
+          className="align-text-center"
+          field={(e) => e?.acq_pay ?? ""}
           style={{ minWidth: "8rem" }}
-          body={loading && <Skeleton />}
-        /> */}
+          body={(e) =>
+            loading ? (
+              <Skeleton />
+            ) : (
+              <div>
+                {e.acq_pay === 1 ? (
+                  <Badge variant="info light">
+                    <i className="bx bxs-circle text-info mr-1"></i> Kas
+                  </Badge>
+                ) : e.acq_pay === 2 ? (
+                  <Badge variant="warning light">
+                    <i className="bx bxs-circle text-warning mr-1"></i> Bank
+                  </Badge>
+                ) : e.acq_pay === 3 ? (
+                  <Badge variant="success light">
+                    <i className="bx bxs-circle text-success mr-1"></i> Giro
+                  </Badge>
+                ) : (
+                  <span className="center"> - </span>
+                )}
+              </div>
+            )
+          }
+        />
+        <Column
+          header="Action"
+          dataType="boolean"
+          bodyClassName="text-center"
+          style={{ minWidth: "2rem" }}
+          body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
+        />
       </DataTable>
 
       <Dialog

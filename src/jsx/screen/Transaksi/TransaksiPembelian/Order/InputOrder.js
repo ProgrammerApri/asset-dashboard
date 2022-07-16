@@ -541,22 +541,22 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
     order?.dprod.forEach((element, i) => {
       if (i > 0) {
-        if (element.prod_id || element.order || element.location) {
+        if (element.prod_id || element.location || element.order || element.price) {
           errors.prod[i] = {
             id: !element.prod_id,
             lok: !element.location,
-            prc:
-              !element.price || element.price === "" || element.price === "0",
             jum:
               !element.order || element.order === "" || element.order === "0",
+            prc:
+              !element.price || element.price === "" || element.price === "0",
           };
         }
       } else {
         errors.prod[i] = {
           id: !element.prod_id,
           lok: !element.location,
-          prc: !element.price || element.price === "" || element.price === "0",
           jum: !element.order || element.order === "" || element.order === "0",
+          prc: !element.price || element.price === "" || element.price === "0",
         };
       }
     });
@@ -580,8 +580,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
     if (
       !errors.prod[0].id &&
-      !errors.prod[0].jum &&
       !errors.prod[0].lok &&
+      !errors.prod[0].jum &&
       !errors.prod[0].prc
     ) {
       errors.jasa?.forEach((e) => {
@@ -591,12 +591,14 @@ const InputOrder = ({ onCancel, onSuccess }) => {
       });
     }
 
-    if (!errors.jasa[0]?.id && !errors.jasa[0]?.jum) {
-      errors.prod?.forEach((e) => {
-        for (var key in e) {
-          e[key] = false;
-        }
-      });
+    if (order?.djasa.length) {
+      if (!errors.jasa[0]?.id && !errors.jasa[0]?.jum) {
+        errors.prod?.forEach((e) => {
+          for (var key in e) {
+            e[key] = false;
+          }
+        });
+      }
     }
 
     let validProduct = false;
@@ -904,10 +906,10 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                   return {
                     ...v,
                     index: i,
-                    order: v?.order ?? 0,
-                    price: v?.price ?? 0,
-                    disc: v?.disc ?? 0,
-                    total: v?.total ?? 0,
+                    // order: v?.order ?? 0,
+                    // price: v?.price ?? 0,
+                    // disc: v?.disc ?? 0,
+                    // total: v?.total ?? 0,
                   };
                 })}
                 className="display w-150 datatable-wrapper header-white no-border"
@@ -1297,26 +1299,26 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                   className="align-text-top"
                   field={""}
                   body={(e) => (
-                      <PrimeNumber
-                        value={e.order && e.order}
-                        onChange={(u) => {
-                          let temp = [...order.djasa];
-                          temp[e.index].order = u.target.value;
-                          temp[e.index].total =
-                            temp[e.index].order * temp[e.index].price;
-                          updateORD({ ...order, djasa: temp });
+                    <PrimeNumber
+                      value={e.order && e.order}
+                      onChange={(u) => {
+                        let temp = [...order.djasa];
+                        temp[e.index].order = u.target.value;
+                        temp[e.index].total =
+                          temp[e.index].order * temp[e.index].price;
+                        updateORD({ ...order, djasa: temp });
 
-                          let newError = error;
-                          newError.jasa[e.index].jum = false;
-                          setError(newError);
-                          console.log(temp);
-                        }}
-                        placeholder="0"
-                        type="number"
-                        min={0}
-                        disabled={order && order.po_id !== null}
-                        error={error?.jasa[e.index]?.jum}
-                      />
+                        let newError = error;
+                        newError.jasa[e.index].jum = false;
+                        setError(newError);
+                        console.log(temp);
+                      }}
+                      placeholder="0"
+                      type="number"
+                      min={0}
+                      disabled={order && order.po_id !== null}
+                      error={error?.jasa[e.index]?.jum}
+                    />
                   )}
                 />
 

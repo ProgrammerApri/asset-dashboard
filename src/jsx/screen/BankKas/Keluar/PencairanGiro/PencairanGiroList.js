@@ -3,8 +3,9 @@ import { request, endpoints } from "src/utils";
 import { FilterMatchMode } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Row, Col, Card } from "react-bootstrap";
+import { Row, Col, Card, Badge } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
+import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { Skeleton } from "primereact/skeleton";
@@ -28,15 +29,17 @@ const data = {
   status: null,
 };
 
-const PencairanGiroMundurList = ({ onSuccess, onDetail }) => {
+const PencairanGiroMundurList = ({ onSuccess, onCancel }) => {
   const [update, setUpdate] = useState(false);
   const [loading, setLoading] = useState(true);
   const [doubleClick, setDoubleClick] = useState(false);
   const toast = useRef(null);
+  const show = useSelector((state) => state.giro.current);
   const giro = useSelector((state) => state.giro.giro);
   const isEdit = useSelector((state) => state.giro.editGiro);
   const dispatch = useDispatch();
   const [bank, setBank] = useState(null);
+  const [comp, setComp] = useState(null);
   const [showBank, setShowBank] = useState(false);
   const [displayData, setDisplayData] = useState(false);
   const [displayDel, setDisplayDel] = useState(false);
@@ -56,6 +59,7 @@ const PencairanGiroMundurList = ({ onSuccess, onDetail }) => {
     });
     getGiro();
     getBank();
+    getComp();
     initFilters1();
   }, []);
 
@@ -94,6 +98,24 @@ const PencairanGiroMundurList = ({ onSuccess, onDetail }) => {
       if (response.status) {
         const { data } = response;
         setBank(data);
+      }
+    } catch (error) {}
+  };
+
+  const getComp = async () => {
+    const config = {
+      ...endpoints.getCompany,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setComp(data);
       }
     } catch (error) {}
   };
@@ -162,15 +184,15 @@ const PencairanGiroMundurList = ({ onSuccess, onDetail }) => {
       <div className="d-flex">
         <Link
           onClick={() => {
-            onDetail();
+            setDisplayData(data);
             dispatch({
               type: SET_CURRENT_GIRO,
               payload: data,
             });
           }}
-          className="btn btn-info shadow btn-xs sharp ml-1"
+          className="btn btn-success shadow btn-xs sharp ml-1"
         >
-          <i className="bx bx-show mt-1"></i>
+          <i className="fa fa-check mt-1"></i>
         </Link>
 
         <Link
@@ -231,7 +253,7 @@ const PencairanGiroMundurList = ({ onSuccess, onDetail }) => {
   const footer = () => {
     return (
       <div className="mt-5 flex justify-content-end">
-        <div>
+        {/* <div>
           <PButton
             label="Batal"
             onClick={() => setDisplayData(false)}
@@ -244,7 +266,7 @@ const PencairanGiroMundurList = ({ onSuccess, onDetail }) => {
             autoFocus
             loading={update}
           />
-        </div>
+        </div> */}
       </div>
     );
   };
@@ -375,20 +397,20 @@ const PencairanGiroMundurList = ({ onSuccess, onDetail }) => {
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
-                {/* <Column
+                <Column
                   header="Action"
                   dataType="boolean"
                   bodyClassName="text-center"
                   style={{ minWidth: "2rem" }}
                   body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
-                /> */}
+                />
               </DataTable>
             </Card.Body>
           </Card>
         </Col>
       </Row>
 
-      {/* <Dialog
+      <Dialog
         header={"Pencairan Giro"}
         visible={displayData}
         style={{ width: "40vw" }}
@@ -398,63 +420,160 @@ const PencairanGiroMundurList = ({ onSuccess, onDetail }) => {
           setDisplayData(false);
         }}
       >
-        <Row className="mb-4">
-          <div className="col-4">
-            <label className="text-label">Tanggal</label>
-            <div className="p-inputgroup">
-              <Calendar
-                value={new Date(`${giro.giro_date}Z`)}
-                onChange={(e) => {
-                  updateGR({ ...giro, giro_date: e.value });
-                }}
-                placeholder="Tanggal Pencairan"
-                showIcon
-                dateFormat="dd/mm/yy"
-              />
-            </div>
-          </div>
+        <Row>
+          <Col>
+            <Card className="px-4 py-3">
+              <div className="flex justify-content-between align-items-center">
+                <div className="">
+                  <img
+                    style={{
+                      height: "50px",
+                      width: "50px",
+                    }}
+                    src={comp?.cp_logo}
+                    alt=""
+                  />
+                  <br></br>
+                  <span className="ml-0 fs-10">
+                    <b>{comp?.cp_name}</b>
+                  </span>
+                </div>
 
-          <div className="col-4">
-            <label className="text-label">Nomor Giro</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={giro.giro_num}
-                onChange={(e) =>
-                  updateGR({ ...giro, giro_num: e.target.value })
-                }
-                placeholder="Nomor Giro"
-              />
-            </div>
-          </div>
+                <div className="">
+                  <label className="text-label ml-2">Nomor Giro</label>
+                  <br></br>
+                  <Badge variant="info light" className="ml-0 fs-12">
+                    <i className="bx bxs-circle text-info mt-1"></i>
+                    <b>{show?.giro_num}</b>
+                  </Badge>
+                </div>
 
-          <div className="col-4">
-            <label className="text-label">Nilai Giro</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={giro.value}
-                onChange={(e) => updateGR({ ...giro, value: e.target.value })}
-                placeholder="Nilai Giro"
-                type="number"
-                min={0}
-              />
-            </div>
-          </div>
+                {/* <div className="">
+                <label className="text-label">Bank</label>
+                <br></br>
+                <span className="ml-0 fs-14">
+                  <b>{`${show?.bank_id?.BANK_NAME} (${
+                    show?.bank_id?.BANK_CODE
+                  })`}</b>
+                </span>
+              </div> */}
 
-          <div className="col-4">
-            <label className="text-label">Kode Bank</label>
-            <div className="p-inputgroup"></div>
-            <CustomDropdown
-              value={giro.bank_id && checkBank(giro.bank_id)}
-              option={bank}
-              onChange={(e) => updateGR({ ...giro, bank_id: e.target.value })}
-              label={"[bank.BANK_NAME] ([bank.BANK_CODE])"}
-              placeholder="Pilih Kode Bank"
-              detail
-              onDetail={() => setShowBank(true)}
-            />
-          </div>
+                <div className="">
+                  <span className="p-buttonset">
+                    {/* <ReactToPrint
+                    trigger={() => {
+                      return (
+                        <Button
+                          className="p-button-info"
+                          label="Cetak"
+                          onClick={() => {}}
+                          icon="bx bxs-printer"
+                          // disabled={show?.apprv === false}
+                        />
+                      );
+                    }}
+                    content={() => printPage.current}
+                  /> */}
+                    <Button
+                      className="p-button-info"
+                      style={{ width: "6rem", height: "2rem" }}
+                      label="Cairkan"
+                      icon="bx bx-money-withdraw"
+                      onClick={() => {}}
+                      // disabled={show?.apprv === false}
+                    />
+                    <Button
+                      style={{ width: "6rem", height: "2rem" }}
+                      label="Batal"
+                      onClick={() => setDisplayData(false)}
+                      className="p-button-info"
+                      icon="bx bx-x"
+                    />
+                  </span>
+                </div>
+              </div>
+            </Card>
+          </Col>
         </Row>
-      </Dialog> */}
+
+        <Row className="ml-0 mr-0 mb-0 mt-0 justify-content-between fs-12">
+          <div className="row justify-content-left col-6 mb-0"></div>
+          <div className="row justify-content-right col-6 mb-0">
+            {/* <div className="col-12 mt-0 fs-12 text-right"> */}
+            {/* <label className="text-label">Tanggal Pencairan : </label> */}
+            {/* <div className="p-inputgroup"> */}
+            <Calendar
+              style={{ width: "12rem", height: "2rem" }}
+              className="ml-5 fs-12"
+              value={new Date(`${giro.giro_date}Z`)}
+              onChange={(e) => {
+                updateGR({ ...giro, giro_date: e.value });
+              }}
+              placeholder="Tanggal Pencairan"
+              showIcon
+              dateFormat="dd-mm-yy"
+            />
+            {/* </div> */}
+            {/* </div> */}
+          </div>
+
+          <Card className="col-12 mt-0">
+            <div className="row col-12">
+              <div className="col-7 fs-12 ml-0">
+                <label className="text-label">
+                  <b>Informasi Bank</b>
+                </label>
+              </div>
+
+              <div className="col-5 fs-12 text-right">
+                <label className="text-label">
+                  <b>Informasi Pembayaran</b>
+                </label>
+              </div>
+
+              <div className="col-7 fs-12 ml-0">
+                {/* <br></br>
+                <br></br> */}
+                <span className="ml-0">
+                  <b>{show?.bank_id?.BANK_CODE}</b>
+                </span>
+                <br></br>
+                <br></br>
+                <span className="ml-0">
+                  <b>{show?.bank_id?.BANK_NAME}</b>
+                </span>
+                <br></br>
+                <br></br>
+              </div>
+
+              <div className="col-5 fs-12 ml-0 text-right">
+                <span className="fs-13">
+                  <b>{show?.pay_code ?? "-"}</b>
+                </span>
+                <br />
+                <br />
+                <span className="ml-0">
+                  Tanggal : <b>{formatDate(show?.pay_date)}</b>
+                </span>
+                <br />
+                <br />
+                <span className="ml-0">
+                  <b>{show?.sup_id?.sup_name}</b>
+                </span>
+                <br></br>
+                <span className="ml-0">
+                  Cp : <b>{show?.sup_id?.sup_cp}</b>
+                </span>
+              </div>
+            </div>
+
+            <div className="col-6"></div>
+            <div className="col-6 fs-14 mt-8">
+              <span><b>Nilai Giro :</b> Rp. {formatIdr(show?.value)}</span>
+            </div>
+          </Card>
+        </Row>
+      </Dialog>
     </>
   );
 };

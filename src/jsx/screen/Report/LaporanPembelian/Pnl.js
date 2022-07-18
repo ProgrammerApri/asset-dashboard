@@ -115,7 +115,7 @@ const Pnl = () => {
           if (el.klasifikasi.id === ek.klasifikasi.id) {
             let saldo = 0;
             trans?.forEach((ej) => {
-              if (ej.acc_id.acc_code === ek.account.acc_code) {
+              if (ej.acc_id?.acc_code === ek.account?.acc_code) {
                 saldo += ej.trx_amnt;
               }
             });

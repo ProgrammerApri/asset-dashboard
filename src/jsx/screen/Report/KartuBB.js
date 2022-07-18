@@ -119,7 +119,7 @@ const ReportKBB = () => {
       let db = 0;
       let kr = 0;
       trans?.forEach((element) => {
-        if (element?.acc_id.id === el?.account.id) {
+        if (element?.acc_id?.id === el?.account?.id) {
           db += element.trx_dbcr === "D" ? element.trx_amnt : 0;
           kr += element.trx_dbcr === "K" ? element.trx_amnt : 0;
           dt = new Date(`${element?.trx_date}Z`);

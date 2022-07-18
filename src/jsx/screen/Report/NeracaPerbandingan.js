@@ -195,7 +195,7 @@ const NeracaPerbandingan = () => {
             trans?.forEach((ej) => {
               let trx_date = new Date(`${ej.trx_date}Z`);
               if (trx_date.getMonth() + 1 === month1.getMonth() + 1) {
-                if (ek.account.acc_code === ej.acc_id.umm_code) {
+                if (ek.account.acc_code === ej.acc_id?.umm_code) {
                   saldo += ej.trx_amnt;
                 }
               }

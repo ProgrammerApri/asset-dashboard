@@ -160,13 +160,13 @@ const Neraca = () => {
 
     datum.forEach((el) => {
       el.kat_id.forEach((e) => {
-        account.forEach((ek) => {
+        account?.forEach((ek) => {
           if (ek.account.dou_type === "U" && ek.kategory.id === e) {
             let saldo = 0;
             trans?.forEach((ej) => {
               let trx_date = new Date(`${ej.trx_date}Z`);
               if (trx_date <= date) {
-                if (ek.account.acc_code == ej.acc_id.umm_code) {
+                if (ek.account.acc_code == ej.acc_id?.umm_code) {
                   saldo += ej.trx_amnt;
                 }
               }

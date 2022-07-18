@@ -192,10 +192,10 @@ const PencairanGiroMundurList = ({ onSuccess, onCancel }) => {
           }}
           className="btn btn-success shadow btn-xs sharp ml-1"
         >
-          <i className="fa fa-check mt-1"></i>
+          <i className="bx bx-check mt-1"></i>
         </Link>
 
-        <Link
+        {/* <Link
           onClick={() => {
             isEdit(true);
             setDisplayDel(true);
@@ -204,7 +204,7 @@ const PencairanGiroMundurList = ({ onSuccess, onCancel }) => {
           className="btn btn-danger shadow btn-xs sharp ml-1"
         >
           <i className="fa fa-trash"></i>
-        </Link>
+        </Link> */}
       </div>
       // </React.Fragment>
     );
@@ -252,7 +252,7 @@ const PencairanGiroMundurList = ({ onSuccess, onCancel }) => {
 
   const footer = () => {
     return (
-      <div className="mt-5 flex justify-content-end">
+      <div>
         {/* <div>
           <PButton
             label="Batal"
@@ -385,17 +385,41 @@ const PencairanGiroMundurList = ({ onSuccess, onCancel }) => {
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
-                <Column
+                {/* <Column
                   header="Pemasok"
                   field={(e) => e.sup_id?.sup_name}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
-                />
+                /> */}
                 <Column
                   header="Nilai"
                   field={(e) => formatIdr(e.value)}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Status"
+                  field={(e) => e.status}
+                  style={{ minWidth: "8rem" }}
+                  body={(e) =>
+                    loading ? (
+                      <Skeleton />
+                    ) : (
+                      <div>
+                        {e.status === 0 ? (
+                          <Badge variant="info light">
+                            <i className="bx bxs-check-circle text-info mr-1 mt-1"></i>{" "}
+                            
+                          </Badge>
+                        ) : (
+                          <Badge variant="warning light">
+                            <i className="bx bxs-x-circle text-warning mr-1 mt-1"></i>{" "}
+                            
+                          </Badge>
+                        )}
+                      </div>
+                    )
+                  }
                 />
                 <Column
                   header="Action"
@@ -404,6 +428,7 @@ const PencairanGiroMundurList = ({ onSuccess, onCancel }) => {
                   style={{ minWidth: "2rem" }}
                   body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
                 />
+                
               </DataTable>
             </Card.Body>
           </Card>
@@ -413,10 +438,9 @@ const PencairanGiroMundurList = ({ onSuccess, onCancel }) => {
       <Dialog
         header={"Pencairan Giro"}
         visible={displayData}
-        style={{ width: "40vw" }}
+        style={{ width: "35vw"}}
         footer={footer}
         onHide={() => {
-          isEdit(false);
           setDisplayData(false);
         }}
       >
@@ -427,8 +451,8 @@ const PencairanGiroMundurList = ({ onSuccess, onCancel }) => {
                 <div className="">
                   <img
                     style={{
-                      height: "50px",
-                      width: "50px",
+                      height: "40px",
+                      width: "40px",
                     }}
                     src={comp?.cp_logo}
                     alt=""

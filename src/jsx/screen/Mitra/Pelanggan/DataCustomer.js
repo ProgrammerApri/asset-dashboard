@@ -23,6 +23,7 @@ import DataPajak from "../../Master/Pajak/DataPajak";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 
 const def = {
   customer: {
@@ -80,6 +81,7 @@ const defError = [
     induk: false,
     addrs: false,
     city: false,
+    npwp: false,
   },
   {
     phone: false,
@@ -88,7 +90,7 @@ const defError = [
   },
   {
     ppn: false,
-    ar: false,
+    // ar: false,
     // um: false,
   },
 ];
@@ -248,9 +250,10 @@ const DataCustomer = ({
           // if (elem.account.kat_code === 3) {
           //   filt.push(elem.account);
           // }
+          filt.push(elem.account);
         });
         console.log(data);
-        setAccount(data);
+        setAccount(filt);
       }
     } catch (error) {}
   };
@@ -589,7 +592,7 @@ const DataCustomer = ({
         name:
           !currentItem.customer.cus_name ||
           currentItem.customer.cus_name === "",
-        jpel: !currentItem.jpel.id,
+        jpel: !currentItem.jpel?.id,
         induk: currentItem.customer.sub_cus
           ? !currentItem.customer.cus_id
           : false,
@@ -597,6 +600,9 @@ const DataCustomer = ({
           !currentItem.customer.cus_address ||
           currentItem.customer.cus_address === "",
         city: !currentItem.customer.cus_kota,
+        npwp:
+          !currentItem.customer.cus_npwp ||
+          currentItem.customer.cus_npwp === "",
       },
       {
         phone:
@@ -608,8 +614,8 @@ const DataCustomer = ({
         cp: !currentItem.customer.cus_cp || currentItem.customer.cus_cp === "",
       },
       {
-        ppn: !currentItem.customer.cus_pjk,
-        ar: !currentItem.customer.cus_gl,
+        ppn: !currentItem.customer.sup_ppn,
+        // ar: !currentItem.customer.cus_gl,
         // um: !currentItem.customer.cus_uang_muka,
       },
     ];
@@ -758,7 +764,7 @@ const DataCustomer = ({
               customer: {
                 ...def.customer,
                 cus_gl: setup?.ar?.id,
-                cus_uang_muka: setup?.pur_advance?.id,
+                cus_uang_muka: setup?.sls_prepaid?.id,
               },
             });
             onInput(true);
@@ -837,30 +843,28 @@ const DataCustomer = ({
 
   const gl = (value) => {
     let gl = {};
-    account.forEach((element) => {
-      if (value === element.account.id) {
+    account?.forEach((element) => {
+      if (value === element.id) {
         gl = element;
       }
     });
     return gl;
   };
 
-  // const um = (value) => {
-  //   let um = {};
-  //   accU?.forEach((element) => {
-  //     if (value === element.id) {
-  //       um = element;
-  //     }
-  //   });
-  //   return um;
-  // };
+  const um = (value) => {
+    let um = {};
+    account?.forEach((element) => {
+      if (value === element.id) {
+        um = element;
+      }
+    });
+    return um;
+  };
 
   const glTemplate = (option) => {
     return (
       <div>
-        {option !== null
-          ? `${option.account.acc_name} - (${option.account.acc_code})`
-          : ""}
+        {option !== null ? `${option.acc_name} - ${option.acc_code}` : ""}
       </div>
     );
   };
@@ -869,9 +873,7 @@ const DataCustomer = ({
     if (option) {
       return (
         <div>
-          {option !== null
-            ? `${option.account.acc_name} - (${option.account.acc_code})`
-            : ""}
+          {option !== null ? `${option.acc_name} - ${option.acc_code}` : ""}
         </div>
       );
     }
@@ -983,7 +985,7 @@ const DataCustomer = ({
           body={load && <Skeleton />}
         />
         <Column
-          header="No. Telepon"
+          header="No. Telepon (+62)"
           field={(e) => e?.customer?.cus_telp1 ?? "-"}
           style={{ minWidth: "8rem" }}
           body={load && <Skeleton />}
@@ -1119,23 +1121,25 @@ const DataCustomer = ({
 
               <div className="row mr-0 ml-0">
                 <div className="col-12">
-                  <label className="text-label">NPWP</label>
-                  <div className="p-inputgroup">
-                    <InputText
-                      value={`${currentItem?.customer?.cus_npwp ?? ""}`}
-                      onChange={(e) =>
-                        setCurrentItem({
-                          ...currentItem,
-                          customer: {
-                            ...currentItem.customer,
-                            cus_npwp: e.target.value,
-                          },
-                        })
-                      }
-                      placeholder="Masukan NPWP"
-                      type="number"
-                    />
-                  </div>
+                  <PrimeNumber
+                    label={"NPWP"}
+                    value={`${currentItem?.customer?.cus_npwp ?? ""}`}
+                    onChange={(e) => {
+                      setCurrentItem({
+                        ...currentItem,
+                        customer: {
+                          ...currentItem.customer,
+                          cus_npwp: e.target.value,
+                        },
+                      });
+                      let newError = error;
+                      newError[0].npwp = false;
+                      setError(newError);
+                    }}
+                    placeholder="Masukan NPWP"
+                    type="number"
+                    error={error[0]?.npwp}
+                  />
                 </div>
               </div>
 
@@ -1318,10 +1322,9 @@ const DataCustomer = ({
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">No. Telepon 2</label>
-                  <div className="p-inputgroup">
-                    <span className="p-inputgroup-addon">+62</span>
-                    <InputText
+                    <PrimeInput
+                    isNumber
+                    label={"No. Telepon 2"}
                       value={`${currentItem?.customer?.cus_telp2 ?? ""}`}
                       onChange={(e) =>
                         setCurrentItem({
@@ -1332,11 +1335,10 @@ const DataCustomer = ({
                           },
                         })
                       }
-                      placeholder="Masukan No. Telepon"
-                      type="number"
-                      // useGrouping={false}
+                      placeholder="0"
+                      mode={"decimal"}
+                      useGrouping={false}
                     />
-                  </div>
                 </div>
               </div>
 
@@ -1520,9 +1522,9 @@ const DataCustomer = ({
                           cus_gl: e.value?.id ?? null,
                         },
                       });
-                      let newError = error;
-                      newError[2].gl = false;
-                      setError(newError);
+                      // let newError = error;
+                      // newError[2].gl = false;
+                      // setError(newError);
                     }}
                     optionLabel="account.acc_name"
                     valueTemplate={clear}
@@ -1531,8 +1533,8 @@ const DataCustomer = ({
                     filterBy="account.acc_name"
                     placeholder="Pilih Kode Distribusi"
                     showClear
-                    error={error[2]?.gl}
-                    errorMessage="Kode Distribusi AR belum dipilih"
+                    // error={error[2]?.gl}
+                    // errorMessage="Kode Distribusi AR belum dipilih"
                   />
                 </div>
 
@@ -1540,18 +1542,19 @@ const DataCustomer = ({
                   <PrimeDropdown
                     label={"Kode Distribusi Uang Muka Penjualan"}
                     value={
-                      currentItem !== null
-                        ? gl(currentItem?.customer?.cus_uang_muka)
+                      currentItem !== null &&
+                      currentItem.customer.cus_uang_muka !== null
+                        ? gl(currentItem.customer.cus_uang_muka)
                         : null
                     }
-                    options={accU}
+                    options={account}
                     onChange={(e) => {
                       console.log(e.value);
                       setCurrentItem({
                         ...currentItem,
                         customer: {
                           ...currentItem.customer,
-                          cus_uang_muka: e.value.id,
+                          cus_uang_muka: e.value?.id ?? null,
                         },
                       });
                       // let newError = error;

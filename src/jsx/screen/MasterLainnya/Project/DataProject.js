@@ -397,9 +397,9 @@ const DataProject = ({
           header={renderHeader}
           filters={filters1}
           globalFilterFields={[
-            "project.proj_code",
-            "project.proj_name",
-            "project.proj_ket",
+            "proj_code",
+            "proj_name",
+            "proj_ket",
           ]}
           emptyMessage="Tidak ada data"
           paginator

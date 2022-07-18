@@ -407,9 +407,9 @@ const DataSalesman = ({
           header={renderHeader}
           filters={filters1}
           globalFilterFields={[
-            "salesman.sales_code",
-            "salesman.sales_name",
-            "salesman.sales_ket",
+            "sales_code",
+            "sales_name",
+            "sales_ket",
           ]}
           emptyMessage="Tidak ada data"
           paginator

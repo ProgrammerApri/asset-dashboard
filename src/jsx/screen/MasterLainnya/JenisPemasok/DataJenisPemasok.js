@@ -407,9 +407,9 @@ const DataJenisPemasok = ({
           header={renderHeader}
           filters={filters1}
           globalFilterFields={[
-            "jenisPemasok.jpem_code",
-            "jenisPemasok.jpem_name",
-            "jenisPemasok.jpem_ket",
+            "jpem_code",
+            "jpem_name",
+            "jpem_ket",
           ]}
           emptyMessage="Tidak ada data"
           paginator

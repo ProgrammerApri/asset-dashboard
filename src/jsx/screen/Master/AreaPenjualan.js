@@ -393,9 +393,9 @@ const AreaPenjualan = () => {
                 header={renderHeader}
                 filters={filters1}
                 globalFilterFields={[
-                  "areaPen.area_pen_code",
-                  "areaPen.area_pen_name",
-                  "areaPen.area_pen_ket",
+                  "area_pen_code",
+                  "area_pen_name",
+                  "area_pen_ket",
                 ]}
                 emptyMessage="Tidak ada data"
                 paginator

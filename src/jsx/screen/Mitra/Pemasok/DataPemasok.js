@@ -20,6 +20,7 @@ import { Badge } from "primereact/badge";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 
 const def = {
   supplier: {
@@ -73,6 +74,7 @@ const defError = [
     jpem: false,
     addrs: false,
     city: false,
+    npwp: false,
   },
   {
     phone: false,
@@ -80,8 +82,8 @@ const defError = [
   },
   {
     ppn: false,
-    ap: false,
-    um: false,
+    // ap: false,
+    // um: false,
   },
 ];
 
@@ -722,7 +724,7 @@ const DataSupplier = ({
   const glTemplate = (option) => {
     return (
       <div>
-        {option !== null ? `${option.acc_name} - (${option.acc_code})` : ""}
+        {option !== null ? `${option.acc_name} - ${option.acc_code}` : ""}
       </div>
     );
   };
@@ -731,7 +733,7 @@ const DataSupplier = ({
     if (option) {
       return (
         <div>
-          {option !== null ? `${option?.acc_name} - (${option?.acc_code})` : ""}
+          {option !== null ? `${option?.acc_name} - ${option?.acc_code}` : ""}
         </div>
       );
     }
@@ -784,6 +786,9 @@ const DataSupplier = ({
           !currentItem.supplier.sup_address ||
           currentItem.supplier.sup_address === "",
         city: !currentItem.supplier.sup_kota,
+        npwp:
+          !currentItem.supplier.sup_npwp ||
+          currentItem.supplier.sup_npwp === "",
       },
       {
         phone:
@@ -793,8 +798,8 @@ const DataSupplier = ({
       },
       {
         ppn: !currentItem.supplier.sup_ppn,
-        ap: !currentItem.supplier.sup_hutang,
-        um: !currentItem.supplier.sup_uang_muka,
+        // ap: !currentItem.supplier.sup_hutang,
+        // um: !currentItem.supplier.sup_uang_muka,
       },
     ];
 
@@ -868,7 +873,7 @@ const DataSupplier = ({
           body={load && <Skeleton />}
         />
         <Column
-          header="No. Telepon"
+          header="No. Telepon (+62)"
           field={(e) => e.supplier?.sup_telp1 ?? "-"}
           style={{ minWidth: "8rem" }}
           body={load && <Skeleton />}
@@ -988,26 +993,32 @@ const DataSupplier = ({
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">NPWP</label>
-                  <div className="p-inputgroup">
-                    <InputText
-                      value={
-                        currentItem !== null
-                          ? `${currentItem?.supplier?.sup_npwp ?? ""}`
-                          : ""
-                      }
-                      onChange={(e) =>
-                        setCurrentItem({
-                          ...currentItem,
-                          supplier: {
-                            ...currentItem.supplier,
-                            sup_npwp: e.target.value,
-                          },
-                        })
-                      }
-                      placeholder="Masukan NPWP"
-                    />
-                  </div>
+                  <PrimeNumber
+                    number
+                    label={"NPWP"}
+                    value={
+                      currentItem !== null
+                        ? currentItem?.supplier?.sup_npwp ?? ""
+                        : ""
+                    }
+                    onChange={(e) => {
+                      setCurrentItem({
+                        ...currentItem,
+                        supplier: {
+                          ...currentItem.supplier,
+                          sup_npwp: e.target.value,
+                        },
+                      });
+                      let newError = error;
+                      newError[0].npwp = false;
+                      setError(newError);
+                    }}
+                    placeholder="Masukan NPWP"
+                    type="number"
+                    min={0}
+                    maxLength={16}
+                    error={error[0]?.npwp}
+                  />
                 </div>
               </div>
 
@@ -1084,9 +1095,9 @@ const DataSupplier = ({
                     <InputText
                       value={
                         currentItem !== null &&
-                      currentItem.supplier.sup_kota !== null
-                        ? kota(currentItem.supplier.sup_kota)?.postal_code
-                        : null
+                        currentItem.supplier.sup_kota !== null
+                          ? kota(currentItem.supplier.sup_kota)?.postal_code
+                          : null
                       }
                       onChange={(e) =>
                         setCurrentItem({
@@ -1137,28 +1148,27 @@ const DataSupplier = ({
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">No. Telepon 2</label>
-                  <div className="p-inputgroup">
-                    <span className="p-inputgroup-addon">+62</span>
-                    <InputText
-                      value={
-                        currentItem !== null
-                          ? `${currentItem?.supplier?.sup_telp2 ?? ""}`
-                          : ""
-                      }
-                      onChange={(e) =>
-                        setCurrentItem({
-                          ...currentItem,
-                          supplier: {
-                            ...currentItem.supplier,
-                            sup_telp2: e.value,
-                          },
-                        })
-                      }
-                      placeholder="Masukan No. Telepon"
-                      type="number"
-                    />
-                  </div>
+                  <PrimeInput
+                    isNumber
+                    label={"No. Telepon 2"}
+                    value={
+                      currentItem !== null
+                        ? `${currentItem?.supplier?.sup_telp2 ?? ""}`
+                        : ""
+                    }
+                    onChange={(e) =>
+                      setCurrentItem({
+                        ...currentItem,
+                        supplier: {
+                          ...currentItem.supplier,
+                          sup_telp2: e.value,
+                        },
+                      })
+                    }
+                    placeholder="0"
+                    mode={"decimal"}
+                    useGrouping={false}
+                  />
                 </div>
               </div>
 
@@ -1328,9 +1338,9 @@ const DataSupplier = ({
                           sup_hutang: e.value?.id ?? null,
                         },
                       });
-                      let newError = error;
-                      newError[2].ap = false;
-                      setError(newError);
+                      // let newError = error;
+                      // newError[2].ap = false;
+                      // setError(newError);
                     }}
                     optionLabel="account.acc_name"
                     valueTemplate={clear}
@@ -1339,8 +1349,8 @@ const DataSupplier = ({
                     filterBy="account.acc_name"
                     placeholder="Kode Distribusi Hutang"
                     showClear
-                    errorMessage="Kode Distribusi AP Belum Dipilih"
-                    error={error[2]?.ap}
+                    // errorMessage="Kode Distribusi AP Belum Dipilih"
+                    // error={error[2]?.ap}
                   />
                 </div>
 
@@ -1362,9 +1372,9 @@ const DataSupplier = ({
                           sup_uang_muka: e.value?.id ?? null,
                         },
                       });
-                      let newError = error;
-                      newError[2].um = false;
-                      setError(newError);
+                      // let newError = error;
+                      // newError[2].um = false;
+                      // setError(newError);
                     }}
                     optionLabel="account.acc_name"
                     valueTemplate={clear}
@@ -1373,8 +1383,8 @@ const DataSupplier = ({
                     filterBy="account.acc_name"
                     placeholder="Kode Distribusi Uang Muka"
                     showClear
-                    errorMessage="Uang Muka Pembelian Belum Dipilih"
-                    error={error[2]?.um}
+                    // errorMessage="Uang Muka Pembelian Belum Dipilih"
+                    // error={error[2]?.um}
                   />
                 </div>
               </div>

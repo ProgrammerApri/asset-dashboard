@@ -440,10 +440,10 @@ const Currency = () => {
                 header={renderHeader}
                 filters={filters1}
                 globalFilterFields={[
-                  "currency.code",
-                  "currency.name",
-                  "currency.date",
-                  "currency.rate",
+                  "code",
+                  "name",
+                  "date",
+                  "rate",
                 ]}
                 emptyMessage="Tidak ada data"
                 paginator

@@ -393,9 +393,9 @@ const DataPusatBiaya = ({
           header={renderHeader}
           filters={filters1}
           globalFilterFields={[
-            "pusatBiaya.ccost_code",
-            "pusatBiaya.ccost_name",
-            "pusatBiaya.ccost_ket",
+            "ccost_code",
+            "ccost_name",
+            "ccost_ket",
           ]}
           emptyMessage="Tidak ada data"
           paginator

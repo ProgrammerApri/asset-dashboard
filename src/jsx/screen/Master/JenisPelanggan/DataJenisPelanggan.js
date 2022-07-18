@@ -382,9 +382,9 @@ const DataJenisPelanggan = ({
           header={renderHeader}
           filters={filters1}
           globalFilterFields={[
-            "jenisPel.jpel_code",
-            "jenisPel.jpel_name",
-            "jenisPel.jpel_ket",
+            "jpel_code",
+            "jpel_name",
+            "jpel_ket",
           ]}
           emptyMessage="Tidak ada data"
           paginator

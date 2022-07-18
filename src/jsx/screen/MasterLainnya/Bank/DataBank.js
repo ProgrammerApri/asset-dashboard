@@ -431,7 +431,7 @@ const DataBank = ({
   const glTemplate = (option) => {
     return (
       <div>
-        {option !== null ? `${option.acc_name} - (${option.acc_code})` : ""}
+        {option !== null ? `${option.acc_name} - ${option.acc_code}` : ""}
       </div>
     );
   };
@@ -440,7 +440,7 @@ const DataBank = ({
     if (option) {
       return (
         <div>
-          {option !== null ? `${option.acc_name} - (${option.acc_code})` : ""}
+          {option !== null ? `${option.acc_name} - ${option.acc_code}` : ""}
         </div>
       );
     }

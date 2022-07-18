@@ -9,6 +9,7 @@ const PrimeNumber = ({
   error,
   disabled = false,
   min,
+  maxLength,
   type,
 }) => {
   return (
@@ -23,6 +24,7 @@ const PrimeNumber = ({
           className={error ? "p-invalid" : ""}
           disabled={disabled}
           min={min}
+          maxLength={maxLength}
           type={type}
         />
       </div>

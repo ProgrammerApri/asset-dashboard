@@ -409,7 +409,7 @@ const DataDivisi = ({
           rowHover
           header={renderHeader}
           filters={filters1}
-          globalFilterFields={["divisi.code", "divisi.name", "divisi.desc"]}
+          globalFilterFields={["code", "name", "desc"]}
           emptyMessage="Tidak ada data"
           paginator
           paginatorTemplate={template2}

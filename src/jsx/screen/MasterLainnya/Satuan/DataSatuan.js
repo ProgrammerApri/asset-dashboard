@@ -566,10 +566,10 @@ const DataSatuan = ({
           groupRowsBy="name"
           filters={filters1}
           globalFilterFields={[
-            "satuan.code",
-            "satuan.name",
-            "satuan.status",
-            "satuan.ket",
+            "code",
+            "name",
+            "status",
+            "ket",
           ]}
           emptyMessage="Tidak ada data"
           paginator

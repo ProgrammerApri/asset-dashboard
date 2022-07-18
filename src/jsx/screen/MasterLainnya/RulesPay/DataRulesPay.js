@@ -405,9 +405,9 @@ const DataRulesPay = ({
           header={renderHeader}
           filters={filters1}
           globalFilterFields={[
-            "rules_pay.name",
-            "rules_pay.day",
-            "rules_pay.ket",
+            "name",
+            "day",
+            "ket",
           ]}
           emptyMessage="Tidak ada data"
           paginator

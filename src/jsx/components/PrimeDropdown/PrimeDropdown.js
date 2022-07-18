@@ -14,7 +14,8 @@ const PrimeDropdown = ({
   errorMessage,
   disabled = false,
   valueTemplate,
-  itemTemplate, 
+  itemTemplate,
+  showClear, 
 }) => {
   return (
     <div>
@@ -31,6 +32,7 @@ const PrimeDropdown = ({
           disabled={disabled}
           itemTemplate={itemTemplate}
           valueTemplate={valueTemplate}
+          showClear={showClear}
         />
       </div>
       {error && (

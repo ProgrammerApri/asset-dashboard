@@ -402,10 +402,10 @@ const DataLokasi = ({
           header={renderHeader}
           filters={filters1}
           globalFilterFields={[
-            "lokasi.code",
-            "lokasi.name",
-            "lokasi.address",
-            "lokasi.desc",
+            "code",
+            "name",
+            "address",
+            "desc",
           ]}
           emptyMessage="Tidak ada data"
           paginator

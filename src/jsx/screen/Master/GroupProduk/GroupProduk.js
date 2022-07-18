@@ -569,7 +569,7 @@ const DataGroupProduk = ({
     return (
       <div>
         {option !== null
-          ? `${option.account.acc_name} - (${option.account.acc_code})`
+          ? `${option.account.acc_name} - ${option.account.acc_code}`
           : ""}
       </div>
     );
@@ -580,7 +580,7 @@ const DataGroupProduk = ({
       return (
         <div>
           {option !== null
-            ? `${option.account.acc_name} - (${option.account.acc_code})`
+            ? `${option.account.acc_name} - ${option.account.acc_code}`
             : ""}
         </div>
       );
@@ -644,9 +644,9 @@ const DataGroupProduk = ({
           header={renderHeader}
           filters={filters1}
           globalFilterFields={[
-            "groupProduk.code",
-            "groupProduk.name",
-            "groupProduk.div_code",
+            "groupPro.code",
+            "groupPro.name",
+            "groupPro.div_code",
           ]}
           emptyMessage="Tidak ada data"
           paginator

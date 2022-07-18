@@ -445,6 +445,12 @@ const DataAkun = ({
     }
   };
 
+  const formatIdr = (value) => {
+    return `${value}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
   const isValid = () => {
     if (currentItem.account.acc_name !== "" && currentItem.kategory.id !== 0) {
       return true;
@@ -846,7 +852,7 @@ const DataAkun = ({
           />
           <Column
             header="Saldo Awal"
-            field={(e) => e.account.sld_awal}
+            field={(e) => formatIdr(e.account.sld_awal)}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />

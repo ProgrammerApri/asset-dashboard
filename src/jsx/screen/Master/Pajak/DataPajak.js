@@ -430,7 +430,7 @@ const DataPajak = ({
   const glTemplate = (option) => {
     return (
       <div>
-        {option !== null ? `${option.acc_name} - (${option.acc_code})` : ""}
+        {option !== null ? `${option.acc_name} - ${option.acc_code}` : ""}
       </div>
     );
   };
@@ -439,7 +439,7 @@ const DataPajak = ({
     if (option) {
       return (
         <div>
-          {option !== null ? `${option.acc_name} - (${option.acc_code})` : ""}
+          {option !== null ? `${option.acc_name} - ${option.acc_code}` : ""}
         </div>
       );
     }
@@ -555,7 +555,7 @@ const DataPajak = ({
           />
           <Column
             header="Gabungan Dari"
-            field={(e) => (e?.combined ?? "-")}
+            field={(e) => e?.combined ?? "-"}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
@@ -630,7 +630,7 @@ const DataPajak = ({
                 <div className="col-6">
                   {/* <div className="p-inputgroup"> */}
                   <PrimeInput
-                    label={"Nilai"}
+                    label={"Nilai (%)"}
                     number
                     value={
                       currentItem !== null ? `${currentItem?.nilai ?? ""}` : ""
@@ -644,8 +644,9 @@ const DataPajak = ({
                     placeholder="Masukan Nilai"
                     error={error?.nilai}
                   />
-                  {/* <span className="p-inputgroup-addon">%</span>
-                  </div> */}
+
+                  {/* <span className="p-inputgroup-addon col-2">%</span> */}
+                  {/* </div> */}
                 </div>
               </div>
 
@@ -667,63 +668,63 @@ const DataPajak = ({
 
               <div className="row ml-0 mt-0">
                 <div className="col-6">
-                    <PrimeDropdown
-                      label={"Akun Pajak Pembelian"}
-                      value={
-                        currentItem !== null && currentItem.acc_sls_tax !== null
-                          ? acc(currentItem.acc_sls_tax)
-                          : null
-                      }
-                      options={account}
-                      onChange={(e) => {
-                        console.log(e.value);
-                        setCurrentItem({
-                          ...currentItem,
-                          acc_sls_tax: e.value?.id,
-                        });
-                        let newError = error;
-                        newError.acc1 = false;
-                        setError(newError);
-                      }}
-                      optionLabel="account.acc_name"
-                      valueTemplate={clear}
-                      itemTemplate={glTemplate}
-                      filter
-                      filterBy="acc_name"
-                      placeholder="Pilih Ppn Masukan"
-                      errorMessage="Akun Pajak Pembelian Belum Dipilih"
-                      error={error?.acc1}
-                    />
+                  <PrimeDropdown
+                    label={"Akun Pajak Pembelian"}
+                    value={
+                      currentItem !== null && currentItem.acc_sls_tax !== null
+                        ? acc(currentItem.acc_sls_tax)
+                        : null
+                    }
+                    options={account}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        acc_sls_tax: e.value?.id,
+                      });
+                      let newError = error;
+                      newError.acc1 = false;
+                      setError(newError);
+                    }}
+                    optionLabel="account.acc_name"
+                    valueTemplate={clear}
+                    itemTemplate={glTemplate}
+                    filter
+                    filterBy="acc_name"
+                    placeholder="Pilih Ppn Masukan"
+                    errorMessage="Akun Pajak Pembelian Belum Dipilih"
+                    error={error?.acc1}
+                  />
                 </div>
 
                 <div className="col-6">
-                    <PrimeDropdown
+                  <PrimeDropdown
                     label={"Akun Pajak Penjualan"}
-                      value={
-                        currentItem !== null && currentItem.acc_pur_tax !== null
-                          ? acc(currentItem.acc_pur_tax)
-                          : null
-                      }
-                      options={account}
-                      onChange={(e) => {
-                        console.log(e.value);
-                        setCurrentItem({
-                          ...currentItem,
-                          acc_pur_tax: e.value?.id,
-                        });
-                        let newError = error;
+                    value={
+                      currentItem !== null && currentItem.acc_pur_tax !== null
+                        ? acc(currentItem.acc_pur_tax)
+                        : null
+                    }
+                    options={account}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        acc_pur_tax: e.value?.id,
+                      });
+                      let newError = error;
                       newError.acc2 = false;
                       setError(newError);
-                      }}
-                      optionLabel="account.acc_name"
-                      valueTemplate={clear}
-                      itemTemplate={glTemplate}
-                      filter
-                      filterBy="acc_name"
-                      placeholder="Pilih Ppn Keluaran"
-                      errorMessage="Akun Pajak Penjualan Belum Dipilih"
-                      error={error?.acc2}
-                    />
+                    }}
+                    optionLabel="account.acc_name"
+                    valueTemplate={clear}
+                    itemTemplate={glTemplate}
+                    filter
+                    filterBy="acc_name"
+                    placeholder="Pilih Ppn Keluaran"
+                    errorMessage="Akun Pajak Penjualan Belum Dipilih"
+                    error={error?.acc2}
+                  />
                 </div>
               </div>
             </>

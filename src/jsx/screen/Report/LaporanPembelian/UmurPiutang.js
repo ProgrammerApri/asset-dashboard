@@ -1115,7 +1115,7 @@ const UmurPiutang = () => {
                   })}
                   <Row className="m-0 mt-5">
                     <div className="text-left font-weight-bold col-6">
-                      Total Hutang
+                      Total Piutang
                     </div>
                     <div className="col-6 text-right font-weight-bold">
                       Rp. {formatIdr(total)}

@@ -42,6 +42,8 @@ const CustomDropdown = ({
   option,
   detail = false,
   onDetail = () => {},
+  history = false,
+  onShow = () => {},
   label,
   placeholder,
   value,
@@ -63,12 +65,12 @@ const CustomDropdown = ({
   //     !drop.current.contains(focusedElement) &&
   //     !panel.current.contains(focusedElement)) {
   //     triggerPanel(false);
-  //   } 
+  //   }
 
   //   if (drop.current === focusedElement) {
   //     triggerPanel(active);
   //   }
-      
+
   // }, [focusedElement]);
 
   const [matches, setMatches] = useState(null);
@@ -134,7 +136,7 @@ const CustomDropdown = ({
           tabIndex={"0"}
           className="p-dropdown p-component p-inputwrapper w-100"
           onClick={() => {
-            triggerPanel(active)
+            triggerPanel(active);
             // drop.current.focus();
             // console.log(active);
             // if (active) {
@@ -244,7 +246,18 @@ const CustomDropdown = ({
               triggerPanel(active);
               onDetail();
             }}
-            className="p-button-sm p-button-text btn-primary text-center vw-100 m-2 center-icon justify-content-center"
+            className="p-button-sm p-button-text btn-primary fs-12 text-center vw-100 m-2 center-icon justify-content-center"
+          />
+        )}
+        {history && (
+          <Button
+            label="Histori Harga"
+            icon="pi pi-eye"
+            onClick={() => {
+              triggerPanel(active);
+              onShow();
+            }}
+            className="p-button-sm p-button-text btn-primary text-center fs-12 vw-100 m-2 center-icon justify-content-center"
           />
         )}
       </div>

@@ -418,7 +418,7 @@ const DataJasa = ({
     return (
       <div>
         {option !== null
-          ? `${option.account.acc_name} - (${option.account.acc_code})`
+          ? `${option.account.acc_name} - ${option.account.acc_code}`
           : ""}
       </div>
     );
@@ -429,7 +429,7 @@ const DataJasa = ({
       return (
         <div>
           {option !== null
-            ? `${option.account.acc_name} - (${option.account.acc_code})`
+            ? `${option.account.acc_name} - ${option.account.acc_code}`
             : ""}
         </div>
       );

@@ -890,6 +890,12 @@ const endpoints = {
     method: "GET",
     data: {},
   },
+
+  price_history: {
+    endpoint: "/v1/api/price-history",
+    method: "GET",
+    data: {},
+  },
 };
 
 export default endpoints;

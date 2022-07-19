@@ -26,6 +26,8 @@ import DataSatuan from "src/jsx/screen/MasterLainnya/Satuan/DataSatuan";
 import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
+import Histori from "../Histori/Index";
+import DataHistori from "../Histori/DataHistori";
 
 const defError = {
   code: false,
@@ -62,12 +64,14 @@ const InputPO = ({ onCancel, onSuccess }) => {
   const [rulesPay, setRulesPay] = useState(null);
   const [ppn, setPpn] = useState(null);
   const [rp, setRequest] = useState(null);
+  const [histori, setHistori] = useState(null);
   const [showSupplier, setShowSupplier] = useState(false);
   const [showRulesPay, setShowRulesPay] = useState(false);
   const [showPpn, setShowPpn] = useState(false);
   const [showProd, setShowProd] = useState(false);
   const [showSatuan, setShowSatuan] = useState(false);
   const [showJasa, setShowJasa] = useState(false);
+  const [showHistori, setShowHistori] = useState(false);
   const [product, setProduct] = useState(null);
   const [jasa, setJasa] = useState(null);
   const [satuan, setSatuan] = useState(null);
@@ -75,6 +79,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
   const [accor, setAccor] = useState({
     produk: true,
     jasa: false,
+    sup: true,
   });
 
   const type = [
@@ -96,6 +101,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
     getProduct();
     getJasa();
     getSatuan();
+    getHistori();
   }, []);
 
   const getSupplier = async () => {
@@ -318,6 +324,28 @@ const InputPO = ({ onCancel, onSuccess }) => {
       if (response.status) {
         const { data } = response;
         setSatuan(data);
+      }
+    } catch (error) {}
+  };
+
+  const getHistori = async () => {
+    const config = {
+      ...endpoints.price_history,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        // let his = [];
+        // data.forEach((elem) => {
+        //   if (elem.product.id === t.id) {
+        //     his.push(elem);
+        //   }
+        // });
+        setHistori(data);
       }
     } catch (error) {}
   };
@@ -721,6 +749,15 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   result.setDate(result.getDate() + rulPay(po?.top)?.day);
                   console.log(result);
                 }
+
+                // let his = [];
+                // histori.forEach((elem) => {
+                //   if (elem.product.id === e.rprod.prod_id.id) {
+                //     his.push(elem);
+                //   }
+                // });
+                // setHistori(his);
+
                 updatePo({
                   ...po,
                   preq_id: e.id,
@@ -937,6 +974,8 @@ const InputPO = ({ onCancel, onSuccess }) => {
                           });
                           setSatuan(sat);
 
+                          
+
                           let temp = [...po.pprod];
                           temp[e.index].prod_id = t.id;
                           temp[e.index].unit_id = t.unit?.id;
@@ -949,7 +988,31 @@ const InputPO = ({ onCancel, onSuccess }) => {
                           setCurrentIndex(e.index);
                           setShowProd(true);
                         }}
+                        // history
+                        // onShow={() => {
+                        //   setCurrentIndex(e.index);
+                        //   setShowHistori(true);
+                        // }}
                       />
+                    )}
+                  />
+
+                  <Column
+                    //  style={{
+                    //     width: "1em",
+                    //   }}
+                    // header="History"
+                    className="align-text-top"
+                    body={(e) => (
+                      <Link
+                        onClick={() => {
+                          setCurrentIndex(e.index);
+                          setShowHistori(true);
+                        }}
+                        className="sharp ml-1"
+                      >
+                        <i className="fa fa-eye"></i>
+                      </Link>
                     )}
                   />
 
@@ -1013,7 +1076,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     // }}
                     body={(e) => (
                       <PrimeNumber
-                        value={e.order && e.order} 
+                        value={e.order && e.order}
                         onChange={(t) => {
                           let temp = [...po.pprod];
                           let val =
@@ -1510,6 +1573,190 @@ const InputPO = ({ onCancel, onSuccess }) => {
           <></>
         )}
 
+        {/* {po?.pprod?.length ? ( */}
+        <CustomAccordion
+          tittle={"Referensi Supplier"}
+          defaultActive={true}
+          active={accor.sup}
+          onClick={() => {
+            setAccor({
+              ...accor,
+              sup: !accor.sup,
+            });
+          }}
+          key={1}
+          body={
+            <>
+              <DataTable
+                responsiveLayout="none"
+                value={po.psup?.map((v, i) => {
+                  return {
+                    ...v,
+                    index: i,
+                    price: v?.price ?? 0,
+                  };
+                })}
+                className="display w-150 datatable-wrapper header-white no-border"
+                showGridlines={false}
+                emptyMessage={() => <div></div>}
+              >
+                <Column
+                  header="Supplier"
+                  className="align-text-top"
+                  field={""}
+                  // style={{
+                  //   width: "12rem",
+                  // }}
+                  body={(e) => (
+                    <CustomDropdown
+                      value={e.sup && checkProd(e.sup)}
+                      option={supplier}
+                      onChange={(t) => {
+                        let temp = [...po.psup];
+                        temp[e.index].sup = t.id;
+                        temp[e.index].addr = t.addr;
+                        temp[e.index].telp = t.telp;
+                        temp[e.index].ppn = t.ppn;
+                        updatePo({ ...po, psup: temp });
+                      }}
+                      placeholder="Pilih Supplier"
+                      label={"[supplier.sup_name]"}
+                      detail
+                      onDetail={() => {
+                        setCurrentIndex(e.index);
+                        setShowSupplier(true);
+                      }}
+                    />
+                  )}
+                />
+
+                <Column
+                  header="Alamat Supplier"
+                  className="align-text-top"
+                  field={""}
+                  // style={{
+                  //   minWidth: "7rem",
+                  // }}
+                  body={(e) => (
+                    <div className="p-inputgroup">
+                      <InputText
+                        value={e.addr && e.addr}
+                        onChange={(t) => {}}
+                        placeholder="Alamat Supplier"
+                        disabled
+                      />
+                    </div>
+                  )}
+                />
+
+                <Column
+                  header="No. Telepon"
+                  className="align-text-top"
+                  field={""}
+                  // style={{
+                  //   width: "5rem",
+                  // }}
+                  body={(e) => (
+                    <PrimeInput
+                      isNumber
+                      value={e.telp && e.telp}
+                      onChange={(t) => {}}
+                      placeholder="0"
+                      disabled
+                    />
+                  )}
+                />
+
+                <Column
+                  header="Ppn"
+                  className="align-text-top"
+                  field={""}
+                  // style={{
+                  //   minWidth: "7rem",
+                  // }}
+                  body={(e) => (
+                    <div className="p-inputgroup">
+                      <InputText
+                        value={e.ppn && e.ppn}
+                        onChange={(t) => {}}
+                        placeholder="Jenis Ppn"
+                        disabled
+                      />
+                    </div>
+                  )}
+                />
+
+                <Column
+                  header="Harga"
+                  className="align-text-top"
+                  field={""}
+                  // style={{
+                  //   minWidth: "10rem",
+                  // }}
+                  body={(e) => (
+                    <div className="p-inputgroup">
+                      <InputText
+                        value={e.price ? e.price : ""}
+                        onChange={(t) => {}}
+                        min={0}
+                        placeholder="0"
+                        type="number"
+                        disabled
+                      />
+                    </div>
+                  )}
+                />
+
+                <Column
+                  className="align-text-top"
+                  body={(e) =>
+                    e.index === po.psup.length - 1 ? (
+                      <Link
+                        onClick={() => {
+                          updatePo({
+                            ...po,
+                            psup: [
+                              ...po.psup,
+                              {
+                                id: 0,
+                                sup: null,
+                                addr: null,
+                                telp: null,
+                                ppn: null,
+                                price: null,
+                              },
+                            ],
+                          });
+                        }}
+                        className="btn btn-primary shadow btn-xs sharp ml-1"
+                      >
+                        <i className="fa fa-plus"></i>
+                      </Link>
+                    ) : (
+                      <Link
+                        onClick={() => {
+                          let temp = [...po.psup];
+                          temp.splice(e.index, 1);
+                          updatePo({
+                            ...po,
+                            psup: temp,
+                          });
+                        }}
+                        className="btn btn-danger shadow btn-xs sharp ml-1"
+                      >
+                        <i className="fa fa-trash"></i>
+                      </Link>
+                    )
+                  }
+                />
+              </DataTable>
+            </>
+          }
+        />
+        {/* ) : (
+          <></>
+        )} */}
+
         {po?.pprod?.length ? (
           <div className="row ml-0 mr-0 mb-0 mt-6 justify-content-between">
             <div>
@@ -1839,34 +2086,6 @@ const InputPO = ({ onCancel, onSuccess }) => {
         </Col>
       </Row>
 
-      {/* <DataPusatBiaya
-        data={pusatBiaya}
-        loading={false}
-        popUp={true}
-        show={showDepartemen}
-        onHide={() => {
-          setShowDept(false);
-        }}
-        onInput={(e) => {
-          setShowDept(!e);
-        }}
-        onSuccessInput={(e) => {
-          getPusatBiaya();
-        }}
-        onRowSelect={(e) => {
-          if (doubleClick) {
-            setShowDept(false);
-            updatePo({ ...rp, req_dep: e.data.id });
-          }
-
-          setDoubleClick(true);
-
-          setTimeout(() => {
-            setDoubleClick(false);
-          }, 2000);
-        }}
-      /> */}
-
       <DataRulesPay
         data={rulesPay}
         loading={false}
@@ -2050,6 +2269,36 @@ const InputPO = ({ onCancel, onSuccess }) => {
             temp[currentIndex].unit_id = e.data.unit?.id;
             updatePo({ ...po, pprod: temp });
           }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <Histori
+        data={histori}
+        loading={false}
+        popUp={true}
+        show={showHistori}
+        onHide={() => {
+          setShowHistori(false);
+        }}
+        onInput={(e) => {
+          setShowHistori(!e);
+        }}
+        onSuccessInput={(e) => {
+          getHistori();
+        }}
+        onRowSelect={(e) => {
+          // if (doubleClick) {
+          //   setShowSatuan(false);
+          //   let temp = [...po.pprod];
+          //   temp[currentIndex].unit_id = e.data.unit?.id;
+          //   updatePo({ ...po, pprod: temp });
+          // }
 
           setDoubleClick(true);
 

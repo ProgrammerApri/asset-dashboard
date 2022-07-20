@@ -160,6 +160,7 @@ const DataLokasi = ({
   };
 
   const delLokasi = async (id) => {
+    setLoading(true)
     const config = {
       ...endpoints.delLokasi,
       endpoint: endpoints.delLokasi.endpoint + currentItem.id,
@@ -171,7 +172,7 @@ const DataLokasi = ({
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setLoading(false);
+          setUpdate(true);
           setShowDelete(false);
           onSuccessInput();
           onInput(false);
@@ -385,6 +386,8 @@ const DataLokasi = ({
 
     setError(errors);
 
+    valid = !errors.code && !errors.name && !errors.addr;
+
     return valid;
   };
 
@@ -401,12 +404,7 @@ const DataLokasi = ({
           rowHover
           header={renderHeader}
           filters={filters1}
-          globalFilterFields={[
-            "code",
-            "name",
-            "address",
-            "desc",
-          ]}
+          globalFilterFields={["code", "name", "address", "desc"]}
           emptyMessage="Tidak ada data"
           paginator
           paginatorTemplate={template2}
@@ -433,13 +431,13 @@ const DataLokasi = ({
           />
           <Column
             header="Alamat"
-            field={(e) => e.address !== "" ? e.address : "-"}
+            field={(e) => (e.address !== "" ? e.address : "-")}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
           <Column
             header="Keterangan"
-            field={(e) => e?.desc !== "" ? e.desc : "-"}
+            field={(e) => (e?.desc !== "" ? e.desc : "-")}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />

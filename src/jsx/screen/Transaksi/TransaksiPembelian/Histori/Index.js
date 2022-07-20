@@ -18,6 +18,7 @@ const data = {
 };
 
 const Histori = ({
+  data,
   popUp = false,
   show = false,
   onHide = () => {},
@@ -35,7 +36,7 @@ const Histori = ({
 
   useEffect(() => {
     initFilters1();
-    getHistori();
+    // getHistori();
     getPO();
   }, []);
 
@@ -202,64 +203,60 @@ const Histori = ({
       <>
         <Row>
           <Col>
-            <Card>
-              <Card.Body>
-                <DataTable
-                  responsiveLayout="scroll"
-                  value={loading ? dummy : histori}
-                  className="display w-150 datatable-wrapper"
-                  showGridlines
-                  dataKey="id"
-                  rowHover
-                  header={renderHeader}
-                  filters={filters1}
-                  globalFilterFields={["code", "name", "address", "desc"]}
-                  emptyMessage="Tidak ada data"
-                  paginator
-                  paginatorTemplate={template2}
-                  first={first2}
-                  rows={rows2}
-                  onPage={onCustomPage2}
-                  paginatorClassName="justify-content-end mt-3"
-                  selectionMode="single"
-                  onRowSelect={onRowSelect}
-                >
-                  <Column
-                    header="Tanggal"
-                    style={{
-                      minWidth: "8rem",
-                    }}
-                    field={(e) => formatDate(e.order?.ord_date)}
-                    body={loading && <Skeleton />}
-                  />
-                  <Column
-                    header="Nomor PO"
-                    field={(e) => checkpo(e.order?.po_id)?.po_code}
-                    style={{ minWidth: "8rem" }}
-                    body={loading && <Skeleton />}
-                  />
-                  <Column
-                    header="Supplier"
-                    field={(e) => e.supplier?.sup_name}
-                    style={{ minWidth: "8rem" }}
-                    body={loading && <Skeleton />}
-                  />
-                  <Column
-                    header="Harga"
-                    field={(e) => formatIdr(e?.price)}
-                    style={{ minWidth: "8rem" }}
-                    body={loading && <Skeleton />}
-                  />
-                  {/* <Column
+            <DataTable
+              responsiveLayout="scroll"
+              value={loading ? dummy : data}
+              className="display w-150 datatable-wrapper"
+              showGridlines
+              dataKey="id"
+              rowHover
+              header={renderHeader}
+              filters={filters1}
+              globalFilterFields={["code", "name", "address", "desc"]}
+              emptyMessage="Tidak ada data"
+              paginator
+              paginatorTemplate={template2}
+              first={first2}
+              rows={rows2}
+              onPage={onCustomPage2}
+              paginatorClassName="justify-content-end mt-3"
+              selectionMode="single"
+              onRowSelect={onRowSelect}
+            >
+              <Column
+                header="Tanggal"
+                style={{
+                  minWidth: "8rem",
+                }}
+                field={(e) => formatDate(e.order?.ord_date)}
+                body={loading && <Skeleton />}
+              />
+              <Column
+                header="Produk"
+                field={(e) => e.product?.name}
+                style={{ minWidth: "8rem" }}
+                body={loading && <Skeleton />}
+              />
+              <Column
+                header="Supplier"
+                field={(e) => e.supplier?.sup_name}
+                style={{ minWidth: "8rem" }}
+                body={loading && <Skeleton />}
+              />
+              <Column
+                header="Harga"
+                field={(e) => formatIdr(e?.price)}
+                style={{ minWidth: "8rem" }}
+                body={loading && <Skeleton />}
+              />
+              {/* <Column
                   header="Action"
                   dataType="boolean"
                   bodyClassName="text-center"
                   style={{ minWidth: "2rem" }}
                   body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
                 /> */}
-                </DataTable>
-              </Card.Body>
-            </Card>
+            </DataTable>
           </Col>
         </Row>
       </>

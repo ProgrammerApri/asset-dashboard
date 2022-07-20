@@ -65,6 +65,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
   const [ppn, setPpn] = useState(null);
   const [rp, setRequest] = useState(null);
   const [histori, setHistori] = useState(null);
+  const [filtHis, setFiltHis] = useState([]);
   const [showSupplier, setShowSupplier] = useState(false);
   const [showRulesPay, setShowRulesPay] = useState(false);
   const [showPpn, setShowPpn] = useState(false);
@@ -750,14 +751,6 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   console.log(result);
                 }
 
-                // let his = [];
-                // histori.forEach((elem) => {
-                //   if (elem.product.id === e.rprod.prod_id.id) {
-                //     his.push(elem);
-                //   }
-                // });
-                // setHistori(his);
-
                 updatePo({
                   ...po,
                   preq_id: e.id,
@@ -958,61 +951,66 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     //   width: "12rem",
                     // }}
                     body={(e) => (
-                      <CustomDropdown
-                        value={e.prod_id && checkProd(e.prod_id)}
-                        option={product}
-                        onChange={(t) => {
-                          let sat = [];
-                          satuan.forEach((element) => {
-                            if (element.id === t.unit.id) {
-                              sat.push(element);
-                            } else {
-                              if (element.u_from?.id === t.unit.id) {
-                                sat.push(element);
-                              }
-                            }
-                          });
-                          setSatuan(sat);
+                      <div className="flex">
+                        <div className="col-11">
+                          <CustomDropdown
+                            value={e.prod_id && checkProd(e.prod_id)}
+                            option={product}
+                            onChange={(t) => {
+                              let sat = [];
+                              satuan.forEach((element) => {
+                                if (element.id === t.unit.id) {
+                                  sat.push(element);
+                                } else {
+                                  if (element.u_from?.id === t.unit.id) {
+                                    sat.push(element);
+                                  }
+                                }
+                              });
+                              setSatuan(sat);
 
-                          
+                              let temp = [...po.pprod];
+                              temp[e.index].prod_id = t.id;
+                              temp[e.index].unit_id = t.unit?.id;
+                              updatePo({ ...po, pprod: temp });
+                            }}
+                            placeholder="Pilih Kode Produk"
+                            label={"[name]"}
+                            detail
+                            onDetail={() => {
+                              setCurrentIndex(e.index);
+                              setShowProd(true);
+                            }}
+                            // history
+                            // onShow={() => {
+                            //   setCurrentIndex(e.index);
+                            //   setShowHistori(true);
+                            // }}
+                          />
+                        </div>
+                        {/* <div className="col-1 align-items-center p-0"> */}
+                          <Link
+                            onClick={() => {
+                              let his = [];
+                              histori.forEach((elem) => {
+                                if (elem.product.id === e.prod_id) {
+                                  his.push(elem);
+                                }
+                              });
+                              setFiltHis(his);
+                              console.log("cekkk");
+                              console.log(his);
+                              console.log(filtHis);
 
-                          let temp = [...po.pprod];
-                          temp[e.index].prod_id = t.id;
-                          temp[e.index].unit_id = t.unit?.id;
-                          updatePo({ ...po, pprod: temp });
-                        }}
-                        placeholder="Pilih Kode Produk"
-                        label={"[name]"}
-                        detail
-                        onDetail={() => {
-                          setCurrentIndex(e.index);
-                          setShowProd(true);
-                        }}
-                        // history
-                        // onShow={() => {
-                        //   setCurrentIndex(e.index);
-                        //   setShowHistori(true);
-                        // }}
-                      />
-                    )}
-                  />
-
-                  <Column
-                    //  style={{
-                    //     width: "1em",
-                    //   }}
-                    // header="History"
-                    className="align-text-top"
-                    body={(e) => (
-                      <Link
-                        onClick={() => {
-                          setCurrentIndex(e.index);
-                          setShowHistori(true);
-                        }}
-                        className="sharp ml-1"
-                      >
-                        <i className="fa fa-eye"></i>
-                      </Link>
+                              setCurrentIndex(e.index);
+                              setShowHistori(true);
+                            }}
+                            className="sharp mt-2"
+                          >
+                            <i className="bx bx-history fs-18"></i>
+                          </Link>
+                        {/* </div> */}
+                      </div>
                     )}
                   />
 
@@ -1574,7 +1572,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
         )}
 
         {/* {po?.pprod?.length ? ( */}
-        <CustomAccordion
+        {/* <CustomAccordion
           tittle={"Referensi Supplier"}
           defaultActive={true}
           active={accor.sup}
@@ -1752,7 +1750,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
               </DataTable>
             </>
           }
-        />
+        /> */}
         {/* ) : (
           <></>
         )} */}
@@ -2279,7 +2277,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
       />
 
       <Histori
-        data={histori}
+        data={filtHis}
         loading={false}
         popUp={true}
         show={showHistori}

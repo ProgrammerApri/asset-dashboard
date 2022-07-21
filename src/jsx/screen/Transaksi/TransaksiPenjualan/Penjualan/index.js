@@ -1,13 +1,20 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Button, Card, Col, Row } from "react-bootstrap";
 import { Toast } from "primereact/toast";
 import DataPenjualan from "./DataPenjualan";
 import InputPenjualan from "./InputPenjualan";
 import Detail from "./Detail";
 
-const Penjualan = () => {
+const Penjualan = ({ trigger }) => {
   const [active, setActive] = useState(0);
   const toast = useRef(null);
+
+  useEffect(() => {
+    if (trigger !== 0) {
+      setActive(0);
+    }
+  }, [trigger]);
+
   const [view, setView] = useState([
     <DataPenjualan
       onAdd={() => {

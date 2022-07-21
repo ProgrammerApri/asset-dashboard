@@ -21,7 +21,7 @@ const TransaksiPembelian = () => {
         <RequestPurchase trigger={trigger} />
       </TabPanel>
       <TabPanel header="Pesanan Pembelian (PO)">
-        <PermintaanPO />
+        <PermintaanPO trigger={trigger}/>
       </TabPanel>
       <TabPanel header="Pembelian">
         <Order trigger={trigger}/>

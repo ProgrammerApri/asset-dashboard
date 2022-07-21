@@ -1,13 +1,20 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Toast } from "primereact/toast";
 import { Row, Col, Card } from "react-bootstrap";
 import ReturJualList from "./RetuJualList";
 import ReturJualInput from "./ReturJualInput";
 import Detail from "./Detail";
 
-const ReturJual = () => {
+const ReturJual = ({ trigger }) => {
   const [active, setActive] = useState(0);
   const toast = useRef(null);
+
+  useEffect(() => {
+    if (trigger !== 0) {
+      setActive(0);
+    }
+  }, [trigger]);
+  
   const [view, setView] = useState([
     <ReturJualList
       onAdd={() => {

@@ -1,13 +1,21 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Toast } from "primereact/toast";
 import DataSalesOrder from "./DataSalesOrder";
 import InputSO from "./InputSO";
 import { Row, Col, Card } from "react-bootstrap";
 import Detail from "./Detail";
+import { set } from "date-fns";
 
-const SalesOrder = () => {
+const SalesOrder = ({ trigger }) => {
   const [active, setActive] = useState(0);
   const toast = useRef(null);
+
+  useEffect(() => {
+    if (trigger !== 0) {
+      setActive(0);
+    }
+  }, [trigger]);
+  
   const [view, setView] = useState([
     <DataSalesOrder
       onAdd={() => {

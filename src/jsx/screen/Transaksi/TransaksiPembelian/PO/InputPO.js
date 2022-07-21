@@ -9,6 +9,7 @@ import { Dropdown } from "primereact/dropdown";
 import { Divider } from "@material-ui/core";
 import { Calendar } from "primereact/calendar";
 import { InputSwitch } from "primereact/inputswitch";
+import { RadioButton } from "primereact/radiobutton";
 import CustomAccordion from "src/jsx/components/Accordion/Accordion";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_PO } from "src/redux/actions";
@@ -468,6 +469,17 @@ const InputPO = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
+  const suppH = (value) => {
+    let selected = {};
+    filtHis?.forEach((element) => {
+      if (value === element.supplier?.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
   const rulPay = (value) => {
     let selected = {};
     rulesPay?.forEach((element) => {
@@ -751,6 +763,14 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   console.log(result);
                 }
 
+                let his = [];
+                histori.forEach((elem) => {
+                  if (elem.product.id === e.prod_id) {
+                    his.push(elem);
+                  }
+                });
+                setFiltHis(his);
+
                 updatePo({
                   ...po,
                   preq_id: e.id,
@@ -806,7 +826,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
               placeholder="Pilih Supplier"
               detail
               onDetail={() => setShowSupplier(true)}
-              label={"[supplier.sup_code] ([supplier.sup_name])"}
+              label={"[supplier.sup_name]"}
               errorMessage="Supplier Belum Dipilih"
               error={error?.sup}
             />
@@ -952,7 +972,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     // }}
                     body={(e) => (
                       <div className="flex">
-                        <div className="col-11">
+                        <div className="col-11 ml-0 p-0">
                           <CustomDropdown
                             value={e.prod_id && checkProd(e.prod_id)}
                             option={product}
@@ -981,34 +1001,26 @@ const InputPO = ({ onCancel, onSuccess }) => {
                               setCurrentIndex(e.index);
                               setShowProd(true);
                             }}
-                            // history
-                            // onShow={() => {
-                            //   setCurrentIndex(e.index);
-                            //   setShowHistori(true);
-                            // }}
                           />
                         </div>
                         {/* <div className="col-1 align-items-center p-0"> */}
-                          <Link
-                            onClick={() => {
-                              let his = [];
-                              histori.forEach((elem) => {
-                                if (elem.product.id === e.prod_id) {
-                                  his.push(elem);
-                                }
-                              });
-                              setFiltHis(his);
-                              console.log("cekkk");
-                              console.log(his);
-                              console.log(filtHis);
+                        <Link
+                          onClick={() => {
+                            let his = [];
+                            histori.forEach((elem) => {
+                              if (elem.product.id === e.prod_id) {
+                                his.push(elem);
+                              }
+                            });
+                            setFiltHis(his);
 
-                              setCurrentIndex(e.index);
-                              setShowHistori(true);
-                            }}
-                            className="sharp mt-2"
-                          >
-                            <i className="bx bx-history fs-18"></i>
-                          </Link>
+                            setCurrentIndex(e.index);
+                            setShowHistori(true);
+                          }}
+                          className="sharp mt-1"
+                        >
+                          <i className="bx bx-history fs-18"></i>
+                        </Link>
                         {/* </div> */}
                       </div>
                     )}
@@ -1571,8 +1583,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
           <></>
         )}
 
-        {/* {po?.pprod?.length ? ( */}
-        {/* <CustomAccordion
+        <CustomAccordion
           tittle={"Referensi Supplier"}
           defaultActive={true}
           active={accor.sup}
@@ -1606,68 +1617,41 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   //   width: "12rem",
                   // }}
                   body={(e) => (
-                    <CustomDropdown
-                      value={e.sup && checkProd(e.sup)}
-                      option={supplier}
-                      onChange={(t) => {
-                        let temp = [...po.psup];
-                        temp[e.index].sup = t.id;
-                        temp[e.index].addr = t.addr;
-                        temp[e.index].telp = t.telp;
-                        temp[e.index].ppn = t.ppn;
-                        updatePo({ ...po, psup: temp });
-                      }}
-                      placeholder="Pilih Supplier"
-                      label={"[supplier.sup_name]"}
-                      detail
-                      onDetail={() => {
-                        setCurrentIndex(e.index);
-                        setShowSupplier(true);
-                      }}
-                    />
-                  )}
-                />
-
-                <Column
-                  header="Alamat Supplier"
-                  className="align-text-top"
-                  field={""}
-                  // style={{
-                  //   minWidth: "7rem",
-                  // }}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={e.addr && e.addr}
-                        onChange={(t) => {}}
-                        placeholder="Alamat Supplier"
-                        disabled
-                      />
+                    <div className="flex">
+                      <div className="col-2 ml-0 p-2">
+                        <RadioButton
+                          inputId="binary"
+                          checked={null}
+                          onChange={(e) => {}}
+                        />
+                      </div>
+                      <div className="col-10 ml-0 p-0">
+                        <CustomDropdown
+                          value={e.sup_id && suppH(e.sup_id)}
+                          option={filtHis}
+                          onChange={(t) => {
+                            let temp = [...po.psup];
+                            temp[e.index].sup_id = t.supplier?.id;
+                            temp[e.index].po_id = t.id;
+                            temp[e.index].prod_id = t.product?.name;
+                            temp[e.index].price = t.price;
+                            updatePo({ ...po, psup: temp });
+                          }}
+                          placeholder="Pilih Supplier"
+                          label={"[supplier.sup_name]"}
+                          // detail
+                          // onDetail={() => {
+                          //   setCurrentIndex(e.index);
+                          //   setShowSupplier(true);
+                          // }}
+                        />
+                      </div>
                     </div>
                   )}
                 />
 
                 <Column
-                  header="No. Telepon"
-                  className="align-text-top"
-                  field={""}
-                  // style={{
-                  //   width: "5rem",
-                  // }}
-                  body={(e) => (
-                    <PrimeInput
-                      isNumber
-                      value={e.telp && e.telp}
-                      onChange={(t) => {}}
-                      placeholder="0"
-                      disabled
-                    />
-                  )}
-                />
-
-                <Column
-                  header="Ppn"
-                  className="align-text-top"
+                  header="Nama Produk"
                   field={""}
                   // style={{
                   //   minWidth: "7rem",
@@ -1675,9 +1659,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        value={e.ppn && e.ppn}
+                        value={e.prod_id && e.prod_id}
                         onChange={(t) => {}}
-                        placeholder="Jenis Ppn"
+                        placeholder="Nama Produk"
                         disabled
                       />
                     </div>
@@ -1686,7 +1670,6 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
                 <Column
                   header="Harga"
-                  className="align-text-top"
                   field={""}
                   // style={{
                   //   minWidth: "10rem",
@@ -1694,7 +1677,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        value={e.price ? e.price : ""}
+                        value={formatIdr(e.price ? e.price : "")}
                         onChange={(t) => {}}
                         min={0}
                         placeholder="0"
@@ -1706,7 +1689,6 @@ const InputPO = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
-                  className="align-text-top"
                   body={(e) =>
                     e.index === po.psup.length - 1 ? (
                       <Link
@@ -1717,10 +1699,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                               ...po.psup,
                               {
                                 id: 0,
-                                sup: null,
-                                addr: null,
-                                telp: null,
-                                ppn: null,
+                                po_id: null,
+                                sup_id: null,
+                                prod_id: null,
                                 price: null,
                               },
                             ],
@@ -1750,10 +1731,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
               </DataTable>
             </>
           }
-        /> */}
-        {/* ) : (
-          <></>
-        )} */}
+        />
 
         {po?.pprod?.length ? (
           <div className="row ml-0 mr-0 mb-0 mt-6 justify-content-between">

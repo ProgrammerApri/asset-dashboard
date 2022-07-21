@@ -1,29 +1,36 @@
-import React from "react";
-import { TabView, TabPanel } from 'primereact/tabview';
+import React, { useState } from "react";
+import { TabView, TabPanel } from "primereact/tabview";
 import RequestPurchase from "./RequestPurchase";
 import PermintaanPO from "./PO";
 import ReturBeli from "./ReturBeli";
 import FakturPembelian from "./FakturPembelian";
 import Order from "./Order";
 
-
 const TransaksiPembelian = () => {
+  const [active, setActive] = useState(0);
+  const [trigger, setTrigger] = useState(0);
   return (
-    <TabView>
+    <TabView
+      activeIndex={active}
+      onTabChange={({index}) => {
+        setActive(index)
+        setTrigger(current => current + 1);
+      }}
+    >
       <TabPanel header="Permintaan Pembelian (RP)">
-          <RequestPurchase/>
+        <RequestPurchase trigger={trigger} />
       </TabPanel>
       <TabPanel header="Pesanan Pembelian (PO)">
-        <PermintaanPO/>
+        <PermintaanPO />
       </TabPanel>
       <TabPanel header="Pembelian">
-        <Order/>
+        <Order trigger={trigger}/>
       </TabPanel>
       <TabPanel header="Faktur">
-        <FakturPembelian/>
+        <FakturPembelian trigger={trigger}/>
       </TabPanel>
       <TabPanel header="Retur Pembelian">
-        <ReturBeli/>
+        <ReturBeli trigger={trigger}/>
       </TabPanel>
     </TabView>
   );

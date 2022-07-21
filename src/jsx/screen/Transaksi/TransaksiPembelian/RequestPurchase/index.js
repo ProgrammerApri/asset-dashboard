@@ -15,10 +15,16 @@ const data = {
   ref_ket: null,
 };
 
-const RequestPurchase = () => {
+const RequestPurchase = ({trigger}) => {
   const [active, setActive] = useState(0);
   const [current, updateCurrent] = useState(data);
   const toast = useRef(null);
+
+  useEffect(() => {
+    if (trigger !== 0) {
+      setActive(0);
+    }
+  }, [trigger]);
 
   const [view, setView] = useState([
     <PermintaanPembelian
@@ -55,40 +61,40 @@ const RequestPurchase = () => {
           });
         }, 500);
       }}
-      onFailAdd={(error, code) => {  
-      if (error.status === 400) {
-        setTimeout(() => {
-          toast.current.show({
-            severity: "error",
-            summary: "Gagal",
-            detail: `Kode ${code} Sudah Digunakan`,
-            life: 3000,
-          });
-        }, 500);
-      } else {
-        setTimeout(() => {
-          toast.current.show({
-            severity: "error",
-            summary: "Gagal",
-            detail: "Gagal Memperbarui Data",
-            life: 3000,
-          });
-        }, 500);
-      }
+      onFailAdd={(error, code) => {
+        if (error.status === 400) {
+          setTimeout(() => {
+            toast.current.show({
+              severity: "error",
+              summary: "Gagal",
+              detail: `Kode ${code} Sudah Digunakan`,
+              life: 3000,
+            });
+          }, 500);
+        } else {
+          setTimeout(() => {
+            toast.current.show({
+              severity: "error",
+              summary: "Gagal",
+              detail: "Gagal Memperbarui Data",
+              life: 3000,
+            });
+          }, 500);
+        }
       }}
     />,
   ]);
 
   return (
     <>
-    <Toast ref={toast} />
-    <Row>
-      <Col className="pt-0">
-        <Card>
-          <Card.Body>{view[active]}</Card.Body>
-        </Card>
-      </Col>
-    </Row>
+      <Toast ref={toast} />
+      <Row>
+        <Col className="pt-0">
+          <Card>
+            <Card.Body>{view[active]}</Card.Body>
+          </Card>
+        </Col>
+      </Row>
     </>
   );
 };

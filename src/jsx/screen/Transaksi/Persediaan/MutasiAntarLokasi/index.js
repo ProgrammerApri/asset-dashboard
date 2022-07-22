@@ -1,23 +1,26 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Toast } from "primereact/toast";
 import { Row, Col, Card } from "react-bootstrap";
 import MutasiAntarList from "./MutasiAntarlokasiList";
 import MutasiAntarInput from "./MutasiAntarlokasiInput";
 
-
-
-
-
-const MutasiLokasi = () => {
+const MutasiLokasi = ({ trigger }) => {
   const [active, setActive] = useState(0);
   const toast = useRef(null);
+
+  useEffect(() => {
+    if (trigger !== 0) {
+      setActive(0);
+    }
+  }, [trigger]);
+  
   const [view, setView] = useState([
     <MutasiAntarList
       onAdd={() => {
         setActive(1);
       }}
     />,
-    
+
     <MutasiAntarInput
       onCancel={() => setActive(0)}
       onSuccess={() => {
@@ -36,14 +39,14 @@ const MutasiLokasi = () => {
 
   return (
     <>
-    <Toast ref={toast} />
-    <Row>
-      <Col className="pt-0">
-        <Card>
-          <Card.Body>{view[active]}</Card.Body>
-        </Card>
-      </Col>
-    </Row>
+      <Toast ref={toast} />
+      <Row>
+        <Col className="pt-0">
+          <Card>
+            <Card.Body>{view[active]}</Card.Body>
+          </Card>
+        </Col>
+      </Row>
     </>
   );
 };

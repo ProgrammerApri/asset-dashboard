@@ -1,29 +1,37 @@
+import { current } from "@reduxjs/toolkit";
 import { TabView, TabPanel } from "primereact/tabview";
-import React from "react";
+import React, { useState } from "react";
 import KoreksiStok from "./KoreksiPersediaan";
 import MutasiLokasi from "./MutasiAntarLokasi";
 import PemakaianBahan from "./PemakaianBahan";
 import PenerimaanHasil from "./PenerimaanHasilJadi";
 
 const Persediaan = () => {
+  const [active, setActive] = useState(0);
+  const [trigger, setTrigger] = useState(0);
+
   return (
-    <TabView>
+    <TabView
+      activeIndex={active}
+      onTabChange={({ index }) => {
+        setActive(index);
+        setTrigger((current) => current + 1);
+      }}
+    >
       <TabPanel header="Koreksi Persediaan">
-          <KoreksiStok/>
+        <KoreksiStok trigger={trigger}/>
       </TabPanel>
       <TabPanel header="Mutasi Antar Lokasi">
-          <MutasiLokasi/>
+        <MutasiLokasi trigger={trigger}/>
       </TabPanel>
       <TabPanel header="Pemakaian Bahan Baku">
-          <PemakaianBahan/>
+        <PemakaianBahan trigger={trigger}/>
       </TabPanel>
       <TabPanel header="Penerimaan Hasil Jadi">
-          <PenerimaanHasil/>
+        <PenerimaanHasil trigger={trigger}/>
       </TabPanel>
-      
     </TabView>
   );
 };
-
 
 export default Persediaan;

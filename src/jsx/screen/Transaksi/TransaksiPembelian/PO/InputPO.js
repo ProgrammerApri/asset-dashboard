@@ -763,14 +763,6 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   console.log(result);
                 }
 
-                let his = [];
-                histori.forEach((elem) => {
-                  if (elem.product.id === e.prod_id) {
-                    his.push(elem);
-                  }
-                });
-                setFiltHis(his);
-
                 updatePo({
                   ...po,
                   preq_id: e.id,
@@ -780,6 +772,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   split_inv: false,
                   pprod: e.rprod ?? null,
                   pjasa: e.rjasa ?? null,
+                  psup: e.rprod ?? null,
                 });
 
                 let newError = error;
@@ -1254,6 +1247,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                                   total: null,
                                 },
                               ],
+                              psup: po.pprod,
                             });
                           }}
                           className="btn btn-primary shadow btn-xs sharp ml-1"
@@ -1583,155 +1577,159 @@ const InputPO = ({ onCancel, onSuccess }) => {
           <></>
         )}
 
-        <CustomAccordion
-          tittle={"Referensi Supplier"}
-          defaultActive={true}
-          active={accor.sup}
-          onClick={() => {
-            setAccor({
-              ...accor,
-              sup: !accor.sup,
-            });
-          }}
-          key={1}
-          body={
-            <>
-              <DataTable
-                responsiveLayout="none"
-                value={po.psup?.map((v, i) => {
-                  return {
-                    ...v,
-                    index: i,
-                    price: v?.price ?? 0,
-                  };
-                })}
-                className="display w-150 datatable-wrapper header-white no-border"
-                showGridlines={false}
-                emptyMessage={() => <div></div>}
-              >
-                <Column
-                  header="Supplier"
-                  className="align-text-top"
-                  field={""}
-                  // style={{
-                  //   width: "12rem",
-                  // }}
-                  body={(e) => (
-                    <div className="flex">
-                      <div className="col-2 ml-0 p-2">
-                        <RadioButton
-                          inputId="binary"
-                          checked={null}
-                          onChange={(e) => {}}
+        {po?.psup?.length ? (
+          <CustomAccordion
+            tittle={"Referensi Supplier"}
+            defaultActive={true}
+            active={accor.sup}
+            onClick={() => {
+              setAccor({
+                ...accor,
+                sup: !accor.sup,
+              });
+            }}
+            key={1}
+            body={
+              <>
+                <DataTable
+                  responsiveLayout="none"
+                  value={po.psup?.map((v, i) => {
+                    return {
+                      ...v,
+                      index: i,
+                      price: v?.price ?? 0,
+                    };
+                  })}
+                  className="display w-150 datatable-wrapper header-white no-border"
+                  showGridlines={false}
+                  emptyMessage={() => <div></div>}
+                >
+                  <Column
+                    header="Supplier"
+                    className="align-text-top"
+                    field={""}
+                    // style={{
+                    //   width: "12rem",
+                    // }}
+                    body={(e) => (
+                      <div className="flex">
+                        <div className="col-2 ml-0 p-2">
+                          <RadioButton
+                            inputId="binary"
+                            checked={null}
+                            onChange={(e) => {}}
+                          />
+                        </div>
+                        <div className="col-10 ml-0 p-0">
+                          <CustomDropdown
+                            value={e.sup_id && supp(e.sup_id)}
+                            option={supplier}
+                            onChange={(t) => {
+                              let temp = [...po.psup];
+                              temp[e.index].sup_id = t.supplier?.id;
+                              // temp[e.index].po_id = t.id;
+                              // temp[e.index].prod_id = t.product?.name;
+                              // temp[e.index].price = t.price;
+                              updatePo({ ...po, psup: temp });
+                            }}
+                            placeholder="Pilih Supplier"
+                            label={"[supplier.sup_name]"}
+                            detail
+                            onDetail={() => {
+                              setCurrentIndex(e.index);
+                              setShowSupplier(true);
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header="Nama Produk"
+                    field={""}
+                    // style={{
+                    //   minWidth: "7rem",
+                    // }}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.prod_id && checkProd(e.prod_id)?.name}
+                          onChange={(t) => {}}
+                          placeholder="Nama Produk"
+                          disabled
                         />
                       </div>
-                      <div className="col-10 ml-0 p-0">
-                        <CustomDropdown
-                          value={e.sup_id && suppH(e.sup_id)}
-                          option={filtHis}
-                          onChange={(t) => {
-                            let temp = [...po.psup];
-                            temp[e.index].sup_id = t.supplier?.id;
-                            temp[e.index].po_id = t.id;
-                            temp[e.index].prod_id = t.product?.name;
-                            temp[e.index].price = t.price;
-                            updatePo({ ...po, psup: temp });
+                    )}
+                  />
+
+                  <Column
+                    header="Harga"
+                    field={""}
+                    // style={{
+                    //   minWidth: "10rem",
+                    // }}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={formatIdr(e.price ? e.price : "")}
+                          onChange={(t) => {}}
+                          min={0}
+                          placeholder="0"
+                          type="number"
+                          // disabled
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    body={(e) =>
+                      e.index === po.psup.length - 1 ? (
+                        <Link
+                          onClick={() => {
+                            updatePo({
+                              ...po,
+                              psup: [
+                                ...po.psup,
+                                {
+                                  id: 0,
+                                  po_id: null,
+                                  sup_id: null,
+                                  prod_id: null,
+                                  price: null,
+                                },
+                              ],
+                            });
                           }}
-                          placeholder="Pilih Supplier"
-                          label={"[supplier.sup_name]"}
-                          // detail
-                          // onDetail={() => {
-                          //   setCurrentIndex(e.index);
-                          //   setShowSupplier(true);
-                          // }}
-                        />
-                      </div>
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header="Nama Produk"
-                  field={""}
-                  // style={{
-                  //   minWidth: "7rem",
-                  // }}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={e.prod_id && e.prod_id}
-                        onChange={(t) => {}}
-                        placeholder="Nama Produk"
-                        disabled
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header="Harga"
-                  field={""}
-                  // style={{
-                  //   minWidth: "10rem",
-                  // }}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={formatIdr(e.price ? e.price : "")}
-                        onChange={(t) => {}}
-                        min={0}
-                        placeholder="0"
-                        type="number"
-                        disabled
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
-                  body={(e) =>
-                    e.index === po.psup.length - 1 ? (
-                      <Link
-                        onClick={() => {
-                          updatePo({
-                            ...po,
-                            psup: [
-                              ...po.psup,
-                              {
-                                id: 0,
-                                po_id: null,
-                                sup_id: null,
-                                prod_id: null,
-                                price: null,
-                              },
-                            ],
-                          });
-                        }}
-                        className="btn btn-primary shadow btn-xs sharp ml-1"
-                      >
-                        <i className="fa fa-plus"></i>
-                      </Link>
-                    ) : (
-                      <Link
-                        onClick={() => {
-                          let temp = [...po.psup];
-                          temp.splice(e.index, 1);
-                          updatePo({
-                            ...po,
-                            psup: temp,
-                          });
-                        }}
-                        className="btn btn-danger shadow btn-xs sharp ml-1"
-                      >
-                        <i className="fa fa-trash"></i>
-                      </Link>
-                    )
-                  }
-                />
-              </DataTable>
-            </>
-          }
-        />
+                          className="btn btn-primary shadow btn-xs sharp ml-1"
+                        >
+                          <i className="fa fa-plus"></i>
+                        </Link>
+                      ) : (
+                        <Link
+                          onClick={() => {
+                            let temp = [...po.psup];
+                            temp.splice(e.index, 1);
+                            updatePo({
+                              ...po,
+                              psup: temp,
+                            });
+                          }}
+                          className="btn btn-danger shadow btn-xs sharp ml-1"
+                        >
+                          <i className="fa fa-trash"></i>
+                        </Link>
+                      )
+                    }
+                  />
+                </DataTable>
+              </>
+            }
+          />
+        ) : (
+          <></>
+        )}
 
         {po?.pprod?.length ? (
           <div className="row ml-0 mr-0 mb-0 mt-6 justify-content-between">

@@ -1593,6 +1593,13 @@ const InputPO = ({ onCancel, onSuccess }) => {
               <>
                 <DataTable
                   responsiveLayout="none"
+                  // value={[
+                  //   {
+                  //     sup_id: null,
+                  //     prod_id: ["produk 1", "produk 2", "produk 3"],
+                  //     price: [1000, 200, 0],
+                  //   },
+                  // ]}
                   value={po.psup?.map((v, i) => {
                     return {
                       ...v,
@@ -1651,16 +1658,20 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     // style={{
                     //   minWidth: "7rem",
                     // }}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.prod_id && checkProd(e.prod_id)?.name}
-                          onChange={(t) => {}}
-                          placeholder="Nama Produk"
-                          disabled
-                        />
-                      </div>
-                    )}
+                    body={(e) =>
+                      po.pprod.map((val, i) => {
+                        return (
+                          <div className={`p-inputgroup${i > 0 ? " mt-2" : ""}`}>
+                            <InputText
+                              value={val.prod_id && checkProd(val.prod_id).name}
+                              onChange={(t) => {}}
+                              placeholder="Nama Produk"
+                              disabled
+                            />
+                          </div>
+                        );
+                      })
+                    }
                   />
 
                   <Column

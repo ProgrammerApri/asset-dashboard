@@ -480,29 +480,7 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
                 ...data,
                 pprod: [],
                 pjasa: [],
-                psup: [
-                  {
-                    id: 0,
-                    po_id: null,
-                    sup_id: null,
-                    prod_id: null,
-                    price: null,
-                  },
-                  {
-                    id: 0,
-                    po_id: null,
-                    sup_id: null,
-                    prod_id: null,
-                    price: null,
-                  },
-                  {
-                    id: 0,
-                    po_id: null,
-                    sup_id: null,
-                    prod_id: null,
-                    price: null,
-                  },
-                ],
+                psup: [],
               },
             });
           }}

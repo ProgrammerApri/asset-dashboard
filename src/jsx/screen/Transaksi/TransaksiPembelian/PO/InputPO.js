@@ -387,6 +387,18 @@ const InputPO = ({ onCancel, onSuccess }) => {
       el.price = el.order === "" ? 0 : el.price;
       el.disc = el.disc === "" ? 0 : el.disc;
     });
+    let ref_supp = []
+    d.psup.forEach((el) => {
+      el.prod_id.forEach((ek, i) => {
+        ref_supp.push({
+          sup_id: el.sup_id,
+          po_id: null,
+          prod_id: ek,
+          price: el.price[i]
+        })
+      });
+    });
+    d.psup = ref_supp;
     const config = {
       ...endpoints.addPO,
       data: d,
@@ -763,16 +775,19 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   console.log(result);
                 }
 
-                let psup = [];
-                e.rprod.forEach(element => {
-                  psup.push(
-                    {
-                      sup_id : null,
-                      prod_id: element.prod_id.id,
-                      price: 0
-                    }
-                  )
+                let prod = [];
+                let prc = [];
+                e.rprod.forEach((element) => {
+                  prod.push(element.prod_id);
+                  prc.push(0);
                 });
+                let psup = [
+                  {
+                    sup_id: 0,
+                    prod_id: prod,
+                    price: prc,
+                  },
+                ];
 
                 updatePo({
                   ...po,
@@ -937,7 +952,6 @@ const InputPO = ({ onCancel, onSuccess }) => {
                                 value={e.sup_id && supp(e.sup_id)}
                                 option={supplier}
                                 onChange={(t) => {
-
                                   let temp = [...po.psup];
                                   temp[e.index].sup_id = t.supplier?.id;
                                   // temp[e.index].po_id = t.id;
@@ -965,7 +979,8 @@ const InputPO = ({ onCancel, onSuccess }) => {
                         //   minWidth: "7rem",
                         // }}
                         body={(e) =>
-                          po.pprod.map((val, i) => {
+                          //  console.log(e)
+                          e?.prod_id?.map((val, i) => {
                             return (
                               <div
                                 className={`p-inputgroup${
@@ -973,9 +988,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                                 }`}
                               >
                                 <InputText
-                                  value={
-                                    val.prod_id && checkProd(val.prod_id).name
-                                  }
+                                  value={val && checkProd(val).name}
                                   onChange={(t) => {}}
                                   placeholder="Nama Produk"
                                   disabled
@@ -993,7 +1006,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                         //   minWidth: "10rem",
                         // }}
                         body={(e) =>
-                          po.pprod?.map((val, i) => {
+                          e?.price?.map((val, i) => {
                             return (
                               <div
                                 className={`p-inputgroup${
@@ -1001,7 +1014,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                                 }`}
                               >
                                 <InputText
-                                  value={formatIdr(val.price ? val.price : 0)}
+                                  value={formatIdr(val ? val : 0)}
                                   onChange={(t) => {}}
                                   min={0}
                                   placeholder="0"
@@ -1019,16 +1032,20 @@ const InputPO = ({ onCancel, onSuccess }) => {
                           e.index === po.psup.length - 1 ? (
                             <Link
                               onClick={() => {
+                                let prod = [];
+                                let prc = [];
+                                po?.pprod?.forEach((element) => {
+                                  prod.push(element.prod_id);
+                                  prc.push(0);
+                                });
                                 updatePo({
                                   ...po,
                                   psup: [
                                     ...po.psup,
                                     {
-                                      id: 0,
-                                      po_id: null,
-                                      sup_id: null,
-                                      prod_id: null,
-                                      price: null,
+                                      sup_id: 0,
+                                      prod_id: prod,
+                                      price: prc,
                                     },
                                   ],
                                 });

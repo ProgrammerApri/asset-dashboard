@@ -18,6 +18,7 @@ import ICReducer from "./ICReducer";
 import LMReducer from "./LMReducer";
 import PBReducer from "./PBReducer";
 import PHJReducer from "./PHJReducer";
+import FMReducer from "./FMReducer";
 
 
 const rootReducer = combineReducers({
@@ -40,6 +41,7 @@ const rootReducer = combineReducers({
   lm: LMReducer,
   pb: PBReducer,
   phj: PHJReducer,
+  forml: FMReducer,
 });
 
 export default rootReducer;

@@ -60,6 +60,7 @@ import LaporanPembelian from "./screen/Report/LaporanPembelian";
 import ReportGRA from "./screen/Report/LaporanPembelian/Gra";
 import ReportJurnal from "./screen/Report/Jurnal";
 import ReportKBB from "./screen/Report/KartuBB";
+import Formula from "./screen/Formula";
 
 const Markup = ({ width }) => {
   const routes = [
@@ -115,6 +116,7 @@ const Markup = ({ width }) => {
 
     // Transaksi Pembelian
     { url: "transaksi", component: TransaksiPembelian },
+    { url: "formula", component: Formula },
   ];
 
   const body = document.querySelector("body");

@@ -3,7 +3,7 @@ import { request, endpoints } from "src/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Button, Row, Col, Card } from "react-bootstrap";
+import { Badge, Button, Card, Row, Col } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { Dialog } from "primereact/dialog";
@@ -12,63 +12,42 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_PO, SET_EDIT_PO } from "src/redux/actions";
+import { SET_CURRENT_FM, SET_EDIT_FM, SET_FM} from "src/redux/actions";
 import { Divider } from "@material-ui/core";
 import ReactToPrint from "react-to-print";
-import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
-import Wrapper from "src/jsx/components/CustomeWrapper/Wrapper";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 
 const data = {
-  id: null,
-  po_code: null,
-  po_date: null,
-  preq_id: null,
-  sup_id: null,
-  ppn_type: null,
-  top: null,
-  due_date: false,
-  split_PO: null,
-  prod_disc: null,
-  jasa_disc: null,
-  total_disc: null,
-  rprod: [],
-  rjasa: [],
+  
 };
 
-const PesananPO = ({ onAdd, onEdit, onDetail }) => {
-  const [po, setPO] = useState(null);
-  const [comp, setComp] = useState(null);
+const DataFormula = ({ onAdd, onEdit, onDetail }) => {
   const [loading, setLoading] = useState(true);
-  const [update, setUpdate] = useState(false);
-  const [displayData, setDisplayData] = useState(false);
+  const [update, setUpdate] = useState(true);
   const [displayDel, setDisplayDel] = useState(false);
-  const [position, setPosition] = useState("center");
   const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
-  const [isEdit, setEdit] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const dispatch = useDispatch();
-  const PO = useSelector((state) => state.po.po);
-  const show = useSelector((state) => state.po.current);
+  const forml = useSelector((state) => state.forml.forml);
+  const show = useSelector((state) => state.forml.current);
   const printPage = useRef(null);
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getPO();
-    getComp();
+    getFormula();
     initFilters1();
   }, []);
 
-  const getPO = async (isUpdate = false) => {
+  const getFormula = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.po,
-      data: PO,
+      ...endpoints.formula,
+      data: forml,
     };
     console.log(config.data);
     let response = null;
@@ -78,7 +57,7 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        setPO(data);
+        dispatch({ type: SET_FM, payload: data });
       }
     } catch (error) {}
     if (isUpdate) {
@@ -90,119 +69,10 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
     }
   };
 
-  const getComp = async (isUpdate = false) => {
-    setLoading(true);
+  const delODR = async (id) => {
     const config = {
-      ...endpoints.getCompany,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setComp(data);
-      }
-    } catch (error) {}
-  };
-
-  const editPO = async () => {
-    const config = {
-      ...endpoints.editPO,
-      endpoint: endpoints.editPO.endpoint + currentItem.id,
-      data: {
-        cus_code: currentItem.customer.cus_code,
-      },
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        setTimeout(() => {
-          setUpdate(false);
-          setDisplayData(false);
-          getPO(true);
-          toast.current.show({
-            severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
-            life: 3000,
-          });
-        }, 500);
-      }
-    } catch (error) {
-      setTimeout(() => {
-        setUpdate(false);
-        toast.current.show({
-          severity: "error",
-          summary: "Gagal",
-          detail: "Gagal Memperbarui Data",
-          life: 3000,
-        });
-      }, 500);
-    }
-  };
-
-  const addPO = async () => {
-    const config = {
-      ...endpoints.addPO,
-      data: {
-        cus_code: currentItem.customer.cus_code,
-      },
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        setTimeout(() => {
-          setUpdate(false);
-          setDisplayData(false);
-          getPO(true);
-          toast.current.show({
-            severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
-            life: 3000,
-          });
-        }, 500);
-      }
-    } catch (error) {
-      console.log(error);
-      if (error.status === 400) {
-        setTimeout(() => {
-          setUpdate(false);
-          toast.current.show({
-            severity: "error",
-            summary: "Gagal",
-            detail: `Kode ${currentItem.customer.cus_code} Sudah Digunakan`,
-            life: 3000,
-          });
-        }, 500);
-      } else {
-        setTimeout(() => {
-          setUpdate(false);
-          toast.current.show({
-            severity: "error",
-            summary: "Gagal",
-            detail: "Gagal Memperbarui Data",
-            life: 3000,
-          });
-        }, 500);
-      }
-    }
-  };
-
-  const delPO = async (id) => {
-    const config = {
-      ...endpoints.delPO,
-      endpoint: endpoints.delPO.endpoint + currentItem.id,
+      ...endpoints.delODR,
+      endpoint: endpoints.delODR.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -213,7 +83,7 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayDel(false);
-          getPO(true);
+          getFormula(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -241,24 +111,22 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
     return (
       // <React.Fragment>
       <div className="d-flex">
-        <Link
+        {/* <Link
           onClick={() => {
             onDetail();
-            let pprod = data.pprod;
-            let pjasa = data.pjasa;
-
+            let dprod = data.dprod;
+            let djasa = data.djasa;
             dispatch({
-              type: SET_CURRENT_PO,
+              type: SET_CURRENT_ODR,
               payload: {
                 ...data,
-                ord_id: data?.ord_id?.id ?? null,
-                product:
-                  pprod.length > 0
-                    ? pprod
+                dprod:
+                  dprod.length > 0
+                    ? dprod
                     : [
                         {
                           id: 0,
-                          rprod_id: null,
+                          do_id: null,
                           prod_id: null,
                           unit_id: null,
                           location: null,
@@ -269,13 +137,13 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
                           total: null,
                         },
                       ],
-                pjasa:
-                  pjasa.length > 0
-                    ? pjasa
+                djasa:
+                  djasa.length > 0
+                    ? djasa
                     : [
                         {
                           id: 0,
-                          rjasa_id: null,
+                          do_id: null,
                           jasa_id: null,
                           sup_id: null,
                           unit_id: null,
@@ -291,67 +159,69 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
           className="btn btn-info shadow btn-xs sharp ml-1"
         >
           <i className="bx bx-show mt-1"></i>
-        </Link>
+        </Link> */}
 
         <Link
           onClick={() => {
-            onEdit();
-            dispatch({
-              type: SET_EDIT_PO,
-              payload: true,
-            });
-
-            let pprod = data.pprod;
-            pprod.forEach((el) => {
-              el.prod_id = el.prod_id.id;
-              el.unit_id = el.unit_id.id;
-            });
-            let pjasa = data.pjasa;
-            pjasa.forEach((el) => {
-              el.jasa_id = el.jasa_id.id;
-              el.unit_id = el.unit_id.id;
-            });
-
-            if (!pprod.length) {
-              pprod.push({
-                id: 0,
-                prod_id: null,
-                rprod_id: null,
-                unit_id: null,
-                order: null,
-                price: null,
-                disc: null,
-                nett_price: null,
-                total: null,
-              });
-            }
-
-            if (!pjasa.length) {
-              pjasa.push({
-                id: 0,
-                jasa_id: null,
-                rjasa_id: null,
-                unit_id: null,
-                sup_id: null,
-                order: null,
-                price: null,
-                disc: null,
-                nett_price: null,
-                total: null,
-              });
-            }
-
-            dispatch({
-              type: SET_CURRENT_PO,
-              payload: {
-                ...data,
-                preq_id: data?.preq_id?.id,
-                sup_id: data?.sup_id?.id,
-                top: data?.top?.id,
-                pprod: pprod,
-                pjasa: pjasa,
-              },
-            });
+            // onEdit(data);
+            // let dprod = data.dprod;
+            // dispatch({
+            //   type: SET_EDIT_ODR,
+            //   payload: true,
+            // });
+            // dprod.forEach((el) => {
+            //   el.prod_id = el.prod_id?.id;
+            //   el.unit_id = el.unit_id?.id;
+            //   el.location = el.location?.id;
+            // });
+            // let djasa = data.djasa;
+            // djasa.forEach((el) => {
+            //   el.jasa_id = el.jasa_id.id;
+            //   el.unit_id = el.unit_id.id;
+            // });
+            // dispatch({
+            //   type: SET_CURRENT_ODR,
+            //   payload: {
+            //     ...data,
+            //     po_id: data?.po_id?.id ?? null,
+            //     dep_id: data?.dep_id?.id ?? null,
+            //     sup_id: data?.sup_id?.id ?? null,
+            //     top: data?.top?.id ?? null,
+            //     dprod:
+            //       dprod.length > 0
+            //         ? dprod
+            //         : [
+            //             {
+            //               id: 0,
+            //               do_id: null,
+            //               prod_id: null,
+            //               unit_id: null,
+            //               location: null,
+            //               order: null,
+            //               price: null,
+            //               disc: null,
+            //               nett_price: null,
+            //               total: null,
+            //             },
+            //           ],
+            //     djasa:
+            //       djasa.length > 0
+            //         ? djasa
+            //         : [
+            //             {
+            //               id: 0,
+            //               do_id: null,
+            //               jasa_id: null,
+            //               sup_id: null,
+            //               unit_id: null,
+            //               order: null,
+            //               price: null,
+            //               disc: null,
+            //               total: null,
+            //             },
+            //           ],
+            //   },
+            // });
           }}
           className="btn btn-primary shadow btn-xs sharp ml-1"
         >
@@ -360,7 +230,7 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
 
         <Link
           onClick={() => {
-            setEdit(true);
+            // setEdit(true);
             setDisplayDel(true);
             setCurrentItem(data);
           }}
@@ -370,51 +240,6 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
         </Link>
       </div>
       // </React.Fragment>
-    );
-  };
-
-  const onClick = () => {
-    setDisplayData(true);
-    setCurrentItem();
-
-    if (position) {
-      setPosition(position);
-    }
-  };
-
-  const onSubmit = () => {
-    if (isEdit) {
-      setUpdate(true);
-      editPO();
-    } else {
-      setUpdate(true);
-      addPO();
-    }
-  };
-
-  const renderFooter = () => {
-    return (
-      <div>
-        <PButton
-          label="Batal"
-          onClick={() => setDisplayData(false)}
-          className="p-button-text btn-primary"
-        />
-
-        <ReactToPrint
-          trigger={() => {
-            return (
-              <PButton variant="primary" onClick={() => {}}>
-                Print{" "}
-                <span className="btn-icon-right">
-                  <i class="bx bxs-printer"></i>
-                </span>
-              </PButton>
-            );
-          }}
-          content={() => printPage.current}
-        />
-      </div>
     );
   };
 
@@ -430,10 +255,10 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
           label="Hapus"
           icon="pi pi-trash"
           onClick={() => {
-            delPO();
+            delODR();
           }}
           autoFocus
-          loading={update}
+          loading={loading}
         />
       </div>
     );
@@ -471,17 +296,42 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
           onClick={() => {
             onAdd();
             dispatch({
-              type: SET_EDIT_PO,
+              type: SET_EDIT_FM,
               payload: false,
             });
             dispatch({
-              type: SET_CURRENT_PO,
+              type: SET_CURRENT_FM,
               payload: {
                 ...data,
-                ref_sup: false,
-                pprod: [],
-                pjasa: [],
-                psup: [],
+                dprod: [
+                  {
+                    id: 0,
+                    do_id: null,
+                    // preq_id: null,
+                    // pprod_id: null,
+                    prod_id: null,
+                    unit_id: null,
+                    location: null,
+                    order: null,
+                    price: null,
+                    disc: null,
+                    nett_price: null,
+                    total: null,
+                  },
+                ],
+                djasa: [
+                  {
+                    id: 0,
+                    do_id: null,
+                    jasa_id: null,
+                    sup_id: null,
+                    unit_id: null,
+                    order: null,
+                    price: null,
+                    disc: null,
+                    total: null,
+                  },
+                ],
               },
             });
           }}
@@ -489,6 +339,31 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
       </div>
     );
   };
+
+  // const renderFooter = () => {
+  //   return (
+  //     <div>
+  //       <PButton
+  //         label="Batal"
+  //         onClick={() => setDisplayData(false)}
+  //         className="p-button-text btn-primary"
+  //       />
+  //       <ReactToPrint
+  //         trigger={() => {
+  //           return (
+  //             <PButton variant="primary" onClick={() => {}}>
+  //               Print{" "}
+  //               <span className="btn-icon-right">
+  //                 <i class="bx bxs-printer"></i>
+  //               </span>
+  //             </PButton>
+  //           );
+  //         }}
+  //         content={() => printPage.current}
+  //       />
+  //     </div>
+  //   );
+  // };
 
   const template2 = {
     layout: "RowsPerPageDropdown CurrentPageReport PrevPageLink NextPageLink",
@@ -554,28 +429,6 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
 
-  const getSubTotalBarang = () => {
-    let total = 0;
-    show?.pprod?.forEach((el) => {
-      if (el.nett_price && el.nett_price > 0) {
-        total += parseInt(el.nett_price);
-      } else {
-        total += el.total - (el.total * el.disc) / 100;
-      }
-    });
-
-    return total;
-  };
-
-  const getSubTotalJasa = () => {
-    let total = 0;
-    show?.pjasa?.forEach((el) => {
-      total += el.total - (el.total * el.disc) / 100;
-    });
-
-    return total;
-  };
-
   return (
     <>
       <Toast ref={toast} />
@@ -585,18 +438,14 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
             <Card.Body>
               <DataTable
                 responsiveLayout="scroll"
-                value={loading ? dummy : po}
+                value={null}
                 className="display w-150 datatable-wrapper"
                 showGridlines
                 dataKey="id"
                 rowHover
                 header={renderHeader}
                 filters={filters1}
-                globalFilterFields={[
-                  "po_code",
-                  "preq_id?.req_code",
-                  "formatDate(po_date)",
-                ]}
+                globalFilterFields={["ord_code"]}
                 emptyMessage="Tidak ada data"
                 paginator
                 paginatorTemplate={template2}
@@ -608,28 +457,52 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
                 <Column
                   header="Tanggal"
                   style={{
-                    minWidth: "10rem",
+                    minWidth: "8rem",
                   }}
-                  field={(e) => formatDate(e.po_date)}
+                  field={(e) => formatDate(e.ord_date)}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Nomor Pesanan"
-                  field={(e) => e.po_code}
-                  style={{ minWidth: "10rem" }}
+                  header="Kode Formula"
+                  field={(e) => e.ord_code}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                {/* <Column
+          header="No. Pesanan Pembelian"
+          field={(e) => e.po_id}
+          style={{ minWidth: "8rem" }}
+          body={loading && <Skeleton />}
+        /> */}
+                <Column
+                  header=""
+                  field={(e) => e?.sup_id?.sup_name}
+                  style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Nomor Permintaan"
-                  field={(e) => e.preq_id?.req_code}
-                  style={{ minWidth: "10rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Pemasok"
-                  field={(e) => e.sup_id?.sup_name}
-                  style={{ minWidth: "10rem" }}
-                  body={loading && <Skeleton />}
+                  header=""
+                  field={(e) => e.faktur}
+                  style={{ minWidth: "8rem" }}
+                  body={(e) =>
+                    loading ? (
+                      <Skeleton />
+                    ) : (
+                      <div>
+                        {e.faktur === true ? (
+                          <Badge variant="info light">
+                            <i className="bx bxs-circle text-info mr-1"></i>{" "}
+                            Faktur
+                          </Badge>
+                        ) : (
+                          <Badge variant="warning light">
+                            <i className="bx bxs-circle text-warning mr-1"></i>{" "}
+                            Non Faktur
+                          </Badge>
+                        )}
+                      </div>
+                    )
+                  }
                 />
                 <Column
                   header="Action"
@@ -665,4 +538,4 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
   );
 };
 
-export default PesananPO;
+export default DataFormula;

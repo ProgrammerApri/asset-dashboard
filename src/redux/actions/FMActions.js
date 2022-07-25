@@ -1,0 +1,5 @@
+export const SET_CURRENT_FM = "forml.SET_CURRENT_FM"
+export const SET_FM = "forml.SET_EXP"
+export const RESET_CURRENT_FM = "forml.RESET_CURRENT_FM"
+export const UPDATE_CURRENT_FM = "forml.UPDATE_CURRENT_FM"
+export const SET_EDIT_FM = "forml.SET_EDIT_FM"

@@ -399,13 +399,14 @@ const InputPO = ({ onCancel, onSuccess }) => {
           po_id: null,
           prod_id: ek,
           price: el.price[i],
+          image: el.image,
         });
       });
     });
-    d.psup = ref_supp;
+    // d.psup = ref_supp;
     const config = {
       ...endpoints.addPO,
-      data: d,
+      data: { ...d, psup: ref_supp },
     };
     console.log(config.data);
     let response = null;
@@ -455,11 +456,10 @@ const InputPO = ({ onCancel, onSuccess }) => {
   const dept = (value) => {
     let selected = {};
     pusatBiaya?.forEach((element) => {
-      if (value === element.id) {
+      if (element.id === `${value}`) {
         selected = element;
       }
     });
-
     return selected;
   };
 
@@ -876,9 +876,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
             <div className="p-inputgroup">
               <InputText
                 value={
-                  po.preq_id !== null
-                    ? dept(req_pur(po.preq_id)?.req_dep)?.ccost_code
-                    : null
+                  po?.preq_id ? req_pur(po.preq_id)?.req_dep?.ccost_name : null
                 }
                 placeholder="Departemen"
                 disabled
@@ -949,6 +947,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                         ? pjk(supp(po.sup_id)?.supplier?.sup_ppn).name
                         : null
                     }
+                    onChange={(e) => {
+                      updatePo({ ...po, ppn_type: e.target.value });
+                    }}
                     placeholder="Jenis Pajak"
                     disabled
                   />
@@ -1073,7 +1074,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                         // }}
                         body={(e) =>
                           //  console.log(e)
-                          e.prod_id?.map((val, i) => {
+                          e?.prod_id?.map((val, i) => {
                             return (
                               <div
                                 className={`p-inputgroup${
@@ -1100,7 +1101,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                         //   minWidth: "10rem",
                         // }}
                         body={(e) =>
-                          e?.price?.map((val, i) => {
+                          e.price?.map((val, i) => {
                             return (
                               <div
                                 className={`p-inputgroup${

@@ -60,7 +60,8 @@ import LaporanPembelian from "./screen/Report/LaporanPembelian";
 import ReportGRA from "./screen/Report/LaporanPembelian/Gra";
 import ReportJurnal from "./screen/Report/Jurnal";
 import ReportKBB from "./screen/Report/KartuBB";
-import Formula from "./screen/Formula";
+import Produksi from "./screen/Produksi";
+import DataMesin from "./screen/Produksi/Mesin/DataMesin";
 
 const Markup = ({ width }) => {
   const routes = [
@@ -96,14 +97,17 @@ const Markup = ({ width }) => {
     { url: "syarat-pembayaran", component: RulesPay },
     { url: "divisi", component: Divisi },
     { url: "non-stok", component: PPN },
+    
+
+
     // { url: "sub-pelanggan", component: SubCustomer },
     { url: "setup-perkiraan", component: SetupKhusus },
     { url: "satuan", component: Satuan },
     { url: "group-produk", component: GroupProduk },
     { url: "pajak", component: Pajak },
     { url: "jasa", component: Jasa },
-
-
+    
+    { url: "data-mesin", component:DataMesin },
     // Report
     { url: "neraca", component: Neraca },
     { url: "report", component: ReportGRA },
@@ -116,7 +120,8 @@ const Markup = ({ width }) => {
 
     // Transaksi Pembelian
     { url: "transaksi", component: TransaksiPembelian },
-    { url: "formula", component: Formula },
+
+    { url: "produksi", component: Produksi },
   ];
 
   const body = document.querySelector("body");

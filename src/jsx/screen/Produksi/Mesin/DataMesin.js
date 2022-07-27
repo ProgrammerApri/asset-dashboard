@@ -28,7 +28,7 @@ const defError = {
   name: false,
 };
 
-const DataDivisi = ({
+const DataMesin = ({
   data,
   load,
   popUp = false,
@@ -38,7 +38,7 @@ const DataDivisi = ({
   onRowSelect,
   onSuccessInput,
 }) => {
-  const [divisi, setDivisi] = useState(null);
+  const [DataMesin, setDataMesin] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
@@ -59,143 +59,7 @@ const DataDivisi = ({
     initFilters1();
   }, []);
 
-  const editDivisi = async () => {
-    const config = {
-      ...endpoints.editDivisi,
-      endpoint: endpoints.editDivisi.endpoint + currentItem.id,
-      data: {
-        code: currentItem.code,
-        name: currentItem.name,
-        desc: currentItem.desc,
-      },
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        setTimeout(() => {
-          setUpdate(false);
-          setDisplayData(false);
-          onSuccessInput();
-          onInput(false);
-          toast.current.show({
-            severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
-            life: 3000,
-          });
-        }, 500);
-      }
-    } catch (error) {
-      setTimeout(() => {
-        setUpdate(false);
-        toast.current.show({
-          severity: "error",
-          summary: "Gagal",
-          detail: "Gagal Memperbarui Data",
-          life: 3000,
-        });
-      }, 500);
-    }
-  };
 
-  const addDivisi = async () => {
-    const config = {
-      ...endpoints.addDivisi,
-      data: {
-        code: currentItem.code,
-        name: currentItem.name,
-        desc: currentItem.desc,
-      },
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        setTimeout(() => {
-          setUpdate(false);
-          setLoading(false);
-          setDisplayData(false);
-          onSuccessInput();
-          onInput(false);
-          toast.current.show({
-            severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
-            life: 3000,
-          });
-        }, 500);
-      }
-    } catch (error) {
-      console.log(error);
-      if (error.status === 400) {
-        setTimeout(() => {
-          setUpdate(false);
-          toast.current.show({
-            severity: "error",
-            summary: "Gagal",
-            detail: `Kode ${currentItem.code} Sudah Digunakan`,
-            life: 3000,
-          });
-        }, 500);
-      } else {
-        setTimeout(() => {
-          setUpdate(false);
-          toast.current.show({
-            severity: "error",
-            summary: "Gagal",
-            detail: "Gagal Memperbarui Data",
-            life: 3000,
-          });
-        }, 500);
-      }
-    }
-  };
-
-  const delDivisi = async (id) => {
-    setUpdate(true)
-    const config = {
-      ...endpoints.delDivisi,
-      endpoint: endpoints.delDivisi.endpoint + currentItem.id,
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        setTimeout(() => {
-          setUpdate(false);
-          setDisplayDel(false);
-          onSuccessInput();
-          onInput(false);
-          toast.current.show({
-            severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
-            life: 3000,
-          });
-        }, 500);
-      }
-    } catch (error) {
-      console.log(error);
-      setTimeout(() => {
-        setUpdate(false);
-        setDisplayDel(false);
-        onInput(false);
-        toast.current.show({
-          severity: "error",
-          summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Data`,
-          life: 3000,
-        });
-      }, 500);
-    }
-  };
 
   const actionBodyTemplate = (data) => {
     return (
@@ -238,17 +102,17 @@ const DataDivisi = ({
     }
   };
 
-  const onSubmit = () => {
-    if (isValid()) {
-      if (isEdit) {
-        setUpdate(true);
-        editDivisi();
-      } else {
-        setUpdate(true);
-        addDivisi();
-      }
-    }
-  };
+  // const onSubmit = () => {
+  //   if (isValid()) {
+  //     if (isEdit) {
+  //       setUpdate(true);
+  //       editDataMesin();
+  //     } else {
+  //       setUpdate(true);
+  //       addDataMesin();
+  //     }
+  //   }
+  // };
 
   const renderFooter = () => {
     return (
@@ -264,7 +128,7 @@ const DataDivisi = ({
         <PButton
           label="Simpan"
           icon="pi pi-check"
-          onClick={() => onSubmit()}
+          // onClick={() => onSubmit()}
           autoFocus
           loading={update}
         />
@@ -287,7 +151,7 @@ const DataDivisi = ({
           label="Hapus"
           icon="pi pi-trash"
           onClick={() => {
-            delDivisi();
+            // delDataMesin();
           }}
           autoFocus
           loading={update}
@@ -422,7 +286,7 @@ const DataDivisi = ({
           onRowSelect={onRowSelect}
         >
           <Column
-            header="Kode Group"
+            header="Kode Mesin"
             style={{
               minWidth: "8rem",
             }}
@@ -430,7 +294,7 @@ const DataDivisi = ({
             body={load && <Skeleton />}
           />
           <Column
-            header="Nama Group"
+            header="Nama Mesin"
             field={(e) => e.name}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
@@ -458,7 +322,7 @@ const DataDivisi = ({
       <>
         <Toast ref={toast} />
         <Dialog
-          header={isEdit ? "Edit Divisi" : "Tambah Divisi"}
+          header={isEdit ? "Edit DataMesin" : "Tambah Mesin"}
           visible={displayData}
           style={{ width: "40vw" }}
           footer={renderFooter()}
@@ -471,7 +335,7 @@ const DataDivisi = ({
           <div className="row ml-0 mt-0">
             <div className="col-6">
               <PrimeInput
-                label={"Kode Grup"}
+                label={"Kode Mesin"}
                 value={currentItem !== null ? `${currentItem.code}` : ""}
                 onChange={(e) => {
                   setCurrentItem({ ...currentItem, code: e.target.value });
@@ -479,14 +343,14 @@ const DataDivisi = ({
                   newError.code = false;
                   setError(newError);
                 }}
-                placeholder="Masukan Kode Grup"
+                placeholder="Masukan Kode Mesin"
                 error={error?.code}
               />
             </div>
 
             <div className="col-6">
               <PrimeInput
-                label={"Nama Grup"}
+                label={"Nama Mesin"}
                 value={currentItem !== null ? `${currentItem.name}` : ""}
                 onChange={(e) => {
                   setCurrentItem({ ...currentItem, name: e.target.value });
@@ -494,7 +358,7 @@ const DataDivisi = ({
                   newError.name = false;
                   setError(newError);
                 }}
-                placeholder="Masukan Nama Group"
+                placeholder="Masukan Nama Mesin"
                 error={error?.name}
               />
             </div>
@@ -542,7 +406,7 @@ const DataDivisi = ({
     return (
       <>
         <Dialog
-          header={"Data Divisi"}
+          header={"Data Mesin"}
           visible={show}
           footer={() => <div></div>}
           style={{ width: "60vw" }}
@@ -562,7 +426,8 @@ const DataDivisi = ({
         {renderDialog()}
       </>
     );
+    
   }
 };
 
-export default DataDivisi;
+export default DataMesin;

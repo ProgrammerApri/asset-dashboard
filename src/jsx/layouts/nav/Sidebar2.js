@@ -40,11 +40,12 @@ const SideMenu = () => {
         to: "bank-&-kas",
         icon: "bx-barcode",
       },
-      {
-        tittle: "Formula",
-        to: "formula",
-        icon: "bx-barcode",
-      },
+
+      {tittle: "Produksi",
+      to: "produksi",
+      icon: "bx-barcode",
+    },
+
     ],
     Laporan: [
       {

@@ -541,22 +541,27 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
     order?.dprod.forEach((element, i) => {
       if (i > 0) {
-        if (element.prod_id || element.location || element.order || element.price) {
+        if (
+          element.prod_id ||
+          element.location ||
+          element.order ||
+          element.price
+        ) {
           errors.prod[i] = {
             id: !element.prod_id,
             lok: !element.location,
             jum:
-              !element.order || element.order === "" || element.order === "0",
+              !element?.order || element?.order === "" || element?.order === "0",
             prc:
-              !element.price || element.price === "" || element.price === "0",
+              !element?.price || element?.price === "" || element?.price === "0",
           };
         }
       } else {
         errors.prod[i] = {
           id: !element.prod_id,
           lok: !element.location,
-          jum: !element.order || element.order === "" || element.order === "0",
-          prc: !element.price || element.price === "" || element.price === "0",
+          jum: !element?.order || element?.order === "" || element?.order === "0",
+          prc: !element?.price || element?.price === "" || element?.price === "0",
         };
       }
     });
@@ -581,8 +586,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     if (
       !errors.prod[0].id &&
       !errors.prod[0].lok &&
-      !errors.prod[0].jum &&
-      !errors.prod[0].prc
+      !errors.prod[0]?.jum &&
+      !errors.prod[0]?.prc
     ) {
       errors.jasa?.forEach((e) => {
         for (var key in e) {
@@ -711,13 +716,18 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                   djasa: e.pjasa,
                 });
                 let newError = error;
+                let ep = [];
                 newError.sup = false;
                 newError.rul = false;
-                newError.prod[0].id = false;
-                newError.prod[0].jum = false;
-                newError.prod[0].prc = false;
-                newError.jasa[0].id = false;
-                newError.jasa[0].jum = false;
+
+                e.pprod?.forEach((element) => {
+                  ep.push({
+                    jum: false,
+                    prc: false,
+                  });
+                });
+
+                newError.prod = ep;
                 setError(newError);
               }}
               placeholder="Pilih No. Pesanan Pembelian"
@@ -1142,6 +1152,18 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                     e.index === order.dprod.length - 1 ? (
                       <Link
                         onClick={() => {
+                          let newError = error;
+                          let ep = [];
+                          e.dprod?.forEach((element) => {
+                            ep.push({
+                              jum: false,
+                              prc: false,
+                            });
+                          });
+
+                          newError.prod = ep;
+                          setError(newError);
+
                           updateORD({
                             ...order,
                             dprod: [

@@ -399,7 +399,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
           po_id: null,
           prod_id: ek,
           price: el.price[i],
-          image: el.image,
+          image: "",
         });
       });
     });

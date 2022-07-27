@@ -200,7 +200,7 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
   };
 
   const delPO = async (id) => {
-    setLoading(true)
+    // setLoading(true)
     const config = {
       ...endpoints.delPO,
       endpoint: endpoints.delPO.endpoint + currentItem.id,

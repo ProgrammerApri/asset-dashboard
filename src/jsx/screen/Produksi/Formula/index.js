@@ -46,9 +46,15 @@ const Formula = ({trigger}) => {
 
   return (
     <>
-      <Toast ref={toast} />
-      {view[active]}
-    </>
+    <Toast ref={toast} />
+    <Row>
+      <Col className="pt-0">
+        <Card>
+          <Card.Body>{view[active]}</Card.Body>
+        </Card>
+      </Col>
+    </Row>
+  </>
   );
 };
 

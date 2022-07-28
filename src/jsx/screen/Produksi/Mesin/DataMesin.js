@@ -256,7 +256,7 @@ const DataMesin = ({
     setError(errors);
 
     valid = !errors.code && !errors.name;
-    
+
     return valid;
   };
 

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Button, Col, Row } from "react-bootstrap";
 import Formula from "./Formula";
 import Mesin from "./Mesin";
+import Planning from "./Planning";
 
 
 
@@ -12,6 +13,11 @@ const Produksi = () => {
       tittle: "Mesin",
       icon: "bx-receipt",
       component: <Mesin />,
+    },
+    {
+      tittle: "Planning",
+      icon: "bx-receipt",
+      component: <Planning />,
     },
     {
       tittle: "Formula",

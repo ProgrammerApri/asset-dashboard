@@ -45,7 +45,6 @@ const SideMenu = () => {
       to: "produksi",
       icon: "bx-barcode",
     },
-
     ],
     Laporan: [
       {

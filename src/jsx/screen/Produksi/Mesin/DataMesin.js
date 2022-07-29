@@ -384,6 +384,8 @@ const DataMesin = ({ data, load, onSuccessInput }) => {
 
     setError(errors);
 
+    valid = !errors.code && !errors.name;
+
     return valid;
   };
 

@@ -50,7 +50,7 @@ const Produksi = () => {
       <Col className="col-12 pb-0">
         <div className="">{renderSubMenu()}</div>
       </Col>
-      <Col className="pt-0">{subMenu[active].component}</Col>
+      <Col className="pt-0 p-component">{subMenu[active].component}</Col>
     </Row>
   );
 };

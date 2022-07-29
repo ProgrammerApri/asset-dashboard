@@ -12,13 +12,21 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_FM, SET_EDIT_FM, SET_FM} from "src/redux/actions";
+import { SET_CURRENT_FM, SET_EDIT_FM, SET_FM } from "src/redux/actions";
 import { Divider } from "@material-ui/core";
 import ReactToPrint from "react-to-print";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 
 const data = {
-  
+  id: null,
+  fcode: null,
+  fname: null,
+  version: null,
+  rev: null,
+  desc: null,
+  active: null,
+  product: [],
+  material: [],
 };
 
 const DataFormula = ({ onAdd, onEdit, onDetail }) => {
@@ -69,10 +77,10 @@ const DataFormula = ({ onAdd, onEdit, onDetail }) => {
     }
   };
 
-  const delODR = async (id) => {
+  const delFM = async (id) => {
     const config = {
-      ...endpoints.delODR,
-      endpoint: endpoints.delODR.endpoint + currentItem.id,
+      ...endpoints.delFormula,
+      endpoint: endpoints.delFormula.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -163,65 +171,53 @@ const DataFormula = ({ onAdd, onEdit, onDetail }) => {
 
         <Link
           onClick={() => {
-            // onEdit(data);
-            // let dprod = data.dprod;
-            // dispatch({
-            //   type: SET_EDIT_ODR,
-            //   payload: true,
-            // });
-            // dprod.forEach((el) => {
-            //   el.prod_id = el.prod_id?.id;
-            //   el.unit_id = el.unit_id?.id;
-            //   el.location = el.location?.id;
-            // });
-            // let djasa = data.djasa;
-            // djasa.forEach((el) => {
-            //   el.jasa_id = el.jasa_id.id;
-            //   el.unit_id = el.unit_id.id;
-            // });
-            // dispatch({
-            //   type: SET_CURRENT_ODR,
-            //   payload: {
-            //     ...data,
-            //     po_id: data?.po_id?.id ?? null,
-            //     dep_id: data?.dep_id?.id ?? null,
-            //     sup_id: data?.sup_id?.id ?? null,
-            //     top: data?.top?.id ?? null,
-            //     dprod:
-            //       dprod.length > 0
-            //         ? dprod
-            //         : [
-            //             {
-            //               id: 0,
-            //               do_id: null,
-            //               prod_id: null,
-            //               unit_id: null,
-            //               location: null,
-            //               order: null,
-            //               price: null,
-            //               disc: null,
-            //               nett_price: null,
-            //               total: null,
-            //             },
-            //           ],
-            //     djasa:
-            //       djasa.length > 0
-            //         ? djasa
-            //         : [
-            //             {
-            //               id: 0,
-            //               do_id: null,
-            //               jasa_id: null,
-            //               sup_id: null,
-            //               unit_id: null,
-            //               order: null,
-            //               price: null,
-            //               disc: null,
-            //               total: null,
-            //             },
-            //           ],
-            //   },
-            // });
+            onEdit(data);
+            let product = data.product;
+            dispatch({
+              type: SET_EDIT_FM,
+              payload: true,
+            });
+            product.forEach((el) => {
+              el.prod_id = el.prod_id?.id;
+              el.unit_id = el.unit_id?.id;
+            });
+            let material = data.material;
+            material.forEach((el) => {
+              el.prod_id = el.prod_id.id;
+              el.unit_id = el.unit_id.id;
+            });
+            dispatch({
+              type: SET_CURRENT_FM,
+              payload: {
+                ...data,
+                product:
+                  product.length > 0
+                    ? product
+                    : [
+                        {
+                          id: 0,
+                          form_id: null,
+                          prod_id: null,
+                          unit_id: null,
+                          qty: null,
+                          aloc: null,
+                        },
+                      ],
+                material:
+                  material.length > 0
+                    ? material
+                    : [
+                        {
+                          id: 0,
+                          form_id: null,
+                          prod_id: null,
+                          unit_id: null,
+                          qty: null,
+                          price: null,
+                        },
+                      ],
+              },
+            });
           }}
           className="btn btn-primary shadow btn-xs sharp ml-1"
         >
@@ -255,7 +251,7 @@ const DataFormula = ({ onAdd, onEdit, onDetail }) => {
           label="Hapus"
           icon="pi pi-trash"
           onClick={() => {
-            delODR();
+            delFM();
           }}
           autoFocus
           loading={loading}
@@ -303,33 +299,25 @@ const DataFormula = ({ onAdd, onEdit, onDetail }) => {
               type: SET_CURRENT_FM,
               payload: {
                 ...data,
-                dprod: [
+                active: false,
+                product: [
                   {
                     id: 0,
-                    do_id: null,
-                    // preq_id: null,
-                    // pprod_id: null,
+                    form_id: 0,
                     prod_id: null,
                     unit_id: null,
-                    location: null,
-                    order: null,
-                    price: null,
-                    disc: null,
-                    nett_price: null,
-                    total: null,
+                    qty: null,
+                    aloc: null,
                   },
                 ],
-                djasa: [
+                material: [
                   {
                     id: 0,
-                    do_id: null,
-                    jasa_id: null,
-                    sup_id: null,
+                    form_id: 0,
+                    prod_id: null,
                     unit_id: null,
-                    order: null,
+                    qty: null,
                     price: null,
-                    disc: null,
-                    total: null,
                   },
                 ],
               },
@@ -432,90 +420,58 @@ const DataFormula = ({ onAdd, onEdit, onDetail }) => {
   return (
     <>
       <Toast ref={toast} />
-      <Row>
-        <Col className="pt-0">
-          <Card>
-            <Card.Body>
-              <DataTable
-                responsiveLayout="scroll"
-                value={null}
-                className="display w-150 datatable-wrapper"
-                showGridlines
-                dataKey="id"
-                rowHover
-                header={renderHeader}
-                filters={filters1}
-                globalFilterFields={["ord_code"]}
-                emptyMessage="Tidak ada data"
-                paginator
-                paginatorTemplate={template2}
-                first={first2}
-                rows={rows2}
-                onPage={onCustomPage2}
-                paginatorClassName="justify-content-end mt-3"
-              >
-                <Column
-                  header="Tanggal"
-                  style={{
-                    minWidth: "8rem",
-                  }}
-                  field={(e) => formatDate(e.ord_date)}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Kode Formula"
-                  field={(e) => e.ord_code}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                {/* <Column
-          header="No. Pesanan Pembelian"
-          field={(e) => e.po_id}
+      <DataTable
+        responsiveLayout="scroll"
+        value={loading ? dummy : forml}
+        className="display w-150 datatable-wrapper"
+        showGridlines
+        dataKey="id"
+        rowHover
+        header={renderHeader}
+        filters={filters1}
+        globalFilterFields={["fcode", "fname", "date_created"]}
+        emptyMessage="Tidak ada data"
+        paginator
+        paginatorTemplate={template2}
+        first={first2}
+        rows={rows2}
+        onPage={onCustomPage2}
+        paginatorClassName="justify-content-end mt-3"
+      >
+        <Column
+          header="Tanggal"
+          style={{
+            minWidth: "8rem",
+          }}
+          field={(e) => formatDate(e.date_created)}
+          body={loading && <Skeleton />}
+        />
+        <Column
+          header="Kode Formula"
+          field={(e) => e.fcode}
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
-        /> */}
-                <Column
-                  header=""
-                  field={(e) => e?.sup_id?.sup_name}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header=""
-                  field={(e) => e.faktur}
-                  style={{ minWidth: "8rem" }}
-                  body={(e) =>
-                    loading ? (
-                      <Skeleton />
-                    ) : (
-                      <div>
-                        {e.faktur === true ? (
-                          <Badge variant="info light">
-                            <i className="bx bxs-circle text-info mr-1"></i>{" "}
-                            Faktur
-                          </Badge>
-                        ) : (
-                          <Badge variant="warning light">
-                            <i className="bx bxs-circle text-warning mr-1"></i>{" "}
-                            Non Faktur
-                          </Badge>
-                        )}
-                      </div>
-                    )
-                  }
-                />
-                <Column
-                  header="Action"
-                  dataType="boolean"
-                  bodyClassName="text-center"
-                  style={{ minWidth: "2rem" }}
-                  body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
-                />
-              </DataTable>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+        />
+        <Column
+          header="Versi Formula"
+          field={(e) => (e?.version ? e.version : "-")}
+          style={{ minWidth: "8rem" }}
+          body={loading && <Skeleton />}
+        />
+        <Column
+          header="Revisi"
+          field={(e) => (e?.rev ? e.rev : "-")}
+          style={{ minWidth: "8rem" }}
+          body={loading && <Skeleton />}
+        />
+        <Column
+          header="Action"
+          dataType="boolean"
+          bodyClassName="text-center"
+          style={{ minWidth: "2rem" }}
+          body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
+        />
+      </DataTable>
 
       <Dialog
         header={"Hapus Data"}

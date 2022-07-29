@@ -5,37 +5,33 @@ import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
-// import { Dropdown } from "primereact/dropdown";
-
-import { Divider } from "@material-ui/core";
-import { Calendar } from "primereact/calendar";
 import { InputSwitch } from "primereact/inputswitch";
 import CustomAccordion from "src/jsx/components/Accordion/Accordion";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_PO } from "src/redux/actions";
+import { SET_CURRENT_FM } from "src/redux/actions";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
-import { InputTextarea } from "primereact/inputtextarea";
+import DataProduk from "../../Master/Produk/DataProduk";
+import DataSatuan from "../../MasterLainnya/Satuan/DataSatuan";
 
 const defError = {
   code: false,
-  date: false,
-  req: false,
-  rul: false,
-  sup: false,
+  name: false,
   prod: [
     {
-      jum: false,
-      prc: false,
+      id: false,
+      qty: false,
+      aloc: false,
     },
   ],
-  jasa: [
+  mtrl: [
     {
-      jum: false,
+      id: false,
+      qty: false,
       prc: false,
     },
   ],
@@ -43,50 +39,22 @@ const defError = {
 
 const InputFormula = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
-  const [check, setCheck] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const toast = useRef(null);
   const [doubleClick, setDoubleClick] = useState(false);
-  const po = useSelector((state) => state.po.current);
-  const isEdit = useSelector((state) => state.po.editpo);
+  const forml = useSelector((state) => state.forml.current);
+  const isEdit = useSelector((state) => state.forml.editForml);
   const dispatch = useDispatch();
-  const [value1, setValue1] = useState("");
-  const [isRp, setRp] = useState(true);
-  const [isRpJasa, setRpJasa] = useState(true);
-  const [pusatBiaya, setPusatBiaya] = useState(null);
-  const [supplier, setSupplier] = useState(null);
-  const [rulesPay, setRulesPay] = useState(null);
-  const [ppn, setPpn] = useState(null);
-  const [rp, setRequest] = useState(null);
-  const [histori, setHistori] = useState(null);
-  const [filtHis, setFiltHis] = useState([]);
-  const [selectedCity1, setSelectedCity1] = useState(null);
-  const [showSupplier, setShowSupplier] = useState(false);
-  const [showSupp, setShowSupp] = useState(false);
-  const [showRulesPay, setShowRulesPay] = useState(false);
-  const [showPpn, setShowPpn] = useState(false);
+  const [date, setDate] = useState(new Date());
   const [showProd, setShowProd] = useState(false);
   const [showSatuan, setShowSatuan] = useState(false);
-  const [showJasa, setShowJasa] = useState(false);
-  const [showHistori, setShowHistori] = useState(false);
   const [product, setProduct] = useState(null);
-  const [jasa, setJasa] = useState(null);
   const [satuan, setSatuan] = useState(null);
   const [error, setError] = useState(defError);
-  const picker = useRef(null);
-
-  const [currentItem, setCurrentItem] = useState();
-  const [file, setFile] = useState(null);
   const [accor, setAccor] = useState({
     produk: true,
-    jasa: false,
-    sup: true,
+    material: true,
   });
-
-  const type = [
-    { name: "%", code: "P" },
-    { name: "Rp", code: "R" },
-  ];
 
   useEffect(() => {
     window.scrollTo({
@@ -94,96 +62,9 @@ const InputFormula = ({ onCancel, onSuccess }) => {
       left: 0,
       behavior: "smooth",
     });
-    getPusatBiaya();
-    getSupplier();
-    getRulesPay();
-    getPpn();
     getProduct();
-    getJasa();
     getSatuan();
-    getHistori();
   }, []);
-
-  const cities = [
-    { name: "New York", code: "NY" },
-    { name: "Rome", code: "RM" },
-    { name: "London", code: "LDN" },
-    { name: "Istanbul", code: "IST" },
-    { name: "Paris", code: "PRS" },
-  ];
-
-  const onCityChange = (e) => {
-    setSelectedCity1(e.value);
-  };
-  const getSupplier = async () => {
-    const config = {
-      ...endpoints.supplier,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setSupplier(data);
-      }
-    } catch (error) {}
-  };
-
-  const getPusatBiaya = async () => {
-    const config = {
-      ...endpoints.pusatBiaya,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setPusatBiaya(data);
-      }
-    } catch (error) {}
-  };
-
-  const getRulesPay = async () => {
-    const config = {
-      ...endpoints.rules_pay,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setRulesPay(data);
-      }
-    } catch (error) {}
-  };
-
-  const getPpn = async () => {
-    const config = {
-      ...endpoints.pajak,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setPpn(data);
-      }
-    } catch (error) {}
-  };
 
   const getProduct = async () => {
     const config = {
@@ -199,22 +80,6 @@ const InputFormula = ({ onCancel, onSuccess }) => {
         setProduct(data);
         console.log("jsdj");
         console.log(data);
-      }
-    } catch (error) {}
-  };
-
-  const getJasa = async () => {
-    const config = {
-      ...endpoints.jasa,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setJasa(data);
       }
     } catch (error) {}
   };
@@ -235,33 +100,11 @@ const InputFormula = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
-  const getHistori = async () => {
+  const editFM = async () => {
     const config = {
-      ...endpoints.price_history,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        // let his = [];
-        // data.forEach((elem) => {
-        //   if (elem.product.id === t.id) {
-        //     his.push(elem);
-        //   }
-        // });
-        setHistori(data);
-      }
-    } catch (error) {}
-  };
-
-  const editPO = async () => {
-    const config = {
-      ...endpoints.editPO,
-      endpoint: endpoints.editPO.endpoint + po.id,
-      data: po,
+      ...endpoints.editFormula,
+      endpoint: endpoints.editFormula.endpoint + forml.id,
+      data: forml,
     };
     console.log(config.data);
     let response = null;
@@ -284,30 +127,10 @@ const InputFormula = ({ onCancel, onSuccess }) => {
     }
   };
 
-  const addPO = async () => {
-    let d = po;
-    d.pprod.forEach((el) => {
-      el.order = el.order === "" ? 0 : el.order;
-      el.nett_price = el.nett_price === "" ? 0 : el.nett_price;
-      el.price = el.order === "" ? 0 : el.price;
-      el.disc = el.disc === "" ? 0 : el.disc;
-    });
-    let ref_supp = [];
-    d.psup.forEach((el) => {
-      el.prod_id.forEach((ek, i) => {
-        ref_supp.push({
-          sup_id: el.sup_id,
-          po_id: null,
-          prod_id: ek,
-          price: el.price[i],
-          image: "",
-        });
-      });
-    });
-    // d.psup = ref_supp;
+  const addFM = async () => {
     const config = {
-      ...endpoints.addPO,
-      data: { ...d, psup: ref_supp },
+      ...endpoints.addFormula,
+      data: forml,
     };
     console.log(config.data);
     let response = null;
@@ -325,7 +148,7 @@ const InputFormula = ({ onCancel, onSuccess }) => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${po.po_code} Sudah Digunakan`,
+            detail: `Kode ${forml.po_code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -341,71 +164,6 @@ const InputFormula = ({ onCancel, onSuccess }) => {
         }, 500);
       }
     }
-  };
-
-  const req_pur = (value) => {
-    let selected = {};
-    rp?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const dept = (value) => {
-    let selected = {};
-    pusatBiaya?.forEach((element) => {
-      if (element.id === `${value}`) {
-        selected = element;
-      }
-    });
-    return selected;
-  };
-
-  const pjk = (value) => {
-    let selected = {};
-    ppn?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const supp = (value) => {
-    let selected = {};
-    supplier?.forEach((element) => {
-      if (value === element.supplier.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const suppH = (value) => {
-    let selected = {};
-    filtHis?.forEach((element) => {
-      if (value === element.supplier?.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const rulPay = (value) => {
-    let selected = {};
-    rulesPay?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
   };
 
   const checkProd = (value) => {
@@ -431,63 +189,14 @@ const InputFormula = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
-  const checkjasa = (value) => {
-    let selected = {};
-    jasa?.forEach((element) => {
-      if (value === element.jasa.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
   const onSubmit = () => {
     if (isValid()) {
       if (isEdit) {
         setUpdate(true);
-        editPO();
+        editFM();
       } else {
         setUpdate(true);
-        addPO();
-      }
-    }
-  };
-
-  const uploadImage = async () => {
-    if (file) {
-      const config = {
-        ...endpoints.uploadImage,
-        data: {
-          image: file,
-        },
-      };
-      console.log(config.data);
-      let response = null;
-      try {
-        response = await request(null, config, {
-          "Content-Type": "multipart/form-data",
-        });
-        console.log(response);
-        if (response.status) {
-          if (isEdit) {
-            editPO(response.data);
-          } else {
-            addPO(response.data);
-          }
-        }
-      } catch (error) {
-        if (isEdit) {
-          editPO("");
-        } else {
-          addPO("");
-        }
-      }
-    } else {
-      if (isEdit) {
-        editPO("");
-      } else {
-        addPO("");
+        addFM();
       }
     }
   };
@@ -501,149 +210,94 @@ const InputFormula = ({ onCancel, onSuccess }) => {
     if (month.length < 2) month = "0" + month;
     if (day.length < 2) day = "0" + day;
 
-    return [year, month, day].join("-");
+    return [day, month, year].join("-");
   };
 
-  const updatePo = (e) => {
+  const updateFM = (e) => {
     dispatch({
-      type: SET_CURRENT_PO,
+      type: SET_CURRENT_FM,
       payload: e,
     });
-  };
-
-  const header = () => {
-    return (
-      <h4 className="mb-5">
-        <b>Pembelian (PO)</b>
-        {/* <b>{isEdit ? "Edit" : "Buat"} Pembelian (PO)</b> */}
-      </h4>
-    );
-  };
-
-  const getSubTotalBarang = () => {
-    let total = 0;
-    po?.pprod?.forEach((el) => {
-      if (el.nett_price && el.nett_price > 0) {
-        total += parseInt(el.nett_price);
-      } else {
-        total += el.total - (el.total * el.disc) / 100;
-      }
-    });
-
-    return total;
-  };
-
-  const getSubTotalJasa = () => {
-    let total = 0;
-    po?.pjasa?.forEach((el) => {
-      total += el.total - (el.total * el.disc) / 100;
-    });
-
-    return total;
-  };
-
-  const formatIdr = (value) => {
-    return `${value}`
-      .replace(".", ",")
-      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
 
   const isValid = () => {
     let valid = false;
     let errors = {
-      code: !po.po_code || po.po_code === "",
-      date: !po.po_date || po.po_date === "",
-      req: !po?.preq_id,
-      rul: !po?.top,
-      sup: !po.sup_id,
+      code: !forml.fcode || forml.fcode === "",
+      name: !forml.fname || forml.fname === "",
       prod: [],
-      jasa: [],
+      mtrl: [],
     };
 
-    po?.pprod?.forEach((element, i) => {
+    forml?.product.forEach((element, i) => {
       if (i > 0) {
-        if (element?.order || element?.price) {
+        if (element.prod_id || element.qty || element.aloc) {
           errors.prod[i] = {
-            jum:
-              !element?.order ||
-              element?.order === "" ||
-              element?.order === "0",
-            prc:
-              !element?.price ||
-              element?.price === "" ||
-              element?.price === "0",
+            id: !element.prod_id,
+            qty: !element.qty || element.qty === "" || element.qty === "0",
+            aloc: !element.aloc || element.aloc === "" || element.aloc === "0",
           };
         }
       } else {
         errors.prod[i] = {
-          jum:
-            !element?.order || element?.order === "" || element?.order === "0",
-          prc:
-            !element?.price || element?.price === "" || element?.price === "0",
+          id: !element.prod_id,
+          qty: !element.qty || element.qty === "" || element.qty === "0",
+          aloc: !element.aloc || element.aloc === "" || element.aloc === "0",
         };
       }
     });
 
-    po?.pjasa?.forEach((element, i) => {
+    forml?.material.forEach((element, i) => {
       if (i > 0) {
-        if (element.order || element.price) {
-          errors.jasa[i] = {
-            jum:
-              !element.order || element.order === "" || element.order === "0",
+        if (element.prod_id || element.qty || element.price) {
+          errors.mtrl[i] = {
+            id: !element.prod_id,
+            qty: !element.qty || element.qty === "" || element.qty === "0",
             prc:
               !element.price || element.price === "" || element.price === "0",
           };
         }
       } else {
-        errors.jasa[i] = {
-          jum: !element.order || element.order === "" || element.order === "0",
+        errors.mtrl[i] = {
+          id: !element.prod_id,
+          qty: !element.qty || element.qty === "" || element.qty === "0",
           prc: !element.price || element.price === "" || element.price === "0",
         };
       }
     });
 
-    if (po?.pprod?.length) {
-      if (!errors.prod[0]?.jum && !errors.prod[0]?.prc) {
-        errors.jasa?.forEach((e) => {
-          for (var key in e) {
-            e[key] = false;
-          }
-        });
-      }
+    if (!errors.prod[0]?.id && !errors.prod[0]?.qty && !errors.prod[0]?.aloc) {
+      errors.mtrl?.forEach((e) => {
+        for (var key in e) {
+          e[key] = false;
+        }
+      });
     }
 
-    if (po?.pjasa.length) {
-      if (!errors.jasa[0]?.jum && !errors.jasa[0]?.prc) {
-        errors.prod?.forEach((e) => {
-          for (var key in e) {
-            e[key] = false;
-          }
-        });
-      }
+    if (!errors.mtrl[0]?.id && !errors.mtrl[0]?.qty && !errors.mtrl[0]?.prc) {
+      errors.prod?.forEach((e) => {
+        for (var key in e) {
+          e[key] = false;
+        }
+      });
     }
 
     let validProduct = false;
-    let validJasa = false;
+    let validMtrl = false;
     errors.prod?.forEach((el) => {
       for (var k in el) {
         validProduct = !el[k];
       }
     });
     if (!validProduct) {
-      errors.jasa?.forEach((el) => {
+      errors.mtrl.forEach((el) => {
         for (var k in el) {
-          validJasa = !el[k];
+          validMtrl = !el[k];
         }
       });
     }
 
-    valid =
-      !errors.code &&
-      !errors.date &&
-      !errors.req &&
-      !errors.sup &&
-      !errors.rul &&
-      (validProduct || validJasa);
+    valid = !errors.code && !errors.name && (validProduct || validMtrl);
 
     setError(errors);
 
@@ -658,19 +312,28 @@ const InputFormula = ({ onCancel, onSuccess }) => {
     return valid;
   };
 
+  const header = () => {
+    return (
+      <h4 className="mb-5">
+        <b>Pembelian (PO)</b>
+        {/* <b>{isEdit ? "Edit" : "Buat"} Pembelian (PO)</b> */}
+      </h4>
+    );
+  };
+
   const body = () => {
     return (
       <>
         {/* Put content body here */}
         <Toast ref={toast} />
 
-        <Row className="mb-5">
-          <div className="col-2">
+        <Row className="mb-4">
+          <div className="col-3 text-black">
             <PrimeInput
               label={"Kode Formula"}
-              value={po.po_code}
+              value={forml.fcode}
               onChange={(e) => {
-                updatePo({});
+                updateFM({ ...forml, fcode: e.target.value });
                 let newError = error;
                 newError.code = false;
                 setError(newError);
@@ -679,19 +342,12 @@ const InputFormula = ({ onCancel, onSuccess }) => {
               error={error?.code}
             />
           </div>
-          <div className="col-2">
+          <div className="col-2 text-black">
             <PrimeCalendar
               label={"Tanggal"}
-              value={new Date(`${po.po_date}Z`)}
+              value={date}
               onChange={(e) => {
-                let result = new Date(e.value);
-                result.setDate(result.getDate() + e.day);
-                console.log(result);
-
-                updatePo({ ...po, po_date: e.value, due_date: result });
-                let newError = error;
-                newError.date = false;
-                setError(newError);
+                setDate(e.value);
               }}
               placeholder="Pilih Tanggal"
               showIcon
@@ -700,87 +356,79 @@ const InputFormula = ({ onCancel, onSuccess }) => {
             />
           </div>
           <div className="col-7"></div>
-          <div className="col-3">
+          <div className="col-3 text-black">
             <PrimeInput
               label={"Nama Formula"}
-              value={po.po_code}
+              value={forml.fname}
               onChange={(e) => {
-                updatePo({});
+                updateFM({ ...forml, fname: e.target.value });
                 let newError = error;
-                newError.code = false;
+                newError.name = false;
                 setError(newError);
               }}
               placeholder="Masukan Nama Formula"
-              error={error?.code}
+              error={error?.name}
             />
           </div>
-          <div className="col-1">
-            <PrimeInput
+          <div className="col-1 text-black">
+            <PrimeNumber
               label={"Versi"}
-              value={po.po_code}
+              value={forml.version}
               onChange={(e) => {
-                updatePo({});
-                let newError = error;
-                newError.code = false;
-                setError(newError);
+                updateFM({ ...forml, version: e.target.value });
               }}
-              placeholder="1"
-              error={error?.code}
+              placeholder="0"
+              type="number"
+              min={0}
             />
           </div>
-          <div className="col-1">
-            <PrimeInput
+          <div className="col-1 text-black">
+            <PrimeNumber
               label={"Revisi"}
-              // value={po.po_code}
+              value={forml.rev}
               onChange={(e) => {
-                updatePo({});
-                let newError = error;
-                newError.code = false;
-                setError(newError);
+                updateFM({ ...forml, rev: e.target.value });
               }}
-              placeholder="1"
-              error={error?.code}
+              placeholder="0"
+              type="number"
+              min={0}
             />
           </div>
-          <div className="col-2">
+          <div className="col-2 text-black">
             <PrimeInput
               label={"Tanggal Revisi"}
-              // value={po.po_code}
+              value={formatDate(date)}
               onChange={(e) => {
-                updatePo({});
-                let newError = error;
-                newError.code = false;
-                setError(newError);
+                setDate(e.value);
               }}
-              placeholder="00/00/0000"
+              placeholder="dd/mm/yyyy"
               disabled
-              error={error?.code}
             />
           </div>
-          <div className="col-3"></div>
-          <div className="flex col-12 align-items-center mt-2">
-            <label className="ml-0 mt-2 fs-12">
-              <b>{"Aktif"}</b>
-            </label>
-            <InputSwitch
-              className="ml-4"
-              checked={po && po.ref_sup}
-              onChange={(e) => {
-                updatePo({ ...po, ref_sup: e.target.value });
-              }}
-            />
-          </div>
-          {/* <div className="col-7"></div> */}
-          <div className="col-4">
+          <div className="col-5 text-black">
             <label className="text-label">Keterangan</label>
             <div className="p-inputgroup">
-              <InputTextarea
-                value={currentItem !== null ? `` : ""}
-                onChange={(e) => setCurrentItem({})}
+              <InputText
+                value={forml.desc}
+                onChange={(e) => updateFM({ ...forml, desc: e.target.value })}
                 placeholder="Masukan Keterangan"
               />
             </div>
           </div>
+          <div className="col-3"></div>
+          <div className="flex col-12 align-items-center mt-1">
+            <label className="ml-0 mt-1 fs-12 text-black">
+              <b>{"Aktif"}</b>
+            </label>
+            <InputSwitch
+              className="ml-4"
+              checked={forml && forml.active}
+              onChange={(e) => {
+                updateFM({ ...forml, active: e.target.value });
+              }}
+            />
+          </div>
+          {/* <div className="col-7"></div> */}
         </Row>
 
         <CustomAccordion
@@ -798,14 +446,11 @@ const InputFormula = ({ onCancel, onSuccess }) => {
             <>
               <DataTable
                 responsiveLayout="none"
-                value={po.pprod?.map((v, i) => {
+                value={forml.product?.map((v, i) => {
                   return {
                     ...v,
                     index: i,
-                    order: v?.order ?? 0,
-                    price: v?.price ?? 0,
-                    disc: v?.disc ?? 0,
-                    total: v?.total ?? 0,
+                    // order: v?.order ?? 0,
                   };
                 })}
                 className="display w-150 datatable-wrapper header-white no-border"
@@ -816,62 +461,45 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                   header="Produk Hasil Jadi"
                   className="align-text-top"
                   field={""}
-                  // style={{
-                  //   width: "12rem",
-                  // }}
+                  style={{
+                    width: "30rem",
+                  }}
                   body={(e) => (
-                    <div className="flex">
-                      <div className="col-11 ml-0 p-0">
-                        <CustomDropdown
-                          value={e.prod_id && checkProd(e.prod_id)}
-                          option={product}
-                          onChange={(t) => {
-                            let sat = [];
-                            satuan.forEach((element) => {
-                              if (element.id === t.unit.id) {
-                                sat.push(element);
-                              } else {
-                                if (element.u_from?.id === t.unit.id) {
-                                  sat.push(element);
-                                }
-                              }
-                            });
-                            setSatuan(sat);
-
-                            let temp = [...po.pprod];
-                            temp[e.index].prod_id = t.id;
-                            temp[e.index].unit_id = t.unit?.id;
-                            updatePo({ ...po, pprod: temp });
-                          }}
-                          placeholder="Pilih Kode Produk"
-                          label={"[name]"}
-                          detail
-                          onDetail={() => {
-                            setCurrentIndex(e.index);
-                            setShowProd(true);
-                          }}
-                        />
-                      </div>
-                      {/* <div className="col-1 align-items-center p-0"> */}
-                      <Link
-                        onClick={() => {
-                          let his = [];
-                          histori.forEach((elem) => {
-                            if (elem.product.id === e.prod_id) {
-                              his.push(elem);
+                    <CustomDropdown
+                      value={e.prod_id && checkProd(e.prod_id)}
+                      option={product}
+                      onChange={(t) => {
+                        let sat = [];
+                        satuan.forEach((element) => {
+                          if (element.id === t.unit.id) {
+                            sat.push(element);
+                          } else {
+                            if (element.u_from?.id === t.unit.id) {
+                              sat.push(element);
                             }
-                          });
-                          setFiltHis(his);
+                          }
+                        });
+                        setSatuan(sat);
 
-                          setCurrentIndex(e.index);
-                          setShowHistori(true);
-                        }}
-                        className="sharp mt-1"
-                      >
-                        <i className="bx bx-history fs-18"></i>
-                      </Link>
-                      {/* </div> */}
-                    </div>
+                        let temp = [...forml.product];
+                        temp[e.index].prod_id = t.id;
+                        temp[e.index].unit_id = t.unit?.id;
+                        updateFM({ ...forml, product: temp });
+
+                        let newError = error;
+                        newError.prod[e.index].id = false;
+                        setError(newError);
+                      }}
+                      placeholder="Pilih Produk"
+                      label={"[name]"}
+                      detail
+                      onDetail={() => {
+                        setCurrentIndex(e.index);
+                        setShowProd(true);
+                      }}
+                      errorMessage="Produk Belum Dipilih"
+                      error={error?.prod[e.index]?.id}
+                    />
                   )}
                 />
 
@@ -879,16 +507,16 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                   header="Satuan"
                   className="align-text-top"
                   field={""}
-                  // style={{
-                  //   width: "8rem",
-                  // }}
+                  style={{
+                    width: "15rem",
+                  }}
                   body={(e) => (
                     <CustomDropdown
                       value={e.unit_id && checkUnit(e.unit_id)}
                       onChange={(t) => {
-                        let temp = [...po.pprod];
+                        let temp = [...forml.product];
                         temp[e.index].unit_id = t.id;
-                        updatePo({ ...po, pprod: temp });
+                        updateFM({ ...forml, product: temp });
                       }}
                       option={satuan}
                       label={"[name]"}
@@ -910,24 +538,27 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                   //   width: "5rem",
                   // }}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={e.request ? e.request : 0}
-                        onChange={(t) => {
-                          let temp = [...po.pprod];
-                          temp[e.index].request = t.target.value;
-                          updatePo({ ...po, pprod: temp });
-                          console.log(temp);
-                        }}
-                        placeholder="0"
-                        disabled
-                      />
-                    </div>
+                    <PrimeNumber
+                      value={e.qty ? e.qty : ""}
+                      onChange={(t) => {
+                        let temp = [...forml.product];
+                        temp[e.index].qty = t.target.value;
+                        updateFM({ ...forml, product: temp });
+
+                        let newError = error;
+                        newError.prod[e.index].qty = false;
+                        setError(newError);
+                      }}
+                      placeholder="0"
+                      type="number"
+                      min={0}
+                      error={error?.prod[e.index]?.qty}
+                    />
                   )}
                 />
 
                 <Column
-                  header="Cost Alokasi"
+                  header="Cost Alokasi (%)"
                   className="align-text-top"
                   field={""}
                   // style={{
@@ -935,76 +566,46 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                   // }}
                   body={(e) => (
                     <PrimeNumber
-                      value={e.order ? e.order : ""}
-                      onChange={(t) => {
-                        let temp = [...po.pprod];
-                        let val =
-                          t.target.value > e.r_remain
-                            ? e.r_remain
-                            : t.target.value;
-                        let result =
-                          temp[e.index].order - val + temp[e.index].remain;
-                        temp[e.index].order = val;
-
-                        temp[e.index].total =
-                          temp[e.index].price * temp[e.index].order;
-                        temp[e.index].remain = result;
-                        updatePo({ ...po, pprod: temp });
+                      value={e.aloc && e.aloc}
+                      onChange={(u) => {
+                        let temp = [...forml.product];
+                        temp[e.index].aloc = u.target.value;
+                        updateFM({ ...forml, product: temp });
 
                         let newError = error;
-                        newError.prod[e.index].jum = false;
+                        newError.prod[e.index].aloc = false;
                         setError(newError);
                       }}
-                      min={0}
                       placeholder="0"
                       type="number"
-                      error={error?.prod[e.index]?.jum}
+                      min={0}
+                      error={error?.prod[e.index]?.aloc}
                     />
-                  )}
-                />
-
-                <Column
-                  header="Action"
-                  className="align-text-top"
-                  field={""}
-                  // style={{
-                  //   minWidth: "7rem",
-                  // }}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <Link
-                        onClick={() => {}}
-                        className="btn btn-danger shadow btn-xs sharp ml-1"
-                      >
-                        <i className="fa fa-trash"></i>
-                      </Link>
-                    </div>
                   )}
                 />
 
                 <Column
                   className="align-text-top"
                   body={(e) =>
-                    e.index === po.pprod.length - 1 ? (
+                    e.index === forml.product.length - 1 ? (
                       <Link
                         onClick={() => {
-                          updatePo({
-                            ...po,
-                            pprod: [
-                              ...po.pprod,
+                          let newError = error;
+                          newError.prod.push({ qty: false, aloc: false });
+                          setError(newError);
+
+                          updateFM({
+                            ...forml,
+                            product: [
+                              ...forml.product,
                               {
                                 id: 0,
                                 prod_id: null,
-                                rprod_id: null,
                                 unit_id: null,
-                                order: null,
-                                price: null,
-                                disc: null,
-                                nett_price: null,
-                                total: null,
+                                qty: null,
+                                aloc: null,
                               },
                             ],
-                            psup: po.pprod,
                           });
                         }}
                         className="btn btn-primary shadow btn-xs sharp ml-1"
@@ -1014,11 +615,11 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                     ) : (
                       <Link
                         onClick={() => {
-                          let temp = [...po.pprod];
+                          let temp = [...forml.product];
                           temp.splice(e.index, 1);
-                          updatePo({
-                            ...po,
-                            pprod: temp,
+                          updateFM({
+                            ...forml,
+                            product: temp,
                           });
                         }}
                         className="btn btn-danger shadow btn-xs sharp ml-1"
@@ -1036,11 +637,11 @@ const InputFormula = ({ onCancel, onSuccess }) => {
         <CustomAccordion
           tittle={"Bahan"}
           defaultActive={true}
-          active={accor.produk}
+          active={accor.material}
           onClick={() => {
             setAccor({
               ...accor,
-              produk: !accor.produk,
+              material: !accor.material,
             });
           }}
           key={1}
@@ -1048,14 +649,12 @@ const InputFormula = ({ onCancel, onSuccess }) => {
             <>
               <DataTable
                 responsiveLayout="none"
-                value={po.pprod?.map((v, i) => {
+                value={forml.material?.map((v, i) => {
                   return {
                     ...v,
                     index: i,
-                    order: v?.order ?? 0,
-                    price: v?.price ?? 0,
-                    disc: v?.disc ?? 0,
-                    total: v?.total ?? 0,
+                    // order: v?.order ?? 0,
+                    // price: v?.price ?? 0,
                   };
                 })}
                 className="display w-150 datatable-wrapper header-white no-border"
@@ -1066,40 +665,40 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                   header="Bahan Hasil Jadi"
                   className="align-text-top"
                   field={""}
-                  // style={{
-                  //   width: "12rem",
-                  // }}
+                  style={{
+                    width: "30rem",
+                  }}
                   body={(e) => (
-                    <div className="flex">
-                      <div className="col-11 ml-0 p-0">
-                        <CustomDropdown
-                          value={selectedCity1}
-                          options={cities}
-                          onChange={onCityChange}
-                          optionLabel="name"
-                          placeholder="Select a City"
-                        />
-                      </div>
-                      {/* <div className="col-1 align-items-center p-0"> */}
-                      <Link
-                        onClick={() => {
-                          let his = [];
-                          histori.forEach((elem) => {
-                            if (elem.product.id === e.prod_id) {
-                              his.push(elem);
+                    <CustomDropdown
+                      value={e.prod_id && checkProd(e.prod_id)}
+                      option={product}
+                      onChange={(t) => {
+                        let sat = [];
+                        satuan.forEach((element) => {
+                          if (element.id === t.unit.id) {
+                            sat.push(element);
+                          } else {
+                            if (element.u_from?.id === t.unit.id) {
+                              sat.push(element);
                             }
-                          });
-                          setFiltHis(his);
+                          }
+                        });
+                        setSatuan(sat);
 
-                          setCurrentIndex(e.index);
-                          setShowHistori(true);
-                        }}
-                        className="sharp mt-1"
-                      >
-                        <i className="bx bx-history fs-18"></i>
-                      </Link>
-                      {/* </div> */}
-                    </div>
+                        let temp = [...forml.material];
+                        temp[e.index].prod_id = t.id;
+                        temp[e.index].unit_id = t.unit?.id;
+                        updateFM({ ...forml, material: temp });
+
+                        let newError = error;
+                        newError.mtrl[e.index].id = false;
+                        setError(newError);
+                      }}
+                      label={"[name]"}
+                      placeholder="Pilih Bahan"
+                      errorMessage="Bahan Belum Dipilih"
+                      error={error?.mtrl[e.index]?.id}
+                    />
                   )}
                 />
 
@@ -1107,16 +706,16 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                   header="Satuan"
                   className="align-text-top"
                   field={""}
-                  // style={{
-                  //   width: "8rem",
-                  // }}
+                  style={{
+                    width: "15rem",
+                  }}
                   body={(e) => (
                     <CustomDropdown
                       value={e.unit_id && checkUnit(e.unit_id)}
                       onChange={(t) => {
-                        let temp = [...po.pprod];
+                        let temp = [...forml.material];
                         temp[e.index].unit_id = t.id;
-                        updatePo({ ...po, pprod: temp });
+                        updateFM({ ...forml, material: temp });
                       }}
                       option={satuan}
                       label={"[name]"}
@@ -1138,19 +737,22 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                   //   width: "5rem",
                   // }}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={e.request ? e.request : 0}
-                        onChange={(t) => {
-                          let temp = [...po.pprod];
-                          temp[e.index].request = t.target.value;
-                          updatePo({ ...po, pprod: temp });
-                          console.log(temp);
-                        }}
-                        placeholder="0"
-                        disabled
-                      />
-                    </div>
+                    <PrimeNumber
+                      value={e.qty ? e.qty : ""}
+                      onChange={(t) => {
+                        let temp = [...forml.material];
+                        temp[e.index].qty = t.target.value;
+                        updateFM({ ...forml, material: temp });
+
+                        let newError = error;
+                        newError.mtrl[e.index].qty = false;
+                        setError(newError);
+                      }}
+                      placeholder="0"
+                      type="number"
+                      min={0}
+                      error={error?.mtrl[e.index]?.qty}
+                    />
                   )}
                 />
 
@@ -1163,78 +765,46 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                   // }}
                   body={(e) => (
                     <PrimeNumber
-                      value={e.order ? e.order : ""}
+                      value={e.price ? e.price : ""}
                       onChange={(t) => {
-                        let temp = [...po.pprod];
-                        let val =
-                          t.target.value > e.r_remain
-                            ? e.r_remain
-                            : t.target.value;
-                        let result =
-                          temp[e.index].order - val + temp[e.index].remain;
-                        temp[e.index].order = val;
-
-                        temp[e.index].total =
-                          temp[e.index].price * temp[e.index].order;
-                        temp[e.index].remain = result;
-                        updatePo({ ...po, pprod: temp });
+                        let temp = [...forml.material];
+                        temp[e.index].price = t.target.value;
+                        updateFM({ ...forml, material: temp });
 
                         let newError = error;
-                        newError.prod[e.index].jum = false;
+                        newError.mtrl[e.index].prc = false;
                         setError(newError);
                       }}
                       min={0}
                       placeholder="0"
                       type="number"
-                      error={error?.prod[e.index]?.jum}
+                      error={error?.mtrl[e.index]?.prc}
                     />
-                  )}
-                />
-
-                <Column
-                  header="Action"
-                  className="align-text-top"
-                  field={""}
-                  style={
-                    {
-                      //   minWidth: "7rem",
-                    }
-                  }
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <Link
-                        onClick={() => {}}
-                        className="btn btn-danger shadow btn-xs sharp ml-1"
-                      >
-                        <i className="fa fa-trash"></i>
-                      </Link>
-                    </div>
                   )}
                 />
 
                 <Column
                   className="align-text-top"
                   body={(e) =>
-                    e.index === po.pprod.length - 1 ? (
+                    e.index === forml.material.length - 1 ? (
                       <Link
                         onClick={() => {
-                          updatePo({
-                            ...po,
-                            pprod: [
-                              ...po.pprod,
+                          let newError = error;
+                          newError.mtrl.push({ qty: false, prc: false });
+                          setError(newError);
+
+                          updateFM({
+                            ...forml,
+                            material: [
+                              ...forml.material,
                               {
                                 id: 0,
                                 prod_id: null,
-                                rprod_id: null,
                                 unit_id: null,
-                                order: null,
+                                qty: null,
                                 price: null,
-                                disc: null,
-                                nett_price: null,
-                                total: null,
                               },
                             ],
-                            psup: po.pprod,
                           });
                         }}
                         className="btn btn-primary shadow btn-xs sharp ml-1"
@@ -1244,11 +814,11 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                     ) : (
                       <Link
                         onClick={() => {
-                          let temp = [...po.pprod];
+                          let temp = [...forml.material];
                           temp.splice(e.index, 1);
-                          updatePo({
-                            ...po,
-                            pprod: temp,
+                          updateFM({
+                            ...forml,
+                            material: temp,
                           });
                         }}
                         className="btn btn-danger shadow btn-xs sharp ml-1"
@@ -1262,38 +832,53 @@ const InputFormula = ({ onCancel, onSuccess }) => {
             </>
           }
         />
-        <InputText
-          value={value1}
-          onChange={(e) => setValue1(e.target.value)}
-          placeholder="Jumlah Produk : 2"
-        />
-        <span className="ml-2">{value1}</span>
-        <InputText
-          value={value1}
-          onChange={(e) => setValue1(e.target.value)}
-          placeholder="Jumlah Bahan : 5"
-        />
-        <span className="ml-2">{value1}</span>
+        <div className="row mb-8">
+          <span className="mb-8"></span>
+        </div>
       </>
     );
+  };
+
+  const getIndex = () => {
+    let total = 0;
+    forml?.product?.forEach((el) => {
+      total += el.index;
+    });
+
+    return total;
   };
 
   const footer = () => {
     return (
       <div className="mt-5 flex justify-content-end">
-        <div>
-          <PButton
-            label="Batal"
-            onClick={onCancel}
-            className="p-button-text btn-primary"
-          />
-          <PButton
-            label="Simpan"
-            icon="pi pi-check"
-            onClick={() => onSubmit()}
-            autoFocus
-            loading={update}
-          />
+        <div className="justify-content-left col-6">
+          <div className="col-12 mt-0 ml-0 p-0 fs-12 text-left">
+            <label className="text-label">
+              <b>Jumlah Produk : </b>
+            </label>
+            <span> {}</span>
+            <label className="ml-8">
+              <b>Jumlah Bahan : </b>
+            </label>
+            <span>{}</span>
+          </div>
+        </div>
+
+        <div className="row justify-content-right col-6">
+          <div className="col-12 mt-0 fs-12 text-right">
+            <PButton
+              label="Batal"
+              onClick={onCancel}
+              className="p-button-text btn-primary"
+            />
+            <PButton
+              label="Simpan"
+              icon="pi pi-check"
+              onClick={() => onSubmit()}
+              autoFocus
+              loading={update}
+            />
+          </div>
         </div>
       </div>
     );
@@ -1310,6 +895,86 @@ const InputFormula = ({ onCancel, onSuccess }) => {
           </>
         </Col>
       </Row>
+
+      <DataProduk
+        data={product}
+        loading={false}
+        popUp={true}
+        show={showProd}
+        onHide={() => {
+          setShowProd(false);
+        }}
+        onInput={(e) => {
+          setShowProd(!e);
+        }}
+        onSuccessInput={(e) => {
+          getProduct();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowProd(false);
+            let sat = [];
+            satuan.forEach((element) => {
+              if (element.id === e.data.unit.id) {
+                sat.push(element);
+              } else {
+                if (element.u_from?.id === e.data.unit.id) {
+                  sat.push(element);
+                }
+              }
+            });
+            setSatuan(sat);
+
+            let temp = [...forml.product];
+            temp[currentIndex].prod_id = e.data.id;
+            temp[currentIndex].unit_id = e.data.unit?.id;
+
+            let tempm = [...forml.material];
+            temp[currentIndex].prod_id = e.data.id;
+            temp[currentIndex].unit_id = e.data.unit?.id;
+            updateFM({ ...forml, product: temp, material: tempm });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataSatuan
+        data={satuan}
+        loading={false}
+        popUp={true}
+        show={showSatuan}
+        onHide={() => {
+          setShowSatuan(false);
+        }}
+        onInput={(e) => {
+          setShowSatuan(!e);
+        }}
+        onSuccessInput={(e) => {
+          getSatuan();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowSatuan(false);
+            let temp = [...forml.product];
+            temp[currentIndex].unit_id = e.data.id;
+
+            let tempm = [...forml.material];
+            tempm[currentIndex].unit_id = e.data.id;
+            updateFM({ ...forml, product: temp, material: tempm });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
     </>
   );
 };

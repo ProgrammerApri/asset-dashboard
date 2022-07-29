@@ -573,13 +573,8 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
               <InputText
                 value={
                   inv.ord_id !== null
-                    ? `${
-                        checkSupp(checkOrd(inv.ord_id)?.sup_id?.id).supplier
-                          ?.sup_name
-                      } (${
-                        checkSupp(checkOrd(inv.ord_id)?.sup_id?.id).supplier
-                          ?.sup_code
-                      })`
+                    ? checkSupp(checkOrd(inv.ord_id)?.sup_id?.id).supplier
+                        ?.sup_name
                     : null
                 }
                 placeholder="Nama Supplier"

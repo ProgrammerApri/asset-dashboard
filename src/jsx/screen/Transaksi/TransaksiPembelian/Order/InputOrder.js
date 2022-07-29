@@ -551,34 +551,36 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             id: !element.prod_id,
             lok: !element.location,
             jum:
-              !element?.order || element?.order === "" || element?.order === "0",
+              !element.order || element.order === "" || element.order === "0",
             prc:
-              !element?.price || element?.price === "" || element?.price === "0",
+              !element.price || element.price === "" || element.price === "0",
           };
         }
       } else {
         errors.prod[i] = {
           id: !element.prod_id,
           lok: !element.location,
-          jum: !element?.order || element?.order === "" || element?.order === "0",
-          prc: !element?.price || element?.price === "" || element?.price === "0",
+          jum: !element.order || element.order === "" || element.order === "0",
+          prc: !element.price || element.price === "" || element.price === "0",
         };
       }
     });
 
     order?.djasa.forEach((element, i) => {
       if (i > 0) {
-        if (element.jasa_id || element.order) {
+        if (element.jasa_id || element.order || element.price) {
           errors.jasa[i] = {
             id: !element.jasa_id,
-            jum:
-              !element.order || element.order === "" || element.order === "0",
+            jum: !element.order || element.order === "" || element.order === "0",
+            prc:
+              !element.price || element.price === "" || element.price === "0",
           };
         }
       } else {
         errors.jasa[i] = {
           id: !element.jasa_id,
           jum: !element.order || element.order === "" || element.order === "0",
+          prc: !element.price || element.price === "" || element.price === "0",
         };
       }
     });
@@ -586,8 +588,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     if (
       !errors.prod[0].id &&
       !errors.prod[0].lok &&
-      !errors.prod[0]?.jum &&
-      !errors.prod[0]?.prc
+      !errors.prod[0].jum &&
+      !errors.prod[0].prc
     ) {
       errors.jasa?.forEach((e) => {
         for (var key in e) {
@@ -596,14 +598,12 @@ const InputOrder = ({ onCancel, onSuccess }) => {
       });
     }
 
-    if (order?.djasa.length) {
-      if (!errors.jasa[0]?.id && !errors.jasa[0]?.jum) {
-        errors.prod?.forEach((e) => {
-          for (var key in e) {
-            e[key] = false;
-          }
-        });
-      }
+    if (!errors.jasa[0]?.id && !errors.jasa[0]?.jum && !errors.jasa[0]?.prc) {
+      errors.prod?.forEach((e) => {
+        for (var key in e) {
+          e[key] = false;
+        }
+      });
     }
 
     let validProduct = false;
@@ -716,18 +716,14 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                   djasa: e.pjasa,
                 });
                 let newError = error;
-                let ep = [];
                 newError.sup = false;
                 newError.rul = false;
-
-                e.pprod?.forEach((element) => {
-                  ep.push({
-                    jum: false,
-                    prc: false,
-                  });
-                });
-
-                newError.prod = ep;
+                newError.prod[0].id = false;
+                newError.prod[0].jum = false;
+                newError.prod[0].prc = false;
+                newError.jasa[0].id = false;
+                newError.jasa[0].jum = false;
+                newError.jasa[0].prc = false;
                 setError(newError);
               }}
               placeholder="Pilih No. Pesanan Pembelian"
@@ -775,7 +771,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
               placeholder="Pilih Supplier"
               detail
               onDetail={() => setShowSupplier(true)}
-              label={"[supplier.sup_code] ([supplier.sup_name])"}
+              label={"[supplier.sup_name]"}
               disabled={order && order.po_id !== null}
               errorMessage="Supplier Belum Dipilih"
               error={error?.sup}
@@ -916,10 +912,10 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                   return {
                     ...v,
                     index: i,
-                    // order: v?.order ?? 0,
-                    // price: v?.price ?? 0,
-                    // disc: v?.disc ?? 0,
-                    // total: v?.total ?? 0,
+                    order: v?.order ?? 0,
+                    price: v?.price ?? 0,
+                    disc: v?.disc ?? 0,
+                    total: v?.total ?? 0,
                   };
                 })}
                 className="display w-150 datatable-wrapper header-white no-border"
@@ -1153,15 +1149,12 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                       <Link
                         onClick={() => {
                           let newError = error;
-                          let ep = [];
-                          e.dprod?.forEach((element) => {
-                            ep.push({
-                              jum: false,
-                              prc: false,
-                            });
+                          newError.prod.push({
+                            id: false,
+                            lok: false,
+                            jum: false,
+                            prc: false,
                           });
-
-                          newError.prod = ep;
                           setError(newError);
 
                           updateORD({
@@ -1359,10 +1352,15 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                             temp[e.index].order * temp[e.index].price;
                           updateORD({ ...order, djasa: temp });
                           console.log(temp);
+
+                          let newError = error;
+                          newError.jasa[e.index].prc = false;
+                          setError(newError);
                         }}
                         placeholder="0"
                         type="number"
                         min={0}
+                        error={error?.jasa[e.index]?.prc}
                         disabled={order && order.po_id !== null}
                       />
                     </div>
@@ -1416,6 +1414,14 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                     e.index === order.djasa?.length - 1 ? (
                       <Link
                         onClick={() => {
+                          let newError = error;
+                          newError.jasa.push({
+                            id: false,
+                            jum: false,
+                            prc: false,
+                          });
+                          setError(newError);
+
                           updateORD({
                             ...order,
                             djasa: [

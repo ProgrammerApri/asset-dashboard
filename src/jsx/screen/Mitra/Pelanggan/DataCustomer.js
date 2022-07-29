@@ -111,7 +111,7 @@ const DataCustomer = ({
   const [jpel, setJpel] = useState(null);
   const [subArea, setSubArea] = useState(null);
   const [setup, setSetup] = useState(null);
-  const [account, setAccount] = useState(null);
+  const [ar, setAr] = useState(null);
   const [accU, setAcc] = useState(null);
   const [company, setComp] = useState(null);
   const [currency, setCurrency] = useState(null);
@@ -245,15 +245,9 @@ const DataCustomer = ({
       console.log(response);
       if (response.status) {
         const { data } = response;
-        let filt = [];
-        data.forEach((elem) => {
-          // if (elem.account.kat_code === 3) {
-          //   filt.push(elem.account);
-          // }
-          filt.push(elem.account);
-        });
         console.log(data);
-        setAccount(filt);
+        setAr(data);
+        // getSetup(data);
       }
     } catch (error) {}
   };
@@ -270,12 +264,7 @@ const DataCustomer = ({
       console.log(response);
       if (response.status) {
         const { data } = response;
-        let filt = [];
-        data.forEach((elem) => {
-          // if (elem.account.kat_code === 5) {
-          //   filt.push(elem.account);
-          // }
-        });
+
         console.log(data);
         setAcc(data);
       }
@@ -300,7 +289,7 @@ const DataCustomer = ({
     } catch (error) {}
   };
 
-  const getSetup = async () => {
+  const getSetup = async (account) => {
     const config = {
       ...endpoints.getSetup,
       data: {},
@@ -312,8 +301,18 @@ const DataCustomer = ({
       console.log(response);
       if (response.status) {
         const { data } = response;
+        // let filt = [];
+        // account.forEach((elem) => {
+        //   elem.st = [];
+        //   data.forEach((element) => {
+        //     if (elem.id === element.ar.id) {
+        //       elem.st.push(element);
+        //     }
+        //   });
+        // });
         console.log(data);
         setSetup(data);
+        // setAr(filt);
       }
     } catch (error) {}
   };
@@ -843,8 +842,8 @@ const DataCustomer = ({
 
   const gl = (value) => {
     let gl = {};
-    account?.forEach((element) => {
-      if (value === element.id) {
+    ar?.forEach((element) => {
+      if (value === element.account.id) {
         gl = element;
       }
     });
@@ -853,7 +852,7 @@ const DataCustomer = ({
 
   const um = (value) => {
     let um = {};
-    account?.forEach((element) => {
+    ar?.forEach((element) => {
       if (value === element.id) {
         um = element;
       }
@@ -864,7 +863,9 @@ const DataCustomer = ({
   const glTemplate = (option) => {
     return (
       <div>
-        {option !== null ? `${option.acc_name} - ${option.acc_code}` : ""}
+        {option !== null
+          ? `${option.account.acc_name} - ${option.account.acc_code}`
+          : ""}
       </div>
     );
   };
@@ -873,7 +874,9 @@ const DataCustomer = ({
     if (option) {
       return (
         <div>
-          {option !== null ? `${option.acc_name} - ${option.acc_code}` : ""}
+          {option !== null
+            ? `${option.account.acc_name} - ${option.account.acc_code}`
+            : ""}
         </div>
       );
     }
@@ -1322,23 +1325,23 @@ const DataCustomer = ({
                 </div>
 
                 <div className="col-6">
-                    <PrimeInput
+                  <PrimeInput
                     isNumber
                     label={"No. Telepon 2"}
-                      value={`${currentItem?.customer?.cus_telp2 ?? ""}`}
-                      onChange={(e) =>
-                        setCurrentItem({
-                          ...currentItem,
-                          customer: {
-                            ...currentItem.customer,
-                            cus_telp2: e.value,
-                          },
-                        })
-                      }
-                      placeholder="0"
-                      mode={"decimal"}
-                      useGrouping={false}
-                    />
+                    value={`${currentItem?.customer?.cus_telp2 ?? ""}`}
+                    onChange={(e) =>
+                      setCurrentItem({
+                        ...currentItem,
+                        customer: {
+                          ...currentItem.customer,
+                          cus_telp2: e.value,
+                        },
+                      })
+                    }
+                    placeholder="0"
+                    mode={"decimal"}
+                    useGrouping={false}
+                  />
                 </div>
               </div>
 
@@ -1512,7 +1515,7 @@ const DataCustomer = ({
                         ? gl(currentItem.customer.cus_gl)
                         : null
                     }
-                    options={account}
+                    options={ar}
                     onChange={(e) => {
                       console.log(e.value);
                       setCurrentItem({
@@ -1547,7 +1550,7 @@ const DataCustomer = ({
                         ? gl(currentItem.customer.cus_uang_muka)
                         : null
                     }
-                    options={account}
+                    options={accU}
                     onChange={(e) => {
                       console.log(e.value);
                       setCurrentItem({

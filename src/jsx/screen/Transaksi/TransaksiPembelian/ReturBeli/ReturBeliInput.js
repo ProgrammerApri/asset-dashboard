@@ -486,11 +486,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
               <InputText
                 value={
                   pr.fk_id !== null
-                    ? `${
-                        supp(checkFK(pr.fk_id)?.ord_id.sup_id).supplier.sup_name
-                      } (${
-                        supp(checkFK(pr.fk_id)?.ord_id.sup_id).supplier.sup_code
-                      })`
+                    ? supp(checkFK(pr.fk_id)?.ord_id.sup_id).supplier.sup_name
                     : null
                 }
                 placeholder="Pilih Supplier"
@@ -567,7 +563,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                     return {
                       ...v,
                       index: i,
-                      retur: v?.retur ?? 0,
+                      // retur: v?.retur ?? 0,
                       price: v?.price ?? 0,
                       disc: v?.disc ?? 0,
                       nett_price: v?.nett_price ?? 0,

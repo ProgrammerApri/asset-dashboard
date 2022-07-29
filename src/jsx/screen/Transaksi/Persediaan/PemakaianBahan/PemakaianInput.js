@@ -442,7 +442,7 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
                     ...v,
                     index: i,
                     end: v?.end ?? 0,
-                    order: v?.order ?? 0
+                    order: v?.order ?? 0,
                   };
                 })}
                 className="display w-150 datatable-wrapper header-white no-border"
@@ -614,11 +614,15 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
-                className="align-text-top"
+                  className="align-text-top"
                   body={(e) =>
                     e.index === pb.product.length - 1 ? (
                       <Link
                         onClick={() => {
+                          let newError = error;
+                          newError.prod.push({ sto: false, jum: false });
+                          setError(newError);
+
                           updatePB({
                             ...pb,
                             product: [

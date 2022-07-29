@@ -896,6 +896,130 @@ const endpoints = {
     method: "GET",
     data: {},
   },
+
+  /// Koreksi Persediaan
+  ic: {
+    endpoint: "/v1/api/ic",
+    method: "GET",
+    data: {},
+  },
+
+  addIC: {
+    endpoint: "/v1/api/ic",
+    method: "POST",
+    data: {},
+  },
+
+  editIC: {
+    endpoint: "/v1/api/ic/",
+    method: "PUT",
+    data: {},
+  },
+  delIC: {
+    endpoint: "/v1/api/ic/",
+    method: "DELETE",
+    data: {},
+  },
+
+  /// Pemakaian Bahan
+  pb: {
+    endpoint: "/v1/api/pb",
+    method: "GET",
+    data: {},
+  },
+
+  addPB: {
+    endpoint: "/v1/api/pb",
+    method: "POST",
+    data: {},
+  },
+
+  editPB: {
+    endpoint: "/v1/api/pb/",
+    method: "PUT",
+    data: {},
+  },
+  delPB: {
+    endpoint: "/v1/api/pb/",
+    method: "DELETE",
+    data: {},
+  },
+
+  /// Penerimaan Hasil Jadi
+  phj: {
+    endpoint: "/v1/api/phj",
+    method: "GET",
+    data: {},
+  },
+
+  addPHJ: {
+    endpoint: "/v1/api/phj",
+    method: "POST",
+    data: {},
+  },
+
+  editPHJ: {
+    endpoint: "/v1/api/phj/",
+    method: "PUT",
+    data: {},
+  },
+
+  delPHJ: {
+    endpoint: "/v1/api/phj/",
+    method: "DELETE",
+    data: {},
+  },
+
+  /// Mesin
+  mesin: {
+    endpoint: "/v1/api/mesin",
+    method: "GET",
+    data: {},
+  },
+
+  addMesin: {
+    endpoint: "/v1/api/mesin",
+    method: "POST",
+    data: {},
+  },
+
+  editMesin: {
+    endpoint: "/v1/api/mesin/",
+    method: "PUT",
+    data: {},
+  },
+
+  delMesin: {
+    endpoint: "/v1/api/mesin/",
+    method: "DELETE",
+    data: {},
+  },
+
+
+  /// Formula
+  formula: {
+    endpoint: "/v1/api/formula",
+    method: "GET",
+    data: {},
+  },
+
+  addFormula: {
+    endpoint: "/v1/api/formula",
+    method: "POST",
+    data: {},
+  },
+
+  editFormula: {
+    endpoint: "/v1/api/formula/",
+    method: "PUT",
+    data: {},
+  },
+
+  delFormula: {
+    endpoint: "/v1/api/formula/",
+    method: "DELETE",
+    data: {},
+  },
 };
 
 export default endpoints;

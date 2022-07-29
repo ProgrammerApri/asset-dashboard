@@ -86,6 +86,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
   };
 
   const delODR = async (id) => {
+    setLoading(true)
     const config = {
       ...endpoints.delODR,
       endpoint: endpoints.delODR.endpoint + currentItem.id,
@@ -319,6 +320,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
               type: SET_CURRENT_ODR,
               payload: {
                 ...data,
+                split_inv : false,
                 dprod: [
                   {
                     id: 0,

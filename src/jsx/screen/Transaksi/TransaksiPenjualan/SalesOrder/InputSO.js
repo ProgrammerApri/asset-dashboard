@@ -654,13 +654,13 @@ const InputSO = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-12 mt-0">
-            <span className="fs-14">
+          <div className="col-12 mt-3">
+            <span className="fs-13">
               <b>Informasi Pelanggan</b>
             </span>
             {/* </div>
           <div className="col-12"> */}
-            <Divider className="mt-2"></Divider>
+            <Divider className="mt-1"></Divider>
           </div>
 
           <div className="col-3">
@@ -729,12 +729,12 @@ const InputSO = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-12 mt-3">
-            <span className="fs-14">
+            <span className="fs-13">
               <b>Informasi Pembayaran</b>
             </span>
             {/* </div>
           <div className="col-12"> */}
-            <Divider className="mt-2"></Divider>
+            <Divider className="mt-1"></Divider>
           </div>
 
           <div className="col-3">
@@ -883,10 +883,10 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   return {
                     ...v,
                     index: i,
-                    order: v?.order ?? 0,
-                    price: v?.price ?? 0,
-                    disc: v?.disc ?? 0,
-                    total: v?.total ?? 0,
+                    // order: v?.order ?? 0,
+                    // price: v?.price ?? 0,
+                    // disc: v?.disc ?? 0,
+                    // total: v?.total ?? 0,
                   };
                 })}
                 className="display w-150 datatable-wrapper header-white no-border"
@@ -1116,6 +1116,10 @@ const InputSO = ({ onCancel, onSuccess }) => {
                     e.index === so.sprod.length - 1 ? (
                       <Link
                         onClick={() => {
+                          let newError = error;
+                          newError.prod.push({ jum: false, prc: false });
+                          setError(newError);
+
                           updateSo({
                             ...so,
                             sprod: [
@@ -1177,10 +1181,10 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   return {
                     ...v,
                     index: i,
-                    order: v?.order ?? 0,
-                    price: v?.price ?? 0,
-                    disc: v?.disc ?? 0,
-                    total: v?.total ?? 0,
+                    // order: v?.order ?? 0,
+                    // price: v?.price ?? 0,
+                    // disc: v?.disc ?? 0,
+                    // total: v?.total ?? 0,
                   };
                 })}
                 className="display w-170 datatable-wrapper header-white no-border"
@@ -1377,6 +1381,10 @@ const InputSO = ({ onCancel, onSuccess }) => {
                     e.index === so.sjasa?.length - 1 ? (
                       <Link
                         onClick={() => {
+                          let newError = error;
+                          newError.jasa.push({ jum: false, prc: false });
+                          setError(newError);
+
                           updateSo({
                             ...so,
                             sjasa: [

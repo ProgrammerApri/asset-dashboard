@@ -654,7 +654,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
       date: !po.po_date || po.po_date === "",
       req: !po?.preq_id,
       rul: !po?.top,
-      sup: !po.sup_id,
+      sup: po.ref_sup === false ? !po.sup_id : false,
       prod: [],
       jasa: [],
     };
@@ -862,6 +862,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                 });
 
                 newError.prod = ep;
+                newError.jasa.push({ jum: false, prc: false });
                 setError(newError);
               }}
               label={"[req_code]"}
@@ -966,6 +967,10 @@ const InputPO = ({ onCancel, onSuccess }) => {
               className="ml-4"
               checked={po && po.ref_sup}
               onChange={(e) => {
+                let newError = error;
+                newError.sup = false;
+                setError(newError);
+
                 updatePo({ ...po, ref_sup: e.target.value });
               }}
             />
@@ -1008,14 +1013,14 @@ const InputPO = ({ onCancel, onSuccess }) => {
                             <div className="col-2 ml-0 p-2">
                               <RadioButton
                                 inputId="binary"
-                                checked={po.check}
+                                checked={po && po.check}
                                 onChange={(e) => {
                                   let temp = [...po.pprod];
 
-                                  po.psup?.forEach((element) => {
+                                  po.psup?.forEach((element, i) => {
                                     temp[e.index]?.prod_id.forEach((elem) => {
                                       if (elem === element.prod_id) {
-                                        temp[e.index].price = element.price;
+                                        temp[e.index].price = element.price[i];
                                       }
                                       console.log("ckckc");
                                       console.log(elem);
@@ -1321,10 +1326,10 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     return {
                       ...v,
                       index: i,
-                      order: v?.order ?? 0,
-                      price: v?.price ?? 0,
-                      disc: v?.disc ?? 0,
-                      total: v?.total ?? 0,
+                      // order: v?.order ?? 0,
+                      // price: v?.price ?? 0,
+                      // disc: v?.disc ?? 0,
+                      // total: v?.total ?? 0,
                     };
                   })}
                   className="display w-150 datatable-wrapper header-white no-border"
@@ -1431,7 +1436,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     body={(e) => (
                       <div className="p-inputgroup">
                         <InputText
-                          value={e.request ? e.request : 0}
+                          value={e.request ? e.request : ""}
                           onChange={(t) => {
                             let temp = [...po.pprod];
                             temp[e.index].request = t.target.value;
@@ -1492,7 +1497,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     body={(e) => (
                       <div className="p-inputgroup">
                         <InputText
-                          value={e.remain ? e.remain : 0}
+                          value={e.remain ? e.remain : ""}
                           placeholder="0"
                           type="number"
                           disabled
@@ -1606,6 +1611,10 @@ const InputPO = ({ onCancel, onSuccess }) => {
                       e.index === po.pprod.length - 1 ? (
                         <Link
                           onClick={() => {
+                            let newError = error;
+                            newError.prod.push({ jum: false, prc: false });
+                            setError(newError);
+
                             updatePo({
                               ...po,
                               pprod: [
@@ -1674,9 +1683,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     return {
                       ...v,
                       index: i,
-                      price: v?.price ?? 0,
-                      disc: v?.disc ?? 0,
-                      total: v?.total ?? 0,
+                      // price: v?.price ?? 0,
+                      // disc: v?.disc ?? 0,
+                      // total: v?.total ?? 0,
                     };
                   })}
                   className="display w-170 datatable-wrapper header-white no-border"
@@ -1764,7 +1773,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     body={(e) => (
                       <div className="p-inputgroup">
                         <InputText
-                          value={e.request ? e.request : 0}
+                          value={e.request && e.request}
                           onChange={(t) => {
                             let temp = [...po.pjasa];
                             temp[e.index].request = t.target.value;
@@ -1904,6 +1913,10 @@ const InputPO = ({ onCancel, onSuccess }) => {
                       e.index === po.pjasa.length - 1 ? (
                         <Link
                           onClick={() => {
+                            let newError = error;
+                            newError.jasa.push({ jum: false, prc: false });
+                            setError(newError);
+
                             updatePo({
                               ...po,
                               pjasa: [

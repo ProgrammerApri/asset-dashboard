@@ -697,13 +697,14 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                           id: null,
                           fk_id: v.ord_id?.id,
                           value: v.trx_amnh,
-                          payment: 0,
+                          payment: null,
                         };
                       }),
                     });
 
                     let newError = error;
                     newError.sup = false;
+                    newError.acq.push({ pay: false });
                     setError(newError);
                   }}
                   label={"[supplier.sup_name]"}
@@ -892,7 +893,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                           return {
                             ...v,
                             index: i,
-                            payment: v?.payment ?? 0,
+                            // payment: v?.payment ?? 0,
                           };
                         })}
                         className="display w-150 datatable-wrapper header-white no-border"
@@ -1125,7 +1126,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                         return {
                           ...v,
                           index: i,
-                          value: v?.value ?? 0,
+                          // value: v?.value ?? 0,
                         };
                       })}
                       className="display w-150 datatable-wrapper header-white no-border"
@@ -1200,7 +1201,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                               newError.exp[e.index].nil = false;
                               setError(newError);
                             }}
-                            placeholder="Nilai"
+                            placeholder="0"
                             type="number"
                             min={0}
                             error={error?.exp[e.index]?.nil}
@@ -1233,6 +1234,10 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                           e.index === exp.exp.length - 1 ? (
                             <Link
                               onClick={() => {
+                                let newError = error;
+                                newError.exp.push({ nil: false });
+                                setError(newError);
+
                                 updateExp({
                                   ...exp,
                                   exp: [

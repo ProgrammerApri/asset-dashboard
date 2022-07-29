@@ -1078,10 +1078,10 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   return {
                     ...v,
                     index: i,
-                    order: v?.order ?? 0,
-                    price: v?.price ?? 0,
-                    disc: v?.disc ?? 0,
-                    total: v?.total ?? 0,
+                    // order: v?.order ?? 0,
+                    // price: v?.price ?? 0,
+                    // disc: v?.disc ?? 0,
+                    // total: v?.total ?? 0,
                   };
                 })}
                 className="display w-150 datatable-wrapper header-white no-border"
@@ -1269,7 +1269,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        value={e.disc ? e.disc : 0}
+                        value={e.disc && e.disc}
                         onChange={(t) => {
                           let temp = [...sale.jprod];
                           temp[e.index].disc = t.target.value;
@@ -1299,7 +1299,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   body={(e) => (
                     <div className="p-inputgroup">
                       <InputText
-                        value={e.nett_price ? e.nett_price : 0}
+                        value={e.nett_price && e.nett_price}
                         onChange={(t) => {
                           let temp = [...sale.jprod];
                           temp[e.index].nett_price = t.target.value;
@@ -1337,6 +1337,10 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                     e.index === sale.jprod.length - 1 ? (
                       <Link
                         onClick={() => {
+                          let newError = error;
+                          newError.prod.push({ jum: false, prc: false });
+                          setError(newError);
+
                           updateSL({
                             ...sale,
                             jprod: [
@@ -1400,10 +1404,10 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   return {
                     ...v,
                     index: i,
-                    order: v?.order ?? 0,
-                    price: v?.price ?? 0,
-                    disc: v?.disc ?? 0,
-                    total: v?.total ?? 0,
+                    // order: v?.order ?? 0,
+                    // price: v?.price ?? 0,
+                    // disc: v?.disc ?? 0,
+                    // total: v?.total ?? 0,
                   };
                 })}
                 className="display w-170 datatable-wrapper header-white no-border"
@@ -1597,6 +1601,10 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                     e.index === sale.jjasa.length - 1 ? (
                       <Link
                         onClick={() => {
+                          let newError = error;
+                          newError.jasa.push({ jum: false, prc: false });
+                          setError(newError);
+
                           updateSL({
                             ...sale,
                             jjasa: [

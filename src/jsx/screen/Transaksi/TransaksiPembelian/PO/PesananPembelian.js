@@ -13,10 +13,6 @@ import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_PO, SET_EDIT_PO } from "src/redux/actions";
-import { Divider } from "@material-ui/core";
-import ReactToPrint from "react-to-print";
-import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
-import Wrapper from "src/jsx/components/CustomeWrapper/Wrapper";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 
 const data = {
@@ -34,6 +30,7 @@ const data = {
   total_disc: null,
   rprod: [],
   rjasa: [],
+  psup: [],
 };
 
 const PesananPO = ({ onAdd, onEdit, onDetail }) => {
@@ -41,20 +38,16 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
   const [comp, setComp] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
-  const [displayData, setDisplayData] = useState(false);
+  const [isEdit, setEdit] = useState(false);
   const [displayDel, setDisplayDel] = useState(false);
-  const [position, setPosition] = useState("center");
   const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
-  const [isEdit, setEdit] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const dispatch = useDispatch();
   const PO = useSelector((state) => state.po.po);
-  const show = useSelector((state) => state.po.current);
-  const printPage = useRef(null);
 
   const dummy = Array.from({ length: 10 });
 
@@ -109,98 +102,8 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
     } catch (error) {}
   };
 
-  const editPO = async () => {
-    const config = {
-      ...endpoints.editPO,
-      endpoint: endpoints.editPO.endpoint + currentItem.id,
-      data: {
-        cus_code: currentItem.customer.cus_code,
-      },
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        setTimeout(() => {
-          setUpdate(false);
-          setDisplayData(false);
-          getPO(true);
-          toast.current.show({
-            severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
-            life: 3000,
-          });
-        }, 500);
-      }
-    } catch (error) {
-      setTimeout(() => {
-        setUpdate(false);
-        toast.current.show({
-          severity: "error",
-          summary: "Gagal",
-          detail: "Gagal Memperbarui Data",
-          life: 3000,
-        });
-      }, 500);
-    }
-  };
-
-  const addPO = async () => {
-    const config = {
-      ...endpoints.addPO,
-      data: {
-        cus_code: currentItem.customer.cus_code,
-      },
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        setTimeout(() => {
-          setUpdate(false);
-          setDisplayData(false);
-          getPO(true);
-          toast.current.show({
-            severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
-            life: 3000,
-          });
-        }, 500);
-      }
-    } catch (error) {
-      console.log(error);
-      if (error.status === 400) {
-        setTimeout(() => {
-          setUpdate(false);
-          toast.current.show({
-            severity: "error",
-            summary: "Gagal",
-            detail: `Kode ${currentItem.customer.cus_code} Sudah Digunakan`,
-            life: 3000,
-          });
-        }, 500);
-      } else {
-        setTimeout(() => {
-          setUpdate(false);
-          toast.current.show({
-            severity: "error",
-            summary: "Gagal",
-            detail: "Gagal Memperbarui Data",
-            life: 3000,
-          });
-        }, 500);
-      }
-    }
-  };
-
   const delPO = async (id) => {
-    // setLoading(true)
+    setLoading(true)
     const config = {
       ...endpoints.delPO,
       endpoint: endpoints.delPO.endpoint + currentItem.id,
@@ -312,6 +215,11 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
               el.jasa_id = el.jasa_id.id;
               el.unit_id = el.unit_id.id;
             });
+            // let psup = data.psup;
+            // psup.forEach((el) => {
+            //   el.sup_id = el.sup_id.id;
+            //   el.prod_id = el.prod_id.id;
+            // });
 
             if (!pprod.length) {
               pprod.push({
@@ -342,6 +250,16 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
               });
             }
 
+            // if (!psup.length) {
+            //   psup.push({
+            //     id: 0,
+            //     sup_id: null,
+            //     prod_id: null,
+            //     price: null,
+            //     image: null,
+            //   });
+            // }
+
             dispatch({
               type: SET_CURRENT_PO,
               payload: {
@@ -351,6 +269,7 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
                 top: data?.top?.id,
                 pprod: pprod,
                 pjasa: pjasa,
+                // psup: psup,
               },
             });
           }}
@@ -371,51 +290,6 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
         </Link>
       </div>
       // </React.Fragment>
-    );
-  };
-
-  const onClick = () => {
-    setDisplayData(true);
-    setCurrentItem();
-
-    if (position) {
-      setPosition(position);
-    }
-  };
-
-  const onSubmit = () => {
-    if (isEdit) {
-      setUpdate(true);
-      editPO();
-    } else {
-      setUpdate(true);
-      addPO();
-    }
-  };
-
-  const renderFooter = () => {
-    return (
-      <div>
-        <PButton
-          label="Batal"
-          onClick={() => setDisplayData(false)}
-          className="p-button-text btn-primary"
-        />
-
-        <ReactToPrint
-          trigger={() => {
-            return (
-              <PButton variant="primary" onClick={() => {}}>
-                Print{" "}
-                <span className="btn-icon-right">
-                  <i class="bx bxs-printer"></i>
-                </span>
-              </PButton>
-            );
-          }}
-          content={() => printPage.current}
-        />
-      </div>
     );
   };
 
@@ -549,33 +423,6 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
     return [day, month, year].join("-");
   };
 
-  const formatIdr = (value) => {
-    return `${value}`
-      .replace(".", ",")
-      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
-  };
-
-  const getSubTotalBarang = () => {
-    let total = 0;
-    show?.pprod?.forEach((el) => {
-      if (el.nett_price && el.nett_price > 0) {
-        total += parseInt(el.nett_price);
-      } else {
-        total += el.total - (el.total * el.disc) / 100;
-      }
-    });
-
-    return total;
-  };
-
-  const getSubTotalJasa = () => {
-    let total = 0;
-    show?.pjasa?.forEach((el) => {
-      total += el.total - (el.total * el.disc) / 100;
-    });
-
-    return total;
-  };
 
   return (
     <>
@@ -628,7 +475,7 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
                 />
                 <Column
                   header="Pemasok"
-                  field={(e) => e.sup_id?.sup_name}
+                  field={(e) => e.sup_id?.sup_name ?? "-"}
                   style={{ minWidth: "10rem" }}
                   body={loading && <Skeleton />}
                 />

@@ -408,13 +408,13 @@ const PenerimaanInput = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-12">
-            <span className="fs-14">
+          <div className="col-12 mt-3">
+            <span className="fs-13">
               <b>Informasi Pemakaian Bahan Baku</b>
             </span>
             {/* </div>
           <div className="col-12"> */}
-            <Divider className="mt-2"></Divider>
+            <Divider className="mt-1"></Divider>
           </div>
 
           <div className="col-4">
@@ -485,6 +485,7 @@ const PenerimaanInput = ({ onCancel, onSuccess }) => {
               >
                 <Column
                   header="Produk"
+                  className="align-text-top"
                   style={{
                     width: "30rem",
                   }}
@@ -510,6 +511,10 @@ const PenerimaanInput = ({ onCancel, onSuccess }) => {
                         temp[e.index].prod_id = e.id;
                         temp[e.index].unit_id = e.unit?.id;
                         updatePhj({ ...phj, product: temp });
+
+                        let newError = error;
+                        newError.prod[e.index].id = false;
+                        setError(newError);
                       }}
                       placeholder="Pilih Kode Produk"
                       label={"[name]"}
@@ -518,12 +523,15 @@ const PenerimaanInput = ({ onCancel, onSuccess }) => {
                         setShowProd(true);
                         setCurrentIndex(e.index);
                       }}
+                      errorMessage="Produk Belum Dipilih"
+                      error={error?.prod[e.index]?.id}
                     />
                   )}
                 />
 
                 <Column
                   header="Lokasi"
+                  className="align-text-top"
                   style={{
                     width: "15rem",
                   }}
@@ -535,6 +543,10 @@ const PenerimaanInput = ({ onCancel, onSuccess }) => {
                         let temp = [...phj.product];
                         temp[e.index].location = e.id;
                         updatePhj({ ...phj, product: temp });
+
+                        let newError = error;
+                        newError.prod[e.index].lok = false;
+                        setError(newError);
                       }}
                       option={lokasi}
                       label={"[name]"}
@@ -544,35 +556,42 @@ const PenerimaanInput = ({ onCancel, onSuccess }) => {
                         setShowLok(true);
                         setCurrentIndex(e.index);
                       }}
+                      errorMessage="Lokasi Belum Dipilih"
+                      error={error?.prod[e.index]?.lok}
                     />
                   )}
                 />
 
                 <Column
                   header="Jumlah"
+                  className="align-text-top"
                   style={{
                     width: "7rem",
                   }}
                   field={""}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={phj.order ? phj.order : null}
-                        onChange={(a) => {
-                          let temp = [...phj.product];
-                          temp[e.index].order = a.target.value;
-                          updatePhj({ ...phj, product: temp });
-                        }}
-                        placeholder="0"
-                        type="number"
-                        min={0}
-                      />
-                    </div>
+                    <PrimeNumber
+                      value={phj.order && phj.order}
+                      onChange={(a) => {
+                        let temp = [...phj.product];
+                        temp[e.index].order = a.target.value;
+                        updatePhj({ ...phj, product: temp });
+
+                        let newError = error;
+                        newError.prod[e.index].jum = false;
+                        setError(newError);
+                      }}
+                      placeholder="0"
+                      type="number"
+                      min={0}
+                      error={error?.prod[e.index]?.jum}
+                    />
                   )}
                 />
 
                 <Column
                   header="Satuan"
+                  className="align-text-top"
                   style={{
                     width: "10rem",
                   }}
@@ -598,10 +617,15 @@ const PenerimaanInput = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
+                className="align-text-top"
                   body={(e) =>
                     e.index === phj.product.length - 1 ? (
                       <Link
                         onClick={() => {
+                          let newError = error;
+                          newError.prod.push({ jum: false });
+                          setError(newError);
+
                           updatePhj({
                             ...phj,
                             product: [

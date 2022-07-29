@@ -96,14 +96,14 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
       }
     }
 
-      let validProduct = false;
-      errors.prod.forEach((el) => {
-        for (var k in el) {
-          validProduct = !el[k];
-        }
-      });
+    let validProduct = false;
+    errors.prod.forEach((el) => {
+      for (var k in el) {
+        validProduct = !el[k];
+      }
+    });
 
-      setError(errors);
+    setError(errors);
 
     valid = !errors.code && !errors.date && !errors.sal && validProduct;
 
@@ -591,10 +591,10 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                     return {
                       ...v,
                       index: i,
-                      retur: v?.retur ?? 0,
-                      price: v?.price ?? 0,
-                      disc: v?.disc ?? 0,
-                      nett_price: v?.nett_price ?? 0,
+                      // retur: v?.retur ?? 0,
+                      // price: v?.price ?? 0,
+                      // disc: v?.disc ?? 0,
+                      // nett_price: v?.nett_price ?? 0,
                       total: v?.total ?? 0,
                     };
                   })}
@@ -777,6 +777,10 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                       e.index === sr.product.length - 1 ? (
                         <Link
                           onClick={() => {
+                            let newError = error;
+                            newError.prod.push({ ret: false });
+                            setError(newError);
+
                             updateSr({
                               ...sr,
                               product: [

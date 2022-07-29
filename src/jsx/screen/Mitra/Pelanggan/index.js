@@ -134,7 +134,7 @@ const Customer = () => {
     let jte = 0;
     ar?.forEach((element) => {
       jte +=
-        (date - new Date(`${element?.trx_due}Z`)) / (1000 * 60 * 60 * 24) > 60
+        (new Date() - new Date(`${element?.trx_due}Z`)) / (1000 * 60 * 60 * 24) > 60
           ? element.trx_amnh
           : 0;
     });
@@ -144,7 +144,7 @@ const Customer = () => {
     let jt = 0;
     ar?.forEach((element) => {
       jt +=
-        (date - new Date(`${element?.trx_due}Z`)) / (1000 * 60 * 60 * 24) <= 0
+        (new Date() - new Date(`${element?.trx_due}Z`)) / (1000 * 60 * 60 * 24) <= 0
           ? element.trx_amnh
           : 0;
     });

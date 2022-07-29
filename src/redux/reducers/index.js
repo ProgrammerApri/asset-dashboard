@@ -19,6 +19,7 @@ import LMReducer from "./LMReducer";
 import PBReducer from "./PBReducer";
 import PHJReducer from "./PHJReducer";
 import FMReducer from "./FMReducer";
+import MSNReducer from "./MSNReducer";
 
 
 const rootReducer = combineReducers({
@@ -42,6 +43,7 @@ const rootReducer = combineReducers({
   pb: PBReducer,
   phj: PHJReducer,
   forml: FMReducer,
+  msn: MSNReducer,
 });
 
 export default rootReducer;

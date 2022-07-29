@@ -15,12 +15,14 @@ import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
+import { useDispatch, useSelector } from "react-redux";
+import { SET_CURRENT_MSN, SET_EDIT_MSN, SET_MSN } from "src/redux/actions";
 
 const def = {
   id: 1,
-  code: "",
-  name: "",
-  desc: "",
+  msn_code: null,
+  msn_name: null,
+  desc: null,
 };
 
 const defError = {
@@ -28,17 +30,10 @@ const defError = {
   name: false,
 };
 
-const DataMesin = ({
-  data,
-  load,
-  popUp = false,
-  show = false,
-  onHide = () => {},
-  onInput = () => {},
-  onRowSelect,
-  onSuccessInput,
-}) => {
-  const [DataMesin, setDataMesin] = useState(null);
+const DataMesin = ({ data, load, onSuccessInput }) => {
+  const msn = useSelector((state) => state.msn.current);
+  const isEdit = useSelector((state) => state.msn.editMsn);
+  const [isEditt, setEdit] = useState(false);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
@@ -48,18 +43,141 @@ const DataMesin = ({
   const toast = useRef(null);
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
-  const [isEdit, setEdit] = useState(def);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+  const dispatch = useDispatch();
   const [error, setError] = useState(defError);
-
-  const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
     initFilters1();
   }, []);
 
+  const editMesin = async () => {
+    // setLoading(true);
+    const config = {
+      ...endpoints.editMesin,
+      endpoint: endpoints.editMesin.endpoint + msn.id,
+      data: msn,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setTimeout(() => {
+          setUpdate(false);
+          setDisplayData(false);
+          onSuccessInput(true);
+          toast.current.show({
+            severity: "info",
+            summary: "Berhasil",
+            detail: "Data Berhasil Diperbarui",
+            life: 3000,
+          });
+        }, 500);
+      }
+    } catch (error) {
+      setTimeout(() => {
+        setUpdate(false);
+        toast.current.show({
+          severity: "error",
+          summary: "Gagal",
+          detail: "Gagal Memperbarui Data",
+          life: 3000,
+        });
+      }, 500);
+    }
+  };
 
+  const addMesin = async () => {
+    // setLoading(true);
+    const config = {
+      ...endpoints.addMesin,
+      data: msn,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setTimeout(() => {
+          setUpdate(false);
+          setDisplayData(false);
+          onSuccessInput(true);
+          toast.current.show({
+            severity: "info",
+            summary: "Berhasil",
+            detail: "Data Berhasil Diperbarui",
+            life: 3000,
+          });
+        }, 500);
+      }
+    } catch (error) {
+      console.log(error);
+      if (error.status === 400) {
+        setTimeout(() => {
+          setUpdate(false);
+          toast.current.show({
+            severity: "error",
+            summary: "Gagal",
+            detail: `Kode ${msn.msn_code} Sudah Digunakan`,
+            life: 3000,
+          });
+        }, 500);
+      } else {
+        setTimeout(() => {
+          setUpdate(false);
+          toast.current.show({
+            severity: "error",
+            summary: "Gagal",
+            detail: "Gagal Memperbarui Data",
+            life: 3000,
+          });
+        }, 500);
+      }
+    }
+  };
+
+  const delDataMesin = async (id) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.delMesin,
+      endpoint: endpoints.delMesin.endpoint + currentItem.id,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setTimeout(() => {
+          setUpdate(false);
+          setDisplayDel(false);
+          onSuccessInput(true);
+          toast.current.show({
+            severity: "info",
+            summary: "Berhasil",
+            detail: "Data Berhasil Dihapus",
+            life: 3000,
+          });
+        }, 500);
+      }
+    } catch (error) {
+      console.log(error);
+      setTimeout(() => {
+        setUpdate(false);
+        setDisplayDel(false);
+        toast.current.show({
+          severity: "error",
+          summary: "Gagal",
+          detail: `Tidak Dapat Menghapus Data`,
+          life: 3000,
+        });
+      }, 500);
+    }
+  };
 
   const actionBodyTemplate = (data) => {
     return (
@@ -67,10 +185,18 @@ const DataMesin = ({
       <div className="d-flex">
         <Link
           onClick={() => {
-            setEdit(true);
-            onClick("displayData", data);
-            setCurrentItem(data);
-            onInput(true);
+            setDisplayData(
+              dispatch({
+                type: SET_EDIT_MSN,
+                payload: true,
+              }),
+              dispatch({
+                type: SET_CURRENT_MSN,
+                payload: data,
+              })
+            );
+            // setDisplayData(true);
+            // setCurrentItem(data);
           }}
           className="btn btn-primary shadow btn-xs sharp ml-1"
         >
@@ -82,7 +208,6 @@ const DataMesin = ({
             setEdit(true);
             setDisplayDel(true);
             setCurrentItem(data);
-            onInput(false);
           }}
           className="btn btn-danger shadow btn-xs sharp ml-1"
         >
@@ -93,26 +218,17 @@ const DataMesin = ({
     );
   };
 
-  const onClick = () => {
-    setDisplayData(true);
-    setCurrentItem();
-
-    if (position) {
-      setPosition(position);
+  const onSubmit = () => {
+    if (isValid()) {
+    if (isEdit) {
+      setUpdate(true);
+      editMesin();
+    } else {
+      setUpdate(true);
+      addMesin();
+    }
     }
   };
-
-  // const onSubmit = () => {
-  //   if (isValid()) {
-  //     if (isEdit) {
-  //       setUpdate(true);
-  //       editDataMesin();
-  //     } else {
-  //       setUpdate(true);
-  //       addDataMesin();
-  //     }
-  //   }
-  // };
 
   const renderFooter = () => {
     return (
@@ -121,14 +237,13 @@ const DataMesin = ({
           label="Batal"
           onClick={() => {
             setDisplayData(false);
-            onInput(false);
           }}
           className="p-button-text btn-primary"
         />
         <PButton
           label="Simpan"
           icon="pi pi-check"
-          // onClick={() => onSubmit()}
+          onClick={onSubmit}
           autoFocus
           loading={update}
         />
@@ -143,7 +258,6 @@ const DataMesin = ({
           label="Batal"
           onClick={() => {
             setDisplayDel(false);
-            onInput(false);
           }}
           className="p-button-text btn-primary"
         />
@@ -151,7 +265,7 @@ const DataMesin = ({
           label="Hapus"
           icon="pi pi-trash"
           onClick={() => {
-            // delDataMesin();
+            delDataMesin();
           }}
           autoFocus
           loading={update}
@@ -190,10 +304,16 @@ const DataMesin = ({
           label="Tambah"
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
-            setEdit(false);
-            setCurrentItem(def);
-            setDisplayData(true);
-            onInput(true);
+            setDisplayData(
+              dispatch({
+                type: SET_EDIT_MSN,
+                payload: false,
+              }),
+              dispatch({
+                type: SET_CURRENT_MSN,
+                payload: data,
+              })
+            );
           }}
         />
       </div>
@@ -246,188 +366,178 @@ const DataMesin = ({
     setRows2(event.rows);
   };
 
+  const updateMSN = (e) => {
+    dispatch({
+      type: SET_CURRENT_MSN,
+      payload: e,
+    });
+  };
+
   const isValid = () => {
     let valid = false;
     let errors = {
-      code: !currentItem.code || currentItem.code === "",
-      name: !currentItem.name || currentItem.name === "",
+      code: !msn.msn_code || msn.msn_code === "",
+      name: !msn.msn_name || msn.msn_name === "",
     };
+
+    valid = !errors.code && !errors.name;
 
     setError(errors);
 
-    valid = !errors.code && !errors.name;
-    
     return valid;
   };
 
-  const renderBody = () => {
-    return (
-      <>
-        <Toast ref={toast} />
-        <DataTable
-          responsiveLayout="scroll"
-          value={data}
-          className="display w-150 datatable-wrapper"
-          showGridlines
-          dataKey="id"
-          rowHover
-          header={renderHeader}
-          filters={filters1}
-          globalFilterFields={["code", "name", "desc"]}
-          emptyMessage="Tidak ada data"
-          paginator
-          paginatorTemplate={template2}
-          first={first2}
-          rows={rows2}
-          
-          onPage={onCustomPage2}
-          paginatorClassName="justify-content-end mt-3"
-          selectionMode="single"
-          onRowSelect={onRowSelect}
-        >
-          <Column
-            header="Kode Mesin"
-            style={{
-              minWidth: "8rem",
-            }}
-            field={(e) => e.code}
-            body={load && <Skeleton />}
-          />
-          <Column
-            header="Nama Mesin"
-            field={(e) => e.name}
-            style={{ minWidth: "8rem" }}
-            body={load && <Skeleton />}
-          />
-          <Column
-            header="Keterangan"
-            field={(e) => (e?.desc !== "" ? e.desc : "-")}
-            style={{ minWidth: "8rem" }}
-            body={load && <Skeleton />}
-          />
-          <Column
-            header="Action"
-            dataType="boolean"
-            bodyClassName="text-center"
-            style={{ minWidth: "2rem" }}
-            body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
-          />
-        </DataTable>
-      </>
-    );
-  };
-
-  const renderDialog = () => {
-    return (
-      <>
-        <Toast ref={toast} />
-        <Dialog
-          header={isEdit ? "Edit DataMesin" : "Tambah Mesin"}
-          visible={displayData}
-          style={{ width: "40vw" }}
-          footer={renderFooter()}
-          onHide={() => {
-            setEdit(false);
-            setDisplayData(false);
-            onInput(false);
+  return (
+    <>
+      <Toast ref={toast} />
+      <DataTable
+        responsiveLayout="scroll"
+        value={data}
+        className="display w-150 datatable-wrapper"
+        showGridlines
+        dataKey="id"
+        rowHover
+        header={renderHeader}
+        filters={filters1}
+        globalFilterFields={["msn_code", "msn_name", "desc"]}
+        emptyMessage="Tidak ada data"
+        paginator
+        paginatorTemplate={template2}
+        first={first2}
+        rows={rows2}
+        onPage={onCustomPage2}
+        paginatorClassName="justify-content-end mt-3"
+      >
+        <Column
+          header="Kode Mesin"
+          style={{
+            minWidth: "8rem",
           }}
-        >
-          <div className="row ml-0 mt-0">
-            <div className="col-6">
-              <PrimeInput
-                label={"Kode Mesin"}
-                value={currentItem !== null ? `${currentItem.code}` : ""}
-                onChange={(e) => {
-                  setCurrentItem({ ...currentItem, code: e.target.value });
-                  let newError = error;
-                  newError.code = false;
-                  setError(newError);
-                }}
-                placeholder="Masukan Kode Mesin"
-                error={error?.code}
-              />
-            </div>
+          field={(e) => e.msn_code}
+          body={load && <Skeleton />}
+        />
+        <Column
+          header="Nama Mesin"
+          field={(e) => e.msn_name}
+          style={{ minWidth: "8rem" }}
+          body={load && <Skeleton />}
+        />
+        <Column
+          header="Keterangan"
+          field={(e) => (e?.desc !== "" ? e.desc : "-")}
+          style={{ minWidth: "8rem" }}
+          body={load && <Skeleton />}
+        />
+        <Column
+          header="Action"
+          dataType="boolean"
+          bodyClassName="text-center"
+          style={{ minWidth: "2rem" }}
+          body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
+        />
+      </DataTable>
 
-            <div className="col-6">
-              <PrimeInput
-                label={"Nama Mesin"}
-                value={currentItem !== null ? `${currentItem.name}` : ""}
-                onChange={(e) => {
-                  setCurrentItem({ ...currentItem, name: e.target.value });
-                  let newError = error;
-                  newError.name = false;
-                  setError(newError);
-                }}
-                placeholder="Masukan Nama Mesin"
-                error={error?.name}
-              />
-            </div>
-          </div>
-
-          <div className="row ml-0 mt-0">
-            <div className="col-12">
-              <label className="text-label">Keterangan</label>
-              <div className="p-inputgroup">
-                <InputTextarea
-                  value={currentItem !== null ? `${currentItem.desc}` : ""}
-                  onChange={(e) =>
-                    setCurrentItem({ ...currentItem, desc: e.target.value })
-                  }
-                  placeholder="Masukan Keterangan"
-                />
-              </div>
-            </div>
-          </div>
-        </Dialog>
-
-        <Dialog
-          header={"Hapus Data"}
-          visible={displayDel}
-          style={{ width: "30vw" }}
-          footer={renderFooterDel("displayDel")}
-          onHide={() => {
-            setDisplayDel(false);
-            onInput(false);
-          }}
-        >
-          <div className="ml-3 mr-3">
-            <i
-              className="pi pi-exclamation-triangle mr-3 align-middle"
-              style={{ fontSize: "2rem" }}
+      <Dialog
+        header={isEdit ? "Edit Data Mesin" : "Tambah Data Mesin"}
+        visible={displayData}
+        style={{ width: "40vw" }}
+        footer={renderFooter()}
+        onHide={() => {
+          // setEdit(false);
+          setDisplayData(false);
+        }}
+      >
+        <div className="row ml-0 mt-0">
+          <div className="col-6">
+            <PrimeInput
+              label={"Kode Mesin"}
+              value={msn.msn_code}
+              onChange={(e) => {
+                updateMSN({ ...msn, msn_code: e.target.value });
+                let newError = error;
+                newError.code = false;
+                setError(newError);
+              }}
+              placeholder="Masukan Kode Mesin"
+              error={error?.code}
             />
-            <span>Apakah anda yakin ingin menghapus data ?</span>
           </div>
-        </Dialog>
-      </>
-    );
-  };
 
-  if (popUp) {
-    return (
-      <>
-        <Dialog
-          header={"Data Mesin"}
-          visible={show}
-          footer={() => <div></div>}
-          style={{ width: "60vw" }}
-          onHide={onHide}
-        >
-          <Row className="ml-0 mr-0">
-            <Col>{renderBody()}</Col>
-          </Row>
-        </Dialog>
-        {renderDialog()}
-      </>
-    );
-  } else {
-    return (
-      <>
-        {renderBody()}
-        {renderDialog()}
-      </>
-    );
-    
-  }
+          <div className="col-6">
+            <PrimeInput
+              label={"Nama Mesin"}
+              value={msn.msn_name}
+              onChange={(e) => {
+                updateMSN({ ...msn, msn_name: e.target.value });
+                let newError = error;
+                newError.name = false;
+                setError(newError);
+              }}
+              placeholder="Masukan Nama Mesin"
+              error={error?.name}
+            />
+          </div>
+        </div>
+
+        <div className="row ml-0 mt-0">
+          <div className="col-12">
+            <label className="text-label">Keterangan</label>
+            <div className="p-inputgroup">
+              <InputTextarea
+                value={msn.desc}
+                onChange={(e) => updateMSN({ ...msn, desc: e.target.value })}
+                placeholder="Masukan Keterangan"
+              />
+            </div>
+          </div>
+        </div>
+      </Dialog>
+
+      <Dialog
+        header={"Hapus Data"}
+        visible={displayDel}
+        style={{ width: "30vw" }}
+        footer={renderFooterDel("displayDel")}
+        onHide={() => {
+          setDisplayDel(false);
+        }}
+      >
+        <div className="ml-3 mr-3">
+          <i
+            className="pi pi-exclamation-triangle mr-3 align-middle"
+            style={{ fontSize: "2rem" }}
+          />
+          <span>Apakah anda yakin ingin menghapus data ?</span>
+        </div>
+      </Dialog>
+    </>
+  );
+
+  // if (popUp) {
+  //   return (
+  //     <>
+  //       <Dialog
+  //         header={"Data Mesin"}
+  //         visible={show}
+  //         footer={() => <div></div>}
+  //         style={{ width: "60vw" }}
+  //         onHide={onHide}
+  //       >
+  //         <Row className="ml-0 mr-0">
+  //           <Col>{renderBody()}</Col>
+  //         </Row>
+  //       </Dialog>
+  //       {renderDialog()}
+  //     </>
+  //   );
+  // } else {
+  //   return (
+  //     <>
+  //       {renderBody()}
+  //       {renderDialog()}
+  //     </>
+  //   );
+  // }
 };
 
 export default DataMesin;

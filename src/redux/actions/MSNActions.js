@@ -1,0 +1,5 @@
+export const SET_CURRENT_MSN = "msn.SET_CURRENT_MSN"
+export const SET_MSN = "msn.SET_MSN"
+export const RESET_CURRENT_MSN = "msn.RESET_CURRENT_MSN"
+export const UPDATE_CURRENT_MSN = "msn.UPDATE_CURRENT_MSN"
+export const SET_EDIT_MSN = "msn.SET_EDIT_MSN"

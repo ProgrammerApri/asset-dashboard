@@ -651,6 +651,10 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                     e.index === lm.product.length - 1 ? (
                       <Link
                         onClick={() => {
+                          let newError = error;
+                          newError.prod.push({ jum: false });
+                          setError(newError);
+
                           updateLM({
                             ...lm,
                             product: [

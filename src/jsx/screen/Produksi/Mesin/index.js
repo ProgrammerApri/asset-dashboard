@@ -1,54 +1,53 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Button, Card, Col, Row } from "react-bootstrap";
-import { Toast } from "primereact/toast";
+import React, { useState, useEffect, useRef } from "react";
+import { request, endpoints } from "src/utils";
+import { Row, Col, Card } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { SET_MSN } from "src/redux/actions";
 import DataMesin from "./DataMesin";
-import InputMesin from "./InputMesin";
 
 const data = {
-  id: 1,
-  code: "",
-  name: "",
-  desc: "",
+  id: null,
+  msn_code: null,
+  msn_name: null,
+  desc: null,
 };
 
-const Mesin = ({ trigger }) => {
-  const [active, setActive] = useState(0);
-  const toast = useRef(null);
+const Mesin = () => {
+  const msn = useSelector((state) => state.msn.msn);
+  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+
+  const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    if (trigger !== 0) {
-      setActive(0);
-    }
-  }, [trigger]);
+    getMesin();
+  }, []);
 
-  const [view, setView] = useState([
-    <DataMesin
-      onAdd={() => {
-        setActive(1);
-      }}
-      onEdit={() => {
-        setActive(1);
-      }}
-      onDetail={() => {
-        setActive(2);
-      }}
-    />,
-    <InputMesin
-      onCancel={() => setActive(0)}
-      onSuccess={() => {
-        setTimeout(() => {
-          setActive(0);
-          toast.current.show({
-            severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
-            life: 3000,
-          });
-        }, 500);
-      }}
-    />,
-    // <Detail onCancel={() => setActive(0)} />,
-  ]);
+  const getMesin = async (isUpdate = false) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.mesin,
+      data: msn,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        dispatch({ type: SET_MSN, payload: data });
+      }
+    } catch (error) {}
+    if (isUpdate) {
+      setLoading(false);
+    } else {
+      setTimeout(() => {
+        setLoading(false);
+      }, 500);
+    }
+  };
 
   return (
     <>
@@ -56,7 +55,11 @@ const Mesin = ({ trigger }) => {
         <Col>
           <Card>
             <Card.Body>
-              <DataMesin />
+              <DataMesin
+                data={loading ? dummy : msn}
+                load={loading}
+                onSuccessInput={() => getMesin()}
+              />
             </Card.Body>
           </Card>
         </Col>

@@ -716,6 +716,10 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                     e.index === ic.product.length - 1 ? (
                       <Link
                         onClick={() => {
+                          let newError = error;
+                          newError.prod.push({ jum: false });
+                          setError(newError);
+
                           updateIC({
                             ...ic,
                             product: [

@@ -12,7 +12,7 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_FM, SET_EDIT_FM, SET_FM } from "src/redux/actions";
+import { SET_CURRENT_PL, SET_EDIT_PL, SET_PL } from "src/redux/actions";
 import { Divider } from "@material-ui/core";
 import ReactToPrint from "react-to-print";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
@@ -30,22 +30,22 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const dispatch = useDispatch();
-  const forml = useSelector((state) => state.forml.forml);
-  const show = useSelector((state) => state.forml.current);
+  const plan = useSelector((state) => state.plan.plan);
+  const show = useSelector((state) => state.plan.current);
   const printPage = useRef(null);
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getFormula();
+    getPlan();
     initFilters1();
   }, []);
 
-  const getFormula = async (isUpdate = false) => {
+  const getPlan = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.formula,
-      data: forml,
+      ...endpoints.planning,
+      data: plan,
     };
     console.log(config.data);
     let response = null;
@@ -55,7 +55,7 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        dispatch({ type: SET_FM, payload: data });
+        dispatch({ type: SET_PL, payload: data });
       }
     } catch (error) {}
     if (isUpdate) {
@@ -67,10 +67,10 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
     }
   };
 
-  const delODR = async (id) => {
+  const delPL = async (id) => {
     const config = {
-      ...endpoints.delODR,
-      endpoint: endpoints.delODR.endpoint + currentItem.id,
+      ...endpoints.delPlan,
+      endpoint: endpoints.delPlan.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -81,7 +81,7 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayDel(false);
-          getFormula(true);
+          getPlan(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -253,7 +253,7 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
           label="Hapus"
           icon="pi pi-trash"
           onClick={() => {
-            delODR();
+            delPL();
           }}
           autoFocus
           loading={loading}
@@ -293,45 +293,45 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
-            dispatch({
-              type: SET_EDIT_FM,
-              payload: false,
-            });
-            dispatch({
-              type: SET_CURRENT_FM,
-              payload: {
-                ...data,
-                dprod: [
-                  {
-                    id: 0,
-                    do_id: null,
-                    // preq_id: null,
-                    // pprod_id: null,
-                    prod_id: null,
-                    unit_id: null,
-                    location: null,
-                    order: null,
-                    price: null,
-                    disc: null,
-                    nett_price: null,
-                    total: null,
-                  },
-                ],
-                djasa: [
-                  {
-                    id: 0,
-                    do_id: null,
-                    jasa_id: null,
-                    sup_id: null,
-                    unit_id: null,
-                    order: null,
-                    price: null,
-                    disc: null,
-                    total: null,
-                  },
-                ],
-              },
-            });
+            // dispatch({
+            //   type: SET_EDIT_FM,
+            //   payload: false,
+            // });
+            // dispatch({
+            //   type: SET_CURRENT_FM,
+            //   payload: {
+            //     ...data,
+            //     dprod: [
+            //       {
+            //         id: 0,
+            //         do_id: null,
+            //         // preq_id: null,
+            //         // pprod_id: null,
+            //         prod_id: null,
+            //         unit_id: null,
+            //         location: null,
+            //         order: null,
+            //         price: null,
+            //         disc: null,
+            //         nett_price: null,
+            //         total: null,
+            //       },
+            //     ],
+            //     djasa: [
+            //       {
+            //         id: 0,
+            //         do_id: null,
+            //         jasa_id: null,
+            //         sup_id: null,
+            //         unit_id: null,
+            //         order: null,
+            //         price: null,
+            //         disc: null,
+            //         total: null,
+            //       },
+            //     ],
+            //   },
+            // });
           }}
         />
       </div>
@@ -434,7 +434,7 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
         <Col className="pt-0">
           <DataTable
             responsiveLayout="scroll"
-            value={null}
+            value={loading ? dummy: plan}
             className="display w-150 datatable-wrapper"
             showGridlines
             dataKey="id"

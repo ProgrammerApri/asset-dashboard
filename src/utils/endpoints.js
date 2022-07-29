@@ -1020,6 +1020,31 @@ const endpoints = {
     method: "DELETE",
     data: {},
   },
+
+  /// Planning
+  planning: {
+    endpoint: "/v1/api/planning",
+    method: "GET",
+    data: {},
+  },
+
+  addPlan: {
+    endpoint: "/v1/api/planning",
+    method: "POST",
+    data: {},
+  },
+
+  editPlan: {
+    endpoint: "/v1/api/planning/",
+    method: "PUT",
+    data: {},
+  },
+
+  delPlan: {
+    endpoint: "/v1/api/planning/",
+    method: "DELETE",
+    data: {},
+  },
 };
 
 export default endpoints;

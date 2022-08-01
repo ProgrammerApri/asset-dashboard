@@ -1,0 +1,5 @@
+export const SET_CURRENT_BTC = "btc.SET_CURRENT_BTC"
+export const SET_BTC = "btc.SET_BTC"
+export const RESET_CURRENT_BTC = "btc.RESET_CURRENT_BTC"
+export const UPDATE_CURRENT_BTC = "btc.UPDATE_CURRENT_BTC"
+export const SET_EDIT_BTC = "btc.SET_EDIT_BTC"

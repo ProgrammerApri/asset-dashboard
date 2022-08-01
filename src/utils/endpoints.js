@@ -1045,6 +1045,31 @@ const endpoints = {
     method: "DELETE",
     data: {},
   },
+
+  /// Batch
+  batch: {
+    endpoint: "/v1/api/batch",
+    method: "GET",
+    data: {},
+  },
+
+  addBatch: {
+    endpoint: "/v1/api/batch",
+    method: "POST",
+    data: {},
+  },
+
+  editBatch: {
+    endpoint: "/v1/api/batch/",
+    method: "PUT",
+    data: {},
+  },
+
+  delBatch: {
+    endpoint: "/v1/api/batch/",
+    method: "DELETE",
+    data: {},
+  },
 };
 
 export default endpoints;

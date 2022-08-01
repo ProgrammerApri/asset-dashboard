@@ -12,7 +12,14 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_FM, SET_EDIT_FM, SET_FM } from "src/redux/actions";
+import {
+  SET_BTC,
+  SET_CURRENT_BTC,
+  SET_CURRENT_FM,
+  SET_EDIT_BTC,
+  SET_EDIT_FM,
+  SET_FM,
+} from "src/redux/actions";
 import { Divider } from "@material-ui/core";
 import ReactToPrint from "react-to-print";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
@@ -30,22 +37,22 @@ const DataBatch = ({ onAdd }) => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const dispatch = useDispatch();
-  const forml = useSelector((state) => state.forml.forml);
-  const show = useSelector((state) => state.forml.current);
+  const btc = useSelector((state) => state.btc.btc);
+  const show = useSelector((state) => state.btc.current);
   const printPage = useRef(null);
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getFormula();
+    getBatch();
     initFilters1();
   }, []);
 
-  const getFormula = async (isUpdate = false) => {
+  const getBatch = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.formula,
-      data: forml,
+      ...endpoints.batch,
+      data: btc,
     };
     console.log(config.data);
     let response = null;
@@ -55,7 +62,7 @@ const DataBatch = ({ onAdd }) => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        dispatch({ type: SET_FM, payload: data });
+        dispatch({ type: SET_BTC, payload: data });
       }
     } catch (error) {}
     if (isUpdate) {
@@ -67,10 +74,10 @@ const DataBatch = ({ onAdd }) => {
     }
   };
 
-  const delODR = async (id) => {
+  const delBTC = async (id) => {
     const config = {
-      ...endpoints.delODR,
-      endpoint: endpoints.delODR.endpoint + currentItem.id,
+      ...endpoints.delBatch,
+      endpoint: endpoints.delBatch.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -81,7 +88,7 @@ const DataBatch = ({ onAdd }) => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayDel(false);
-          getFormula(true);
+          getBatch(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -253,7 +260,7 @@ const DataBatch = ({ onAdd }) => {
           label="Hapus"
           icon="pi pi-trash"
           onClick={() => {
-            delODR();
+            delBTC();
           }}
           autoFocus
           loading={loading}
@@ -293,7 +300,42 @@ const DataBatch = ({ onAdd }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
-            
+            dispatch({
+              type: SET_EDIT_BTC,
+              payload: false,
+            });
+            dispatch({
+              type: SET_CURRENT_BTC,
+              payload: {
+                ...data,
+                mesin: [
+                  {
+                    id: 0,
+                    mch_id: null,
+                  },
+                ],
+                product: [
+                  {
+                    id: 0,
+                    form_id: null,
+                    prod_id: null,
+                    unit_id: null,
+                    qty: null,
+                    aloc: null,
+                  },
+                ],
+                material: [
+                  {
+                    id: 0,
+                    form_id: null,
+                    prod_id: null,
+                    unit_id: null,
+                    qty: null,
+                    price: null,
+                  },
+                ],
+              },
+            });
           }}
         />
       </div>
@@ -396,7 +438,7 @@ const DataBatch = ({ onAdd }) => {
         <Col className="pt-0">
           <DataTable
             responsiveLayout="scroll"
-            value={null}
+            value={loading ? dummy : btc}
             className="display w-150 datatable-wrapper"
             showGridlines
             dataKey="id"
@@ -413,22 +455,22 @@ const DataBatch = ({ onAdd }) => {
             paginatorClassName="justify-content-end mt-3"
           >
             <Column
-              header="Kode Batch"
-              style={{
-                minWidth: "8rem",
-              }}
-              field={(e) => formatDate(e.ord_date)}
-              body={loading && <Skeleton />}
-            />
-            <Column
-              header="Nama Batch"
-              field={(e) => e.ord_code}
+              header="Tgl Batch"
+              field={(e) => formatDate(e.ord_code)}
               style={{ minWidth: "8rem" }}
               body={loading && <Skeleton />}
             />
             <Column
-              header="Tgl Batch"
-              field={(e) => e.ord_code}
+              header="Kode Batch"
+              style={{
+                minWidth: "8rem",
+              }}
+              field={(e) => e.bcode}
+              body={loading && <Skeleton />}
+            />
+            <Column
+              header="Nama Batch"
+              field={(e) => e.bname}
               style={{ minWidth: "8rem" }}
               body={loading && <Skeleton />}
             />

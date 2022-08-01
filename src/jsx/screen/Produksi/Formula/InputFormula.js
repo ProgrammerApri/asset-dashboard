@@ -406,6 +406,7 @@ const InputFormula = ({ onCancel, onSuccess }) => {
               placeholder="0"
               type="number"
               min={0}
+              disabled
             />
           </div>
           <div className="col-1 text-black">
@@ -461,7 +462,7 @@ const InputFormula = ({ onCancel, onSuccess }) => {
           <TabPanel header="Produk">
             <DataTable
               responsiveLayout="none"
-              value={plan.product?.map((v, i) => {
+              value={forml.product?.map((v, i) => {
                 return {
                   ...v,
                   index: i,
@@ -545,22 +546,51 @@ const InputFormula = ({ onCancel, onSuccess }) => {
               />
 
               <Column
+                header=""
                 className="align-text-top"
-                body={(e) => (
-                  <Link
-                    onClick={() => {
-                      let temp = [...plan.product];
-                      temp.splice(e.index, 1);
-                      updatePL({
-                        ...plan,
-                        product: temp,
-                      });
-                    }}
-                    className="btn btn-danger shadow btn-xs sharp ml-1"
-                  >
-                    <i className="fa fa-trash"></i>
-                  </Link>
-                )}
+                field={""}
+                body={(e) =>
+                  e.index === forml.product.length - 1 ? (
+                    <Link
+                      onClick={() => {
+                        let newError = error;
+                        newError.prod.push({
+                          qty: false,
+                          aloc: false,
+                        });
+                        setError(newError);
+
+                        updateFM({
+                          ...forml,
+                          dprod: [
+                            ...forml.product,
+                            {
+                              id: 0,
+                              prod_id: null,
+                              unit_id: null,
+                              qty: null,
+                              aloc: null,
+                            },
+                          ],
+                        });
+                      }}
+                      className="btn btn-primary shadow btn-xs sharp"
+                    >
+                      <i className="fa fa-plus"></i>
+                    </Link>
+                  ) : (
+                    <Link
+                      onClick={() => {
+                        let temp = [...forml.product];
+                        temp.splice(e.index, 1);
+                        updateFM({ ...forml, product: temp });
+                      }}
+                      className="btn btn-danger shadow btn-xs sharp"
+                    >
+                      <i className="fa fa-trash"></i>
+                    </Link>
+                  )
+                }
               />
             </DataTable>
           </TabPanel>
@@ -568,7 +598,7 @@ const InputFormula = ({ onCancel, onSuccess }) => {
           <TabPanel header="Bahan">
             <DataTable
               responsiveLayout="none"
-              value={plan.material?.map((v, i) => {
+              value={forml.material?.map((v, i) => {
                 return {
                   ...v,
                   index: i,
@@ -649,106 +679,46 @@ const InputFormula = ({ onCancel, onSuccess }) => {
               />
 
               <Column
-                className="align-text-top"
-                body={(e) => (
-                  <Link
-                    onClick={() => {
-                      let temp = [...plan.material];
-                      temp.splice(e.index, 1);
-                      updatePL({
-                        ...plan,
-                        material: temp,
-                      });
-                    }}
-                    className="btn btn-danger shadow btn-xs sharp ml-1"
-                  >
-                    <i className="fa fa-trash"></i>
-                  </Link>
-                )}
-              />
-            </DataTable>
-          </TabPanel>
-
-          <TabPanel header="Mesin">
-            <DataTable
-              responsiveLayout="none"
-              value={plan.mesin?.map((v, i) => {
-                return {
-                  ...v,
-                  index: i,
-                  // order: v?.order ?? 0,
-                  // price: v?.price ?? 0,
-                };
-              })}
-              className="display w-150 datatable-wrapper header-white no-border"
-              showGridlines={false}
-              emptyMessage={() => <div></div>}
-            >
-              <Column
-                header="Kode Mesin"
+                header=""
                 className="align-text-top"
                 field={""}
-                style={{
-                  width: "20rem",
-                }}
-                body={(e) => (
-                  <CustomDropdown
-                    // value={e.mch_id && checkMsn(e.mch_id)}
-                    option={mesin}
-                    onChange={(t) => {
-                      let temp = [...plan.mesin];
-                      temp[e.index].mch_id = t.id;
-                      updatePL({ ...plan, mesin: temp });
-
-                      let newError = error;
-                      newError.msn[e.index].id = false;
-                      setError(newError);
-                    }}
-                    detail
-                    onDetail={() => {
-                      setCurrentIndex(e.index);
-                      setShowMsn(true);
-                    }}
-                    label={"[msn_name]"}
-                    placeholder="Pilih Mesin"
-                    errorMessage="Mesin Belum Dipilih"
-                    error={error?.msn[e.index]?.id}
-                  />
-                )}
-              />
-
-              <Column
-                className="align-text-top"
                 body={(e) =>
-                  e.index === plan.mesin.length - 1 ? (
+                  e.index === forml.material.length - 1 ? (
                     <Link
                       onClick={() => {
-                        updatePL({
-                          ...plan,
-                          mesin: [
-                            ...plan.mesin,
+                        let newError = error;
+                        newError.mtrl.push({
+                          qty: false,
+                          prc: false,
+                        });
+                        setError(newError);
+
+                        updateFM({
+                          ...forml,
+                          material: [
+                            ...forml.material,
                             {
                               id: 0,
-                              mch_id: null,
+                              prod_id: null,
+                              unit_id: null,
+                              qty: null,
+                              price: null,
                             },
                           ],
                         });
                       }}
-                      className="btn btn-primary shadow btn-xs sharp ml-1"
+                      className="btn btn-primary shadow btn-xs sharp"
                     >
                       <i className="fa fa-plus"></i>
                     </Link>
                   ) : (
                     <Link
                       onClick={() => {
-                        let temp = [...plan.mesin];
+                        let temp = [...forml.material];
                         temp.splice(e.index, 1);
-                        updatePL({
-                          ...plan,
-                          mesin: temp,
-                        });
+                        updateFM({ ...forml, material: temp });
                       }}
-                      className="btn btn-danger shadow btn-xs sharp ml-1"
+                      className="btn btn-danger shadow btn-xs sharp"
                     >
                       <i className="fa fa-trash"></i>
                     </Link>

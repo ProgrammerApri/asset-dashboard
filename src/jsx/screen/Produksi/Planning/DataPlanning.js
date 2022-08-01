@@ -314,7 +314,6 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
               type: SET_CURRENT_PL,
               payload: {
                 ...data,
-                version: 0,
                 mesin: [
                   {
                     id: 0,

@@ -17,7 +17,16 @@ import { Divider } from "@material-ui/core";
 import ReactToPrint from "react-to-print";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 
-const data = {};
+const data = {
+  id: null,
+  pcode: null,
+  pname: null,
+  form_id: null,
+  desc: null,
+  total: null,
+  unit: null,
+  mesin: [],
+};
 
 const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
   const [loading, setLoading] = useState(true);
@@ -161,65 +170,69 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
 
         <Link
           onClick={() => {
-            // onEdit(data);
-            // let dprod = data.dprod;
-            // dispatch({
-            //   type: SET_EDIT_ODR,
-            //   payload: true,
-            // });
-            // dprod.forEach((el) => {
-            //   el.prod_id = el.prod_id?.id;
-            //   el.unit_id = el.unit_id?.id;
-            //   el.location = el.location?.id;
-            // });
-            // let djasa = data.djasa;
-            // djasa.forEach((el) => {
-            //   el.jasa_id = el.jasa_id.id;
-            //   el.unit_id = el.unit_id.id;
-            // });
-            // dispatch({
-            //   type: SET_CURRENT_ODR,
-            //   payload: {
-            //     ...data,
-            //     po_id: data?.po_id?.id ?? null,
-            //     dep_id: data?.dep_id?.id ?? null,
-            //     sup_id: data?.sup_id?.id ?? null,
-            //     top: data?.top?.id ?? null,
-            //     dprod:
-            //       dprod.length > 0
-            //         ? dprod
-            //         : [
-            //             {
-            //               id: 0,
-            //               do_id: null,
-            //               prod_id: null,
-            //               unit_id: null,
-            //               location: null,
-            //               order: null,
-            //               price: null,
-            //               disc: null,
-            //               nett_price: null,
-            //               total: null,
-            //             },
-            //           ],
-            //     djasa:
-            //       djasa.length > 0
-            //         ? djasa
-            //         : [
-            //             {
-            //               id: 0,
-            //               do_id: null,
-            //               jasa_id: null,
-            //               sup_id: null,
-            //               unit_id: null,
-            //               order: null,
-            //               price: null,
-            //               disc: null,
-            //               total: null,
-            //             },
-            //           ],
-            //   },
-            // });
+            onEdit(data);
+            let product = data.product;
+            dispatch({
+              type: SET_EDIT_PL,
+              payload: true,
+            });
+            product.forEach((el) => {
+              el.prod_id = el.prod_id?.id;
+              el.unit_id = el.unit_id?.id;
+            });
+            let material = data.material;
+            material.forEach((el) => {
+              el.prod_id = el.prod_id.id;
+              el.unit_id = el.unit_id.id;
+            });
+            let mesin = data.mesin;
+            mesin.forEach((el) => {
+              el.mch_id = el.mch_id.id;
+            });
+            dispatch({
+              type: SET_CURRENT_PL,
+              payload: {
+                ...data,
+                form_id: data?.form_id?.id ?? null,
+                unit: data?.unit?.id ?? null,
+                product:
+                  product.length > 0
+                    ? product
+                    : [
+                        {
+                          id: 0,
+                          form_id: null,
+                          prod_id: null,
+                          unit_id: null,
+                          qty: null,
+                          aloc: null,
+                        },
+                      ],
+                material:
+                  material.length > 0
+                    ? material
+                    : [
+                        {
+                          id: 0,
+                          form_id: null,
+                          prod_id: null,
+                          unit_id: null,
+                          qty: null,
+                          price: null,
+                        },
+                      ],
+                mesin:
+                  mesin.length > 0
+                    ? mesin
+                    : [
+                        {
+                          id: 0,
+                          pl_id: null,
+                          mch_id: null,
+                        },
+                      ],
+              },
+            });
           }}
           className="btn btn-primary shadow btn-xs sharp ml-1"
         >
@@ -293,45 +306,42 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
-            // dispatch({
-            //   type: SET_EDIT_FM,
-            //   payload: false,
-            // });
-            // dispatch({
-            //   type: SET_CURRENT_FM,
-            //   payload: {
-            //     ...data,
-            //     dprod: [
-            //       {
-            //         id: 0,
-            //         do_id: null,
-            //         // preq_id: null,
-            //         // pprod_id: null,
-            //         prod_id: null,
-            //         unit_id: null,
-            //         location: null,
-            //         order: null,
-            //         price: null,
-            //         disc: null,
-            //         nett_price: null,
-            //         total: null,
-            //       },
-            //     ],
-            //     djasa: [
-            //       {
-            //         id: 0,
-            //         do_id: null,
-            //         jasa_id: null,
-            //         sup_id: null,
-            //         unit_id: null,
-            //         order: null,
-            //         price: null,
-            //         disc: null,
-            //         total: null,
-            //       },
-            //     ],
-            //   },
-            // });
+            dispatch({
+              type: SET_EDIT_PL,
+              payload: false,
+            });
+            dispatch({
+              type: SET_CURRENT_PL,
+              payload: {
+                ...data,
+                mesin: [
+                  {
+                    id: 0,
+                    mch_id: null,
+                  },
+                ],
+                product: [
+                  {
+                    id: 0,
+                    form_id: null,
+                    prod_id: null,
+                    unit_id: null,
+                    qty: null,
+                    aloc: null,
+                  },
+                ],
+                material: [
+                  {
+                    id: 0,
+                    form_id: null,
+                    prod_id: null,
+                    unit_id: null,
+                    qty: null,
+                    price: null,
+                  },
+                ],
+              },
+            });
           }}
         />
       </div>
@@ -434,14 +444,14 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
         <Col className="pt-0">
           <DataTable
             responsiveLayout="scroll"
-            value={loading ? dummy: plan}
+            value={loading ? dummy : plan}
             className="display w-150 datatable-wrapper"
             showGridlines
             dataKey="id"
             rowHover
             header={renderHeader}
             filters={filters1}
-            globalFilterFields={["ord_code"]}
+            globalFilterFields={["pcode", "pname", "form_id.fcode"]}
             emptyMessage="Tidak ada data"
             paginator
             paginatorTemplate={template2}
@@ -451,50 +461,50 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
             paginatorClassName="justify-content-end mt-3"
           >
             <Column
-              header="Kode Planning"
-              style={{
-                minWidth: "8rem",
-              }}
-              field={(e) => formatDate(e.ord_date)}
-              body={loading && <Skeleton />}
-            />
-            <Column
-              header="Nama Planning"
-              field={(e) => e.ord_code}
-              style={{ minWidth: "10rem" }}
-              body={loading && <Skeleton />}
-            />
-            <Column
-              header="Tgl Planning"
-              field={(e) => e.ord_code}
+              header="Tanggal"
+              field={(e) => formatDate(e.date_created)}
               style={{ minWidth: "8rem" }}
               body={loading && <Skeleton />}
             />
             <Column
+              header="Kode Planning"
+              style={{
+                minWidth: "8rem",
+              }}
+              field={(e) => e.pcode}
+              body={loading && <Skeleton />}
+            />
+            <Column
+              header="Nama Planning"
+              field={(e) => e.pname}
+              style={{ minWidth: "10rem" }}
+              body={loading && <Skeleton />}
+            />
+            <Column
               header="Rencana Tgl Planning"
-              field={(e) => e.ord_code}
+              field={(e) => formatDate(e.date_planing)}
               style={{ minWidth: "12rem" }}
               body={loading && <Skeleton />}
             />
             <Column
               header="Kode Formula"
-              field={(e) => e.ord_code}
+              field={(e) => e.form_id.fcode}
               style={{ minWidth: "8rem" }}
               body={loading && <Skeleton />}
             />
             <Column
               header="Nama Formula"
-              field={(e) => e.ord_code}
+              field={(e) => e.form_id.fname}
               style={{ minWidth: "8rem" }}
               body={loading && <Skeleton />}
             />
             <Column
               header="Status"
-              field={(e) => e.ord_code}
+              field={(e) => e.status}
               style={{ minWidth: "8rem" }}
               body={loading && <Skeleton />}
             />
-          
+
             <Column
               header="Action"
               dataType="boolean"

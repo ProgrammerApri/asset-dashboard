@@ -30,7 +30,16 @@ const defError = {
   name: false,
 };
 
-const DataMesin = ({ data, load, onSuccessInput }) => {
+const DataMesin = ({
+  data,
+  load,
+  onSuccessInput,
+  onRowSelect,
+  popUp,
+  show,
+  onHide = () => {},
+  onInput = () => {},
+}) => {
   const msn = useSelector((state) => state.msn.current);
   const isEdit = useSelector((state) => state.msn.editMsn);
   const [isEditt, setEdit] = useState(false);
@@ -220,13 +229,13 @@ const DataMesin = ({ data, load, onSuccessInput }) => {
 
   const onSubmit = () => {
     if (isValid()) {
-    if (isEdit) {
-      setUpdate(true);
-      editMesin();
-    } else {
-      setUpdate(true);
-      addMesin();
-    }
+      if (isEdit) {
+        setUpdate(true);
+        editMesin();
+      } else {
+        setUpdate(true);
+        addMesin();
+      }
     }
   };
 
@@ -389,157 +398,168 @@ const DataMesin = ({ data, load, onSuccessInput }) => {
     return valid;
   };
 
-  return (
-    <>
-      <Toast ref={toast} />
-      <DataTable
-        responsiveLayout="scroll"
-        value={data}
-        className="display w-150 datatable-wrapper"
-        showGridlines
-        dataKey="id"
-        rowHover
-        header={renderHeader}
-        filters={filters1}
-        globalFilterFields={["msn_code", "msn_name", "desc"]}
-        emptyMessage="Tidak ada data"
-        paginator
-        paginatorTemplate={template2}
-        first={first2}
-        rows={rows2}
-        onPage={onCustomPage2}
-        paginatorClassName="justify-content-end mt-3"
-      >
-        <Column
-          header="Kode Mesin"
-          style={{
-            minWidth: "8rem",
+  const renderBody = () => {
+    return (
+      <>
+        <Toast ref={toast} />
+        <DataTable
+          responsiveLayout="scroll"
+          value={data}
+          className="display w-150 datatable-wrapper"
+          showGridlines
+          dataKey="id"
+          rowHover
+          header={renderHeader}
+          filters={filters1}
+          globalFilterFields={["msn_code", "msn_name", "desc"]}
+          emptyMessage="Tidak ada data"
+          paginator
+          paginatorTemplate={template2}
+          first={first2}
+          rows={rows2}
+          onPage={onCustomPage2}
+          paginatorClassName="justify-content-end mt-3"
+          selectionMode="single"
+          onRowSelect={onRowSelect}
+        >
+          <Column
+            header="Kode Mesin"
+            style={{
+              minWidth: "8rem",
+            }}
+            field={(e) => e.msn_code}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Nama Mesin"
+            field={(e) => e.msn_name}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Keterangan"
+            field={(e) => (e?.desc !== "" ? e.desc : "-")}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Action"
+            dataType="boolean"
+            bodyClassName="text-center"
+            style={{ minWidth: "2rem" }}
+            body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
+          />
+        </DataTable>
+      </>
+    );
+  };
+
+  const renderDialog = () => {
+    return (
+      <>
+        <Dialog
+          header={isEdit ? "Edit Data Mesin" : "Tambah Data Mesin"}
+          visible={displayData}
+          style={{ width: "40vw" }}
+          footer={renderFooter()}
+          onHide={() => {
+            // setEdit(false);
+            setDisplayData(false);
+            onInput(false);
           }}
-          field={(e) => e.msn_code}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header="Nama Mesin"
-          field={(e) => e.msn_name}
-          style={{ minWidth: "8rem" }}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header="Keterangan"
-          field={(e) => (e?.desc !== "" ? e.desc : "-")}
-          style={{ minWidth: "8rem" }}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header="Action"
-          dataType="boolean"
-          bodyClassName="text-center"
-          style={{ minWidth: "2rem" }}
-          body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
-        />
-      </DataTable>
+        >
+          <div className="row ml-0 mt-0">
+            <div className="col-6">
+              <PrimeInput
+                label={"Kode Mesin"}
+                value={msn.msn_code}
+                onChange={(e) => {
+                  updateMSN({ ...msn, msn_code: e.target.value });
+                  let newError = error;
+                  newError.code = false;
+                  setError(newError);
+                }}
+                placeholder="Masukan Kode Mesin"
+                error={error?.code}
+              />
+            </div>
 
-      <Dialog
-        header={isEdit ? "Edit Data Mesin" : "Tambah Data Mesin"}
-        visible={displayData}
-        style={{ width: "40vw" }}
-        footer={renderFooter()}
-        onHide={() => {
-          // setEdit(false);
-          setDisplayData(false);
-        }}
-      >
-        <div className="row ml-0 mt-0">
-          <div className="col-6">
-            <PrimeInput
-              label={"Kode Mesin"}
-              value={msn.msn_code}
-              onChange={(e) => {
-                updateMSN({ ...msn, msn_code: e.target.value });
-                let newError = error;
-                newError.code = false;
-                setError(newError);
-              }}
-              placeholder="Masukan Kode Mesin"
-              error={error?.code}
-            />
-          </div>
-
-          <div className="col-6">
-            <PrimeInput
-              label={"Nama Mesin"}
-              value={msn.msn_name}
-              onChange={(e) => {
-                updateMSN({ ...msn, msn_name: e.target.value });
-                let newError = error;
-                newError.name = false;
-                setError(newError);
-              }}
-              placeholder="Masukan Nama Mesin"
-              error={error?.name}
-            />
-          </div>
-        </div>
-
-        <div className="row ml-0 mt-0">
-          <div className="col-12">
-            <label className="text-label">Keterangan</label>
-            <div className="p-inputgroup">
-              <InputTextarea
-                value={msn.desc}
-                onChange={(e) => updateMSN({ ...msn, desc: e.target.value })}
-                placeholder="Masukan Keterangan"
+            <div className="col-6">
+              <PrimeInput
+                label={"Nama Mesin"}
+                value={msn.msn_name}
+                onChange={(e) => {
+                  updateMSN({ ...msn, msn_name: e.target.value });
+                  let newError = error;
+                  newError.name = false;
+                  setError(newError);
+                }}
+                placeholder="Masukan Nama Mesin"
+                error={error?.name}
               />
             </div>
           </div>
-        </div>
-      </Dialog>
 
-      <Dialog
-        header={"Hapus Data"}
-        visible={displayDel}
-        style={{ width: "30vw" }}
-        footer={renderFooterDel("displayDel")}
-        onHide={() => {
-          setDisplayDel(false);
-        }}
-      >
-        <div className="ml-3 mr-3">
-          <i
-            className="pi pi-exclamation-triangle mr-3 align-middle"
-            style={{ fontSize: "2rem" }}
-          />
-          <span>Apakah anda yakin ingin menghapus data ?</span>
-        </div>
-      </Dialog>
-    </>
-  );
+          <div className="row ml-0 mt-0">
+            <div className="col-12">
+              <label className="text-label">Keterangan</label>
+              <div className="p-inputgroup">
+                <InputTextarea
+                  value={msn.desc}
+                  onChange={(e) => updateMSN({ ...msn, desc: e.target.value })}
+                  placeholder="Masukan Keterangan"
+                />
+              </div>
+            </div>
+          </div>
+        </Dialog>
 
-  // if (popUp) {
-  //   return (
-  //     <>
-  //       <Dialog
-  //         header={"Data Mesin"}
-  //         visible={show}
-  //         footer={() => <div></div>}
-  //         style={{ width: "60vw" }}
-  //         onHide={onHide}
-  //       >
-  //         <Row className="ml-0 mr-0">
-  //           <Col>{renderBody()}</Col>
-  //         </Row>
-  //       </Dialog>
-  //       {renderDialog()}
-  //     </>
-  //   );
-  // } else {
-  //   return (
-  //     <>
-  //       {renderBody()}
-  //       {renderDialog()}
-  //     </>
-  //   );
-  // }
+        <Dialog
+          header={"Hapus Data"}
+          visible={displayDel}
+          style={{ width: "30vw" }}
+          footer={renderFooterDel("displayDel")}
+          onHide={() => {
+            setDisplayDel(false);
+          }}
+        >
+          <div className="ml-3 mr-3">
+            <i
+              className="pi pi-exclamation-triangle mr-3 align-middle"
+              style={{ fontSize: "2rem" }}
+            />
+            <span>Apakah anda yakin ingin menghapus data ?</span>
+          </div>
+        </Dialog>
+      </>
+    );
+  };
+
+  if (popUp) {
+    return (
+      <>
+        <Dialog
+          header={"Data Mesin"}
+          visible={show}
+          footer={() => <div></div>}
+          style={{ width: "60vw" }}
+          onHide={onHide}
+        >
+          <Row className="ml-0 mr-0">
+            <Col>{renderBody()}</Col>
+          </Row>
+        </Dialog>
+        {renderDialog()}
+      </>
+    );
+  } else {
+    return (
+      <>
+        {renderBody()}
+        {renderDialog()}
+      </>
+    );
+  }
 };
 
 export default DataMesin;

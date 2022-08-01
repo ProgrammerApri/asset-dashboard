@@ -416,7 +416,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
               disabled
             />
           </div>
-          <div className="col-7"></div>
+          {/* <div className="col-7"></div> */}
 
           <div className="col-3 text-black">
             <PrimeInput
@@ -449,7 +449,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
               error={error?.date}
             />
           </div>
-          <div className="col-7"></div>
+          {/* <div className="col-7"></div> */}
           <div className="col-3 text-black">
             {/* <div className="col-1"> */}
             <label className="text-black">Kode Formula</label>

@@ -779,7 +779,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                   className="align-text-top"
                   field={""}
                   style={{
-                    width: "30rem",
+                    width: "60rem",
                   }}
                   body={(e) => (
                     <CustomDropdown

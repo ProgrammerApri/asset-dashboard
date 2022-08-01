@@ -481,22 +481,20 @@ const InputBatch = ({ onCancel, onSuccess }) => {
               disabled
             />
           </div>
-          <div className="col-3"></div>
-          <div className="col-3 text-black">
+          {/* <div className="col-1"></div> */}
+          <div className="col-4 text-black">
             <label className="text-label">Keterangan</label>
             <div className="p-inputgroup">
-              <InputTextarea
+              <InputText
                 value={forml.desc}
                 onChange={(e) => updateFM({ ...forml, desc: e.target.value })}
                 placeholder="Masukan Keterangan"
-                rows={5}
-                cols={20}
               />
             </div>
           </div>
 
           {/* <div className="col-3"></div> */}
-          <div className="col-9"></div>
+          {/* <div className="col-"></div> */}
           <div className="col-2 text-black">
             <PrimeInput
               label={"Total Pembuatan"}
@@ -527,20 +525,20 @@ const InputBatch = ({ onCancel, onSuccess }) => {
             />
           </div>
           <div className="col-9"></div>
-          <div className="col-4 text-black">
+          <div className="col-2 text-black">
             <label className="text-black">Departement</label>
             <div className="p-inputgroup"></div>
-            <Dropdown
+            <CustomDropdown
               //   label={"Kode Planning"}
-              value={forml.fcode}
+              value={null}
               onChange={(e) => {
-                updateFM({ ...forml, fcode: e.target.value });
-                let newError = error;
-                newError.code = false;
-                setError(newError);
+                // updateRp({ ...rp, req_dep: e.id });
               }}
-              placeholder="001-001xx"
-              error={error?.code}
+              //   option={""}
+              detail
+              //   onDetail={() => setShowDepartemen(true)}
+              label={"[ccost_name] ([ccost_code])"}
+              placeholder="Sambel Ngulek"
             />
           </div>
 

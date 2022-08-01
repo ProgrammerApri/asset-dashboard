@@ -8,6 +8,7 @@ import { Toast } from "primereact/toast";
 import { InputSwitch } from "primereact/inputswitch";
 import CustomAccordion from "src/jsx/components/Accordion/Accordion";
 import { useDispatch, useSelector } from "react-redux";
+
 import { SET_CURRENT_FM } from "src/redux/actions";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -17,6 +18,7 @@ import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 import DataProduk from "../../Master/Produk/DataProduk";
 import DataSatuan from "../../MasterLainnya/Satuan/DataSatuan";
+import { TabPanel, TabView } from "primereact/tabview";
 
 const defError = {
   code: false,
@@ -38,19 +40,40 @@ const defError = {
 };
 
 const InputFormula = ({ onCancel, onSuccess }) => {
+  // const [update, setUpdate] = useState(false);
+  // const [currentIndex, setCurrentIndex] = useState(0);
+  const toast = useRef(null);
+  // const [doubleClick, setDoubleClick] = useState(false);
+  const plan = useSelector((state) => state.plan.current);
+  // const isEdit = useSelector((state) => state.plan.editPlan);
+  // const dispatch = useDispatch();
+  // const [date, setDate] = useState(new Date());
+  // const [showProd, setShowProd] = useState(false);
+  // const [showSatuan, setShowSatuan] = useState(false);
+  const [showMsn, setShowMsn] = useState(false);
+  // const [product, setProduct] = useState(null);
+  // const [satuan, setSatuan] = useState(null);
+  const [mesin, setMesin] = useState(null);
+  const [formula, setFormula] = useState(null);
+  const [error, setError] = useState(defError);
+  // const [active, setActive] = useState(0);
   const [update, setUpdate] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const toast = useRef(null);
+  // const toast = useRef(null);
   const [doubleClick, setDoubleClick] = useState(false);
   const forml = useSelector((state) => state.forml.current);
   const isEdit = useSelector((state) => state.forml.editForml);
   const dispatch = useDispatch();
   const [date, setDate] = useState(new Date());
   const [showProd, setShowProd] = useState(false);
+
+  // const plan = useSelector((state) => state.plan.current);
   const [showSatuan, setShowSatuan] = useState(false);
   const [product, setProduct] = useState(null);
   const [satuan, setSatuan] = useState(null);
-  const [error, setError] = useState(defError);
+  // const [error, setError] = useState(defError);
+
+  const [active, setActive] = useState(0);
   const [accor, setAccor] = useState({
     produk: true,
     material: true,
@@ -176,6 +199,9 @@ const InputFormula = ({ onCancel, onSuccess }) => {
     });
 
     return selected;
+  };
+  const updatePL = (e) => {
+    dispatch({});
   };
 
   const checkUnit = (value) => {
@@ -431,407 +457,307 @@ const InputFormula = ({ onCancel, onSuccess }) => {
           {/* <div className="col-7"></div> */}
         </Row>
 
-        <CustomAccordion
-          tittle={"Produk"}
-          defaultActive={true}
-          active={accor.produk}
-          onClick={() => {
-            setAccor({
-              ...accor,
-              produk: !accor.produk,
-            });
-          }}
-          key={1}
-          body={
-            <>
-              <DataTable
-                responsiveLayout="none"
-                value={forml.product?.map((v, i) => {
-                  return {
-                    ...v,
-                    index: i,
-                    // order: v?.order ?? 0,
-                  };
-                })}
-                className="display w-150 datatable-wrapper header-white no-border"
-                showGridlines={false}
-                emptyMessage={() => <div></div>}
-              >
-                <Column
-                  header="Produk Hasil Jadi"
-                  className="align-text-top"
-                  field={""}
-                  style={{
-                    width: "30rem",
-                  }}
-                  body={(e) => (
-                    <CustomDropdown
-                      value={e.prod_id && checkProd(e.prod_id)}
-                      option={product}
-                      onChange={(t) => {
-                        let sat = [];
-                        satuan.forEach((element) => {
-                          if (element.id === t.unit.id) {
-                            sat.push(element);
-                          } else {
-                            if (element.u_from?.id === t.unit.id) {
-                              sat.push(element);
-                            }
-                          }
-                        });
-                        setSatuan(sat);
-
-                        let temp = [...forml.product];
-                        temp[e.index].prod_id = t.id;
-                        temp[e.index].unit_id = t.unit?.id;
-                        updateFM({ ...forml, product: temp });
-
-                        let newError = error;
-                        newError.prod[e.index].id = false;
-                        setError(newError);
-                      }}
-                      placeholder="Pilih Produk"
-                      label={"[name]"}
-                      detail
-                      onDetail={() => {
-                        setCurrentIndex(e.index);
-                        setShowProd(true);
-                      }}
-                      errorMessage="Produk Belum Dipilih"
-                      error={error?.prod[e.index]?.id}
+        <TabView activeIndex={active} onTabChange={(e) => setActive(e.index)}>
+          <TabPanel header="Produk">
+            <DataTable
+              responsiveLayout="none"
+              value={plan.product?.map((v, i) => {
+                return {
+                  ...v,
+                  index: i,
+                  // order: v?.order ?? 0,
+                };
+              })}
+              className="display w-150 datatable-wrapper header-white no-border"
+              showGridlines={false}
+              emptyMessage={() => <div></div>}
+            >
+              <Column
+                header="Produk"
+                className="align-text-top"
+                field={""}
+                style={{
+                  width: "25rem",
+                }}
+                body={(e) => (
+                  <div className="p-inputgroup">
+                    <InputText
+                      value={e.prod_id && checkProd(e.prod_id).name}
+                      placeholder="Nama Produk"
+                      disabled
                     />
-                  )}
-                />
+                  </div>
+                )}
+              />
 
-                <Column
-                  header="Satuan"
-                  className="align-text-top"
-                  field={""}
-                  style={{
-                    width: "15rem",
-                  }}
-                  body={(e) => (
-                    <CustomDropdown
-                      value={e.unit_id && checkUnit(e.unit_id)}
-                      onChange={(t) => {
-                        let temp = [...forml.product];
-                        temp[e.index].unit_id = t.id;
-                        updateFM({ ...forml, product: temp });
-                      }}
-                      option={satuan}
-                      label={"[name]"}
-                      placeholder="Pilih Satuan"
-                      detail
-                      onDetail={() => {
-                        setCurrentIndex(e.index);
-                        setShowSatuan(true);
-                      }}
+              <Column
+                header="Satuan"
+                className="align-text-top"
+                field={""}
+                style={{
+                  width: "15rem",
+                }}
+                body={(e) => (
+                  <div className="p-inputgroup">
+                    <InputText
+                      value={e.unit_id && checkUnit(e.unit_id).name}
+                      placeholder="Satuan Produk"
+                      disabled
                     />
-                  )}
-                />
+                  </div>
+                )}
+              />
 
-                <Column
-                  header="Kuantitas"
-                  className="align-text-top"
-                  field={""}
-                  // style={{
-                  //   width: "5rem",
-                  // }}
-                  body={(e) => (
-                    <PrimeNumber
-                      value={e.qty ? e.qty : ""}
-                      onChange={(t) => {
-                        let temp = [...forml.product];
-                        temp[e.index].qty = t.target.value;
-                        updateFM({ ...forml, product: temp });
-
-                        let newError = error;
-                        newError.prod[e.index].qty = false;
-                        setError(newError);
-                      }}
+              <Column
+                header="Kuantitas"
+                className="align-text-top"
+                field={""}
+                // style={{
+                //   width: "5rem",
+                // }}
+                body={(e) => (
+                  <div className="p-inputgroup">
+                    <InputText
+                      value={e.qty && e.qty}
                       placeholder="0"
-                      type="number"
-                      min={0}
-                      error={error?.prod[e.index]?.qty}
+                      disabled
                     />
-                  )}
-                />
+                  </div>
+                )}
+              />
 
-                <Column
-                  header="Cost Alokasi (%)"
-                  className="align-text-top"
-                  field={""}
-                  // style={{
-                  //   minWidth: "7rem",
-                  // }}
-                  body={(e) => (
-                    <PrimeNumber
+              <Column
+                header="Cost Alokasi (%)"
+                className="align-text-top"
+                field={""}
+                // style={{
+                //   minWidth: "7rem",
+                // }}
+                body={(e) => (
+                  <div className="p-inputgroup">
+                    <InputText
                       value={e.aloc && e.aloc}
-                      onChange={(u) => {
-                        let temp = [...forml.product];
-                        temp[e.index].aloc = u.target.value;
-                        updateFM({ ...forml, product: temp });
-
-                        let newError = error;
-                        newError.prod[e.index].aloc = false;
-                        setError(newError);
-                      }}
                       placeholder="0"
-                      type="number"
-                      min={0}
-                      error={error?.prod[e.index]?.aloc}
+                      disabled
                     />
-                  )}
-                />
+                  </div>
+                )}
+              />
 
-                <Column
-                  className="align-text-top"
-                  body={(e) =>
-                    e.index === forml.product.length - 1 ? (
-                      <Link
-                        onClick={() => {
-                          let newError = error;
-                          newError.prod.push({ qty: false, aloc: false });
-                          setError(newError);
+              <Column
+                className="align-text-top"
+                body={(e) => (
+                  <Link
+                    onClick={() => {
+                      let temp = [...plan.product];
+                      temp.splice(e.index, 1);
+                      updatePL({
+                        ...plan,
+                        product: temp,
+                      });
+                    }}
+                    className="btn btn-danger shadow btn-xs sharp ml-1"
+                  >
+                    <i className="fa fa-trash"></i>
+                  </Link>
+                )}
+              />
+            </DataTable>
+          </TabPanel>
 
-                          updateFM({
-                            ...forml,
-                            product: [
-                              ...forml.product,
-                              {
-                                id: 0,
-                                prod_id: null,
-                                unit_id: null,
-                                qty: null,
-                                aloc: null,
-                              },
-                            ],
-                          });
-                        }}
-                        className="btn btn-primary shadow btn-xs sharp ml-1"
-                      >
-                        <i className="fa fa-plus"></i>
-                      </Link>
-                    ) : (
-                      <Link
-                        onClick={() => {
-                          let temp = [...forml.product];
-                          temp.splice(e.index, 1);
-                          updateFM({
-                            ...forml,
-                            product: temp,
-                          });
-                        }}
-                        className="btn btn-danger shadow btn-xs sharp ml-1"
-                      >
-                        <i className="fa fa-trash"></i>
-                      </Link>
-                    )
-                  }
-                />
-              </DataTable>
-            </>
-          }
-        />
+          <TabPanel header="Bahan">
+            <DataTable
+              responsiveLayout="none"
+              value={plan.material?.map((v, i) => {
+                return {
+                  ...v,
+                  index: i,
+                  // order: v?.order ?? 0,
+                  // price: v?.price ?? 0,
+                };
+              })}
+              className="display w-150 datatable-wrapper header-white no-border"
+              showGridlines={false}
+              emptyMessage={() => <div></div>}
+            >
+              <Column
+                header="Bahan"
+                className="align-text-top"
+                field={""}
+                style={{
+                  width: "25rem",
+                }}
+                body={(e) => (
+                  <div className="p-inputgroup">
+                    <InputText
+                      value={e.prod_id && checkProd(e.prod_id).name}
+                      placeholder="Nama Produk"
+                      disabled
+                    />
+                  </div>
+                )}
+              />
 
-        <CustomAccordion
-          tittle={"Bahan"}
-          defaultActive={true}
-          active={accor.material}
-          onClick={() => {
-            setAccor({
-              ...accor,
-              material: !accor.material,
-            });
-          }}
-          key={1}
-          body={
-            <>
-              <DataTable
-                responsiveLayout="none"
-                value={forml.material?.map((v, i) => {
-                  return {
-                    ...v,
-                    index: i,
-                    // order: v?.order ?? 0,
-                    // price: v?.price ?? 0,
-                  };
-                })}
-                className="display w-150 datatable-wrapper header-white no-border"
-                showGridlines={false}
-                emptyMessage={() => <div></div>}
-              >
-                <Column
-                  header="Bahan Hasil Jadi"
-                  className="align-text-top"
-                  field={""}
-                  style={{
-                    width: "30rem",
-                  }}
-                  body={(e) => (
-                    <CustomDropdown
-                      value={e.prod_id && checkProd(e.prod_id)}
-                      option={product}
-                      onChange={(t) => {
-                        let sat = [];
-                        satuan.forEach((element) => {
-                          if (element.id === t.unit.id) {
-                            sat.push(element);
-                          } else {
-                            if (element.u_from?.id === t.unit.id) {
-                              sat.push(element);
-                            }
-                          }
+              <Column
+                header="Satuan"
+                className="align-text-top"
+                field={""}
+                style={{
+                  width: "15rem",
+                }}
+                body={(e) => (
+                  <div className="p-inputgroup">
+                    <InputText
+                      value={e.unit_id && checkUnit(e.unit_id).name}
+                      placeholder="Satuan Produk"
+                      disabled
+                    />
+                  </div>
+                )}
+              />
+
+              <Column
+                header="Kuantitas"
+                className="align-text-top"
+                field={""}
+                // style={{
+                //   width: "5rem",
+                // }}
+                body={(e) => (
+                  <PrimeNumber
+                    value={e.qty ? e.qty : ""}
+                    placeholder="0"
+                    disabled
+                  />
+                )}
+              />
+
+              <Column
+                header="Harga"
+                className="align-text-top"
+                field={""}
+                // style={{
+                //   minWidth: "7rem",
+                // }}
+                body={(e) => (
+                  <PrimeNumber
+                    value={e.price ? e.price : ""}
+                    placeholder="0"
+                    disabled
+                  />
+                )}
+              />
+
+              <Column
+                className="align-text-top"
+                body={(e) => (
+                  <Link
+                    onClick={() => {
+                      let temp = [...plan.material];
+                      temp.splice(e.index, 1);
+                      updatePL({
+                        ...plan,
+                        material: temp,
+                      });
+                    }}
+                    className="btn btn-danger shadow btn-xs sharp ml-1"
+                  >
+                    <i className="fa fa-trash"></i>
+                  </Link>
+                )}
+              />
+            </DataTable>
+          </TabPanel>
+
+          <TabPanel header="Mesin">
+            <DataTable
+              responsiveLayout="none"
+              value={plan.mesin?.map((v, i) => {
+                return {
+                  ...v,
+                  index: i,
+                  // order: v?.order ?? 0,
+                  // price: v?.price ?? 0,
+                };
+              })}
+              className="display w-150 datatable-wrapper header-white no-border"
+              showGridlines={false}
+              emptyMessage={() => <div></div>}
+            >
+              <Column
+                header="Kode Mesin"
+                className="align-text-top"
+                field={""}
+                style={{
+                  width: "20rem",
+                }}
+                body={(e) => (
+                  <CustomDropdown
+                    // value={e.mch_id && checkMsn(e.mch_id)}
+                    option={mesin}
+                    onChange={(t) => {
+                      let temp = [...plan.mesin];
+                      temp[e.index].mch_id = t.id;
+                      updatePL({ ...plan, mesin: temp });
+
+                      let newError = error;
+                      newError.msn[e.index].id = false;
+                      setError(newError);
+                    }}
+                    detail
+                    onDetail={() => {
+                      setCurrentIndex(e.index);
+                      setShowMsn(true);
+                    }}
+                    label={"[msn_name]"}
+                    placeholder="Pilih Mesin"
+                    errorMessage="Mesin Belum Dipilih"
+                    error={error?.msn[e.index]?.id}
+                  />
+                )}
+              />
+
+              <Column
+                className="align-text-top"
+                body={(e) =>
+                  e.index === plan.mesin.length - 1 ? (
+                    <Link
+                      onClick={() => {
+                        updatePL({
+                          ...plan,
+                          mesin: [
+                            ...plan.mesin,
+                            {
+                              id: 0,
+                              mch_id: null,
+                            },
+                          ],
                         });
-                        setSatuan(sat);
-
-                        let temp = [...forml.material];
-                        temp[e.index].prod_id = t.id;
-                        temp[e.index].unit_id = t.unit?.id;
-                        updateFM({ ...forml, material: temp });
-
-                        let newError = error;
-                        newError.mtrl[e.index].id = false;
-                        setError(newError);
                       }}
-                      label={"[name]"}
-                      placeholder="Pilih Bahan"
-                      errorMessage="Bahan Belum Dipilih"
-                      error={error?.mtrl[e.index]?.id}
-                    />
-                  )}
-                />
-
-                <Column
-                  header="Satuan"
-                  className="align-text-top"
-                  field={""}
-                  style={{
-                    width: "15rem",
-                  }}
-                  body={(e) => (
-                    <CustomDropdown
-                      value={e.unit_id && checkUnit(e.unit_id)}
-                      onChange={(t) => {
-                        let temp = [...forml.material];
-                        temp[e.index].unit_id = t.id;
-                        updateFM({ ...forml, material: temp });
+                      className="btn btn-primary shadow btn-xs sharp ml-1"
+                    >
+                      <i className="fa fa-plus"></i>
+                    </Link>
+                  ) : (
+                    <Link
+                      onClick={() => {
+                        let temp = [...plan.mesin];
+                        temp.splice(e.index, 1);
+                        updatePL({
+                          ...plan,
+                          mesin: temp,
+                        });
                       }}
-                      option={satuan}
-                      label={"[name]"}
-                      placeholder="Pilih Satuan"
-                      detail
-                      onDetail={() => {
-                        setCurrentIndex(e.index);
-                        setShowSatuan(true);
-                      }}
-                    />
-                  )}
-                />
-
-                <Column
-                  header="Kuantitas"
-                  className="align-text-top"
-                  field={""}
-                  // style={{
-                  //   width: "5rem",
-                  // }}
-                  body={(e) => (
-                    <PrimeNumber
-                      value={e.qty ? e.qty : ""}
-                      onChange={(t) => {
-                        let temp = [...forml.material];
-                        temp[e.index].qty = t.target.value;
-                        updateFM({ ...forml, material: temp });
-
-                        let newError = error;
-                        newError.mtrl[e.index].qty = false;
-                        setError(newError);
-                      }}
-                      placeholder="0"
-                      type="number"
-                      min={0}
-                      error={error?.mtrl[e.index]?.qty}
-                    />
-                  )}
-                />
-
-                <Column
-                  header="Harga"
-                  className="align-text-top"
-                  field={""}
-                  // style={{
-                  //   minWidth: "7rem",
-                  // }}
-                  body={(e) => (
-                    <PrimeNumber
-                      value={e.price ? e.price : ""}
-                      onChange={(t) => {
-                        let temp = [...forml.material];
-                        temp[e.index].price = t.target.value;
-                        updateFM({ ...forml, material: temp });
-
-                        let newError = error;
-                        newError.mtrl[e.index].prc = false;
-                        setError(newError);
-                      }}
-                      min={0}
-                      placeholder="0"
-                      type="number"
-                      error={error?.mtrl[e.index]?.prc}
-                    />
-                  )}
-                />
-
-                <Column
-                  className="align-text-top"
-                  body={(e) =>
-                    e.index === forml.material.length - 1 ? (
-                      <Link
-                        onClick={() => {
-                          let newError = error;
-                          newError.mtrl.push({ qty: false, prc: false });
-                          setError(newError);
-
-                          updateFM({
-                            ...forml,
-                            material: [
-                              ...forml.material,
-                              {
-                                id: 0,
-                                prod_id: null,
-                                unit_id: null,
-                                qty: null,
-                                price: null,
-                              },
-                            ],
-                          });
-                        }}
-                        className="btn btn-primary shadow btn-xs sharp ml-1"
-                      >
-                        <i className="fa fa-plus"></i>
-                      </Link>
-                    ) : (
-                      <Link
-                        onClick={() => {
-                          let temp = [...forml.material];
-                          temp.splice(e.index, 1);
-                          updateFM({
-                            ...forml,
-                            material: temp,
-                          });
-                        }}
-                        className="btn btn-danger shadow btn-xs sharp ml-1"
-                      >
-                        <i className="fa fa-trash"></i>
-                      </Link>
-                    )
-                  }
-                />
-              </DataTable>
-            </>
-          }
-        />
+                      className="btn btn-danger shadow btn-xs sharp ml-1"
+                    >
+                      <i className="fa fa-trash"></i>
+                    </Link>
+                  )
+                }
+              />
+            </DataTable>
+          </TabPanel>
+        </TabView>
         <div className="row mb-8">
           <span className="mb-8"></span>
         </div>

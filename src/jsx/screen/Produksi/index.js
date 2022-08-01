@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Button, Col, Row } from "react-bootstrap";
+import Batch from "./Batchh";
 import Formula from "./Formula";
 import Mesin from "./Mesin";
 import Planning from "./Planning";
@@ -23,6 +24,11 @@ const Produksi = () => {
       tittle: "Formula",
       icon: "bx-receipt",
       component: <Formula/>,
+    },
+    {
+    tittle: "Batch",
+      icon: "bx-receipt",
+      component: <Batch/>,
     },
   ]);
 

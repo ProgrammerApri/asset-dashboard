@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { Button, Col, Row } from "react-bootstrap";
+import { batch } from "react-redux";
+import PenerimaanHJ from "./PenerimaanHJ";
+
+import Pembebanan from "./Pembebanan";
 import Batch from "./Batchh";
 import Formula from "./Formula";
 import Mesin from "./Mesin";
 import Planning from "./Planning";
-
-
 
 const Produksi = () => {
   const [active, setActive] = useState(0);
@@ -23,12 +25,22 @@ const Produksi = () => {
     {
       tittle: "Formula",
       icon: "bx-receipt",
-      component: <Formula/>,
+      component: <Formula />,
     },
     {
-    tittle: "Batch",
+      tittle: "Batch",
       icon: "bx-receipt",
-      component: <Batch/>,
+      component: <Batch />,
+    },
+    {
+      tittle: "Penerimaan Hasil Jadi",
+      icon: "bx-receipt",
+      component: <PenerimaanHJ />,
+    },
+    {
+      tittle: "Pembebanan",
+      icon: "bx-receipt",
+      component: <Pembebanan />,
     },
   ]);
 

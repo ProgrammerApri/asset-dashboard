@@ -367,7 +367,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
     }
 
     if (!valid) {
-      setActive(active)
+      setActive(active);
     }
 
     return valid;
@@ -636,7 +636,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                     <InputText
                       value={e.qty && e.qty}
                       placeholder="0"
-                      disabled
+                      // disabled
                     />
                   </div>
                 )}
@@ -654,7 +654,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                     <InputText
                       value={e.aloc && e.aloc}
                       placeholder="0"
-                      disabled
+                      // disabled
                     />
                   </div>
                 )}
@@ -726,7 +726,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                     <InputText
                       value={e.unit_id && checkUnit(e.unit_id).name}
                       placeholder="Satuan Produk"
-                      disabled
+                      // disabled
                     />
                   </div>
                 )}
@@ -743,7 +743,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                   <PrimeNumber
                     value={e.qty ? e.qty : ""}
                     placeholder="0"
-                    disabled
+                    // disabled
                   />
                 )}
               />
@@ -759,7 +759,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                   <PrimeNumber
                     value={e.price ? e.price : ""}
                     placeholder="0"
-                    disabled
+                    // disabled
                   />
                 )}
               />

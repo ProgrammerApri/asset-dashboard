@@ -3,16 +3,13 @@ import { request, endpoints } from "src/utils";
 import { Row, Col } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
-import {
-  SET_CURRENT_FM,
-  SET_CURRENT_PL,
-  UPDATE_CURRENT_FM,
-} from "src/redux/actions";
 import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
-// import CustomAccordion from "src/jsx/components/Accordion/Accordion";
+import { InputSwitch } from "primereact/inputswitch";
+import CustomAccordion from "src/jsx/components/Accordion/Accordion";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_BTC } from "src/redux/actions";
+
+import { SET_CURRENT_FM } from "src/redux/actions";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
@@ -21,8 +18,6 @@ import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 import DataProduk from "../../Master/Produk/DataProduk";
 import DataSatuan from "../../MasterLainnya/Satuan/DataSatuan";
-import { Dropdown } from "primereact/dropdown";
-import { Divider } from "@material-ui/core";
 import { TabPanel, TabView } from "primereact/tabview";
 
 const defError = {
@@ -44,28 +39,41 @@ const defError = {
   ],
 };
 
-const InputBatch = ({ onCancel, onSuccess }) => {
+const InputPembebanan = ({ onCancel, onSuccess }) => {
+  // const [update, setUpdate] = useState(false);
+  // const [currentIndex, setCurrentIndex] = useState(0);
+  const toast = useRef(null);
+  // const [doubleClick, setDoubleClick] = useState(false);
+  const plan = useSelector((state) => state.plan.current);
+  // const isEdit = useSelector((state) => state.plan.editPlan);
+  // const dispatch = useDispatch();
+  // const [date, setDate] = useState(new Date());
+  // const [showProd, setShowProd] = useState(false);
+  // const [showSatuan, setShowSatuan] = useState(false);
+  const [showMsn, setShowMsn] = useState(false);
+  // const [product, setProduct] = useState(null);
+  // const [satuan, setSatuan] = useState(null);
+  const [mesin, setMesin] = useState(null);
+  const [formula, setFormula] = useState(null);
+  const [error, setError] = useState(defError);
+  // const [active, setActive] = useState(0);
   const [update, setUpdate] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const toast = useRef(null);
-  const [mesin, setMesin] = useState(null);
-  const [active, setActive] = useState(0);
+  // const toast = useRef(null);
   const [doubleClick, setDoubleClick] = useState(false);
-  const btc = useSelector((state) => state.btc.current);
-  const isEdit = useSelector((state) => state.btc.editBtc);
+  const forml = useSelector((state) => state.forml.current);
+  const isEdit = useSelector((state) => state.forml.editForml);
   const dispatch = useDispatch();
-  const [showMsn, setShowMsn] = useState(false);
   const [date, setDate] = useState(new Date());
-  const plan = useSelector((state) => state.plan.current);
   const [showProd, setShowProd] = useState(false);
+
+  // const plan = useSelector((state) => state.plan.current);
   const [showSatuan, setShowSatuan] = useState(false);
-  const [showDept, setShowDept] = useState(false);
   const [product, setProduct] = useState(null);
   const [satuan, setSatuan] = useState(null);
-  const [formula, setFormula] = useState(null);
-  const [planning, setPlanning] = useState(null);
-  const [dept, setDept] = useState(null);
-  const [error, setError] = useState(defError);
+  // const [error, setError] = useState(defError);
+
+  const [active, setActive] = useState(0);
   const [accor, setAccor] = useState({
     produk: true,
     material: true,
@@ -79,9 +87,6 @@ const InputBatch = ({ onCancel, onSuccess }) => {
     });
     getProduct();
     getSatuan();
-    getFormula();
-    getPlanning();
-    getDept();
   }, []);
 
   const getProduct = async () => {
@@ -101,23 +106,6 @@ const InputBatch = ({ onCancel, onSuccess }) => {
       }
     } catch (error) {}
   };
-  const updatePL = (e) => {
-    dispatch({
-      type: SET_CURRENT_PL,
-      payload: e,
-    });
-  };
-
-  const checkMsn = (value) => {
-    let selected = {};
-    mesin?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
 
   const getSatuan = async () => {
     const config = {
@@ -135,59 +123,11 @@ const InputBatch = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
-  const getFormula = async () => {
+  const editFM = async () => {
     const config = {
-      ...endpoints.formula,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setFormula(data);
-      }
-    } catch (error) {}
-  };
-
-  const getPlanning = async () => {
-    const config = {
-      ...endpoints.planning,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setPlanning(data);
-      }
-    } catch (error) {}
-  };
-
-  const getDept = async () => {
-    const config = {
-      ...endpoints.pusatBiaya,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setDept(data);
-      }
-    } catch (error) {}
-  };
-
-  const editBTC = async () => {
-    const config = {
-      ...endpoints.editBatch,
-      endpoint: endpoints.editBatch.endpoint + btc.id,
-      data: btc,
+      ...endpoints.editFormula,
+      endpoint: endpoints.editFormula.endpoint + forml.id,
+      data: forml,
     };
     console.log(config.data);
     let response = null;
@@ -210,10 +150,10 @@ const InputBatch = ({ onCancel, onSuccess }) => {
     }
   };
 
-  const addBTC = async () => {
+  const addFM = async () => {
     const config = {
-      ...endpoints.addBatch,
-      data: btc,
+      ...endpoints.addFormula,
+      data: forml,
     };
     console.log(config.data);
     let response = null;
@@ -231,7 +171,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${btc.bcode} Sudah Digunakan`,
+            detail: `Kode ${forml.po_code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -260,6 +200,9 @@ const InputBatch = ({ onCancel, onSuccess }) => {
 
     return selected;
   };
+  const updatePL = (e) => {
+    dispatch({});
+  };
 
   const checkUnit = (value) => {
     let selected = {};
@@ -272,49 +215,16 @@ const InputBatch = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
-  const checkFor = (value) => {
-    let selected = {};
-    formula?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const checkPlan = (value) => {
-    let selected = {};
-    planning?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const checkDept = (value) => {
-    let selected = {};
-    dept?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
   const onSubmit = () => {
-    // if (isValid()) {
-    if (isEdit) {
-      setUpdate(true);
-      editBTC();
-    } else {
-      setUpdate(true);
-      addBTC();
+    if (isValid()) {
+      if (isEdit) {
+        setUpdate(true);
+        editFM();
+      } else {
+        setUpdate(true);
+        addFM();
+      }
     }
-    // }
   };
 
   const formatDate = (date) => {
@@ -329,104 +239,104 @@ const InputBatch = ({ onCancel, onSuccess }) => {
     return [day, month, year].join("-");
   };
 
-  const updateBTC = (e) => {
+  const updateFM = (e) => {
     dispatch({
-      type: SET_CURRENT_BTC,
+      type: SET_CURRENT_FM,
       payload: e,
     });
   };
 
-  // const isValid = () => {
-  //   let valid = false;
-  //   let errors = {
-  //     code: !forml.fcode || forml.fcode === "",
-  //     name: !forml.fname || forml.fname === "",
-  //     prod: [],
-  //     mtrl: [],
-  //   };
+  const isValid = () => {
+    let valid = false;
+    let errors = {
+      code: !forml.fcode || forml.fcode === "",
+      name: !forml.fname || forml.fname === "",
+      prod: [],
+      mtrl: [],
+    };
 
-  //   forml?.product.forEach((element, i) => {
-  //     if (i > 0) {
-  //       if (element.prod_id || element.qty || element.aloc) {
-  //         errors.prod[i] = {
-  //           id: !element.prod_id,
-  //           qty: !element.qty || element.qty === "" || element.qty === "0",
-  //           aloc: !element.aloc || element.aloc === "" || element.aloc === "0",
-  //         };
-  //       }
-  //     } else {
-  //       errors.prod[i] = {
-  //         id: !element.prod_id,
-  //         qty: !element.qty || element.qty === "" || element.qty === "0",
-  //         aloc: !element.aloc || element.aloc === "" || element.aloc === "0",
-  //       };
-  //     }
-  //   });
+    forml?.product.forEach((element, i) => {
+      if (i > 0) {
+        if (element.prod_id || element.qty || element.aloc) {
+          errors.prod[i] = {
+            id: !element.prod_id,
+            qty: !element.qty || element.qty === "" || element.qty === "0",
+            aloc: !element.aloc || element.aloc === "" || element.aloc === "0",
+          };
+        }
+      } else {
+        errors.prod[i] = {
+          id: !element.prod_id,
+          qty: !element.qty || element.qty === "" || element.qty === "0",
+          aloc: !element.aloc || element.aloc === "" || element.aloc === "0",
+        };
+      }
+    });
 
-  //   forml?.material.forEach((element, i) => {
-  //     if (i > 0) {
-  //       if (element.prod_id || element.qty || element.price) {
-  //         errors.mtrl[i] = {
-  //           id: !element.prod_id,
-  //           qty: !element.qty || element.qty === "" || element.qty === "0",
-  //           prc:
-  //             !element.price || element.price === "" || element.price === "0",
-  //         };
-  //       }
-  //     } else {
-  //       errors.mtrl[i] = {
-  //         id: !element.prod_id,
-  //         qty: !element.qty || element.qty === "" || element.qty === "0",
-  //         prc: !element.price || element.price === "" || element.price === "0",
-  //       };
-  //     }
-  //   });
+    forml?.material.forEach((element, i) => {
+      if (i > 0) {
+        if (element.prod_id || element.qty || element.price) {
+          errors.mtrl[i] = {
+            id: !element.prod_id,
+            qty: !element.qty || element.qty === "" || element.qty === "0",
+            prc:
+              !element.price || element.price === "" || element.price === "0",
+          };
+        }
+      } else {
+        errors.mtrl[i] = {
+          id: !element.prod_id,
+          qty: !element.qty || element.qty === "" || element.qty === "0",
+          prc: !element.price || element.price === "" || element.price === "0",
+        };
+      }
+    });
 
-  //   if (!errors.prod[0]?.id && !errors.prod[0]?.qty && !errors.prod[0]?.aloc) {
-  //     errors.mtrl?.forEach((e) => {
-  //       for (var key in e) {
-  //         e[key] = false;
-  //       }
-  //     });
-  //   }
+    if (!errors.prod[0]?.id && !errors.prod[0]?.qty && !errors.prod[0]?.aloc) {
+      errors.mtrl?.forEach((e) => {
+        for (var key in e) {
+          e[key] = false;
+        }
+      });
+    }
 
-  //   if (!errors.mtrl[0]?.id && !errors.mtrl[0]?.qty && !errors.mtrl[0]?.prc) {
-  //     errors.prod?.forEach((e) => {
-  //       for (var key in e) {
-  //         e[key] = false;
-  //       }
-  //     });
-  //   }
+    if (!errors.mtrl[0]?.id && !errors.mtrl[0]?.qty && !errors.mtrl[0]?.prc) {
+      errors.prod?.forEach((e) => {
+        for (var key in e) {
+          e[key] = false;
+        }
+      });
+    }
 
-  //   let validProduct = false;
-  //   let validMtrl = false;
-  //   errors.prod?.forEach((el) => {
-  //     for (var k in el) {
-  //       validProduct = !el[k];
-  //     }
-  //   });
-  //   if (!validProduct) {
-  //     errors.mtrl.forEach((el) => {
-  //       for (var k in el) {
-  //         validMtrl = !el[k];
-  //       }
-  //     });
-  //   }
+    let validProduct = false;
+    let validMtrl = false;
+    errors.prod?.forEach((el) => {
+      for (var k in el) {
+        validProduct = !el[k];
+      }
+    });
+    if (!validProduct) {
+      errors.mtrl.forEach((el) => {
+        for (var k in el) {
+          validMtrl = !el[k];
+        }
+      });
+    }
 
-  //   valid = !errors.code && !errors.name && (validProduct || validMtrl);
+    valid = !errors.code && !errors.name && (validProduct || validMtrl);
 
-  //   setError(errors);
+    setError(errors);
 
-  //   if (!valid) {
-  //     window.scrollTo({
-  //       top: 180,
-  //       left: 0,
-  //       behavior: "smooth",
-  //     });
-  //   }
+    if (!valid) {
+      window.scrollTo({
+        top: 180,
+        left: 0,
+        behavior: "smooth",
+      });
+    }
 
-  //   return valid;
-  // };
+    return valid;
+  };
 
   const header = () => {
     return (
@@ -444,19 +354,18 @@ const InputBatch = ({ onCancel, onSuccess }) => {
         <Toast ref={toast} />
 
         <Row className="mb-4">
-          <div className="col-2 text-black">
+          <div className="col-3 text-black">
             <PrimeInput
-              label={"Kode Batch"}
-              value={btc.fcode}
+              label={"Kode Formula"}
+              value={forml.fcode}
               onChange={(e) => {
-                updateBTC({ ...btc, fcode: e.target.value });
+                updateFM({ ...forml, fcode: e.target.value });
                 let newError = error;
                 newError.code = false;
                 setError(newError);
               }}
-              placeholder="Masukan Kode Batch"
+              placeholder="Masukan Kode Formula"
               error={error?.code}
-              //   disabled
             />
           </div>
           <div className="col-2 text-black">
@@ -466,159 +375,33 @@ const InputBatch = ({ onCancel, onSuccess }) => {
               onChange={(e) => {
                 setDate(e.value);
               }}
-              //   placeholder="Pilih Tanggal"
-              // showIcon
+              placeholder="Pilih Tanggal"
+              showIcon
               dateFormat="dd-mm-yy"
-              disabled
               error={error?.date}
             />
           </div>
-
-          <div className="col-3 text-black">
-            <label className="text-black">Departement</label>
-            <div className="p-inputgroup"></div>
-            <CustomDropdown
-              value={btc.dep_id && checkDept(btc.dep_id)}
-              onChange={(e) => {
-                updateBTC({ ...btc, dep_id: e.id });
-              }}
-              option={dept}
-              detail
-              onDetail={() => setShowDept(true)}
-              label={"[ccost_name] ([ccost_code])"}
-              placeholder="Pilih Departement"
-            />
-          </div>
-
-          <div className="col-12 p-0 text-black">
-            <div className="mt-4 mb-2 ml-3 mr-3 fs-13">
-              <b>Informasi Planning</b>
-            </div>
-            <Divider className="mb-2 ml-3 mr-3"></Divider>
-          </div>
-
-          <div className="col-3">
-            <label className="text-black">Kode Planning</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={btc.pl_id && checkPlan(btc.pl_id)}
-                options={planning}
-                onChange={(e) => {
-                  updateBTC({ ...btc, pl_id: e.target.value });
-                  let newError = error;
-                  newError.code = false;
-                  setError(newError);
-                }}
-                placeholder="Pilih Kode Planning"
-                optionLabel="pcode"
-                filter
-                filterBy="pcode"
-                error={error?.code}
-              />
-            </div>
-          </div>
-
-          <div className="col-9"></div>
-
-          <div className="col-3 text-black">
-            <PrimeInput
-              label={"Nama Planning"}
-              value={btc.fcode}
-              onChange={(e) => {
-                updateBTC({ ...btc, fcode: e.target.value });
-                let newError = error;
-                newError.code = false;
-                setError(newError);
-              }}
-              placeholder="Masukan Nama Planning"
-              disabled
-              error={error?.code}
-            />
-          </div>
-
-          <div className="col-2 text-black">
-            <PrimeCalendar
-              label={"Rencana Produksi"}
-              value={null}
-              onChange={(e) => {
-                setDate(e.value);
-              }}
-              placeholder="Tanggal Planning"
-              dateFormat="dd-mm-yy"
-              disabled
-              error={error?.date}
-            />
-          </div>
-
-          <div className="col-2 text-black">
-            <PrimeInput
-              label={"Total Pembuatan"}
-              value={btc.fname}
-              // onChange={(e) => {
-              //   updateBTC({ ...btc, fname: e.target.value });
-              //   let newError = error;
-              //   newError.name = false;
-              //   setError(newError);
-              // }}
-              placeholder="200"
-              disabled
-            />
-          </div>
-
-          <div className="col-2">
-            <label className="text-black">Satuan</label>
-            <div className="p-inputgroup"></div>
-            <InputText value={null} placeholder="Satuan Produksi" disabled />
-          </div>
-
-          <div className="col-12 p-0 text-black">
-            <div className="mt-4 mb-2 ml-3 mr-3 fs-13">
-              <b>Informasi Formula</b>
-            </div>
-            <Divider className="mb-2 ml-3 mr-3"></Divider>
-          </div>
-
-          <div className="col-3 text-black ">
-            <label className="text-black">Kode Formula</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={btc.fcode}
-                options={formula}
-                onChange={(e) => {
-                  updateBTC({ ...btc, fcode: e.target.value });
-                  let newError = error;
-                  newError.code = false;
-                  setError(newError);
-                }}
-                placeholder="Pilih Kode Formula"
-                optionLabel="fcode"
-                filter
-                filterBy="fcode"
-                error={error?.code}
-              />
-            </div>
-          </div>
-
-          <div className="col-9"></div>
-
+          <div className="col-7"></div>
           <div className="col-3 text-black">
             <PrimeInput
               label={"Nama Formula"}
-              value={btc.fname}
+              value={forml.fname}
               onChange={(e) => {
-                updateBTC({ ...btc, fname: e.target.value });
+                updateFM({ ...forml, fname: e.target.value });
+                let newError = error;
+                newError.name = false;
+                setError(newError);
               }}
               placeholder="Masukan Nama Formula"
-              disabled
+              error={error?.name}
             />
           </div>
-
           <div className="col-1 text-black">
             <PrimeNumber
               label={"Versi"}
-              value={btc.version}
+              value={forml.version}
               onChange={(e) => {
-                updateBTC({ ...btc, version: e.target.value });
+                updateFM({ ...forml, version: e.target.value });
               }}
               placeholder="0"
               type="number"
@@ -626,21 +409,18 @@ const InputBatch = ({ onCancel, onSuccess }) => {
               disabled
             />
           </div>
-
           <div className="col-1 text-black">
             <PrimeNumber
               label={"Revisi"}
-              value={btc.rev}
+              value={forml.rev}
               onChange={(e) => {
-                updateBTC({ ...btc, rev: e.target.value });
+                updateFM({ ...forml, rev: e.target.value });
               }}
               placeholder="0"
               type="number"
               min={0}
-              disabled
             />
           </div>
-
           <div className="col-2 text-black">
             <PrimeInput
               label={"Tanggal Revisi"}
@@ -648,30 +428,41 @@ const InputBatch = ({ onCancel, onSuccess }) => {
               onChange={(e) => {
                 setDate(e.value);
               }}
-              placeholder="Tanggal Revisi"
+              placeholder="dd/mm/yyyy"
               disabled
             />
           </div>
-
           <div className="col-5 text-black">
             <label className="text-label">Keterangan</label>
             <div className="p-inputgroup">
               <InputText
-                value={btc.desc}
-                onChange={(e) => updateBTC({ ...btc, desc: e.target.value })}
+                value={forml.desc}
+                onChange={(e) => updateFM({ ...forml, desc: e.target.value })}
                 placeholder="Masukan Keterangan"
               />
             </div>
           </div>
+          <div className="col-3"></div>
+          <div className="flex col-12 align-items-center mt-1">
+            <label className="ml-0 mt-1 fs-12 text-black">
+              <b>{"Aktif"}</b>
+            </label>
+            <InputSwitch
+              className="ml-4"
+              checked={forml && forml.active}
+              onChange={(e) => {
+                updateFM({ ...forml, active: e.target.value });
+              }}
+            />
+          </div>
+          {/* <div className="col-7"></div> */}
         </Row>
-
-
 
         <TabView activeIndex={active} onTabChange={(e) => setActive(e.index)}>
           <TabPanel header="Produk">
             <DataTable
               responsiveLayout="none"
-              value={plan.product?.map((v, i) => {
+              value={forml.product?.map((v, i) => {
                 return {
                   ...v,
                   index: i,
@@ -755,22 +546,51 @@ const InputBatch = ({ onCancel, onSuccess }) => {
               />
 
               <Column
+                header=""
                 className="align-text-top"
-                body={(e) => (
-                  <Link
-                    onClick={() => {
-                      let temp = [...plan.product];
-                      temp.splice(e.index, 1);
-                      updatePL({
-                        ...plan,
-                        product: temp,
-                      });
-                    }}
-                    className="btn btn-danger shadow btn-xs sharp ml-1"
-                  >
-                    <i className="fa fa-trash"></i>
-                  </Link>
-                )}
+                field={""}
+                body={(e) =>
+                  e.index === forml.product.length - 1 ? (
+                    <Link
+                      onClick={() => {
+                        let newError = error;
+                        newError.prod.push({
+                          qty: false,
+                          aloc: false,
+                        });
+                        setError(newError);
+
+                        updateFM({
+                          ...forml,
+                          dprod: [
+                            ...forml.product,
+                            {
+                              id: 0,
+                              prod_id: null,
+                              unit_id: null,
+                              qty: null,
+                              aloc: null,
+                            },
+                          ],
+                        });
+                      }}
+                      className="btn btn-primary shadow btn-xs sharp"
+                    >
+                      <i className="fa fa-plus"></i>
+                    </Link>
+                  ) : (
+                    <Link
+                      onClick={() => {
+                        let temp = [...forml.product];
+                        temp.splice(e.index, 1);
+                        updateFM({ ...forml, product: temp });
+                      }}
+                      className="btn btn-danger shadow btn-xs sharp"
+                    >
+                      <i className="fa fa-trash"></i>
+                    </Link>
+                  )
+                }
               />
             </DataTable>
           </TabPanel>
@@ -778,7 +598,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
           <TabPanel header="Bahan">
             <DataTable
               responsiveLayout="none"
-              value={plan.material?.map((v, i) => {
+              value={forml.material?.map((v, i) => {
                 return {
                   ...v,
                   index: i,
@@ -859,106 +679,46 @@ const InputBatch = ({ onCancel, onSuccess }) => {
               />
 
               <Column
-                className="align-text-top"
-                body={(e) => (
-                  <Link
-                    onClick={() => {
-                      let temp = [...plan.material];
-                      temp.splice(e.index, 1);
-                      updatePL({
-                        ...plan,
-                        material: temp,
-                      });
-                    }}
-                    className="btn btn-danger shadow btn-xs sharp ml-1"
-                  >
-                    <i className="fa fa-trash"></i>
-                  </Link>
-                )}
-              />
-            </DataTable>
-          </TabPanel>
-
-          <TabPanel header="Mesin">
-            <DataTable
-              responsiveLayout="none"
-              value={plan.mesin?.map((v, i) => {
-                return {
-                  ...v,
-                  index: i,
-                  // order: v?.order ?? 0,
-                  // price: v?.price ?? 0,
-                };
-              })}
-              className="display w-150 datatable-wrapper header-white no-border"
-              showGridlines={false}
-              emptyMessage={() => <div></div>}
-            >
-              <Column
-                header="Kode Mesin"
+                header=""
                 className="align-text-top"
                 field={""}
-                style={{
-                  width: "20rem",
-                }}
-                body={(e) => (
-                  <CustomDropdown
-                    value={e.mch_id && checkMsn(e.mch_id)}
-                    option={mesin}
-                    onChange={(t) => {
-                      let temp = [...plan.mesin];
-                      temp[e.index].mch_id = t.id;
-                      updatePL({ ...plan, mesin: temp });
-
-                      let newError = error;
-                      newError.msn[e.index].id = false;
-                      setError(newError);
-                    }}
-                    detail
-                    onDetail={() => {
-                      setCurrentIndex(e.index);
-                      setShowMsn(true);
-                    }}
-                    label={"[msn_name]"}
-                    placeholder="Pilih Mesin"
-                    errorMessage="Mesin Belum Dipilih"
-                    error={error?.msn[e.index]?.id}
-                  />
-                )}
-              />
-
-              <Column
-                className="align-text-top"
                 body={(e) =>
-                  e.index === plan.mesin.length - 1 ? (
+                  e.index === forml.material.length - 1 ? (
                     <Link
                       onClick={() => {
-                        updatePL({
-                          ...plan,
-                          mesin: [
-                            ...plan.mesin,
+                        let newError = error;
+                        newError.mtrl.push({
+                          qty: false,
+                          prc: false,
+                        });
+                        setError(newError);
+
+                        updateFM({
+                          ...forml,
+                          material: [
+                            ...forml.material,
                             {
                               id: 0,
-                              mch_id: null,
+                              prod_id: null,
+                              unit_id: null,
+                              qty: null,
+                              price: null,
                             },
                           ],
                         });
                       }}
-                      className="btn btn-primary shadow btn-xs sharp ml-1"
+                      className="btn btn-primary shadow btn-xs sharp"
                     >
                       <i className="fa fa-plus"></i>
                     </Link>
                   ) : (
                     <Link
                       onClick={() => {
-                        let temp = [...plan.mesin];
+                        let temp = [...forml.material];
                         temp.splice(e.index, 1);
-                        updatePL({
-                          ...plan,
-                          mesin: temp,
-                        });
+                        updateFM({ ...forml, material: temp });
                       }}
-                      className="btn btn-danger shadow btn-xs sharp ml-1"
+                      className="btn btn-danger shadow btn-xs sharp"
                     >
                       <i className="fa fa-trash"></i>
                     </Link>
@@ -977,7 +737,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
 
   const getIndex = () => {
     let total = 0;
-    btc?.product?.forEach((el) => {
+    forml?.product?.forEach((el) => {
       total += el.index;
     });
 
@@ -1061,14 +821,14 @@ const InputBatch = ({ onCancel, onSuccess }) => {
             });
             setSatuan(sat);
 
-            let temp = [...btc.product];
+            let temp = [...forml.product];
             temp[currentIndex].prod_id = e.data.id;
             temp[currentIndex].unit_id = e.data.unit?.id;
 
-            let tempm = [...btc.material];
+            let tempm = [...forml.material];
             temp[currentIndex].prod_id = e.data.id;
             temp[currentIndex].unit_id = e.data.unit?.id;
-            updateBTC({ ...btc, product: temp, material: tempm });
+            updateFM({ ...forml, product: temp, material: tempm });
           }
 
           setDoubleClick(true);
@@ -1096,12 +856,12 @@ const InputBatch = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowSatuan(false);
-            let temp = [...btc.product];
+            let temp = [...forml.product];
             temp[currentIndex].unit_id = e.data.id;
 
-            let tempm = [...btc.material];
+            let tempm = [...forml.material];
             tempm[currentIndex].unit_id = e.data.id;
-            updateBTC({ ...btc, product: temp, material: tempm });
+            updateFM({ ...forml, product: temp, material: tempm });
           }
 
           setDoubleClick(true);
@@ -1115,4 +875,4 @@ const InputBatch = ({ onCancel, onSuccess }) => {
   );
 };
 
-export default InputBatch;
+export default InputPembebanan;

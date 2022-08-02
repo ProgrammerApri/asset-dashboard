@@ -192,6 +192,8 @@ const SetupAkun = () => {
         sto_production: data?.sto?.sto_production ?? null,
         sto_hpp_diff: data?.sto_hpp_diff?.id ?? null,
         sto_wip: data?.sto_wip?.id ?? null,
+        sto_bb: data?.sto_bb?.id ?? null,
+        sto_bbp: data?.sto_bbp?.id ?? null,
         fixed_assets: data?.fixed_assets?.id ?? null,
       },
     };
@@ -250,6 +252,8 @@ const SetupAkun = () => {
         sto_production: data?.sto?.sto_production ?? null,
         sto_hpp_diff: data?.sto_hpp_diff?.id ?? null,
         sto_wip: data?.sto_wip?.id ?? null,
+        sto_bb: data?.sto_bb?.id ?? null,
+        sto_bbp: data?.sto_bbp?.id ?? null,
         fixed_assets: data?.fixed_assets?.id ?? null,
       },
     };
@@ -609,10 +613,18 @@ const SetupAkun = () => {
         }}
         body={
           <Row className="mr-0 ml-0">
-            {renderAccountDropdown("Persediaan", setup && setup.sto, (e) => {
+            {/* {renderAccountDropdown("Persediaan", setup && setup.sto, (e) => {
               setSetup({ ...setup, sto: e.value });
               submitUpdate({ ...setup, sto: e.value });
-            })}
+            })} */}
+            {renderAccountDropdown(
+              "Persediaan - Akun Umum",
+              setup && setup.sto_general,
+              (e) => {
+                setSetup({ ...setup, sto_general: e.value });
+                submitUpdate({ ...setup, sto_general: e.value });
+              }
+            )}
 
             {renderAccountDropdown(
               "Persediaan Rusak",
@@ -620,15 +632,6 @@ const SetupAkun = () => {
               (e) => {
                 setSetup({ ...setup, sto_broken: e.value });
                 submitUpdate({ ...setup, sto_broken: e.value });
-              }
-            )}
-
-            {renderAccountDropdown(
-              "Persediaan Umum",
-              setup && setup.sto_general,
-              (e) => {
-                setSetup({ ...setup, sto_general: e.value });
-                submitUpdate({ ...setup, sto_general: e.value });
               }
             )}
 
@@ -651,11 +654,29 @@ const SetupAkun = () => {
             )}
 
             {renderAccountDropdown(
-              "Persediaan WIP",
+              "Persediaan WIP - Akun Umum",
               setup && setup.sto_wip,
               (e) => {
                 setSetup({ ...setup, sto_wip: e.value });
                 submitUpdate({ ...setup, sto_wip: e.value });
+              }
+            )}
+
+            {renderAccountDropdown(
+              "Persediaan Bahan Baku",
+              setup && setup.sto_bb,
+              (e) => {
+                setSetup({ ...setup, sto_bb: e.value });
+                submitUpdate({ ...setup, sto_bb: e.value });
+              }
+            )}
+
+            {renderAccountDropdown(
+              "Persediaan Bahan Baku Pembantu",
+              setup && setup.sto_bbp,
+              (e) => {
+                setSetup({ ...setup, sto_bbp: e.value });
+                submitUpdate({ ...setup, sto_bbp: e.value });
               }
             )}
           </Row>
@@ -667,47 +688,47 @@ const SetupAkun = () => {
   const renderLabaRugi = () => {
     return (
       <CustomAccordion
-      tittle={"Laba Rugi"}
-      active={accor.labarugi}
-      key={1}
-      defaultActive={true}
-      onClick={() => {
-        setAccor({
-          ...accor,
-          labarugi: !accor.labarugi,
-        });
-      }}
-      body={
-        <Row className="mr-0 ml-0">
-        {renderAccountDropdown(
-          "Laba Rugi Berjalan",
-          setup && setup.pnl,
-          (e) => {
-            setSetup({ ...setup, pnl: e.value });
-            submitUpdate({ ...setup, pnl: e.value });
-          }
-        )}
+        tittle={"Laba Rugi"}
+        active={accor.labarugi}
+        key={1}
+        defaultActive={true}
+        onClick={() => {
+          setAccor({
+            ...accor,
+            labarugi: !accor.labarugi,
+          });
+        }}
+        body={
+          <Row className="mr-0 ml-0">
+            {renderAccountDropdown(
+              "Laba Rugi Berjalan",
+              setup && setup.pnl,
+              (e) => {
+                setSetup({ ...setup, pnl: e.value });
+                submitUpdate({ ...setup, pnl: e.value });
+              }
+            )}
 
-        {renderAccountDropdown(
-          "Laba Rugi Tahun Berjalan",
-          setup && setup.pnl_year,
-          (e) => {
-            setSetup({ ...setup, pnl_year: e.value });
-            submitUpdate({ ...setup, pnl_year: e.value });
-          }
-        )}
+            {renderAccountDropdown(
+              "Laba Rugi Tahun Berjalan",
+              setup && setup.pnl_year,
+              (e) => {
+                setSetup({ ...setup, pnl_year: e.value });
+                submitUpdate({ ...setup, pnl_year: e.value });
+              }
+            )}
 
-        {renderAccountDropdown(
-          "Laba Rugi Ditahan",
-          setup && setup.rtn_income,
-          (e) => {
-            setSetup({ ...setup, rtn_income: e.value });
-            submitUpdate({ ...setup, rtn_income: e.value });
-          }
-        )}
-      </Row>
-      }
-    />
+            {renderAccountDropdown(
+              "Laba Rugi Ditahan",
+              setup && setup.rtn_income,
+              (e) => {
+                setSetup({ ...setup, rtn_income: e.value });
+                submitUpdate({ ...setup, rtn_income: e.value });
+              }
+            )}
+          </Row>
+        }
+      />
     );
   };
 

@@ -455,7 +455,7 @@ const DataFormula = ({ onAdd, onEdit, onDetail }) => {
         />
         <Column
           header="Nama Formula"
-          field={(e) => (e?.version ? e.version : "-")}
+          field={(e) => e.fname}
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
         />

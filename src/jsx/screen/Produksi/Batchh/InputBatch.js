@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { request, endpoints } from "src/utils";
-import { Row, Col } from "react-bootstrap";
+import { Row, Col, Card } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
@@ -591,7 +591,9 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                   label={"Tanggal Revisi"}
                   value={
                     btc.plan_id !== null
-                      ? formatDate(checkPlan(btc.plan_id)?.form_id?.date_updated)
+                      ? formatDate(
+                          checkPlan(btc.plan_id)?.form_id?.date_updated
+                        )
                       : ""
                   }
                   placeholder="Tanggal Revisi"
@@ -618,220 +620,230 @@ const InputBatch = ({ onCancel, onSuccess }) => {
         {btc && btc.plan_id !== null && (
           <>
             <TabView
+              className="ml-2"
               activeIndex={active}
               onTabChange={(e) => setActive(e.index)}
             >
               <TabPanel header="Produk Jadi">
-                <DataTable
-                  responsiveLayout="none"
-                  value={btc.product?.map((v, i) => {
-                    return {
-                      ...v,
-                      index: i,
-                      // order: v?.order ?? 0,
-                    };
-                  })}
-                  className="display w-150 datatable-wrapper header-white no-border"
-                  showGridlines={false}
-                  emptyMessage={() => <div></div>}
-                >
-                  <Column
-                    header="Produk"
-                    className="align-text-top"
-                    field={""}
-                    style={{
-                      width: "20rem",
-                    }}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.prod_id && checkProd(e.prod_id).name}
-                          placeholder="Nama Produk"
-                          disabled
-                        />
-                      </div>
-                    )}
-                  />
+                <Card>
+                  <Card.Body>
+                    <DataTable
+                      responsiveLayout="none"
+                      value={btc.product?.map((v, i) => {
+                        return {
+                          ...v,
+                          index: i,
+                          // order: v?.order ?? 0,
+                        };
+                      })}
+                      className="display w-150 datatable-wrapper header-white no-border"
+                      showGridlines={false}
+                      emptyMessage={() => <div></div>}
+                    >
+                      <Column
+                        header="Produk"
+                        className="align-text-top"
+                        field={""}
+                        style={{
+                          width: "20rem",
+                        }}
+                        body={(e) => (
+                          <div className="p-inputgroup">
+                            <InputText
+                              value={e.prod_id && checkProd(e.prod_id).name}
+                              placeholder="Nama Produk"
+                              disabled
+                            />
+                          </div>
+                        )}
+                      />
 
-                  <Column
-                    header="Satuan"
-                    className="align-text-top"
-                    field={""}
-                    style={{
-                      width: "15rem",
-                    }}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.unit_id && checkUnit(e.unit_id).name}
-                          placeholder="Satuan Produk"
-                          disabled
-                        />
-                      </div>
-                    )}
-                  />
+                      <Column
+                        header="Satuan"
+                        className="align-text-top"
+                        field={""}
+                        style={{
+                          width: "15rem",
+                        }}
+                        body={(e) => (
+                          <div className="p-inputgroup">
+                            <InputText
+                              value={e.unit_id && checkUnit(e.unit_id).name}
+                              placeholder="Satuan Produk"
+                              disabled
+                            />
+                          </div>
+                        )}
+                      />
 
-                  <Column
-                    header="Kuantitas"
-                    className="align-text-top"
-                    field={""}
-                    // style={{
-                    //   width: "5rem",
-                    // }}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.qty && e.qty}
-                          placeholder="0"
-                          disabled
-                        />
-                      </div>
-                    )}
-                  />
+                      <Column
+                        header="Kuantitas"
+                        className="align-text-top"
+                        field={""}
+                        // style={{
+                        //   width: "5rem",
+                        // }}
+                        body={(e) => (
+                          <div className="p-inputgroup">
+                            <InputText
+                              value={e.qty && e.qty}
+                              placeholder="0"
+                              disabled
+                            />
+                          </div>
+                        )}
+                      />
 
-                  <Column
-                    header="Cost Alokasi (%)"
-                    className="align-text-top"
-                    field={""}
-                    // style={{
-                    //   minWidth: "7rem",
-                    // }}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.aloc && e.aloc}
-                          placeholder="0"
-                          disabled
-                        />
-                      </div>
-                    )}
-                  />
-                </DataTable>
+                      <Column
+                        header="Cost Alokasi (%)"
+                        className="align-text-top"
+                        field={""}
+                        // style={{
+                        //   minWidth: "7rem",
+                        // }}
+                        body={(e) => (
+                          <div className="p-inputgroup">
+                            <InputText
+                              value={e.aloc && e.aloc}
+                              placeholder="0"
+                              disabled
+                            />
+                          </div>
+                        )}
+                      />
+                    </DataTable>
+                  </Card.Body>
+                </Card>
               </TabPanel>
 
-              <TabPanel header="Bahan Jadi">
-                <DataTable
-                  responsiveLayout="none"
-                  value={btc.material?.map((v, i) => {
-                    return {
-                      ...v,
-                      index: i,
-                      // order: v?.order ?? 0,
-                      // price: v?.price ?? 0,
-                    };
-                  })}
-                  className="display w-150 datatable-wrapper header-white no-border"
-                  showGridlines={false}
-                  emptyMessage={() => <div></div>}
-                >
-                  <Column
-                    header="Bahan"
-                    className="align-text-top"
-                    field={""}
-                    style={{
-                      width: "20rem",
-                    }}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.prod_id && checkProd(e.prod_id).name}
-                          placeholder="Nama Produk"
-                          disabled
-                        />
-                      </div>
-                    )}
-                  />
-
-                  <Column
-                    header="Satuan"
-                    className="align-text-top"
-                    field={""}
-                    style={{
-                      width: "15rem",
-                    }}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.unit_id && checkUnit(e.unit_id).name}
-                          placeholder="Satuan Produk"
-                          disabled
-                        />
-                      </div>
-                    )}
-                  />
-
-                  <Column
-                    header="Kuantitas"
-                    className="align-text-top"
-                    field={""}
-                    // style={{
-                    //   width: "5rem",
-                    // }}
-                    body={(e) => (
-                      <PrimeNumber
-                        value={e.qty ? e.qty : ""}
-                        placeholder="0"
-                        disabled
+              <TabPanel header="Bahan">
+                <Card>
+                  <Card.Body>
+                    <DataTable
+                      responsiveLayout="none"
+                      value={btc.material?.map((v, i) => {
+                        return {
+                          ...v,
+                          index: i,
+                          // order: v?.order ?? 0,
+                          // price: v?.price ?? 0,
+                        };
+                      })}
+                      className="display w-150 datatable-wrapper header-white no-border"
+                      showGridlines={false}
+                      emptyMessage={() => <div></div>}
+                    >
+                      <Column
+                        header="Bahan"
+                        className="align-text-top"
+                        field={""}
+                        style={{
+                          width: "20rem",
+                        }}
+                        body={(e) => (
+                          <div className="p-inputgroup">
+                            <InputText
+                              value={e.prod_id && checkProd(e.prod_id).name}
+                              placeholder="Nama Produk"
+                              disabled
+                            />
+                          </div>
+                        )}
                       />
-                    )}
-                  />
 
-                  <Column
-                    header="Harga"
-                    className="align-text-top"
-                    field={""}
-                    // style={{
-                    //   minWidth: "7rem",
-                    // }}
-                    body={(e) => (
-                      <PrimeNumber
-                        value={e.price ? e.price : ""}
-                        placeholder="0"
-                        disabled
+                      <Column
+                        header="Satuan"
+                        className="align-text-top"
+                        field={""}
+                        style={{
+                          width: "15rem",
+                        }}
+                        body={(e) => (
+                          <div className="p-inputgroup">
+                            <InputText
+                              value={e.unit_id && checkUnit(e.unit_id).name}
+                              placeholder="Satuan Produk"
+                              disabled
+                            />
+                          </div>
+                        )}
                       />
-                    )}
-                  />
-                </DataTable>
+
+                      <Column
+                        header="Kuantitas"
+                        className="align-text-top"
+                        field={""}
+                        // style={{
+                        //   width: "5rem",
+                        // }}
+                        body={(e) => (
+                          <PrimeNumber
+                            value={e.qty ? e.qty : ""}
+                            placeholder="0"
+                            disabled
+                          />
+                        )}
+                      />
+
+                      <Column
+                        header="Harga"
+                        className="align-text-top"
+                        field={""}
+                        // style={{
+                        //   minWidth: "7rem",
+                        // }}
+                        body={(e) => (
+                          <PrimeNumber
+                            value={e.price ? e.price : ""}
+                            placeholder="0"
+                            disabled
+                          />
+                        )}
+                      />
+                    </DataTable>
+                  </Card.Body>
+                </Card>
               </TabPanel>
 
               <TabPanel header="Mesin">
-                <DataTable
-                  responsiveLayout="none"
-                  value={btc.mesin?.map((v, i) => {
-                    return {
-                      ...v,
-                      index: i,
-                      // order: v?.order ?? 0,
-                      // price: v?.price ?? 0,
-                    };
-                  })}
-                  className="display w-150 datatable-wrapper header-white no-border"
-                  showGridlines={false}
-                  emptyMessage={() => <div></div>}
-                >
-                  <Column
-                    header="Kode Mesin"
-                    className="align-text-top"
-                    field={""}
-                    style={{
-                      width: "20rem",
-                    }}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.mch_id && checkMsn(e.mch_id).msn_name}
-                          placeholder="Nama Mesin"
-                          disabled
-                        />
-                      </div>
-                    )}
-                  />
+                <Card>
+                  <Card.Body>
+                    <DataTable
+                      responsiveLayout="none"
+                      value={btc.mesin?.map((v, i) => {
+                        return {
+                          ...v,
+                          index: i,
+                          // order: v?.order ?? 0,
+                          // price: v?.price ?? 0,
+                        };
+                      })}
+                      className="display w-150 datatable-wrapper header-white no-border"
+                      showGridlines={false}
+                      emptyMessage={() => <div></div>}
+                    >
+                      <Column
+                        header="Kode Mesin" 
+                        className="align-text-top"
+                        field={""}
+                        style={{
+                          width: "20rem",
+                        }}
+                        body={(e) => (
+                          <div className="p-inputgroup">
+                            <InputText
+                              value={e.mch_id && checkMsn(e.mch_id).msn_name}
+                              placeholder="Nama Mesin"
+                              disabled
+                            />
+                          </div>
+                        )}
+                      />
 
-                  <Column
-                    className="align-text-top"
-                    body={null}
-                  />
-                </DataTable>
+                      <Column className="align-text-top" body={null} />
+                    </DataTable>
+                  </Card.Body>
+                </Card>
               </TabPanel>
             </TabView>
           </>

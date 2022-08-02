@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { request, endpoints } from "src/utils";
-import { Row, Col } from "react-bootstrap";
+import { Row, Col, Card } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
@@ -8,11 +8,7 @@ import { Toast } from "primereact/toast";
 import { InputSwitch } from "primereact/inputswitch";
 import CustomAccordion from "src/jsx/components/Accordion/Accordion";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  SET_CURRENT_FM,
-  SET_CURRENT_PL,
-  UPDATE_CURRENT_FM,
-} from "src/redux/actions";
+import { SET_CURRENT_PL } from "src/redux/actions";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
@@ -346,6 +342,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
           }
         }
       });
+      console.log(active);
     }
 
     valid =
@@ -365,9 +362,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
         left: 0,
         behavior: "smooth",
       });
-    }
 
-    if (!valid) {
       setActive(active);
     }
 
@@ -453,6 +448,12 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
               label={"Rencana Pembuatan"}
               value={plan.total}
               onChange={(e) => {
+                if (plan.form_id) {
+                  plan.product.forEach((element) => {
+                    element.qty = element.def_qty * Number(e.target.value);
+                  });
+                }
+
                 updatePL({ ...plan, total: e.target.value });
                 let newError = error;
                 newError.rp = false;
@@ -501,6 +502,16 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
               value={plan.form_id !== null ? checkFm(plan.form_id) : null}
               option={formula}
               onChange={(e) => {
+                e.product.forEach((element) => {
+                  element.def_qty = element.qty;
+                });
+
+                if (plan.total) {
+                  e.product.forEach((element) => {
+                    element.qty = element.def_qty * plan.total;
+                  });
+                }
+
                 updatePL({
                   ...plan,
                   form_id: e.id,
@@ -558,7 +569,11 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
             <label className="text-label">Tanggal Revisi</label>
             <div className="p-inputgroup">
               <InputText
-                value={plan.form_id !== null ? formatDate(checkFm(plan.form_id)?.date_updated) : ""}
+                value={
+                  plan.form_id !== null
+                    ? formatDate(checkFm(plan.form_id)?.date_updated)
+                    : ""
+                }
                 placeholder="Tanggal Revisi"
                 dateFormat="dd-mm-yyyy"
                 disabled
@@ -582,269 +597,282 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
         {plan && plan.form_id !== null && (
           <>
             <TabView
+              className="ml-2"
               activeIndex={active}
               onTabChange={(e) => setActive(e.index)}
             >
               <TabPanel header="Produk Jadi">
-                <DataTable
-                  responsiveLayout="none"
-                  value={plan.product?.map((v, i) => {
-                    return {
-                      ...v,
-                      index: i,
-                      // order: v?.order ?? 0,
-                    };
-                  })}
-                  className="display w-150 datatable-wrapper header-white no-border"
-                  showGridlines={false}
-                  emptyMessage={() => <div></div>}
-                >
-                  <Column
-                    header="Produk"
-                    className="align-text-top"
-                    field={""}
-                    style={{
-                      width: "25rem",
-                    }}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.prod_id && checkProd(e.prod_id).name}
-                          placeholder="Nama Produk"
-                          disabled
-                        />
-                      </div>
-                    )}
-                  />
+                <Card>
+                  <Card.Body>
+                    <DataTable
+                      responsiveLayout="none"
+                      value={plan.product?.map((v, i) => {
+                        return {
+                          ...v,
+                          index: i,
+                          // order: v?.order ?? 0,
+                        };
+                      })}
+                      className="display w-150 datatable-wrapper header-white no-border"
+                      showGridlines={false}
+                      emptyMessage={() => <div></div>}
+                    >
+                      <Column
+                        header="Produk"
+                        className="align-text-top"
+                        field={""}
+                        style={{
+                          width: "25rem",
+                        }}
+                        body={(e) => (
+                          <div className="p-inputgroup">
+                            <InputText
+                              value={e.prod_id && checkProd(e.prod_id).name}
+                              placeholder="Nama Produk"
+                              disabled
+                            />
+                          </div>
+                        )}
+                      />
 
-                  <Column
-                    header="Satuan"
-                    className="align-text-top"
-                    field={""}
-                    style={{
-                      width: "15rem",
-                    }}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.unit_id && checkUnit(e.unit_id).name}
-                          placeholder="Satuan Produk"
-                          disabled
-                        />
-                      </div>
-                    )}
-                  />
+                      <Column
+                        header="Satuan"
+                        className="align-text-top"
+                        field={""}
+                        style={{
+                          width: "15rem",
+                        }}
+                        body={(e) => (
+                          <div className="p-inputgroup">
+                            <InputText
+                              value={e.unit_id && checkUnit(e.unit_id).name}
+                              placeholder="Satuan Produk"
+                              disabled
+                            />
+                          </div>
+                        )}
+                      />
 
-                  <Column
-                    header="Kuantitas"
-                    className="align-text-top"
-                    field={""}
-                    // style={{
-                    //   width: "5rem",
-                    // }}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.qty && e.qty}
-                          placeholder="0"
-                          disabled
-                        />
-                      </div>
-                    )}
-                  />
+                      <Column
+                        header="Kuantitas"
+                        className="align-text-top"
+                        field={""}
+                        // style={{
+                        //   width: "5rem",
+                        // }}
+                        body={(e) => (
+                          <div className="p-inputgroup">
+                            <InputText
+                              value={e.qty && e.qty}
+                              placeholder="0"
+                              disabled
+                            />
+                          </div>
+                        )}
+                      />
 
-                  <Column
-                    header="Cost Alokasi (%)"
-                    className="align-text-top"
-                    field={""}
-                    // style={{
-                    //   minWidth: "7rem",
-                    // }}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.aloc && e.aloc}
-                          placeholder="0"
-                          disabled
-                        />
-                      </div>
-                    )}
-                  />
-                </DataTable>
+                      <Column
+                        header="Cost Alokasi (%)"
+                        className="align-text-top"
+                        field={""}
+                        // style={{
+                        //   minWidth: "7rem",
+                        // }}
+                        body={(e) => (
+                          <div className="p-inputgroup">
+                            <InputText
+                              value={e.aloc && e.aloc}
+                              placeholder="0"
+                              disabled
+                            />
+                          </div>
+                        )}
+                      />
+                    </DataTable>
+                  </Card.Body>
+                </Card>
               </TabPanel>
 
-              <TabPanel header="Bahan Jadi">
-                <DataTable
-                  responsiveLayout="none"
-                  value={plan.material?.map((v, i) => {
-                    return {
-                      ...v,
-                      index: i,
-                      // order: v?.order ?? 0,
-                      // price: v?.price ?? 0,
-                    };
-                  })}
-                  className="display w-150 datatable-wrapper header-white no-border"
-                  showGridlines={false}
-                  emptyMessage={() => <div></div>}
-                >
-                  <Column
-                    header="Bahan"
-                    className="align-text-top"
-                    field={""}
-                    style={{
-                      width: "25rem",
-                    }}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.prod_id && checkProd(e.prod_id).name}
-                          placeholder="Nama Produk"
-                          disabled
-                        />
-                      </div>
-                    )}
-                  />
-
-                  <Column
-                    header="Satuan"
-                    className="align-text-top"
-                    field={""}
-                    style={{
-                      width: "15rem",
-                    }}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.unit_id && checkUnit(e.unit_id).name}
-                          placeholder="Satuan Produk"
-                          disabled
-                        />
-                      </div>
-                    )}
-                  />
-
-                  <Column
-                    header="Kuantitas"
-                    className="align-text-top"
-                    field={""}
-                    // style={{
-                    //   width: "5rem",
-                    // }}
-                    body={(e) => (
-                      <PrimeNumber
-                        value={e.qty ? e.qty : ""}
-                        placeholder="0"
-                        disabled
+              <TabPanel header="Bahan">
+                <Card>
+                  <Card.Body>
+                    <DataTable
+                      responsiveLayout="none"
+                      value={plan.material?.map((v, i) => {
+                        return {
+                          ...v,
+                          index: i,
+                          // order: v?.order ?? 0,
+                          // price: v?.price ?? 0,
+                        };
+                      })}
+                      className="display w-150 datatable-wrapper header-white no-border"
+                      showGridlines={false}
+                      emptyMessage={() => <div></div>}
+                    >
+                      <Column
+                        header="Bahan"
+                        className="align-text-top"
+                        field={""}
+                        style={{
+                          width: "25rem",
+                        }}
+                        body={(e) => (
+                          <div className="p-inputgroup">
+                            <InputText
+                              value={e.prod_id && checkProd(e.prod_id).name}
+                              placeholder="Nama Produk"
+                              disabled
+                            />
+                          </div>
+                        )}
                       />
-                    )}
-                  />
 
-                  <Column
-                    header="Harga"
-                    className="align-text-top"
-                    field={""}
-                    // style={{
-                    //   minWidth: "7rem",
-                    // }}
-                    body={(e) => (
-                      <PrimeNumber
-                        value={e.price ? e.price : ""}
-                        placeholder="0"
-                        disabled
+                      <Column
+                        header="Satuan"
+                        className="align-text-top"
+                        field={""}
+                        style={{
+                          width: "15rem",
+                        }}
+                        body={(e) => (
+                          <div className="p-inputgroup">
+                            <InputText
+                              value={e.unit_id && checkUnit(e.unit_id).name}
+                              placeholder="Satuan Produk"
+                              disabled
+                            />
+                          </div>
+                        )}
                       />
-                    )}
-                  />
-                </DataTable>
+
+                      <Column
+                        header="Kuantitas"
+                        className="align-text-top"
+                        field={""}
+                        // style={{
+                        //   width: "5rem",
+                        // }}
+                        body={(e) => (
+                          <PrimeNumber
+                            value={e.qty ? e.qty : ""}
+                            placeholder="0"
+                            disabled
+                          />
+                        )}
+                      />
+
+                      <Column
+                        header="Harga"
+                        className="align-text-top"
+                        field={""}
+                        // style={{
+                        //   minWidth: "7rem",
+                        // }}
+                        body={(e) => (
+                          <PrimeNumber
+                            value={e.price ? e.price : ""}
+                            placeholder="0"
+                            disabled
+                          />
+                        )}
+                      />
+                    </DataTable>
+                  </Card.Body>
+                </Card>
               </TabPanel>
 
               <TabPanel header="Mesin">
-                <DataTable
-                  responsiveLayout="none"
-                  value={plan.mesin?.map((v, i) => {
-                    return {
-                      ...v,
-                      index: i,
-                      // order: v?.order ?? 0,
-                      // price: v?.price ?? 0,
-                    };
-                  })}
-                  className="display w-150 datatable-wrapper header-white no-border"
-                  showGridlines={false}
-                  emptyMessage={() => <div></div>}
-                >
-                  <Column
-                    header="Kode Mesin"
-                    className="align-text-top"
-                    field={""}
-                    style={{
-                      width: "20rem",
-                    }}
-                    body={(e) => (
-                      <CustomDropdown
-                        value={e.mch_id && checkMsn(e.mch_id)}
-                        option={mesin}
-                        onChange={(t) => {
-                          let temp = [...plan.mesin];
-                          temp[e.index].mch_id = t.id;
-                          updatePL({ ...plan, mesin: temp });
+                <Card>
+                  <Card.Body>
+                    <DataTable
+                      responsiveLayout="none"
+                      value={plan.mesin?.map((v, i) => {
+                        return {
+                          ...v,
+                          index: i,
+                          // order: v?.order ?? 0,
+                          // price: v?.price ?? 0,
+                        };
+                      })}
+                      className="display w-150 datatable-wrapper header-white no-border"
+                      showGridlines={false}
+                      emptyMessage={() => <div></div>}
+                    >
+                      <Column
+                        header="Kode Mesin"
+                        className="align-text-top"
+                        field={""}
+                        style={{
+                          width: "20rem",
+                        }}
+                        body={(e) => (
+                          <CustomDropdown
+                            value={e.mch_id && checkMsn(e.mch_id)}
+                            option={mesin}
+                            onChange={(t) => {
+                              let temp = [...plan.mesin];
+                              temp[e.index].mch_id = t.id;
+                              updatePL({ ...plan, mesin: temp });
 
-                          let newError = error;
-                          newError.msn[e.index].id = false;
-                          setError(newError);
-                        }}
-                        detail
-                        onDetail={() => {
-                          setCurrentIndex(e.index);
-                          setShowMsn(true);
-                        }}
-                        label={"[msn_name]"}
-                        placeholder="Pilih Mesin"
-                        errorMessage="Mesin Belum Dipilih"
-                        error={error?.msn[e.index]?.id}
+                              let newError = error;
+                              newError.msn[e.index].id = false;
+                              setError(newError);
+                            }}
+                            detail
+                            onDetail={() => {
+                              setCurrentIndex(e.index);
+                              setShowMsn(true);
+                            }}
+                            label={"[msn_name]"}
+                            placeholder="Pilih Mesin"
+                            errorMessage="Mesin Belum Dipilih"
+                            error={error?.msn[e.index]?.id}
+                          />
+                        )}
                       />
-                    )}
-                  />
 
-                  <Column
-                    className="align-text-top"
-                    body={(e) =>
-                      e.index === plan.mesin.length - 1 ? (
-                        <Link
-                          onClick={() => {
-                            updatePL({
-                              ...plan,
-                              mesin: [
-                                ...plan.mesin,
-                                {
-                                  id: 0,
-                                  mch_id: null,
-                                },
-                              ],
-                            });
-                          }}
-                          className="btn btn-primary shadow btn-xs sharp ml-1"
-                        >
-                          <i className="fa fa-plus"></i>
-                        </Link>
-                      ) : (
-                        <Link
-                          onClick={() => {
-                            let temp = [...plan.mesin];
-                            temp.splice(e.index, 1);
-                            updatePL({
-                              ...plan,
-                              mesin: temp,
-                            });
-                          }}
-                          className="btn btn-danger shadow btn-xs sharp ml-1"
-                        >
-                          <i className="fa fa-trash"></i>
-                        </Link>
-                      )
-                    }
-                  />
-                </DataTable>
+                      <Column
+                        className="align-text-top"
+                        body={(e) =>
+                          e.index === plan.mesin.length - 1 ? (
+                            <Link
+                              onClick={() => {
+                                updatePL({
+                                  ...plan,
+                                  mesin: [
+                                    ...plan.mesin,
+                                    {
+                                      id: 0,
+                                      mch_id: null,
+                                    },
+                                  ],
+                                });
+                              }}
+                              className="btn btn-primary shadow btn-xs sharp ml-1"
+                            >
+                              <i className="fa fa-plus"></i>
+                            </Link>
+                          ) : (
+                            <Link
+                              onClick={() => {
+                                let temp = [...plan.mesin];
+                                temp.splice(e.index, 1);
+                                updatePL({
+                                  ...plan,
+                                  mesin: temp,
+                                });
+                              }}
+                              className="btn btn-danger shadow btn-xs sharp ml-1"
+                            >
+                              <i className="fa fa-trash"></i>
+                            </Link>
+                          )
+                        }
+                      />
+                    </DataTable>
+                  </Card.Body>
+                </Card>
               </TabPanel>
             </TabView>
           </>

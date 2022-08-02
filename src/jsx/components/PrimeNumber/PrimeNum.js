@@ -7,7 +7,6 @@ const PrimeNumber = ({
   onChange = () => {},
   placeholder,
   error,
-  errorMessage,
   disabled = false,
   min,
   maxLength,
@@ -32,7 +31,7 @@ const PrimeNumber = ({
 
       {error && (
         <small id="name-error" className="p-error block">
-          <i class="bx bxs-error-circle ml-1"></i> {errorMessage ? errorMessage : "Field ini tidak boleh kosong"}
+          <i class="bx bxs-error-circle ml-1"></i> Field ini tidak boleh kosong
         </small>
       )}
     </div>

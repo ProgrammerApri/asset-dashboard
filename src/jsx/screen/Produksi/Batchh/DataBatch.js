@@ -21,6 +21,9 @@ const data = {
   batch_date: null,
   plan_id: null,
   dep_id: null,
+  product: [],
+  material: [],
+  mesin: [],
 };
 
 const DataBatch = ({ onAdd, onEdit }) => {
@@ -166,21 +169,21 @@ const DataBatch = ({ onAdd, onEdit }) => {
         <Link
           onClick={() => {
             onEdit(data);
-            let product = data.product;
+            let product = data.plan_id.product;
             dispatch({
               type: SET_EDIT_BTC,
               payload: true,
             });
-            product?.forEach((elem) => {
-              elem.prod_id = elem.prod_id?.id;
-              elem.unit_id = elem.unit_id?.id;
+            product?.forEach((element) => {
+              element.prod_id = element.prod_id?.id;
+              element.unit_id = element.unit_id?.id;
             });
-            let material = data.material;
-            material?.forEach((el) => {
-              el.prod_id = el.prod_id.id;
-              el.unit_id = el.unit_id.id;
+            let material = data.plan_id.material;
+            material?.forEach((elem) => {
+              elem.prod_id = elem.prod_id.id;
+              elem.unit_id = elem.unit_id.id;
             });
-            let mesin = data.mesin;
+            let mesin = data.plan_id.mesin;
             mesin?.forEach((el) => {
               el.mch_id = el.mch_id.id;
             });
@@ -190,21 +193,8 @@ const DataBatch = ({ onAdd, onEdit }) => {
                 ...data,
                 plan_id: data?.plan_id?.id ?? null,
                 dep_id: data?.dep_id?.id ?? null,
-                product:
-                  product.length > 0
-                    ? product
-                    : [
-                        {
-                          id: 0,
-                          form_id: null,
-                          prod_id: null,
-                          unit_id: null,
-                          qty: null,
-                          aloc: null,
-                        },
-                      ],
                 material:
-                  material.length > 0
+                  material?.length > 0
                     ? material
                     : [
                         {
@@ -216,8 +206,21 @@ const DataBatch = ({ onAdd, onEdit }) => {
                           price: null,
                         },
                       ],
+                product:
+                  product?.length > 0
+                    ? product
+                    : [
+                        {
+                          id: 0,
+                          form_id: null,
+                          prod_id: null,
+                          unit_id: null,
+                          qty: null,
+                          aloc: null,
+                        },
+                      ],
                 mesin:
-                  mesin.length > 0
+                  mesin?.length > 0
                     ? mesin
                     : [
                         {
@@ -309,12 +312,6 @@ const DataBatch = ({ onAdd, onEdit }) => {
               type: SET_CURRENT_BTC,
               payload: {
                 ...data,
-                mesin: [
-                  {
-                    id: 0,
-                    mch_id: null,
-                  },
-                ],
                 product: [
                   {
                     id: 0,
@@ -333,6 +330,12 @@ const DataBatch = ({ onAdd, onEdit }) => {
                     unit_id: null,
                     qty: null,
                     price: null,
+                  },
+                ],
+                mesin: [
+                  {
+                    id: 0,
+                    mch_id: null,
                   },
                 ],
               },
@@ -446,7 +449,7 @@ const DataBatch = ({ onAdd, onEdit }) => {
             rowHover
             header={renderHeader}
             filters={filters1}
-            globalFilterFields={["ord_code"]}
+            globalFilterFields={["bcode", "dep_id.ccost_name", "plan_id.pcode"]}
             emptyMessage="Tidak ada data"
             paginator
             paginatorTemplate={template2}
@@ -476,8 +479,8 @@ const DataBatch = ({ onAdd, onEdit }) => {
               body={loading && <Skeleton />}
             />
             <Column
-              header="Tgl Batch"
-              field={(e) => formatDate(e.ord_code)}
+              header="Tgl Planning"
+              field={(e) => formatDate(e.plan_id?.date_planing)}
               style={{ minWidth: "8rem" }}
               body={loading && <Skeleton />}
             />

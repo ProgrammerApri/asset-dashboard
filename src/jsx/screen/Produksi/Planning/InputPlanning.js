@@ -25,6 +25,7 @@ import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import { Dropdown } from "primereact/dropdown";
 import DataMesin from "../Mesin/DataMesin";
 import { TabPanel, TabView } from "primereact/tabview";
+import { Divider } from "@material-ui/core";
 
 const defError = {
   code: false,
@@ -448,6 +449,12 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
               dateFormat="dd-mm-yy"
               error={error?.date}
             />
+          </div>
+          <div className="col-12 p-0 text-black">
+            <div className="mt-4 mb-2 ml-3 mr-3 fs-13">
+              <b>Informasi Formula</b>
+            </div>
+            <Divider className="mb-2 ml-3 mr-3"></Divider>
           </div>
           {/* <div className="col-7"></div> */}
           <div className="col-3 text-black">

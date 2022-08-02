@@ -440,7 +440,7 @@ const DataFormula = ({ onAdd, onEdit, onDetail }) => {
         paginatorClassName="justify-content-end mt-3"
       >
         <Column
-          header="Tanggal"
+          header="Kode Formula"
           style={{
             minWidth: "8rem",
           }}
@@ -448,14 +448,20 @@ const DataFormula = ({ onAdd, onEdit, onDetail }) => {
           body={loading && <Skeleton />}
         />
         <Column
-          header="Kode Formula"
+          header="Tgl Formula"
           field={(e) => e.fcode}
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
         />
         <Column
-          header="Versi Formula"
+          header="Nama Formula"
           field={(e) => (e?.version ? e.version : "-")}
+          style={{ minWidth: "8rem" }}
+          body={loading && <Skeleton />}
+        />
+        <Column
+          header="Versi Formula"
+          field={(e) => (e?.rev ? e.rev : "-")}
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
         />
@@ -465,6 +471,7 @@ const DataFormula = ({ onAdd, onEdit, onDetail }) => {
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
         />
+
         <Column
           header="Action"
           dataType="boolean"

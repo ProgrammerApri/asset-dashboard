@@ -455,12 +455,6 @@ const DataBatch = ({ onAdd }) => {
             paginatorClassName="justify-content-end mt-3"
           >
             <Column
-              header="Tgl Batch"
-              field={(e) => formatDate(e.ord_code)}
-              style={{ minWidth: "8rem" }}
-              body={loading && <Skeleton />}
-            />
-            <Column
               header="Kode Batch"
               style={{
                 minWidth: "8rem",
@@ -471,6 +465,12 @@ const DataBatch = ({ onAdd }) => {
             <Column
               header="Nama Batch"
               field={(e) => e.bname}
+              style={{ minWidth: "8rem" }}
+              body={loading && <Skeleton />}
+            />
+            <Column
+              header="Tgl Batch"
+              field={(e) => formatDate(e.ord_code)}
               style={{ minWidth: "8rem" }}
               body={loading && <Skeleton />}
             />

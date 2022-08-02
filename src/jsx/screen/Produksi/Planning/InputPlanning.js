@@ -493,6 +493,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
             <Divider className="mb-2 ml-3 mr-3"></Divider>
           </div>
 
+          {/* <div className="col-7"></div> */}
           <div className="col-3 text-black">
             <label className="text-black">Kode Formula</label>
             <div className="p-inputgroup"></div>

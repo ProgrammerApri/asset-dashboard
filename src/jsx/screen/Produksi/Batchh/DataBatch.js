@@ -476,6 +476,12 @@ const DataBatch = ({ onAdd, onEdit }) => {
               body={loading && <Skeleton />}
             />
             <Column
+              header="Tgl Batch"
+              field={(e) => formatDate(e.ord_code)}
+              style={{ minWidth: "8rem" }}
+              body={loading && <Skeleton />}
+            />
+            <Column
               header="Kode Planning"
               field={(e) => e.plan_id?.pcode}
               style={{ minWidth: "8rem" }}

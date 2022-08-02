@@ -461,12 +461,6 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
             paginatorClassName="justify-content-end mt-3"
           >
             <Column
-              header="Tanggal"
-              field={(e) => formatDate(e.date_created)}
-              style={{ minWidth: "8rem" }}
-              body={loading && <Skeleton />}
-            />
-            <Column
               header="Kode Planning"
               style={{
                 minWidth: "8rem",

@@ -19,6 +19,7 @@ import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 import DataProduk from "../../Master/Produk/DataProduk";
 import DataSatuan from "../../MasterLainnya/Satuan/DataSatuan";
 import { TabPanel, TabView } from "primereact/tabview";
+import { Divider } from "@material-ui/core";
 
 const defError = {
   code: false,
@@ -43,6 +44,8 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
   // const [update, setUpdate] = useState(false);
   // const [currentIndex, setCurrentIndex] = useState(0);
   const toast = useRef(null);
+  const [dept, setDept] = useState(null);
+  const [showDept, setShowDept] = useState(false);
   // const [doubleClick, setDoubleClick] = useState(false);
   const plan = useSelector((state) => state.plan.current);
   // const isEdit = useSelector((state) => state.plan.editPlan);
@@ -226,7 +229,16 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
       }
     }
   };
+  const checkDept = (value) => {
+    let selected = {};
+    dept?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
 
+    return selected;
+  };
   const formatDate = (date) => {
     var d = new Date(`${date}Z`),
       month = "" + (d.getMonth() + 1),
@@ -355,8 +367,10 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
 
         <Row className="mb-4">
           <div className="col-3 text-black">
-            <PrimeInput
-              label={"Kode Formula"}
+            {/* <div className="col-1"> */}
+            <label className="text-black">Kode Batch</label>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
               value={forml.fcode}
               onChange={(e) => {
                 updateFM({ ...forml, fcode: e.target.value });
@@ -364,27 +378,49 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                 newError.code = false;
                 setError(newError);
               }}
-              placeholder="Masukan Kode Formula"
+              placeholder="PHJ-01"
               error={error?.code}
             />
           </div>
           <div className="col-2 text-black">
             <PrimeCalendar
-              label={"Tanggal"}
+              label={"Tanggal Batch"}
               value={date}
               onChange={(e) => {
                 setDate(e.value);
               }}
               placeholder="Pilih Tanggal"
-              showIcon
+              disabled
               dateFormat="dd-mm-yy"
               error={error?.date}
             />
           </div>
-          <div className="col-7"></div>
+          <div className="col-4 text-black">
+            <label className="text-black">Departement</label>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
+              value={checkDept()}
+              onChange={(e) => {
+                // updateBTC({ ...btc, dep_id: e.id });
+              }}
+              option={dept}
+              detail
+              onDetail={() => setShowDept(true)}
+              label={"Pilih Departement)"}
+              // placeholder="Pilih Departement"
+            />
+          </div>
+          <div className="col-12 p-0 text-black">
+            <div className="mt-4 mb-2 ml-3 mr-3 fs-13">
+              <b>Informasi PHJ</b>
+            </div>
+            <Divider className="mb-2 ml-3 mr-3"></Divider>
+          </div>
+          <div className="col-0"></div>
+          <div className="col-12 text-black"></div>
           <div className="col-3 text-black">
             <PrimeInput
-              label={"Nama Formula"}
+              label={"Kode PHJ"}
               value={forml.fname}
               onChange={(e) => {
                 updateFM({ ...forml, fname: e.target.value });
@@ -392,74 +428,67 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                 newError.name = false;
                 setError(newError);
               }}
-              placeholder="Masukan Nama Formula"
+              placeholder="Batch-01"
               error={error?.name}
             />
           </div>
-          <div className="col-1 text-black">
-            <PrimeNumber
-              label={"Versi"}
-              value={forml.version}
-              onChange={(e) => {
-                updateFM({ ...forml, version: e.target.value });
-              }}
-              placeholder="0"
-              type="number"
-              min={0}
-              disabled
-            />
-          </div>
-          <div className="col-1 text-black">
-            <PrimeNumber
-              label={"Revisi"}
-              value={forml.rev}
-              onChange={(e) => {
-                updateFM({ ...forml, rev: e.target.value });
-              }}
-              placeholder="0"
-              type="number"
-              min={0}
-            />
-          </div>
+
           <div className="col-2 text-black">
-            <PrimeInput
-              label={"Tanggal Revisi"}
-              value={formatDate(date)}
+            <PrimeCalendar
+              label={"Tanggal PHJ"}
+              value={date}
               onChange={(e) => {
                 setDate(e.value);
               }}
-              placeholder="dd/mm/yyyy"
-              disabled
+              placeholder="Pilih Tanggal"
+              // disabled
+              dateFormat="dd-mm-yy"
+              showIcon
+              error={error?.date}
             />
           </div>
-          <div className="col-5 text-black">
-            <label className="text-label">Keterangan</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={forml.desc}
-                onChange={(e) => updateFM({ ...forml, desc: e.target.value })}
-                placeholder="Masukan Keterangan"
-              />
-            </div>
-          </div>
-          <div className="col-3"></div>
-          <div className="flex col-12 align-items-center mt-1">
-            <label className="ml-0 mt-1 fs-12 text-black">
-              <b>{"Aktif"}</b>
-            </label>
-            <InputSwitch
-              className="ml-4"
-              checked={forml && forml.active}
+          <div className="col-6 text-black"></div>
+          <div className="col-2 text-black">
+            <PrimeInput
+              label={"Total Pembuatan"}
+              value={forml.fcode}
               onChange={(e) => {
-                updateFM({ ...forml, active: e.target.value });
+                updateFM({ ...forml, fcode: e.target.value });
+                let newError = error;
+                newError.code = false;
+                setError(newError);
               }}
+              placeholder="PHJ-01"
+              error={error?.code}
             />
           </div>
+          <div className="col-2 text-black">
+            <label className="text-black">Satuan</label>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
+              value={plan.unit !== null ? checkUnit(plan.unit) : ""}
+              option={satuan}
+              onChange={(e) => {
+                updatePL({ ...plan, unit: e.id });
+                let newError = error;
+                newError.un = false;
+                setError(newError);
+              }}
+              placeholder="Pilih Satuan"
+              detail
+              onDetail={() => setShowSatuan(true)}
+              label={"[name]"}
+              errorMessage="Satuan Belum Dipilih"
+              error={error?.un}
+            />
+          </div>
+          <div className="col-8 text-black"></div>
+
           {/* <div className="col-7"></div> */}
         </Row>
 
         <TabView activeIndex={active} onTabChange={(e) => setActive(e.index)}>
-          <TabPanel header="Produk">
+          <TabPanel header="Produk Jadi">
             <DataTable
               responsiveLayout="none"
               value={forml.product?.map((v, i) => {
@@ -528,24 +557,6 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
               />
 
               <Column
-                header="Cost Alokasi (%)"
-                className="align-text-top"
-                field={""}
-                // style={{
-                //   minWidth: "7rem",
-                // }}
-                body={(e) => (
-                  <div className="p-inputgroup">
-                    <InputText
-                      value={e.aloc && e.aloc}
-                      placeholder="0"
-                      disabled
-                    />
-                  </div>
-                )}
-              />
-
-              <Column
                 header=""
                 className="align-text-top"
                 field={""}
@@ -595,7 +606,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
             </DataTable>
           </TabPanel>
 
-          <TabPanel header="Bahan">
+          <TabPanel header="Produk Reject">
             <DataTable
               responsiveLayout="none"
               value={forml.material?.map((v, i) => {
@@ -656,22 +667,6 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                 body={(e) => (
                   <PrimeNumber
                     value={e.qty ? e.qty : ""}
-                    placeholder="0"
-                    disabled
-                  />
-                )}
-              />
-
-              <Column
-                header="Harga"
-                className="align-text-top"
-                field={""}
-                // style={{
-                //   minWidth: "7rem",
-                // }}
-                body={(e) => (
-                  <PrimeNumber
-                    value={e.price ? e.price : ""}
                     placeholder="0"
                     disabled
                   />

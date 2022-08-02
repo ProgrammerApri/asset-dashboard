@@ -448,7 +448,7 @@ const DataPenerimaanHJ = ({ onAdd, onEdit, onDetail }) => {
           body={loading && <Skeleton />}
         />
         <Column
-          header="TGL PHJ"
+          header="Tgl PHJ"
           field={(e) => e.fcode}
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
@@ -465,7 +465,7 @@ const DataPenerimaanHJ = ({ onAdd, onEdit, onDetail }) => {
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
         />
-         <Column
+        <Column
           header="Departement"
           field={(e) => (e?.rev ? e.rev : "-")}
           style={{ minWidth: "8rem" }}

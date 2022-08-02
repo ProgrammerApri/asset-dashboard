@@ -40,44 +40,20 @@ const defError = {
 };
 
 const InputFormula = ({ onCancel, onSuccess }) => {
-  // const [update, setUpdate] = useState(false);
-  // const [currentIndex, setCurrentIndex] = useState(0);
   const toast = useRef(null);
-  // const [doubleClick, setDoubleClick] = useState(false);
-  const plan = useSelector((state) => state.plan.current);
-  // const isEdit = useSelector((state) => state.plan.editPlan);
-  // const dispatch = useDispatch();
-  // const [date, setDate] = useState(new Date());
-  // const [showProd, setShowProd] = useState(false);
-  // const [showSatuan, setShowSatuan] = useState(false);
-  const [showMsn, setShowMsn] = useState(false);
-  // const [product, setProduct] = useState(null);
-  // const [satuan, setSatuan] = useState(null);
-  const [mesin, setMesin] = useState(null);
-  const [formula, setFormula] = useState(null);
   const [error, setError] = useState(defError);
-  // const [active, setActive] = useState(0);
   const [update, setUpdate] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-  // const toast = useRef(null);
   const [doubleClick, setDoubleClick] = useState(false);
   const forml = useSelector((state) => state.forml.current);
   const isEdit = useSelector((state) => state.forml.editForml);
   const dispatch = useDispatch();
   const [date, setDate] = useState(new Date());
   const [showProd, setShowProd] = useState(false);
-
-  // const plan = useSelector((state) => state.plan.current);
   const [showSatuan, setShowSatuan] = useState(false);
   const [product, setProduct] = useState(null);
   const [satuan, setSatuan] = useState(null);
-  // const [error, setError] = useState(defError);
-
   const [active, setActive] = useState(0);
-  const [accor, setAccor] = useState({
-    produk: true,
-    material: true,
-  });
 
   useEffect(() => {
     window.scrollTo({
@@ -477,17 +453,43 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                 header="Produk"
                 className="align-text-top"
                 field={""}
-                style={{
-                  width: "25rem",
-                }}
                 body={(e) => (
-                  <div className="p-inputgroup">
-                    <InputText
-                      value={e.prod_id && checkProd(e.prod_id).name}
-                      placeholder="Nama Produk"
-                      disabled
-                    />
-                  </div>
+                  <CustomDropdown
+                    value={e.prod_id && checkProd(e.prod_id)}
+                    option={product}
+                    onChange={(u) => {
+                      // looping satuan
+                      let sat = [];
+                      satuan.forEach((element) => {
+                        if (element.id === u.unit.id) {
+                          sat.push(element);
+                        } else {
+                          if (element.u_from?.id === u.unit.id) {
+                            sat.push(element);
+                          }
+                        }
+                      });
+                      setSatuan(sat);
+
+                      let temp = [...forml.product];
+                      temp[e.index].prod_id = u.id;
+                      temp[e.index].unit_id = u.unit?.id;
+                      updateFM({ ...forml, product: temp });
+
+                      let newError = error;
+                      newError.prod[e.index].id = false;
+                      setError(newError);
+                    }}
+                    detail
+                    onDetail={() => {
+                      setCurrentIndex(e.index);
+                      setShowProd(true);
+                    }}
+                    label={"[name]"}
+                    placeholder="Pilih Produk"
+                    errorMessage="Produk Belum Dipilih"
+                    error={error?.prod[e.index]?.id}
+                  />
                 )}
               />
 
@@ -495,35 +497,47 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                 header="Satuan"
                 className="align-text-top"
                 field={""}
-                style={{
-                  width: "15rem",
-                }}
                 body={(e) => (
-                  <div className="p-inputgroup">
-                    <InputText
-                      value={e.unit_id && checkUnit(e.unit_id).name}
-                      placeholder="Satuan Produk"
-                      disabled
-                    />
-                  </div>
+                  <CustomDropdown
+                    value={e.unit_id && checkUnit(e.unit_id)}
+                    onChange={(u) => {
+                      let temp = [...forml.product];
+                      temp[e.index].unit_id = u.id;
+                      updateFM({ ...forml, product: temp });
+                    }}
+                    option={satuan}
+                    detail
+                    onDetail={() => {
+                      setCurrentIndex(e.index);
+                      setShowSatuan(true);
+                    }}
+                    label={"[name]"}
+                    placeholder="Pilih Satuan"
+                  />
                 )}
               />
 
               <Column
-                header="Kuantitas"
+                header="Jumlah"
                 className="align-text-top"
                 field={""}
-                // style={{
-                //   width: "5rem",
-                // }}
                 body={(e) => (
-                  <div className="p-inputgroup">
-                    <InputText
-                      value={e.qty && e.qty}
-                      placeholder="0"
-                      disabled
-                    />
-                  </div>
+                  <PrimeNumber
+                    value={e.qty && e.qty}
+                    onChange={(u) => {
+                      let temp = [...forml.product];
+                      temp[e.index].qty = u.target.value;
+                      updateFM({ ...forml, product: temp });
+
+                      let newError = error;
+                      newError.prod[e.index].qty = false;
+                      setError(newError);
+                    }}
+                    placeholder="0"
+                    type="number"
+                    min={0}
+                    error={error?.prod[e.index]?.qty}
+                  />
                 )}
               />
 
@@ -535,13 +549,22 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                 //   minWidth: "7rem",
                 // }}
                 body={(e) => (
-                  <div className="p-inputgroup">
-                    <InputText
-                      value={e.aloc && e.aloc}
-                      placeholder="0"
-                      disabled
-                    />
-                  </div>
+                  <PrimeNumber
+                    value={e.aloc && e.aloc}
+                    onChange={(u) => {
+                      let temp = [...forml.product];
+                      temp[e.index].aloc = u.target.value;
+                      updateFM({ ...forml, product: temp });
+
+                      let newError = error;
+                      newError.prod[e.index].aloc = false;
+                      setError(newError);
+                    }}
+                    placeholder="0"
+                    type="number"
+                    min={0}
+                    error={error?.prod[e.index]?.aloc}
+                  />
                 )}
               />
 
@@ -562,7 +585,7 @@ const InputFormula = ({ onCancel, onSuccess }) => {
 
                         updateFM({
                           ...forml,
-                          dprod: [
+                          product: [
                             ...forml.product,
                             {
                               id: 0,

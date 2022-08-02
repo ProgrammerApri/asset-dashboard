@@ -12,21 +12,18 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  SET_BTC,
-  SET_CURRENT_BTC,
-  SET_CURRENT_FM,
-  SET_EDIT_BTC,
-  SET_EDIT_FM,
-  SET_FM,
-} from "src/redux/actions";
-import { Divider } from "@material-ui/core";
-import ReactToPrint from "react-to-print";
+import { SET_BTC, SET_CURRENT_BTC, SET_EDIT_BTC } from "src/redux/actions";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 
-const data = {};
+const data = {
+  id: null,
+  bcode: null,
+  batch_date: null,
+  plan_id: null,
+  dep_id: null,
+};
 
-const DataBatch = ({ onAdd }) => {
+const DataBatch = ({ onAdd, onEdit }) => {
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(true);
   const [displayDel, setDisplayDel] = useState(false);
@@ -168,65 +165,69 @@ const DataBatch = ({ onAdd }) => {
 
         <Link
           onClick={() => {
-            // onEdit(data);
-            // let dprod = data.dprod;
-            // dispatch({
-            //   type: SET_EDIT_ODR,
-            //   payload: true,
-            // });
-            // dprod.forEach((el) => {
-            //   el.prod_id = el.prod_id?.id;
-            //   el.unit_id = el.unit_id?.id;
-            //   el.location = el.location?.id;
-            // });
-            // let djasa = data.djasa;
-            // djasa.forEach((el) => {
-            //   el.jasa_id = el.jasa_id.id;
-            //   el.unit_id = el.unit_id.id;
-            // });
-            // dispatch({
-            //   type: SET_CURRENT_ODR,
-            //   payload: {
-            //     ...data,
-            //     po_id: data?.po_id?.id ?? null,
-            //     dep_id: data?.dep_id?.id ?? null,
-            //     sup_id: data?.sup_id?.id ?? null,
-            //     top: data?.top?.id ?? null,
-            //     dprod:
-            //       dprod.length > 0
-            //         ? dprod
-            //         : [
-            //             {
-            //               id: 0,
-            //               do_id: null,
-            //               prod_id: null,
-            //               unit_id: null,
-            //               location: null,
-            //               order: null,
-            //               price: null,
-            //               disc: null,
-            //               nett_price: null,
-            //               total: null,
-            //             },
-            //           ],
-            //     djasa:
-            //       djasa.length > 0
-            //         ? djasa
-            //         : [
-            //             {
-            //               id: 0,
-            //               do_id: null,
-            //               jasa_id: null,
-            //               sup_id: null,
-            //               unit_id: null,
-            //               order: null,
-            //               price: null,
-            //               disc: null,
-            //               total: null,
-            //             },
-            //           ],
-            //   },
-            // });
+            onEdit(data);
+            let product = data.product;
+            dispatch({
+              type: SET_EDIT_BTC,
+              payload: true,
+            });
+            product?.forEach((elem) => {
+              elem.prod_id = elem.prod_id?.id;
+              elem.unit_id = elem.unit_id?.id;
+            });
+            let material = data.material;
+            material?.forEach((el) => {
+              el.prod_id = el.prod_id.id;
+              el.unit_id = el.unit_id.id;
+            });
+            let mesin = data.mesin;
+            mesin?.forEach((el) => {
+              el.mch_id = el.mch_id.id;
+            });
+            dispatch({
+              type: SET_CURRENT_BTC,
+              payload: {
+                ...data,
+                plan_id: data?.plan_id?.id ?? null,
+                dep_id: data?.dep_id?.id ?? null,
+                product:
+                  product.length > 0
+                    ? product
+                    : [
+                        {
+                          id: 0,
+                          form_id: null,
+                          prod_id: null,
+                          unit_id: null,
+                          qty: null,
+                          aloc: null,
+                        },
+                      ],
+                material:
+                  material.length > 0
+                    ? material
+                    : [
+                        {
+                          id: 0,
+                          form_id: null,
+                          prod_id: null,
+                          unit_id: null,
+                          qty: null,
+                          price: null,
+                        },
+                      ],
+                mesin:
+                  mesin.length > 0
+                    ? mesin
+                    : [
+                        {
+                          id: 0,
+                          pl_id: null,
+                          mch_id: null,
+                        },
+                      ],
+              },
+            });
           }}
           className="btn btn-primary shadow btn-xs sharp ml-1"
         >
@@ -456,7 +457,7 @@ const DataBatch = ({ onAdd }) => {
           >
             <Column
               header="Tgl Batch"
-              field={(e) => formatDate(e.ord_code)}
+              field={(e) => formatDate(e.batch_date)}
               style={{ minWidth: "8rem" }}
               body={loading && <Skeleton />}
             />
@@ -469,26 +470,20 @@ const DataBatch = ({ onAdd }) => {
               body={loading && <Skeleton />}
             />
             <Column
-              header="Nama Batch"
-              field={(e) => e.bname}
+              header="Departemen"
+              field={(e) => e.dep_id?.ccost_name}
               style={{ minWidth: "8rem" }}
               body={loading && <Skeleton />}
             />
             <Column
               header="Kode Planning"
-              field={(e) => e.ord_code}
+              field={(e) => e.plan_id?.pcode}
               style={{ minWidth: "8rem" }}
               body={loading && <Skeleton />}
             />
             <Column
               header="Nama Planning"
-              field={(e) => e.ord_code}
-              style={{ minWidth: "8rem" }}
-              body={loading && <Skeleton />}
-            />
-            <Column
-              header="Departement"
-              field={(e) => e.ord_code}
+              field={(e) => e.plan_id?.pname}
               style={{ minWidth: "8rem" }}
               body={loading && <Skeleton />}
             />

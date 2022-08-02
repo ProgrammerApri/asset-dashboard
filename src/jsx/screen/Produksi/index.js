@@ -18,14 +18,14 @@ const Produksi = () => {
       component: <Mesin />,
     },
     {
-      tittle: "Planning",
-      icon: "bx-receipt",
-      component: <Planning />,
-    },
-    {
       tittle: "Formula",
       icon: "bx-receipt",
       component: <Formula />,
+    },
+    {
+      tittle: "Planning",
+      icon: "bx-receipt",
+      component: <Planning />,
     },
     {
       tittle: "Batch",

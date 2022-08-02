@@ -442,70 +442,9 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
       <>
         {/* Put content body here */}
         <Toast ref={toast} />
-
         <Row className="mb-4">
-          <div className="col-2 text-black">
-            <label className="text-black">Kode Batch</label>
-            <div className="p-inputgroup"></div>
-            <CustomDropdown
-              label={"Kode Batch"}
-              value={btc.fcode}
-              onChange={(e) => {
-                updateBTC({ ...btc, fcode: e.target.value });
-                let newError = error;
-                newError.code = false;
-                setError(newError);
-              }}
-              placeholder="Masukan Kode Batch"
-              error={error?.code}
-              //   disabled
-            />
-          </div>
-          <div className="col-3 text-black">
-            <label className="text-black">Departement</label>
-            <div className="p-inputgroup"></div>
-            <CustomDropdown
-              value={btc.dep_id && checkDept(btc.dep_id)}
-              onChange={(e) => {
-                updateBTC({ ...btc, dep_id: e.id });
-              }}
-              option={dept}
-              detail
-              onDetail={() => setShowDept(true)}
-              label={"[ccost_name] ([ccost_code])"}
-              placeholder="Pilih Departement"
-            />
-          </div>
-          <div className="col-6 text-black"></div>
-          <div className="col-2 text-black">
-            <label className="text-black">Nama Batch</label>
-            <div className="p-inputgroup"></div>
-            <CustomDropdown
-              label={"Kode Batch"}
-              value={btc.fcode}
-              onChange={(e) => {
-                updateBTC({ ...btc, fcode: e.target.value });
-                let newError = error;
-                newError.code = false;
-                setError(newError);
-              }}
-              placeholder="Masukan Kode Batch"
-              error={error?.code}
-              //   disabled
-            />
-          </div>
-
-          <div className="col- text-black"></div>
-
-          <div className="col-12 p-0 text-black">
-            <div className="mt-4 mb-2 ml-3 mr-3 fs-13">
-              <b>Informasi Pembebanan</b>
-            </div>
-            <Divider className="mb-2 ml-3 mr-3"></Divider>
-          </div>
-          <div className="col-12"></div>
-
-          <div className="col-3">
+        {/* <div className="col-12"></div> */}
+          <div className="col-2">
             <label className="text-black">Kode Pembebanan</label>
             <div className="p-inputgroup">
               <PrimeInput
@@ -517,7 +456,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                   newError.code = false;
                   setError(newError);
                 }}
-                placeholder="Pilih Kode Planning"
+                placeholder="001-001xx"
                 optionLabel="pcode"
                 filter
                 filterBy="pcode"
@@ -525,9 +464,10 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
               />
             </div>
           </div>
+          <div className="col- text-black"></div>
           <div className="col-2 text-black">
             <PrimeCalendar
-              label={"Tgl Pembebanan"}
+              label={"Tgl Dibuat"}
               value={null}
               onChange={(e) => {
                 setDate(e.value);
@@ -540,7 +480,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-5"></div>
+          <div className="col-6"></div>
 
           <div className="col-3 text-black">
             <PrimeInput
@@ -558,7 +498,70 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-7"></div>
+
+          <div className="col-12 p-0 text-black">
+            <div className="mt-4 mb-2 ml-3 mr-3 fs-13">
+              <b>Informasi Batch</b>
+            </div>
+            <Divider className="mb-2 ml-3 mr-3"></Divider>
+          </div>
+          <div className="col-12"></div>
+
+
+          <div className="col-2 text-black">
+            <label className="text-black">Kode Batch</label>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
+              label={"Kode Batch"}
+              value={btc.fcode}
+              onChange={(e) => {
+                updateBTC({ ...btc, fcode: e.target.value });
+                let newError = error;
+                newError.code = false;
+                setError(newError);
+              }}
+              placeholder="Masukan Kode Batch"
+              error={error?.code}
+              //   disabled
+            />
+          </div>
+          <div className="col-2 text-black">
+            <label className="text-black">Nama Batch</label>
+            <div className="p-inputgroup"></div>
+            <PrimeInput
+            
+              value={btc.fcode}
+              onChange={(e) => {
+                updateBTC({ ...btc, fcode: e.target.value });
+                let newError = error;
+                newError.code = false;
+                setError(newError);
+              }}
+              placeholder="Otomatis"
+              error={error?.code}
+                disabled
+            />
+          </div>
+          {/* <div className="col-7"></div> */}
+          <div className="col-3 text-black">
+            <label className="text-black">Departement</label>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
+              value={btc.dep_id && checkDept(btc.dep_id)}
+              onChange={(e) => {
+                updateBTC({ ...btc, dep_id: e.id });
+              }}
+              option={dept}
+              detail
+              onDetail={() => setShowDept(true)}
+              label={"[ccost_name] ([ccost_code])"}
+              placeholder="Pilih Departement"
+            />
+          </div>
+          {/* <div className="col-6 text-black"></div> */}
+          
+
+          <div className="col-9"></div>
           <div className="col-5 text-black">
             <label className="text-label">Keterangan</label>
             <div className="p-inputgroup">
@@ -570,24 +573,38 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
             </div>
           </div>
           <div className="col-7"></div>
-          <div className="col-3">
+          <div className="col-3 text-black">
             <label className="text-black">Akun Kredit</label>
-            <div className="p-inputgroup">
-              <InputText
+            <div className="p-inputgroup"></div>
+              <CustomDropdown
                 value={null}
                 onChange={(e) => {
                   setDate(e.value);
                 }}
-                placeholder="3215647xxxxxxx"
+                placeholder="Pilih Buku Rekening"
                 //   dateFormat="dd-mm-yy"
                 //   disabled
                 error={error?.date}
               />
-            </div>
+            {/* </div> */}
           </div>
 
           <div className="col-12"></div>
-        </Row>
+
+
+         
+
+          
+
+        {/* <Row className="mb-4"> */}
+         
+
+          {/* <div className="col-24"></div> */}
+
+          </Row>
+
+          <div className="col-12"></div>
+     
 
         <TabView activeIndex={active} onTabChange={(e) => setActive(e.index)}>
           <TabPanel header="Upah">

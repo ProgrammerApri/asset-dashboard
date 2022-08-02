@@ -366,6 +366,83 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
         <Toast ref={toast} />
 
         <Row className="mb-4">
+          
+        {/* <div className="col-0"></div> */}
+          {/* <div className="col-12 text-black"></div> */}
+          <div className="col-2 text-black">
+            <PrimeInput
+              label={"Kode Penerimaan Hasil Jadi"}
+              value={forml.fname}
+              onChange={(e) => {
+                updateFM({ ...forml, fname: e.target.value });
+                let newError = error;
+                newError.name = false;
+                setError(newError);
+              }}
+              placeholder="Batch-001"
+              error={error?.name}
+            />
+          </div>
+
+          <div className="col-2 text-black">
+            <PrimeCalendar
+              label={"Tgl Penerimaan Hasil Jadi"}
+              value={date}
+              onChange={(e) => {
+                setDate(e.value);
+              }}
+              placeholder="Pilih Tanggal"
+              // disabled
+              dateFormat="dd-mm-yy"
+              showIcon
+              error={error?.date}
+            />
+          </div>
+
+          <div className="col-2 text-black">
+            <label className="text-black">Satuan</label>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
+              value={plan.unit !== null ? checkUnit(plan.unit) : ""}
+              option={satuan}
+              onChange={(e) => {
+                updatePL({ ...plan, unit: e.id });
+                let newError = error;
+                newError.un = false;
+                setError(newError);
+              }}
+              placeholder="Pilih Satuan"
+              detail
+              onDetail={() => setShowSatuan(true)}
+              label={"[name]"}
+              errorMessage="Satuan Belum Dipilih"
+              error={error?.un}
+            />
+          </div>
+          <div className="col-6 text-black"></div>
+          <div className="col-2 text-black">
+            <PrimeInput
+              label={"Total Pembuatan"}
+              value={forml.fcode}
+              onChange={(e) => {
+                updateFM({ ...forml, fcode: e.target.value });
+                let newError = error;
+                newError.code = false;
+                setError(newError);
+              }}
+              placeholder="1xxxx"
+              error={error?.code}
+            />
+          </div>
+          
+
+          <div className="col-12 p-0 text-black">
+            <div className="mt-4 mb-2 ml-3 mr-3 fs-13">
+              <b>Informasi Penerimaan Hasil Jadi</b>
+            </div>
+            <Divider className="mb-2 ml-3 mr-3"></Divider>
+          </div>
+
           <div className="col-3 text-black">
             {/* <div className="col-1"> */}
             <label className="text-black">Kode Batch</label>
@@ -378,7 +455,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                 newError.code = false;
                 setError(newError);
               }}
-              placeholder="PHJ-01"
+              placeholder="Pilih "
               error={error?.code}
             />
           </div>
@@ -410,78 +487,16 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
               // placeholder="Pilih Departement"
             />
           </div>
-          <div className="col-12 p-0 text-black">
-            <div className="mt-4 mb-2 ml-3 mr-3 fs-13">
-              <b>Informasi PHJ</b>
-            </div>
-            <Divider className="mb-2 ml-3 mr-3"></Divider>
-          </div>
-          <div className="col-0"></div>
-          <div className="col-12 text-black"></div>
-          <div className="col-3 text-black">
-            <PrimeInput
-              label={"Kode PHJ"}
-              value={forml.fname}
-              onChange={(e) => {
-                updateFM({ ...forml, fname: e.target.value });
-                let newError = error;
-                newError.name = false;
-                setError(newError);
-              }}
-              placeholder="Batch-01"
-              error={error?.name}
-            />
-          </div>
 
-          <div className="col-2 text-black">
-            <PrimeCalendar
-              label={"Tanggal PHJ"}
-              value={date}
-              onChange={(e) => {
-                setDate(e.value);
-              }}
-              placeholder="Pilih Tanggal"
-              // disabled
-              dateFormat="dd-mm-yy"
-              showIcon
-              error={error?.date}
-            />
-          </div>
-          <div className="col-6 text-black"></div>
-          <div className="col-2 text-black">
-            <PrimeInput
-              label={"Total Pembuatan"}
-              value={forml.fcode}
-              onChange={(e) => {
-                updateFM({ ...forml, fcode: e.target.value });
-                let newError = error;
-                newError.code = false;
-                setError(newError);
-              }}
-              placeholder="PHJ-01"
-              error={error?.code}
-            />
-          </div>
-          <div className="col-2 text-black">
-            <label className="text-black">Satuan</label>
-            <div className="p-inputgroup"></div>
-            <CustomDropdown
-              value={plan.unit !== null ? checkUnit(plan.unit) : ""}
-              option={satuan}
-              onChange={(e) => {
-                updatePL({ ...plan, unit: e.id });
-                let newError = error;
-                newError.un = false;
-                setError(newError);
-              }}
-              placeholder="Pilih Satuan"
-              detail
-              onDetail={() => setShowSatuan(true)}
-              label={"[name]"}
-              errorMessage="Satuan Belum Dipilih"
-              error={error?.un}
-            />
-          </div>
+
+
+
+
+
+
+
+
+         
           <div className="col-8 text-black"></div>
 
           {/* <div className="col-7"></div> */}

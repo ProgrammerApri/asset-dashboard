@@ -48,6 +48,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const toast = useRef(null);
+  const forml = useSelector((state) => state.forml.current);
   const [mesin, setMesin] = useState(null);
   const [active, setActive] = useState(0);
   const [doubleClick, setDoubleClick] = useState(false);
@@ -208,6 +209,12 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
         });
       }, 500);
     }
+  };
+  const updateFM = (e) => {
+    dispatch({
+      type: SET_CURRENT_FM,
+      payload: e,
+    });
   };
 
   const addBTC = async () => {
@@ -443,7 +450,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
         {/* Put content body here */}
         <Toast ref={toast} />
         <Row className="mb-4">
-        {/* <div className="col-12"></div> */}
+          {/* <div className="col-12"></div> */}
           <div className="col-2">
             <label className="text-black">Kode Pembebanan</label>
             <div className="p-inputgroup">
@@ -498,7 +505,6 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-
           <div className="col-12 p-0 text-black">
             <div className="mt-4 mb-2 ml-3 mr-3 fs-13">
               <b>Informasi Batch</b>
@@ -506,7 +512,6 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
             <Divider className="mb-2 ml-3 mr-3"></Divider>
           </div>
           <div className="col-12"></div>
-
 
           <div className="col-2 text-black">
             <label className="text-black">Kode Batch</label>
@@ -529,7 +534,6 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
             <label className="text-black">Nama Batch</label>
             <div className="p-inputgroup"></div>
             <PrimeInput
-            
               value={btc.fcode}
               onChange={(e) => {
                 updateBTC({ ...btc, fcode: e.target.value });
@@ -539,7 +543,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
               }}
               placeholder="Otomatis"
               error={error?.code}
-                disabled
+              disabled
             />
           </div>
           {/* <div className="col-7"></div> */}
@@ -559,7 +563,6 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
             />
           </div>
           {/* <div className="col-6 text-black"></div> */}
-          
 
           <div className="col-9"></div>
           <div className="col-5 text-black">
@@ -576,41 +579,37 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
           <div className="col-3 text-black">
             <label className="text-black">Akun Kredit</label>
             <div className="p-inputgroup"></div>
-              <CustomDropdown
-                value={null}
-                onChange={(e) => {
-                  setDate(e.value);
-                }}
-                placeholder="Pilih Buku Rekening"
-                //   dateFormat="dd-mm-yy"
-                //   disabled
-                error={error?.date}
-              />
+            <CustomDropdown
+              value={null}
+              onChange={(e) => {
+                setDate(e.value);
+              }}
+              placeholder="Pilih Buku Rekening"
+              //   dateFormat="dd-mm-yy"
+              //   disabled
+              error={error?.date}
+            />
             {/* </div> */}
           </div>
 
           <div className="col-12"></div>
 
-
-         
-
-          
-
-        {/* <Row className="mb-4"> */}
-         
+          {/* <Row className="mb-4"> */}
 
           {/* <div className="col-24"></div> */}
+        </Row>
 
-          </Row>
+        <div className="col-12"></div>
 
-          <div className="col-12"></div>
-     
-
-        <TabView activeIndex={active} onTabChange={(e) => setActive(e.index)}>
+        <TabView
+          className="m-1"
+          activeIndex={active}
+          onTabChange={(e) => setActive(e.index)}
+        >
           <TabPanel header="Upah">
             <DataTable
               responsiveLayout="none"
-              value={plan.product?.map((v, i) => {
+              value={forml.product?.map((v, i) => {
                 return {
                   ...v,
                   index: i,
@@ -622,41 +621,97 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
               emptyMessage={() => <div></div>}
             >
               <Column
-                header="Upah"
-                className="align-text-top"
+                // header="Produk"
+                className="col-5 align-text-top"
                 field={""}
-                style={{
-                  width: "30rem",
-                }}
                 body={(e) => (
-                  <div className="p-inputgroup">
-                    <InputText
-                      value={e.prod_id && checkProd(e.prod_id).name}
-                      placeholder="Upah"
-                      disabled
-                    />
-                  </div>
+                  <CustomDropdown
+                    value={e.prod_id && checkProd(e.prod_id)}
+                    option={product}
+                    onChange={(u) => {
+                      // looping satuan
+                      let sat = [];
+                      satuan.forEach((element) => {
+                        if (element.id === u.unit.id) {
+                          sat.push(element);
+                        } else {
+                          if (element.u_from?.id === u.unit.id) {
+                            sat.push(element);
+                          }
+                        }
+                      });
+                      setSatuan(sat);
+
+                      let temp = [...forml.product];
+                      temp[e.index].prod_id = u.id;
+                      temp[e.index].unit_id = u.unit?.id;
+                      updateFM({ ...forml, product: temp });
+
+                      let newError = error;
+                      newError.prod[e.index].id = false;
+                      setError(newError);
+                    }}
+                    detail
+                    onDetail={() => {
+                      setCurrentIndex(e.index);
+                      setShowProd(true);
+                    }}
+                    label={"[name]"}
+                    placeholder="52000001 - Upah"
+                    errorMessage="Produk Belum Dipilih"
+                    error={error?.prod[e.index]?.id}
+                  />
                 )}
               />
-              <div className="col-7"></div>
+
+              <div className="col-6"></div>
 
               <Column
+                header=""
                 className="align-text-top"
-                body={(e) => (
-                  <Link
-                    onClick={() => {
-                      let temp = [...plan.product];
-                      temp.splice(e.index, 1);
-                      updatePL({
-                        ...plan,
-                        product: temp,
-                      });
-                    }}
-                    className="btn btn-danger shadow btn-xs sharp ml-1"
-                  >
-                    <i className="fa fa-trash"></i>
-                  </Link>
-                )}
+                field={""}
+                body={(e) =>
+                  e.index === forml.product.length - 1 ? (
+                    <Link
+                      onClick={() => {
+                        let newError = error;
+                        newError.prod.push({
+                          qty: false,
+                          aloc: false,
+                        });
+                        setError(newError);
+
+                        updateFM({
+                          ...forml,
+                          product: [
+                            ...forml.product,
+                            {
+                              id: 0,
+                              prod_id: null,
+                              unit_id: null,
+                              qty: null,
+                              aloc: null,
+                            },
+                          ],
+                        });
+                      }}
+                      className="btn btn-primary shadow btn-xs sharp"
+                    >
+                      <i className="fa fa-plus"></i>
+                    </Link>
+                  ) : (
+                    <Link
+                      onClick={() => {
+                        let temp = [...forml.product];
+                        temp.splice(e.index, 1);
+                        updateFM({ ...forml, product: temp });
+                      }}
+                      className="btn btn-danger shadow btn-xs sharp"
+                    >
+                      <i className="fa fa-trash"></i>
+                    </Link>
+                  )
+                }
               />
             </DataTable>
           </TabPanel>
@@ -664,12 +719,11 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
           <TabPanel header="Overhead">
             <DataTable
               responsiveLayout="none"
-              value={plan.material?.map((v, i) => {
+              value={forml.product?.map((v, i) => {
                 return {
                   ...v,
                   index: i,
                   // order: v?.order ?? 0,
-                  // price: v?.price ?? 0,
                 };
               })}
               className="display w-150 datatable-wrapper header-white no-border"
@@ -677,40 +731,97 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
               emptyMessage={() => <div></div>}
             >
               <Column
-                header="Upah"
-                className="align-text-top"
+                // header="Produk"
+                className="col-5 align-text-top"
                 field={""}
-                style={{
-                  width: "30rem",
-                }}
                 body={(e) => (
-                  <div className="p-inputgroup">
-                    <InputText
-                      value={e.prod_id && checkProd(e.prod_id).name}
-                      placeholder="Overhead"
-                      disabled
-                    />
-                  </div>
+                  <CustomDropdown
+                    value={e.prod_id && checkProd(e.prod_id)}
+                    option={product}
+                    onChange={(u) => {
+                      // looping satuan
+                      let sat = [];
+                      satuan.forEach((element) => {
+                        if (element.id === u.unit.id) {
+                          sat.push(element);
+                        } else {
+                          if (element.u_from?.id === u.unit.id) {
+                            sat.push(element);
+                          }
+                        }
+                      });
+                      setSatuan(sat);
+
+                      let temp = [...forml.product];
+                      temp[e.index].prod_id = u.id;
+                      temp[e.index].unit_id = u.unit?.id;
+                      updateFM({ ...forml, product: temp });
+
+                      let newError = error;
+                      newError.prod[e.index].id = false;
+                      setError(newError);
+                    }}
+                    detail
+                    onDetail={() => {
+                      setCurrentIndex(e.index);
+                      setShowProd(true);
+                    }}
+                    label={"[name]"}
+                    placeholder="5200000123- Overhead"
+                    errorMessage="Produk Belum Dipilih"
+                    error={error?.prod[e.index]?.id}
+                  />
                 )}
               />
-              <div className="col-7" />
+
+              <div className="col-6"></div>
+
               <Column
+                header=""
                 className="align-text-top"
-                body={(e) => (
-                  <Link
-                    onClick={() => {
-                      let temp = [...plan.material];
-                      temp.splice(e.index, 1);
-                      updatePL({
-                        ...plan,
-                        material: temp,
-                      });
-                    }}
-                    className="btn btn-danger shadow btn-xs sharp ml-1"
-                  >
-                    <i className="fa fa-trash"></i>
-                  </Link>
-                )}
+                field={""}
+                body={(e) =>
+                  e.index === forml.product.length - 1 ? (
+                    <Link
+                      onClick={() => {
+                        let newError = error;
+                        newError.prod.push({
+                          qty: false,
+                          aloc: false,
+                        });
+                        setError(newError);
+
+                        updateFM({
+                          ...forml,
+                          product: [
+                            ...forml.product,
+                            {
+                              id: 0,
+                              prod_id: null,
+                              unit_id: null,
+                              qty: null,
+                              aloc: null,
+                            },
+                          ],
+                        });
+                      }}
+                      className="btn btn-primary shadow btn-xs sharp"
+                    >
+                      <i className="fa fa-plus"></i>
+                    </Link>
+                  ) : (
+                    <Link
+                      onClick={() => {
+                        let temp = [...forml.product];
+                        temp.splice(e.index, 1);
+                        updateFM({ ...forml, product: temp });
+                      }}
+                      className="btn btn-danger shadow btn-xs sharp"
+                    >
+                      <i className="fa fa-trash"></i>
+                    </Link>
+                  )
+                }
               />
             </DataTable>
           </TabPanel>

@@ -7,6 +7,8 @@ import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_BTC } from "src/redux/actions";
+import { SET_CURRENT_FM } from "src/redux/actions";
+
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
@@ -18,6 +20,8 @@ import { Divider } from "@material-ui/core";
 import { TabPanel, TabView } from "primereact/tabview";
 import DataPusatBiaya from "../../MasterLainnya/PusatBiaya/DataPusatBiaya";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
+import DataProduk from "../../Master/Produk/DataProduk";
+import DataSatuan from "../../MasterLainnya/Satuan/DataSatuan";
 
 const defError = {
   code: false,
@@ -29,17 +33,22 @@ const defError = {
 const InputBatch = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
   const toast = useRef(null);
+  const plan = useSelector((state) => state.plan.current);
   const [mesin, setMesin] = useState(null);
+  const forml = useSelector((state) => state.forml.current);
   const [active, setActive] = useState(0);
   const [doubleClick, setDoubleClick] = useState(false);
   const btc = useSelector((state) => state.btc.current);
   const isEdit = useSelector((state) => state.btc.editBtc);
   const dispatch = useDispatch();
+  const [showSatuan, setShowSatuan] = useState(false);
   const [date, setDate] = useState(new Date());
   const [showDept, setShowDept] = useState(false);
   const [product, setProduct] = useState(null);
   const [satuan, setSatuan] = useState(null);
   const [formula, setFormula] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [showProd, setShowProd] = useState(false);
   const [planning, setPlanning] = useState(null);
   const [dept, setDept] = useState(null);
   const [error, setError] = useState(defError);
@@ -85,6 +94,16 @@ const InputBatch = ({ onCancel, onSuccess }) => {
     });
 
     return selected;
+  };
+
+  const updateFM = (e) => {
+    dispatch({
+      type: SET_CURRENT_FM,
+      payload: e,
+    });
+  };
+  const updatePL = (e) => {
+    dispatch({});
   };
 
   const getSatuan = async () => {
@@ -614,230 +633,321 @@ const InputBatch = ({ onCancel, onSuccess }) => {
             </>
           )}
         </Row>
-
-        {btc && btc.plan_id !== null && (
-          <>
-            <TabView
-              activeIndex={active}
-              onTabChange={(e) => setActive(e.index)}
+        <TabView
+          className="m-1"
+          activeIndex={active}
+          onTabChange={(e) => setActive(e.index)}
+        >
+          <TabPanel header="Produk Jadi">
+            <DataTable
+              responsiveLayout="none"
+              value={forml.product?.map((v, i) => {
+                return {
+                  ...v,
+                  index: i,
+                  // order: v?.order ?? 0,
+                };
+              })}
+              className="display w-150 datatable-wrapper header-white no-border"
+              showGridlines={false}
+              emptyMessage={() => <div></div>}
             >
-              <TabPanel header="Produk Jadi">
-                <DataTable
-                  responsiveLayout="none"
-                  value={btc.product?.map((v, i) => {
-                    return {
-                      ...v,
-                      index: i,
-                      // order: v?.order ?? 0,
-                    };
-                  })}
-                  className="display w-150 datatable-wrapper header-white no-border"
-                  showGridlines={false}
-                  emptyMessage={() => <div></div>}
-                >
-                  <Column
-                    header="Produk"
-                    className="align-text-top"
-                    field={""}
-                    style={{
-                      width: "20rem",
+              <Column
+                // header="Produk"
+                className="col-5 align-text"
+                field={""}
+                body={(e) => (
+                  <CustomDropdown
+                    value={e.prod_id && checkProd(e.prod_id)}
+                    option={product}
+                    onChange={(u) => {
+                      // looping satuan
+                      let sat = [];
+                      satuan.forEach((element) => {
+                        if (element.id === u.unit.id) {
+                          sat.push(element);
+                        } else {
+                          if (element.u_from?.id === u.unit.id) {
+                            sat.push(element);
+                          }
+                        }
+                      });
+                      setSatuan(sat);
+
+                      let temp = [...forml.product];
+                      temp[e.index].prod_id = u.id;
+                      temp[e.index].unit_id = u.unit?.id;
+                      updateFM({ ...forml, product: temp });
+
+                      let newError = error;
+                      newError.prod[e.index].id = false;
+                      setError(newError);
                     }}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.prod_id && checkProd(e.prod_id).name}
-                          placeholder="Nama Produk"
-                          disabled
-                        />
-                      </div>
-                    )}
-                  />
-
-                  <Column
-                    header="Satuan"
-                    className="align-text-top"
-                    field={""}
-                    style={{
-                      width: "15rem",
+                    detail
+                    onDetail={() => {
+                      setCurrentIndex(e.index);
+                      setShowProd(true);
                     }}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.unit_id && checkUnit(e.unit_id).name}
-                          placeholder="Satuan Produk"
-                          disabled
-                        />
-                      </div>
-                    )}
+                    label={"[name]"}
+                    placeholder="001 - Sambel Terasi"
+                    errorMessage="Produk Belum Dipilih"
+                    error={error?.prod[e.index]?.id}
                   />
+                )}
+              />
 
-                  <Column
-                    header="Kuantitas"
-                    className="align-text-top"
-                    field={""}
-                    // style={{
-                    //   width: "5rem",
-                    // }}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.qty && e.qty}
-                          placeholder="0"
-                          disabled
-                        />
-                      </div>
-                    )}
-                  />
-
-                  <Column
-                    header="Cost Alokasi (%)"
-                    className="align-text-top"
-                    field={""}
-                    // style={{
-                    //   minWidth: "7rem",
-                    // }}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.aloc && e.aloc}
-                          placeholder="0"
-                          disabled
-                        />
-                      </div>
-                    )}
-                  />
-                </DataTable>
-              </TabPanel>
-
-              <TabPanel header="Bahan Jadi">
-                <DataTable
-                  responsiveLayout="none"
-                  value={btc.material?.map((v, i) => {
-                    return {
-                      ...v,
-                      index: i,
-                      // order: v?.order ?? 0,
-                      // price: v?.price ?? 0,
-                    };
-                  })}
-                  className="display w-150 datatable-wrapper header-white no-border"
-                  showGridlines={false}
-                  emptyMessage={() => <div></div>}
-                >
-                  <Column
-                    header="Bahan"
-                    className="align-text-top"
-                    field={""}
-                    style={{
-                      width: "20rem",
+              <Column
+                // header="Produk"
+                className="col-2 align-text-top"
+                field={""}
+                body={(e) => (
+                  // <div className="p-inputgroup"></div>
+                  <CustomDropdown
+                    value={plan.unit !== null ? checkUnit(plan.unit) : ""}
+                    option={satuan}
+                    onChange={(e) => {
+                      updatePL({ ...plan, unit: e.id });
+                      let newError = error;
+                      newError.un = false;
+                      setError(newError);
                     }}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.prod_id && checkProd(e.prod_id).name}
-                          placeholder="Nama Produk"
-                          disabled
-                        />
-                      </div>
-                    )}
+                    placeholder="Pcs"
+                    detail
+                    onDetail={() => setShowSatuan(true)}
+                    label={"[name]"}
+                    errorMessage="Satuan Belum Dipilih"
+                    error={error?.un}
                   />
+                )}
+              />
 
-                  <Column
-                    header="Satuan"
-                    className="align-text-top"
-                    field={""}
-                    style={{
-                      width: "15rem",
+              <Column
+                // header="Produk"
+                className="col-2 align-text-top"
+                field={""}
+                body={(e) => (
+                  <PrimeInput
+                    // label={"Kode Penerimaan"}
+                    value={forml.fname}
+                    onChange={(e) => {
+                      updateFM({ ...forml, fname: e.target.value });
+                      let newError = error;
+                      newError.name = false;
+                      setError(newError);
                     }}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.unit_id && checkUnit(e.unit_id).name}
-                          placeholder="Satuan Produk"
-                          disabled
-                        />
-                      </div>
-                    )}
+                    placeholder="1"
+                    error={error?.name}
                   />
+                )}
+              />
+              <div className="col-2" ></div>
+              <Column
+                header=""
+                className="align-text-top"
+                field={""}
+                body={(e) =>
+                  e.index === forml.product.length - 1 ? (
+                    <Link
+                      onClick={() => {
+                        let newError = error;
+                        newError.prod.push({
+                          qty: false,
+                          aloc: false,
+                        });
+                        setError(newError);
 
-                  <Column
-                    header="Kuantitas"
-                    className="align-text-top"
-                    field={""}
-                    // style={{
-                    //   width: "5rem",
-                    // }}
-                    body={(e) => (
-                      <PrimeNumber
-                        value={e.qty ? e.qty : ""}
-                        placeholder="0"
-                        disabled
-                      />
-                    )}
-                  />
+                        updateFM({
+                          ...forml,
+                          product: [
+                            ...forml.product,
+                            {
+                              id: 0,
+                              prod_id: null,
+                              unit_id: null,
+                              qty: null,
+                              aloc: null,
+                            },
+                          ],
+                        });
+                      }}
+                      className="btn btn-primary shadow btn-xs sharp"
+                    >
+                      <i className="fa fa-plus"></i>
+                    </Link>
+                  ) : (
+                    <Link
+                      onClick={() => {
+                        let temp = [...forml.product];
+                        temp.splice(e.index, 1);
+                        updateFM({ ...forml, product: temp });
+                      }}
+                      className="btn btn-danger shadow btn-xs sharp"
+                    >
+                      <i className="fa fa-trash"></i>
+                    </Link>
+                  )
+                }
+              />
+            </DataTable>
+          </TabPanel>
 
-                  <Column
-                    header="Harga"
-                    className="align-text-top"
-                    field={""}
-                    // style={{
-                    //   minWidth: "7rem",
-                    // }}
-                    body={(e) => (
-                      <PrimeNumber
-                        value={e.price ? e.price : ""}
-                        placeholder="0"
-                        disabled
-                      />
-                    )}
-                  />
-                </DataTable>
-              </TabPanel>
+          <TabPanel header="Produk Reject">
+            <DataTable
+              responsiveLayout="none"
+              value={forml.product?.map((v, i) => {
+                return {
+                  ...v,
+                  index: i,
+                  // order: v?.order ?? 0,
+                };
+              })}
+              className="display w-150 datatable-wrapper header-white no-border"
+              showGridlines={false}
+              emptyMessage={() => <div></div>}
+            >
+              <Column
+                // header="Produk"
+                className="col-5 align-text"
+                field={""}
+                body={(e) => (
+                  <CustomDropdown
+                    value={e.prod_id && checkProd(e.prod_id)}
+                    option={product}
+                    onChange={(u) => {
+                      // looping satuan
+                      let sat = [];
+                      satuan.forEach((element) => {
+                        if (element.id === u.unit.id) {
+                          sat.push(element);
+                        } else {
+                          if (element.u_from?.id === u.unit.id) {
+                            sat.push(element);
+                          }
+                        }
+                      });
+                      setSatuan(sat);
 
-              <TabPanel header="Mesin">
-                <DataTable
-                  responsiveLayout="none"
-                  value={btc.mesin?.map((v, i) => {
-                    return {
-                      ...v,
-                      index: i,
-                      // order: v?.order ?? 0,
-                      // price: v?.price ?? 0,
-                    };
-                  })}
-                  className="display w-150 datatable-wrapper header-white no-border"
-                  showGridlines={false}
-                  emptyMessage={() => <div></div>}
-                >
-                  <Column
-                    header="Kode Mesin"
-                    className="align-text-top"
-                    field={""}
-                    style={{
-                      width: "20rem",
+                      let temp = [...forml.product];
+                      temp[e.index].prod_id = u.id;
+                      temp[e.index].unit_id = u.unit?.id;
+                      updateFM({ ...forml, product: temp });
+
+                      let newError = error;
+                      newError.prod[e.index].id = false;
+                      setError(newError);
                     }}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.mch_id && checkMsn(e.mch_id).msn_name}
-                          placeholder="Nama Mesin"
-                          disabled
-                        />
-                      </div>
-                    )}
+                    detail
+                    onDetail={() => {
+                      setCurrentIndex(e.index);
+                      setShowProd(true);
+                    }}
+                    label={"[name]"}
+                    placeholder="001 - Sambel Terasi"
+                    errorMessage="Produk Belum Dipilih"
+                    error={error?.prod[e.index]?.id}
                   />
+                )}
+              />
 
-                  <Column
-                    className="align-text-top"
-                    body={null}
+              <Column
+                // header="Produk"
+                className="col-2 align-text-top"
+                field={""}
+                body={(e) => (
+                  // <div className="p-inputgroup"></div>
+                  <CustomDropdown
+                    value={plan.unit !== null ? checkUnit(plan.unit) : ""}
+                    option={satuan}
+                    onChange={(e) => {
+                      updatePL({ ...plan, unit: e.id });
+                      let newError = error;
+                      newError.un = false;
+                      setError(newError);
+                    }}
+                    placeholder="Pcs"
+                    detail
+                    onDetail={() => setShowSatuan(true)}
+                    label={"[name]"}
+                    errorMessage="Satuan Belum Dipilih"
+                    error={error?.un}
                   />
-                </DataTable>
-              </TabPanel>
-            </TabView>
-          </>
-        )}
-        <div className="row mb-5">
-          <span className="mb-5"></span>
+                )}
+              />
+
+              <Column
+                // header="Produk"
+                className="col-2 align-text-top"
+                field={""}
+                body={(e) => (
+                  <PrimeInput
+                    // label={"Kode Penerimaan"}
+                    value={forml.fname}
+                    onChange={(e) => {
+                      updateFM({ ...forml, fname: e.target.value });
+                      let newError = error;
+                      newError.name = false;
+                      setError(newError);
+                    }}
+                    placeholder="1"
+                    error={error?.name}
+                  />
+                )}
+              />
+              <div className="col-2" ></div>
+              <Column
+                header=""
+                className=" align-text-top"
+                field={""}
+                body={(e) =>
+                  e.index === forml.product.length - 1 ? (
+                    <Link
+                      onClick={() => {
+                        let newError = error;
+                        newError.prod.push({
+                          qty: false,
+                          aloc: false,
+                        });
+                        setError(newError);
+
+                        updateFM({
+                          ...forml,
+                          product: [
+                            ...forml.product,
+                            {
+                              id: 0,
+                              prod_id: null,
+                              unit_id: null,
+                              qty: null,
+                              aloc: null,
+                            },
+                          ],
+                        });
+                      }}
+                      className="btn btn-primary shadow btn-xs sharp"
+                    >
+                      <i className="fa fa-plus"></i>
+                    </Link>
+                  ) : (
+                    <Link
+                      onClick={() => {
+                        let temp = [...forml.product];
+                        temp.splice(e.index, 1);
+                        updateFM({ ...forml, product: temp });
+                      }}
+                      className="btn btn-danger shadow btn-xs sharp"
+                    >
+                      <i className="fa fa-trash"></i>
+                    </Link>
+                  )
+                }
+              />
+            </DataTable>
+          </TabPanel>
+        </TabView>
+          
+        
+        <div className="row mb-8">
+          <span className="mb-8"></span>
         </div>
       </>
     );
@@ -845,7 +955,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
 
   const getIndex = () => {
     let total = 0;
-    btc?.product?.forEach((el) => {
+    forml?.product?.forEach((el) => {
       total += el.index;
     });
 
@@ -900,24 +1010,76 @@ const InputBatch = ({ onCancel, onSuccess }) => {
         </Col>
       </Row>
 
-      <DataPusatBiaya
-        data={dept}
+      <DataProduk
+        data={product}
         loading={false}
         popUp={true}
-        show={showDept}
+        show={showProd}
         onHide={() => {
-          setShowDept(false);
+          setShowProd(false);
         }}
         onInput={(e) => {
-          setShowDept(!e);
+          setShowProd(!e);
         }}
         onSuccessInput={(e) => {
-          getDept();
+          getProduct();
         }}
         onRowSelect={(e) => {
           if (doubleClick) {
-            setShowDept(false);
-            updateBTC({ ...btc, dep_id: e.data.id });
+            setShowProd(false);
+            let sat = [];
+            satuan.forEach((element) => {
+              if (element.id === e.data.unit.id) {
+                sat.push(element);
+              } else {
+                if (element.u_from?.id === e.data.unit.id) {
+                  sat.push(element);
+                }
+              }
+            });
+            setSatuan(sat);
+
+            let temp = [...forml.product];
+            temp[currentIndex].prod_id = e.data.id;
+            temp[currentIndex].unit_id = e.data.unit?.id;
+
+            let tempm = [...forml.material];
+            temp[currentIndex].prod_id = e.data.id;
+            temp[currentIndex].unit_id = e.data.unit?.id;
+            updateFM({ ...forml, product: temp, material: tempm });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataSatuan
+        data={satuan}
+        loading={false}
+        popUp={true}
+        show={showSatuan}
+        onHide={() => {
+          setShowSatuan(false);
+        }}
+        onInput={(e) => {
+          setShowSatuan(!e);
+        }}
+        onSuccessInput={(e) => {
+          getSatuan();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowSatuan(false);
+            let temp = [...forml.product];
+            temp[currentIndex].unit_id = e.data.id;
+
+            let tempm = [...forml.material];
+            tempm[currentIndex].unit_id = e.data.id;
+            updateFM({ ...forml, product: temp, material: tempm });
           }
 
           setDoubleClick(true);

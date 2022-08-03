@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { request, endpoints } from "src/utils";
-import { Row, Col } from "react-bootstrap";
+import { Row, Col, Dropdown } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
@@ -20,6 +20,7 @@ import DataProduk from "../../Master/Produk/DataProduk";
 import DataSatuan from "../../MasterLainnya/Satuan/DataSatuan";
 import { TabPanel, TabView } from "primereact/tabview";
 import { Divider } from "@material-ui/core";
+import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 
 const defError = {
   code: false,
@@ -365,13 +366,13 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
         {/* Put content body here */}
         <Toast ref={toast} />
 
-        <Row className="mb-4">
-          
-        {/* <div className="col-0"></div> */}
+        <Row className="mb-3">
+          {/* <div className="col-0"></div> */}
           {/* <div className="col-12 text-black"></div> */}
+
           <div className="col-2 text-black">
             <PrimeInput
-              label={"Kode Penerimaan Hasil Jadi"}
+              label={"Kode Penerimaan"}
               value={forml.fname}
               onChange={(e) => {
                 updateFM({ ...forml, fname: e.target.value });
@@ -385,8 +386,9 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-2 text-black">
+            <div className="ml-3"></div>
             <PrimeCalendar
-              label={"Tgl Penerimaan Hasil Jadi"}
+              label={"Tgl Penerimaan"}
               value={date}
               onChange={(e) => {
                 setDate(e.value);
@@ -434,7 +436,6 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
               error={error?.code}
             />
           </div>
-          
 
           <div className="col-12 p-0 text-black">
             <div className="mt-4 mb-2 ml-3 mr-3 fs-13">
@@ -488,21 +489,16 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-
-
-
-
-
-
-
-
-         
           <div className="col-8 text-black"></div>
 
           {/* <div className="col-7"></div> */}
         </Row>
 
-        <TabView activeIndex={active} onTabChange={(e) => setActive(e.index)}>
+        <TabView
+          className="m-1"
+          activeIndex={active}
+          onTabChange={(e) => setActive(e.index)}
+        >
           <TabPanel header="Produk Jadi">
             <DataTable
               responsiveLayout="none"
@@ -518,59 +514,94 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
               emptyMessage={() => <div></div>}
             >
               <Column
-                header="Produk"
-                className="align-text-top"
+                // header="Produk"
+                className="col-5 align-text"
                 field={""}
-                style={{
-                  width: "25rem",
-                }}
                 body={(e) => (
-                  <div className="p-inputgroup">
-                    <InputText
-                      value={e.prod_id && checkProd(e.prod_id).name}
-                      placeholder="Nama Produk"
-                      disabled
-                    />
-                  </div>
+                  <CustomDropdown
+                    value={e.prod_id && checkProd(e.prod_id)}
+                    option={product}
+                    onChange={(u) => {
+                      // looping satuan
+                      let sat = [];
+                      satuan.forEach((element) => {
+                        if (element.id === u.unit.id) {
+                          sat.push(element);
+                        } else {
+                          if (element.u_from?.id === u.unit.id) {
+                            sat.push(element);
+                          }
+                        }
+                      });
+                      setSatuan(sat);
+
+                      let temp = [...forml.product];
+                      temp[e.index].prod_id = u.id;
+                      temp[e.index].unit_id = u.unit?.id;
+                      updateFM({ ...forml, product: temp });
+
+                      let newError = error;
+                      newError.prod[e.index].id = false;
+                      setError(newError);
+                    }}
+                    detail
+                    onDetail={() => {
+                      setCurrentIndex(e.index);
+                      setShowProd(true);
+                    }}
+                    label={"[name]"}
+                    placeholder="001 - Sambel Terasi"
+                    errorMessage="Produk Belum Dipilih"
+                    error={error?.prod[e.index]?.id}
+                  />
                 )}
               />
 
               <Column
-                header="Satuan"
-                className="align-text-top"
+                // header="Produk"
+                className="col-2 align-text-top"
                 field={""}
-                style={{
-                  width: "15rem",
-                }}
                 body={(e) => (
-                  <div className="p-inputgroup">
-                    <InputText
-                      value={e.unit_id && checkUnit(e.unit_id).name}
-                      placeholder="Satuan Produk"
-                      disabled
-                    />
-                  </div>
+                  // <div className="p-inputgroup"></div>
+                  <CustomDropdown
+                    value={plan.unit !== null ? checkUnit(plan.unit) : ""}
+                    option={satuan}
+                    onChange={(e) => {
+                      updatePL({ ...plan, unit: e.id });
+                      let newError = error;
+                      newError.un = false;
+                      setError(newError);
+                    }}
+                    placeholder="Pcs"
+                    detail
+                    onDetail={() => setShowSatuan(true)}
+                    label={"[name]"}
+                    errorMessage="Satuan Belum Dipilih"
+                    error={error?.un}
+                  />
                 )}
               />
 
               <Column
-                header="Kuantitas"
-                className="align-text-top"
+                // header="Produk"
+                className="col-2 align-text-top"
                 field={""}
-                // style={{
-                //   width: "5rem",
-                // }}
                 body={(e) => (
-                  <div className="p-inputgroup">
-                    <InputText
-                      value={e.qty && e.qty}
-                      placeholder="0"
-                      disabled
-                    />
-                  </div>
+                  <PrimeInput
+                    // label={"Kode Penerimaan"}
+                    value={forml.fname}
+                    onChange={(e) => {
+                      updateFM({ ...forml, fname: e.target.value });
+                      let newError = error;
+                      newError.name = false;
+                      setError(newError);
+                    }}
+                    placeholder="1"
+                    error={error?.name}
+                  />
                 )}
               />
-
+              <div className="col-2"></div>
               <Column
                 header=""
                 className="align-text-top"
@@ -588,7 +619,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
 
                         updateFM({
                           ...forml,
-                          dprod: [
+                          product: [
                             ...forml.product,
                             {
                               id: 0,
@@ -624,12 +655,11 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
           <TabPanel header="Produk Reject">
             <DataTable
               responsiveLayout="none"
-              value={forml.material?.map((v, i) => {
+              value={forml.product?.map((v, i) => {
                 return {
                   ...v,
                   index: i,
                   // order: v?.order ?? 0,
-                  // price: v?.price ?? 0,
                 };
               })}
               className="display w-150 datatable-wrapper header-white no-border"
@@ -637,82 +667,119 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
               emptyMessage={() => <div></div>}
             >
               <Column
-                header="Bahan"
-                className="align-text-top"
+                // header="Produk"
+                className="col-5 align-text"
                 field={""}
-                style={{
-                  width: "25rem",
-                }}
                 body={(e) => (
-                  <div className="p-inputgroup">
-                    <InputText
-                      value={e.prod_id && checkProd(e.prod_id).name}
-                      placeholder="Nama Produk"
-                      disabled
-                    />
-                  </div>
-                )}
-              />
+                  <CustomDropdown
+                    value={e.prod_id && checkProd(e.prod_id)}
+                    option={product}
+                    onChange={(u) => {
+                      // looping satuan
+                      let sat = [];
+                      satuan.forEach((element) => {
+                        if (element.id === u.unit.id) {
+                          sat.push(element);
+                        } else {
+                          if (element.u_from?.id === u.unit.id) {
+                            sat.push(element);
+                          }
+                        }
+                      });
+                      setSatuan(sat);
 
-              <Column
-                header="Satuan"
-                className="align-text-top"
-                field={""}
-                style={{
-                  width: "15rem",
-                }}
-                body={(e) => (
-                  <div className="p-inputgroup">
-                    <InputText
-                      value={e.unit_id && checkUnit(e.unit_id).name}
-                      placeholder="Satuan Produk"
-                      disabled
-                    />
-                  </div>
-                )}
-              />
+                      let temp = [...forml.product];
+                      temp[e.index].prod_id = u.id;
+                      temp[e.index].unit_id = u.unit?.id;
+                      updateFM({ ...forml, product: temp });
 
-              <Column
-                header="Kuantitas"
-                className="align-text-top"
-                field={""}
-                // style={{
-                //   width: "5rem",
-                // }}
-                body={(e) => (
-                  <PrimeNumber
-                    value={e.qty ? e.qty : ""}
-                    placeholder="0"
-                    disabled
+                      let newError = error;
+                      newError.prod[e.index].id = false;
+                      setError(newError);
+                    }}
+                    detail
+                    onDetail={() => {
+                      setCurrentIndex(e.index);
+                      setShowProd(true);
+                    }}
+                    label={"[name]"}
+                    placeholder="001 - Sambel Terasi"
+                    errorMessage="Produk Belum Dipilih"
+                    error={error?.prod[e.index]?.id}
                   />
                 )}
               />
 
               <Column
+                // header="Produk"
+                className="col-2 align-text-top"
+                field={""}
+                body={(e) => (
+                  // <div className="p-inputgroup"></div>
+                  <CustomDropdown
+                    value={plan.unit !== null ? checkUnit(plan.unit) : ""}
+                    option={satuan}
+                    onChange={(e) => {
+                      updatePL({ ...plan, unit: e.id });
+                      let newError = error;
+                      newError.un = false;
+                      setError(newError);
+                    }}
+                    placeholder="Pcs"
+                    detail
+                    onDetail={() => setShowSatuan(true)}
+                    label={"[name]"}
+                    errorMessage="Satuan Belum Dipilih"
+                    error={error?.un}
+                  />
+                )}
+              />
+
+              <Column
+                // header="Produk"
+                className="col-2 align-text-top"
+                field={""}
+                body={(e) => (
+                  <PrimeInput
+                    // label={"Kode Penerimaan"}
+                    value={forml.fname}
+                    onChange={(e) => {
+                      updateFM({ ...forml, fname: e.target.value });
+                      let newError = error;
+                      newError.name = false;
+                      setError(newError);
+                    }}
+                    placeholder="1"
+                    error={error?.name}
+                  />
+                )}
+              />
+              <div className="col-2"></div>
+              <Column
                 header=""
-                className="align-text-top"
+                className=" align-text-top"
                 field={""}
                 body={(e) =>
-                  e.index === forml.material.length - 1 ? (
+                  e.index === forml.product.length - 1 ? (
                     <Link
                       onClick={() => {
                         let newError = error;
-                        newError.mtrl.push({
+                        newError.prod.push({
                           qty: false,
-                          prc: false,
+                          aloc: false,
                         });
                         setError(newError);
 
                         updateFM({
                           ...forml,
-                          material: [
-                            ...forml.material,
+                          product: [
+                            ...forml.product,
                             {
                               id: 0,
                               prod_id: null,
                               unit_id: null,
                               qty: null,
-                              price: null,
+                              aloc: null,
                             },
                           ],
                         });
@@ -724,9 +791,9 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                   ) : (
                     <Link
                       onClick={() => {
-                        let temp = [...forml.material];
+                        let temp = [...forml.product];
                         temp.splice(e.index, 1);
-                        updateFM({ ...forml, material: temp });
+                        updateFM({ ...forml, product: temp });
                       }}
                       className="btn btn-danger shadow btn-xs sharp"
                     >

@@ -10,7 +10,6 @@ import {
 } from "src/redux/actions";
 import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
-// import CustomAccordion from "src/jsx/components/Accordion/Accordion";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_BTC } from "src/redux/actions";
 import { DataTable } from "primereact/datatable";
@@ -343,98 +342,6 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
     });
   };
 
-  // const isValid = () => {
-  //   let valid = false;
-  //   let errors = {
-  //     code: !forml.fcode || forml.fcode === "",
-  //     name: !forml.fname || forml.fname === "",
-  //     prod: [],
-  //     mtrl: [],
-  //   };
-
-  //   forml?.product.forEach((element, i) => {
-  //     if (i > 0) {
-  //       if (element.prod_id || element.qty || element.aloc) {
-  //         errors.prod[i] = {
-  //           id: !element.prod_id,
-  //           qty: !element.qty || element.qty === "" || element.qty === "0",
-  //           aloc: !element.aloc || element.aloc === "" || element.aloc === "0",
-  //         };
-  //       }
-  //     } else {
-  //       errors.prod[i] = {
-  //         id: !element.prod_id,
-  //         qty: !element.qty || element.qty === "" || element.qty === "0",
-  //         aloc: !element.aloc || element.aloc === "" || element.aloc === "0",
-  //       };
-  //     }
-  //   });
-
-  //   forml?.material.forEach((element, i) => {
-  //     if (i > 0) {
-  //       if (element.prod_id || element.qty || element.price) {
-  //         errors.mtrl[i] = {
-  //           id: !element.prod_id,
-  //           qty: !element.qty || element.qty === "" || element.qty === "0",
-  //           prc:
-  //             !element.price || element.price === "" || element.price === "0",
-  //         };
-  //       }
-  //     } else {
-  //       errors.mtrl[i] = {
-  //         id: !element.prod_id,
-  //         qty: !element.qty || element.qty === "" || element.qty === "0",
-  //         prc: !element.price || element.price === "" || element.price === "0",
-  //       };
-  //     }
-  //   });
-
-  //   if (!errors.prod[0]?.id && !errors.prod[0]?.qty && !errors.prod[0]?.aloc) {
-  //     errors.mtrl?.forEach((e) => {
-  //       for (var key in e) {
-  //         e[key] = false;
-  //       }
-  //     });
-  //   }
-
-  //   if (!errors.mtrl[0]?.id && !errors.mtrl[0]?.qty && !errors.mtrl[0]?.prc) {
-  //     errors.prod?.forEach((e) => {
-  //       for (var key in e) {
-  //         e[key] = false;
-  //       }
-  //     });
-  //   }
-
-  //   let validProduct = false;
-  //   let validMtrl = false;
-  //   errors.prod?.forEach((el) => {
-  //     for (var k in el) {
-  //       validProduct = !el[k];
-  //     }
-  //   });
-  //   if (!validProduct) {
-  //     errors.mtrl.forEach((el) => {
-  //       for (var k in el) {
-  //         validMtrl = !el[k];
-  //       }
-  //     });
-  //   }
-
-  //   valid = !errors.code && !errors.name && (validProduct || validMtrl);
-
-  //   setError(errors);
-
-  //   if (!valid) {
-  //     window.scrollTo({
-  //       top: 180,
-  //       left: 0,
-  //       behavior: "smooth",
-  //     });
-  //   }
-
-  //   return valid;
-  // };
-
   const header = () => {
     return (
       <h4 className="mb-5">
@@ -564,18 +471,9 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
           </div>
           {/* <div className="col-6 text-black"></div> */}
 
-          <div className="col-9"></div>
-          <div className="col-5 text-black">
-            <label className="text-label">Keterangan</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={btc.desc}
-                onChange={(e) => updateBTC({ ...btc, desc: e.target.value })}
-                placeholder="Masukan Keterangan"
-              />
-            </div>
-          </div>
-          <div className="col-7"></div>
+          {/* <div className="col-9"></div> */}
+
+          <div className="col-5"></div>
           <div className="col-3 text-black">
             <label className="text-black">Akun Kredit</label>
             <div className="p-inputgroup"></div>
@@ -590,6 +488,17 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
               error={error?.date}
             />
             {/* </div> */}
+          </div>
+
+          <div className="col-4 text-black">
+            <label className="text-label">Keterangan</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={btc.desc}
+                onChange={(e) => updateBTC({ ...btc, desc: e.target.value })}
+                placeholder="Masukan Keterangan"
+              />
+            </div>
           </div>
 
           <div className="col-12"></div>
@@ -621,7 +530,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
               emptyMessage={() => <div></div>}
             >
               <Column
-                // header="Produk"
+                header="Upah"
                 className="col-5 align-text-top"
                 field={""}
                 body={(e) => (
@@ -731,7 +640,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
               emptyMessage={() => <div></div>}
             >
               <Column
-                // header="Produk"
+                header="Overhead"
                 className="col-5 align-text-top"
                 field={""}
                 body={(e) => (

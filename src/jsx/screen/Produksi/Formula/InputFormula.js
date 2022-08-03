@@ -23,6 +23,7 @@ import { TabPanel, TabView } from "primereact/tabview";
 const defError = {
   code: false,
   name: false,
+  date: false,
   prod: [
     {
       id: false,
@@ -54,6 +55,7 @@ const InputFormula = ({ onCancel, onSuccess }) => {
   const [product, setProduct] = useState(null);
   const [satuan, setSatuan] = useState(null);
   const [active, setActive] = useState(0);
+  const [state, setState] = useState(0);
 
   useEffect(() => {
     window.scrollTo({
@@ -227,9 +229,11 @@ const InputFormula = ({ onCancel, onSuccess }) => {
     let errors = {
       code: !forml.fcode || forml.fcode === "",
       name: !forml.fname || forml.fname === "",
+      date: !forml.date_created || forml.date_created === "",
       prod: [],
       mtrl: [],
     };
+    let total = 0;
 
     forml?.product.forEach((element, i) => {
       if (i > 0) {
@@ -247,6 +251,13 @@ const InputFormula = ({ onCancel, onSuccess }) => {
           aloc: !element.aloc || element.aloc === "" || element.aloc === "0",
         };
       }
+
+      total += Number(element.aloc);
+    });
+    console.log(total);
+    setState(total !== 100);
+    errors.prod.forEach((element) => {
+      element.aloc = total !== 100;
     });
 
     forml?.material.forEach((element, i) => {
@@ -299,7 +310,11 @@ const InputFormula = ({ onCancel, onSuccess }) => {
       });
     }
 
-    valid = !errors.code && !errors.name && (validProduct || validMtrl);
+    valid =
+      !errors.code &&
+      !errors.name &&
+      !errors.date &&
+      (validProduct || validMtrl);
 
     setError(errors);
 
@@ -347,9 +362,13 @@ const InputFormula = ({ onCancel, onSuccess }) => {
           <div className="col-2 text-black">
             <PrimeCalendar
               label={"Tanggal"}
-              value={date}
+              value={new Date(`${forml.date_created}Z`)}
               onChange={(e) => {
-                setDate(e.value);
+                updateFM({ ...forml, date_created: e.target.value });
+
+                let newError = error;
+                newError.date = false;
+                setError(newError);
               }}
               placeholder="Pilih Tanggal"
               showIcon
@@ -402,7 +421,7 @@ const InputFormula = ({ onCancel, onSuccess }) => {
               label={"Tanggal Revisi"}
               value={formatDate(date)}
               onChange={(e) => {
-                setDate(e.value);
+                updateFM({ ...forml, date_updated: e.target.value });
               }}
               placeholder="dd/mm/yyyy"
               disabled
@@ -559,11 +578,13 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                       let newError = error;
                       newError.prod[e.index].aloc = false;
                       setError(newError);
+                      setState(false);
                     }}
                     placeholder="0"
                     type="number"
                     min={0}
                     error={error?.prod[e.index]?.aloc}
+                    errorMessage={state ? "Jumlah Harus 100%" : null}
                   />
                 )}
               />
@@ -637,17 +658,43 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                 header="Bahan"
                 className="align-text-top"
                 field={""}
-                style={{
-                  width: "25rem",
-                }}
                 body={(e) => (
-                  <div className="p-inputgroup">
-                    <InputText
-                      value={e.prod_id && checkProd(e.prod_id).name}
-                      placeholder="Nama Produk"
-                      disabled
-                    />
-                  </div>
+                  <CustomDropdown
+                    value={e.prod_id && checkProd(e.prod_id)}
+                    option={product}
+                    onChange={(u) => {
+                      // looping satuan
+                      let sat = [];
+                      satuan.forEach((element) => {
+                        if (element.id === u.unit.id) {
+                          sat.push(element);
+                        } else {
+                          if (element.u_from?.id === u.unit.id) {
+                            sat.push(element);
+                          }
+                        }
+                      });
+                      setSatuan(sat);
+
+                      let temp = [...forml.material];
+                      temp[e.index].prod_id = u.id;
+                      temp[e.index].unit_id = u.unit?.id;
+                      updateFM({ ...forml, material: temp });
+
+                      let newError = error;
+                      newError.mtrl[e.index].id = false;
+                      setError(newError);
+                    }}
+                    detail
+                    onDetail={() => {
+                      setCurrentIndex(e.index);
+                      setShowProd(true);
+                    }}
+                    label={"[name]"}
+                    placeholder="Pilih Bahan"
+                    errorMessage="Bahan Belum Dipilih"
+                    error={error?.mtrl[e.index]?.id}
+                  />
                 )}
               />
 
@@ -655,17 +702,23 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                 header="Satuan"
                 className="align-text-top"
                 field={""}
-                style={{
-                  width: "15rem",
-                }}
                 body={(e) => (
-                  <div className="p-inputgroup">
-                    <InputText
-                      value={e.unit_id && checkUnit(e.unit_id).name}
-                      placeholder="Satuan Produk"
-                      disabled
-                    />
-                  </div>
+                  <CustomDropdown
+                    value={e.unit_id && checkUnit(e.unit_id)}
+                    onChange={(u) => {
+                      let temp = [...forml.material];
+                      temp[e.index].unit_id = u.id;
+                      updateFM({ ...forml, material: temp });
+                    }}
+                    option={satuan}
+                    detail
+                    onDetail={() => {
+                      setCurrentIndex(e.index);
+                      setShowSatuan(true);
+                    }}
+                    label={"[name]"}
+                    placeholder="Pilih Satuan"
+                  />
                 )}
               />
 
@@ -673,14 +726,22 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                 header="Kuantitas"
                 className="align-text-top"
                 field={""}
-                // style={{
-                //   width: "5rem",
-                // }}
                 body={(e) => (
                   <PrimeNumber
-                    value={e.qty ? e.qty : ""}
+                    value={e.qty && e.qty}
+                    onChange={(u) => {
+                      let temp = [...forml.material];
+                      temp[e.index].qty = u.target.value;
+                      updateFM({ ...forml, material: temp });
+
+                      let newError = error;
+                      newError.mtrl[e.index].qty = false;
+                      setError(newError);
+                    }}
                     placeholder="0"
-                    disabled
+                    type="number"
+                    min={0}
+                    error={error?.mtrl[e.index]?.qty}
                   />
                 )}
               />
@@ -694,9 +755,20 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                 // }}
                 body={(e) => (
                   <PrimeNumber
-                    value={e.price ? e.price : ""}
+                    value={e.price && e.price}
+                    onChange={(u) => {
+                      let temp = [...forml.material];
+                      temp[e.index].price = u.target.value;
+                      updateFM({ ...forml, material: temp });
+
+                      let newError = error;
+                      newError.mtrl[e.index].prc = false;
+                      setError(newError);
+                    }}
                     placeholder="0"
-                    disabled
+                    type="number"
+                    min={0}
+                    error={error?.mtrl[e.index]?.prc}
                   />
                 )}
               />

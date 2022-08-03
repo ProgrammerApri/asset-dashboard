@@ -5,11 +5,9 @@ import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
-import { InputSwitch } from "primereact/inputswitch";
-import CustomAccordion from "src/jsx/components/Accordion/Accordion";
 import { useDispatch, useSelector } from "react-redux";
 
-import { SET_CURRENT_FM } from "src/redux/actions";
+import { SET_CURRENT_FM, SET_CURRENT_PHJ } from "src/redux/actions";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
@@ -24,64 +22,42 @@ import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 
 const defError = {
   code: false,
-  name: false,
+  date: false,
+  btc: false,
   prod: [
     {
       id: false,
       qty: false,
-      aloc: false,
     },
   ],
-  mtrl: [
+  rej: [
     {
       id: false,
       qty: false,
-      prc: false,
     },
   ],
 };
 
 const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
-  // const [update, setUpdate] = useState(false);
-  // const [currentIndex, setCurrentIndex] = useState(0);
   const toast = useRef(null);
   const [dept, setDept] = useState(null);
   const [showDept, setShowDept] = useState(false);
-  // const [doubleClick, setDoubleClick] = useState(false);
-  const plan = useSelector((state) => state.plan.current);
-  // const isEdit = useSelector((state) => state.plan.editPlan);
-  // const dispatch = useDispatch();
-  // const [date, setDate] = useState(new Date());
-  // const [showProd, setShowProd] = useState(false);
-  // const [showSatuan, setShowSatuan] = useState(false);
   const [showMsn, setShowMsn] = useState(false);
-  // const [product, setProduct] = useState(null);
-  // const [satuan, setSatuan] = useState(null);
   const [mesin, setMesin] = useState(null);
-  const [formula, setFormula] = useState(null);
+  const [batch, setBatch] = useState(null);
   const [error, setError] = useState(defError);
-  // const [active, setActive] = useState(0);
   const [update, setUpdate] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-  // const toast = useRef(null);
   const [doubleClick, setDoubleClick] = useState(false);
-  const forml = useSelector((state) => state.forml.current);
-  const isEdit = useSelector((state) => state.forml.editForml);
+  const phj = useSelector((state) => state.phj.current);
+  const isEdit = useSelector((state) => state.phj.editPhj);
   const dispatch = useDispatch();
   const [date, setDate] = useState(new Date());
   const [showProd, setShowProd] = useState(false);
-
-  // const plan = useSelector((state) => state.plan.current);
   const [showSatuan, setShowSatuan] = useState(false);
   const [product, setProduct] = useState(null);
   const [satuan, setSatuan] = useState(null);
-  // const [error, setError] = useState(defError);
-
   const [active, setActive] = useState(0);
-  const [accor, setAccor] = useState({
-    produk: true,
-    material: true,
-  });
 
   useEffect(() => {
     window.scrollTo({
@@ -91,6 +67,8 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
     });
     getProduct();
     getSatuan();
+    getBatch();
+    getDept();
   }, []);
 
   const getProduct = async () => {
@@ -127,11 +105,44 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
-  const editFM = async () => {
+  const getBatch = async () => {
     const config = {
-      ...endpoints.editFormula,
-      endpoint: endpoints.editFormula.endpoint + forml.id,
-      data: forml,
+      ...endpoints.batch,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+
+        setBatch(data);
+      }
+    } catch (error) {}
+  };
+
+  const getDept = async () => {
+    const config = {
+      ...endpoints.pusatBiaya,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setDept(data);
+      }
+    } catch (error) {}
+  };
+
+  const editPHJ = async () => {
+    const config = {
+      ...endpoints.editPHJ,
+      endpoint: endpoints.editPHJ.endpoint + phj.id,
+      data: phj,
     };
     console.log(config.data);
     let response = null;
@@ -154,10 +165,10 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
     }
   };
 
-  const addFM = async () => {
+  const addPHJ = async () => {
     const config = {
-      ...endpoints.addFormula,
-      data: forml,
+      ...endpoints.addPHJ,
+      data: phj,
     };
     console.log(config.data);
     let response = null;
@@ -175,7 +186,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${forml.po_code} Sudah Digunakan`,
+            detail: `Kode ${phj.phj_code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -204,9 +215,6 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
 
     return selected;
   };
-  const updatePL = (e) => {
-    dispatch({});
-  };
 
   const checkUnit = (value) => {
     let selected = {};
@@ -223,13 +231,25 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
     if (isValid()) {
       if (isEdit) {
         setUpdate(true);
-        editFM();
+        editPHJ();
       } else {
         setUpdate(true);
-        addFM();
+        addPHJ();
       }
     }
   };
+
+  const checkbtc = (value) => {
+    let selected = {};
+    batch?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
   const checkDept = (value) => {
     let selected = {};
     dept?.forEach((element) => {
@@ -240,6 +260,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
 
     return selected;
   };
+
   const formatDate = (date) => {
     var d = new Date(`${date}Z`),
       month = "" + (d.getMonth() + 1),
@@ -252,68 +273,57 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
     return [day, month, year].join("-");
   };
 
-  const updateFM = (e) => {
+  const updatePHJ = (e) => {
     dispatch({
-      type: SET_CURRENT_FM,
+      type: SET_CURRENT_PHJ,
       payload: e,
     });
   };
 
   const isValid = () => {
     let valid = false;
+    let active = 1;
     let errors = {
-      code: !forml.fcode || forml.fcode === "",
-      name: !forml.fname || forml.fname === "",
+      code: !phj.phj_code || phj.phj_code === "",
+      date: !phj.phj_date || phj.phj_date === "",
+      btc: !phj.batch_id,
       prod: [],
-      mtrl: [],
+      rej: [],
     };
 
-    forml?.product.forEach((element, i) => {
+    phj?.product.forEach((element, i) => {
       if (i > 0) {
-        if (element.prod_id || element.qty || element.aloc) {
+        if (element.prod_id || element.qty) {
           errors.prod[i] = {
             id: !element.prod_id,
             qty: !element.qty || element.qty === "" || element.qty === "0",
-            aloc: !element.aloc || element.aloc === "" || element.aloc === "0",
           };
         }
       } else {
         errors.prod[i] = {
           id: !element.prod_id,
           qty: !element.qty || element.qty === "" || element.qty === "0",
-          aloc: !element.aloc || element.aloc === "" || element.aloc === "0",
         };
       }
     });
 
-    forml?.material.forEach((element, i) => {
+    phj?.reject.forEach((element, i) => {
       if (i > 0) {
-        if (element.prod_id || element.qty || element.price) {
-          errors.mtrl[i] = {
+        if (element.prod_id || element.qty) {
+          errors.rej[i] = {
             id: !element.prod_id,
             qty: !element.qty || element.qty === "" || element.qty === "0",
-            prc:
-              !element.price || element.price === "" || element.price === "0",
           };
         }
       } else {
-        errors.mtrl[i] = {
+        errors.rej[i] = {
           id: !element.prod_id,
           qty: !element.qty || element.qty === "" || element.qty === "0",
-          prc: !element.price || element.price === "" || element.price === "0",
         };
       }
     });
 
-    if (!errors.prod[0]?.id && !errors.prod[0]?.qty && !errors.prod[0]?.aloc) {
-      errors.mtrl?.forEach((e) => {
-        for (var key in e) {
-          e[key] = false;
-        }
-      });
-    }
-
-    if (!errors.mtrl[0]?.id && !errors.mtrl[0]?.qty && !errors.mtrl[0]?.prc) {
+    if (!errors.prod[0]?.id && !errors.prod[0]?.qty) {
       errors.prod?.forEach((e) => {
         for (var key in e) {
           e[key] = false;
@@ -321,22 +331,37 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
       });
     }
 
-    let validProduct = false;
-    let validMtrl = false;
-    errors.prod?.forEach((el) => {
-      for (var k in el) {
-        validProduct = !el[k];
-      }
-    });
-    if (!validProduct) {
-      errors.mtrl.forEach((el) => {
-        for (var k in el) {
-          validMtrl = !el[k];
+    if (!errors.rej[0]?.id && !errors.rej[0]?.qty) {
+      errors.rej?.forEach((e) => {
+        for (var key in e) {
+          e[key] = false;
         }
       });
     }
 
-    valid = !errors.code && !errors.name && (validProduct || validMtrl);
+    let validProduct = false;
+    let validRej = false;
+    if (!validProduct) {
+      errors.prod?.forEach((el) => {
+        for (var k in el) {
+          validProduct = !el[k];
+        }
+      });
+    }
+
+    if (!validRej) {
+      errors.rej.forEach((elem, i) => {
+        for (var k in elem) {
+          validRej = !elem[k];
+          if (elem[k] && i < active) {
+            active = 1;
+          }
+        }
+      });
+    }
+
+    valid =
+      !errors.code && !errors.date && !errors.btc && (validProduct || validRej);
 
     setError(errors);
 
@@ -346,6 +371,8 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
         left: 0,
         behavior: "smooth",
       });
+
+      setActive(active);
     }
 
     return valid;
@@ -367,21 +394,18 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
         <Toast ref={toast} />
 
         <Row className="mb-3">
-          {/* <div className="col-0"></div> */}
-          {/* <div className="col-12 text-black"></div> */}
-
           <div className="col-2 text-black">
             <PrimeInput
               label={"Kode Penerimaan"}
-              value={forml.fname}
+              value={phj.phj_code}
               onChange={(e) => {
-                updateFM({ ...forml, fname: e.target.value });
+                updatePHJ({ ...phj, phj_code: e.target.value });
                 let newError = error;
-                newError.name = false;
+                newError.code = false;
                 setError(newError);
               }}
-              placeholder="Batch-001"
-              error={error?.name}
+              placeholder="Masukan Kode"
+              error={error?.code}
             />
           </div>
 
@@ -389,12 +413,15 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
             <div className="ml-3"></div>
             <PrimeCalendar
               label={"Tgl Penerimaan"}
-              value={date}
+              value={new Date(`${phj.phj_date}Z`)}
               onChange={(e) => {
-                setDate(e.value);
+                updatePHJ({ ...phj, phj_date: e.target.value });
+
+                let newError = error;
+                newError.date = false;
+                setError(newError);
               }}
               placeholder="Pilih Tanggal"
-              // disabled
               dateFormat="dd-mm-yy"
               showIcon
               error={error?.date}
@@ -402,38 +429,28 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-2 text-black">
-            <label className="text-black">Satuan</label>
-            <div className="p-inputgroup"></div>
-            <CustomDropdown
-              value={plan.unit !== null ? checkUnit(plan.unit) : ""}
-              option={satuan}
-              onChange={(e) => {
-                updatePL({ ...plan, unit: e.id });
-                let newError = error;
-                newError.un = false;
-                setError(newError);
-              }}
-              placeholder="Pilih Satuan"
-              detail
-              onDetail={() => setShowSatuan(true)}
-              label={"[name]"}
-              errorMessage="Satuan Belum Dipilih"
-              error={error?.un}
+            <PrimeInput
+              label={"Satuan Produksi"}
+              value={
+                phj.batch_id !== null
+                  ? checkbtc(phj.batch_id)?.plan_id?.unit?.name
+                  : ""
+              }
+              placeholder="Satuan Produksi"
+              disabled
             />
           </div>
           <div className="col-6 text-black"></div>
           <div className="col-2 text-black">
             <PrimeInput
               label={"Total Pembuatan"}
-              value={forml.fcode}
-              onChange={(e) => {
-                updateFM({ ...forml, fcode: e.target.value });
-                let newError = error;
-                newError.code = false;
-                setError(newError);
-              }}
-              placeholder="1xxxx"
-              error={error?.code}
+              value={
+                phj.batch_id !== null
+                  ? checkbtc(phj.batch_id)?.plan_id?.total
+                  : ""
+              }
+              placeholder="Total Pembuatan"
+              disabled
             />
           </div>
 
@@ -449,43 +466,43 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
             <label className="text-black">Kode Batch</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
-              value={forml.fcode}
+              value={phj.batch_id !== null ? checkbtc(phj.batch_id) : null}
+              option={batch}
               onChange={(e) => {
-                updateFM({ ...forml, fcode: e.target.value });
+                updatePHJ({ ...phj, batch_id: e.id });
                 let newError = error;
-                newError.code = false;
+                newError.btc = false;
                 setError(newError);
               }}
-              placeholder="Pilih "
-              error={error?.code}
+              label={"[bcode]"}
+              placeholder="Pilih Kode Batch"
+              errorMessage="Kode Batch Belum Dipilih"
+              error={error?.btc}
             />
           </div>
           <div className="col-2 text-black">
-            <PrimeCalendar
+            <PrimeInput
               label={"Tanggal Batch"}
-              value={date}
-              onChange={(e) => {
-                setDate(e.value);
-              }}
-              placeholder="Pilih Tanggal"
+              value={
+                phj.batch_id !== null
+                  ? formatDate(checkbtc(phj.batch_id)?.batch_date)
+                  : ""
+              }
+              placeholder="Tanggal Batch"
               disabled
               dateFormat="dd-mm-yy"
-              error={error?.date}
             />
           </div>
           <div className="col-4 text-black">
-            <label className="text-black">Departement</label>
-            <div className="p-inputgroup"></div>
-            <CustomDropdown
-              value={checkDept()}
-              onChange={(e) => {
-                // updateBTC({ ...btc, dep_id: e.id });
-              }}
-              option={dept}
-              detail
-              onDetail={() => setShowDept(true)}
-              label={"Pilih Departement)"}
-              // placeholder="Pilih Departement"
+            <PrimeInput
+              label={"Departemen"}
+              value={
+                phj.batch_id !== null
+                  ? checkbtc(phj.batch_id)?.dep_id?.ccost_name
+                  : ""
+              }
+              placeholder="Departement"
+              disabled
             />
           </div>
 
@@ -499,10 +516,10 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
           activeIndex={active}
           onTabChange={(e) => setActive(e.index)}
         >
-          <TabPanel header="Produk Jadi">
+          <TabPanel header="Produk">
             <DataTable
               responsiveLayout="none"
-              value={forml.product?.map((v, i) => {
+              value={phj.product?.map((v, i) => {
                 return {
                   ...v,
                   index: i,
@@ -535,10 +552,10 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                       });
                       setSatuan(sat);
 
-                      let temp = [...forml.product];
+                      let temp = [...phj.product];
                       temp[e.index].prod_id = u.id;
                       temp[e.index].unit_id = u.unit?.id;
-                      updateFM({ ...forml, product: temp });
+                      updatePHJ({ ...phj, product: temp });
 
                       let newError = error;
                       newError.prod[e.index].id = false;
@@ -550,7 +567,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                       setShowProd(true);
                     }}
                     label={"[name]"}
-                    placeholder="001 - Sambel Terasi"
+                    placeholder="Pilih Produk"
                     errorMessage="Produk Belum Dipilih"
                     error={error?.prod[e.index]?.id}
                   />
@@ -558,75 +575,76 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
               />
 
               <Column
-                // header="Produk"
-                className="col-2 align-text-top"
+                // header="Satuan"
+                className="align-text-top"
                 field={""}
                 body={(e) => (
-                  // <div className="p-inputgroup"></div>
                   <CustomDropdown
-                    value={plan.unit !== null ? checkUnit(plan.unit) : ""}
-                    option={satuan}
-                    onChange={(e) => {
-                      updatePL({ ...plan, unit: e.id });
-                      let newError = error;
-                      newError.un = false;
-                      setError(newError);
+                    value={e.unit_id && checkUnit(e.unit_id)}
+                    onChange={(u) => {
+                      let temp = [...phj.product];
+                      temp[e.index].unit_id = u.id;
+                      updatePHJ({ ...phj, product: temp });
                     }}
-                    placeholder="Pcs"
+                    option={satuan}
                     detail
-                    onDetail={() => setShowSatuan(true)}
+                    onDetail={() => {
+                      setCurrentIndex(e.index);
+                      setShowSatuan(true);
+                    }}
                     label={"[name]"}
-                    errorMessage="Satuan Belum Dipilih"
-                    error={error?.un}
+                    placeholder="Pilih Satuan"
                   />
                 )}
               />
 
               <Column
-                // header="Produk"
-                className="col-2 align-text-top"
+                // header="Jumlah"
+                className="align-text-top"
                 field={""}
                 body={(e) => (
-                  <PrimeInput
-                    // label={"Kode Penerimaan"}
-                    value={forml.fname}
-                    onChange={(e) => {
-                      updateFM({ ...forml, fname: e.target.value });
+                  <PrimeNumber
+                    value={e.qty && e.qty}
+                    onChange={(u) => {
+                      let temp = [...phj.product];
+                      temp[e.index].qty = u.target.value;
+                      updatePHJ({ ...phj, product: temp });
+
                       let newError = error;
-                      newError.name = false;
+                      newError.prod[e.index].qty = false;
                       setError(newError);
                     }}
-                    placeholder="1"
-                    error={error?.name}
+                    placeholder="0"
+                    type="number"
+                    min={0}
+                    error={error?.prod[e.index]?.qty}
                   />
                 )}
               />
-              <div className="col-2"></div>
+
               <Column
                 header=""
                 className="align-text-top"
                 field={""}
                 body={(e) =>
-                  e.index === forml.product.length - 1 ? (
+                  e.index === phj.product.length - 1 ? (
                     <Link
                       onClick={() => {
                         let newError = error;
                         newError.prod.push({
                           qty: false,
-                          aloc: false,
                         });
                         setError(newError);
 
-                        updateFM({
-                          ...forml,
+                        updatePHJ({
+                          ...phj,
                           product: [
-                            ...forml.product,
+                            ...phj.product,
                             {
                               id: 0,
                               prod_id: null,
                               unit_id: null,
                               qty: null,
-                              aloc: null,
                             },
                           ],
                         });
@@ -638,9 +656,9 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                   ) : (
                     <Link
                       onClick={() => {
-                        let temp = [...forml.product];
+                        let temp = [...phj.product];
                         temp.splice(e.index, 1);
-                        updateFM({ ...forml, product: temp });
+                        updatePHJ({ ...phj, product: temp });
                       }}
                       className="btn btn-danger shadow btn-xs sharp"
                     >
@@ -655,7 +673,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
           <TabPanel header="Produk Reject">
             <DataTable
               responsiveLayout="none"
-              value={forml.product?.map((v, i) => {
+              value={phj.reject?.map((v, i) => {
                 return {
                   ...v,
                   index: i,
@@ -667,7 +685,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
               emptyMessage={() => <div></div>}
             >
               <Column
-                // header="Produk"
+                header="Produk"
                 className="col-5 align-text"
                 field={""}
                 body={(e) => (
@@ -688,13 +706,13 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                       });
                       setSatuan(sat);
 
-                      let temp = [...forml.product];
+                      let temp = [...phj.reject];
                       temp[e.index].prod_id = u.id;
                       temp[e.index].unit_id = u.unit?.id;
-                      updateFM({ ...forml, product: temp });
+                      updatePHJ({ ...phj, reject: temp });
 
                       let newError = error;
-                      newError.prod[e.index].id = false;
+                      newError.rej[e.index].id = false;
                       setError(newError);
                     }}
                     detail
@@ -703,83 +721,84 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                       setShowProd(true);
                     }}
                     label={"[name]"}
-                    placeholder="001 - Sambel Terasi"
+                    placeholder="Pilih Produk"
                     errorMessage="Produk Belum Dipilih"
-                    error={error?.prod[e.index]?.id}
+                    error={error?.rej[e.index]?.id}
                   />
                 )}
               />
 
               <Column
-                // header="Produk"
-                className="col-2 align-text-top"
+                header="Satuan"
+                className="align-text-top"
                 field={""}
                 body={(e) => (
-                  // <div className="p-inputgroup"></div>
                   <CustomDropdown
-                    value={plan.unit !== null ? checkUnit(plan.unit) : ""}
-                    option={satuan}
-                    onChange={(e) => {
-                      updatePL({ ...plan, unit: e.id });
-                      let newError = error;
-                      newError.un = false;
-                      setError(newError);
+                    value={e.unit_id && checkUnit(e.unit_id)}
+                    onChange={(u) => {
+                      let temp = [...phj.reject];
+                      temp[e.index].unit_id = u.id;
+                      updatePHJ({ ...phj, reject: temp });
                     }}
-                    placeholder="Pcs"
+                    option={satuan}
                     detail
-                    onDetail={() => setShowSatuan(true)}
+                    onDetail={() => {
+                      setCurrentIndex(e.index);
+                      setShowSatuan(true);
+                    }}
                     label={"[name]"}
-                    errorMessage="Satuan Belum Dipilih"
-                    error={error?.un}
+                    placeholder="Pilih Satuan"
                   />
                 )}
               />
 
               <Column
-                // header="Produk"
-                className="col-2 align-text-top"
+                header="Jumlah"
+                className="align-text-top"
                 field={""}
                 body={(e) => (
-                  <PrimeInput
-                    // label={"Kode Penerimaan"}
-                    value={forml.fname}
-                    onChange={(e) => {
-                      updateFM({ ...forml, fname: e.target.value });
+                  <PrimeNumber
+                    value={e.qty && e.qty}
+                    onChange={(u) => {
+                      let temp = [...phj.reject];
+                      temp[e.index].qty = u.target.value;
+                      updatePHJ({ ...phj, reject: temp });
+
                       let newError = error;
-                      newError.name = false;
+                      newError.rej[e.index].qty = false;
                       setError(newError);
                     }}
-                    placeholder="1"
-                    error={error?.name}
+                    placeholder="0"
+                    type="number"
+                    min={0}
+                    error={error?.rej[e.index]?.qty}
                   />
                 )}
               />
-              <div className="col-2"></div>
+
               <Column
                 header=""
                 className=" align-text-top"
                 field={""}
                 body={(e) =>
-                  e.index === forml.product.length - 1 ? (
+                  e.index === phj.reject.length - 1 ? (
                     <Link
                       onClick={() => {
                         let newError = error;
-                        newError.prod.push({
+                        newError.rej.push({
                           qty: false,
-                          aloc: false,
                         });
                         setError(newError);
 
-                        updateFM({
-                          ...forml,
-                          product: [
-                            ...forml.product,
+                        updatePHJ({
+                          ...phj,
+                          reject: [
+                            ...phj.reject,
                             {
                               id: 0,
                               prod_id: null,
                               unit_id: null,
                               qty: null,
-                              aloc: null,
                             },
                           ],
                         });
@@ -791,9 +810,9 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                   ) : (
                     <Link
                       onClick={() => {
-                        let temp = [...forml.product];
+                        let temp = [...phj.reject];
                         temp.splice(e.index, 1);
-                        updateFM({ ...forml, product: temp });
+                        updatePHJ({ ...phj, reject: temp });
                       }}
                       className="btn btn-danger shadow btn-xs sharp"
                     >
@@ -814,7 +833,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
 
   const getIndex = () => {
     let total = 0;
-    forml?.product?.forEach((el) => {
+    phj?.product?.forEach((el) => {
       total += el.index;
     });
 
@@ -898,14 +917,14 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
             });
             setSatuan(sat);
 
-            let temp = [...forml.product];
+            let temp = [...phj.product];
             temp[currentIndex].prod_id = e.data.id;
             temp[currentIndex].unit_id = e.data.unit?.id;
 
-            let tempm = [...forml.material];
+            let tempm = [...phj.reject];
             temp[currentIndex].prod_id = e.data.id;
             temp[currentIndex].unit_id = e.data.unit?.id;
-            updateFM({ ...forml, product: temp, material: tempm });
+            updatePHJ({ ...phj, product: temp, reject: tempm });
           }
 
           setDoubleClick(true);
@@ -933,12 +952,12 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowSatuan(false);
-            let temp = [...forml.product];
+            let temp = [...phj.product];
             temp[currentIndex].unit_id = e.data.id;
 
-            let tempm = [...forml.material];
+            let tempm = [...phj.reject];
             tempm[currentIndex].unit_id = e.data.id;
-            updateFM({ ...forml, product: temp, material: tempm });
+            updatePHJ({ ...phj, product: temp, reject: tempm });
           }
 
           setDoubleClick(true);

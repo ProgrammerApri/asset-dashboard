@@ -1150,8 +1150,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                         onClick={() => {
                           let newError = error;
                           newError.prod.push({
-                            id: false,
-                            lok: false,
+                            // id: false,
+                            // lok: false,
                             jum: false,
                             prc: false,
                           });

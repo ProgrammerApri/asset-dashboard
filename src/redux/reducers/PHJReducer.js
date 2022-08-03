@@ -4,7 +4,7 @@ import { SET_CURRENT_PHJ, SET_PHJ, SET_EDIT_PHJ } from "../actions";
 const initialState = {
   phj: [],
   current: {},
-  editdPhj: false
+  editPhj: false
 };
 
 const PHJReducer = (state = initialState, { type, payload }) => {
@@ -22,7 +22,7 @@ const PHJReducer = (state = initialState, { type, payload }) => {
       case SET_EDIT_PHJ:
         return {
           ...state,
-          editdPhj: payload,
+          editPhj: payload,
         };
 
     default:

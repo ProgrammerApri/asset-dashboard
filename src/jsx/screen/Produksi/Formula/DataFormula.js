@@ -300,7 +300,7 @@ const DataFormula = ({ onAdd, onEdit, onDetail }) => {
               payload: {
                 ...data,
                 active: false,
-                version: 0,
+                version: 1,
                 product: [
                   {
                     id: 0,

@@ -226,6 +226,7 @@ const InputFormula = ({ onCancel, onSuccess }) => {
 
   const isValid = () => {
     let valid = false;
+    let active = 1;
     let errors = {
       code: !forml.fcode || forml.fcode === "",
       name: !forml.fname || forml.fname === "",
@@ -297,15 +298,18 @@ const InputFormula = ({ onCancel, onSuccess }) => {
 
     let validProduct = false;
     let validMtrl = false;
-    errors.prod?.forEach((el) => {
+    errors.prod?.forEach((el, i) => {
       for (var k in el) {
         validProduct = !el[k];
       }
     });
     if (!validProduct) {
-      errors.mtrl.forEach((el) => {
-        for (var k in el) {
-          validMtrl = !el[k];
+      errors.mtrl.forEach((elem, i) => {
+        for (var k in elem) {
+          validMtrl = !elem[k];
+          if (elem[k] && i < active) {
+            active = 1;
+          }
         }
       });
     }
@@ -324,6 +328,8 @@ const InputFormula = ({ onCancel, onSuccess }) => {
         left: 0,
         behavior: "smooth",
       });
+
+      setActive(active)
     }
 
     return valid;
@@ -453,7 +459,7 @@ const InputFormula = ({ onCancel, onSuccess }) => {
           {/* <div className="col-7"></div> */}
         </Row>
 
-        <TabView activeIndex={active} onTabChange={(e) => setActive(e.index)}>
+        <TabView className="ml-2" activeIndex={active} onTabChange={(e) => setActive(e.index)}>
           <TabPanel header="Produk">
             <DataTable
               responsiveLayout="none"
@@ -496,7 +502,7 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                       updateFM({ ...forml, product: temp });
 
                       let newError = error;
-                      newError.prod[e.index].id = false;
+                      newError[0].prod[e.index].id = false;
                       setError(newError);
                     }}
                     detail
@@ -584,7 +590,7 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                     type="number"
                     min={0}
                     error={error?.prod[e.index]?.aloc}
-                    errorMessage={state ? "Jumlah Harus 100%" : null}
+                    errorMessage={state ? "Total Cost Alokasi Harus 100%" : null}
                   />
                 )}
               />

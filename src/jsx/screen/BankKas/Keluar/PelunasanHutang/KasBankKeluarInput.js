@@ -28,7 +28,7 @@ const defError = {
   date: false,
   sup: false,
   akn: false,
-  dep: false,
+  btc: false,
   proj: false,
   acco: false,
   bn_code: false,
@@ -65,6 +65,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
   const [apcard, setAP] = useState(null);
   const [dept, setDept] = useState(null);
   const [proj, setProj] = useState(null);
+  const [batch, setBatch] = useState(null);
   const [showSupplier, setShowSupplier] = useState(false);
   const [showDepartemen, setShowDept] = useState(false);
   const [showProj, setShowProj] = useState(false);
@@ -100,7 +101,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
     getAccKas();
     getBank();
     getSupplier();
-    getDept();
+    getBatch();
     getProj();
     getAccount();
   }, []);
@@ -112,7 +113,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
       date: !exp.exp_date || exp.exp_date === "",
       sup: exp.exp_type === 1 ? !exp.acq_sup : false,
       akn: exp.exp_type === 2 ? !exp.exp_acc : false,
-      dep: exp.exp_type === 2 ? !exp.exp_dep : false,
+      btc: exp.exp_type === 2 ? !exp.batch_id : false,
       proj: exp.exp_type === 2 ? !exp.exp_prj : false,
       acco: exp.acq_pay === 1 ? !exp.kas_acc : false,
       bn_code: exp.acq_pay === 2 ? !exp.bank_ref : false,
@@ -205,7 +206,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
       !errors.date &&
       !errors.sup &&
       !errors.akn &&
-      !errors.dep &&
+      !errors.btc &&
       !errors.proj &&
       !errors.acco &&
       !errors.bn_code &&
@@ -319,12 +320,6 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        // let filt = [];
-        // data.forEach((elem) => {
-        //   if (elem.account.kat_code === 1 & 2) {
-        //     filt.push(elem);
-        //   }
-        // });
         setAccount(data);
       }
     } catch (error) {}
@@ -377,9 +372,9 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
-  const getDept = async () => {
+  const getBatch = async () => {
     const config = {
-      ...endpoints.pusatBiaya,
+      ...endpoints.batch,
       data: {},
     };
     let response = null;
@@ -388,7 +383,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        setDept(data);
+        setBatch(data);
       }
     } catch (error) {}
   };
@@ -475,17 +470,6 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
     }
   };
 
-  const checkDept = (value) => {
-    let selected = {};
-    dept?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
   const checkProj = (value) => {
     let selected = {};
     proj?.forEach((element) => {
@@ -541,9 +525,9 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
-  const checkFk = (value) => {
+  const checkbtc = (value) => {
     let selected = {};
-    faktur?.forEach((element) => {
+    batch?.forEach((element) => {
       if (value === element.id) {
         selected = element;
       }
@@ -643,13 +627,13 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-12">
-            <span className="fs-14">
+          <div className="col-12 mt-1">
+            <span className="fs-13">
               <b>Informasi Pengeluaran</b>
             </span>
             {/* </div>
           <div className="col-12"> */}
-            <Divider className="mt-2"></Divider>
+            <Divider className="mt-1"></Divider>
           </div>
 
           <div className="col-4 mb-2">
@@ -1058,31 +1042,41 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                   error={error?.akn}
                 />
               </div>
-              <div className="col-4">
-                <label className="text-label">Kode Departemen</label>
+              <div className="col-2">
+                <label className="text-label">Kode Batch</label>
                 <div className="p-inputgroup"></div>
                 <CustomDropdown
-                  value={exp.exp_dep && checkDept(exp.exp_dep)}
-                  option={dept}
+                  value={exp.batch_id && checkbtc(exp.batch_id)}
+                  option={batch}
                   onChange={(e) => {
                     updateExp({
                       ...exp,
-                      exp_dep: e.id,
+                      batch_id: e.id,
                     });
 
                     let newError = error;
-                    newError.dep = false;
+                    newError.btc = false;
                     setError(newError);
                   }}
-                  label={"[ccost_name] - [ccost_code]"}
-                  placeholder="Pilih Departemen"
-                  detail
-                  onDetail={() => setShowDept(true)}
-                  errorMessage="Departemen Belum Dipilih"
-                  error={error?.dep}
+                  label={"[bcode]"}
+                  placeholder="Pilih Kode Batch"
+                  errorMessage="Kode Batch Belum Dipilih"
+                  error={error?.btc}
                 />
               </div>
-              <div className="col-4">
+              <div className="col-3">
+                <PrimeInput
+                  label={"Departemen"}
+                  value={
+                    exp.batch_id !== null
+                      ? checkbtc(exp.batch_id)?.dep_id?.ccost_name
+                      : ""
+                  }
+                  placeholder="Departemen"
+                  disabled
+                />
+              </div>
+              <div className="col-3">
                 <label className="text-label">Kode Project</label>
                 <div className="p-inputgroup"></div>
                 <CustomDropdown
@@ -1330,34 +1324,6 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
           if (doubleClick) {
             setShowSupplier(false);
             updateExp({ ...exp, acq_sup: e.data.id });
-          }
-
-          setDoubleClick(true);
-
-          setTimeout(() => {
-            setDoubleClick(false);
-          }, 2000);
-        }}
-      />
-
-      <DataPusatBiaya
-        data={dept}
-        loading={false}
-        popUp={true}
-        show={showDepartemen}
-        onHide={() => {
-          setShowDept(false);
-        }}
-        onInput={(e) => {
-          setShowDept(!e);
-        }}
-        onSuccessInput={(e) => {
-          getDept();
-        }}
-        onRowSelect={(e) => {
-          if (doubleClick) {
-            setShowDept(false);
-            updateExp({ ...exp, exp_dep: e.data.id });
           }
 
           setDoubleClick(true);

@@ -12,26 +12,20 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_FM, SET_EDIT_FM, SET_FM } from "src/redux/actions";
-import { Divider } from "@material-ui/core";
-import ReactToPrint from "react-to-print";
+import { SET_CURRENT_FM, SET_CURRENT_PHJ, SET_EDIT_FM, SET_EDIT_PHJ, SET_FM, SET_PHJ } from "src/redux/actions";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 
 const data = {
   id: null,
-  fcode: null,
-  fname: null,
-  version: null,
-  rev: null,
-  desc: null,
-  active: null,
-  product: [],
-  material: [],
+  phj_code: null,
+  phj_date: null,
+  batch_id: null,
 };
 
 const DataPenerimaanHJ = ({ onAdd, onEdit, onDetail }) => {
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(true);
+  const [dept, setDept] = useState(true);
   const [displayDel, setDisplayDel] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
@@ -40,22 +34,23 @@ const DataPenerimaanHJ = ({ onAdd, onEdit, onDetail }) => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const dispatch = useDispatch();
-  const forml = useSelector((state) => state.forml.forml);
-  const show = useSelector((state) => state.forml.current);
+  const phj = useSelector((state) => state.phj.phj);
+  const show = useSelector((state) => state.phj.current);
   const printPage = useRef(null);
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getFormula();
+    getPHJ();
+    getDept();
     initFilters1();
   }, []);
 
-  const getFormula = async (isUpdate = false) => {
+  const getPHJ = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.formula,
-      data: forml,
+      ...endpoints.phj,
+      data: phj,
     };
     console.log(config.data);
     let response = null;
@@ -65,7 +60,7 @@ const DataPenerimaanHJ = ({ onAdd, onEdit, onDetail }) => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        dispatch({ type: SET_FM, payload: data });
+        dispatch({ type: SET_PHJ, payload: data });
       }
     } catch (error) {}
     if (isUpdate) {
@@ -77,10 +72,29 @@ const DataPenerimaanHJ = ({ onAdd, onEdit, onDetail }) => {
     }
   };
 
-  const delFM = async (id) => {
+  const getDept = async (isUpdate = false) => {
+    setLoading(true);
     const config = {
-      ...endpoints.delFormula,
-      endpoint: endpoints.delFormula.endpoint + currentItem.id,
+      ...endpoints.pusatBiaya,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setDept(data);
+      }
+    } catch (error) {}
+  };
+
+  const delPHJ = async (id) => {
+    const config = {
+      ...endpoints.delPHJ,
+      endpoint: endpoints.delPHJ.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -91,7 +105,7 @@ const DataPenerimaanHJ = ({ onAdd, onEdit, onDetail }) => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayDel(false);
-          getFormula(true);
+          getPHJ();
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -174,46 +188,45 @@ const DataPenerimaanHJ = ({ onAdd, onEdit, onDetail }) => {
             onEdit(data);
             let product = data.product;
             dispatch({
-              type: SET_EDIT_FM,
+              type: SET_EDIT_PHJ,
               payload: true,
             });
-            product.forEach((el) => {
+            product?.forEach((el) => {
               el.prod_id = el.prod_id?.id;
               el.unit_id = el.unit_id?.id;
             });
-            let material = data.material;
-            material.forEach((el) => {
-              el.prod_id = el.prod_id.id;
-              el.unit_id = el.unit_id.id;
+            let reject = data.reject;
+            reject?.forEach((elem) => {
+              elem.prod_id = elem.prod_id.id;
+              elem.unit_id = elem.unit_id.id;
             });
             dispatch({
-              type: SET_CURRENT_FM,
+              type: SET_CURRENT_PHJ,
               payload: {
                 ...data,
+                batch_id: data.batch_id.id,
                 product:
-                  product.length > 0
+                  product?.length > 0
                     ? product
                     : [
                         {
                           id: 0,
-                          form_id: null,
+                          phj_id: null,
                           prod_id: null,
                           unit_id: null,
                           qty: null,
-                          aloc: null,
                         },
                       ],
-                material:
-                  material.length > 0
-                    ? material
+                reject:
+                  reject?.length > 0
+                    ? reject
                     : [
                         {
                           id: 0,
-                          form_id: null,
+                          phj_id: null,
                           prod_id: null,
                           unit_id: null,
                           qty: null,
-                          price: null,
                         },
                       ],
               },
@@ -251,7 +264,7 @@ const DataPenerimaanHJ = ({ onAdd, onEdit, onDetail }) => {
           label="Hapus"
           icon="pi pi-trash"
           onClick={() => {
-            delFM();
+            delPHJ();
           }}
           autoFocus
           loading={loading}
@@ -292,15 +305,13 @@ const DataPenerimaanHJ = ({ onAdd, onEdit, onDetail }) => {
           onClick={() => {
             onAdd();
             dispatch({
-              type: SET_EDIT_FM,
+              type: SET_EDIT_PHJ,
               payload: false,
             });
             dispatch({
-              type: SET_CURRENT_FM,
+              type: SET_CURRENT_PHJ,
               payload: {
                 ...data,
-                active: false,
-                version: 0,
                 product: [
                   {
                     id: 0,
@@ -308,17 +319,15 @@ const DataPenerimaanHJ = ({ onAdd, onEdit, onDetail }) => {
                     prod_id: null,
                     unit_id: null,
                     qty: null,
-                    aloc: null,
                   },
                 ],
-                material: [
+                reject: [
                   {
                     id: 0,
                     form_id: 0,
                     prod_id: null,
                     unit_id: null,
                     qty: null,
-                    price: null,
                   },
                 ],
               },
@@ -327,6 +336,17 @@ const DataPenerimaanHJ = ({ onAdd, onEdit, onDetail }) => {
         />
       </div>
     );
+  };
+
+  const checkDept = (value) => {
+    let selected = {};
+    dept?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
   };
 
   // const renderFooter = () => {
@@ -422,52 +442,52 @@ const DataPenerimaanHJ = ({ onAdd, onEdit, onDetail }) => {
     <>
       <Toast ref={toast} />
       <DataTable
-        // responsiveLayout="scroll"
-        value={loading ? dummy : forml}
-        // className="display w-150 datatable-wrapper"
-        // showGridlines
-        // dataKey="id"
-        // rowHover
+        responsiveLayout="scroll"
+        value={loading ? dummy : phj}
+        className="display w-150 datatable-wrapper"
+        showGridlines
+        dataKey="id"
+        rowHover
         header={renderHeader}
-        // filters={filters1}
-        // globalFilterFields={["fcode", "fname", "date_created"]}
-        // emptyMessage="Tidak ada data"
-        // paginator
-        // paginatorTemplate={template2}
-        // first={first2}
-        // rows={rows2}
-        // onPage={onCustomPage2}
-        // paginatorClassName="justify-content-end mt-3"
+        filters={filters1}
+        globalFilterFields={["phj_code", "batch_id.bcode", "batch_id.dep_id.ccost_name"]}
+        emptyMessage="Tidak ada data"
+        paginator
+        paginatorTemplate={template2}
+        first={first2}
+        rows={rows2}
+        onPage={onCustomPage2}
+        paginatorClassName="justify-content-end mt-3"
       >
         <Column
           header="Kode PHJ"
           style={{
             minWidth: "8rem",
           }}
-          field={(e) => formatDate(e.date_created)}
+          field={(e) => e.phj_code}
           body={loading && <Skeleton />}
         />
         <Column
           header="Tgl PHJ"
-          field={(e) => e.fcode}
+          field={(e) => formatDate(e.phj_date)}
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
         />
         <Column
-          header="Nama Batch"
-          field={(e) => (e?.version ? e.version : "-")}
+          header="Kode Batch"
+          field={(e) => e?.batch_id?.bcode}
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
         />
         <Column
           header="Tgl Batch"
-          field={(e) => (e?.rev ? e.rev : "-")}
+          field={(e) => formatDate(e.batch_id?.batch_date)}
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
         />
         <Column
           header="Departement"
-          field={(e) => (e?.rev ? e.rev : "-")}
+          field={(e) => checkDept(e.batch_id?.dep_id)?.ccost_name}
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
         />

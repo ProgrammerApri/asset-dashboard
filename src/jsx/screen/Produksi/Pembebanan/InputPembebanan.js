@@ -10,6 +10,7 @@ import {
 } from "src/redux/actions";
 import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
+// import CustomAccordion from "src/jsx/components/Accordion/Accordion";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_BTC } from "src/redux/actions";
 import { DataTable } from "primereact/datatable";
@@ -342,6 +343,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
     });
   };
 
+
   const header = () => {
     return (
       <h4 className="mb-5">
@@ -358,25 +360,19 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
         <Toast ref={toast} />
         <Row className="mb-4">
           {/* <div className="col-12"></div> */}
-          <div className="col-2">
-            <label className="text-black">Kode Pembebanan</label>
-            <div className="p-inputgroup">
-              <PrimeInput
-                value={btc.pl_id && checkPlan(btc.pl_id)}
-                options={planning}
-                onChange={(e) => {
-                  updateBTC({ ...btc, pl_id: e.target.value });
-                  let newError = error;
-                  newError.code = false;
-                  setError(newError);
-                }}
-                placeholder="001-001xx"
-                optionLabel="pcode"
-                filter
-                filterBy="pcode"
-                error={error?.code}
-              />
-            </div>
+          <div className="col-3 text-black">
+            <PrimeInput
+              label={"Kode Pembebanan"}
+              value={plan.pcode}
+              onChange={(e) => {
+                updatePL({ ...plan, pcode: e.target.value });
+                let newError = error;
+                newError.code = false;
+                setError(newError);
+              }}
+              placeholder="001-001xx"
+              error={error?.code}
+            />
           </div>
           <div className="col- text-black"></div>
           <div className="col-2 text-black">
@@ -399,9 +395,9 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
           <div className="col-3 text-black">
             <PrimeInput
               label={"Nama Pembebanan"}
-              value={btc.fcode}
+              value={btc.pcode}
               onChange={(e) => {
-                updateBTC({ ...btc, fcode: e.target.value });
+                updateBTC({ ...btc, pcode: e.target.value });
                 let newError = error;
                 newError.code = false;
                 setError(newError);
@@ -508,7 +504,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
           {/* <div className="col-24"></div> */}
         </Row>
 
-        <div className="col-12"></div>
+        <div className="col-10"></div>
 
         <TabView
           className="m-1"
@@ -530,8 +526,8 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
               emptyMessage={() => <div></div>}
             >
               <Column
-                header="Upah"
-                className="col-5 align-text-top"
+                header="Akun Upah"
+                className="col-11 align-text-top"
                 field={""}
                 body={(e) => (
                   <CustomDropdown
@@ -573,7 +569,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                 )}
               />
 
-              <div className="col-6"></div>
+              {/* <div className="col-"></div> */}
 
               <Column
                 header=""
@@ -640,8 +636,8 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
               emptyMessage={() => <div></div>}
             >
               <Column
-                header="Overhead"
-                className="col-5 align-text-top"
+                header="Akun Overhead"
+                className="col-11 align-text-top"
                 field={""}
                 body={(e) => (
                   <CustomDropdown
@@ -683,7 +679,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                 )}
               />
 
-              <div className="col-6"></div>
+              {/* <div className="col-"></div> */}
 
               <Column
                 header=""

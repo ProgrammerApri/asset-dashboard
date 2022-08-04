@@ -29,6 +29,7 @@ import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 import Histori from "../Histori/Index";
 import DataHistori from "../Histori/DataHistori";
+import { InputNumber } from "primereact/inputnumber";
 
 const defError = {
   code: false,
@@ -1515,10 +1516,11 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     // }}
                     body={(e) => (
                       <PrimeNumber
-                        value={e.price ? e.price : ""}
+                        price
+                        value={e.price && e.price}
                         onChange={(t) => {
                           let temp = [...po.pprod];
-                          temp[e.index].price = t.target.value;
+                          temp[e.index].price = t.value;
                           temp[e.index].total =
                             temp[e.index].price * temp[e.index].order;
                           updatePo({ ...po, pprod: temp });
@@ -1529,7 +1531,8 @@ const InputPO = ({ onCancel, onSuccess }) => {
                         }}
                         min={0}
                         placeholder="0"
-                        type="number"
+                        // mode="decimal"
+                        // type="number"
                         error={error?.prod[e.index]?.prc}
                       />
                     )}
@@ -1573,16 +1576,16 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     // }}
                     body={(e) => (
                       <div className="p-inputgroup">
-                        <InputText
-                          value={formatIdr(e.nett_price ? e.nett_price : "")}
+                        <InputNumber
+                          value={e.nett_price ? e.nett_price : ""}
                           onChange={(t) => {
                             let temp = [...po.pprod];
-                            temp[e.index].nett_price = t.target.value;
+                            temp[e.index].nett_price = t.value;
                             updatePo({ ...po, pprod: temp });
                             console.log(temp);
                           }}
                           placeholder="0"
-                          type="number"
+                          min={0}
                         />
                       </div>
                     )}
@@ -1849,26 +1852,24 @@ const InputPO = ({ onCancel, onSuccess }) => {
                       minWidth: "10rem",
                     }}
                     body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={formatIdr(e.price && e.price)}
-                          onChange={(t) => {
-                            let temp = [...po.pjasa];
-                            temp[e.index].price = t.target.value;
-                            temp[e.index].total =
-                              temp[e.index].order * temp[e.index].price;
-                            updatePo({ ...po, pjasa: temp });
-                            console.log(temp);
-                            let newError = error;
-                            newError.jasa[e.index].prc = false;
-                            setError(newError);
-                          }}
-                          placeholder="0"
-                          type="number"
-                          min={0}
-                          error={error?.jasa[e.index]?.prc}
-                        />
-                      </div>
+                      <PrimeNumber
+                        price
+                        value={e.price && e.price}
+                        onChange={(t) => {
+                          let temp = [...po.pjasa];
+                          temp[e.index].price = t.value;
+                          temp[e.index].total =
+                            temp[e.index].order * temp[e.index].price;
+                          updatePo({ ...po, pjasa: temp });
+                          console.log(temp);
+                          let newError = error;
+                          newError.jasa[e.index].prc = false;
+                          setError(newError);
+                        }}
+                        placeholder="0"
+                        min={0}
+                        error={error?.jasa[e.index]?.prc}
+                      />
                     )}
                   />
 

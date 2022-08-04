@@ -22,6 +22,7 @@ import { Divider } from "@material-ui/core";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
+import { InputNumber } from "primereact/inputnumber";
 
 const defError = {
   code: false,
@@ -30,6 +31,7 @@ const defError = {
   akn: false,
   btc: false,
   proj: false,
+  dep: false,
   acco: false,
   bn_code: false,
   bn_acc: false,
@@ -81,6 +83,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
   const exp_type = [
     { typePengeluaran: "Pelunasan", kode: 1 },
     { typePengeluaran: "Pengeluaran Kas/Bank", kode: 2 },
+    { typePengeluaran: "Biaya Batch", kode: 3 },
   ];
 
   const acq_pay = [
@@ -103,6 +106,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
     getSupplier();
     getBatch();
     getProj();
+    getDept();
     getAccount();
   }, []);
 
@@ -113,8 +117,9 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
       date: !exp.exp_date || exp.exp_date === "",
       sup: exp.exp_type === 1 ? !exp.acq_sup : false,
       akn: exp.exp_type === 2 ? !exp.exp_acc : false,
-      btc: exp.exp_type === 2 ? !exp.batch_id : false,
       proj: exp.exp_type === 2 ? !exp.exp_prj : false,
+      dep: exp.exp_dep === 2 ? !exp.exp_dep : false,
+      btc: exp.exp_type === 3 ? !exp.batch_id : false,
       acco: exp.acq_pay === 1 ? !exp.kas_acc : false,
       bn_code: exp.acq_pay === 2 ? !exp.bank_ref : false,
       bn_acc: exp.acq_pay === 2 ? !exp.bank_acc : false,
@@ -208,6 +213,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
       !errors.akn &&
       !errors.btc &&
       !errors.proj &&
+      !errors.dep &&
       !errors.acco &&
       !errors.bn_code &&
       !errors.bn_acc &&
@@ -404,6 +410,22 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
+  const getDept = async () => {
+    const config = {
+      ...endpoints.pusatBiaya,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setDept(data);
+      }
+    } catch (error) {}
+  };
+
   const editEXP = async () => {
     const config = {
       ...endpoints.editEXP,
@@ -473,6 +495,17 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
   const checkProj = (value) => {
     let selected = {};
     proj?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkDept = (value) => {
+    let selected = {};
+    dept?.forEach((element) => {
       if (value === element.id) {
         selected = element;
       }
@@ -631,8 +664,6 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
             <span className="fs-13">
               <b>Informasi Pengeluaran</b>
             </span>
-            {/* </div>
-          <div className="col-12"> */}
             <Divider className="mt-1"></Divider>
           </div>
 
@@ -644,7 +675,9 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                   exp !== null && exp.exp_type !== ""
                     ? exp.exp_type === 1
                       ? { kode: 1, typePengeluaran: "Pelunasan" }
-                      : { kode: 2, typePengeluaran: "Pengeluaran Kas/Bank" }
+                      : exp.exp_type === 2
+                      ? { kode: 2, typePengeluaran: "Pengeluaran Kas/Bank" }
+                      : { kode: 3, typePengeluaran: "Biaya Batch" }
                     : null
                 }
                 options={exp_type}
@@ -950,11 +983,10 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                           field={""}
                           body={(e) => (
                             <div className="p-inputgroup">
-                              <InputText
+                              <InputNumber
                                 value={e.value}
                                 onChange={(e) => {}}
                                 placeholder="0"
-                                type="number"
                                 disabled
                               />
                             </div>
@@ -967,10 +999,11 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                           field={""}
                           body={(e) => (
                             <PrimeNumber
+                            price
                               value={e.payment && e.payment}
                               onChange={(u) => {
                                 let temp = [...exp.acq];
-                                temp[e.index].payment = u.target.value;
+                                temp[e.index].payment = u.value;
                                 updateExp({ ...exp, acq: temp });
 
                                 let newError = error;
@@ -978,7 +1011,6 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                                 setError(newError);
                               }}
                               placeholder="0"
-                              type="number"
                               min={0}
                               error={error?.acq[e.index]?.pay}
                             />
@@ -1014,11 +1046,11 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                 <></>
               )}
             </>
-          ) : (
+          ) : exp !== null && exp.exp_type === 2 ? (
             // Type Pengeluaran
             <>
               {" "}
-              <div className="col-4">
+              <div className="col-3">
                 <label className="text-label">Kode Akun</label>
                 <div className="p-inputgroup"></div>
                 <CustomDropdown
@@ -1042,38 +1074,28 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                   error={error?.akn}
                 />
               </div>
-              <div className="col-2">
-                <label className="text-label">Kode Batch</label>
+              <div className="col-3">
+                <label className="text-label">Kode Departemen</label>
                 <div className="p-inputgroup"></div>
                 <CustomDropdown
-                  value={exp.batch_id && checkbtc(exp.batch_id)}
-                  option={batch}
+                  value={exp.exp_dep && checkDept(exp.exp_dep)}
+                  option={dept}
                   onChange={(e) => {
                     updateExp({
                       ...exp,
-                      batch_id: e.id,
+                      exp_dep: e.id,
                     });
 
                     let newError = error;
-                    newError.btc = false;
+                    newError.dep = false;
                     setError(newError);
                   }}
-                  label={"[bcode]"}
-                  placeholder="Pilih Kode Batch"
-                  errorMessage="Kode Batch Belum Dipilih"
-                  error={error?.btc}
-                />
-              </div>
-              <div className="col-3">
-                <PrimeInput
-                  label={"Departemen"}
-                  value={
-                    exp.batch_id !== null
-                      ? checkbtc(exp.batch_id)?.dep_id?.ccost_name
-                      : ""
-                  }
-                  placeholder="Departemen"
-                  disabled
+                  label={"[ccost_name] - [ccost_code]"}
+                  placeholder="Pilih Departemen"
+                  detail
+                  onDetail={() => setShowDept(true)}
+                  errorMessage="Kode Departemen Belum Dipilih"
+                  error={error?.dep}
                 />
               </div>
               <div className="col-3">
@@ -1182,13 +1204,17 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                       <Column
                         header="Nilai"
                         className="align-text-top"
+                        style={{
+                          maxWidth: "5rem",
+                        }}
                         field={""}
                         body={(e) => (
                           <PrimeNumber
+                          price
                             value={e.value && e.value}
                             onChange={(u) => {
                               let temp = [...exp.exp];
-                              temp[e.index].value = u.target.value;
+                              temp[e.index].value = u.value;
                               updateExp({ ...exp, exp: temp });
 
                               let newError = error;
@@ -1196,7 +1222,264 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                               setError(newError);
                             }}
                             placeholder="0"
-                            type="number"
+                            min={0}
+                            error={error?.exp[e.index]?.nil}
+                          />
+                        )}
+                      />
+
+                      <Column
+                        header="Keterangan"
+                        className="align-text-top"
+                        // style={{
+                        //   maxWidth: "15rem",
+                        // }}
+                        field={""}
+                        body={(e) => (
+                          <PrimeInput
+                            value={e.desc}
+                            onChange={(u) => {
+                              let temp = [...exp.exp];
+                              temp[e.index].desc = u.target.value;
+                              updateExp({ ...exp, exp: temp });
+                            }}
+                            placeholder="Masukan Keterangan"
+                          />
+                        )}
+                      />
+
+                      <Column
+                        body={(e) =>
+                          e.index === exp.exp.length - 1 ? (
+                            <Link
+                              onClick={() => {
+                                let newError = error;
+                                newError.exp.push({ nil: false });
+                                setError(newError);
+
+                                updateExp({
+                                  ...exp,
+                                  exp: [
+                                    ...exp.exp,
+                                    {
+                                      id: null,
+                                      acc_code: null,
+                                      value: null,
+                                      desc: null,
+                                    },
+                                  ],
+                                });
+                              }}
+                              className="btn btn-primary shadow btn-xs sharp ml-1"
+                            >
+                              <i className="fa fa-plus"></i>
+                            </Link>
+                          ) : (
+                            <Link
+                              onClick={() => {
+                                let temp = [...exp.exp];
+                                temp.splice(e.index, 1);
+                                updateExp({
+                                  ...exp,
+                                  exp: temp,
+                                });
+                              }}
+                              className="btn btn-danger shadow btn-xs sharp ml-1"
+                            >
+                              <i className="fa fa-trash"></i>
+                            </Link>
+                          )
+                        }
+                      />
+                    </DataTable>
+                  </>
+                }
+              />
+            </>
+          ) : (
+            <>
+              <div className="col-3">
+                <label className="text-label">Kode Akun</label>
+                <div className="p-inputgroup"></div>
+                <CustomDropdown
+                  value={exp.exp_acc && checkAcc(exp.exp_acc)}
+                  option={account}
+                  onChange={(e) => {
+                    updateExp({
+                      ...exp,
+                      exp_acc: e.account.id,
+                    });
+
+                    let newError = error;
+                    newError.akn = false;
+                    setError(newError);
+                  }}
+                  label={"[account.acc_name] - [account.acc_code]"}
+                  placeholder="Pilih Kode Akun"
+                  detail
+                  onDetail={() => setShowAcc(true)}
+                  errorMessage="Akun Belum Dipilih"
+                  error={error?.akn}
+                />
+              </div>
+              <div className="col-2">
+                <label className="text-label">Kode Batch</label>
+                <div className="p-inputgroup"></div>
+                <CustomDropdown
+                  value={exp.batch_id && checkbtc(exp.batch_id)}
+                  option={batch}
+                  onChange={(e) => {
+                    updateExp({
+                      ...exp,
+                      batch_id: e.id,
+                    });
+
+                    let newError = error;
+                    newError.btc = false;
+                    setError(newError);
+                  }}
+                  label={"[bcode]"}
+                  placeholder="Pilih Kode Batch"
+                  errorMessage="Kode Batch Belum Dipilih"
+                  error={error?.btc}
+                />
+              </div>
+              <div className="col-3">
+                <PrimeInput
+                  label={"Departemen"}
+                  value={
+                    exp.batch_id !== null
+                      ? checkbtc(exp.batch_id)?.dep_id?.ccost_name
+                      : ""
+                  }
+                  placeholder="Departemen"
+                  disabled
+                />
+              </div>
+              <div className="col-3">
+                <label className="text-label">Kode Project</label>
+                <div className="p-inputgroup"></div>
+                <CustomDropdown
+                  value={exp.exp_prj && checkProj(exp.exp_prj)}
+                  option={proj}
+                  onChange={(e) => {
+                    updateExp({
+                      ...exp,
+                      exp_prj: e.id,
+                    });
+
+                    let newError = error;
+                    newError.proj = false;
+                    setError(newError);
+                  }}
+                  label={"[proj_name] - [proj_code]"}
+                  placeholder="Pilih Project"
+                  detail
+                  onDetail={() => setShowProj(true)}
+                  errorMessage="Kode Project Belum Dipilih"
+                  error={error?.proj}
+                />
+              </div>
+              <CustomAccordion
+                className="col-12 mt-4"
+                tittle={"Biaya Batch"}
+                defaultActive={true}
+                active={accor.keluar}
+                onClick={() => {
+                  setAccor({
+                    ...accor,
+                    keluar: !accor.keluar,
+                  });
+                }}
+                key={1}
+                body={
+                  <>
+                    <DataTable
+                      responsiveLayout="none"
+                      value={exp.exp?.map((v, i) => {
+                        return {
+                          ...v,
+                          index: i,
+                          // value: v?.value ?? 0,
+                        };
+                      })}
+                      className="display w-150 datatable-wrapper header-white no-border"
+                      showGridlines={false}
+                      emptyMessage={() => <div></div>}
+                    >
+                      <Column
+                        header="Kode Akun"
+                        className="align-text-top"
+                        style={{
+                          width: "25rem",
+                        }}
+                        field={""}
+                        body={(e) => (
+                          <CustomDropdown
+                            value={e.acc_code && checkAcc(e.acc_code)}
+                            option={account}
+                            onChange={(u) => {
+                              console.log(e.value);
+                              let temp = [...exp.exp];
+                              temp[e.index].acc_code = u.account.id;
+                              updateExp({ ...exp, exp: temp });
+
+                              let newError = error;
+                              newError.exp[e.index].acc = false;
+                              setError(newError);
+                            }}
+                            label={"[account.acc_name] - [account.acc_code]"}
+                            placeholder="Pilih Kode Akun"
+                            detail
+                            errorMessage="Akun Belum Dipilih"
+                            error={error?.exp[e.index]?.acc}
+                          />
+                        )}
+                      />
+
+                      <Column
+                        header="D/K"
+                        className="align-text-top"
+                        style={{
+                          width: "6rem",
+                        }}
+                        field={""}
+                        body={(e) => (
+                          <div className="p-inputgroup">
+                            <InputText
+                              value={
+                                e.acc_code &&
+                                checkAcc(e.acc_code)?.account?.sld_type
+                              }
+                              onChange={(e) => {}}
+                              placeholder="D/K"
+                              disabled
+                            />
+                          </div>
+                        )}
+                      />
+
+                      <Column
+                        header="Nilai"
+                        className="align-text-top"
+                        style={{
+                          maxWidth: "5rem",
+                        }}
+                        field={""}
+                        body={(e) => (
+                          <PrimeNumber
+                          price
+                            value={e.value && e.value}
+                            onChange={(u) => {
+                              let temp = [...exp.exp];
+                              temp[e.index].value = u.value;
+                              updateExp({ ...exp, exp: temp });
+
+                              let newError = error;
+                              newError.exp[e.index].nil = false;
+                              setError(newError);
+                            }}
+                            placeholder="0"
                             min={0}
                             error={error?.exp[e.index]?.nil}
                           />

@@ -286,7 +286,9 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
             setDisplayDel(true);
             setCurrentItem(data);
           }}
-          className="btn btn-danger shadow btn-xs sharp ml-1"
+          className={`btn ${
+            data.status === 0 ? "" : "disabled"
+          } btn-danger shadow btn-xs sharp ml-1`}
         >
           <i className="fa fa-trash"></i>
         </Link>

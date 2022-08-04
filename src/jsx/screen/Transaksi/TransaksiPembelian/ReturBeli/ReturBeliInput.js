@@ -20,6 +20,7 @@ import { el } from "date-fns/locale";
 import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
+import { InputNumber } from "primereact/inputnumber";
 
 const defError = {
   code: false,
@@ -564,10 +565,10 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                       ...v,
                       index: i,
                       // retur: v?.retur ?? 0,
-                      price: v?.price ?? 0,
-                      disc: v?.disc ?? 0,
-                      nett_price: v?.nett_price ?? 0,
-                      total: v?.total ?? 0,
+                      // price: v?.price ?? 0,
+                      // disc: v?.disc ?? 0,
+                      // nett_price: v?.nett_price ?? 0,
+                      // total: v?.total ?? 0,
                     };
                   })}
                   className="display w-150 datatable-wrapper header-white no-border"
@@ -662,18 +663,17 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                     field={""}
                     body={(e) => (
                       <div className="p-inputgroup">
-                        <InputText
+                        <InputNumber
                           value={e.price && e.price}
                           onChange={(u) => {
                             let temp = [...pr.product];
-                            temp[e.index].price = u.target.value;
+                            temp[e.index].price = u.value;
                             temp[e.index].total =
                               temp[e.index].retur * temp[e.index].price;
                             updatePr({ ...pr, product: temp });
                             console.log(temp);
                           }}
                           placeholder="0"
-                          type="number"
                           min={0}
                         />
                       </div>
@@ -709,16 +709,15 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                     field={""}
                     body={(e) => (
                       <div className="p-inputgroup">
-                        <InputText
+                        <InputNumber
                           value={e.nett_price && e.nett_price}
                           onChange={(u) => {
                             let temp = [...pr.product];
-                            temp[e.index].nett_price = u.target.value;
+                            temp[e.index].nett_price = u.value;
                             updatePr({ ...pr, product: temp });
                             console.log(temp);
                           }}
                           placeholder="0"
-                          type="number"
                           min={0}
                         />
                       </div>

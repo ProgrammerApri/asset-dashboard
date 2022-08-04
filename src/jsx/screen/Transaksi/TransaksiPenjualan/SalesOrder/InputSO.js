@@ -26,6 +26,7 @@ import DataLokasi from "src/jsx/screen/Master/Lokasi/DataLokasi";
 import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
+import { InputNumber } from "primereact/inputnumber";
 
 const defError = {
   code: false,
@@ -1023,26 +1024,24 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   className="align-text-top"
                   field={""}
                   body={(e) => (
-                    <div className="p-inputgroup">
-                      <PrimeNumber
-                        value={e.price && e.price}
-                        onChange={(u) => {
-                          let temp = [...so.sprod];
-                          temp[e.index].price = u.target.value;
-                          temp[e.index].total =
-                            temp[e.index].order * temp[e.index].price;
-                          updateSo({ ...so, sprod: temp });
-                          console.log(temp);
-                          let newError = error;
-                          newError.prod[e.index].prc = false;
-                          setError(newError);
-                        }}
-                        placeholder="0"
-                        type="number"
-                        min={0}
-                        error={error?.prod[e.index]?.prc}
-                      />
-                    </div>
+                    <PrimeNumber
+                      price
+                      value={e.price && e.price}
+                      onChange={(u) => {
+                        let temp = [...so.sprod];
+                        temp[e.index].price = u.value;
+                        temp[e.index].total =
+                          temp[e.index].order * temp[e.index].price;
+                        updateSo({ ...so, sprod: temp });
+                        console.log(temp);
+                        let newError = error;
+                        newError.prod[e.index].prc = false;
+                        setError(newError);
+                      }}
+                      placeholder="0"
+                      min={0}
+                      error={error?.prod[e.index]?.prc}
+                    />
                   )}
                 />
 
@@ -1075,16 +1074,15 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   field={""}
                   body={(e) => (
                     <div className="p-inputgroup">
-                      <InputText
+                      <InputNumber
                         value={e.nett_price && e.nett_price}
                         onChange={(u) => {
                           let temp = [...so.sprod];
-                          temp[e.index].nett_price = u.target.value;
+                          temp[e.index].nett_price = u.value;
                           updateSo({ ...so, sprod: temp });
                           console.log(temp);
                         }}
                         placeholder="0"
-                        type="number"
                         min={0}
                       />
                     </div>
@@ -1312,10 +1310,11 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   field={""}
                   body={(e) => (
                     <PrimeNumber
+                      price
                       value={e.price && e.price}
                       onChange={(u) => {
                         let temp = [...so.sjasa];
-                        temp[e.index].price = u.target.value;
+                        temp[e.index].price = u.value;
                         temp[e.index].total =
                           temp[e.index].qty * temp[e.index].price;
                         updateSo({ ...so, sjasa: temp });
@@ -1325,7 +1324,6 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         setError(newError);
                       }}
                       placeholder="0"
-                      type="number"
                       min={0}
                       error={error?.jasa[e.index]?.prc}
                     />

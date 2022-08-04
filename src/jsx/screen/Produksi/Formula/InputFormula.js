@@ -773,10 +773,11 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                     // }}
                     body={(e) => (
                       <PrimeNumber
+                      price
                         value={e.price && e.price}
                         onChange={(u) => {
                           let temp = [...forml.material];
-                          temp[e.index].price = u.target.value;
+                          temp[e.index].price = u.value;
                           updateFM({ ...forml, material: temp });
 
                           let newError = error;
@@ -784,7 +785,6 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                           setError(newError);
                         }}
                         placeholder="0"
-                        type="number"
                         min={0}
                         error={error?.mtrl[e.index]?.prc}
                       />

@@ -855,13 +855,8 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
         <div className="justify-content-left col-6">
           <div className="col-12 mt-0 ml-0 p-0 fs-12 text-left">
             <label className="text-label">
-              <b>Jumlah Produk : </b>
+              <b>Saldo WIP : </b>
             </label>
-            <span> {}</span>
-            <label className="ml-8">
-              <b>Jumlah Bahan : </b>
-            </label>
-            <span>{}</span>
           </div>
         </div>
 

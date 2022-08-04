@@ -813,6 +813,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                         // }}
                         body={(e) => (
                           <PrimeNumber
+                            price
                             value={e.price ? e.price : ""}
                             placeholder="0"
                             disabled

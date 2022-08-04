@@ -28,6 +28,7 @@ import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 import { Dropdown } from "primereact/dropdown";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
+import { InputNumber } from "primereact/inputnumber";
 
 const defError = {
   code: false,
@@ -1237,10 +1238,11 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   field={""}
                   body={(e) => (
                     <PrimeNumber
+                    price
                       value={e.price && e.price}
                       onChange={(u) => {
                         let temp = [...sale.jprod];
-                        temp[e.index].price = u.target.value;
+                        temp[e.index].price = u.value;
                         temp[e.index].total =
                           temp[e.index].order * temp[e.index].price;
                         updateSL({ ...sale, jprod: temp });
@@ -1251,7 +1253,6 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         setError(newError);
                       }}
                       placeholder="0"
-                      type="number"
                       min={0}
                       error={error?.prod[e.index]?.prc}
                       disabled={sale && sale.so_id}
@@ -1298,16 +1299,15 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   }}
                   body={(e) => (
                     <div className="p-inputgroup">
-                      <InputText
+                      <InputNumber
                         value={e.nett_price && e.nett_price}
                         onChange={(t) => {
                           let temp = [...sale.jprod];
-                          temp[e.index].nett_price = t.target.value;
+                          temp[e.index].nett_price = t.value;
                           updateSL({ ...sale, jprod: temp });
                           console.log(temp);
                         }}
                         placeholder="0"
-                        type="number"
                         disabled={sale && sale.so_id}
                       />
                     </div>
@@ -1537,10 +1537,11 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   }}
                   body={(e) => (
                     <PrimeNumber
+                    price
                       value={e.price && e.price}
                       onChange={(t) => {
                         let temp = [...sale.jjasa];
-                        temp[e.index].price = t.target.value;
+                        temp[e.index].price = t.value;
                         temp[e.index].total =
                           temp[e.index].order * temp[e.index].price;
                         updateSL({ ...sale, jjasa: temp });
@@ -1550,7 +1551,6 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         setError(newError);
                       }}
                       placeholder="0"
-                      type="number"
                       min={0}
                       disabled={sale && sale.so_id}
                       error={error?.jasa[e.index]?.prc}

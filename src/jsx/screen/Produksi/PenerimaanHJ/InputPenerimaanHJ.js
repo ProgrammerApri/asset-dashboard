@@ -517,7 +517,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
           activeIndex={active}
           onTabChange={(e) => setActive(e.index)}
         >
-          <TabPanel header="Produk">
+          <TabPanel header="Produk Jadi">
             <DataTable
               responsiveLayout="none"
               value={phj.product?.map((v, i) => {
@@ -532,7 +532,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
               emptyMessage={() => <div></div>}
             >
               <Column
-                // header="Produk"
+                header="Nama Produk"
                 className="col-5 align-text"
                 field={""}
                 body={(e) => (
@@ -576,7 +576,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
               />
 
               <Column
-                // header="Satuan"
+                header="Satuan"
                 className="align-text-top"
                 field={""}
                 body={(e) => (
@@ -600,7 +600,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
               />
 
               <Column
-                // header="Jumlah"
+                header="Jumlah"
                 className="align-text-top"
                 field={""}
                 body={(e) => (
@@ -686,7 +686,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
               emptyMessage={() => <div></div>}
             >
               <Column
-                header="Produk"
+                header="Nama Produk"
                 className="col-5 align-text"
                 field={""}
                 body={(e) => (

@@ -468,7 +468,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
               dateFormat="dd-mm-yy"
             />
           </div>
-          <div className="col-4 text-black">
+          <div className="col-3 text-black">
             <PrimeInput
               label={"Departemen"}
               value={

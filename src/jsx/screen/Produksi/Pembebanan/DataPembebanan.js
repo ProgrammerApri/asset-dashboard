@@ -12,7 +12,7 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_FM, SET_EDIT_FM, SET_FM } from "src/redux/actions";
+import { SET_CURRENT_FM, SET_CURRENT_PBN, SET_EDIT_FM, SET_EDIT_PBN, SET_FM, SET_PBN } from "src/redux/actions";
 import { Divider } from "@material-ui/core";
 import ReactToPrint from "react-to-print";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
@@ -40,22 +40,22 @@ const DataPembebanan = ({ onAdd, onEdit, onDetail }) => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const dispatch = useDispatch();
-  const forml = useSelector((state) => state.forml.forml);
-  const show = useSelector((state) => state.forml.current);
+  const pbn = useSelector((state) => state.pbn.pbn);
+  const show = useSelector((state) => state.pbn.current);
   const printPage = useRef(null);
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getFormula();
+    getPBN();
     initFilters1();
   }, []);
 
-  const getFormula = async (isUpdate = false) => {
+  const getPBN = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.formula,
-      data: forml,
+      ...endpoints.pbn,
+      data: pbn,
     };
     console.log(config.data);
     let response = null;
@@ -65,7 +65,7 @@ const DataPembebanan = ({ onAdd, onEdit, onDetail }) => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        dispatch({ type: SET_FM, payload: data });
+        dispatch({ type: SET_PBN, payload: data });
       }
     } catch (error) {}
     if (isUpdate) {
@@ -77,10 +77,10 @@ const DataPembebanan = ({ onAdd, onEdit, onDetail }) => {
     }
   };
 
-  const delFM = async (id) => {
+  const delPBN = async (id) => {
     const config = {
-      ...endpoints.delFormula,
-      endpoint: endpoints.delFormula.endpoint + currentItem.id,
+      ...endpoints.delPbn,
+      endpoint: endpoints.delPbn.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -91,7 +91,7 @@ const DataPembebanan = ({ onAdd, onEdit, onDetail }) => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayDel(false);
-          getFormula(true);
+          getPBN(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -251,7 +251,7 @@ const DataPembebanan = ({ onAdd, onEdit, onDetail }) => {
           label="Hapus"
           icon="pi pi-trash"
           onClick={() => {
-            delFM();
+            delPBN();
           }}
           autoFocus
           loading={loading}
@@ -292,33 +292,25 @@ const DataPembebanan = ({ onAdd, onEdit, onDetail }) => {
           onClick={() => {
             onAdd();
             dispatch({
-              type: SET_EDIT_FM,
+              type: SET_EDIT_PBN,
               payload: false,
             });
             dispatch({
-              type: SET_CURRENT_FM,
+              type: SET_CURRENT_PBN,
               payload: {
                 ...data,
-                active: false,
-                version: 0,
-                product: [
+                upah: [
                   {
                     id: 0,
-                    form_id: 0,
-                    prod_id: null,
-                    unit_id: null,
-                    qty: null,
-                    aloc: null,
+                    pbn_id: 0,
+                    acc_id: null,
                   },
                 ],
-                material: [
+                overhead: [
                   {
                     id: 0,
-                    form_id: 0,
-                    prod_id: null,
-                    unit_id: null,
-                    qty: null,
-                    price: null,
+                    pbn_id: 0,
+                    acc_id: null,
                   },
                 ],
               },
@@ -422,22 +414,22 @@ const DataPembebanan = ({ onAdd, onEdit, onDetail }) => {
     <>
       <Toast ref={toast} />
       <DataTable
-        // responsiveLayout="scroll"
-        value={loading ? dummy : forml}
-        // className="display w-150 datatable-wrapper"
-        // showGridlines
-        // dataKey="id"
-        // rowHover
+        responsiveLayout="scroll"
+        value={loading ? dummy : pbn}
+        className="display w-150 datatable-wrapper"
+        showGridlines
+        dataKey="id"
+        rowHover
         header={renderHeader}
-        // filters={filters1}
-        // globalFilterFields={["fcode", "fname", "date_created"]}
-        // emptyMessage="Tidak ada data"
-        // paginator
-        // paginatorTemplate={template2}
-        // first={first2}
-        // rows={rows2}
-        // onPage={onCustomPage2}
-        // paginatorClassName="justify-content-end mt-3"
+        filters={filters1}
+        globalFilterFields={["fcode", "fname", "date_created"]}
+        emptyMessage="Tidak ada data"
+        paginator
+        paginatorTemplate={template2}
+        first={first2}
+        rows={rows2}
+        onPage={onCustomPage2}
+        paginatorClassName="justify-content-end mt-3"
       >
         <Column
           header="Kode Pembebanan"

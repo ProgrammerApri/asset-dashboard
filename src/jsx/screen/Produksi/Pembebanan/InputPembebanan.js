@@ -3,43 +3,30 @@ import { request, endpoints } from "src/utils";
 import { Row, Col } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
-import {
-  SET_CURRENT_FM,
-  SET_CURRENT_PL,
-  UPDATE_CURRENT_FM,
-} from "src/redux/actions";
+import { SET_CURRENT_PBN } from "src/redux/actions";
 import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
-// import CustomAccordion from "src/jsx/components/Accordion/Accordion";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_BTC } from "src/redux/actions";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
-import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
-import DataProduk from "../../Master/Produk/DataProduk";
-import DataSatuan from "../../MasterLainnya/Satuan/DataSatuan";
-import { Dropdown } from "primereact/dropdown";
-import { Card, Divider } from "@material-ui/core";
+import { Divider } from "@material-ui/core";
 import { TabPanel, TabView } from "primereact/tabview";
+import DataAkun from "../../Master/Akun/DataAkun";
 
 const defError = {
   code: false,
   name: false,
-  prod: [
+  uph: [
     {
       id: false,
-      qty: false,
-      aloc: false,
     },
   ],
-  mtrl: [
+  ovr: [
     {
       id: false,
-      qty: false,
-      prc: false,
     },
   ],
 };
@@ -48,29 +35,17 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const toast = useRef(null);
-  const forml = useSelector((state) => state.forml.current);
-  const [mesin, setMesin] = useState(null);
   const [active, setActive] = useState(0);
   const [doubleClick, setDoubleClick] = useState(false);
-  const btc = useSelector((state) => state.btc.current);
-  const isEdit = useSelector((state) => state.btc.editBtc);
+  const pbn = useSelector((state) => state.pbn.current);
+  const isEdit = useSelector((state) => state.pbn.editPbn);
   const dispatch = useDispatch();
-  const [showMsn, setShowMsn] = useState(false);
   const [date, setDate] = useState(new Date());
-  const plan = useSelector((state) => state.plan.current);
-  const [showProd, setShowProd] = useState(false);
-  const [showSatuan, setShowSatuan] = useState(false);
-  const [showDept, setShowDept] = useState(false);
-  const [product, setProduct] = useState(null);
-  const [satuan, setSatuan] = useState(null);
-  const [formula, setFormula] = useState(null);
-  const [planning, setPlanning] = useState(null);
-  const [dept, setDept] = useState(null);
+  const [showAcc, setShowAcc] = useState(false);
+  const [acc, setAcc] = useState(null);
+  const [account, setAccount] = useState(null);
+  const [batch, setBatch] = useState(null);
   const [error, setError] = useState(defError);
-  const [accor, setAccor] = useState({
-    produk: true,
-    material: true,
-  });
 
   useEffect(() => {
     window.scrollTo({
@@ -78,51 +53,14 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
       left: 0,
       behavior: "smooth",
     });
-    getProduct();
-    getSatuan();
-    getFormula();
-    getPlanning();
-    getDept();
+    getAcc();
+    getAccount();
+    getBatch();
   }, []);
 
-  const getProduct = async () => {
+  const getAcc = async () => {
     const config = {
-      ...endpoints.product,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-
-      if (response.status) {
-        const { data } = response;
-        setProduct(data);
-        console.log("jsdj");
-        console.log(data);
-      }
-    } catch (error) {}
-  };
-  const updatePL = (e) => {
-    dispatch({
-      type: SET_CURRENT_PL,
-      payload: e,
-    });
-  };
-
-  const checkMsn = (value) => {
-    let selected = {};
-    mesin?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const getSatuan = async () => {
-    const config = {
-      ...endpoints.getSatuan,
+      ...endpoints.account,
       data: {},
     };
     let response = null;
@@ -131,14 +69,14 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        setSatuan(data);
+        setAcc(data);
       }
     } catch (error) {}
   };
 
-  const getFormula = async () => {
+  const getAccount = async () => {
     const config = {
-      ...endpoints.formula,
+      ...endpoints.account,
       data: {},
     };
     let response = null;
@@ -147,14 +85,14 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        setFormula(data);
+        setAccount(data);
       }
     } catch (error) {}
   };
 
-  const getPlanning = async () => {
+  const getBatch = async () => {
     const config = {
-      ...endpoints.planning,
+      ...endpoints.batch,
       data: {},
     };
     let response = null;
@@ -163,32 +101,16 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        setPlanning(data);
+        setBatch(data);
       }
     } catch (error) {}
   };
 
-  const getDept = async () => {
+  const editPBN = async () => {
     const config = {
-      ...endpoints.pusatBiaya,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setDept(data);
-      }
-    } catch (error) {}
-  };
-
-  const editBTC = async () => {
-    const config = {
-      ...endpoints.editBatch,
-      endpoint: endpoints.editBatch.endpoint + btc.id,
-      data: btc,
+      ...endpoints.editPbn,
+      endpoint: endpoints.editPbn.endpoint + pbn.id,
+      data: pbn,
     };
     console.log(config.data);
     let response = null;
@@ -210,17 +132,11 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
       }, 500);
     }
   };
-  const updateFM = (e) => {
-    dispatch({
-      type: SET_CURRENT_FM,
-      payload: e,
-    });
-  };
 
-  const addBTC = async () => {
+  const addPBN = async () => {
     const config = {
-      ...endpoints.addBatch,
-      data: btc,
+      ...endpoints.addPbn,
+      data: pbn,
     };
     console.log(config.data);
     let response = null;
@@ -238,7 +154,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${btc.bcode} Sudah Digunakan`,
+            detail: `Kode ${pbn.bcode} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -256,10 +172,10 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
     }
   };
 
-  const checkProd = (value) => {
+  const checkAcc = (value) => {
     let selected = {};
-    product?.forEach((element) => {
-      if (value === element.id) {
+    acc?.forEach((element) => {
+      if (value === element.account.id) {
         selected = element;
         console.log(selected);
       }
@@ -268,42 +184,9 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
-  const checkUnit = (value) => {
+  const checkBtc = (value) => {
     let selected = {};
-    satuan?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const checkFor = (value) => {
-    let selected = {};
-    formula?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const checkPlan = (value) => {
-    let selected = {};
-    planning?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const checkDept = (value) => {
-    let selected = {};
-    dept?.forEach((element) => {
+    batch?.forEach((element) => {
       if (value === element.id) {
         selected = element;
       }
@@ -316,10 +199,10 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
     // if (isValid()) {
     if (isEdit) {
       setUpdate(true);
-      editBTC();
+      editPBN();
     } else {
       setUpdate(true);
-      addBTC();
+      addPBN();
     }
     // }
   };
@@ -336,9 +219,9 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
     return [day, month, year].join("-");
   };
 
-  const updateBTC = (e) => {
+  const updatePBN = (e) => {
     dispatch({
-      type: SET_CURRENT_BTC,
+      type: SET_CURRENT_PBN,
       payload: e,
     });
   };
@@ -355,55 +238,49 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
   const body = () => {
     return (
       <>
-        {/* Put content body here */}
         <Toast ref={toast} />
         <Row className="mb-4">
-          {/* <div className="col-12"></div> */}
-          <div className="col-3 text-black">
+          <div className="col-2 text-black">
             <PrimeInput
               label={"Kode Pembebanan"}
-              value={plan.pcode}
+              value={pbn.pcode}
               onChange={(e) => {
-                updatePL({ ...plan, pcode: e.target.value });
+                updatePBN({ ...pbn, pcode: e.target.value });
                 let newError = error;
                 newError.code = false;
                 setError(newError);
               }}
-              placeholder="001-001xx"
+              placeholder="Masukan Kode"
               error={error?.code}
             />
           </div>
-          <div className="col- text-black"></div>
-          <div className="col-2 text-black">
-            <PrimeCalendar
-              label={"Tgl Dibuat"}
-              value={null}
-              onChange={(e) => {
-                setDate(e.value);
-              }}
-              placeholder="Pilih Tanggal"
-              dateFormat="dd-mm-yy"
-              //   disabled
-              showIcon
-              error={error?.date}
-            />
-          </div>
-
-          <div className="col-6"></div>
 
           <div className="col-3 text-black">
             <PrimeInput
               label={"Nama Pembebanan"}
-              value={btc.pcode}
+              value={pbn.pcode}
               onChange={(e) => {
-                updateBTC({ ...btc, pcode: e.target.value });
+                updatePBN({ ...pbn, pcode: e.target.value });
                 let newError = error;
                 newError.code = false;
                 setError(newError);
               }}
               placeholder="Masukan Nama Pembebanan"
-              //   disabled
               error={error?.code}
+            />
+          </div>
+
+          <div className="col-2 text-black">
+            <PrimeCalendar
+              label={"Tanggal"}
+              value={new Date(`${pbn.pbn_date}Z`)}
+              onChange={(e) => {
+                updatePBN({ ...pbn, pbn: e.target.value });
+              }}
+              placeholder="Pilih Tanggal"
+              dateFormat="dd-mm-yy"
+              showIcon
+              error={error?.date}
             />
           </div>
 
@@ -413,32 +290,32 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
             </div>
             <Divider className="mb-2 ml-3 mr-3"></Divider>
           </div>
-          <div className="col-12"></div>
 
           <div className="col-2 text-black">
             <label className="text-black">Kode Batch</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
-              label={"Kode Batch"}
-              value={btc.fcode}
+              value={pbn.batch_id && checkBtc(pbn.batch_id)}
+              option={batch}
               onChange={(e) => {
-                updateBTC({ ...btc, fcode: e.target.value });
+                updatePBN({ ...pbn, batch_id: e.id });
                 let newError = error;
                 newError.code = false;
                 setError(newError);
               }}
-              placeholder="Masukan Kode Batch"
+              label={"[bcode]"}
+              placeholder="Pilih Kode Batch"
               error={error?.code}
-              //   disabled
             />
           </div>
-          <div className="col-2 text-black">
+
+          {/* <div className="col-2 text-black">
             <label className="text-black">Nama Batch</label>
             <div className="p-inputgroup"></div>
             <PrimeInput
-              value={btc.fcode}
+              value={pbn.fcode}
               onChange={(e) => {
-                updateBTC({ ...btc, fcode: e.target.value });
+                updatePBN({ ...pbn, fcode: e.target.value });
                 let newError = error;
                 newError.code = false;
                 setError(newError);
@@ -447,60 +324,50 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
               error={error?.code}
               disabled
             />
-          </div>
-          {/* <div className="col-7"></div> */}
+          </div> */}
+
           <div className="col-3 text-black">
             <label className="text-black">Departement</label>
             <div className="p-inputgroup"></div>
-            <CustomDropdown
-              value={btc.dep_id && checkDept(btc.dep_id)}
-              onChange={(e) => {
-                updateBTC({ ...btc, dep_id: e.id });
-              }}
-              option={dept}
-              detail
-              onDetail={() => setShowDept(true)}
-              label={"[ccost_name] ([ccost_code])"}
-              placeholder="Pilih Departement"
+            <PrimeInput
+              value={pbn.batch_id && checkBtc(pbn.batch_id)?.dep_id?.ccost_name}
+              placeholder="Departemen"
+              disabled
             />
           </div>
-          {/* <div className="col-6 text-black"></div> */}
 
-          {/* <div className="col-9"></div> */}
-
-          <div className="col-5"></div>
           <div className="col-3 text-black">
             <label className="text-black">Akun Kredit</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
-              value={null}
-              onChange={(e) => {
-                setDate(e.value);
+              value={pbn.code_acc && checkAcc(pbn.code_acc)}
+              option={account}
+              onChange={(u) => {
+                updatePBN({ ...pbn, code_acc: u.account.id });
+
+                let newError = error;
+                newError.id = false;
+                setError(newError);
               }}
-              placeholder="Pilih Buku Rekening"
-              //   dateFormat="dd-mm-yy"
-              //   disabled
-              error={error?.date}
+              detail
+              onDetail={() => setShowAcc(true)}
+              label={"[account.acc_name] - [account.acc_code]"}
+              placeholder="Pilih Akun Kredit"
+              errorMessage="Akun Belum Dipilih"
+              error={error?.id}
             />
-            {/* </div> */}
           </div>
 
           <div className="col-4 text-black">
             <label className="text-label">Keterangan</label>
             <div className="p-inputgroup">
               <InputText
-                value={btc.desc}
-                onChange={(e) => updateBTC({ ...btc, desc: e.target.value })}
+                value={pbn.desc}
+                onChange={(e) => updatePBN({ ...pbn, desc: e.target.value })}
                 placeholder="Masukan Keterangan"
               />
             </div>
           </div>
-
-          <div className="col-12"></div>
-
-          {/* <Row className="mb-4"> */}
-
-          {/* <div className="col-24"></div> */}
         </Row>
 
         <div className="col-10"></div>
@@ -513,7 +380,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
           <TabPanel header="Upah">
             <DataTable
               responsiveLayout="none"
-              value={forml.product?.map((v, i) => {
+              value={pbn.upah?.map((v, i) => {
                 return {
                   ...v,
                   index: i,
@@ -526,30 +393,16 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
             >
               <Column
                 header="Akun Upah"
-                className="col-11 align-text-top"
+                className="col-4 align-text-top"
                 field={""}
                 body={(e) => (
                   <CustomDropdown
-                    value={e.prod_id && checkProd(e.prod_id)}
-                    option={product}
+                    value={e.acc_id && checkAcc(e.acc_id)}
+                    option={acc}
                     onChange={(u) => {
-                      // looping satuan
-                      let sat = [];
-                      satuan.forEach((element) => {
-                        if (element.id === u.unit.id) {
-                          sat.push(element);
-                        } else {
-                          if (element.u_from?.id === u.unit.id) {
-                            sat.push(element);
-                          }
-                        }
-                      });
-                      setSatuan(sat);
-
-                      let temp = [...forml.product];
-                      temp[e.index].prod_id = u.id;
-                      temp[e.index].unit_id = u.unit?.id;
-                      updateFM({ ...forml, product: temp });
+                      let temp = [...pbn.upah];
+                      temp[e.index].acc_id = u.account.id;
+                      updatePBN({ ...pbn, upah: temp });
 
                       let newError = error;
                       newError.prod[e.index].id = false;
@@ -558,11 +411,11 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                     detail
                     onDetail={() => {
                       setCurrentIndex(e.index);
-                      setShowProd(true);
+                      setShowAcc(true);
                     }}
-                    label={"[name]"}
-                    placeholder="52000001 - Upah"
-                    errorMessage="Produk Belum Dipilih"
+                    label={"[account.acc_name] - [account.acc_code]"}
+                    placeholder="Pilih Akun Upah"
+                    errorMessage="Akun Belum Dipilih"
                     error={error?.prod[e.index]?.id}
                   />
                 )}
@@ -575,7 +428,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                 className="align-text-top"
                 field={""}
                 body={(e) =>
-                  e.index === forml.product.length - 1 ? (
+                  e.index === pbn.upah.length - 1 ? (
                     <Link
                       onClick={() => {
                         let newError = error;
@@ -585,16 +438,13 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                         });
                         setError(newError);
 
-                        updateFM({
-                          ...forml,
-                          product: [
-                            ...forml.product,
+                        updatePBN({
+                          ...pbn,
+                          upah: [
+                            ...pbn.upah,
                             {
                               id: 0,
-                              prod_id: null,
-                              unit_id: null,
-                              qty: null,
-                              aloc: null,
+                              acc_id: null,
                             },
                           ],
                         });
@@ -606,9 +456,9 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                   ) : (
                     <Link
                       onClick={() => {
-                        let temp = [...forml.product];
+                        let temp = [...pbn.upah];
                         temp.splice(e.index, 1);
-                        updateFM({ ...forml, product: temp });
+                        updatePBN({ ...pbn, upah: temp });
                       }}
                       className="btn btn-danger shadow btn-xs sharp"
                     >
@@ -623,7 +473,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
           <TabPanel header="Overhead">
             <DataTable
               responsiveLayout="none"
-              value={forml.product?.map((v, i) => {
+              value={pbn.overhead?.map((v, i) => {
                 return {
                   ...v,
                   index: i,
@@ -636,30 +486,16 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
             >
               <Column
                 header="Akun Overhead"
-                className="col-11 align-text-top"
+                className="col-4 align-text-top"
                 field={""}
                 body={(e) => (
                   <CustomDropdown
-                    value={e.prod_id && checkProd(e.prod_id)}
-                    option={product}
+                    value={e.acc_id && checkAcc(e.acc_id)}
+                    option={acc}
                     onChange={(u) => {
-                      // looping satuan
-                      let sat = [];
-                      satuan.forEach((element) => {
-                        if (element.id === u.unit.id) {
-                          sat.push(element);
-                        } else {
-                          if (element.u_from?.id === u.unit.id) {
-                            sat.push(element);
-                          }
-                        }
-                      });
-                      setSatuan(sat);
-
-                      let temp = [...forml.product];
-                      temp[e.index].prod_id = u.id;
-                      temp[e.index].unit_id = u.unit?.id;
-                      updateFM({ ...forml, product: temp });
+                      let temp = [...pbn.overhead];
+                      temp[e.index].acc_id = u.account.id;
+                      updatePBN({ ...pbn, overhead: temp });
 
                       let newError = error;
                       newError.prod[e.index].id = false;
@@ -668,11 +504,11 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                     detail
                     onDetail={() => {
                       setCurrentIndex(e.index);
-                      setShowProd(true);
+                      setShowAcc(true);
                     }}
-                    label={"[name]"}
-                    placeholder="5200000123- Overhead"
-                    errorMessage="Produk Belum Dipilih"
+                    label={"[account.acc_name] - [account.acc_code]"}
+                    placeholder="Pilih Akun Overhead"
+                    errorMessage="Akun Belum Dipilih"
                     error={error?.prod[e.index]?.id}
                   />
                 )}
@@ -685,7 +521,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                 className="align-text-top"
                 field={""}
                 body={(e) =>
-                  e.index === forml.product.length - 1 ? (
+                  e.index === pbn.overhead.length - 1 ? (
                     <Link
                       onClick={() => {
                         let newError = error;
@@ -695,16 +531,13 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                         });
                         setError(newError);
 
-                        updateFM({
-                          ...forml,
-                          product: [
-                            ...forml.product,
+                        updatePBN({
+                          ...pbn,
+                          overhead: [
+                            ...pbn.overhead,
                             {
                               id: 0,
-                              prod_id: null,
-                              unit_id: null,
-                              qty: null,
-                              aloc: null,
+                              acc_id: null,
                             },
                           ],
                         });
@@ -716,9 +549,9 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                   ) : (
                     <Link
                       onClick={() => {
-                        let temp = [...forml.product];
+                        let temp = [...pbn.overhead];
                         temp.splice(e.index, 1);
-                        updateFM({ ...forml, product: temp });
+                        updatePBN({ ...pbn, overhead: temp });
                       }}
                       className="btn btn-danger shadow btn-xs sharp"
                     >
@@ -738,46 +571,22 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
     );
   };
 
-  const getIndex = () => {
-    let total = 0;
-    btc?.product?.forEach((el) => {
-      total += el.index;
-    });
-
-    return total;
-  };
-
   const footer = () => {
     return (
       <div className="mt-5 flex justify-content-end">
-        <div className="justify-content-left col-6">
-          <div className="col-12 mt-0 ml-0 p-0 fs-12 text-left">
-            <label className="text-label">
-              <b>Jumlah Produk : </b>
-            </label>
-            <span> {}</span>
-            <label className="ml-8">
-              <b>Jumlah Bahan : </b>
-            </label>
-            <span>{}</span>
-          </div>
-        </div>
-
-        <div className="row justify-content-right col-6">
-          <div className="col-12 mt-0 fs-12 text-right">
-            <PButton
-              label="Batal"
-              onClick={onCancel}
-              className="p-button-text btn-primary"
-            />
-            <PButton
-              label="Simpan"
-              icon="pi pi-check"
-              onClick={() => onSubmit()}
-              autoFocus
-              loading={update}
-            />
-          </div>
+        <div className="col-12 mt-0 fs-12 text-right">
+          <PButton
+            label="Batal"
+            onClick={onCancel}
+            className="p-button-text btn-primary"
+          />
+          <PButton
+            label="Simpan"
+            icon="pi pi-check"
+            onClick={() => onSubmit()}
+            autoFocus
+            loading={update}
+          />
         </div>
       </div>
     );
@@ -795,76 +604,30 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
         </Col>
       </Row>
 
-      <DataProduk
-        data={product}
+      <DataAkun
+        data={acc}
         loading={false}
         popUp={true}
-        show={showProd}
+        show={showAcc}
         onHide={() => {
-          setShowProd(false);
+          setShowAcc(false);
         }}
         onInput={(e) => {
-          setShowProd(!e);
+          setShowAcc(!e);
         }}
         onSuccessInput={(e) => {
-          getProduct();
+          getAcc();
         }}
         onRowSelect={(e) => {
           if (doubleClick) {
-            setShowProd(false);
-            let sat = [];
-            satuan.forEach((element) => {
-              if (element.id === e.data.unit.id) {
-                sat.push(element);
-              } else {
-                if (element.u_from?.id === e.data.unit.id) {
-                  sat.push(element);
-                }
-              }
-            });
-            setSatuan(sat);
+            setShowAcc(false);
 
-            let temp = [...btc.product];
-            temp[currentIndex].prod_id = e.data.id;
-            temp[currentIndex].unit_id = e.data.unit?.id;
+            let temp = [...pbn.upah];
+            temp[currentIndex].acc_id = e.data.account.id;
 
-            let tempm = [...btc.material];
-            temp[currentIndex].prod_id = e.data.id;
-            temp[currentIndex].unit_id = e.data.unit?.id;
-            updateBTC({ ...btc, product: temp, material: tempm });
-          }
-
-          setDoubleClick(true);
-
-          setTimeout(() => {
-            setDoubleClick(false);
-          }, 2000);
-        }}
-      />
-
-      <DataSatuan
-        data={satuan}
-        loading={false}
-        popUp={true}
-        show={showSatuan}
-        onHide={() => {
-          setShowSatuan(false);
-        }}
-        onInput={(e) => {
-          setShowSatuan(!e);
-        }}
-        onSuccessInput={(e) => {
-          getSatuan();
-        }}
-        onRowSelect={(e) => {
-          if (doubleClick) {
-            setShowSatuan(false);
-            let temp = [...btc.product];
-            temp[currentIndex].unit_id = e.data.id;
-
-            let tempm = [...btc.material];
-            tempm[currentIndex].unit_id = e.data.id;
-            updateBTC({ ...btc, product: temp, material: tempm });
+            let tempm = [...pbn.overhead];
+            temp[currentIndex].acc_id = e.data.account.id;
+            updatePBN({ ...pbn, code_acc: e.data.account.id, upah: temp, overhead: tempm });
           }
 
           setDoubleClick(true);

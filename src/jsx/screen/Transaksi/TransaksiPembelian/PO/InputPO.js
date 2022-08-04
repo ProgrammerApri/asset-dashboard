@@ -1574,7 +1574,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     body={(e) => (
                       <div className="p-inputgroup">
                         <InputText
-                          value={e.nett_price ? e.nett_price : ""}
+                          value={formatIdr(e.nett_price ? e.nett_price : "")}
                           onChange={(t) => {
                             let temp = [...po.pprod];
                             temp[e.index].nett_price = t.target.value;
@@ -1851,7 +1851,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     body={(e) => (
                       <div className="p-inputgroup">
                         <InputText
-                          value={e.price && e.price}
+                          value={formatIdr(e.price && e.price)}
                           onChange={(t) => {
                             let temp = [...po.pjasa];
                             temp[e.index].price = t.target.value;

@@ -1070,6 +1070,31 @@ const endpoints = {
     method: "DELETE",
     data: {},
   },
+
+  /// Pembebanan
+  pbn: {
+    endpoint: "/v1/api/pbn",
+    method: "GET",
+    data: {},
+  },
+
+  addPbn: {
+    endpoint: "/v1/api/pbn",
+    method: "POST",
+    data: {},
+  },
+
+  editPbn: {
+    endpoint: "/v1/api/pbn/",
+    method: "PUT",
+    data: {},
+  },
+
+  delPbn: {
+    endpoint: "/v1/api/pbn/",
+    method: "DELETE",
+    data: {},
+  },
 };
 
 export default endpoints;

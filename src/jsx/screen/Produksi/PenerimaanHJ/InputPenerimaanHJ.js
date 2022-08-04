@@ -428,12 +428,9 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-         
-          
-
           <div className="col-12 p-0 text-black">
             <div className="mt-4 mb-2 ml-3 mr-3 fs-13">
-              <b>Informasi Penerimaan Hasil Jadi</b>
+              <b>Informasi Batch</b>
             </div>
             <Divider className="mb-2 ml-3 mr-3"></Divider>
           </div>
@@ -458,7 +455,6 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          
           <div className="col-2 text-black">
             <PrimeInput
               label={"Tanggal Batch"}
@@ -485,7 +481,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-2 text-black"></div>
+          {/* <div className="col-2 text-black"></div> */}
           <div className="col-2 text-black">
             <PrimeInput
               label={"Total Pembuatan"}
@@ -510,7 +506,6 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
               disabled
             />
           </div>
-          
 
           <div className="col-8 text-black"></div>
 

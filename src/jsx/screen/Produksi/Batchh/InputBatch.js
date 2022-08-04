@@ -635,7 +635,6 @@ const InputBatch = ({ onCancel, onSuccess }) => {
             </>
           )}
         </Row>
-        
 
         {btc && btc.plan_id !== null && (
           <>
@@ -843,7 +842,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                       emptyMessage={() => <div></div>}
                     >
                       <Column
-                        header="Kode Mesin" 
+                        header="Kode Mesin"
                         className="align-text-top"
                         field={""}
                         style={{

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { request, endpoints } from "src/utils";
-import { Row, Col, Dropdown } from "react-bootstrap";
+import { Row, Col, Dropdown, Card } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
@@ -518,311 +518,319 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
           onTabChange={(e) => setActive(e.index)}
         >
           <TabPanel header="Produk Jadi">
-            <DataTable
-              responsiveLayout="none"
-              value={phj.product?.map((v, i) => {
-                return {
-                  ...v,
-                  index: i,
-                  // order: v?.order ?? 0,
-                };
-              })}
-              className="display w-150 datatable-wrapper header-white no-border"
-              showGridlines={false}
-              emptyMessage={() => <div></div>}
-            >
-              <Column
-                header="Nama Produk"
-                className="col-5 align-text"
-                field={""}
-                body={(e) => (
-                  <CustomDropdown
-                    value={e.prod_id && checkProd(e.prod_id)}
-                    option={product}
-                    onChange={(u) => {
-                      // looping satuan
-                      let sat = [];
-                      satuan.forEach((element) => {
-                        if (element.id === u.unit.id) {
-                          sat.push(element);
-                        } else {
-                          if (element.u_from?.id === u.unit.id) {
-                            sat.push(element);
-                          }
-                        }
-                      });
-                      setSatuan(sat);
+            <Card>
+              <Card.Body>
+                <DataTable
+                  responsiveLayout="none"
+                  value={phj.product?.map((v, i) => {
+                    return {
+                      ...v,
+                      index: i,
+                      // order: v?.order ?? 0,
+                    };
+                  })}
+                  className="display w-150 datatable-wrapper header-white no-border"
+                  showGridlines={false}
+                  emptyMessage={() => <div></div>}
+                >
+                  <Column
+                    header="Nama Produk"
+                    className="col-5 align-text"
+                    field={""}
+                    body={(e) => (
+                      <CustomDropdown
+                        value={e.prod_id && checkProd(e.prod_id)}
+                        option={product}
+                        onChange={(u) => {
+                          // looping satuan
+                          let sat = [];
+                          satuan.forEach((element) => {
+                            if (element.id === u.unit.id) {
+                              sat.push(element);
+                            } else {
+                              if (element.u_from?.id === u.unit.id) {
+                                sat.push(element);
+                              }
+                            }
+                          });
+                          setSatuan(sat);
 
-                      let temp = [...phj.product];
-                      temp[e.index].prod_id = u.id;
-                      temp[e.index].unit_id = u.unit?.id;
-                      updatePHJ({ ...phj, product: temp });
+                          let temp = [...phj.product];
+                          temp[e.index].prod_id = u.id;
+                          temp[e.index].unit_id = u.unit?.id;
+                          updatePHJ({ ...phj, product: temp });
 
-                      let newError = error;
-                      newError.prod[e.index].id = false;
-                      setError(newError);
-                    }}
-                    detail
-                    onDetail={() => {
-                      setCurrentIndex(e.index);
-                      setShowProd(true);
-                    }}
-                    label={"[name]"}
-                    placeholder="Pilih Produk"
-                    errorMessage="Produk Belum Dipilih"
-                    error={error?.prod[e.index]?.id}
+                          let newError = error;
+                          newError.prod[e.index].id = false;
+                          setError(newError);
+                        }}
+                        detail
+                        onDetail={() => {
+                          setCurrentIndex(e.index);
+                          setShowProd(true);
+                        }}
+                        label={"[name]"}
+                        placeholder="Pilih Produk"
+                        errorMessage="Produk Belum Dipilih"
+                        error={error?.prod[e.index]?.id}
+                      />
+                    )}
                   />
-                )}
-              />
 
-              <Column
-                header="Satuan"
-                className="align-text-top"
-                field={""}
-                body={(e) => (
-                  <CustomDropdown
-                    value={e.unit_id && checkUnit(e.unit_id)}
-                    onChange={(u) => {
-                      let temp = [...phj.product];
-                      temp[e.index].unit_id = u.id;
-                      updatePHJ({ ...phj, product: temp });
-                    }}
-                    option={satuan}
-                    detail
-                    onDetail={() => {
-                      setCurrentIndex(e.index);
-                      setShowSatuan(true);
-                    }}
-                    label={"[name]"}
-                    placeholder="Pilih Satuan"
+                  <Column
+                    header="Satuan"
+                    className="align-text-top"
+                    field={""}
+                    body={(e) => (
+                      <CustomDropdown
+                        value={e.unit_id && checkUnit(e.unit_id)}
+                        onChange={(u) => {
+                          let temp = [...phj.product];
+                          temp[e.index].unit_id = u.id;
+                          updatePHJ({ ...phj, product: temp });
+                        }}
+                        option={satuan}
+                        detail
+                        onDetail={() => {
+                          setCurrentIndex(e.index);
+                          setShowSatuan(true);
+                        }}
+                        label={"[name]"}
+                        placeholder="Pilih Satuan"
+                      />
+                    )}
                   />
-                )}
-              />
 
-              <Column
-                header="Jumlah"
-                className="align-text-top"
-                field={""}
-                body={(e) => (
-                  <PrimeNumber
-                    value={e.qty && e.qty}
-                    onChange={(u) => {
-                      let temp = [...phj.product];
-                      temp[e.index].qty = u.target.value;
-                      updatePHJ({ ...phj, product: temp });
+                  <Column
+                    header="Jumlah"
+                    className="align-text-top"
+                    field={""}
+                    body={(e) => (
+                      <PrimeNumber
+                        value={e.qty && e.qty}
+                        onChange={(u) => {
+                          let temp = [...phj.product];
+                          temp[e.index].qty = u.target.value;
+                          updatePHJ({ ...phj, product: temp });
 
-                      let newError = error;
-                      newError.prod[e.index].qty = false;
-                      setError(newError);
-                    }}
-                    placeholder="0"
-                    type="number"
-                    min={0}
-                    error={error?.prod[e.index]?.qty}
+                          let newError = error;
+                          newError.prod[e.index].qty = false;
+                          setError(newError);
+                        }}
+                        placeholder="0"
+                        type="number"
+                        min={0}
+                        error={error?.prod[e.index]?.qty}
+                      />
+                    )}
                   />
-                )}
-              />
 
-              <Column
-                header=""
-                className="align-text-top"
-                field={""}
-                body={(e) =>
-                  e.index === phj.product.length - 1 ? (
-                    <Link
-                      onClick={() => {
-                        let newError = error;
-                        newError.prod.push({
-                          qty: false,
-                        });
-                        setError(newError);
+                  <Column
+                    header=""
+                    className="align-text-top"
+                    field={""}
+                    body={(e) =>
+                      e.index === phj.product.length - 1 ? (
+                        <Link
+                          onClick={() => {
+                            let newError = error;
+                            newError.prod.push({
+                              qty: false,
+                            });
+                            setError(newError);
 
-                        updatePHJ({
-                          ...phj,
-                          product: [
-                            ...phj.product,
-                            {
-                              id: 0,
-                              prod_id: null,
-                              unit_id: null,
-                              qty: null,
-                            },
-                          ],
-                        });
-                      }}
-                      className="btn btn-primary shadow btn-xs sharp"
-                    >
-                      <i className="fa fa-plus"></i>
-                    </Link>
-                  ) : (
-                    <Link
-                      onClick={() => {
-                        let temp = [...phj.product];
-                        temp.splice(e.index, 1);
-                        updatePHJ({ ...phj, product: temp });
-                      }}
-                      className="btn btn-danger shadow btn-xs sharp"
-                    >
-                      <i className="fa fa-trash"></i>
-                    </Link>
-                  )
-                }
-              />
-            </DataTable>
+                            updatePHJ({
+                              ...phj,
+                              product: [
+                                ...phj.product,
+                                {
+                                  id: 0,
+                                  prod_id: null,
+                                  unit_id: null,
+                                  qty: null,
+                                },
+                              ],
+                            });
+                          }}
+                          className="btn btn-primary shadow btn-xs sharp"
+                        >
+                          <i className="fa fa-plus"></i>
+                        </Link>
+                      ) : (
+                        <Link
+                          onClick={() => {
+                            let temp = [...phj.product];
+                            temp.splice(e.index, 1);
+                            updatePHJ({ ...phj, product: temp });
+                          }}
+                          className="btn btn-danger shadow btn-xs sharp"
+                        >
+                          <i className="fa fa-trash"></i>
+                        </Link>
+                      )
+                    }
+                  />
+                </DataTable>
+              </Card.Body>
+            </Card>
           </TabPanel>
 
           <TabPanel header="Produk Reject">
-            <DataTable
-              responsiveLayout="none"
-              value={phj.reject?.map((v, i) => {
-                return {
-                  ...v,
-                  index: i,
-                  // order: v?.order ?? 0,
-                };
-              })}
-              className="display w-150 datatable-wrapper header-white no-border"
-              showGridlines={false}
-              emptyMessage={() => <div></div>}
-            >
-              <Column
-                header="Nama Produk"
-                className="col-5 align-text"
-                field={""}
-                body={(e) => (
-                  <CustomDropdown
-                    value={e.prod_id && checkProd(e.prod_id)}
-                    option={product}
-                    onChange={(u) => {
-                      // looping satuan
-                      let sat = [];
-                      satuan.forEach((element) => {
-                        if (element.id === u.unit.id) {
-                          sat.push(element);
-                        } else {
-                          if (element.u_from?.id === u.unit.id) {
-                            sat.push(element);
-                          }
-                        }
-                      });
-                      setSatuan(sat);
+            <Card>
+              <Card.Body>
+                <DataTable
+                  responsiveLayout="none"
+                  value={phj.reject?.map((v, i) => {
+                    return {
+                      ...v,
+                      index: i,
+                      // order: v?.order ?? 0,
+                    };
+                  })}
+                  className="display w-150 datatable-wrapper header-white no-border"
+                  showGridlines={false}
+                  emptyMessage={() => <div></div>}
+                >
+                  <Column
+                    header="Nama Produk"
+                    className="col-5 align-text"
+                    field={""}
+                    body={(e) => (
+                      <CustomDropdown
+                        value={e.prod_id && checkProd(e.prod_id)}
+                        option={product}
+                        onChange={(u) => {
+                          // looping satuan
+                          let sat = [];
+                          satuan.forEach((element) => {
+                            if (element.id === u.unit.id) {
+                              sat.push(element);
+                            } else {
+                              if (element.u_from?.id === u.unit.id) {
+                                sat.push(element);
+                              }
+                            }
+                          });
+                          setSatuan(sat);
 
-                      let temp = [...phj.reject];
-                      temp[e.index].prod_id = u.id;
-                      temp[e.index].unit_id = u.unit?.id;
-                      updatePHJ({ ...phj, reject: temp });
+                          let temp = [...phj.reject];
+                          temp[e.index].prod_id = u.id;
+                          temp[e.index].unit_id = u.unit?.id;
+                          updatePHJ({ ...phj, reject: temp });
 
-                      let newError = error;
-                      newError.rej[e.index].id = false;
-                      setError(newError);
-                    }}
-                    detail
-                    onDetail={() => {
-                      setCurrentIndex(e.index);
-                      setShowProd(true);
-                    }}
-                    label={"[name]"}
-                    placeholder="Pilih Produk"
-                    errorMessage="Produk Belum Dipilih"
-                    error={error?.rej[e.index]?.id}
+                          let newError = error;
+                          newError.rej[e.index].id = false;
+                          setError(newError);
+                        }}
+                        detail
+                        onDetail={() => {
+                          setCurrentIndex(e.index);
+                          setShowProd(true);
+                        }}
+                        label={"[name]"}
+                        placeholder="Pilih Produk"
+                        errorMessage="Produk Belum Dipilih"
+                        error={error?.rej[e.index]?.id}
+                      />
+                    )}
                   />
-                )}
-              />
 
-              <Column
-                header="Satuan"
-                className="align-text-top"
-                field={""}
-                body={(e) => (
-                  <CustomDropdown
-                    value={e.unit_id && checkUnit(e.unit_id)}
-                    onChange={(u) => {
-                      let temp = [...phj.reject];
-                      temp[e.index].unit_id = u.id;
-                      updatePHJ({ ...phj, reject: temp });
-                    }}
-                    option={satuan}
-                    detail
-                    onDetail={() => {
-                      setCurrentIndex(e.index);
-                      setShowSatuan(true);
-                    }}
-                    label={"[name]"}
-                    placeholder="Pilih Satuan"
+                  <Column
+                    header="Satuan"
+                    className="align-text-top"
+                    field={""}
+                    body={(e) => (
+                      <CustomDropdown
+                        value={e.unit_id && checkUnit(e.unit_id)}
+                        onChange={(u) => {
+                          let temp = [...phj.reject];
+                          temp[e.index].unit_id = u.id;
+                          updatePHJ({ ...phj, reject: temp });
+                        }}
+                        option={satuan}
+                        detail
+                        onDetail={() => {
+                          setCurrentIndex(e.index);
+                          setShowSatuan(true);
+                        }}
+                        label={"[name]"}
+                        placeholder="Pilih Satuan"
+                      />
+                    )}
                   />
-                )}
-              />
 
-              <Column
-                header="Jumlah"
-                className="align-text-top"
-                field={""}
-                body={(e) => (
-                  <PrimeNumber
-                    value={e.qty && e.qty}
-                    onChange={(u) => {
-                      let temp = [...phj.reject];
-                      temp[e.index].qty = u.target.value;
-                      updatePHJ({ ...phj, reject: temp });
+                  <Column
+                    header="Jumlah"
+                    className="align-text-top"
+                    field={""}
+                    body={(e) => (
+                      <PrimeNumber
+                        value={e.qty && e.qty}
+                        onChange={(u) => {
+                          let temp = [...phj.reject];
+                          temp[e.index].qty = u.target.value;
+                          updatePHJ({ ...phj, reject: temp });
 
-                      let newError = error;
-                      newError.rej[e.index].qty = false;
-                      setError(newError);
-                    }}
-                    placeholder="0"
-                    type="number"
-                    min={0}
-                    error={error?.rej[e.index]?.qty}
+                          let newError = error;
+                          newError.rej[e.index].qty = false;
+                          setError(newError);
+                        }}
+                        placeholder="0"
+                        type="number"
+                        min={0}
+                        error={error?.rej[e.index]?.qty}
+                      />
+                    )}
                   />
-                )}
-              />
 
-              <Column
-                header=""
-                className=" align-text-top"
-                field={""}
-                body={(e) =>
-                  e.index === phj.reject.length - 1 ? (
-                    <Link
-                      onClick={() => {
-                        let newError = error;
-                        newError.rej.push({
-                          qty: false,
-                        });
-                        setError(newError);
+                  <Column
+                    header=""
+                    className=" align-text-top"
+                    field={""}
+                    body={(e) =>
+                      e.index === phj.reject.length - 1 ? (
+                        <Link
+                          onClick={() => {
+                            let newError = error;
+                            newError.rej.push({
+                              qty: false,
+                            });
+                            setError(newError);
 
-                        updatePHJ({
-                          ...phj,
-                          reject: [
-                            ...phj.reject,
-                            {
-                              id: 0,
-                              prod_id: null,
-                              unit_id: null,
-                              qty: null,
-                            },
-                          ],
-                        });
-                      }}
-                      className="btn btn-primary shadow btn-xs sharp"
-                    >
-                      <i className="fa fa-plus"></i>
-                    </Link>
-                  ) : (
-                    <Link
-                      onClick={() => {
-                        let temp = [...phj.reject];
-                        temp.splice(e.index, 1);
-                        updatePHJ({ ...phj, reject: temp });
-                      }}
-                      className="btn btn-danger shadow btn-xs sharp"
-                    >
-                      <i className="fa fa-trash"></i>
-                    </Link>
-                  )
-                }
-              />
-            </DataTable>
+                            updatePHJ({
+                              ...phj,
+                              reject: [
+                                ...phj.reject,
+                                {
+                                  id: 0,
+                                  prod_id: null,
+                                  unit_id: null,
+                                  qty: null,
+                                },
+                              ],
+                            });
+                          }}
+                          className="btn btn-primary shadow btn-xs sharp"
+                        >
+                          <i className="fa fa-plus"></i>
+                        </Link>
+                      ) : (
+                        <Link
+                          onClick={() => {
+                            let temp = [...phj.reject];
+                            temp.splice(e.index, 1);
+                            updatePHJ({ ...phj, reject: temp });
+                          }}
+                          className="btn btn-danger shadow btn-xs sharp"
+                        >
+                          <i className="fa fa-trash"></i>
+                        </Link>
+                      )
+                    }
+                  />
+                </DataTable>
+              </Card.Body>
+            </Card>
           </TabPanel>
         </TabView>
         <div className="row mb-8">

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { request, endpoints } from "src/utils";
-import { Row, Col } from "react-bootstrap";
+import { Row, Col, Card } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { SET_CURRENT_PBN } from "src/redux/actions";
@@ -243,9 +243,9 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
           <div className="col-2 text-black">
             <PrimeInput
               label={"Kode Pembebanan"}
-              value={pbn.pcode}
+              value={pbn.ucode}
               onChange={(e) => {
-                updatePBN({ ...pbn, pcode: e.target.value });
+                updatePBN({ ...pbn, ucode: e.target.value });
                 let newError = error;
                 newError.code = false;
                 setError(newError);
@@ -378,189 +378,197 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
           onTabChange={(e) => setActive(e.index)}
         >
           <TabPanel header="Upah">
-            <DataTable
-              responsiveLayout="none"
-              value={pbn.upah?.map((v, i) => {
-                return {
-                  ...v,
-                  index: i,
-                  // order: v?.order ?? 0,
-                };
-              })}
-              className="display w-150 datatable-wrapper header-white no-border"
-              showGridlines={false}
-              emptyMessage={() => <div></div>}
-            >
-              <Column
-                header="Akun Upah"
-                className="col-4 align-text-top"
-                field={""}
-                body={(e) => (
-                  <CustomDropdown
-                    value={e.acc_id && checkAcc(e.acc_id)}
-                    option={acc}
-                    onChange={(u) => {
-                      let temp = [...pbn.upah];
-                      temp[e.index].acc_id = u.account.id;
-                      updatePBN({ ...pbn, upah: temp });
+            <Card>
+              <Card.Body>
+                <DataTable
+                  responsiveLayout="none"
+                  value={pbn.upah?.map((v, i) => {
+                    return {
+                      ...v,
+                      index: i,
+                      // order: v?.order ?? 0,
+                    };
+                  })}
+                  className="display w-150 datatable-wrapper header-white no-border"
+                  showGridlines={false}
+                  emptyMessage={() => <div></div>}
+                >
+                  <Column
+                    header="Akun Upah"
+                    className="col-4 align-text-top"
+                    field={""}
+                    body={(e) => (
+                      <CustomDropdown
+                        value={e.acc_id && checkAcc(e.acc_id)}
+                        option={acc}
+                        onChange={(u) => {
+                          let temp = [...pbn.upah];
+                          temp[e.index].acc_id = u.account.id;
+                          updatePBN({ ...pbn, upah: temp });
 
-                      let newError = error;
-                      newError.prod[e.index].id = false;
-                      setError(newError);
-                    }}
-                    detail
-                    onDetail={() => {
-                      setCurrentIndex(e.index);
-                      setShowAcc(true);
-                    }}
-                    label={"[account.acc_name] - [account.acc_code]"}
-                    placeholder="Pilih Akun Upah"
-                    errorMessage="Akun Belum Dipilih"
-                    error={error?.prod[e.index]?.id}
+                          // let newError = error;
+                          // // newError.prod[e.index].id = false;
+                          // setError(newError);
+                        }}
+                        detail
+                        onDetail={() => {
+                          setCurrentIndex(e.index);
+                          setShowAcc(true);
+                        }}
+                        label={"[account.acc_name] - [account.acc_code]"}
+                        placeholder="Pilih Akun Upah"
+                        errorMessage="Akun Belum Dipilih"
+                        // error={error?.prod[e.index]?.id}
+                      />
+                    )}
                   />
-                )}
-              />
 
-              {/* <div className="col-"></div> */}
+                  {/* <div className="col-"></div> */}
 
-              <Column
-                header=""
-                className="align-text-top"
-                field={""}
-                body={(e) =>
-                  e.index === pbn.upah.length - 1 ? (
-                    <Link
-                      onClick={() => {
-                        let newError = error;
-                        newError.prod.push({
-                          qty: false,
-                          aloc: false,
-                        });
-                        setError(newError);
+                  <Column
+                    header=""
+                    className="align-text-top"
+                    field={""}
+                    body={(e) =>
+                      e.index === pbn.upah.length - 1 ? (
+                        <Link
+                          onClick={() => {
+                            let newError = error;
+                            newError.prod.push({
+                              qty: false,
+                              aloc: false,
+                            });
+                            setError(newError);
 
-                        updatePBN({
-                          ...pbn,
-                          upah: [
-                            ...pbn.upah,
-                            {
-                              id: 0,
-                              acc_id: null,
-                            },
-                          ],
-                        });
-                      }}
-                      className="btn btn-primary shadow btn-xs sharp"
-                    >
-                      <i className="fa fa-plus"></i>
-                    </Link>
-                  ) : (
-                    <Link
-                      onClick={() => {
-                        let temp = [...pbn.upah];
-                        temp.splice(e.index, 1);
-                        updatePBN({ ...pbn, upah: temp });
-                      }}
-                      className="btn btn-danger shadow btn-xs sharp"
-                    >
-                      <i className="fa fa-trash"></i>
-                    </Link>
-                  )
-                }
-              />
-            </DataTable>
+                            updatePBN({
+                              ...pbn,
+                              upah: [
+                                ...pbn.upah,
+                                {
+                                  id: 0,
+                                  acc_id: null,
+                                },
+                              ],
+                            });
+                          }}
+                          className="btn btn-primary shadow btn-xs sharp"
+                        >
+                          <i className="fa fa-plus"></i>
+                        </Link>
+                      ) : (
+                        <Link
+                          onClick={() => {
+                            let temp = [...pbn.upah];
+                            temp.splice(e.index, 1);
+                            updatePBN({ ...pbn, upah: temp });
+                          }}
+                          className="btn btn-danger shadow btn-xs sharp"
+                        >
+                          <i className="fa fa-trash"></i>
+                        </Link>
+                      )
+                    }
+                  />
+                </DataTable>
+              </Card.Body>
+            </Card>
           </TabPanel>
 
           <TabPanel header="Overhead">
-            <DataTable
-              responsiveLayout="none"
-              value={pbn.overhead?.map((v, i) => {
-                return {
-                  ...v,
-                  index: i,
-                  // order: v?.order ?? 0,
-                };
-              })}
-              className="display w-150 datatable-wrapper header-white no-border"
-              showGridlines={false}
-              emptyMessage={() => <div></div>}
-            >
-              <Column
-                header="Akun Overhead"
-                className="col-4 align-text-top"
-                field={""}
-                body={(e) => (
-                  <CustomDropdown
-                    value={e.acc_id && checkAcc(e.acc_id)}
-                    option={acc}
-                    onChange={(u) => {
-                      let temp = [...pbn.overhead];
-                      temp[e.index].acc_id = u.account.id;
-                      updatePBN({ ...pbn, overhead: temp });
+            <Card>
+              <Card.Body>
+                <DataTable
+                  responsiveLayout="none"
+                  value={pbn.overhead?.map((v, i) => {
+                    return {
+                      ...v,
+                      index: i,
+                      // order: v?.order ?? 0,
+                    };
+                  })}
+                  className="display w-150 datatable-wrapper header-white no-border"
+                  showGridlines={false}
+                  emptyMessage={() => <div></div>}
+                >
+                  <Column
+                    header="Akun Overhead"
+                    className="col-4 align-text-top"
+                    field={""}
+                    body={(e) => (
+                      <CustomDropdown
+                        value={e.acc_id && checkAcc(e.acc_id)}
+                        option={acc}
+                        onChange={(u) => {
+                          let temp = [...pbn.overhead];
+                          temp[e.index].acc_id = u.account.id;
+                          updatePBN({ ...pbn, overhead: temp });
 
-                      let newError = error;
-                      newError.prod[e.index].id = false;
-                      setError(newError);
-                    }}
-                    detail
-                    onDetail={() => {
-                      setCurrentIndex(e.index);
-                      setShowAcc(true);
-                    }}
-                    label={"[account.acc_name] - [account.acc_code]"}
-                    placeholder="Pilih Akun Overhead"
-                    errorMessage="Akun Belum Dipilih"
-                    error={error?.prod[e.index]?.id}
+                          // let newError = error;
+                          // newError.prod[e.index].id = false;
+                          // setError(newError);
+                        }}
+                        detail
+                        onDetail={() => {
+                          setCurrentIndex(e.index);
+                          setShowAcc(true);
+                        }}
+                        label={"[account.acc_name] - [account.acc_code]"}
+                        placeholder="Pilih Akun Overhead"
+                        errorMessage="Akun Belum Dipilih"
+                        // error={error?.prod[e.index]?.id}
+                      />
+                    )}
                   />
-                )}
-              />
 
-              {/* <div className="col-"></div> */}
+                  {/* <div className="col-"></div> */}
 
-              <Column
-                header=""
-                className="align-text-top"
-                field={""}
-                body={(e) =>
-                  e.index === pbn.overhead.length - 1 ? (
-                    <Link
-                      onClick={() => {
-                        let newError = error;
-                        newError.prod.push({
-                          qty: false,
-                          aloc: false,
-                        });
-                        setError(newError);
+                  <Column
+                    header=""
+                    className="align-text-top"
+                    field={""}
+                    body={(e) =>
+                      e.index === pbn.overhead.length - 1 ? (
+                        <Link
+                          onClick={() => {
+                            let newError = error;
+                            newError.prod.push({
+                              qty: false,
+                              aloc: false,
+                            });
+                            setError(newError);
 
-                        updatePBN({
-                          ...pbn,
-                          overhead: [
-                            ...pbn.overhead,
-                            {
-                              id: 0,
-                              acc_id: null,
-                            },
-                          ],
-                        });
-                      }}
-                      className="btn btn-primary shadow btn-xs sharp"
-                    >
-                      <i className="fa fa-plus"></i>
-                    </Link>
-                  ) : (
-                    <Link
-                      onClick={() => {
-                        let temp = [...pbn.overhead];
-                        temp.splice(e.index, 1);
-                        updatePBN({ ...pbn, overhead: temp });
-                      }}
-                      className="btn btn-danger shadow btn-xs sharp"
-                    >
-                      <i className="fa fa-trash"></i>
-                    </Link>
-                  )
-                }
-              />
-            </DataTable>
+                            updatePBN({
+                              ...pbn,
+                              overhead: [
+                                ...pbn.overhead,
+                                {
+                                  id: 0,
+                                  acc_id: null,
+                                },
+                              ],
+                            });
+                          }}
+                          className="btn btn-primary shadow btn-xs sharp"
+                        >
+                          <i className="fa fa-plus"></i>
+                        </Link>
+                      ) : (
+                        <Link
+                          onClick={() => {
+                            let temp = [...pbn.overhead];
+                            temp.splice(e.index, 1);
+                            updatePBN({ ...pbn, overhead: temp });
+                          }}
+                          className="btn btn-danger shadow btn-xs sharp"
+                        >
+                          <i className="fa fa-trash"></i>
+                        </Link>
+                      )
+                    }
+                  />
+                </DataTable>
+              </Card.Body>
+            </Card>
           </TabPanel>
         </TabView>
 
@@ -627,7 +635,12 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
 
             let tempm = [...pbn.overhead];
             temp[currentIndex].acc_id = e.data.account.id;
-            updatePBN({ ...pbn, code_acc: e.data.account.id, upah: temp, overhead: tempm });
+            updatePBN({
+              ...pbn,
+              code_acc: e.data.account.id,
+              upah: temp,
+              overhead: tempm,
+            });
           }
 
           setDoubleClick(true);

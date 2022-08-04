@@ -611,265 +611,277 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
               onTabChange={(e) => setActive(e.index)}
             >
               <TabPanel header="Produk Jadi">
-                <DataTable
-                  responsiveLayout="none"
-                  value={plan.product?.map((v, i) => {
-                    return {
-                      ...v,
-                      index: i,
-                      // order: v?.order ?? 0,
-                    };
-                  })}
-                  className="display w-150 datatable-wrapper header-white no-border"
-                  showGridlines={false}
-                  emptyMessage={() => <div></div>}
-                >
-                  <Column
-                    header="Produk"
-                    className="align-text-top"
-                    field={""}
-                    style={{
-                      width: "25rem",
-                    }}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.prod_id && checkProd(e.prod_id).name}
-                          placeholder="Nama Produk"
-                          disabled
-                        />
-                      </div>
-                    )}
-                  />
+                <Card>
+                  <Card.Body>
+                    <DataTable
+                      responsiveLayout="none"
+                      value={plan.product?.map((v, i) => {
+                        return {
+                          ...v,
+                          index: i,
+                          // order: v?.order ?? 0,
+                        };
+                      })}
+                      className="display w-150 datatable-wrapper header-white no-border"
+                      showGridlines={false}
+                      emptyMessage={() => <div></div>}
+                    >
+                      <Column
+                        header="Produk"
+                        className="align-text-top"
+                        field={""}
+                        style={{
+                          width: "25rem",
+                        }}
+                        body={(e) => (
+                          <div className="p-inputgroup">
+                            <InputText
+                              value={e.prod_id && checkProd(e.prod_id).name}
+                              placeholder="Nama Produk"
+                              disabled
+                            />
+                          </div>
+                        )}
+                      />
 
-                  <Column
-                    header="Satuan"
-                    className="align-text-top"
-                    field={""}
-                    style={{
-                      width: "15rem",
-                    }}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.unit_id && checkUnit(e.unit_id).name}
-                          placeholder="Satuan Produk"
-                          disabled
-                        />
-                      </div>
-                    )}
-                  />
+                      <Column
+                        header="Satuan"
+                        className="align-text-top"
+                        field={""}
+                        style={{
+                          width: "15rem",
+                        }}
+                        body={(e) => (
+                          <div className="p-inputgroup">
+                            <InputText
+                              value={e.unit_id && checkUnit(e.unit_id).name}
+                              placeholder="Satuan Produk"
+                              disabled
+                            />
+                          </div>
+                        )}
+                      />
 
-                  <Column
-                    header="Kuantitas"
-                    className="align-text-top"
-                    field={""}
-                    // style={{
-                    //   width: "5rem",
-                    // }}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.qty && e.qty}
-                          placeholder="0"
-                          disabled
-                        />
-                      </div>
-                    )}
-                  />
+                      <Column
+                        header="Kuantitas"
+                        className="align-text-top"
+                        field={""}
+                        // style={{
+                        //   width: "5rem",
+                        // }}
+                        body={(e) => (
+                          <div className="p-inputgroup">
+                            <InputText
+                              value={e.qty && e.qty}
+                              placeholder="0"
+                              disabled
+                            />
+                          </div>
+                        )}
+                      />
 
-                  <Column
-                    header="Cost Alokasi (%)"
-                    className="align-text-top"
-                    field={""}
-                    // style={{
-                    //   minWidth: "7rem",
-                    // }}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.aloc && e.aloc}
-                          placeholder="0"
-                          disabled
-                        />
-                      </div>
-                    )}
-                  />
-                </DataTable>
+                      <Column
+                        header="Cost Alokasi (%)"
+                        className="align-text-top"
+                        field={""}
+                        // style={{
+                        //   minWidth: "7rem",
+                        // }}
+                        body={(e) => (
+                          <div className="p-inputgroup">
+                            <InputText
+                              value={e.aloc && e.aloc}
+                              placeholder="0"
+                              disabled
+                            />
+                          </div>
+                        )}
+                      />
+                    </DataTable>
+                  </Card.Body>
+                </Card>
               </TabPanel>
 
               <TabPanel header="Bahan">
-                <DataTable
-                  responsiveLayout="none"
-                  value={plan.material?.map((v, i) => {
-                    return {
-                      ...v,
-                      index: i,
-                      // order: v?.order ?? 0,
-                      // price: v?.price ?? 0,
-                    };
-                  })}
-                  className="display w-150 datatable-wrapper header-white no-border"
-                  showGridlines={false}
-                  emptyMessage={() => <div></div>}
-                >
-                  <Column
-                    header="Bahan"
-                    className="align-text-top"
-                    field={""}
-                    style={{
-                      width: "25rem",
-                    }}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.prod_id && checkProd(e.prod_id).name}
-                          placeholder="Nama Produk"
-                          disabled
-                        />
-                      </div>
-                    )}
-                  />
-
-                  <Column
-                    header="Satuan"
-                    className="align-text-top"
-                    field={""}
-                    style={{
-                      width: "15rem",
-                    }}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.unit_id && checkUnit(e.unit_id).name}
-                          placeholder="Satuan Produk"
-                          disabled
-                        />
-                      </div>
-                    )}
-                  />
-
-                  <Column
-                    header="Kuantitas"
-                    className="align-text-top"
-                    field={""}
-                    // style={{
-                    //   width: "5rem",
-                    // }}
-                    body={(e) => (
-                      <PrimeNumber
-                        value={e.qty ? e.qty : ""}
-                        placeholder="0"
-                        disabled
+                <Card>
+                  <Card.Body>
+                    <DataTable
+                      responsiveLayout="none"
+                      value={plan.material?.map((v, i) => {
+                        return {
+                          ...v,
+                          index: i,
+                          // order: v?.order ?? 0,
+                          // price: v?.price ?? 0,
+                        };
+                      })}
+                      className="display w-150 datatable-wrapper header-white no-border"
+                      showGridlines={false}
+                      emptyMessage={() => <div></div>}
+                    >
+                      <Column
+                        header="Bahan"
+                        className="align-text-top"
+                        field={""}
+                        style={{
+                          width: "25rem",
+                        }}
+                        body={(e) => (
+                          <div className="p-inputgroup">
+                            <InputText
+                              value={e.prod_id && checkProd(e.prod_id).name}
+                              placeholder="Nama Produk"
+                              disabled
+                            />
+                          </div>
+                        )}
                       />
-                    )}
-                  />
 
-                  <Column
-                    header="Harga"
-                    className="align-text-top"
-                    field={""}
-                    // style={{
-                    //   minWidth: "7rem",
-                    // }}
-                    body={(e) => (
-                      <PrimeNumber
-                        value={e.price ? e.price : ""}
-                        placeholder="0"
-                        disabled
+                      <Column
+                        header="Satuan"
+                        className="align-text-top"
+                        field={""}
+                        style={{
+                          width: "15rem",
+                        }}
+                        body={(e) => (
+                          <div className="p-inputgroup">
+                            <InputText
+                              value={e.unit_id && checkUnit(e.unit_id).name}
+                              placeholder="Satuan Produk"
+                              disabled
+                            />
+                          </div>
+                        )}
                       />
-                    )}
-                  />
-                </DataTable>
+
+                      <Column
+                        header="Kuantitas"
+                        className="align-text-top"
+                        field={""}
+                        // style={{
+                        //   width: "5rem",
+                        // }}
+                        body={(e) => (
+                          <PrimeNumber
+                            value={e.qty ? e.qty : ""}
+                            placeholder="0"
+                            disabled
+                          />
+                        )}
+                      />
+
+                      <Column
+                        header="Harga"
+                        className="align-text-top"
+                        field={""}
+                        // style={{
+                        //   minWidth: "7rem",
+                        // }}
+                        body={(e) => (
+                          <PrimeNumber
+                            value={e.price ? e.price : ""}
+                            placeholder="0"
+                            disabled
+                          />
+                        )}
+                      />
+                    </DataTable>
+                  </Card.Body>
+                </Card>
               </TabPanel>
 
               <TabPanel header="Mesin">
-                <DataTable
-                  responsiveLayout="none"
-                  value={plan.mesin?.map((v, i) => {
-                    return {
-                      ...v,
-                      index: i,
-                      // order: v?.order ?? 0,
-                      // price: v?.price ?? 0,
-                    };
-                  })}
-                  className="display w-150 datatable-wrapper header-white no-border"
-                  showGridlines={false}
-                  emptyMessage={() => <div></div>}
-                >
-                  <Column
-                    header="Kode Mesin"
-                    className="align-text-top"
-                    field={""}
-                    style={{
-                      width: "20rem",
-                    }}
-                    body={(e) => (
-                      <CustomDropdown
-                        value={e.mch_id && checkMsn(e.mch_id)}
-                        option={mesin}
-                        onChange={(t) => {
-                          let temp = [...plan.mesin];
-                          temp[e.index].mch_id = t.id;
-                          updatePL({ ...plan, mesin: temp });
+                <Card>
+                  <Card.Body>
+                    <DataTable
+                      responsiveLayout="none"
+                      value={plan.mesin?.map((v, i) => {
+                        return {
+                          ...v,
+                          index: i,
+                          // order: v?.order ?? 0,
+                          // price: v?.price ?? 0,
+                        };
+                      })}
+                      className="display w-150 datatable-wrapper header-white no-border"
+                      showGridlines={false}
+                      emptyMessage={() => <div></div>}
+                    >
+                      <Column
+                        header="Kode Mesin"
+                        className="align-text-top"
+                        field={""}
+                        style={{
+                          width: "20rem",
+                        }}
+                        body={(e) => (
+                          <CustomDropdown
+                            value={e.mch_id && checkMsn(e.mch_id)}
+                            option={mesin}
+                            onChange={(t) => {
+                              let temp = [...plan.mesin];
+                              temp[e.index].mch_id = t.id;
+                              updatePL({ ...plan, mesin: temp });
 
-                          let newError = error;
-                          newError.msn[e.index].id = false;
-                          setError(newError);
-                        }}
-                        detail
-                        onDetail={() => {
-                          setCurrentIndex(e.index);
-                          setShowMsn(true);
-                        }}
-                        label={"[msn_name]"}
-                        placeholder="Pilih Mesin"
-                        errorMessage="Mesin Belum Dipilih"
-                        error={error?.msn[e.index]?.id}
+                              let newError = error;
+                              newError.msn[e.index].id = false;
+                              setError(newError);
+                            }}
+                            detail
+                            onDetail={() => {
+                              setCurrentIndex(e.index);
+                              setShowMsn(true);
+                            }}
+                            label={"[msn_name]"}
+                            placeholder="Pilih Mesin"
+                            errorMessage="Mesin Belum Dipilih"
+                            error={error?.msn[e.index]?.id}
+                          />
+                        )}
                       />
-                    )}
-                  />
 
-                  <Column
-                    className="align-text-top"
-                    body={(e) =>
-                      e.index === plan.mesin.length - 1 ? (
-                        <Link
-                          onClick={() => {
-                            updatePL({
-                              ...plan,
-                              mesin: [
-                                ...plan.mesin,
-                                {
-                                  id: 0,
-                                  mch_id: null,
-                                },
-                              ],
-                            });
-                          }}
-                          className="btn btn-primary shadow btn-xs sharp ml-1"
-                        >
-                          <i className="fa fa-plus"></i>
-                        </Link>
-                      ) : (
-                        <Link
-                          onClick={() => {
-                            let temp = [...plan.mesin];
-                            temp.splice(e.index, 1);
-                            updatePL({
-                              ...plan,
-                              mesin: temp,
-                            });
-                          }}
-                          className="btn btn-danger shadow btn-xs sharp ml-1"
-                        >
-                          <i className="fa fa-trash"></i>
-                        </Link>
-                      )
-                    }
-                  />
-                </DataTable>
+                      <Column
+                        className="align-text-top"
+                        body={(e) =>
+                          e.index === plan.mesin.length - 1 ? (
+                            <Link
+                              onClick={() => {
+                                updatePL({
+                                  ...plan,
+                                  mesin: [
+                                    ...plan.mesin,
+                                    {
+                                      id: 0,
+                                      mch_id: null,
+                                    },
+                                  ],
+                                });
+                              }}
+                              className="btn btn-primary shadow btn-xs sharp ml-1"
+                            >
+                              <i className="fa fa-plus"></i>
+                            </Link>
+                          ) : (
+                            <Link
+                              onClick={() => {
+                                let temp = [...plan.mesin];
+                                temp.splice(e.index, 1);
+                                updatePL({
+                                  ...plan,
+                                  mesin: temp,
+                                });
+                              }}
+                              className="btn btn-danger shadow btn-xs sharp ml-1"
+                            >
+                              <i className="fa fa-trash"></i>
+                            </Link>
+                          )
+                        }
+                      />
+                    </DataTable>
+                  </Card.Body>
+                </Card>
               </TabPanel>
             </TabView>
           </>

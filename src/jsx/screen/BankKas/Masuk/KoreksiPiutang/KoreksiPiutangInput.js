@@ -16,8 +16,9 @@ import DataCustomer from "src/jsx/screen/Mitra/Pelanggan/DataCustomer";
 
 const KoreksiARInput = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
-  const [currentItem, setCurrentItem] = useState(null);
+  const [currentItem, setCurrentItem] = useState(def);
   const toast = useRef(null);
+
   const [doubleClick, setDoubleClick] = useState(false);
   const kp = useSelector((state) => state.kp.current);
   const isEdit = useSelector((state) => state.kp.editKp);
@@ -37,6 +38,9 @@ const KoreksiARInput = ({ onCancel, onSuccess }) => {
     getCustomer();
     getAcc();
   }, []);
+  const def = {
+    type: null,
+  };
 
   const getCustomer = async () => {
     const config = {
@@ -68,6 +72,16 @@ const KoreksiARInput = ({ onCancel, onSuccess }) => {
         setAcc(data);
       }
     } catch (error) {}
+  };
+
+  const getType = (nilai) => {
+    let typ = {};
+    type.forEach((element) => {
+      if (nilai === element.id) {
+        typ = element;
+      }
+    });
+    return typ;
   };
 
   const editKP = async () => {
@@ -146,6 +160,10 @@ const KoreksiARInput = ({ onCancel, onSuccess }) => {
 
     return selected;
   };
+  const type = [
+    { name: "Nota Debit", id: 1 },
+    { name: "Nota Kredit", id: 2 },
+  ];
 
   const cuss = (value) => {
     let selected = {};
@@ -250,8 +268,8 @@ const KoreksiARInput = ({ onCancel, onSuccess }) => {
             <label className="text-label">Type Koreksi</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={kp.type && kp.type}
-                options={rp}
+                value={kp.type !== null ? getType(kp.type) : null}
+                options={type}
                 onChange={(e) => {
                   updateKP({
                     ...kp,

@@ -343,7 +343,6 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
     });
   };
 
-
   const header = () => {
     return (
       <h4 className="mb-5">

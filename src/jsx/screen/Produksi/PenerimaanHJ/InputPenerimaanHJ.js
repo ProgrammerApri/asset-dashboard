@@ -394,7 +394,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
         <Toast ref={toast} />
 
         <Row className="mb-3">
-          <div className="col-2 text-black">
+          <div className="col-3 text-black">
             <PrimeInput
               label={"Kode Penerimaan"}
               value={phj.phj_code}
@@ -428,31 +428,8 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-2 text-black">
-            <PrimeInput
-              label={"Satuan Produksi"}
-              value={
-                phj.batch_id !== null
-                  ? checkbtc(phj.batch_id)?.plan_id?.unit?.name
-                  : ""
-              }
-              placeholder="Satuan Produksi"
-              disabled
-            />
-          </div>
-          <div className="col-6 text-black"></div>
-          <div className="col-2 text-black">
-            <PrimeInput
-              label={"Total Pembuatan"}
-              value={
-                phj.batch_id !== null
-                  ? checkbtc(phj.batch_id)?.plan_id?.total
-                  : ""
-              }
-              placeholder="Total Pembuatan"
-              disabled
-            />
-          </div>
+         
+          
 
           <div className="col-12 p-0 text-black">
             <div className="mt-4 mb-2 ml-3 mr-3 fs-13">
@@ -480,6 +457,8 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
               error={error?.btc}
             />
           </div>
+
+          
           <div className="col-2 text-black">
             <PrimeInput
               label={"Tanggal Batch"}
@@ -505,6 +484,33 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
               disabled
             />
           </div>
+
+          <div className="col-2 text-black"></div>
+          <div className="col-2 text-black">
+            <PrimeInput
+              label={"Total Pembuatan"}
+              value={
+                phj.batch_id !== null
+                  ? checkbtc(phj.batch_id)?.plan_id?.total
+                  : ""
+              }
+              placeholder="Total Pembuatan"
+              disabled
+            />
+          </div>
+          <div className="col-2 text-black">
+            <PrimeInput
+              label={"Satuan Produksi"}
+              value={
+                phj.batch_id !== null
+                  ? checkbtc(phj.batch_id)?.plan_id?.unit?.name
+                  : ""
+              }
+              placeholder="Satuan Produksi"
+              disabled
+            />
+          </div>
+          
 
           <div className="col-8 text-black"></div>
 

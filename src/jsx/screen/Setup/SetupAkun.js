@@ -36,6 +36,7 @@ const set = {
   sto_hpp_diff: null,
   sto_wip: null,
   fixed_assets: null,
+  costing: null
 };
 
 const SetupAkun = () => {
@@ -732,12 +733,77 @@ const SetupAkun = () => {
     );
   };
 
+  const renderCosting = () => {
+    return (
+      <CustomAccordion
+        tittle={"Costing"}
+        defaultActive={false}
+        active={accor.lainnya}
+        onClick={() => {
+          setAccor({
+            ...accor,
+            lainnya: !accor.lainnya,
+          });
+        }}
+        key={1}
+        body={
+          <Row className="mr-0 ml-0">
+            <div className={"col-12"}>
+              {loading ? (
+                <>
+                  <Skeleton width="200px" />
+                  <Skeleton className="mt-3" height="45px" />
+                </>
+              ) : (
+                <>
+                  <label className="text-label">Jenis Costing</label>
+                  <div className="p-inputgroup">
+                    <Dropdown
+                      value={setup && setup?.costing}
+                      options={[
+                        { code: 1, name: "Standard Costing" },
+                        { code: 2, name: "Prepectual Costing" },
+                      ]}
+                      onChange={(e) => {
+                        setSetup({...setup, costing: e.value})
+                      }}
+                      optionLabel={(option) => (
+                        <div>
+                          {option !== null
+                            ? `${option.name}`
+                            : ""}
+                        </div>
+                      )}
+                      filter
+                      filterBy="name"
+                      placeholder="Pilih Jenis Costing"
+                      itemTemplate={(option) => (
+                        <div>
+                          {option !== null
+                            ? `${option.name}`
+                            : ""}
+                        </div>
+                      )}
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+          </Row>
+        }
+      />
+    );
+  };
+
   return (
     <>
       <Toast ref={toast} />
       <Row>
         <Col className="col-lg-6 col-sm-12 col-xs-12">
-          {renderArAp()} {renderPenjualan()} {renderPersediaan()}
+          {renderArAp()}
+          {renderPenjualan()}
+          {renderPersediaan()}
+          {renderCosting()}
         </Col>
 
         <Col className="col-lg-6 col-sm-12 col-xs-12">

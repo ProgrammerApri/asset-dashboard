@@ -183,44 +183,46 @@ const InputOrder = ({ onCancel, onSuccess }) => {
         const { data } = response;
         let filt = [];
         data.forEach((elem) => {
-          let prod = [];
-          elem.pprod.forEach((el) => {
-            el.prod_id = el.prod_id.id;
-            el.unit_id = el.unit_id.id;
-            prod.push({
-              ...el,
-              r_order: el.order,
-            });
+          if (elem.status !== 1) {
+            let prod = [];
+            elem.pprod.forEach((el) => {
+              el.prod_id = el.prod_id.id;
+              el.unit_id = el.unit_id.id;
+              prod.push({
+                ...el,
+                r_order: el.order,
+              });
 
-            let temp = [...order.dprod];
-            order.dprod.forEach((e, i) => {
-              if (el.id === e.pprod_id) {
-                temp[i].order = el.order;
-                updateORD({ ...order, dprod: temp });
-              }
+              let temp = [...order.dprod];
+              order.dprod.forEach((e, i) => {
+                if (el.id === e.pprod_id) {
+                  temp[i].order = el.order;
+                  updateORD({ ...order, dprod: temp });
+                }
+              });
             });
-          });
-          elem.pprod = prod;
+            elem.pprod = prod;
 
-          let jasa = [];
-          elem.pjasa.forEach((element) => {
-            element.jasa_id = element.jasa_id.id;
-            element.unit_id = element.unit_id.id;
-            jasa.push({
-              ...element,
-              r_order: element.order,
-            });
+            let jasa = [];
+            elem.pjasa.forEach((element) => {
+              element.jasa_id = element.jasa_id.id;
+              element.unit_id = element.unit_id.id;
+              jasa.push({
+                ...element,
+                r_order: element.order,
+              });
 
-            let temp = [...order.djasa];
-            order.djasa.forEach((e, i) => {
-              if (el.id == e.pjasa_id) {
-                temp[i].order = el.order;
-                updateORD({ ...order, djasa: temp });
-              }
+              let temp = [...order.djasa];
+              order.djasa.forEach((e, i) => {
+                if (el.id == e.pjasa_id) {
+                  temp[i].order = el.order;
+                  updateORD({ ...order, djasa: temp });
+                }
+              });
             });
-          });
-          elem.pjasa = jasa;
-          filt.push(elem);
+            elem.pjasa = jasa;
+            filt.push(elem);
+          }
         });
         setPO(filt);
       }
@@ -571,7 +573,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
         if (element.jasa_id || element.order || element.price) {
           errors.jasa[i] = {
             id: !element.jasa_id,
-            jum: !element.order || element.order === "" || element.order === "0",
+            jum:
+              !element.order || element.order === "" || element.order === "0",
             prc:
               !element.price || element.price === "" || element.price === "0",
           };
@@ -718,12 +721,27 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                 let newError = error;
                 newError.sup = false;
                 newError.rul = false;
-                newError.prod[0].id = false;
-                newError.prod[0].jum = false;
-                newError.prod[0].prc = false;
-                newError.jasa[0].id = false;
-                newError.jasa[0].jum = false;
-                newError.jasa[0].prc = false;
+
+                let eprod = [];
+                e.pprod.forEach((el) => {
+                  eprod.push({
+                    id: false,
+                    lok: false,
+                    jum: false,
+                    prc: false,
+                  });
+                });
+                newError.prod = eprod;
+
+                let ejasa = [];
+                e.pjasa.forEach((el) => {
+                  ejasa.push({
+                    id: false,
+                    jum: false,
+                  });
+                });
+                newError.jasa = ejasa;
+
                 setError(newError);
               }}
               placeholder="Pilih No. Pesanan Pembelian"

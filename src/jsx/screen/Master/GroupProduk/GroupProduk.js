@@ -18,6 +18,7 @@ import { TabPanel, TabView } from "primereact/tabview";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import { InputSwitch } from "primereact/inputswitch";
 
 const def = {
   groupPro: {
@@ -81,6 +82,8 @@ const DataGroupProduk = ({
   const [position, setPosition] = useState("center");
   const [currentItem, setCurrentItem] = useState(def);
   const toast = useRef(null);
+  const [checked1, setChecked1] = useState(false);
+  const [checked2, setChecked2] = useState(true);
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
   const [isEdit, setEdit] = useState(def);
@@ -778,6 +781,19 @@ const DataGroupProduk = ({
                   </div>
                 </div>
               </div>
+
+              <div className="col-12"></div>
+              <div className="row mr-0 ml-0">
+                <div className="col-12">
+                  <label className="text-label">Group Produk Bahan Baku</label>
+                  <div className="p-inputgroup">
+                    <InputSwitch
+                      checked={checked1}
+                      onChange={(e) => setChecked1(e.value)}
+                    />
+                  </div>
+                </div>
+              </div>
             </TabPanel>
 
             <TabPanel
@@ -857,7 +873,7 @@ const DataGroupProduk = ({
               </div>
 
               <div className="row mr-0 ml-0">
-                <div className="col-12">
+                <div className="col-6">
                   <PrimeDropdown
                     label={"Akun Penerimaan Barang"}
                     value={
@@ -891,7 +907,45 @@ const DataGroupProduk = ({
                     error={error[1]?.acc_3}
                   />
                 </div>
+                <div className="col-6">
+                  <PrimeDropdown
+                    label={"Akun WIP"}
+                    value={
+                      currentItem !== null &&
+                      currentItem.groupPro.acc_terima !== null
+                        ? gl(currentItem.groupPro.acc_terima)
+                        : null
+                    }
+                    options={account}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        groupPro: {
+                          ...currentItem.groupPro,
+                          acc_terima: e.value?.account?.id ?? null,
+                        },
+                      });
+                      let newError = error;
+                      newError[1].acc_3 = false;
+                      setError(newError);
+                    }}
+                    optionLabel="account.acc_name"
+                    valueTemplate={clear}
+                    itemTemplate={glTemplate}
+                    filter
+                    filterBy="account.acc_name"
+                    placeholder="Pilih Akun Penerimaan"
+                    showClear
+                    disabled
+                    errorMessage="Akun Penerimaan Belum Dipilih"
+                    error={error[1]?.acc_3}
+                  />
+                </div>
               </div>
+              
+                
+            
 
               <div className="col-12 p-0">
                 <div className="mt-4 ml-3 mr-3 fs-16 mb-2">

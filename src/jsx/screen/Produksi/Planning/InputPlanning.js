@@ -22,12 +22,14 @@ import { Dropdown } from "primereact/dropdown";
 import DataMesin from "../Mesin/DataMesin";
 import { TabPanel, TabView } from "primereact/tabview";
 import { Divider } from "@material-ui/core";
+import DataPusatBiaya from "../../MasterLainnya/PusatBiaya/DataPusatBiaya";
 
 const defError = {
   code: false,
   name: false,
   date: false,
   rp: false,
+  dep: false,
   fm: false,
   un: false,
   msn: [
@@ -49,10 +51,12 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
   const [showProd, setShowProd] = useState(false);
   const [showSatuan, setShowSatuan] = useState(false);
   const [showMsn, setShowMsn] = useState(false);
+  const [showDept, setShowDept] = useState(false);
   const [product, setProduct] = useState(null);
   const [satuan, setSatuan] = useState(null);
   const [mesin, setMesin] = useState(null);
   const [formula, setFormula] = useState(null);
+  const [dept, setDept] = useState(null);
   const [error, setError] = useState(defError);
   const [active, setActive] = useState(0);
 
@@ -66,6 +70,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
     getMesin();
     getProduct();
     getSatuan();
+    getDept()
   }, []);
 
   const getFormula = async () => {
@@ -151,6 +156,22 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
       if (response.status) {
         const { data } = response;
         setSatuan(data);
+      }
+    } catch (error) {}
+  };
+
+  const getDept = async () => {
+    const config = {
+      ...endpoints.pusatBiaya,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setDept(data);
       }
     } catch (error) {}
   };
@@ -244,6 +265,17 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
+  const checkDept = (value) => {
+    let selected = {};
+    dept?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
   const checkFm = (value) => {
     let selected = {};
     formula?.forEach((element) => {
@@ -305,6 +337,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
       name: !plan.pname || plan.pname === "",
       date: !plan.date_planing || plan.date_planing === "",
       rp: !plan.total || plan.total === "",
+      dep: !plan.dep_id,
       fm: !plan.form_id,
       un: !plan.unit,
       msn: [],
@@ -349,6 +382,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
       !errors.code &&
       !errors.name &&
       !errors.date &&
+      !errors.dep &&
       !errors.fm &&
       !errors.rp &&
       !errors.un &&
@@ -425,6 +459,27 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
             />
           </div>
 
+          <div className="col-3">
+            <label className="text-black">Departemen</label>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
+              value={plan.dep_id && checkDept(plan.dep_id)}
+              option={dept}
+              onChange={(e) => {
+                updatePL({ ...plan, dep_id: e.id });
+                let newError = error;
+                newError.dep = false;
+                setError(newError);
+              }}
+              placeholder="Pilih Departemen"
+              detail
+              onDetail={() => setShowDept(true)}
+              label={"[ccost_name] - [ccost_code]"}
+              errorMessage="Departemen Belum Dipilih"
+              error={error?.dep}
+            />
+          </div>
+
           <div className="col-2 text-black">
             <PrimeCalendar
               label={"Rencana Produksi"}
@@ -443,7 +498,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-3 text-black">
+          <div className="col-2 text-black">
             <PrimeNumber
               label={"Rencana Pembuatan"}
               value={plan.total}
@@ -469,7 +524,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-3">
+          <div className="col-2">
             <label className="text-black">Satuan</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
@@ -1052,6 +1107,37 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
               product: temp,
               material: tempm,
               unit: e.data.id,
+            });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataPusatBiaya
+        data={dept}
+        loading={false}
+        popUp={true}
+        show={showDept}
+        onHide={() => {
+          setShowDept(false);
+        }}
+        onInput={(e) => {
+          setShowDept(!e);
+        }}
+        onSuccessInput={(e) => {
+          getDept();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowDept(false);
+            updatePL({
+              ...plan,
+              dep_id: e.data.id,
             });
           }
 

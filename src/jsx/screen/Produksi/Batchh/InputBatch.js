@@ -2,23 +2,18 @@ import React, { useState, useEffect, useRef } from "react";
 import { request, endpoints } from "src/utils";
 import { Row, Col, Card } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
-import { Link } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_BTC } from "src/redux/actions";
 import { SET_CURRENT_FM } from "src/redux/actions";
-
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
-import { Dropdown } from "primereact/dropdown";
 import { Divider } from "@material-ui/core";
 import { TabPanel, TabView } from "primereact/tabview";
-import DataPusatBiaya from "../../MasterLainnya/PusatBiaya/DataPusatBiaya";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import DataProduk from "../../Master/Produk/DataProduk";
 import DataSatuan from "../../MasterLainnya/Satuan/DataSatuan";
@@ -26,7 +21,6 @@ import DataSatuan from "../../MasterLainnya/Satuan/DataSatuan";
 const defError = {
   code: false,
   date: false,
-  dep: false,
   pl: false,
 };
 
@@ -43,7 +37,6 @@ const InputBatch = ({ onCancel, onSuccess }) => {
   const dispatch = useDispatch();
   const [showSatuan, setShowSatuan] = useState(false);
   const [date, setDate] = useState(new Date());
-  const [showDept, setShowDept] = useState(false);
   const [product, setProduct] = useState(null);
   const [satuan, setSatuan] = useState(null);
   const [formula, setFormula] = useState(null);
@@ -101,9 +94,6 @@ const InputBatch = ({ onCancel, onSuccess }) => {
       type: SET_CURRENT_FM,
       payload: e,
     });
-  };
-  const updatePL = (e) => {
-    dispatch({});
   };
 
   const getSatuan = async () => {
@@ -370,11 +360,10 @@ const InputBatch = ({ onCancel, onSuccess }) => {
     let errors = {
       code: !btc.bcode || btc.bcode === "",
       date: !btc.batch_date || btc.batch_date === "",
-      dep: !btc.dep_id,
       pl: !btc.plan_id,
     };
 
-    valid = !errors.code && !errors.date && !errors.dep && !errors.pl;
+    valid = !errors.code && !errors.date && !errors.pl;
 
     setError(errors);
 
@@ -437,28 +426,6 @@ const InputBatch = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-3 text-black">
-            <label className="text-black">Departement</label>
-            <div className="p-inputgroup"></div>
-            <CustomDropdown
-              value={btc.dep_id && checkDept(btc.dep_id)}
-              onChange={(e) => {
-                updateBTC({ ...btc, dep_id: e.id });
-
-                let newError = error;
-                newError.dep = false;
-                setError(newError);
-              }}
-              option={dept}
-              detail
-              onDetail={() => setShowDept(true)}
-              label={"[ccost_name] - [ccost_code]"}
-              placeholder="Pilih Departement"
-              errorMessage="Departemen Belum Dipilih"
-              error={error?.dep}
-            />
-          </div>
-
           <div className="col-12 p-0 text-black">
             <div className="mt-4 mb-2 ml-3 mr-3 fs-13">
               <b>Informasi Planning</b>
@@ -500,6 +467,18 @@ const InputBatch = ({ onCancel, onSuccess }) => {
               placeholder="Masukan Nama Planning"
               disabled
             />
+          </div>
+          <div className="col-3 text-black">
+            <label className="text-black">Departement</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={
+                  btc.plan_id && checkPlan(btc.plan_id)?.dep_id?.ccost_name
+                }
+                placeholder="Departement"
+                disabled
+              />
+            </div>
           </div>
 
           <div className="col-2 text-black">
@@ -569,7 +548,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                     btc.plan_id !== null
                       ? checkPlan(btc.plan_id)?.form_id?.fname
                       : ""
-                  }
+                  } 
                   placeholder="Nama Formula"
                   disabled
                 />

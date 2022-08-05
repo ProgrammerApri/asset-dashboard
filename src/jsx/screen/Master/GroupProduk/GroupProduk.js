@@ -25,6 +25,7 @@ const def = {
     id: null,
     code: null,
     name: null,
+    wip: false,
     div_code: null,
     acc_sto: null,
     acc_send: null,
@@ -58,6 +59,7 @@ const defError = [
     acc_6: false,
     acc_7: false,
     acc_8: false,
+    acc_9: false,
   },
 ];
 
@@ -560,7 +562,7 @@ const DataGroupProduk = ({
 
   const gl = (value) => {
     let gl = {};
-    account.forEach((element) => {
+    account?.forEach((element) => {
       if (value === element.account.id) {
         gl = element;
       }
@@ -609,6 +611,7 @@ const DataGroupProduk = ({
         acc_6: !currentItem.groupPro?.potongan,
         acc_7: !currentItem.groupPro?.pengembalian,
         acc_8: !currentItem.groupPro?.selisih,
+        // acc_9: !currentItem.wip && !currentItem.groupPro.acc_wip,
       },
     ];
 
@@ -788,8 +791,10 @@ const DataGroupProduk = ({
                   <label className="text-label">Group Produk Bahan Baku</label>
                   <div className="p-inputgroup">
                     <InputSwitch
-                      checked={checked1}
-                      onChange={(e) => setChecked1(e.value)}
+                      checked={currentItem && currentItem.wip}
+                      onChange={(e) => {
+                        setCurrentItem({ ...currentItem, wip: e.target.value });
+                      }}
                     />
                   </div>
                 </div>
@@ -912,8 +917,8 @@ const DataGroupProduk = ({
                     label={"Akun WIP"}
                     value={
                       currentItem !== null &&
-                      currentItem.groupPro.acc_terima !== null
-                        ? gl(currentItem.groupPro.acc_terima)
+                      currentItem.groupPro.acc_wip !== null
+                        ? gl(currentItem.groupPro.acc_wip)
                         : null
                     }
                     options={account}
@@ -923,11 +928,11 @@ const DataGroupProduk = ({
                         ...currentItem,
                         groupPro: {
                           ...currentItem.groupPro,
-                          acc_terima: e.value?.account?.id ?? null,
+                          acc_wip: e.value?.account?.id ?? null,
                         },
                       });
                       let newError = error;
-                      newError[1].acc_3 = false;
+                      newError[1].acc_9 = false;
                       setError(newError);
                     }}
                     optionLabel="account.acc_name"
@@ -937,15 +942,12 @@ const DataGroupProduk = ({
                     filterBy="account.acc_name"
                     placeholder="Pilih Akun Penerimaan"
                     showClear
-                    disabled
-                    errorMessage="Akun Penerimaan Belum Dipilih"
-                    error={error[1]?.acc_3}
+                    disabled={currentItem && !currentItem.wip}
+                    // errorMessage="Akun wip harus dipilih"
+                    error={error[1]?.acc_9}
                   />
                 </div>
               </div>
-              
-                
-            
 
               <div className="col-12 p-0">
                 <div className="mt-4 ml-3 mr-3 fs-16 mb-2">

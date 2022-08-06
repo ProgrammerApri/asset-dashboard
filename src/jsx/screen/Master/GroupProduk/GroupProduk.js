@@ -763,7 +763,7 @@ const DataGroupProduk = ({
                 </div>
               </div>
               <div className="row mr-0 ml-0">
-                <div className="col-12">
+                <div className="col-6">
                   <label className="text-label">Divisi</label>
                   <div className="p-inputgroup">
                     <Dropdown
@@ -783,19 +783,23 @@ const DataGroupProduk = ({
                     />
                   </div>
                 </div>
-              </div>
-
-              <div className="col-12"></div>
-              <div className="row mr-0 ml-0">
-                <div className="col-12">
-                  <label className="text-label">Group Produk Bahan Baku</label>
-                  <div className="p-inputgroup">
-                    <InputSwitch
-                      checked={currentItem && currentItem.wip}
-                      onChange={(e) => {
-                        setCurrentItem({ ...currentItem, wip: e.target.value });
-                      }}
-                    />
+                <div className="row mr-0 ml-0">
+                  <div className="col-12">
+                    <label className="text-label">
+                      Group Produk Bahan Baku
+                    </label>
+                    <div className="col-12"></div>
+                    <div className="p-inputgroup">
+                      <InputSwitch
+                        checked={currentItem && currentItem.wip}
+                        onChange={(e) => {
+                          setCurrentItem({
+                            ...currentItem,
+                            wip: e.target.value,
+                          });
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>

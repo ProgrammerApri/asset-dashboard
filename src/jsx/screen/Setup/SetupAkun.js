@@ -49,9 +49,10 @@ const SetupAkun = () => {
     penjualan: true,
     pembelian: true,
     ar_ap: true,
-    persediaan: false,
+    persediaan: true,
     lainnya: false,
     labarugi: true,
+    costing: false,
   });
 
   useEffect(() => {
@@ -605,7 +606,7 @@ const SetupAkun = () => {
         tittle={"Persediaan"}
         active={accor.persediaan}
         key={1}
-        defaultActive={false}
+        defaultActive={true}
         onClick={() => {
           setAccor({
             ...accor,
@@ -696,7 +697,7 @@ const SetupAkun = () => {
         onClick={() => {
           setAccor({
             ...accor,
-            labarugi: !accor.labarugi,
+            costing: !accor.costing,
           });
         }}
         body={
@@ -803,13 +804,13 @@ const SetupAkun = () => {
           {renderArAp()}
           {renderPenjualan()}
           {renderPersediaan()}
-          {renderCosting()}
         </Col>
 
         <Col className="col-lg-6 col-sm-12 col-xs-12">
           {renderLabaRugi()}
           {renderPembelian()}
           {renderOthers()}
+          {renderCosting()}
         </Col>
       </Row>
     </>

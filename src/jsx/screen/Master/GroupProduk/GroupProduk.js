@@ -949,7 +949,7 @@ const DataGroupProduk = ({
                     itemTemplate={glTemplate}
                     filter
                     filterBy="account.acc_name"
-                    placeholder="Pilih Akun Penerimaan"
+                    placeholder="Pilih Akun WIP"
                     showClear
                     disabled={currentItem && !currentItem.wip}
                     // errorMessage="Akun wip harus dipilih"

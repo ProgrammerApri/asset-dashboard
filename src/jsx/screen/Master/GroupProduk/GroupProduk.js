@@ -85,7 +85,8 @@ const DataGroupProduk = ({
   const [currentItem, setCurrentItem] = useState(def);
   const toast = useRef(null);
   const [checked1, setChecked1] = useState(false);
-  const [checked2, setChecked2] = useState(true);
+  const [wip, setWip] = useState(null);
+
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
   const [isEdit, setEdit] = useState(def);
@@ -97,7 +98,7 @@ const DataGroupProduk = ({
   useEffect(() => {
     getDivisi();
     getSetup();
-    getAccount();
+
     initFilters1();
   }, []);
 
@@ -129,11 +130,12 @@ const DataGroupProduk = ({
       if (response.status) {
         const { data } = response;
         setSetup(data);
+        getAccount(data);
       }
     } catch (error) {}
   };
 
-  const getAccount = async (isUpdate = false) => {
+  const getAccount = async (setup) => {
     const config = {
       ...endpoints.account,
     };
@@ -142,8 +144,16 @@ const DataGroupProduk = ({
     try {
       response = await request(null, config);
       console.log(response);
+
       if (response.status) {
         const { data } = response;
+        let filt = [];
+        data.forEach((element) => {
+          if (element.account.kat_code === setup?.sto_wip?.kat_code) {
+            filt.push(element);
+          }
+        });
+        setWip(filt);
         setAccount(data);
       }
     } catch (error) {}
@@ -159,6 +169,7 @@ const DataGroupProduk = ({
         div_code: currentItem?.divisi?.id ?? null,
         acc_sto: currentItem?.groupPro?.acc_sto ?? null,
         acc_send: currentItem?.groupPro?.acc_send ?? null,
+        acc_wip: currentItem?.groupPro?.acc_wip ?? null,
         acc_terima: currentItem?.groupPro?.acc_terima ?? null,
         hrg_pokok: currentItem?.groupPro?.hrg_pokok ?? null,
         acc_penj: currentItem?.groupPro?.acc_penj ?? null,
@@ -209,6 +220,7 @@ const DataGroupProduk = ({
         div_code: currentItem?.divisi?.id ?? null,
         acc_sto: currentItem?.groupPro?.acc_sto ?? null,
         acc_send: currentItem?.groupPro?.acc_send ?? null,
+        acc_wip: currentItem?.groupPro?.acc_wip ?? null,
         acc_terima: currentItem?.groupPro?.acc_terima ?? null,
         hrg_pokok: currentItem?.groupPro?.hrg_pokok ?? null,
         acc_penj: currentItem?.groupPro?.acc_penj ?? null,
@@ -611,23 +623,29 @@ const DataGroupProduk = ({
         acc_6: !currentItem.groupPro?.potongan,
         acc_7: !currentItem.groupPro?.pengembalian,
         acc_8: !currentItem.groupPro?.selisih,
-        // acc_9: !currentItem.wip && !currentItem.groupPro.acc_wip,
+        acc_9: !currentItem.wip ? false : !currentItem.groupPro?.acc_wip,
       },
     ];
 
     setError(errors);
-
+    let count = 0;
+    let total_valid = 0;
     errors.forEach((el, i) => {
       for (var key in el) {
-        valid = !el[key];
+        count++;
+        if (!el[key]) {
+          total_valid++;
+        }
+
         if (el[key] && i < active) {
           active = i;
         }
       }
     });
+    console.log(count);
+    console.log(total_valid);
 
-    console.log(active);
-    console.log(valid);
+    valid = count === total_valid;
 
     if (!valid) {
       setActive(active);
@@ -785,12 +803,14 @@ const DataGroupProduk = ({
                 </div>
                 <div className="row mr-0 ml-0">
                   <div className="col-12">
-                    <label className="text-label">
-                      Group Produk Bahan Baku
-                    </label>
+                    {/*  */}
+                    <div className="col-12"></div>
+
                     <div className="col-12"></div>
                     <div className="p-inputgroup">
                       <InputSwitch
+                        className="mr-3"
+                        inputId="email"
                         checked={currentItem && currentItem.wip}
                         onChange={(e) => {
                           setCurrentItem({
@@ -799,6 +819,7 @@ const DataGroupProduk = ({
                           });
                         }}
                       />
+                      <label className="mr-5 mt-1">{"Group Produk WIP"}</label>
                     </div>
                   </div>
                 </div>
@@ -925,7 +946,7 @@ const DataGroupProduk = ({
                         ? gl(currentItem.groupPro.acc_wip)
                         : null
                     }
-                    options={account}
+                    options={wip}
                     onChange={(e) => {
                       console.log(e.value);
                       setCurrentItem({
@@ -944,10 +965,10 @@ const DataGroupProduk = ({
                     itemTemplate={glTemplate}
                     filter
                     filterBy="account.acc_name"
-                    placeholder="Pilih Akun Penerimaan"
+                    placeholder="Pilih Akun WIP"
                     showClear
                     disabled={currentItem && !currentItem.wip}
-                    // errorMessage="Akun wip harus dipilih"
+                    errorMessage="Akun wip harus dipilih"
                     error={error[1]?.acc_9}
                   />
                 </div>

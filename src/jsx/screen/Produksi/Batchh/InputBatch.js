@@ -17,6 +17,7 @@ import { TabPanel, TabView } from "primereact/tabview";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import DataProduk from "../../Master/Produk/DataProduk";
 import DataSatuan from "../../MasterLainnya/Satuan/DataSatuan";
+import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 
 const defError = {
   code: false,
@@ -359,11 +360,11 @@ const InputBatch = ({ onCancel, onSuccess }) => {
     let valid = false;
     let errors = {
       code: !btc.bcode || btc.bcode === "",
-      date: !btc.batch_date || btc.batch_date === "",
+      // date: !btc.batch_date || btc.batch_date === "",
       pl: !btc.plan_id,
     };
 
-    valid = !errors.code && !errors.date && !errors.pl;
+    valid = !errors.code && !errors.pl;
 
     setError(errors);
 
@@ -411,18 +412,18 @@ const InputBatch = ({ onCancel, onSuccess }) => {
           <div className="col-2 text-black">
             <PrimeCalendar
               label={"Tanggal"}
-              value={new Date(`${btc.batch_date}Z`)}
+              value={date}
               onChange={(e) => {
                 updateBTC({ ...btc, batch_date: e.target.value });
 
-                let newError = error;
-                newError.date = false;
-                setError(newError);
+                // let newError = error;
+                // newError.date = false;
+                // setError(newError);
               }}
               placeholder="Pilih Tanggal"
               showIcon
               dateFormat="dd-mm-yy"
-              error={error?.date}
+              // error={error?.date}
             />
           </div>
 
@@ -434,25 +435,43 @@ const InputBatch = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-3">
-            <PrimeDropdown
-              label={"Kode Planning"}
+            <label className="text-label">Kode Planning</label>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
               value={btc.plan_id && checkPlan(btc.plan_id)}
-              options={planning}
+              option={planning}
               onChange={(e) => {
+                e.product?.forEach((element) => {
+                  element.def_qty = element.qty;
+                  console.log(element);
+                });
+                e.material?.forEach((elem) => {
+                  elem.def_qty = elem.qty;
+                });
+
+                e.product.forEach((element) => {
+                  element.qty = element.def_qty * Number(e.total);
+                  console.log(element.qty);
+                });
+                e.material.forEach((elem) => {
+                  elem.qty = elem.def_qty * Number(e.total);
+                });
+
                 updateBTC({
                   ...btc,
-                  plan_id: e.value.id,
-                  form_id: e.value.form_id?.id,
-                  product: e.value.product,
-                  material: e.value.material,
-                  mesin: e.value.mesin,
+                  plan_id: e.id,
+                  form_id: e.form_id?.id,
+                  dep_id: e.dep_id?.id,
+                  product: e.product,
+                  material: e.material,
+                  mesin: e.mesin,
                 });
                 let newError = error;
                 newError.pl = false;
                 setError(newError);
               }}
               placeholder="Pilih Kode Planning"
-              optionLabel="pcode"
+              label={"[pcode]"}
               errorMessage="Kode Planning Belum Dipilih"
               error={error?.pl}
             />
@@ -548,7 +567,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                     btc.plan_id !== null
                       ? checkPlan(btc.plan_id)?.form_id?.fname
                       : ""
-                  } 
+                  }
                   placeholder="Nama Formula"
                   disabled
                 />

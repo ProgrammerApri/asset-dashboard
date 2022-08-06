@@ -787,6 +787,7 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                         placeholder="0"
                         min={0}
                         error={error?.mtrl[e.index]?.prc}
+                        disabled
                       />
                     )}
                   />

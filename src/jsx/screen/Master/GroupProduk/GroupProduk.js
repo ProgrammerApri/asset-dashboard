@@ -785,12 +785,14 @@ const DataGroupProduk = ({
                 </div>
                 <div className="row mr-0 ml-0">
                   <div className="col-12">
-                    <label className="text-label">
-                      Group Produk Bahan Baku
-                    </label>
+                    {/*  */}
+                    <div className="col-12"></div>
+                    
                     <div className="col-12"></div>
                     <div className="p-inputgroup">
                       <InputSwitch
+                    className="mr-3"
+                    inputId="email"
                         checked={currentItem && currentItem.wip}
                         onChange={(e) => {
                           setCurrentItem({
@@ -799,6 +801,9 @@ const DataGroupProduk = ({
                           });
                         }}
                       />
+                      <label className="mr-5 mt-1">
+              {"Group Produk WIP"}
+            </label>
                     </div>
                   </div>
                 </div>

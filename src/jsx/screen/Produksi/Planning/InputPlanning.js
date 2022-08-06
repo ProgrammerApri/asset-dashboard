@@ -526,7 +526,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-12"></div>
+          <div className="col-3"></div>
           <div className="col-3">
             <label className="text-black">Departement</label>
             <div className="p-inputgroup"></div>

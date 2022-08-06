@@ -70,7 +70,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
     getMesin();
     getProduct();
     getSatuan();
-    getDept()
+    getDept();
   }, []);
 
   const getFormula = async () => {
@@ -459,8 +459,6 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-         
-
           <div className="col-2 text-black">
             <PrimeCalendar
               label={"Rencana Produksi"}
@@ -478,7 +476,27 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
               error={error?.date}
             />
           </div>
-
+          <div className="col-3">
+            <label className="text-black">Departement</label>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
+              value={plan.dep_id && checkDept(plan.dep_id)}
+              option={dept}
+              onChange={(e) => {
+                updatePL({ ...plan, dep_id: e.id });
+                let newError = error;
+                newError.dep = false;
+                setError(newError);
+              }}
+              placeholder="Pilih Departemen"
+              detail
+              onDetail={() => setShowDept(true)}
+              label={"[ccost_name] - [ccost_code]"}
+              errorMessage="Departemen Belum Dipilih"
+              error={error?.dep}
+            />
+          </div>
+          <div className="col-3"></div>
           <div className="col-2 text-black">
             <PrimeNumber
               label={"Rencana Pembuatan"}
@@ -526,27 +544,8 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-3"></div>
-          <div className="col-3">
-            <label className="text-black">Departement</label>
-            <div className="p-inputgroup"></div>
-            <CustomDropdown
-              value={plan.dep_id && checkDept(plan.dep_id)}
-              option={dept}
-              onChange={(e) => {
-                updatePL({ ...plan, dep_id: e.id });
-                let newError = error;
-                newError.dep = false;
-                setError(newError);
-              }}
-              placeholder="Pilih Departemen"
-              detail
-              onDetail={() => setShowDept(true)}
-              label={"[ccost_name] - [ccost_code]"}
-              errorMessage="Departemen Belum Dipilih"
-              error={error?.dep}
-            />
-          </div>
+          {/* <div className="col-3"></div> */}
+         
           <div className="col-12 p-0 text-black">
             <div className="mt-4 mb-2 ml-3 mr-3 fs-13">
               <b>Informasi Formula</b>

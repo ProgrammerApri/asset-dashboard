@@ -308,7 +308,7 @@ const DataFormula = ({ onAdd, onEdit, onDetail }) => {
                     prod_id: null,
                     unit_id: null,
                     qty: null,
-                    aloc: null,
+                    aloc: 100,
                   },
                 ],
                 material: [

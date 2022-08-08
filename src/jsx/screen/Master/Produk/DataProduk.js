@@ -618,7 +618,7 @@ const DataProduk = ({
         group: !currentItem.group?.id,
         type: !currentItem.type,
         sat: !currentItem.unit?.id,
-        sup: !currentItem.suplier?.id,
+        // sup: !currentItem.suplier?.id,
       },
       {
         hpp: !currentItem.metode,

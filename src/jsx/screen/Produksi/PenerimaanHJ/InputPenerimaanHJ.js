@@ -116,8 +116,18 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-
-        setBatch(data);
+        let filt = [];
+        data.forEach((elem) => {
+          let prod = [];
+          elem.plan_id.form_id.product.forEach((el) => {
+            el.prod_id = el.prod_id.id;
+            el.unit_id = el.unit_id.id;
+            prod.push(el);
+          });
+          elem.plan_id.product = prod;
+          filt.push(elem);
+        });
+        setBatch(filt);
       }
     } catch (error) {}
   };
@@ -443,7 +453,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
               value={phj.batch_id !== null ? checkbtc(phj.batch_id) : null}
               option={batch}
               onChange={(e) => {
-                updatePHJ({ ...phj, batch_id: e.id });
+                updatePHJ({ ...phj, batch_id: e.id, product: e.product });
                 let newError = error;
                 newError.btc = false;
                 setError(newError);

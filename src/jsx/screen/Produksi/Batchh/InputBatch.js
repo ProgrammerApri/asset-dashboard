@@ -187,6 +187,11 @@ const InputBatch = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
+
+
+
+
+
   const getMesin = async () => {
     const config = {
       ...endpoints.mesin,
@@ -233,7 +238,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
   const addBTC = async () => {
     const config = {
       ...endpoints.addBatch,
-      data: btc,
+      data:{...btc, date_created: currentDate(btc.date_created) },
     };
     console.log(config.data);
     let response = null;
@@ -349,6 +354,20 @@ const InputBatch = ({ onCancel, onSuccess }) => {
     return [day, month, year].join("-");
   };
 
+  const currentDate = (date) => {
+    let now = new Date();
+    let newDate = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      now.getHours(),
+      now.getMinutes(),
+      now.getSeconds(),
+      now.getMilliseconds()
+    );
+    return newDate.toISOString();
+  };
+
   const updateBTC = (e) => {
     dispatch({
       type: SET_CURRENT_BTC,
@@ -360,7 +379,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
     let valid = false;
     let errors = {
       code: !btc.bcode || btc.bcode === "",
-      // date: !btc.batch_date || btc.batch_date === "",
+      date: !btc.date_created || btc.date_created === "",
       pl: !btc.plan_id,
     };
 
@@ -412,19 +431,29 @@ const InputBatch = ({ onCancel, onSuccess }) => {
           <div className="col-2 text-black">
             <PrimeCalendar
               label={"Tanggal"}
-              value={new Date(`${plan.date_created}Z`)}
+              value={new Date(`${btc.date_created}Z`)}
               onChange={(e) => {
                 updateBTC({ ...btc, date_created: e.target.value });
-                let newError = error;
-                newError.date = false;
-                setError(newError);
+
+                // let newError = error;
+                // newError.date = false;
+                // setError(newError);
               }}
               placeholder="Pilih Tanggal"
               showIcon
               dateFormat="dd-mm-yy"
-              error={error?.date}
+              // error={error?.date}
             />
           </div>
+
+
+
+
+
+
+
+
+          
 
           <div className="col-12 p-0 text-black">
             <div className="mt-4 mb-2 ml-3 mr-3 fs-13">

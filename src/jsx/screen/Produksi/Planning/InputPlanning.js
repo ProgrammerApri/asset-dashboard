@@ -206,7 +206,9 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
   const addPL = async () => {
     const config = {
       ...endpoints.addPlan,
-      data: plan,
+      data:{...plan, date_created: currentDate(plan.date_created)},
+
+
     };
     console.log(config.data);
     let response = null;
@@ -322,6 +324,20 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
     return [day, month, year].join("-");
   };
 
+  const currentDate = (date) => {
+    let now = new Date();
+    let newDate = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      now.getHours(),
+      now.getMinutes(),
+      now.getSeconds(),
+      now.getMilliseconds()
+    );
+    return newDate.toISOString();
+  };
+
   const updatePL = (e) => {
     dispatch({
       type: SET_CURRENT_PL,
@@ -335,7 +351,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
     let errors = {
       code: !plan.pcode || plan.pcode === "",
       name: !plan.pname || plan.pname === "",
-      date: !plan.date_planing || plan.date_planing === "",
+      date: !plan.date_created || plan.date_created === "",
       rp: !plan.total || plan.total === "",
       dep: !plan.dep_id,
       fm: !plan.form_id,
@@ -464,7 +480,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
               label={"Rencana Produksi"}
               value={new Date(`${plan.date_planing}Z`)}
               onChange={(e) => {
-                updatePL({ ...plan, date_created: e.target.value });
+                updatePL({ ...plan, date_planing: e.target.value });
 
                 let newError = error;
                 newError.date = false;
@@ -477,7 +493,23 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-         
+ <div className="col-2 text-black">
+            <PrimeCalendar
+              label={"Tanggal"}
+              value={new Date(`${plan.date_created}Z`)}
+              onChange={(e) => {
+                updatePL({ ...plan, date_created: e.target.value });
+
+                let newError = error;
+                newError.date = false;
+                setError(newError);
+              }}
+              placeholder="Pilih Tanggal"
+              showIcon
+              dateFormat="dd-mm-yy"
+              error={error?.date}
+            />
+          </div>
 
 
 

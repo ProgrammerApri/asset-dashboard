@@ -131,7 +131,7 @@ const InputFormula = ({ onCancel, onSuccess }) => {
   const addFM = async () => {
     const config = {
       ...endpoints.addFormula,
-      data: forml,
+      data: { ...forml, date_created: currentDate(forml.date_created) },
     };
     console.log(config.data);
     let response = null;
@@ -215,6 +215,20 @@ const InputFormula = ({ onCancel, onSuccess }) => {
     if (day.length < 2) day = "0" + day;
 
     return [day, month, year].join("-");
+  };
+
+  const currentDate = (date) => {
+    let now = new Date();
+    let newDate = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      now.getHours(),
+      now.getMinutes(),
+      now.getSeconds(),
+      now.getMilliseconds()
+    );
+    return newDate.toISOString();
   };
 
   const updateFM = (e) => {
@@ -773,7 +787,7 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                     // }}
                     body={(e) => (
                       <PrimeNumber
-                      price
+                        price
                         value={e.price && e.price}
                         onChange={(u) => {
                           let temp = [...forml.material];

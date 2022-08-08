@@ -78,6 +78,7 @@ const DataFormula = ({ onAdd, onEdit, onDetail }) => {
   };
 
   const delFM = async (id) => {
+    setLoading(true)
     const config = {
       ...endpoints.delFormula,
       endpoint: endpoints.delFormula.endpoint + currentItem.id,
@@ -440,7 +441,7 @@ const DataFormula = ({ onAdd, onEdit, onDetail }) => {
         paginatorClassName="justify-content-end mt-3"
       >
         <Column
-          header="Kode Formula"
+          header="Tanggal Formula"
           style={{
             minWidth: "8rem",
           }}
@@ -448,7 +449,7 @@ const DataFormula = ({ onAdd, onEdit, onDetail }) => {
           body={loading && <Skeleton />}
         />
         <Column
-          header="Tgl Formula"
+          header="Kode Formula"
           field={(e) => e.fcode}
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
@@ -461,7 +462,7 @@ const DataFormula = ({ onAdd, onEdit, onDetail }) => {
         />
         <Column
           header="Versi Formula"
-          field={(e) => (e?.rev ? e.rev : "-")}
+          field={(e) => (e?.version ? e.version : "-")}
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
         />

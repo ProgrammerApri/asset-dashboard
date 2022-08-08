@@ -77,6 +77,7 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
   };
 
   const delPL = async (id) => {
+    setLoading(true)
     const config = {
       ...endpoints.delPlan,
       endpoint: endpoints.delPlan.endpoint + currentItem.id,
@@ -193,6 +194,7 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
               type: SET_CURRENT_PL,
               payload: {
                 ...data,
+                dep_id : data?.dep_id?.id ?? null,
                 form_id: data?.form_id?.id ?? null,
                 unit: data?.unit?.id ?? null,
                 product:

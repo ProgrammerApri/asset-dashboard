@@ -180,7 +180,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
     const config = {
       ...endpoints.editPlan,
       endpoint: endpoints.editPlan.endpoint + plan.id,
-      data: plan,
+      data: { ...plan, date_planing: currentDate(plan.date_planing) },
     };
     console.log(config.data);
     let response = null;
@@ -206,9 +206,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
   const addPL = async () => {
     const config = {
       ...endpoints.addPlan,
-      data:{...plan, date_created: currentDate(plan.date_created)},
-
-
+      data: { ...plan, date_planing: currentDate(plan.date_planing) },
     };
     console.log(config.data);
     let response = null;
@@ -351,7 +349,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
     let errors = {
       code: !plan.pcode || plan.pcode === "",
       name: !plan.pname || plan.pname === "",
-      date: !plan.date_created || plan.date_created === "",
+      date: !plan.date_planing || plan.date_planing === "",
       rp: !plan.total || plan.total === "",
       dep: !plan.dep_id,
       fm: !plan.form_id,
@@ -493,30 +491,6 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
             />
           </div>
 
- <div className="col-2 text-black">
-            <PrimeCalendar
-              label={"Tanggal"}
-              value={new Date(`${plan.date_created}Z`)}
-              onChange={(e) => {
-                updatePL({ ...plan, date_created: e.target.value });
-
-                let newError = error;
-                newError.date = false;
-                setError(newError);
-              }}
-              placeholder="Pilih Tanggal"
-              showIcon
-              dateFormat="dd-mm-yy"
-              error={error?.date}
-            />
-          </div>
-
-
-
-
-
-
-
           <div className="col-3">
             <label className="text-black">Departement</label>
             <div className="p-inputgroup"></div>
@@ -537,7 +511,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
               error={error?.dep}
             />
           </div>
-          <div className="col-3"></div>
+          <div className="col-4"></div>
           <div className="col-2 text-black">
             <PrimeNumber
               label={"Rencana Pembuatan"}
@@ -586,7 +560,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
           </div>
 
           {/* <div className="col-3"></div> */}
-         
+
           <div className="col-12 p-0 text-black">
             <div className="mt-4 mb-2 ml-3 mr-3 fs-13">
               <b>Informasi Formula</b>

@@ -119,7 +119,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
         let filt = [];
         data.forEach((elem) => {
           let prod = [];
-          elem.plan_id.form_id.product.forEach((el) => {
+          elem.plan_id.product.forEach((el) => {
             el.prod_id = el.prod_id.id;
             el.unit_id = el.unit_id.id;
             prod.push(el);
@@ -152,7 +152,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
     const config = {
       ...endpoints.editPHJ,
       endpoint: endpoints.editPHJ.endpoint + phj.id,
-      data: phj,
+      data: { ...phj, phj_date: currentDate(phj.phj_date) },
     };
     console.log(config.data);
     let response = null;
@@ -178,7 +178,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
   const addPHJ = async () => {
     const config = {
       ...endpoints.addPHJ,
-      data: phj,
+      data: { ...phj, phj_date: currentDate(phj.phj_date) },
     };
     console.log(config.data);
     let response = null;
@@ -283,6 +283,20 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
     return [day, month, year].join("-");
   };
 
+  const currentDate = (date) => {
+    let now = new Date();
+    let newDate = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      now.getHours(),
+      now.getMinutes(),
+      now.getSeconds(),
+      now.getMilliseconds()
+    );
+    return newDate.toISOString();
+  };
+
   const updatePHJ = (e) => {
     dispatch({
       type: SET_CURRENT_PHJ,
@@ -303,37 +317,35 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
 
     phj?.product.forEach((element, i) => {
       if (i > 0) {
-        if (element.prod_id || element.qty) {
+        if (element.qty) {
           errors.prod[i] = {
-            id: !element.prod_id,
             qty: !element.qty || element.qty === "" || element.qty === "0",
           };
         }
       } else {
         errors.prod[i] = {
-          id: !element.prod_id,
           qty: !element.qty || element.qty === "" || element.qty === "0",
         };
       }
     });
 
-    phj?.reject.forEach((element, i) => {
-      if (i > 0) {
-        if (element.prod_id || element.qty) {
-          errors.rej[i] = {
-            id: !element.prod_id,
-            qty: !element.qty || element.qty === "" || element.qty === "0",
-          };
-        }
-      } else {
-        errors.rej[i] = {
-          id: !element.prod_id,
-          qty: !element.qty || element.qty === "" || element.qty === "0",
-        };
-      }
-    });
+    // phj?.reject.forEach((element, i) => {
+    //   if (i > 0) {
+    //     if (element.prod_id || element.qty) {
+    //       errors.rej[i] = {
+    //         id: !element.prod_id,
+    //         qty: !element.qty || element.qty === "" || element.qty === "0",
+    //       };
+    //     }
+    //   } else {
+    //     errors.rej[i] = {
+    //       id: !element.prod_id,
+    //       qty: !element.qty || element.qty === "" || element.qty === "0",
+    //     };
+    //   }
+    // });
 
-    if (!errors.prod[0]?.id && !errors.prod[0]?.qty) {
+    if (!errors.prod[0]?.qty) {
       errors.prod?.forEach((e) => {
         for (var key in e) {
           e[key] = false;
@@ -341,13 +353,13 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
       });
     }
 
-    if (!errors.rej[0]?.id && !errors.rej[0]?.qty) {
-      errors.rej?.forEach((e) => {
-        for (var key in e) {
-          e[key] = false;
-        }
-      });
-    }
+    // if (!errors.rej[0]?.id && !errors.rej[0]?.qty) {
+    //   errors.rej?.forEach((e) => {
+    //     for (var key in e) {
+    //       e[key] = false;
+    //     }
+    //   });
+    // }
 
     let validProduct = false;
     let validRej = false;
@@ -359,16 +371,16 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
       });
     }
 
-    if (!validRej) {
-      errors.rej.forEach((elem, i) => {
-        for (var k in elem) {
-          validRej = !elem[k];
-          if (elem[k] && i < active) {
-            active = 1;
-          }
-        }
-      });
-    }
+    // if (!validRej) {
+    //   errors.rej.forEach((elem, i) => {
+    //     for (var k in elem) {
+    //       validRej = !elem[k];
+    //       if (elem[k] && i < active) {
+    //         active = 1;
+    //       }
+    //     }
+    //   });
+    // }
 
     valid =
       !errors.code && !errors.date && !errors.btc && (validProduct || validRej);
@@ -382,7 +394,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
         behavior: "smooth",
       });
 
-      setActive(active);
+      // setActive(active);
     }
 
     return valid;
@@ -446,16 +458,25 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-3 text-black">
-            {/* <div className="col-1"> */}
             <label className="text-black">Kode Batch</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
               value={phj.batch_id !== null ? checkbtc(phj.batch_id) : null}
               option={batch}
               onChange={(e) => {
-                updatePHJ({ ...phj, batch_id: e.id, product: e.product });
+                updatePHJ({
+                  ...phj,
+                  batch_id: e.id,
+                  product: e.plan_id.product.map((v) => {
+                    return { ...v, qty: "" };
+                  }),
+                  reject: e.plan_id.product.map((v) => {
+                    return { ...v, qty: "" };
+                  }),
+                });
                 let newError = error;
                 newError.btc = false;
+                newError.prod[0].qty = false;
                 setError(newError);
               }}
               label={"[bcode]"}
@@ -583,6 +604,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                         placeholder="Pilih Produk"
                         errorMessage="Produk Belum Dipilih"
                         error={error?.prod[e.index]?.id}
+                        disabled
                       />
                     )}
                   />
@@ -607,6 +629,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                         }}
                         label={"[name]"}
                         placeholder="Pilih Satuan"
+                        disabled
                       />
                     )}
                   />
@@ -639,34 +662,8 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                     header=""
                     className="align-text-top"
                     field={""}
-                    body={(e) =>
-                      e.index === phj.product.length - 1 ? (
-                        <Link
-                          onClick={() => {
-                            let newError = error;
-                            newError.prod.push({
-                              qty: false,
-                            });
-                            setError(newError);
-
-                            updatePHJ({
-                              ...phj,
-                              product: [
-                                ...phj.product,
-                                {
-                                  id: 0,
-                                  prod_id: null,
-                                  unit_id: null,
-                                  qty: null,
-                                },
-                              ],
-                            });
-                          }}
-                          className="btn btn-primary shadow btn-xs sharp"
-                        >
-                          <i className="fa fa-plus"></i>
-                        </Link>
-                      ) : (
+                    body={
+                      (e) => (
                         <Link
                           onClick={() => {
                             let temp = [...phj.product];
@@ -678,6 +675,34 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                           <i className="fa fa-trash"></i>
                         </Link>
                       )
+                      // e.index === phj.product.length - 1 ? (
+                      //   <Link
+                      //     onClick={() => {
+                      //       let newError = error;
+                      //       newError.prod.push({
+                      //         qty: false,
+                      //       });
+                      //       setError(newError);
+
+                      //       updatePHJ({
+                      //         ...phj,
+                      //         product: [
+                      //           ...phj.product,
+                      //           {
+                      //             id: 0,
+                      //             prod_id: null,
+                      //             unit_id: null,
+                      //             qty: null,
+                      //           },
+                      //         ],
+                      //       });
+                      //     }}
+                      //     className="btn btn-primary shadow btn-xs sharp"
+                      //   >
+                      //     <i className="fa fa-plus"></i>
+                      //   </Link>
+                      // ) : (
+                      // )
                     }
                   />
                 </DataTable>

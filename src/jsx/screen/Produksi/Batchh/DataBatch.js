@@ -75,6 +75,7 @@ const DataBatch = ({ onAdd, onEdit }) => {
   };
 
   const delBTC = async (id) => {
+    setLoading(true)
     const config = {
       ...endpoints.delBatch,
       endpoint: endpoints.delBatch.endpoint + currentItem.id,

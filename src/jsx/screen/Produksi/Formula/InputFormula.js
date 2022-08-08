@@ -149,7 +149,7 @@ const InputFormula = ({ onCancel, onSuccess }) => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${forml.po_code} Sudah Digunakan`,
+            detail: `Kode ${forml.fcode} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -177,9 +177,6 @@ const InputFormula = ({ onCancel, onSuccess }) => {
     });
 
     return selected;
-  };
-  const updatePL = (e) => {
-    dispatch({});
   };
 
   const checkUnit = (value) => {
@@ -868,7 +865,7 @@ const InputFormula = ({ onCancel, onSuccess }) => {
   const getIndex = () => {
     let total = 0;
     forml?.product?.forEach((el) => {
-      total += el.index;
+      total += el.length;
     });
 
     return total;

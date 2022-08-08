@@ -149,7 +149,10 @@ const DataGroupProduk = ({
         const { data } = response;
         let filt = [];
         data.forEach((element) => {
-          if (element.account.kat_code === setup?.sto_wip?.kat_code) {
+          if (
+            element.account.kat_code === setup?.sto_wip?.kat_code &&
+            element.account.dou_type === "U"
+          ) {
             filt.push(element);
           }
         });
@@ -495,6 +498,7 @@ const DataGroupProduk = ({
                 acc_sto: setup?.sto?.id,
                 acc_send: setup?.pur_shipping?.id,
                 acc_terima: setup?.ap?.id,
+                // acc_wip: setup?.sto_wip?.id,
                 hrg_pokok: setup?.pur_cogs?.id,
                 acc_penj: setup?.sls_rev?.id,
                 potongan: setup?.sls_disc?.id,
@@ -615,14 +619,14 @@ const DataGroupProduk = ({
         name: !currentItem.groupPro.name || currentItem.groupPro.name === "",
       },
       {
-        acc_1: !currentItem.groupPro?.acc_sto,
-        acc_2: !currentItem.groupPro?.acc_send,
-        acc_3: !currentItem.groupPro?.acc_terima,
-        acc_4: !currentItem.groupPro?.hrg_pokok,
-        acc_5: !currentItem.groupPro?.acc_penj,
-        acc_6: !currentItem.groupPro?.potongan,
-        acc_7: !currentItem.groupPro?.pengembalian,
-        acc_8: !currentItem.groupPro?.selisih,
+        acc_1: currentItem.wip ? false : !currentItem.groupPro?.acc_sto,
+        acc_2: currentItem.wip ? false : !currentItem.groupPro?.acc_send,
+        acc_3: currentItem.wip ? false : !currentItem.groupPro?.acc_terima,
+        acc_4: currentItem.wip ? false : !currentItem.groupPro?.hrg_pokok,
+        acc_5: currentItem.wip ? false : !currentItem.groupPro?.acc_penj,
+        acc_6: currentItem.wip ? false : !currentItem.groupPro?.potongan,
+        acc_7: currentItem.wip ? false : !currentItem.groupPro?.pengembalian,
+        acc_8: currentItem.wip ? false : !currentItem.groupPro?.selisih,
         acc_9: !currentItem.wip ? false : !currentItem.groupPro?.acc_wip,
       },
     ];
@@ -683,7 +687,7 @@ const DataGroupProduk = ({
           onRowSelect={onRowSelect}
         >
           <Column
-            header="Kode Kelompok"
+            header="Kode Group"
             style={{
               minWidth: "8rem",
             }}
@@ -691,7 +695,7 @@ const DataGroupProduk = ({
             body={load && <Skeleton />}
           />
           <Column
-            header="Nama Kelompok"
+            header="Nama Group"
             style={{
               minWidth: "8rem",
             }}
@@ -740,7 +744,7 @@ const DataGroupProduk = ({
               <div className="row mr-0 ml-0">
                 <div className="col-6">
                   <PrimeInput
-                    label={"Nama Grup"}
+                    label={"Kode Group"}
                     value={`${currentItem?.groupPro?.code ?? ""}`}
                     onChange={(e) => {
                       setCurrentItem({
@@ -754,14 +758,14 @@ const DataGroupProduk = ({
                       newError[0].code = false;
                       setError(newError);
                     }}
-                    placeholder="Masukan Kode Grup"
+                    placeholder="Masukan Kode Group"
                     error={error[0]?.code}
                   />
                 </div>
 
                 <div className="col-6">
                   <PrimeInput
-                    label={"Nama Grup"}
+                    label={"Nama Group"}
                     value={`${currentItem?.groupPro?.name ?? ""}`}
                     onChange={(e) => {
                       setCurrentItem({
@@ -775,7 +779,7 @@ const DataGroupProduk = ({
                       newError[0].name = false;
                       setError(newError);
                     }}
-                    placeholder="Masukan Nama Grup"
+                    placeholder="Masukan Nama Group"
                     error={error[0]?.name}
                   />
                 </div>
@@ -810,7 +814,6 @@ const DataGroupProduk = ({
                     <div className="p-inputgroup">
                       <InputSwitch
                         className="mr-3"
-                        inputId="email"
                         checked={currentItem && currentItem.wip}
                         onChange={(e) => {
                           setCurrentItem({
@@ -863,6 +866,7 @@ const DataGroupProduk = ({
                     showClear
                     errorMessage="Akun Persediaan Belum Dipilih"
                     error={error[1]?.acc_1}
+                    disabled={currentItem.wip === true}
                   />
                 </div>
 
@@ -898,6 +902,7 @@ const DataGroupProduk = ({
                     showClear
                     errorMessage="Akun Pengiriman Belum Dipilih"
                     error={error[1]?.acc_2}
+                    disabled={currentItem.wip === true}
                   />
                 </div>
               </div>
@@ -935,6 +940,7 @@ const DataGroupProduk = ({
                     showClear
                     errorMessage="Akun Penerimaan Belum Dipilih"
                     error={error[1]?.acc_3}
+                    disabled={currentItem.wip === true}
                   />
                 </div>
                 <div className="col-6">
@@ -1014,6 +1020,7 @@ const DataGroupProduk = ({
                     showClear
                     errorMessage="Akun HPP Belum Dipilih"
                     error={error[1]?.acc_4}
+                    disabled={currentItem.wip === true}
                   />
                 </div>
 
@@ -1049,6 +1056,7 @@ const DataGroupProduk = ({
                     showClear
                     errorMessage="Akun Penjualan Belum Dipilih"
                     error={error[1]?.acc_5}
+                    disabled={currentItem.wip === true}
                   />
                 </div>
               </div>
@@ -1086,6 +1094,7 @@ const DataGroupProduk = ({
                     showClear
                     errorMessage="Akun Potongan Penjualan Belum Dipilih"
                     error={error[1]?.acc_6}
+                    disabled={currentItem.wip === true}
                   />
                 </div>
 
@@ -1121,6 +1130,7 @@ const DataGroupProduk = ({
                     showClear
                     errorMessage="Akun Pengembalian Belum Dipilih"
                     error={error[1]?.acc_7}
+                    disabled={currentItem.wip === true}
                   />
                 </div>
               </div>
@@ -1158,6 +1168,7 @@ const DataGroupProduk = ({
                     showClear
                     errorMessage="Akun Selisih Harga Belum Dipilih"
                     error={error[1]?.acc_8}
+                    disabled={currentItem.wip === true}
                   />
                 </div>
               </div>

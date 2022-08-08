@@ -92,6 +92,7 @@ const DataPenerimaanHJ = ({ onAdd, onEdit, onDetail }) => {
   };
 
   const delPHJ = async (id) => {
+    setLoading(true)
     const config = {
       ...endpoints.delPHJ,
       endpoint: endpoints.delPHJ.endpoint + currentItem.id,
@@ -204,7 +205,7 @@ const DataPenerimaanHJ = ({ onAdd, onEdit, onDetail }) => {
               type: SET_CURRENT_PHJ,
               payload: {
                 ...data,
-                batch_id: data.batch_id.id,
+                batch_id: data?.batch_id?.id ?? null,
                 product:
                   product?.length > 0
                     ? product

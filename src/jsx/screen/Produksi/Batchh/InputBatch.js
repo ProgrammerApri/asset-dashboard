@@ -187,11 +187,6 @@ const InputBatch = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
-
-
-
-
-
   const getMesin = async () => {
     const config = {
       ...endpoints.mesin,
@@ -212,7 +207,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
     const config = {
       ...endpoints.editBatch,
       endpoint: endpoints.editBatch.endpoint + btc.id,
-      data: btc,
+      data: { ...btc, batch_date: currentDate(btc.batch_date) },
     };
     console.log(config.data);
     let response = null;
@@ -238,7 +233,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
   const addBTC = async () => {
     const config = {
       ...endpoints.addBatch,
-      data:{...btc, date_created: currentDate(btc.date_created) },
+      data: { ...btc, batch_date: currentDate(btc.batch_date) },
     };
     console.log(config.data);
     let response = null;
@@ -431,29 +426,20 @@ const InputBatch = ({ onCancel, onSuccess }) => {
           <div className="col-2 text-black">
             <PrimeCalendar
               label={"Tanggal"}
-              value={new Date(`${btc.date_created}Z`)}
+              value={new Date(`${btc.batch_date}Z`)}
               onChange={(e) => {
-                updateBTC({ ...btc, date_created: e.target.value });
+                updateBTC({ ...btc, batch_date: e.target.value });
 
-                // let newError = error;
-                // newError.date = false;
-                // setError(newError);
+                let newError = error;
+                newError.date = false;
+                setError(newError);
               }}
               placeholder="Pilih Tanggal"
               showIcon
               dateFormat="dd-mm-yy"
-              // error={error?.date}
+              error={error?.date}
             />
           </div>
-
-
-
-
-
-
-
-
-          
 
           <div className="col-12 p-0 text-black">
             <div className="mt-4 mb-2 ml-3 mr-3 fs-13">
@@ -469,20 +455,20 @@ const InputBatch = ({ onCancel, onSuccess }) => {
               value={btc.plan_id && checkPlan(btc.plan_id)}
               option={planning}
               onChange={(e) => {
-                e.product?.forEach((element) => {
-                  element.def_qty = element.qty;
-                  console.log(element);
-                });
-                e.material?.forEach((elem) => {
-                  elem.def_qty = elem.qty;
-                });
+                // e.product?.forEach((element) => {
+                //   element.def_qty = element.qty;
+                //   console.log(element);
+                // });
+                // e.material?.forEach((elem) => {
+                //   elem.def_qty = elem.qty;
+                // });
 
                 e.product.forEach((element) => {
-                  element.qty = element.def_qty * Number(e.total);
+                  element.qty = element.qty * Number(e.total);
                   console.log(element.qty);
                 });
                 e.material.forEach((elem) => {
-                  elem.qty = elem.def_qty * Number(e.total);
+                  elem.qty = elem.qty * Number(e.total);
                 });
 
                 updateBTC({

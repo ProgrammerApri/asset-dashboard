@@ -464,7 +464,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
               label={"Rencana Produksi"}
               value={new Date(`${plan.date_planing}Z`)}
               onChange={(e) => {
-                updatePL({ ...plan, date_planing: e.target.value });
+                updatePL({ ...plan, date_created: e.target.value });
 
                 let newError = error;
                 newError.date = false;
@@ -476,6 +476,15 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
               error={error?.date}
             />
           </div>
+
+         
+
+
+
+
+
+
+
           <div className="col-3">
             <label className="text-black">Departement</label>
             <div className="p-inputgroup"></div>

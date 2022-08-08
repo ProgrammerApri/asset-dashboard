@@ -412,18 +412,17 @@ const InputBatch = ({ onCancel, onSuccess }) => {
           <div className="col-2 text-black">
             <PrimeCalendar
               label={"Tanggal"}
-              value={date}
+              value={new Date(`${plan.date_created}Z`)}
               onChange={(e) => {
-                updateBTC({ ...btc, batch_date: e.target.value });
-
-                // let newError = error;
-                // newError.date = false;
-                // setError(newError);
+                updateBTC({ ...btc, date_created: e.target.value });
+                let newError = error;
+                newError.date = false;
+                setError(newError);
               }}
               placeholder="Pilih Tanggal"
               showIcon
               dateFormat="dd-mm-yy"
-              // error={error?.date}
+              error={error?.date}
             />
           </div>
 

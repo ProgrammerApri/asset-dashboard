@@ -180,7 +180,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
     const config = {
       ...endpoints.editPlan,
       endpoint: endpoints.editPlan.endpoint + plan.id,
-      data: { ...plan, date_planing: currentDate(plan.date_planing) },
+      data: plan,
     };
     console.log(config.data);
     let response = null;
@@ -325,13 +325,13 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
   const currentDate = (date) => {
     let now = new Date();
     let newDate = new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate(),
-      now.getHours(),
-      now.getMinutes(),
-      now.getSeconds(),
-      now.getMilliseconds()
+      date?.getFullYear(),
+      date?.getMonth(),
+      date?.getDate(),
+      now?.getHours(),
+      now?.getMinutes(),
+      now?.getSeconds(),
+      now?.getMilliseconds()
     );
     return newDate.toISOString();
   };

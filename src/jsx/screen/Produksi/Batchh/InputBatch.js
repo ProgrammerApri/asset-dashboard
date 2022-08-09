@@ -207,7 +207,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
     const config = {
       ...endpoints.editBatch,
       endpoint: endpoints.editBatch.endpoint + btc.id,
-      data: { ...btc, batch_date: currentDate(btc.batch_date) },
+      data: btc,
     };
     console.log(config.data);
     let response = null;

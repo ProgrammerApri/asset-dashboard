@@ -106,7 +106,7 @@ const DataPenerimaanHJ = ({ onAdd, onEdit, onDetail }) => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayDel(false);
-          getPHJ();
+          getPHJ(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",

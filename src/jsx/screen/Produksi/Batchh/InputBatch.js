@@ -374,7 +374,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
     let valid = false;
     let errors = {
       code: !btc.bcode || btc.bcode === "",
-      date: !btc.date_created || btc.date_created === "",
+      date: !btc.batch_date || btc.batch_date === "",
       pl: !btc.plan_id,
     };
 

@@ -178,11 +178,13 @@ const DataBatch = ({ onAdd, onEdit }) => {
             product?.forEach((element) => {
               element.prod_id = element.prod_id?.id;
               element.unit_id = element.unit_id?.id;
+              element.qty = element.qty * Number(data.plan_id.total)
             });
             let material = data.plan_id.material;
             material?.forEach((elem) => {
               elem.prod_id = elem.prod_id.id;
               elem.unit_id = elem.unit_id.id;
+              elem.qty = elem.qty * Number(data.plan_id.total)
             });
             let mesin = data.plan_id.mesin;
             mesin?.forEach((el) => {

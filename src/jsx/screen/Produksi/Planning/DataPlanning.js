@@ -180,11 +180,15 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
             product.forEach((el) => {
               el.prod_id = el.prod_id?.id;
               el.unit_id = el.unit_id?.id;
+              el.def_qty = el.qty;
+              el.qty = el.qty * Number(data.total)
             });
             let material = data.material;
             material.forEach((el) => {
               el.prod_id = el.prod_id.id;
               el.unit_id = el.unit_id.id;
+              el.def_qty = el.qty;
+              el.qty = el.qty * Number(data.total)
             });
             let mesin = data.mesin;
             mesin.forEach((el) => {

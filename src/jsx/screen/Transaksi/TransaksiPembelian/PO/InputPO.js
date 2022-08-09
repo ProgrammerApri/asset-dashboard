@@ -1322,7 +1322,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
             body={
               <>
                 <DataTable
-                  responsiveLayout="scroll"
+                  responsiveLayout="none"
                   value={po.pprod?.map((v, i) => {
                     return {
                       ...v,
@@ -1681,7 +1681,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
             body={
               <>
                 <DataTable
-                  responsiveLayout="scroll"
+                  responsiveLayout="none"
                   value={po.pjasa?.map((v, i) => {
                     return {
                       ...v,

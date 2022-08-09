@@ -366,6 +366,7 @@ const DataAkun = ({
           onSuccessInput();
           onInput(false);
           getKategori(true);
+          getAccount(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -536,7 +537,7 @@ const DataAkun = ({
             }
           }}
           autoFocus
-          loading={update}
+          loading={loading}
         />
       </div>
     );

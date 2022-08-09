@@ -170,6 +170,7 @@ const DataGroupProduk = ({
         code: currentItem?.groupPro?.code ?? null,
         name: currentItem?.groupPro?.name ?? null,
         div_code: currentItem?.divisi?.id ?? null,
+        wip: currentItem?.groupPro?.wip ?? null,
         acc_sto: currentItem?.groupPro?.acc_sto ?? null,
         acc_send: currentItem?.groupPro?.acc_send ?? null,
         acc_wip: currentItem?.groupPro?.acc_wip ?? null,
@@ -221,6 +222,7 @@ const DataGroupProduk = ({
         code: currentItem?.groupPro?.code ?? null,
         name: currentItem?.groupPro?.name ?? null,
         div_code: currentItem?.divisi?.id ?? null,
+        wip: currentItem?.groupPro?.wip ?? null,
         acc_sto: currentItem?.groupPro?.acc_sto ?? null,
         acc_send: currentItem?.groupPro?.acc_send ?? null,
         acc_wip: currentItem?.groupPro?.acc_wip ?? null,
@@ -495,6 +497,7 @@ const DataGroupProduk = ({
               ...def,
               groupPro: {
                 ...def.groupPro,
+                wip: false,
                 acc_sto: setup?.sto?.id,
                 acc_send: setup?.pur_shipping?.id,
                 acc_terima: setup?.ap?.id,
@@ -619,15 +622,15 @@ const DataGroupProduk = ({
         name: !currentItem.groupPro.name || currentItem.groupPro.name === "",
       },
       {
-        acc_1: currentItem.wip ? false : !currentItem.groupPro?.acc_sto,
-        acc_2: currentItem.wip ? false : !currentItem.groupPro?.acc_send,
-        acc_3: currentItem.wip ? false : !currentItem.groupPro?.acc_terima,
-        acc_4: currentItem.wip ? false : !currentItem.groupPro?.hrg_pokok,
-        acc_5: currentItem.wip ? false : !currentItem.groupPro?.acc_penj,
-        acc_6: currentItem.wip ? false : !currentItem.groupPro?.potongan,
-        acc_7: currentItem.wip ? false : !currentItem.groupPro?.pengembalian,
-        acc_8: currentItem.wip ? false : !currentItem.groupPro?.selisih,
-        acc_9: !currentItem.wip ? false : !currentItem.groupPro?.acc_wip,
+        acc_1: currentItem.groupPro.wip ? false : !currentItem.groupPro?.acc_sto,
+        acc_2: currentItem.groupPro.wip ? false : !currentItem.groupPro?.acc_send,
+        acc_3: currentItem.groupPro.wip ? false : !currentItem.groupPro?.acc_terima,
+        acc_4: currentItem.groupPro.wip ? false : !currentItem.groupPro?.hrg_pokok,
+        acc_5: currentItem.groupPro.wip ? false : !currentItem.groupPro?.acc_penj,
+        acc_6: currentItem.groupPro.wip ? false : !currentItem.groupPro?.potongan,
+        acc_7: currentItem.groupPro.wip ? false : !currentItem.groupPro?.pengembalian,
+        acc_8: currentItem.groupPro.wip ? false : !currentItem.groupPro?.selisih,
+        acc_9: !currentItem.groupPro.wip ? false : !currentItem.groupPro?.acc_wip,
       },
     ];
 
@@ -814,11 +817,14 @@ const DataGroupProduk = ({
                     <div className="p-inputgroup">
                       <InputSwitch
                         className="mr-3"
-                        checked={currentItem && currentItem.wip}
+                        checked={currentItem && currentItem.groupPro.wip}
                         onChange={(e) => {
                           setCurrentItem({
                             ...currentItem,
-                            wip: e.target.value,
+                            groupPro: {
+                              ...currentItem.groupPro,
+                              wip: e.target.value,
+                            },
                           });
                         }}
                       />
@@ -866,7 +872,7 @@ const DataGroupProduk = ({
                     showClear
                     errorMessage="Akun Persediaan Belum Dipilih"
                     error={error[1]?.acc_1}
-                    disabled={currentItem.wip === true}
+                    disabled={currentItem.groupPro.wip === true}
                   />
                 </div>
 
@@ -902,7 +908,7 @@ const DataGroupProduk = ({
                     showClear
                     errorMessage="Akun Pengiriman Belum Dipilih"
                     error={error[1]?.acc_2}
-                    disabled={currentItem.wip === true}
+                    disabled={currentItem.groupPro.wip === true}
                   />
                 </div>
               </div>
@@ -940,7 +946,7 @@ const DataGroupProduk = ({
                     showClear
                     errorMessage="Akun Penerimaan Belum Dipilih"
                     error={error[1]?.acc_3}
-                    disabled={currentItem.wip === true}
+                    disabled={currentItem.groupPro.wip === true}
                   />
                 </div>
                 <div className="col-6">
@@ -973,7 +979,7 @@ const DataGroupProduk = ({
                     filterBy="account.acc_name"
                     placeholder="Pilih Akun WIP"
                     showClear
-                    disabled={currentItem && !currentItem.wip}
+                    disabled={currentItem && !currentItem.groupPro.wip}
                     errorMessage="Akun wip harus dipilih"
                     error={error[1]?.acc_9}
                   />
@@ -1020,7 +1026,7 @@ const DataGroupProduk = ({
                     showClear
                     errorMessage="Akun HPP Belum Dipilih"
                     error={error[1]?.acc_4}
-                    disabled={currentItem.wip === true}
+                    disabled={currentItem.groupPro.wip === true}
                   />
                 </div>
 
@@ -1056,7 +1062,7 @@ const DataGroupProduk = ({
                     showClear
                     errorMessage="Akun Penjualan Belum Dipilih"
                     error={error[1]?.acc_5}
-                    disabled={currentItem.wip === true}
+                    disabled={currentItem.groupPro.wip === true}
                   />
                 </div>
               </div>
@@ -1094,7 +1100,7 @@ const DataGroupProduk = ({
                     showClear
                     errorMessage="Akun Potongan Penjualan Belum Dipilih"
                     error={error[1]?.acc_6}
-                    disabled={currentItem.wip === true}
+                    disabled={currentItem.groupPro.wip === true}
                   />
                 </div>
 
@@ -1130,7 +1136,7 @@ const DataGroupProduk = ({
                     showClear
                     errorMessage="Akun Pengembalian Belum Dipilih"
                     error={error[1]?.acc_7}
-                    disabled={currentItem.wip === true}
+                    disabled={currentItem.groupPro.wip === true}
                   />
                 </div>
               </div>
@@ -1168,7 +1174,7 @@ const DataGroupProduk = ({
                     showClear
                     errorMessage="Akun Selisih Harga Belum Dipilih"
                     error={error[1]?.acc_8}
-                    disabled={currentItem.wip === true}
+                    disabled={currentItem.groupPro.wip === true}
                   />
                 </div>
               </div>

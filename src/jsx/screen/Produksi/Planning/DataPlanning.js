@@ -199,6 +199,7 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
               payload: {
                 ...data,
                 dep_id : data?.dep_id?.id ?? null,
+                loc_id : data?.loc_id?.id ?? null,
                 form_id: data?.form_id?.id ?? null,
                 unit: data?.unit?.id ?? null,
                 product:

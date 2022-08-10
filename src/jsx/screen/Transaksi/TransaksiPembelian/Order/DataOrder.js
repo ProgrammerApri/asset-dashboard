@@ -200,7 +200,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
               type: SET_CURRENT_ODR,
               payload: {
                 ...data,
-                po_id: data?.po_id?.id ?? null,
+                // po_id: data?.po_id?.id,
                 dep_id: data?.dep_id?.id ?? null,
                 sup_id: data?.sup_id?.id ?? null,
                 top: data?.top?.id ?? null,

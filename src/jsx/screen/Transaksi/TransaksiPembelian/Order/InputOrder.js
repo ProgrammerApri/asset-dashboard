@@ -703,7 +703,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             <label className="text-label">No. Pesanan Pembelian</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
-              value={order.po_id !== null ? checkPO(order.po_id) : null}
+              value={order.po_id !== null ? checkPO(order?.po_id) : null}
               onChange={(e) => {
                 let result = new Date(`${order.ord_date}Z`);
                 result.setDate(result.getDate() + checRulPay(e.top?.id)?.day);

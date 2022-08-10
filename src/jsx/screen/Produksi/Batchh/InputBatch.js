@@ -41,6 +41,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
   const [product, setProduct] = useState(null);
   const [satuan, setSatuan] = useState(null);
   const [formula, setFormula] = useState(null);
+  const [lokasi, setLokasi] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showProd, setShowProd] = useState(false);
   const [planning, setPlanning] = useState(null);
@@ -59,6 +60,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
     getPlanning();
     getDept();
     getMesin();
+    getLok();
   }, []);
 
   const getProduct = async () => {
@@ -203,6 +205,22 @@ const InputBatch = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
+  const getLok = async () => {
+    const config = {
+      ...endpoints.lokasi,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setLokasi(data);
+      }
+    } catch (error) {}
+  };
+
   const editBTC = async () => {
     const config = {
       ...endpoints.editBatch,
@@ -292,9 +310,9 @@ const InputBatch = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
-  const checkFor = (value) => {
+  const checkLok = (value) => {
     let selected = {};
-    formula?.forEach((element) => {
+    lokasi?.forEach((element) => {
       if (value === element.id) {
         selected = element;
       }
@@ -491,8 +509,6 @@ const InputBatch = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-9"></div>
-
           <div className="col-3 text-black">
             <PrimeInput
               label={"Nama Planning"}
@@ -501,6 +517,9 @@ const InputBatch = ({ onCancel, onSuccess }) => {
               disabled
             />
           </div>
+
+          <div className="col-6"></div>
+
           <div className="col-3 text-black">
             <label className="text-black">Departement</label>
             <div className="p-inputgroup">
@@ -548,6 +567,17 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                 disabled
               />
             </div>
+          </div>
+
+          <div className="col-3 text-black">
+            <PrimeInput
+              label={"Lokasi Gudang"}
+              value={
+                btc.plan_id && checkPlan(btc.plan_id)?.loc_id?.name
+              }
+              placeholder="Masukan Lokasi"
+              disabled
+            />
           </div>
 
           {btc && btc.plan_id !== null && (

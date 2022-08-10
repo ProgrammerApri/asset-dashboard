@@ -23,6 +23,7 @@ import DataMesin from "../Mesin/DataMesin";
 import { TabPanel, TabView } from "primereact/tabview";
 import { Divider } from "@material-ui/core";
 import DataPusatBiaya from "../../MasterLainnya/PusatBiaya/DataPusatBiaya";
+import DataLokasi from "../../Master/Lokasi/DataLokasi";
 
 const defError = {
   code: false,
@@ -52,11 +53,13 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
   const [showSatuan, setShowSatuan] = useState(false);
   const [showMsn, setShowMsn] = useState(false);
   const [showDept, setShowDept] = useState(false);
+  const [showLok, setShowLok] = useState(false);
   const [product, setProduct] = useState(null);
   const [satuan, setSatuan] = useState(null);
   const [mesin, setMesin] = useState(null);
   const [formula, setFormula] = useState(null);
   const [dept, setDept] = useState(null);
+  const [lokasi, setLokasi] = useState(null);
   const [error, setError] = useState(defError);
   const [active, setActive] = useState(0);
 
@@ -71,6 +74,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
     getProduct();
     getSatuan();
     getDept();
+    getLok();
   }, []);
 
   const getFormula = async () => {
@@ -176,6 +180,22 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
+  const getLok = async () => {
+    const config = {
+      ...endpoints.lokasi,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setLokasi(data);
+      }
+    } catch (error) {}
+  };
+
   const editPL = async () => {
     const config = {
       ...endpoints.editPlan,
@@ -268,6 +288,17 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
   const checkDept = (value) => {
     let selected = {};
     dept?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkLoc = (value) => {
+    let selected = {};
+    lokasi?.forEach((element) => {
       if (value === element.id) {
         selected = element;
       }
@@ -433,7 +464,16 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
         <Toast ref={toast} />
 
         <Row className="mb-4">
-          <div className="col-3 text-black">
+          <div className="col-2 text-black">
+            <PrimeCalendar
+              label={"Tanggal"}
+              value={date}
+              dateFormat="dd-mm-yy"
+              disabled
+            />
+          </div>
+          <div className="col-10"></div>
+          <div className="col-2 text-black">
             <PrimeInput
               label={"Kode Planning"}
               value={plan.pcode}
@@ -443,22 +483,12 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                 newError.code = false;
                 setError(newError);
               }}
-              placeholder="Masukan Kode Planning"
+              placeholder="Masukan Kode"
               error={error?.code}
             />
           </div>
+
           <div className="col-2 text-black">
-            <PrimeCalendar
-              label={"Tanggal"}
-              value={date}
-              dateFormat="dd-mm-yy"
-              disabled
-            />
-          </div>
-
-          <div className="col-7"></div>
-
-          <div className="col-3 text-black">
             <PrimeInput
               label={"Nama Planning"}
               value={plan.pname}
@@ -468,7 +498,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                 newError.name = false;
                 setError(newError);
               }}
-              placeholder="Masukan Nama Planning"
+              placeholder="Masukan Nama"
               error={error?.name}
             />
           </div>
@@ -511,7 +541,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
               error={error?.dep}
             />
           </div>
-          <div className="col-4"></div>
+          <div className="col-2"></div>
           <div className="col-2 text-black">
             <PrimeNumber
               label={"Rencana Pembuatan"}
@@ -556,6 +586,27 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
               label={"[name]"}
               errorMessage="Satuan Belum Dipilih"
               error={error?.un}
+            />
+          </div>
+
+          <div className="col-3">
+            <label className="text-black">Lokasi Gudang</label>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
+              value={plan.loc_id && checkLoc(plan.loc_id)}
+              option={lokasi}
+              onChange={(e) => {
+                updatePL({ ...plan, loc_id: e.id });
+                let newError = error;
+                newError.dep = false;
+                setError(newError);
+              }}
+              placeholder="Pilih Lokasi"
+              detail
+              onDetail={() => setShowLok(true)}
+              label={"[name] - [code]"}
+              errorMessage="Lokasi Belum Dipilih"
+              error={error?.dep}
             />
           </div>
 
@@ -1154,6 +1205,37 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
             updatePL({
               ...plan,
               dep_id: e.data.id,
+            });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataLokasi
+        data={lokasi}
+        loading={false}
+        popUp={true}
+        show={showLok}
+        onHide={() => {
+          setShowLok(false);
+        }}
+        onInput={(e) => {
+          setShowLok(!e);
+        }}
+        onSuccessInput={(e) => {
+          getLok();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowLok(false);
+            updatePL({
+              ...plan,
+              loc_id: e.data.id,
             });
           }
 

@@ -34,7 +34,7 @@ const KartuWIP = () => {
 
   const getWip = async () => {
     const config = {
-      ...endpoints.st_card,
+      ...endpoints.trans,
       data: {},
     };
     console.log(config.data);
@@ -52,6 +52,233 @@ const KartuWIP = () => {
         setWip(grouped);
       }
     } catch (error) {}
+  };
+
+  const jsonForExcel = (trans, excel = false) => {
+    let data = [];
+    if (selectedProduct && filtersDate[0] && filtersDate[1]) {
+      let saldo = 0;
+      
+      trans?.forEach((el) => {
+        if (selectedProduct.prod_id.id === el.prod_id.id) {
+          let dt = new Date(`${el?.trx_date}Z`);
+          if (dt >= filtersDate[0] && dt <= filtersDate[1]) {
+            // if (el.trx_dbcr === "d") {
+            //   saldo += el.trx_qty;
+            // } else {
+            //   saldo -= el.trx_qty;
+            // }
+            data.push({
+              type: "item",
+              value: {
+                trx_code: el.trx_code,
+                trx_date: formatDate(el.trx_date),
+                product: `${el.prod_id?.name} (${el.prod_id?.code})`,
+                trx_type: el.trx_type,
+                // trx_debit: el.trx_dbcr === "d" ? el.trx_qty : 0,
+                // trx_kredit: el.trx_dbcr === "k" ? el.trx_qty : 0,
+                // sld: saldo,
+              },
+            });
+          }
+        }
+      });
+    }
+
+    let item = [];
+
+    data.forEach((el) => {
+      item.push([
+        {
+          value: el.trx_code,
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: el.trx_date,
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: el.product,
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: el.trx_type,
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "center", vertical: "center" },
+          },
+        },
+        // {
+        //   value: el.value.trx_debit,
+        //   style: {
+        //     font: { sz: "14", bold: false },
+        //     alignment: { horizontal: "right", vertical: "center" },
+        //   },
+        // },
+        // {
+        //   value: el.value.trx_kredit,
+        //   style: {
+        //     font: { sz: "14", bold: false },
+        //     alignment: { horizontal: "right", vertical: "center" },
+        //   },
+        // },
+        // {
+        //   value: el.value.sld,
+        //   style: {
+        //     font: { sz: "14", bold: false },
+        //     alignment: { horizontal: "right", vertical: "center" },
+        //   },
+        // },
+      ]);
+    });
+
+    console.log(item);
+
+    let final = [
+      {
+        columns: [
+          {
+            title: "WIP Card Report",
+            width: { wch: 30 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+        ],
+        data: [
+          [
+            {
+              value: cp,
+              style: {
+                font: { sz: "14", bold: false },
+                alignment: { horizontal: "left", vertical: "center" },
+              },
+            },
+          ],
+        ],
+      },
+      {
+        columns: [
+          {
+            title: `Period ${formatDate(filtersDate[0])} to ${formatDate(
+              filtersDate[1]
+            )}`,
+            width: { wch: 30 },
+            style: {
+              font: { sz: "14", bold: false },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+        ],
+        data: [[]],
+      },
+    ];
+
+    final.push({
+      columns: [
+        {
+          title: "Kode Transaksi",
+          width: { wch: 20 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "center", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          title: "Tanggal Transaksi",
+          width: { wch: 20 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "center", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          title: "Kode Produk",
+          width: { wch: 50 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "center", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          title: "Jenis Transaksi",
+          width: { wch: 13 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "center", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        // {
+        //   title: "Debit",
+        //   width: { wch: 13 },
+        //   style: {
+        //     font: { sz: "14", bold: true },
+        //     alignment: { horizontal: "center", vertical: "center" },
+        //     fill: {
+        //       paternType: "solid",
+        //       fgColor: { rgb: "F3F3F3" },
+        //     },
+        //   },
+        // },
+        // {
+        //   title: "Kredit",
+        //   width: { wch: 13 },
+        //   style: {
+        //     font: { sz: "14", bold: true },
+        //     alignment: { horizontal: "center", vertical: "center" },
+        //     fill: {
+        //       paternType: "solid",
+        //       fgColor: { rgb: "F3F3F3" },
+        //     },
+        //   },
+        // },
+        // {
+        //   title: "Saldo",
+        //   width: { wch: 13 },
+        //   style: {
+        //     font: { sz: "14", bold: true },
+        //     alignment: { horizontal: "center", vertical: "center" },
+        //     fill: {
+        //       paternType: "solid",
+        //       fgColor: { rgb: "F3F3F3" },
+        //     },
+        //   },
+        // },
+      ],
+      data: item,
+    });
+
+    if (excel) {
+      return final;
+    } else {
+      return data;
+    }
   };
 
   const renderHeader = () => {
@@ -79,7 +306,7 @@ const KartuWIP = () => {
             <div className="">
               <Dropdown
                 value={selectedProduct ?? null}
-                options={product}
+                options={wip}
                 onChange={(e) => {
                   setSelected(e.value);
                 }}
@@ -169,7 +396,7 @@ const KartuWIP = () => {
             <Card className="ml-1 mr-1 mt-2">
               <Card.Body className="p-0">
                 <CustomeWrapper
-                  tittle={"Stock Card Report"}
+                  tittle={"WIP Card Report"}
                   subTittle={`WIP Card Report for Period ${formatDate(
                     filtersDate[0]
                   )} to ${formatDate(filtersDate[1])}`}
@@ -240,7 +467,7 @@ const KartuWIP = () => {
                             </div>
                           )}
                         />
-                        <Column
+                        {/* <Column
                           className="header-center"
                           header="Debit"
                           style={{ minWidht: "10rem" }}
@@ -267,7 +494,7 @@ const KartuWIP = () => {
                           body={(e) => (
                             <div className={"text-right"}>{e.value.sld}</div>
                           )}
-                        />
+                        /> */}
                       </DataTable>
                     </>
                   }

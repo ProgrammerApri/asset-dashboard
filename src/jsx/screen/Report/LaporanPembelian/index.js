@@ -13,6 +13,7 @@ import ReportKBB from "../KartuBB";
 import SalesReport from "./Penjualan";
 import NeracaPerbandingan from "../NeracaPerbandingan";
 import KartuStock from "../KartuStock";
+import KartuWIP from "../KartuWIP";
 
 const LaporanPembelian = () => {
   const [active, setActive] = useState(0);
@@ -76,6 +77,11 @@ const LaporanPembelian = () => {
       tittle: "Kartu Stock",
       icon: "bx-spreadsheet",
       component: <KartuStock />,
+    },
+    {
+      tittle: "Kartu WIP",
+      icon: "bx-spreadsheet",
+      component: <KartuWIP />,
     },
   ]);
 

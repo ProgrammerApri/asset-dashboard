@@ -228,7 +228,7 @@ const KartuWIP = () => {
                             >
                               {e.value.product}
                             </div>
-                          )}
+                          )}s
                         />
                         <Column
                           className="header-center"

@@ -31,6 +31,7 @@ const defError = {
   date: false,
   rp: false,
   dep: false,
+  lok: false,
   fm: false,
   un: false,
   msn: [
@@ -383,6 +384,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
       date: !plan.date_planing || plan.date_planing === "",
       rp: !plan.total || plan.total === "",
       dep: !plan.dep_id,
+      lok: !plan.loc_id,
       fm: !plan.form_id,
       un: !plan.unit,
       msn: [],
@@ -428,6 +430,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
       !errors.name &&
       !errors.date &&
       !errors.dep &&
+      !errors.lok &&
       !errors.fm &&
       !errors.rp &&
       !errors.un &&
@@ -598,7 +601,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
               onChange={(e) => {
                 updatePL({ ...plan, loc_id: e.id });
                 let newError = error;
-                newError.dep = false;
+                newError.lok = false;
                 setError(newError);
               }}
               placeholder="Pilih Lokasi"
@@ -606,7 +609,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
               onDetail={() => setShowLok(true)}
               label={"[name] - [code]"}
               errorMessage="Lokasi Belum Dipilih"
-              error={error?.dep}
+              error={error?.lok}
             />
           </div>
 

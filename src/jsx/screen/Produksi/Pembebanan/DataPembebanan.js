@@ -23,6 +23,7 @@ const data = {
   fname: null,
   version: null,
   rev: null,
+
   desc: null,
   active: null,
   product: [],
@@ -34,6 +35,7 @@ const DataPembebanan = ({ onAdd, onEdit, onDetail }) => {
   const [update, setUpdate] = useState(true);
   const [displayDel, setDisplayDel] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
+  const [dept, setDept] = useState(null);
   const toast = useRef(null);
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
@@ -48,13 +50,15 @@ const DataPembebanan = ({ onAdd, onEdit, onDetail }) => {
 
   useEffect(() => {
     getPBN();
+    getDept();
     initFilters1();
   }, []);
+
 
   const getPBN = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.pbn,
+      ...endpoints.pbb,
       data: pbn,
     };
     console.log(config.data);
@@ -77,10 +81,37 @@ const DataPembebanan = ({ onAdd, onEdit, onDetail }) => {
     }
   };
 
+  const getDept = async () => {
+    const config = {
+      ...endpoints.pusatBiaya,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setDept(data);
+      }
+    } catch (error) {}
+  };
+  const checkDept = (value) => {
+    let selected = {};
+    dept?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+
   const delPBN = async (id) => {
     const config = {
-      ...endpoints.delPbn,
-      endpoint: endpoints.delPbn.endpoint + currentItem.id,
+      ...endpoints.delPBB,
+      endpoint: endpoints.delPBB.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -433,37 +464,38 @@ const DataPembebanan = ({ onAdd, onEdit, onDetail }) => {
       >
         <Column
           header="Kode Pembebanan"
-          field={(e) => e.fcode}
+          field={(e) => e.pbb_code}
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
         />
         <Column
           header="Nama Pembebanan"
-          field={(e) => e.fcode}
+          field={(e) => e.pbb_name}
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
         />
         <Column
           header="Tgl Pembebanan"
-          field={(e) => (e?.version ? e.version : "-")}
+          field={(e) => formatDate(e?.pbb_date ? e.pbb_date : "-")}
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
         />
         <Column
           header="Kode Batch"
-          field={(e) => (e?.rev ? e.rev : "-")}
+          field={(e) => (e?.batch_id.bcode)}
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
         />
-        <Column
-          header="Nama Batch"
-          field={(e) => (e?.rev ? e.rev : "-")}
-          style={{ minWidth: "8rem" }}
-          body={loading && <Skeleton />}
-        />
+        
         <Column
           header="Departement"
-          field={(e) => (e?.rev ? e.rev : "-")}
+          field={(e) => checkDept(e?.batch_id.dep_id).ccost_name}
+          style={{ minWidth: "8rem" }}
+          body={loading && <Skeleton />}
+        />
+        <Column
+          header="Akun Kredit"
+          field={(e) => (e?.acc_cred.acc_name)}
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
         />

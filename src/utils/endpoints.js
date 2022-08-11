@@ -970,6 +970,31 @@ const endpoints = {
     data: {},
   },
 
+  /// Pembebanan
+  pbb: {
+    endpoint: "/v1/api/pbb",
+    method: "GET",
+    data: {},
+  },
+
+  addPBB: {
+    endpoint: "/v1/api/pbb",
+    method: "POST",
+    data: {},
+  },
+
+  editPBB: {
+    endpoint: "/v1/api/pbb/",
+    method: "PUT",
+    data: {},
+  },
+
+  delPBB: {
+    endpoint: "/v1/api/pbb/",
+    method: "DELETE",
+    data: {},
+  },
+
   /// Mesin
   mesin: {
     endpoint: "/v1/api/mesin",
@@ -1071,24 +1096,24 @@ const endpoints = {
     data: {},
   },
 
-  /// Pembebanan
-  pbn: {
-    endpoint: "/v1/api/pbn",
-    method: "GET",
-    data: {},
-  },
+  // /// Pembebanan
+  // pbn: {
+  //   endpoint: "/v1/api/pbn",
+  //   method: "GET",
+  //   data: {},
+  // },
 
-  addPbn: {
-    endpoint: "/v1/api/pbn",
-    method: "POST",
-    data: {},
-  },
+  // addPbn: {
+  //   endpoint: "/v1/api/pbn",
+  //   method: "POST",
+  //   data: {},
+  // },
 
-  editPbn: {
-    endpoint: "/v1/api/pbn/",
-    method: "PUT",
-    data: {},
-  },
+  // editPbn: {
+  //   endpoint: "/v1/api/pbn/",
+  //   method: "PUT",
+  //   data: {},
+  // },
 
   delPbn: {
     endpoint: "/v1/api/pbn/",
@@ -1102,6 +1127,11 @@ const endpoints = {
     method: "GET",
     data: {},
   },
+  // delPbn: {
+  //   endpoint: "/v1/api/pbn/",
+  //   method: "DELETE",
+  //   data: {},
+  // },
 };
 
 export default endpoints;

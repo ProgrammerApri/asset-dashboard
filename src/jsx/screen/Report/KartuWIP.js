@@ -5,150 +5,150 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Calendar } from "primereact/calendar";
 import { Button, Card, Col, Row } from "react-bootstrap";
+import { Toast } from "primereact/toast";
+import { Skeleton } from "primereact/skeleton";
+
 import ReactExport from "react-data-export";
 import ReactToPrint from "react-to-print";
+// import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
+// import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
+import { el } from "date-fns/locale";
 import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
-import { Dropdown } from "primereact/dropdown";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import { Dropdown } from "primereact/dropdown";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
 const KartuWIP = () => {
-  const [wip, setWip] = useState(null);
+  const [report, setReport] = useState(null);
+  const [product, setProduct] = useState(null);
   const [selectedProduct, setSelected] = useState(null);
-  const [stCard, setStCard] = useState(null);
+  const [loading, setLoading] = useState(true);
   const printPage = useRef(null);
-  const [filtersDate, setFiltersDate] = useState([new Date(), new Date()]);
-  const chunkSize = 30;
+  // const [filtDate, setFiltDate] = useState(new Date());
+  const [filtDate, setFiltDate] = useState([new Date(), new Date()]);
+  const [customer, setCustomer] = useState(null);
+  const [selectCus, setSelectCus] = useState(null);
+  const [account, setAcc] = useState(null);
+  const [trans, setTrans] = useState(null);
   const [cp, setCp] = useState("");
-
-  const dummy = Array.from({ length: 10 });
+  const chunkSize = 27;
 
   useEffect(() => {
     var d = new Date();
     d.setDate(d.getDate() - 7);
-    setFiltersDate([d, new Date()]);
-    getWip();
+    setFiltDate([d, new Date()]);
+    getAcc();
   }, []);
 
-  const getWip = async () => {
+  const getTrans = async (acc) => {
     const config = {
       ...endpoints.trans,
       data: {},
     };
-    console.log(config.data);
     let response = null;
     try {
       response = await request(null, config);
       console.log(response);
       if (response.status) {
         const { data } = response;
-        setStCard(data);
-        let grouped = data?.filter(
-          (el, i) =>
-            i === data.findIndex((ek) => el?.prod_id?.id === ek?.prod_id?.id)
-        );
-        setWip(grouped);
+        // let acc = [];
+        // acc.forEach((element) => {
+        //   element.trans = [];
+        //   data.forEach((el) => {
+        //     if (element.account.id === el.acc_id.id) {
+        //       element.trans.push({ ...el, trx_amnh: 0, acq_amnh: 0 });
+        //     }
+        //   });
+        //   element.trans.forEach((el) => {
+        //     data.forEach((ek) => {
+        //       if (el.id === ek.id) {
+        //         el.trx_amnh = ek?.trx_amnh ?? 0;
+        //         el.acq_amnh += ek?.acq_amnh ?? 0;
+        //       }
+        //     });
+        //   });
+        //   if (element.trans.length > 0) {
+        //     acc.push(element);
+        //   }
+        // });
+        setTrans(data);
+        // jsonForExcel(data);
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const jsonForExcel = (trans, excel = false) => {
-    let data = [];
-    if (selectedProduct && filtersDate[0] && filtersDate[1]) {
-      let saldo = 0;
-      
-      trans?.forEach((el) => {
-        if (selectedProduct.prod_id.id === el.prod_id.id) {
-          let dt = new Date(`${el?.trx_date}Z`);
-          if (dt >= filtersDate[0] && dt <= filtersDate[1]) {
-            // if (el.trx_dbcr === "d") {
-            //   saldo += el.trx_qty;
-            // } else {
-            //   saldo -= el.trx_qty;
-            // }
-            data.push({
-              type: "item",
-              value: {
-                trx_code: el.trx_code,
-                trx_date: formatDate(el.trx_date),
-                product: `${el.prod_id?.name} (${el.prod_id?.code})`,
-                trx_type: el.trx_type,
-                // trx_debit: el.trx_dbcr === "d" ? el.trx_qty : 0,
-                // trx_kredit: el.trx_dbcr === "k" ? el.trx_qty : 0,
-                // sld: saldo,
-              },
-            });
+  const getAcc = async () => {
+    const config = {
+      ...endpoints.account,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        let filt = [];
+        data.forEach((el) => {
+          if (el.account.dou_type === "D") {
+            filt.push(el);
           }
+        });
+        setAcc(filt);
+        getTrans(data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const formatDate = (date) => {
+    var d = new Date(`${date}Z`),
+      month = "" + (d.getMonth() + 1),
+      day = "" + d.getDate(),
+      year = d.getFullYear();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+
+    return [day, month, year].join("-");
+  };
+
+  const jsonForExcel = (account, excel = false) => {
+    let data = [];
+
+    account?.forEach((el) => {
+      let dt = [];
+      let db = 0;
+      let kr = 0;
+      trans?.forEach((element) => {
+        if (element?.acc_id?.id === el?.account?.id) {
+          db += element.trx_dbcr === "D" ? element.trx_amnt : 0;
+          kr += element.trx_dbcr === "K" ? element.trx_amnt : 0;
+          dt = new Date(`${element?.trx_date}Z`);
         }
       });
-    }
-
-    let item = [];
-
-    data.forEach((el) => {
-      item.push([
-        {
-          value: el.trx_code,
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "left", vertical: "center" },
-          },
-        },
-        {
-          value: el.trx_date,
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "left", vertical: "center" },
-          },
-        },
-        {
-          value: el.product,
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "left", vertical: "center" },
-          },
-        },
-        {
-          value: el.trx_type,
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "center", vertical: "center" },
-          },
-        },
-        // {
-        //   value: el.value.trx_debit,
-        //   style: {
-        //     font: { sz: "14", bold: false },
-        //     alignment: { horizontal: "right", vertical: "center" },
-        //   },
-        // },
-        // {
-        //   value: el.value.trx_kredit,
-        //   style: {
-        //     font: { sz: "14", bold: false },
-        //     alignment: { horizontal: "right", vertical: "center" },
-        //   },
-        // },
-        // {
-        //   value: el.value.sld,
-        //   style: {
-        //     font: { sz: "14", bold: false },
-        //     alignment: { horizontal: "right", vertical: "center" },
-        //   },
-        // },
-      ]);
+      if (dt <= filtDate) {
+        data.push({
+          acco: `${el.account.acc_name} (${el.account.acc_code})`,
+          slda: `Rp. ${formatIdr(0)}`,
+          debe: `Rp. ${formatIdr(db)}`,
+          kred: `Rp. ${formatIdr(kr)}`,
+          blce: `Rp. ${formatIdr(db + kr)}`,
+        });
+      }
     });
-
-    console.log(item);
 
     let final = [
       {
         columns: [
           {
-            title: "WIP Card Report",
-            width: { wch: 30 },
+            title: "Pemakaian Bahan",
+            width: { wch: 40 },
             style: {
               font: { sz: "14", bold: true },
               alignment: { horizontal: "left", vertical: "center" },
@@ -170,12 +170,10 @@ const KartuWIP = () => {
       {
         columns: [
           {
-            title: `Period ${formatDate(filtersDate[0])} to ${formatDate(
-              filtersDate[1]
-            )}`,
-            width: { wch: 30 },
+            title: `Period ${formatDate(filtDate)}`,
+            width: { wch: 40 },
             style: {
-              font: { sz: "14", bold: false },
+              font: { sz: "14", bold: true },
               alignment: { horizontal: "left", vertical: "center" },
             },
           },
@@ -184,94 +182,120 @@ const KartuWIP = () => {
       },
     ];
 
+    let item = [];
+    // data.forEach((el) => {
+    //   item.push([
+    //     {
+    //       value: `${el.acco}`,
+    //       style: {
+    //         font: {
+    //           sz: "14",
+    //           bold: false,
+    //         },
+    //         alignment: { horizontal: "left", vertical: "center" },
+    //       },
+    //     },
+    //     {
+    //       value: `${el.slda}`,
+    //       style: {
+    //         font: { sz: "14", bold: false },
+    //         alignment: { horizontal: "right", vertical: "center" },
+    //       },
+    //     },
+    //     {
+    //       value: `${el.debe}`,
+    //       style: {
+    //         font: { sz: "14", bold: false },
+    //         alignment: { horizontal: "right", vertical: "center" },
+    //       },
+    //     },
+    //     {
+    //       value: `${el.kred}`,
+    //       style: {
+    //         font: {
+    //           sz: "14",
+    //           bold: false,
+    //         },
+    //         alignment: { horizontal: "right", vertical: "center" },
+    //       },
+    //     },
+    //     {
+    //       value: `${el.blce}`,
+    //       style: {
+    //         font: {
+    //           sz: "14",
+    //           bold: false,
+    //         },
+    //         alignment: { horizontal: "right", vertical: "center" },
+    //       },
+    //     },
+    //   ]);
+    // });
+
     final.push({
-      columns: [
-        {
-          title: "Kode Transaksi",
-          width: { wch: 20 },
-          style: {
-            font: { sz: "14", bold: true },
-            alignment: { horizontal: "center", vertical: "center" },
-            fill: {
-              paternType: "solid",
-              fgColor: { rgb: "F3F3F3" },
-            },
-          },
-        },
-        {
-          title: "Tanggal Transaksi",
-          width: { wch: 20 },
-          style: {
-            font: { sz: "14", bold: true },
-            alignment: { horizontal: "center", vertical: "center" },
-            fill: {
-              paternType: "solid",
-              fgColor: { rgb: "F3F3F3" },
-            },
-          },
-        },
-        {
-          title: "Kode Produk",
-          width: { wch: 50 },
-          style: {
-            font: { sz: "14", bold: true },
-            alignment: { horizontal: "center", vertical: "center" },
-            fill: {
-              paternType: "solid",
-              fgColor: { rgb: "F3F3F3" },
-            },
-          },
-        },
-        {
-          title: "Jenis Transaksi",
-          width: { wch: 13 },
-          style: {
-            font: { sz: "14", bold: true },
-            alignment: { horizontal: "center", vertical: "center" },
-            fill: {
-              paternType: "solid",
-              fgColor: { rgb: "F3F3F3" },
-            },
-          },
-        },
-        // {
-        //   title: "Debit",
-        //   width: { wch: 13 },
-        //   style: {
-        //     font: { sz: "14", bold: true },
-        //     alignment: { horizontal: "center", vertical: "center" },
-        //     fill: {
-        //       paternType: "solid",
-        //       fgColor: { rgb: "F3F3F3" },
-        //     },
-        //   },
-        // },
-        // {
-        //   title: "Kredit",
-        //   width: { wch: 13 },
-        //   style: {
-        //     font: { sz: "14", bold: true },
-        //     alignment: { horizontal: "center", vertical: "center" },
-        //     fill: {
-        //       paternType: "solid",
-        //       fgColor: { rgb: "F3F3F3" },
-        //     },
-        //   },
-        // },
-        // {
-        //   title: "Saldo",
-        //   width: { wch: 13 },
-        //   style: {
-        //     font: { sz: "14", bold: true },
-        //     alignment: { horizontal: "center", vertical: "center" },
-        //     fill: {
-        //       paternType: "solid",
-        //       fgColor: { rgb: "F3F3F3" },
-        //     },
-        //   },
-        // },
-      ],
-      data: item,
+      //   columns: [
+      //     {
+      //       title: "Account",
+      //       width: { wch: 40 },
+      //       style: {
+      //         font: { sz: "14", bold: true },
+      //         alignment: { horizontal: "left", vertical: "center" },
+      //         fill: {
+      //           paternType: "solid",
+      //           fgColor: { rgb: "F3F3F3" },
+      //         },
+      //       },
+      //     },
+      //     {
+      //       title: "Start Balance",
+      //       width: { wch: 20 },
+      //       style: {
+      //         font: { sz: "14", bold: true },
+      //         alignment: { horizontal: "right", vertical: "center" },
+      //         fill: {
+      //           paternType: "solid",
+      //           fgColor: { rgb: "F3F3F3" },
+      //         },
+      //       },
+      //     },
+      //     {
+      //       title: "Mutasi Debit",
+      //       width: { wch: 20 },
+      //       style: {
+      //         font: { sz: "14", bold: true },
+      //         alignment: { horizontal: "right", vertical: "center" },
+      //         fill: {
+      //           paternType: "solid",
+      //           fgColor: { rgb: "F3F3F3" },
+      //         },
+      //       },
+      //     },
+      //     {
+      //       title: "Mutasi Kredit",
+      //       width: { wch: 20 },
+      //       style: {
+      //         font: { sz: "14", bold: true },
+      //         alignment: { horizontal: "right", vertical: "center" },
+      //         fill: {
+      //           paternType: "solid",
+      //           fgColor: { rgb: "F3F3F3" },
+      //         },
+      //       },
+      //     },
+      //     {
+      //       title: "Balance",
+      //       width: { wch: 20 },
+      //       style: {
+      //         font: { sz: "14", bold: true },
+      //         alignment: { horizontal: "right", vertical: "center" },
+      //         fill: {
+      //           paternType: "solid",
+      //           fgColor: { rgb: "F3F3F3" },
+      //         },
+      //       },
+      //     },
+      //   ],
+      //   data: item,
     });
 
     if (excel) {
@@ -281,32 +305,38 @@ const KartuWIP = () => {
     }
   };
 
+  const formatIdr = (value) => {
+    return `${value}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
   const renderHeader = () => {
     return (
       <div className="flex justify-content-between">
-        <div className="col-6 ml-0 mr-0 pl-0">
-          <Row className="m-0">
-            <div className="col-5 mr-3 p-0">
-              <div className="p-inputgroup">
-                <span className="p-inputgroup-addon">
-                  <i className="pi pi-calendar" />
-                </span>
-                <Calendar
-                  value={filtersDate}
-                  onChange={(e) => {
-                    console.log(e.value);
-                    setFiltersDate(e.value);
-                  }}
-                  selectionMode="range"
-                  placeholder="Pilih Tanggal"
-                  dateFormat="dd-mm-yy"
-                />
-              </div>
+        <div className="col-6 ml-0 mr-0 pl-0 pt-0">
+          <Row className="mt-0">
+            <div className="p-inputgroup col-6">
+              <span className="p-inputgroup-addon">
+                <i className="pi pi-calendar" />
+              </span>
+              <Calendar
+                value={filtDate}
+                id="range"
+                onChange={(e) => {
+                  console.log(e.value);
+                  setFiltDate(e.value);
+                }}
+                selectionMode="range"
+                placeholder="Pilih Tanggal"
+                readOnlyInput
+                dateFormat="dd-mm-yy"
+              />
             </div>
-            <div className="">
+            <div className="col-4">
               <Dropdown
                 value={selectedProduct ?? null}
-                options={wip}
+                options={product}
                 onChange={(e) => {
                   setSelected(e.value);
                 }}
@@ -317,13 +347,23 @@ const KartuWIP = () => {
                 showClear
               />
             </div>
+            <div className="col-4">
+              {/* <CustomDropdown
+                value={customer && selectCus}
+                option={customer}
+                onChange={(e) => {
+                  setSelectCus(e);
+                }}
+                label={"[customer.cus_name] ([customer.cus_code])"}
+                placeholder="Pilih Pelanggan"
+              /> */}
+            </div>
           </Row>
         </div>
-        <div style={{ height: "1rem" }}></div>
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
             <ExcelFile
-              filename={`card_stock_report_export_${new Date().getTime()}`}
+              filename={`gl_card_report_export_${new Date().getTime()}`}
               element={
                 <PrimeSingleButton
                   label="Excel"
@@ -332,8 +372,8 @@ const KartuWIP = () => {
               }
             >
               <ExcelSheet
-                dataSet={stCard ? jsonForExcel(stCard, true) : null}
-                name="Report WIP"
+                dataSet={account ? jsonForExcel(account, true) : null}
+                name="GL Card Report"
               />
             </ExcelFile>
           </div>
@@ -353,24 +393,6 @@ const KartuWIP = () => {
     );
   };
 
-  const formatDate = (date) => {
-    var d = new Date(`${date}Z`),
-      month = "" + (d.getMonth() + 1),
-      day = "" + d.getDate(),
-      year = d.getFullYear();
-
-    if (month.length < 2) month = "0" + month;
-    if (day.length < 2) day = "0" + day;
-
-    return [day, month, year].join("-");
-  };
-
-  const formatIdr = (value) => {
-    return `${value}`
-      .replace(".", ",")
-      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
-  };
-
   const chunk = (arr, size) =>
     arr.reduce(
       (acc, e, i) => (
@@ -385,117 +407,243 @@ const KartuWIP = () => {
       <Row>
         <Col>
           <Card>
-            <Card.Body>{renderHeader()}</Card.Body>
+            <Card.Body>
+              {renderHeader()}
+              {/* <DataTable
+                responsiveLayout="scroll"
+                value={jsonForExcel(account)}
+                showGridlines
+                dataKey="id"
+                rowHover
+                emptyMessage="Data Tidak Ditemukan"
+              >
+                <Column
+                  className="header-center"
+                  header="Account"
+                  style={{ width: "20rem" }}
+                  field={(e) => e?.acco}
+                />
+                <Column
+                  className="header-center text-right"
+                  header="Begining Balance"
+                  style={{ minWidht: "8rem" }}
+                  field={(e) => e?.slda}
+                />
+                <Column
+                  className="header-center text-right"
+                  header="Debit"
+                  style={{ minWidht: "8rem" }}
+                  field={(e) => e?.debe}
+                />
+                <Column
+                  className="header-center text-right"
+                  header="Credit"
+                  style={{ minWidht: "10rem" }}
+                  field={(e) => e?.kred}
+                />
+                <Column
+                  className="header-center text-right"
+                  header="Balance"
+                  style={{ minWidht: "10rem" }}
+                  field={(e) => e?.blce}
+                />
+              </DataTable> */}
+            </Card.Body>
           </Card>
         </Col>
       </Row>
 
+      {/* <Row className="m-0 d-none">
+        <Card ref={printPage}>
+          <Card.Body className="p-0">
+            <CustomeWrapper
+              tittle={"Kartu Buku Besar"}
+              subTittle={`Laporan Kartu Buku Besar Per ${formatDate(filtDate)}`}
+              body={
+                <>
+                  <DataTable
+                    responsiveLayout="scroll"
+                    value={jsonForExcel(account)}
+                    showGridlines
+                    dataKey="id"
+                    rowHover
+                    emptyMessage="Data Tidak Ditemukan"
+                  >
+                    <Column
+                      className="header-center"
+                      header="Akun"
+                      style={{ width: "20rem" }}
+                      field={(e) => e?.acco}
+                    />
+                    <Column
+                      className="header-center text-right"
+                      header="Saldo Awal"
+                      style={{ minWidht: "8rem" }}
+                      field={(e) => e?.slda}
+                    />
+                    <Column
+                      className="header-center text-right"
+                      header="Mutasi Debit"
+                      style={{ minWidht: "8rem" }}
+                      field={(e) => e?.debe}
+                    />
+                    <Column
+                      className="header-center text-right"
+                      header="Mutasi Kredit"
+                      style={{ minWidht: "10rem" }}
+                      field={(e) => e?.kred}
+                    />
+                    <Column
+                      className="header-center text-right"
+                      header="Balance"
+                      style={{ minWidht: "10rem" }}
+                      field={(e) => e?.blce}
+                    />
+                  </DataTable>
+                </>
+              }
+            />
+          </Card.Body>
+        </Card>
+      </Row> */}
+
       <Row className="m-0 justify-content-center" ref={printPage}>
-        {chunk(jsonForExcel(stCard) ?? [], chunkSize)?.map((val, idx) => {
+        {chunk(jsonForExcel(account) ?? [], chunkSize)?.map((val, idx) => {
           return (
             <Card className="ml-1 mr-1 mt-2">
               <Card.Body className="p-0">
                 <CustomeWrapper
-                  tittle={"WIP Card Report"}
-                  subTittle={`WIP Card Report for Period ${formatDate(
-                    filtersDate[0]
-                  )} to ${formatDate(filtersDate[1])}`}
+                  tittle={"Pemakaian Bahan"}
+                  subTittle={`Pemakaian Bahan as of ${formatDate(
+                    filtDate[0]
+                  )} to ${formatDate(filtDate[1])}`}
                   onComplete={(cp) => setCp(cp)}
                   page={idx + 1}
                   body={
                     <>
+                      {/* {val.map((v) => { */}
+                      {/* return ( */}
                       <DataTable
                         responsiveLayout="scroll"
                         value={val}
                         showGridlines
                         dataKey="id"
                         rowHover
+                        footer="Subtotal"
                         emptyMessage="Data Tidak Ditemukan"
-                        className="mt-4"
+                        className="header-center text-left"
                       >
                         <Column
-                          className=""
-                          header="Transaction Code"
-                          style={{ width: "11rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header" || e.type === "footer"
-                                  ? "font-weight-bold"
-                                  : ""
-                              }
-                            >
-                              {e.value.trx_code}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className=""
-                          header="Transaction Date"
-                          style={{ width: "11" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header" && "font-weight-bold"
-                              }
-                            >
-                              {e.value.trx_date}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className=""
-                          header="Product"
-                          style={{ minWidht: "20rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header" && "font-weight-bold"
-                              }
-                            >
-                              {e.value.product}
-                            </div>
-                          )}s
-                        />
-                        <Column
                           className="header-center"
-                          header="Type"
-                          style={{ minWidht: "10rem" }}
-                          body={(e) => (
-                            <div className="text-center">
-                              {e.value.trx_type}
-                            </div>
-                          )}
-                        />
-                        {/* <Column
-                          className="header-center"
-                          header="Debit"
-                          style={{ minWidht: "10rem" }}
-                          body={(e) => (
-                            <div className="text-right">
-                              {e.value.trx_debit}
-                            </div>
-                          )}
+                          header="Jenis Produksi"
+                          style={{ width: "20rem" }}
+                          field=""
                         />
                         <Column
-                          className="header-center"
-                          header="Kredit"
-                          style={{ minWidht: "10rem" }}
-                          body={(e) => (
-                            <div className="text-right">
-                              {e.value.trx_kredit}
-                            </div>
-                          )}
+                          className="header-center text-right"
+                          header="Mesin"
+                          style={{ minWidht: "8rem" }}
+                          field=""
                         />
                         <Column
-                          className="header-center"
-                          header="Saldo"
+                          className="header-center text-right"
+                          header="Dept 1"
+                          style={{ minWidht: "8rem" }}
+                          field=""
+                        />
+                        <Column
+                          className="header-center text-right"
+                          header="Formula"
                           style={{ minWidht: "10rem" }}
-                          body={(e) => (
-                            <div className={"text-right"}>{e.value.sld}</div>
-                          )}
-                        /> */}
+                          field=""
+                        />
+                        <Column
+                          className="header-center text-right"
+                          header="Planning"
+                          style={{ minWidht: "10rem" }}
+                          field=""
+                        />
+                        <Column
+                          className="header-center text-right"
+                          header="Jadi"
+                          style={{ minWidht: "10rem" }}
+                          field=""
+                        />
+                        <Column
+                          className="header-center text-right"
+                          header="Harga"
+                          style={{ minWidht: "10rem" }}
+                          field=""
+                        />
+                        <Column
+                          className="header-center text-right"
+                          header="Total"
+                          style={{ minWidht: "10rem" }}
+                          field=""
+                        />
                       </DataTable>
+
+                      <DataTable
+                        responsiveLayout="scroll"
+                        value={val}
+                        showGridlines
+                        dataKey="id"
+                        rowHover
+                        footer="Subtotal"
+                        emptyMessage="Data Tidak Ditemukan"
+                        className="header-center text-left"
+                      >
+                        <Column
+                          className="header-center"
+                          header="Bahan"
+                          style={{ width: "20rem" }}
+                          field=""
+                        />
+                        <Column
+                          className="header-center text-right"
+                          header=""
+                          style={{ minWidht: "8rem" }}
+                          field=""
+                        />
+                        <Column
+                          className="header-center text-right"
+                          header=""
+                          style={{ minWidht: "8rem" }}
+                          field=""
+                        />
+                        <Column
+                          className="header-center text-right"
+                          header="Formula"
+                          style={{ minWidht: "10rem" }}
+                          field=""
+                        />
+                        <Column
+                          className="header-center text-right"
+                          header="Pemakaian"
+                          style={{ minWidht: "10rem" }}
+                          field=""
+                        />
+                        <Column
+                          className="header-center text-right"
+                          header="Harga"
+                          style={{ minWidht: "10rem" }}
+                          field=""
+                        />
+                        <Column
+                          className="header-center text-right"
+                          header="Total"
+                          style={{ minWidht: "10rem" }}
+                          field=""
+                        />
+                        <Column
+                          className="header-center text-right"
+                          header="Total"
+                          style={{ minWidht: "10rem" }}
+                          field=""
+                        />
+                      </DataTable>
+                      {/* );
+                       })} */}
                     </>
                   }
                 />

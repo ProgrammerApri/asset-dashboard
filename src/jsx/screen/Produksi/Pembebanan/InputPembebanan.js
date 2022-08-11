@@ -3,7 +3,7 @@ import { request, endpoints } from "src/utils";
 import { Row, Col, Card } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
-import { SET_CURRENT_PBN } from "src/redux/actions";
+import { SET_CURRENT_PBB } from "src/redux/actions";
 import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,10 +15,12 @@ import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import { Divider } from "@material-ui/core";
 import { TabPanel, TabView } from "primereact/tabview";
 import DataAkun from "../../Master/Akun/DataAkun";
+import { id } from "chartjs-plugin-streaming";
 
 const defError = {
   code: false,
   name: false,
+  btc: false,
   uph: [
     {
       id: false,
@@ -37,7 +39,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
   const toast = useRef(null);
   const [active, setActive] = useState(0);
   const [doubleClick, setDoubleClick] = useState(false);
-  const pbn = useSelector((state) => state.pbn.current);
+  const pbb = useSelector((state) => state.pbb.current);
   const isEdit = useSelector((state) => state.pbn.editPbn);
   const dispatch = useDispatch();
   const [date, setDate] = useState(new Date());
@@ -106,11 +108,11 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
-  const editPBN = async () => {
+  const editPBB = async () => {
     const config = {
-      ...endpoints.editPbn,
-      endpoint: endpoints.editPbn.endpoint + pbn.id,
-      data: pbn,
+      ...endpoints.editPBB,
+      endpoint: endpoints.editPBB.endpoint + pbb.id,
+      data: pbb,
     };
     console.log(config.data);
     let response = null;
@@ -133,10 +135,10 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
     }
   };
 
-  const addPBN = async () => {
+  const addPBB = async () => {
     const config = {
-      ...endpoints.addPbn,
-      data: pbn,
+      ...endpoints.addPBB,
+      data: pbb,
     };
     console.log(config.data);
     let response = null;
@@ -154,7 +156,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${pbn.bcode} Sudah Digunakan`,
+            detail: `Kode ${pbb.bcode} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -184,7 +186,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
-  const checkBtc = (value) => {
+  const checkbtc = (value) => {
     let selected = {};
     batch?.forEach((element) => {
       if (value === element.id) {
@@ -199,10 +201,10 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
     // if (isValid()) {
     if (isEdit) {
       setUpdate(true);
-      editPBN();
+      editPBB();
     } else {
       setUpdate(true);
-      addPBN();
+      addPBB();
     }
     // }
   };
@@ -219,9 +221,9 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
     return [day, month, year].join("-");
   };
 
-  const updatePBN = (e) => {
+  const updatePBB = (e) => {
     dispatch({
-      type: SET_CURRENT_PBN,
+      type: SET_CURRENT_PBB,
       payload: e,
     });
   };
@@ -243,9 +245,9 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
           <div className="col-2 text-black">
             <PrimeInput
               label={"Kode Pembebanan"}
-              value={pbn.ucode}
+              value={pbb.pbb_code}
               onChange={(e) => {
-                updatePBN({ ...pbn, ucode: e.target.value });
+                updatePBB({ ...pbb, pbb_code: e.target.value });
                 let newError = error;
                 newError.code = false;
                 setError(newError);
@@ -258,9 +260,9 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
           <div className="col-3 text-black">
             <PrimeInput
               label={"Nama Pembebanan"}
-              value={pbn.pcode}
+              value={pbb.pbb_name}
               onChange={(e) => {
-                updatePBN({ ...pbn, pcode: e.target.value });
+                updatePBB({ ...pbb, pbb_name: e.target.value });
                 let newError = error;
                 newError.code = false;
                 setError(newError);
@@ -273,9 +275,9 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
           <div className="col-2 text-black">
             <PrimeCalendar
               label={"Tanggal"}
-              value={new Date(`${pbn.pbn_date}Z`)}
+              value={new Date(`${pbb.pbb_date}Z`)}
               onChange={(e) => {
-                updatePBN({ ...pbn, pbn: e.target.value });
+                updatePBB({ ...pbb, pbb_date: e.target.value });
               }}
               placeholder="Pilih Tanggal"
               dateFormat="dd-mm-yy"
@@ -295,17 +297,17 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
             <label className="text-black">Kode Batch</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
-              value={pbn.batch_id && checkBtc(pbn.batch_id)}
+              value={pbb.batch_id && checkbtc(pbb.batch_id)}
               option={batch}
               onChange={(e) => {
-                updatePBN({ ...pbn, batch_id: e.id });
+                updatePBB({ ...pbb, batch_id: e.id, });
                 let newError = error;
                 newError.code = false;
                 setError(newError);
               }}
               label={"[bcode]"}
               placeholder="Pilih Kode Batch"
-              error={error?.code}
+              error={error?.btc}
             />
           </div>
 
@@ -330,7 +332,11 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
             <label className="text-black">Departement</label>
             <div className="p-inputgroup"></div>
             <PrimeInput
-              value={pbn.batch_id && checkBtc(pbn.batch_id)?.dep_id?.ccost_name}
+              value={
+                pbb.batch_id !== null
+                  ? checkbtc(pbb.batch_id)?.dep_id?.ccost_name
+                  : ""
+              }
               placeholder="Departemen"
               disabled
             />
@@ -340,10 +346,10 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
             <label className="text-black">Akun Kredit</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
-              value={pbn.code_acc && checkAcc(pbn.code_acc)}
+              value={pbb.acc_cred && checkAcc(pbb.acc_cred)}
               option={account}
               onChange={(u) => {
-                updatePBN({ ...pbn, code_acc: u.account.id });
+                updatePBB({ ...pbb, acc_cred: u.account.id });
 
                 let newError = error;
                 newError.id = false;
@@ -362,8 +368,8 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
             <label className="text-label">Keterangan</label>
             <div className="p-inputgroup">
               <InputText
-                value={pbn.desc}
-                onChange={(e) => updatePBN({ ...pbn, desc: e.target.value })}
+                value={pbb.desc}
+                onChange={(e) => updatePBB({ ...pbb, desc: e.target.value })}
                 placeholder="Masukan Keterangan"
               />
             </div>
@@ -382,7 +388,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
               <Card.Body>
                 <DataTable
                   responsiveLayout="none"
-                  value={pbn.upah?.map((v, i) => {
+                  value={pbb.upah?.map((v, i) => {
                     return {
                       ...v,
                       index: i,
@@ -402,9 +408,9 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                         value={e.acc_id && checkAcc(e.acc_id)}
                         option={acc}
                         onChange={(u) => {
-                          let temp = [...pbn.upah];
+                          let temp = [...pbb.upah];
                           temp[e.index].acc_id = u.account.id;
-                          updatePBN({ ...pbn, upah: temp });
+                          updatePBB({ ...pbb, upah: temp });
 
                           // let newError = error;
                           // // newError.prod[e.index].id = false;
@@ -430,7 +436,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                     className="align-text-top"
                     field={""}
                     body={(e) =>
-                      e.index === pbn.upah.length - 1 ? (
+                      e.index === pbb.upah.length - 1 ? (
                         <Link
                           onClick={() => {
                             let newError = error;
@@ -440,10 +446,10 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                             });
                             setError(newError);
 
-                            updatePBN({
-                              ...pbn,
+                            updatePBB({
+                              ...pbb,
                               upah: [
-                                ...pbn.upah,
+                                ...pbb.upah,
                                 {
                                   id: 0,
                                   acc_id: null,
@@ -458,9 +464,9 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                       ) : (
                         <Link
                           onClick={() => {
-                            let temp = [...pbn.upah];
+                            let temp = [...pbb.upah];
                             temp.splice(e.index, 1);
-                            updatePBN({ ...pbn, upah: temp });
+                            updatePBB({ ...pbb, upah: temp });
                           }}
                           className="btn btn-danger shadow btn-xs sharp"
                         >
@@ -479,7 +485,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
               <Card.Body>
                 <DataTable
                   responsiveLayout="none"
-                  value={pbn.overhead?.map((v, i) => {
+                  value={"p".overhead?.map((v, i) => {
                     return {
                       ...v,
                       index: i,
@@ -498,10 +504,10 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                       <CustomDropdown
                         value={e.acc_id && checkAcc(e.acc_id)}
                         option={acc}
-                        onChange={(u) => {
-                          let temp = [...pbn.overhead];
-                          temp[e.index].acc_id = u.account.id;
-                          updatePBN({ ...pbn, overhead: temp });
+                        onChange={(p) => {
+                          let temp = [...p.overhead];
+                          temp[e.index].acc_id = p.account.id;
+                          updatePBB({ ...p, overhead: temp });
 
                           // let newError = error;
                           // newError.prod[e.index].id = false;
@@ -527,7 +533,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                     className="align-text-top"
                     field={""}
                     body={(e) =>
-                      e.index === pbn.overhead.length - 1 ? (
+                      e.index === pbb.overhead.length - 1 ? (
                         <Link
                           onClick={() => {
                             let newError = error;
@@ -537,10 +543,10 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                             });
                             setError(newError);
 
-                            updatePBN({
-                              ...pbn,
+                            updatePBB({
+                              ...pbb,
                               overhead: [
-                                ...pbn.overhead,
+                                ...pbb.overhead,
                                 {
                                   id: 0,
                                   acc_id: null,
@@ -555,9 +561,9 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                       ) : (
                         <Link
                           onClick={() => {
-                            let temp = [...pbn.overhead];
+                            let temp = [...pbb.overhead];
                             temp.splice(e.index, 1);
-                            updatePBN({ ...pbn, overhead: temp });
+                            updatePBB({ ...pbb, overhead: temp });
                           }}
                           className="btn btn-danger shadow btn-xs sharp"
                         >
@@ -630,13 +636,13 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
           if (doubleClick) {
             setShowAcc(false);
 
-            let temp = [...pbn.upah];
+            let temp = [...pbb.upah];
             temp[currentIndex].acc_id = e.data.account.id;
 
-            let tempm = [...pbn.overhead];
+            let tempm = [...pbb.overhead];
             temp[currentIndex].acc_id = e.data.account.id;
-            updatePBN({
-              ...pbn,
+            updatePBB({
+              ...pbb,
               code_acc: e.data.account.id,
               upah: temp,
               overhead: tempm,

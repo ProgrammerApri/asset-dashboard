@@ -7,6 +7,7 @@ import { endpoints, request } from "src/utils";
 const CustomeWrapper = ({
   body,
   subTittle,
+  subTittle1,
   tittle,
   page,
   onComplete = () => {},
@@ -59,6 +60,7 @@ const CustomeWrapper = ({
             </b>
           </h3>
           <h5 className="mt-2">{subTittle}</h5>
+          <h5 className="mt-2">{subTittle1}</h5>
           <div className="mt-5">{body}</div>
         </div>
         <Divider className="ml-3 mr-3"></Divider>

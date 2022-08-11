@@ -1095,6 +1095,13 @@ const endpoints = {
     method: "DELETE",
     data: {},
   },
+
+  /// RPBB_REPORT
+  rpbb: {
+    endpoint: "/v1/api/rpbb",
+    method: "GET",
+    data: {},
+  },
 };
 
 export default endpoints;

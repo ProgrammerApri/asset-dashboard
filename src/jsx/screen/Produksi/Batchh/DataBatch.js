@@ -26,7 +26,7 @@ const data = {
   mesin: [],
 };
 
-const DataBatch = ({ onAdd, onEdit }) => {
+const DataBatch = ({ onAdd, onEdit, onDetail }) => {
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(true);
   const [displayDel, setDisplayDel] = useState(false);
@@ -75,7 +75,7 @@ const DataBatch = ({ onAdd, onEdit }) => {
   };
 
   const delBTC = async (id) => {
-    setLoading(true)
+    setLoading(true);
     const config = {
       ...endpoints.delBatch,
       endpoint: endpoints.delBatch.endpoint + currentItem.id,
@@ -117,46 +117,61 @@ const DataBatch = ({ onAdd, onEdit }) => {
     return (
       // <React.Fragment>
       <div className="d-flex">
-        {/* <Link
+        <Link
           onClick={() => {
             onDetail();
-            let dprod = data.dprod;
-            let djasa = data.djasa;
+            let product = data.plan_id.product;
+            let material = data.plan_id.material;
+            product?.forEach((element) => {
+              element.qty = element.qty * Number(data.plan_id.total);
+            });
+
+            material?.forEach((elem) => {
+              elem.qty = elem.qty * Number(data.plan_id.total);
+            });
+
+            let mesin = data.plan_id.mesin;
+            mesin?.forEach((el) => {
+              // el.mch_id = el.mch_id.id;
+            });
             dispatch({
-              type: SET_CURRENT_ODR,
+              type: SET_CURRENT_BTC,
               payload: {
                 ...data,
-                dprod:
-                  dprod.length > 0
-                    ? dprod
+                product:
+                  product?.length > 0
+                    ? product
                     : [
                         {
                           id: 0,
-                          do_id: null,
+                          form_id: null,
                           prod_id: null,
                           unit_id: null,
-                          location: null,
-                          order: null,
-                          price: null,
-                          disc: null,
-                          nett_price: null,
-                          total: null,
+                          qty: null,
+                          aloc: null,
                         },
                       ],
-                djasa:
-                  djasa.length > 0
-                    ? djasa
+                material:
+                  material?.length > 0
+                    ? material
                     : [
                         {
                           id: 0,
-                          do_id: null,
-                          jasa_id: null,
-                          sup_id: null,
+                          form_id: null,
+                          prod_id: null,
                           unit_id: null,
-                          order: null,
+                          qty: null,
                           price: null,
-                          disc: null,
-                          total: null,
+                        },
+                      ],
+                mesin:
+                  mesin?.length > 0
+                    ? mesin
+                    : [
+                        {
+                          id: 0,
+                          pl_id: null,
+                          mch_id: null,
                         },
                       ],
               },
@@ -165,7 +180,7 @@ const DataBatch = ({ onAdd, onEdit }) => {
           className="btn btn-info shadow btn-xs sharp ml-1"
         >
           <i className="bx bx-show mt-1"></i>
-        </Link> */}
+        </Link>
 
         <Link
           onClick={() => {
@@ -178,13 +193,13 @@ const DataBatch = ({ onAdd, onEdit }) => {
             product?.forEach((element) => {
               element.prod_id = element.prod_id?.id;
               element.unit_id = element.unit_id?.id;
-              element.qty = element.qty * Number(data.plan_id.total)
+              element.qty = element.qty * Number(data.plan_id.total);
             });
             let material = data.plan_id.material;
             material?.forEach((elem) => {
               elem.prod_id = elem.prod_id.id;
               elem.unit_id = elem.unit_id.id;
-              elem.qty = elem.qty * Number(data.plan_id.total)
+              elem.qty = elem.qty * Number(data.plan_id.total);
             });
             let mesin = data.plan_id.mesin;
             mesin?.forEach((el) => {
@@ -443,70 +458,78 @@ const DataBatch = ({ onAdd, onEdit }) => {
       <Toast ref={toast} />
       <Row>
         <Col className="pt-0">
-          <DataTable
-            responsiveLayout="scroll"
-            value={loading ? dummy : btc}
-            className="display w-150 datatable-wrapper"
-            showGridlines
-            dataKey="id"
-            rowHover
-            header={renderHeader}
-            filters={filters1}
-            globalFilterFields={["bcode", "dep_id.ccost_name", "plan_id.pcode"]}
-            emptyMessage="Tidak ada data"
-            paginator
-            paginatorTemplate={template2}
-            first={first2}
-            rows={rows2}
-            onPage={onCustomPage2}
-            paginatorClassName="justify-content-end mt-3"
-          >
-            <Column
-              header="Tgl Batch"
-              field={(e) => formatDate(e.batch_date)}
-              style={{ minWidth: "8rem" }}
-              body={loading && <Skeleton />}
-            />
-            <Column
-              header="Kode Batch"
-              style={{
-                minWidth: "8rem",
-              }}
-              field={(e) => e.bcode}
-              body={loading && <Skeleton />}
-            />
-            <Column
-              header="Departemen"
-              field={(e) => e.dep_id?.ccost_name}
-              style={{ minWidth: "8rem" }}
-              body={loading && <Skeleton />}
-            />
-            <Column
-              header="Tgl Planning"
-              field={(e) => formatDate(e.plan_id?.date_planing)}
-              style={{ minWidth: "8rem" }}
-              body={loading && <Skeleton />}
-            />
-            <Column
-              header="Kode Planning"
-              field={(e) => e.plan_id?.pcode}
-              style={{ minWidth: "8rem" }}
-              body={loading && <Skeleton />}
-            />
-            <Column
-              header="Nama Planning"
-              field={(e) => e.plan_id?.pname}
-              style={{ minWidth: "8rem" }}
-              body={loading && <Skeleton />}
-            />
-            <Column
-              header="Action"
-              dataType="boolean"
-              bodyClassName="text-center"
-              style={{ minWidth: "2rem" }}
-              body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
-            />
-          </DataTable>
+          <Card>
+            <Card.Body>
+              <DataTable
+                responsiveLayout="scroll"
+                value={loading ? dummy : btc}
+                className="display w-150 datatable-wrapper"
+                showGridlines
+                dataKey="id"
+                rowHover
+                header={renderHeader}
+                filters={filters1}
+                globalFilterFields={[
+                  "bcode",
+                  "dep_id.ccost_name",
+                  "plan_id.pcode",
+                ]}
+                emptyMessage="Tidak ada data"
+                paginator
+                paginatorTemplate={template2}
+                first={first2}
+                rows={rows2}
+                onPage={onCustomPage2}
+                paginatorClassName="justify-content-end mt-3"
+              >
+                <Column
+                  header="Tgl Batch"
+                  field={(e) => formatDate(e.batch_date)}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Kode Batch"
+                  style={{
+                    minWidth: "8rem",
+                  }}
+                  field={(e) => e.bcode}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Departemen"
+                  field={(e) => e.dep_id?.ccost_name}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Tgl Planning"
+                  field={(e) => formatDate(e.plan_id?.date_planing)}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Kode Planning"
+                  field={(e) => e.plan_id?.pcode}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Nama Planning"
+                  field={(e) => e.plan_id?.pname}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Action"
+                  dataType="boolean"
+                  bodyClassName="text-center"
+                  style={{ minWidth: "2rem" }}
+                  body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
+                />
+              </DataTable>
+            </Card.Body>
+          </Card>
         </Col>
       </Row>
 

@@ -4,8 +4,9 @@ import { Toast } from "primereact/toast";
 // import Detail from "./Detail";
 import DataBatch from "./DataBatch";
 import InputBatch from "./InputBatch";
+import Detail from "./Detail";
 
-const Batch = ({trigger}) => {
+const Batch = ({ trigger }) => {
   const [active, setActive] = useState(0);
   const toast = useRef(null);
 
@@ -28,47 +29,27 @@ const Batch = ({trigger}) => {
       }}
     />,
     <InputBatch
-    onCancel={() => setActive(0)}
-    onSuccess={() => {
-      setTimeout(() => {
-        setActive(0);
-        toast.current.show({
-          severity: "info",
-          summary: "Berhasil",
-          detail: "Data Berhasil Diperbarui",
-          life: 3000,
-        });
-      }, 500);
-    }}
-  />,
-    // <Input
-    //   onCancel={() => setActive(0)}
-    //   onSuccess={() => {
-    //     setTimeout(() => {
-    //       setActive(0);
-    //       toast.current.show({
-    //         severity: "info",
-    //         summary: "Berhasil",
-    //         detail: "Data Berhasil Diperbarui",
-    //         life: 3000,
-    //       });
-    //     }, 500);
-    //   }}
-    // />
-    // <Detail onCancel={() => setActive(0)} />,
+      onCancel={() => setActive(0)}
+      onSuccess={() => {
+        setTimeout(() => {
+          setActive(0);
+          toast.current.show({
+            severity: "info",
+            summary: "Berhasil",
+            detail: "Data Berhasil Diperbarui",
+            life: 3000,
+          });
+        }, 500);
+      }}
+    />,
+    <Detail onCancel={() => setActive(0)} />,
   ]);
 
   return (
     <>
-    <Toast ref={toast} />
-    <Row>
-      <Col className="pt-0">
-        <Card>
-          <Card.Body>{view[active]}</Card.Body>
-        </Card>
-      </Col>
-    </Row>
-  </>
+      <Toast ref={toast} />
+      {view[active]}
+    </>
   );
 };
 

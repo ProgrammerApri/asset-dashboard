@@ -14,6 +14,7 @@ import SalesReport from "./Penjualan";
 import NeracaPerbandingan from "../NeracaPerbandingan";
 import KartuStock from "../KartuStock";
 import KartuWIP from "../KartuWIP";
+import RencanaPemakaianBB from "../RencanaPemakaianBB";
 
 const LaporanPembelian = () => {
   const [active, setActive] = useState(0);
@@ -82,6 +83,11 @@ const LaporanPembelian = () => {
       tittle: "Kartu WIP",
       icon: "bx-spreadsheet",
       component: <KartuWIP />,
+    },
+    {
+      tittle: "Rencana Pemakaian BB",
+      icon: "bx-spreadsheet",
+      component: <RencanaPemakaianBB />,
     },
   ]);
 

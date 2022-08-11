@@ -396,13 +396,13 @@ const InputBatch = ({ onCancel, onSuccess }) => {
       pl: !btc.plan_id,
     };
 
-    valid = !errors.code && !errors.pl;
+    valid = !errors.code && !errors.date && !errors.pl;
 
     setError(errors);
 
     if (!valid) {
       window.scrollTo({
-        top: 180,
+        top: 80,
         left: 0,
         behavior: "smooth",
       });
@@ -572,9 +572,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
           <div className="col-3 text-black">
             <PrimeInput
               label={"Lokasi Gudang"}
-              value={
-                btc.plan_id && checkPlan(btc.plan_id)?.loc_id?.name
-              }
+              value={btc.plan_id && checkPlan(btc.plan_id)?.loc_id?.name}
               placeholder="Masukan Lokasi"
               disabled
             />
@@ -966,11 +964,15 @@ const InputBatch = ({ onCancel, onSuccess }) => {
     <>
       <Row>
         <Col className="pt-0">
-          <>
-            {/* {header()} */}
-            {body()}
-            {footer()}
-          </>
+          <Card>
+            <Card.Body>
+              <>
+                {/* {header()} */}
+                {body()}
+                {footer()}
+              </>
+            </Card.Body>
+          </Card>
         </Col>
       </Row>
 

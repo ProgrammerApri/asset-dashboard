@@ -22,6 +22,7 @@ const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
 const KartuWIP = () => {
   const [batch, setBatch] = useState(null);
+  const [btch, setBtch] = useState(null);
   const [product, setProduct] = useState(null);
   const [selectedProduct, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -40,6 +41,7 @@ const KartuWIP = () => {
     d.setDate(d.getDate() - 7);
     setFiltDate([d, new Date()]);
     getBatch();
+    getBtch();
     getPhj();
   }, []);
 
@@ -55,11 +57,39 @@ const KartuWIP = () => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        setStCard(data);
+        let filtered = [];
+        data.forEach((el) => {
+          if (el.trx_type === "PR" || el.trx_type === "PM") {
+            filtered.push(el);
+          }
+        });
+        setStCard(filtered);
         let grouped = data?.filter(
-          (el, i) => i === data.findIndex((ek) => el?.trx_code === ek?.bcode)
+          (el, i) =>
+            i ===
+            data.findIndex(
+              (ek) =>
+                el?.trx_code === ek?.trx_code &&
+                (el.trx_type === "PR" || el.trx_type === "PM")
+            )
         );
         setBatch(grouped);
+      }
+    } catch (error) {}
+  };
+
+  const getBtch = async () => {
+    const config = {
+      ...endpoints.batch,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setBtch(data);
       }
     } catch (error) {}
   };
@@ -97,67 +127,168 @@ const KartuWIP = () => {
   const jsonForExcel = (stCard, excel = false) => {
     let data = [];
 
-    stCard?.forEach((el) => {
-      let prd_jd = 0;
-      let hrg = el.trx_hpok / el.trx_qty;
-      let hrg_jadi = 0;
+    batch?.forEach((el) => {
+      phj?.forEach((ek) => {
+        if (ek.batch_id.bcode === el.trx_code) {
+          let prd = [
+            {
+              btc: el.trx_code,
+              type: "header",
+              value: {
+                prod: "Produk",
+                msn: "Mesin",
+                dep: "Departemen",
+                qty: "Kuantitas",
+                plan: "Planning",
+                jadi: "Hasil Jadi",
+                prc: "Harga",
+                total: "Total",
+              },
+            },
+          ];
 
-      phj?.forEach((element) => {
-        if (element.product.prod_id === el.prod_id) {
-          prd_jd.push({});
+          btch?.forEach((ej) => {
+            if (ej.bcode === ek.batch_id.bcode) {
+              let msin = [];
+              let qty_total = 0;
+              let hpok_total = 0;
+              let plan_total = 0;
+              let jadi_total = 0;
+              let bahan_total = 0;
+              let prc_total = 0;
+              let form_total = 0;
+              let used_total = 0;
+              let total = 0;
+
+              ej?.plan_id?.mesin?.forEach((ei) => {
+                msin.push(ei.mch_id.msn_name);
+              });
+
+              ej?.plan_id?.product?.forEach((ei, i) => {
+                stCard?.forEach((eh) => {
+                  if (
+                    ej.bcode === eh.trx_code &&
+                    ei.prod_id.id === eh.prod_id.id
+                  ) {
+                    prd.push({
+                      btc: el.trx_code,
+                      type: "item",
+                      value: {
+                        prod: ei.prod_id.name,
+                        msn: msin.join(", "),
+                        dep: `${ej.dep_id.ccost_code}-${ej.dep_id.ccost_name}`,
+                        qty: ei.qty,
+                        plan: ei.qty * ej.plan_id.total,
+                        jadi: ek.product[i].qty,
+                        prc: `Rp. ${formatIdr(eh.trx_hpok / eh.trx_qty)}`,
+                        total: `Rp. ${formatIdr(eh.trx_hpok)}`,
+                      },
+                    });
+                    qty_total += ei.qty;
+                    plan_total += ei.qty * ej.plan_id.total;
+                    jadi_total += ek.product[i].qty;
+                    hpok_total += eh.trx_hpok / eh.trx_qty;
+                    total += eh.trx_hpok;
+                  }
+                });
+              });
+
+              prd.push({
+                btc: el.trx_code,
+                type: "footer",
+                value: {
+                  prod: "Sub Total",
+                  msn: "",
+                  dep: "",
+                  qty: qty_total,
+                  plan: plan_total,
+                  jadi: jadi_total,
+                  prc: `Rp. ${formatIdr(hpok_total)}`,
+                  total: `Rp. ${formatIdr(total)}`,
+                },
+              });
+
+              prd.push({
+                btc: el.trx_code,
+                type: "header",
+                value: {
+                  prod: "",
+                  msn: "",
+                  dep: "",
+                  qty: "",
+                  plan: "",
+                  jadi: "",
+                  prc: "",
+                  total: "",
+                },
+              });
+
+              prd.push({
+                btc: el.trx_code,
+                type: "header",
+                value: {
+                  prod: "Bahan",
+                  msn: "",
+                  dep: "",
+                  qty: "",
+                  plan: "Formula",
+                  jadi: "Pemakaian",
+                  prc: "Harga",
+                  total: "Total",
+                },
+              });
+
+              ej.plan_id.material.forEach((ei) => {
+                stCard?.forEach((eh) => {
+                  if (
+                    ej.bcode === eh.trx_code &&
+                    ei.prod_id.id === eh.prod_id.id
+                  ) {
+                    prd.push({
+                      btc: el.trx_code,
+                      type: "item",
+                      value: {
+                        prod: ei.prod_id.name,
+                        msn: "",
+                        dep: "",
+                        qty: "",
+                        plan: ei.qty,
+                        jadi: ei.qty * ej.plan_id.total,
+                        prc: `Rp. ${formatIdr(eh.trx_hpok / eh.trx_qty)}`,
+                        total: `Rp. ${formatIdr(eh.trx_hpok)}`,
+                      },
+                    });
+                    bahan_total += eh.trx_hpok
+                    prc_total += eh.trx_hpok / eh.trx_qty
+                    used_total += ei.qty * ej.plan_id.total
+                    form_total += ei.qty
+                  }
+                });
+              });
+
+              prd.push({
+                btc: el.trx_code,
+                type: "footer",
+                value: {
+                  prod: "Sub Total",
+                  msn: "",
+                  dep: "",
+                  qty: "",
+                  plan: form_total,
+                  jadi: used_total,
+                  prc: `Rp. ${formatIdr(prc_total)}`,
+                  total: `Rp. ${formatIdr(bahan_total)}`,
+                },
+              });
+            }
+          });
+
+          data.push(prd);
         }
       });
-
-      let prd = [
-        {
-          btc: "",
-          type: "header",
-          value: {
-            prod: "Produk",
-            msn: "Mesin",
-            dep: "Departemen",
-            qty: "Kuantitas",
-            plan: "Planning",
-            jadi: "Hasil Jadi",
-            prc: "Harga",
-            total: "Total",
-          },
-        },
-      ];
-
-      prd.push({
-        btc: "",
-        type: "item",
-        value: {
-          prod: el.trx_dbcr === "d" ? el.prod_id.name : null,
-          msn: null,
-          dep: null,
-          qty: 0,
-          plan: 0,
-          jadi: 0,
-          prc: 0,
-          total: 0,
-        },
-      });
-     
-      prd.push({
-        btc: "",
-        type: "footer",
-        value: {
-          prod: "Sub Total",
-          msn: "",
-          dep: "",
-          qty: 0,
-          plan: 0,
-          jadi: 0,
-          prc: 0,
-          total: 0,
-        },
-      });
-
-      data.push(prd);
-      // }
     });
+
+    console.log(data);
 
     let final = [
       {

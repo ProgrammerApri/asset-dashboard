@@ -24,18 +24,6 @@ const defError = {
   code: false,
   date: false,
   btc: false,
-  prod: [
-    {
-      id: false,
-      qty: false,
-    },
-  ],
-  rej: [
-    {
-      id: false,
-      qty: false,
-    },
-  ],
 };
 
 const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
@@ -311,79 +299,9 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
       code: !phj.phj_code || phj.phj_code === "",
       date: !phj.phj_date || phj.phj_date === "",
       btc: !phj.batch_id,
-      prod: [],
-      rej: [],
     };
 
-    phj?.product.forEach((element, i) => {
-      if (i > 0) {
-        if (element.qty) {
-          errors.prod[i] = {
-            qty: !element.qty || element.qty === "" || element.qty === "0",
-          };
-        }
-      } else {
-        errors.prod[i] = {
-          qty: !element.qty || element.qty === "" || element.qty === "0",
-        };
-      }
-    });
-
-    // phj?.reject.forEach((element, i) => {
-    //   if (i > 0) {
-    //     if (element.prod_id || element.qty) {
-    //       errors.rej[i] = {
-    //         id: !element.prod_id,
-    //         qty: !element.qty || element.qty === "" || element.qty === "0",
-    //       };
-    //     }
-    //   } else {
-    //     errors.rej[i] = {
-    //       id: !element.prod_id,
-    //       qty: !element.qty || element.qty === "" || element.qty === "0",
-    //     };
-    //   }
-    // });
-
-    if (!errors.prod[0]?.qty) {
-      errors.prod?.forEach((e) => {
-        for (var key in e) {
-          e[key] = false;
-        }
-      });
-    }
-
-    // if (!errors.rej[0]?.id && !errors.rej[0]?.qty) {
-    //   errors.rej?.forEach((e) => {
-    //     for (var key in e) {
-    //       e[key] = false;
-    //     }
-    //   });
-    // }
-
-    let validProduct = false;
-    let validRej = false;
-    if (!validProduct) {
-      errors.prod?.forEach((el) => {
-        for (var k in el) {
-          validProduct = !el[k];
-        }
-      });
-    }
-
-    // if (!validRej) {
-    //   errors.rej.forEach((elem, i) => {
-    //     for (var k in elem) {
-    //       validRej = !elem[k];
-    //       if (elem[k] && i < active) {
-    //         active = 1;
-    //       }
-    //     }
-    //   });
-    // }
-
-    valid =
-      !errors.code && !errors.date && !errors.btc && (validProduct || validRej);
+    valid = !errors.code && !errors.date && !errors.btc;
 
     setError(errors);
 
@@ -590,10 +508,6 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                           temp[e.index].prod_id = u.id;
                           temp[e.index].unit_id = u.unit?.id;
                           updatePHJ({ ...phj, product: temp });
-
-                          let newError = error;
-                          newError.prod[e.index].id = false;
-                          setError(newError);
                         }}
                         detail
                         onDetail={() => {
@@ -602,8 +516,6 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                         }}
                         label={"[name]"}
                         placeholder="Pilih Produk"
-                        errorMessage="Produk Belum Dipilih"
-                        error={error?.prod[e.index]?.id}
                         disabled
                       />
                     )}
@@ -645,65 +557,12 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                           let temp = [...phj.product];
                           temp[e.index].qty = u.target.value;
                           updatePHJ({ ...phj, product: temp });
-
-                          let newError = error;
-                          newError.prod[e.index].qty = false;
-                          setError(newError);
                         }}
                         placeholder="0"
                         type="number"
                         min={0}
-                        error={error?.prod[e.index]?.qty}
                       />
                     )}
-                  />
-
-                  <Column
-                    header=""
-                    className="align-text-top"
-                    field={""}
-                    body={
-                      (e) => (
-                        <Link
-                          onClick={() => {
-                            let temp = [...phj.product];
-                            temp.splice(e.index, 1);
-                            updatePHJ({ ...phj, product: temp });
-                          }}
-                          className="btn btn-danger shadow btn-xs sharp"
-                        >
-                          <i className="fa fa-trash"></i>
-                        </Link>
-                      )
-                      // e.index === phj.product.length - 1 ? (
-                      //   <Link
-                      //     onClick={() => {
-                      //       let newError = error;
-                      //       newError.prod.push({
-                      //         qty: false,
-                      //       });
-                      //       setError(newError);
-
-                      //       updatePHJ({
-                      //         ...phj,
-                      //         product: [
-                      //           ...phj.product,
-                      //           {
-                      //             id: 0,
-                      //             prod_id: null,
-                      //             unit_id: null,
-                      //             qty: null,
-                      //           },
-                      //         ],
-                      //       });
-                      //     }}
-                      //     className="btn btn-primary shadow btn-xs sharp"
-                      //   >
-                      //     <i className="fa fa-plus"></i>
-                      //   </Link>
-                      // ) : (
-                      // )
-                    }
                   />
                 </DataTable>
               </Card.Body>
@@ -752,10 +611,6 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                           temp[e.index].prod_id = u.id;
                           temp[e.index].unit_id = u.unit?.id;
                           updatePHJ({ ...phj, reject: temp });
-
-                          let newError = error;
-                          newError.rej[e.index].id = false;
-                          setError(newError);
                         }}
                         detail
                         onDetail={() => {
@@ -765,7 +620,6 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                         label={"[name]"}
                         placeholder="Pilih Produk"
                         errorMessage="Produk Belum Dipilih"
-                        error={error?.rej[e.index]?.id}
                       />
                     )}
                   />
@@ -805,15 +659,10 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                           let temp = [...phj.reject];
                           temp[e.index].qty = u.target.value;
                           updatePHJ({ ...phj, reject: temp });
-
-                          let newError = error;
-                          newError.rej[e.index].qty = false;
-                          setError(newError);
                         }}
                         placeholder="0"
                         type="number"
                         min={0}
-                        error={error?.rej[e.index]?.qty}
                       />
                     )}
                   />

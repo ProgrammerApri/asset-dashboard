@@ -23,7 +23,7 @@ import FMReducer from "./FMReducer";
 import MSNReducer from "./MSNReducer";
 import PLReducer from "./PLReducer";
 import BTCReducer from "./BTCReducer";
-import PBNReducer from "./PBNReducer";
+// import PBNReducer from "./PBNReducer";
 
 
 const rootReducer = combineReducers({
@@ -51,7 +51,7 @@ const rootReducer = combineReducers({
   msn: MSNReducer,
   plan: PLReducer,
   btc: BTCReducer,
-  pbn: PBNReducer,
+  // pbn: PBNReducer,
 });
 
 export default rootReducer;

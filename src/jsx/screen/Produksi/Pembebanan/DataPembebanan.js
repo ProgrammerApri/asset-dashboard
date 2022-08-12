@@ -12,7 +12,7 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_FM, SET_CURRENT_PBN, SET_EDIT_FM, SET_EDIT_PBN, SET_FM, SET_PBN } from "src/redux/actions";
+import { SET_CURRENT_FM, SET_CURRENT_PBB, SET_CURRENT_PBN, SET_EDIT_FM, SET_EDIT_PBB, SET_EDIT_PBN, SET_FM, SET_PBB, SET_PBN } from "src/redux/actions";
 import { Divider } from "@material-ui/core";
 import ReactToPrint from "react-to-print";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
@@ -42,24 +42,25 @@ const DataPembebanan = ({ onAdd, onEdit, onDetail }) => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const dispatch = useDispatch();
-  const pbn = useSelector((state) => state.pbn.pbn);
-  const show = useSelector((state) => state.pbn.current);
+  const pbb = useSelector((state) => state.pbb.pbb);
+  const show = useSelector((state) => state.pbb.current);
   const printPage = useRef(null);
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getPBN();
+    // getPBN();
+    getPBB();
     getDept();
     initFilters1();
   }, []);
 
 
-  const getPBN = async (isUpdate = false) => {
+  const getPBB = async (isUpdate = false) => {
     setLoading(true);
     const config = {
       ...endpoints.pbb,
-      data: pbn,
+      data: pbb,
     };
     console.log(config.data);
     let response = null;
@@ -69,7 +70,7 @@ const DataPembebanan = ({ onAdd, onEdit, onDetail }) => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        dispatch({ type: SET_PBN, payload: data });
+        dispatch({ type: SET_PBB, payload: data });
       }
     } catch (error) {}
     if (isUpdate) {
@@ -108,7 +109,7 @@ const DataPembebanan = ({ onAdd, onEdit, onDetail }) => {
   };
 
 
-  const delPBN = async (id) => {
+  const delPBB = async (id) => {
     const config = {
       ...endpoints.delPBB,
       endpoint: endpoints.delPBB.endpoint + currentItem.id,
@@ -122,7 +123,7 @@ const DataPembebanan = ({ onAdd, onEdit, onDetail }) => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayDel(false);
-          getPBN(true);
+          getPBB(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -205,49 +206,24 @@ const DataPembebanan = ({ onAdd, onEdit, onDetail }) => {
             onEdit(data);
             let product = data.product;
             dispatch({
-              type: SET_EDIT_FM,
+              type: SET_EDIT_PBB,
               payload: true,
             });
-            product.forEach((el) => {
-              el.prod_id = el.prod_id?.id;
-              el.unit_id = el.unit_id?.id;
-            });
-            let material = data.material;
-            material.forEach((el) => {
-              el.prod_id = el.prod_id.id;
-              el.unit_id = el.unit_id.id;
-            });
+            // product.forEach((el) => {
+            //   el.prod_id = el.prod_id?.id;
+            //   el.unit_id = el.unit_id?.id;
+            // });
+            // let material = data.material;
+            // material.forEach((el) => {
+            //   el.prod_id = el.prod_id.id;
+            //   el.unit_id = el.unit_id.id;
+            // });
             dispatch({
-              type: SET_CURRENT_FM,
+              type: SET_CURRENT_PBB,
               payload: {
                 ...data,
-                product:
-                  product.length > 0
-                    ? product
-                    : [
-                        {
-                          id: 0,
-                          form_id: null,
-                          prod_id: null,
-                          unit_id: null,
-                          qty: null,
-                          aloc: null,
-                        },
-                      ],
-                material:
-                  material.length > 0
-                    ? material
-                    : [
-                        {
-                          id: 0,
-                          form_id: null,
-                          prod_id: null,
-                          unit_id: null,
-                          qty: null,
-                          price: null,
-                        },
-                      ],
-              },
+              batch_id: data.batch_id.id,
+            acc_cred: data.acc_cred.id}
             });
           }}
           className="btn btn-primary shadow btn-xs sharp ml-1"
@@ -282,7 +258,7 @@ const DataPembebanan = ({ onAdd, onEdit, onDetail }) => {
           label="Hapus"
           icon="pi pi-trash"
           onClick={() => {
-            delPBN();
+            delPBB();
           }}
           autoFocus
           loading={loading}
@@ -323,24 +299,24 @@ const DataPembebanan = ({ onAdd, onEdit, onDetail }) => {
           onClick={() => {
             onAdd();
             dispatch({
-              type: SET_EDIT_PBN,
+              type: SET_EDIT_PBB,
               payload: false,
             });
             dispatch({
-              type: SET_CURRENT_PBN,
+              type: SET_CURRENT_PBB,
               payload: {
                 ...data,
                 upah: [
                   {
                     id: 0,
-                    pbn_id: 0,
+                    pbb_id: 0,
                     acc_id: null,
                   },
                 ],
                 overhead: [
                   {
                     id: 0,
-                    pbn_id: 0,
+                    pbb_id: 0,
                     acc_id: null,
                   },
                 ],
@@ -446,7 +422,7 @@ const DataPembebanan = ({ onAdd, onEdit, onDetail }) => {
       <Toast ref={toast} />
       <DataTable
         responsiveLayout="scroll"
-        value={loading ? dummy : pbn}
+        value={loading ? dummy : pbb}
         className="display w-150 datatable-wrapper"
         showGridlines
         dataKey="id"

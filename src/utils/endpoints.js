@@ -1115,18 +1115,18 @@ const endpoints = {
   //   data: {},
   // },
 
-  delPbn: {
-    endpoint: "/v1/api/pbn/",
-    method: "DELETE",
-    data: {},
-  },
+  // delPbn: {
+  //   endpoint: "/v1/api/pbn/",
+  //   method: "DELETE",
+  //   data: {},
+  // },
 
   /// RPBB_REPORT
-  rpbb: {
-    endpoint: "/v1/api/rpbb",
-    method: "GET",
-    data: {},
-  },
+  // rpbb: {
+  //   endpoint: "/v1/api/rpbb",
+  //   method: "GET",
+  //   data: {},
+  // },
   // delPbn: {
   //   endpoint: "/v1/api/pbn/",
   //   method: "DELETE",

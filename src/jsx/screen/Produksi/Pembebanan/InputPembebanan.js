@@ -40,7 +40,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
   const [active, setActive] = useState(0);
   const [doubleClick, setDoubleClick] = useState(false);
   const pbb = useSelector((state) => state.pbb.current);
-  const isEdit = useSelector((state) => state.pbn.editPbn);
+  const isEdit = useSelector((state) => state.pbb.editPBB);
   const dispatch = useDispatch();
   const [date, setDate] = useState(new Date());
   const [showAcc, setShowAcc] = useState(false);
@@ -297,7 +297,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
             <label className="text-black">Kode Batch</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
-              value={pbb.batch_id && checkbtc(pbb.batch_id)}
+              value={pbb.batch_id && checkbtc(pbb.dept_id)}
               option={batch}
               onChange={(e) => {
                 updatePBB({ ...pbb, batch_id: e.id, });

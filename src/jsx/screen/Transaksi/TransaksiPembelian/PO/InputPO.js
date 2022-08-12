@@ -805,7 +805,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
           <div className="col-12 p-0">
             <div className="mt-4 mb-2 ml-3 mr-3 fs-14">
-              <b>Informasi Pembelian</b>
+              <b>Permintaan Pembelian</b>
             </div>
             <Divider className="mb-2 ml-3 mr-3"></Divider>
           </div>
@@ -1250,7 +1250,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
           <div className="col-12 p-0">
             <div className="mt-5 mb-2 ml-3 mr-3 fs-14">
-              <b>Informasi Pembayaran</b>
+              <b>Pembayaran</b>
             </div>
             <Divider className="mb-2 ml-3 mr-3"></Divider>
           </div>

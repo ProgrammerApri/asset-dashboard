@@ -32,6 +32,8 @@ import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 const defError = {
   code: false,
   date: false,
+  noDoc: false,
+  docDate: false,
   sup: false,
   rul: false,
   prod: [
@@ -108,7 +110,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     const config = {
       ...endpoints.editODR,
       endpoint: endpoints.editODR.endpoint + order.id,
-      data: order,
+      data:{ ...order, doc_date: currentDate(order.doc_date) },
     };
     console.log(config.data);
     let response = null;
@@ -134,7 +136,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
   const addODR = async () => {
     const config = {
       ...endpoints.addODR,
-      data: order,
+      data: { ...order, doc_date: currentDate(order.doc_date) },
     };
     console.log(config.data);
     let response = null;
@@ -522,6 +524,20 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     return [year, month, day].join("-");
   };
 
+  const currentDate = (date) => {
+    let now = new Date();
+    let newDate = new Date(
+      date?.getFullYear(),
+      date?.getMonth(),
+      date?.getDate(),
+      now?.getHours(),
+      now?.getMinutes(),
+      now?.getSeconds(),
+      now?.getMilliseconds()
+    );
+    return newDate.toISOString();
+  };
+
   const header = () => {
     return (
       <h4 className="mb-5">
@@ -535,6 +551,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     let errors = {
       code: !order.ord_code || order.ord_code === "",
       date: !order.ord_date || order.ord_date === "",
+      noDoc: !order.no_doc || order.no_doc === "",
+      docDate: !order.doc_date || order.doc_date === "",
       sup: !order.sup_id,
       rul: !order.top,
       prod: [],
@@ -627,6 +645,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     valid =
       !errors.code &&
       !errors.date &&
+      !errors.noDoc &&
+      !errors.docDate &&
       !errors.sup &&
       !errors.rul &&
       (validProduct || validJasa);
@@ -651,7 +671,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
         <Toast ref={toast} />
 
         <Row className="mb-4">
-          <div className="col-4">
+          <div className="col-3">
             <PrimeInput
               label={"Kode Pembelian"}
               value={order.ord_code}
@@ -692,24 +712,58 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-12 mt-2">
+          <div className="col-3">
+            <PrimeInput
+              label={"No. Dokumen"}
+              value={order.no_doc}
+              onChange={(e) => {
+                updateORD({ ...order, no_doc: e.target.value });
+                let newError = error;
+                newError.noDoc = false;
+                setError(newError);
+              }}
+              placeholder="Masukan No. Dokumen"
+              error={error?.noDoc}
+            />
+          </div>
+
+          <div className="col-2">
+            <PrimeCalendar
+              label={"Tanggal Dokumen"}
+              value={new Date(`${order.doc_date}Z`)}
+              onChange={(e) => {
+                updateORD({ ...order, doc_date: e.value });
+
+                let newError = error;
+                newError.docDate = false;
+                setError(newError);
+              }}
+              placeholder="Pilih Tanggal"
+              showIcon
+              dateFormat="dd-mm-yy"
+              error={error?.docDate}
+            />
+          </div>
+
+          <div className="col-12 mt-3">
             <span className="fs-14">
-              <b>Informasi PO</b>
+              <b>Pesanan Pembelian (PO)</b>
             </span>
             <Divider className="mt-1"></Divider>
           </div>
 
-          <div className="col-6">
+          <div className="col-3">
             <label className="text-label">No. Pesanan Pembelian</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
-              value={order.po_id !== null ? checkPO(order?.po_id) : null}
+              value={order.po_id !== null ? checkPO(order.po_id) : null}
+              option={po}
               onChange={(e) => {
                 let result = new Date(`${order.ord_date}Z`);
                 result.setDate(result.getDate() + checRulPay(e.top?.id)?.day);
                 updateORD({
                   ...order,
-                  po_id: e.id,
+                  po_id: e.id ?? null,
                   top: e.top?.id ?? null,
                   due_date: result,
                   sup_id: e.sup_id?.id ?? null,
@@ -745,12 +799,11 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                 setError(newError);
               }}
               placeholder="Pilih No. Pesanan Pembelian"
-              option={po}
               label={"[po_code]"}
             />
           </div>
 
-          <div className="col-6">
+          <div className="col-3">
             <label className="text-label">Departemen</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
@@ -767,11 +820,11 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-12 mt-2">
-            <span className="fs-14">
+          <div className="col-6 mt-0">
+            {/* <span className="fs-14">
               <b>Informasi Supplier</b>
-            </span>
-            <Divider className="mt-1"></Divider>
+            </span> */}
+            {/* <Divider className="mt-1"></Divider> */}
           </div>
 
           <div className="col-3">
@@ -840,14 +893,14 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-12 mt-2">
+          <div className="col-12 mt-3">
             <span className="fs-14">
-              <b>Informasi Pembayaran</b>
+              <b>Pembayaran</b>
             </span>
             <Divider className="mt-1"></Divider>
           </div>
 
-          <div className="col-4">
+          <div className="col-2">
             <label className="text-label">Syarat Pembayaran</label>
             <div className="p-inputgroup mt-2"></div>
             <CustomDropdown
@@ -873,7 +926,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-4">
+          <div className="col-2">
             <label className="text-label">Tanggal Jatuh Tempo</label>
             <div className="p-inputgroup mt-2">
               <Calendar

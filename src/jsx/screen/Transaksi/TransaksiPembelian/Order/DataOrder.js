@@ -86,7 +86,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
   };
 
   const delODR = async (id) => {
-    setLoading(true)
+    setLoading(true);
     const config = {
       ...endpoints.delODR,
       endpoint: endpoints.delODR.endpoint + currentItem.id,
@@ -200,7 +200,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
               type: SET_CURRENT_ODR,
               payload: {
                 ...data,
-                // po_id: data?.po_id?.id,
+                po_id: data?.po_id?.id ?? null,
                 dep_id: data?.dep_id?.id ?? null,
                 sup_id: data?.sup_id?.id ?? null,
                 top: data?.top?.id ?? null,
@@ -320,7 +320,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
               type: SET_CURRENT_ODR,
               payload: {
                 ...data,
-                split_inv : false,
+                split_inv: false,
                 dprod: [
                   {
                     id: 0,
@@ -508,12 +508,37 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
-                {/* <Column
-          header="No. Pesanan Pembelian"
-          field={(e) => e.po_id}
-          style={{ minWidth: "8rem" }}
-          body={loading && <Skeleton />}
-        /> */}
+                <Column
+                  header="Nomor PO"
+                  field={(e) =>
+                    e.po_id.po_code !== null ? e.po_id.po_code : "-"
+                  }
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="PO Status"
+                  field={(e) => (e.po_id.status !== null ? e.po_id.status : "")}
+                  style={{ minWidth: "8rem" }}
+                  body={(e) =>
+                    loading ? (
+                      <Skeleton />
+                    ) : (
+                      <div>
+                        {e.po_id.status !== 1 ? (
+                          <Badge variant="success light">
+                            <i className="bx bx-check text-success mr-1"></i>{" "}
+                            Open
+                          </Badge>
+                        ) : (
+                          <Badge variant="danger light">
+                            <i className="bx bx-x text-danger mr-1"></i> Close
+                          </Badge>
+                        )}
+                      </div>
+                    )
+                  }
+                />
                 <Column
                   header="Supplier"
                   field={(e) => e?.sup_id?.sup_name}

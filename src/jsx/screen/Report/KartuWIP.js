@@ -21,16 +21,16 @@ const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
 const KartuWIP = () => {
-  const [report, setReport] = useState(null);
+  const [batch, setBatch] = useState(null);
   const [product, setProduct] = useState(null);
   const [selectedProduct, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
   const printPage = useRef(null);
   // const [filtDate, setFiltDate] = useState(new Date());
   const [filtDate, setFiltDate] = useState([new Date(), new Date()]);
-  const [customer, setCustomer] = useState(null);
+  const [phj, setPhj] = useState(null);
   const [selectCus, setSelectCus] = useState(null);
-  const [account, setAcc] = useState(null);
+  const [stCard, setStCard] = useState(null);
   const [trans, setTrans] = useState(null);
   const [cp, setCp] = useState("");
   const chunkSize = 27;
@@ -39,51 +39,34 @@ const KartuWIP = () => {
     var d = new Date();
     d.setDate(d.getDate() - 7);
     setFiltDate([d, new Date()]);
-    getAcc();
+    getBatch();
+    getPhj();
   }, []);
 
-  const getTrans = async (acc) => {
+  const getBatch = async () => {
     const config = {
-      ...endpoints.trans,
+      ...endpoints.st_card,
       data: {},
     };
+    console.log(config.data);
     let response = null;
     try {
       response = await request(null, config);
       console.log(response);
       if (response.status) {
         const { data } = response;
-        // let acc = [];
-        // acc.forEach((element) => {
-        //   element.trans = [];
-        //   data.forEach((el) => {
-        //     if (element.account.id === el.acc_id.id) {
-        //       element.trans.push({ ...el, trx_amnh: 0, acq_amnh: 0 });
-        //     }
-        //   });
-        //   element.trans.forEach((el) => {
-        //     data.forEach((ek) => {
-        //       if (el.id === ek.id) {
-        //         el.trx_amnh = ek?.trx_amnh ?? 0;
-        //         el.acq_amnh += ek?.acq_amnh ?? 0;
-        //       }
-        //     });
-        //   });
-        //   if (element.trans.length > 0) {
-        //     acc.push(element);
-        //   }
-        // });
-        setTrans(data);
-        // jsonForExcel(data);
+        setStCard(data);
+        let grouped = data?.filter(
+          (el, i) => i === data.findIndex((ek) => el?.trx_code === ek?.bcode)
+        );
+        setBatch(grouped);
       }
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
 
-  const getAcc = async () => {
+  const getPhj = async () => {
     const config = {
-      ...endpoints.account,
+      ...endpoints.phj,
       data: {},
     };
     let response = null;
@@ -92,14 +75,7 @@ const KartuWIP = () => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        let filt = [];
-        data.forEach((el) => {
-          if (el.account.dou_type === "D") {
-            filt.push(el);
-          }
-        });
-        setAcc(filt);
-        getTrans(data);
+        setPhj(data);
       }
     } catch (error) {
       console.log(error);
@@ -118,37 +94,77 @@ const KartuWIP = () => {
     return [day, month, year].join("-");
   };
 
-  const jsonForExcel = (account, excel = false) => {
+  const jsonForExcel = (stCard, excel = false) => {
     let data = [];
 
-    account?.forEach((el) => {
-      let dt = [];
-      let db = 0;
-      let kr = 0;
-      trans?.forEach((element) => {
-        if (element?.acc_id?.id === el?.account?.id) {
-          db += element.trx_dbcr === "D" ? element.trx_amnt : 0;
-          kr += element.trx_dbcr === "K" ? element.trx_amnt : 0;
-          dt = new Date(`${element?.trx_date}Z`);
+    stCard?.forEach((el) => {
+      let prd_jd = 0;
+      let hrg = el.trx_hpok / el.trx_qty;
+      let hrg_jadi = 0;
+
+      phj?.forEach((element) => {
+        if (element.product.prod_id === el.prod_id) {
+          prd_jd.push({});
         }
       });
-      if (dt <= filtDate) {
-        data.push({
-          acco: `${el.account.acc_name} (${el.account.acc_code})`,
-          slda: `Rp. ${formatIdr(0)}`,
-          debe: `Rp. ${formatIdr(db)}`,
-          kred: `Rp. ${formatIdr(kr)}`,
-          blce: `Rp. ${formatIdr(db + kr)}`,
-        });
-      }
+
+      let prd = [
+        {
+          btc: "",
+          type: "header",
+          value: {
+            prod: "Produk",
+            msn: "Mesin",
+            dep: "Departemen",
+            qty: "Kuantitas",
+            plan: "Planning",
+            jadi: "Hasil Jadi",
+            prc: "Harga",
+            total: "Total",
+          },
+        },
+      ];
+
+      prd.push({
+        btc: "",
+        type: "item",
+        value: {
+          prod: el.trx_dbcr === "d" ? el.prod_id.name : null,
+          msn: null,
+          dep: null,
+          qty: 0,
+          plan: 0,
+          jadi: 0,
+          prc: 0,
+          total: 0,
+        },
+      });
+     
+      prd.push({
+        btc: "",
+        type: "footer",
+        value: {
+          prod: "Sub Total",
+          msn: "",
+          dep: "",
+          qty: 0,
+          plan: 0,
+          jadi: 0,
+          prc: 0,
+          total: 0,
+        },
+      });
+
+      data.push(prd);
+      // }
     });
 
     let final = [
       {
         columns: [
           {
-            title: "Pemakaian Bahan",
-            width: { wch: 40 },
+            title: "Material Usage Report",
+            width: { wch: 30 },
             style: {
               font: { sz: "14", bold: true },
               alignment: { horizontal: "left", vertical: "center" },
@@ -170,8 +186,8 @@ const KartuWIP = () => {
       {
         columns: [
           {
-            title: `Period ${formatDate(filtDate)}`,
-            width: { wch: 40 },
+            title: `Periode ${formatDate(filtDate)}`,
+            width: { wch: 30 },
             style: {
               font: { sz: "14", bold: true },
               alignment: { horizontal: "left", vertical: "center" },
@@ -182,120 +198,205 @@ const KartuWIP = () => {
       },
     ];
 
-    let item = [];
-    // data.forEach((el) => {
-    //   item.push([
-    //     {
-    //       value: `${el.acco}`,
-    //       style: {
-    //         font: {
-    //           sz: "14",
-    //           bold: false,
-    //         },
-    //         alignment: { horizontal: "left", vertical: "center" },
-    //       },
-    //     },
-    //     {
-    //       value: `${el.slda}`,
-    //       style: {
-    //         font: { sz: "14", bold: false },
-    //         alignment: { horizontal: "right", vertical: "center" },
-    //       },
-    //     },
-    //     {
-    //       value: `${el.debe}`,
-    //       style: {
-    //         font: { sz: "14", bold: false },
-    //         alignment: { horizontal: "right", vertical: "center" },
-    //       },
-    //     },
-    //     {
-    //       value: `${el.kred}`,
-    //       style: {
-    //         font: {
-    //           sz: "14",
-    //           bold: false,
-    //         },
-    //         alignment: { horizontal: "right", vertical: "center" },
-    //       },
-    //     },
-    //     {
-    //       value: `${el.blce}`,
-    //       style: {
-    //         font: {
-    //           sz: "14",
-    //           bold: false,
-    //         },
-    //         alignment: { horizontal: "right", vertical: "center" },
-    //       },
-    //     },
-    //   ]);
-    // });
+    data.forEach((el) => {
+      let item_prd = [];
+      let item_mtr = [];
+      el.forEach((ek) => {
+        item_prd.push([
+          {
+            value: ek.value.prod,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            value: ek.value.msn,
+            style: {
+              font: { sz: "14", bold: ek.type === "header" ? true : false },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            value: ek.value.dep,
+            style: {
+              font: { sz: "14", bold: ek.type === "header" ? true : false },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            value: ek.value.qty,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            value: ek.value.plan,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            value: ek.value.jadi,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            value: ek.value.prc,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            value: ek.value.total,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+        ]);
 
-    final.push({
-      //   columns: [
-      //     {
-      //       title: "Account",
-      //       width: { wch: 40 },
-      //       style: {
-      //         font: { sz: "14", bold: true },
-      //         alignment: { horizontal: "left", vertical: "center" },
-      //         fill: {
-      //           paternType: "solid",
-      //           fgColor: { rgb: "F3F3F3" },
-      //         },
-      //       },
-      //     },
-      //     {
-      //       title: "Start Balance",
-      //       width: { wch: 20 },
-      //       style: {
-      //         font: { sz: "14", bold: true },
-      //         alignment: { horizontal: "right", vertical: "center" },
-      //         fill: {
-      //           paternType: "solid",
-      //           fgColor: { rgb: "F3F3F3" },
-      //         },
-      //       },
-      //     },
-      //     {
-      //       title: "Mutasi Debit",
-      //       width: { wch: 20 },
-      //       style: {
-      //         font: { sz: "14", bold: true },
-      //         alignment: { horizontal: "right", vertical: "center" },
-      //         fill: {
-      //           paternType: "solid",
-      //           fgColor: { rgb: "F3F3F3" },
-      //         },
-      //       },
-      //     },
-      //     {
-      //       title: "Mutasi Kredit",
-      //       width: { wch: 20 },
-      //       style: {
-      //         font: { sz: "14", bold: true },
-      //         alignment: { horizontal: "right", vertical: "center" },
-      //         fill: {
-      //           paternType: "solid",
-      //           fgColor: { rgb: "F3F3F3" },
-      //         },
-      //       },
-      //     },
-      //     {
-      //       title: "Balance",
-      //       width: { wch: 20 },
-      //       style: {
-      //         font: { sz: "14", bold: true },
-      //         alignment: { horizontal: "right", vertical: "center" },
-      //         fill: {
-      //           paternType: "solid",
-      //           fgColor: { rgb: "F3F3F3" },
-      //         },
-      //       },
-      //     },
-      //   ],
-      //   data: item,
+        item_mtr.push([
+          {
+            value: ek.value.prod,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            value: ek.value.msn,
+            style: {
+              font: { sz: "14", bold: ek.type === "header" ? true : false },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            value: ek.value.dep,
+            style: {
+              font: { sz: "14", bold: ek.type === "header" ? true : false },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            value: ek.value.qty,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            value: ek.value.plan,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            value: ek.value.jadi,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            value: ek.value.prc,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            value: ek.value.total,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+        ]);
+      });
+
+      item_prd.push([
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+      ]);
+
+      final.push({
+        columns: [
+          {
+            title: `${el[0].btc}`,
+            width: { wch: 30 },
+            style: {
+              font: { sz: "14", bold: false },
+              alignment: { horizontal: "left", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+        ],
+        data: item_prd,
+        data: item_mtr,
+      });
     });
 
     if (excel) {
@@ -336,27 +437,16 @@ const KartuWIP = () => {
             <div className="col-4">
               <Dropdown
                 value={selectedProduct ?? null}
-                options={product}
+                options={batch}
                 onChange={(e) => {
                   setSelected(e.value);
                 }}
-                placeholder="Pilih Produk"
-                optionLabel="prod_id.name"
+                placeholder="Pilih Batch"
+                optionLabel="trx_code"
                 filter
-                filterBy="prod_id.name"
+                filterBy="trx_code"
                 showClear
               />
-            </div>
-            <div className="col-4">
-              {/* <CustomDropdown
-                value={customer && selectCus}
-                option={customer}
-                onChange={(e) => {
-                  setSelectCus(e);
-                }}
-                label={"[customer.cus_name] ([customer.cus_code])"}
-                placeholder="Pilih Pelanggan"
-              /> */}
             </div>
           </Row>
         </div>
@@ -372,7 +462,7 @@ const KartuWIP = () => {
               }
             >
               <ExcelSheet
-                dataSet={account ? jsonForExcel(account, true) : null}
+                dataSet={stCard ? jsonForExcel(stCard, true) : null}
                 name="GL Card Report"
               />
             </ExcelFile>
@@ -403,112 +493,16 @@ const KartuWIP = () => {
 
   return (
     <>
-      {/* <Toast ref={toast} /> */}
       <Row>
         <Col>
           <Card>
-            <Card.Body>
-              {renderHeader()}
-              {/* <DataTable
-                responsiveLayout="scroll"
-                value={jsonForExcel(account)}
-                showGridlines
-                dataKey="id"
-                rowHover
-                emptyMessage="Data Tidak Ditemukan"
-              >
-                <Column
-                  className="header-center"
-                  header="Account"
-                  style={{ width: "20rem" }}
-                  field={(e) => e?.acco}
-                />
-                <Column
-                  className="header-center text-right"
-                  header="Begining Balance"
-                  style={{ minWidht: "8rem" }}
-                  field={(e) => e?.slda}
-                />
-                <Column
-                  className="header-center text-right"
-                  header="Debit"
-                  style={{ minWidht: "8rem" }}
-                  field={(e) => e?.debe}
-                />
-                <Column
-                  className="header-center text-right"
-                  header="Credit"
-                  style={{ minWidht: "10rem" }}
-                  field={(e) => e?.kred}
-                />
-                <Column
-                  className="header-center text-right"
-                  header="Balance"
-                  style={{ minWidht: "10rem" }}
-                  field={(e) => e?.blce}
-                />
-              </DataTable> */}
-            </Card.Body>
+            <Card.Body>{renderHeader()}</Card.Body>
           </Card>
         </Col>
       </Row>
 
-      {/* <Row className="m-0 d-none">
-        <Card ref={printPage}>
-          <Card.Body className="p-0">
-            <CustomeWrapper
-              tittle={"Kartu Buku Besar"}
-              subTittle={`Laporan Kartu Buku Besar Per ${formatDate(filtDate)}`}
-              body={
-                <>
-                  <DataTable
-                    responsiveLayout="scroll"
-                    value={jsonForExcel(account)}
-                    showGridlines
-                    dataKey="id"
-                    rowHover
-                    emptyMessage="Data Tidak Ditemukan"
-                  >
-                    <Column
-                      className="header-center"
-                      header="Akun"
-                      style={{ width: "20rem" }}
-                      field={(e) => e?.acco}
-                    />
-                    <Column
-                      className="header-center text-right"
-                      header="Saldo Awal"
-                      style={{ minWidht: "8rem" }}
-                      field={(e) => e?.slda}
-                    />
-                    <Column
-                      className="header-center text-right"
-                      header="Mutasi Debit"
-                      style={{ minWidht: "8rem" }}
-                      field={(e) => e?.debe}
-                    />
-                    <Column
-                      className="header-center text-right"
-                      header="Mutasi Kredit"
-                      style={{ minWidht: "10rem" }}
-                      field={(e) => e?.kred}
-                    />
-                    <Column
-                      className="header-center text-right"
-                      header="Balance"
-                      style={{ minWidht: "10rem" }}
-                      field={(e) => e?.blce}
-                    />
-                  </DataTable>
-                </>
-              }
-            />
-          </Card.Body>
-        </Card>
-      </Row> */}
-
       <Row className="m-0 justify-content-center" ref={printPage}>
-        {chunk(jsonForExcel(account) ?? [], chunkSize)?.map((val, idx) => {
+        {chunk(jsonForExcel(stCard) ?? [], chunkSize)?.map((val, idx) => {
           return (
             <Card className="ml-1 mr-1 mt-2">
               <Card.Body className="p-0">
@@ -521,129 +515,155 @@ const KartuWIP = () => {
                   page={idx + 1}
                   body={
                     <>
-                      {/* {val.map((v) => { */}
-                      {/* return ( */}
-                      <DataTable
-                        responsiveLayout="scroll"
-                        value={val}
-                        showGridlines
-                        dataKey="id"
-                        rowHover
-                        footer="Subtotal"
-                        emptyMessage="Data Tidak Ditemukan"
-                        className="header-center text-left"
-                      >
-                        <Column
-                          className="header-center"
-                          header="Jenis Produksi"
-                          style={{ width: "20rem" }}
-                          field=""
-                        />
-                        <Column
-                          className="header-center text-right"
-                          header="Mesin"
-                          style={{ minWidht: "8rem" }}
-                          field=""
-                        />
-                        <Column
-                          className="header-center text-right"
-                          header="Dept 1"
-                          style={{ minWidht: "8rem" }}
-                          field=""
-                        />
-                        <Column
-                          className="header-center text-right"
-                          header="Formula"
-                          style={{ minWidht: "10rem" }}
-                          field=""
-                        />
-                        <Column
-                          className="header-center text-right"
-                          header="Planning"
-                          style={{ minWidht: "10rem" }}
-                          field=""
-                        />
-                        <Column
-                          className="header-center text-right"
-                          header="Jadi"
-                          style={{ minWidht: "10rem" }}
-                          field=""
-                        />
-                        <Column
-                          className="header-center text-right"
-                          header="Harga"
-                          style={{ minWidht: "10rem" }}
-                          field=""
-                        />
-                        <Column
-                          className="header-center text-right"
-                          header="Total"
-                          style={{ minWidht: "10rem" }}
-                          field=""
-                        />
-                      </DataTable>
-
-                      <DataTable
-                        responsiveLayout="scroll"
-                        value={val}
-                        showGridlines
-                        dataKey="id"
-                        rowHover
-                        footer="Subtotal"
-                        emptyMessage="Data Tidak Ditemukan"
-                        className="header-center text-left"
-                      >
-                        <Column
-                          className="header-center"
-                          header="Bahan"
-                          style={{ width: "20rem" }}
-                          field=""
-                        />
-                        <Column
-                          className="header-center text-right"
-                          header=""
-                          style={{ minWidht: "8rem" }}
-                          field=""
-                        />
-                        <Column
-                          className="header-center text-right"
-                          header=""
-                          style={{ minWidht: "8rem" }}
-                          field=""
-                        />
-                        <Column
-                          className="header-center text-right"
-                          header="Formula"
-                          style={{ minWidht: "10rem" }}
-                          field=""
-                        />
-                        <Column
-                          className="header-center text-right"
-                          header="Pemakaian"
-                          style={{ minWidht: "10rem" }}
-                          field=""
-                        />
-                        <Column
-                          className="header-center text-right"
-                          header="Harga"
-                          style={{ minWidht: "10rem" }}
-                          field=""
-                        />
-                        <Column
-                          className="header-center text-right"
-                          header="Total"
-                          style={{ minWidht: "10rem" }}
-                          field=""
-                        />
-                        <Column
-                          className="header-center text-right"
-                          header="Total"
-                          style={{ minWidht: "10rem" }}
-                          field=""
-                        />
-                      </DataTable>
-                      {/* );
-                       })} */}
+                      {val.map((v) => {
+                        return (
+                          <DataTable
+                            responsiveLayout="scroll"
+                            value={v}
+                            showGridlines
+                            dataKey="id"
+                            rowHover
+                            emptyMessage="Data Tidak Ditemukan"
+                          >
+                            <Column
+                              className="header-center"
+                              header={(e) =>
+                                e.props.value ? e.props?.value[0]?.btc : null
+                              }
+                              style={{ width: "15rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header" || e.type === "footer"
+                                      ? "font-weight-bold"
+                                      : ""
+                                  }
+                                >
+                                  {e.value.prod}
+                                </div>
+                              )}
+                            />
+                            <Column
+                              className="header-center"
+                              header=""
+                              style={{ minWidht: "10rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header" && "font-weight-bold"
+                                  }
+                                >
+                                  {e.value.msn}
+                                </div>
+                              )}
+                            />
+                            <Column
+                              className="header-center"
+                              header=""
+                              style={{ minWidht: "10rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header" && "font-weight-bold"
+                                  }
+                                >
+                                  {e.value.dep}
+                                </div>
+                              )}
+                            />
+                            <Column
+                              className="header-center"
+                              header=""
+                              style={{ minWidht: "10rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header"
+                                      ? "font-weight-bold text-right"
+                                      : e.type === "footer"
+                                      ? "font-weight-bold text-right"
+                                      : "text-right"
+                                  }
+                                >
+                                  {e.value.qty}
+                                </div>
+                              )}
+                            />
+                            <Column
+                              className="header-center"
+                              header=""
+                              style={{ minWidht: "10rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header"
+                                      ? "font-weight-bold text-right"
+                                      : e.type === "footer"
+                                      ? "font-weight-bold text-right"
+                                      : "text-right"
+                                  }
+                                >
+                                  {e.value.plan}
+                                </div>
+                              )}
+                            />
+                            <Column
+                              className="header-center"
+                              header=""
+                              style={{ minWidht: "10rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header"
+                                      ? "font-weight-bold text-right"
+                                      : e.type === "footer"
+                                      ? "font-weight-bold text-right"
+                                      : "text-right"
+                                  }
+                                >
+                                  {e.value.jadi}
+                                </div>
+                              )}
+                            />
+                            <Column
+                              className="header-center"
+                              header=""
+                              style={{ minWidht: "10rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header"
+                                      ? "font-weight-bold text-right"
+                                      : e.type === "footer"
+                                      ? "font-weight-bold text-right"
+                                      : "text-right"
+                                  }
+                                >
+                                  {e.value.prc}
+                                </div>
+                              )}
+                            />
+                            <Column
+                              className="header-center"
+                              header=""
+                              style={{ minWidht: "10rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header"
+                                      ? "font-weight-bold text-right"
+                                      : e.type === "footer"
+                                      ? "font-weight-bold text-right"
+                                      : "text-right"
+                                  }
+                                >
+                                  {e.value.total}
+                                </div>
+                              )}
+                            />
+                          </DataTable>
+                        );
+                      })}
                     </>
                   }
                 />

@@ -80,7 +80,7 @@ const LaporanPembelian = () => {
       component: <KartuStock />,
     },
     {
-      tittle: "Kartu WIP",
+      tittle: "Pemakaian Bahan",
       icon: "bx-spreadsheet",
       component: <KartuWIP />,
     },

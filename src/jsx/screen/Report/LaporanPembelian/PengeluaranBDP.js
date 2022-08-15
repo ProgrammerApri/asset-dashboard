@@ -658,6 +658,7 @@ const PengeluaranBDP = () => {
                         rowHover
                         emptyMessage="Data Tidak Ditemukan"
                         className="mt-4"
+                        
                       >
                         <Column
                           className=""
@@ -687,7 +688,6 @@ const PengeluaranBDP = () => {
                                   : ""
                               }
                             >
-                             
                               {}
                             </div>
                           )}
@@ -704,7 +704,6 @@ const PengeluaranBDP = () => {
                                   : ""
                               }
                             >
-                               <tr colspan="2" header></tr>
                               <tr>
                                 <th className="colspan-1">Nomor</th>
                                 <th className="col-1">Tanggal</th>
@@ -725,7 +724,7 @@ const PengeluaranBDP = () => {
                                   : ""
                               }
                             >
-                               <tr colspan="2" header></tr>
+                              <tr colspan="2" header></tr>
                               <tr>
                                 <th className="colspan-1">Nomor</th>
                                 <th className="col-1">Tanggal</th>

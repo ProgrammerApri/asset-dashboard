@@ -692,6 +692,9 @@ const PemasukanDB = () => {
                             </div>
                           )}
                         />
+
+<Column header="Profits" colSpan={2} />
+
                         <Column
                           className=""
                           header="Dokumen Pabean"

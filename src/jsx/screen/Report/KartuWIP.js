@@ -24,10 +24,9 @@ const KartuWIP = () => {
   const [batch, setBatch] = useState(null);
   const [btch, setBtch] = useState(null);
   const [product, setProduct] = useState(null);
-  const [selectedProduct, setSelected] = useState(null);
+  const [selectedBatch, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
   const printPage = useRef(null);
-  // const [filtDate, setFiltDate] = useState(new Date());
   const [filtDate, setFiltDate] = useState([new Date(), new Date()]);
   const [phj, setPhj] = useState(null);
   const [selectCus, setSelectCus] = useState(null);
@@ -126,7 +125,6 @@ const KartuWIP = () => {
 
   const jsonForExcel = (stCard, excel = false) => {
     let data = [];
-
     batch?.forEach((el) => {
       phj?.forEach((ek) => {
         if (ek.batch_id.bcode === el.trx_code) {
@@ -147,147 +145,150 @@ const KartuWIP = () => {
             },
           ];
 
-          btch?.forEach((ej) => {
-            if (ej.bcode === ek.batch_id.bcode) {
-              let msin = [];
-              let qty_total = 0;
-              let hpok_total = 0;
-              let plan_total = 0;
-              let jadi_total = 0;
-              let bahan_total = 0;
-              let prc_total = 0;
-              let form_total = 0;
-              let used_total = 0;
-              let total = 0;
+          let dt = new Date(`${el?.trx_date}Z`);
+          if (dt >= filtDate[0] && dt <= filtDate[1]) {
+            // if (selectedBatch?.trx_code === el.trx_code) {
+            btch?.forEach((ej) => {
+              if (ej.bcode === ek.batch_id.bcode) {
+                let msin = [];
+                let qty_total = 0;
+                let hpok_total = 0;
+                let plan_total = 0;
+                let jadi_total = 0;
+                let bahan_total = 0;
+                let prc_total = 0;
+                let form_total = 0;
+                let used_total = 0;
+                let total = 0;
 
-              ej?.plan_id?.mesin?.forEach((ei) => {
-                msin.push(ei.mch_id.msn_name);
-              });
-
-              ej?.plan_id?.product?.forEach((ei, i) => {
-                stCard?.forEach((eh) => {
-                  if (
-                    ej.bcode === eh.trx_code &&
-                    ei.prod_id.id === eh.prod_id.id
-                  ) {
-                    prd.push({
-                      btc: el.trx_code,
-                      type: "item",
-                      value: {
-                        prod: ei.prod_id.name,
-                        msn: msin.join(", "),
-                        dep: `${ej.dep_id.ccost_code}-${ej.dep_id.ccost_name}`,
-                        qty: ei.qty,
-                        plan: ei.qty * ej.plan_id.total,
-                        jadi: ek.product[i].qty,
-                        prc: `Rp. ${formatIdr(eh.trx_hpok / eh.trx_qty)}`,
-                        total: `Rp. ${formatIdr(eh.trx_hpok)}`,
-                      },
-                    });
-                    qty_total += ei.qty;
-                    plan_total += ei.qty * ej.plan_id.total;
-                    jadi_total += ek.product[i].qty;
-                    hpok_total += eh.trx_hpok / eh.trx_qty;
-                    total += eh.trx_hpok;
-                  }
+                ej?.plan_id?.mesin?.forEach((ei) => {
+                  msin.push(ei.mch_id.msn_name);
                 });
-              });
 
-              prd.push({
-                btc: el.trx_code,
-                type: "footer",
-                value: {
-                  prod: "Sub Total",
-                  msn: "",
-                  dep: "",
-                  qty: qty_total,
-                  plan: plan_total,
-                  jadi: jadi_total,
-                  prc: `Rp. ${formatIdr(hpok_total)}`,
-                  total: `Rp. ${formatIdr(total)}`,
-                },
-              });
-
-              prd.push({
-                btc: el.trx_code,
-                type: "header",
-                value: {
-                  prod: "",
-                  msn: "",
-                  dep: "",
-                  qty: "",
-                  plan: "",
-                  jadi: "",
-                  prc: "",
-                  total: "",
-                },
-              });
-
-              prd.push({
-                btc: el.trx_code,
-                type: "header",
-                value: {
-                  prod: "Bahan",
-                  msn: "",
-                  dep: "",
-                  qty: "",
-                  plan: "Formula",
-                  jadi: "Pemakaian",
-                  prc: "Harga",
-                  total: "Total",
-                },
-              });
-
-              ej.plan_id.material.forEach((ei) => {
-                stCard?.forEach((eh) => {
-                  if (
-                    ej.bcode === eh.trx_code &&
-                    ei.prod_id.id === eh.prod_id.id
-                  ) {
-                    prd.push({
-                      btc: el.trx_code,
-                      type: "item",
-                      value: {
-                        prod: ei.prod_id.name,
-                        msn: "",
-                        dep: "",
-                        qty: "",
-                        plan: ei.qty,
-                        jadi: ei.qty * ej.plan_id.total,
-                        prc: `Rp. ${formatIdr(eh.trx_hpok / eh.trx_qty)}`,
-                        total: `Rp. ${formatIdr(eh.trx_hpok)}`,
-                      },
-                    });
-                    bahan_total += eh.trx_hpok
-                    prc_total += eh.trx_hpok / eh.trx_qty
-                    used_total += ei.qty * ej.plan_id.total
-                    form_total += ei.qty
-                  }
+                ej?.plan_id?.product?.forEach((ei, i) => {
+                  stCard?.forEach((eh) => {
+                    if (
+                      ej.bcode === eh.trx_code &&
+                      ei.prod_id.id === eh.prod_id.id
+                    ) {
+                      prd.push({
+                        btc: el.trx_code,
+                        type: "item",
+                        value: {
+                          prod: ei.prod_id.name,
+                          msn: msin.join(", "),
+                          dep: `${ej.dep_id.ccost_code}-${ej.dep_id.ccost_name}`,
+                          qty: ei.qty,
+                          plan: ei.qty * ej.plan_id.total,
+                          jadi: ek.product[i].qty,
+                          prc: `Rp. ${formatIdr(eh.trx_hpok / eh.trx_qty)}`,
+                          total: `Rp. ${formatIdr(eh.trx_hpok)}`,
+                        },
+                      });
+                      qty_total += ei.qty;
+                      plan_total += ei.qty * ej.plan_id.total;
+                      jadi_total += ek.product[i].qty;
+                      hpok_total += eh.trx_hpok / eh.trx_qty;
+                      total += eh.trx_hpok;
+                    }
+                  });
                 });
-              });
 
-              prd.push({
-                btc: el.trx_code,
-                type: "footer",
-                value: {
-                  prod: "Sub Total",
-                  msn: "",
-                  dep: "",
-                  qty: "",
-                  plan: form_total,
-                  jadi: used_total,
-                  prc: `Rp. ${formatIdr(prc_total)}`,
-                  total: `Rp. ${formatIdr(bahan_total)}`,
-                },
-              });
-            }
-          });
+                prd.push({
+                  btc: el.trx_code,
+                  type: "footer",
+                  value: {
+                    prod: "Sub Total",
+                    msn: "",
+                    dep: "",
+                    qty: qty_total,
+                    plan: plan_total,
+                    jadi: jadi_total,
+                    prc: `Rp. ${formatIdr(hpok_total)}`,
+                    total: `Rp. ${formatIdr(total)}`,
+                  },
+                });
 
+                prd.push({
+                  btc: el.trx_code,
+                  type: "header",
+                  value: {
+                    prod: "",
+                    msn: "",
+                    dep: "",
+                    qty: "",
+                    plan: "",
+                    jadi: "",
+                    prc: "",
+                    total: "",
+                  },
+                });
+
+                prd.push({
+                  btc: el.trx_code,
+                  type: "header",
+                  value: {
+                    prod: "Bahan",
+                    msn: "",
+                    dep: "",
+                    qty: "",
+                    plan: "Formula",
+                    jadi: "Pemakaian",
+                    prc: "Harga",
+                    total: "Total",
+                  },
+                });
+
+                ej.plan_id.material.forEach((ei) => {
+                  stCard?.forEach((eh) => {
+                    if (
+                      ej.bcode === eh.trx_code &&
+                      ei.prod_id.id === eh.prod_id.id
+                    ) {
+                      prd.push({
+                        btc: el.trx_code,
+                        type: "item",
+                        value: {
+                          prod: ei.prod_id.name,
+                          msn: "",
+                          dep: "",
+                          qty: "",
+                          plan: ei.qty,
+                          jadi: ei.qty * ej.plan_id.total,
+                          prc: `Rp. ${formatIdr(eh.trx_hpok / eh.trx_qty)}`,
+                          total: `Rp. ${formatIdr(eh.trx_hpok)}`,
+                        },
+                      });
+                      bahan_total += eh.trx_hpok;
+                      prc_total += eh.trx_hpok / eh.trx_qty;
+                      used_total += ei.qty * ej.plan_id.total;
+                      form_total += ei.qty;
+                    }
+                  });
+                });
+
+                prd.push({
+                  btc: el.trx_code,
+                  type: "footer",
+                  value: {
+                    prod: "Sub Total",
+                    msn: "",
+                    dep: "",
+                    qty: "",
+                    plan: form_total,
+                    jadi: used_total,
+                    prc: `Rp. ${formatIdr(prc_total)}`,
+                    total: `Rp. ${formatIdr(bahan_total)}`,
+                  },
+                });
+              }
+            });
+            // }
+          }
           data.push(prd);
         }
       });
     });
-
     console.log(data);
 
     let final = [
@@ -317,10 +318,12 @@ const KartuWIP = () => {
       {
         columns: [
           {
-            title: `Periode ${formatDate(filtDate)}`,
+            title: `Period ${formatDate(filtDate[0])} to ${formatDate(
+              filtDate[1]
+            )}`,
             width: { wch: 30 },
             style: {
-              font: { sz: "14", bold: true },
+              font: { sz: "14", bold: false },
               alignment: { horizontal: "left", vertical: "center" },
             },
           },
@@ -524,6 +527,90 @@ const KartuWIP = () => {
               },
             },
           },
+          {
+            title: "",
+            width: { wch: 27 },
+            style: {
+              font: { sz: "14", bold: false },
+              alignment: { horizontal: "left", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 27 },
+            style: {
+              font: { sz: "14", bold: false },
+              alignment: { horizontal: "left", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: false },
+              alignment: { horizontal: "left", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: false },
+              alignment: { horizontal: "left", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: false },
+              alignment: { horizontal: "left", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 30 },
+            style: {
+              font: { sz: "14", bold: false },
+              alignment: { horizontal: "left", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 30 },
+            style: {
+              font: { sz: "14", bold: false },
+              alignment: { horizontal: "left", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
         ],
         data: item_prd,
         data: item_mtr,
@@ -567,7 +654,7 @@ const KartuWIP = () => {
             </div>
             <div className="col-4">
               <Dropdown
-                value={selectedProduct ?? null}
+                value={selectedBatch ?? null}
                 options={batch}
                 onChange={(e) => {
                   setSelected(e.value);
@@ -584,7 +671,7 @@ const KartuWIP = () => {
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
             <ExcelFile
-              filename={`gl_card_report_export_${new Date().getTime()}`}
+              filename={`pemakaian_bahan_report_export_${new Date().getTime()}`}
               element={
                 <PrimeSingleButton
                   label="Excel"
@@ -594,7 +681,7 @@ const KartuWIP = () => {
             >
               <ExcelSheet
                 dataSet={stCard ? jsonForExcel(stCard, true) : null}
-                name="GL Card Report"
+                name="Material Usage Report"
               />
             </ExcelFile>
           </div>

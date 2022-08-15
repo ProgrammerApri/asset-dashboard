@@ -15,6 +15,9 @@ import NeracaPerbandingan from "../NeracaPerbandingan";
 import KartuStock from "../KartuStock";
 import KartuWIP from "../KartuWIP";
 import RencanaPemakaianBB from "../RencanaPemakaianBB";
+import PemasukanBDP from "./PengeluaranBDP";
+import PengeluaranBDP from "./PengeluaranBDP";
+import PemasukanDB from "./PemasukanDB";
 
 const LaporanPembelian = () => {
   const [active, setActive] = useState(0);
@@ -88,6 +91,16 @@ const LaporanPembelian = () => {
       tittle: "Rencana Pemakaian BB",
       icon: "bx-spreadsheet",
       component: <RencanaPemakaianBB />,
+    },
+    {
+      tittle: "Pengeluaran Barang DP",
+      icon: "bx-spreadsheet",
+      component: <PengeluaranBDP />,
+    },
+    {
+      tittle: "Pemasukan Barang DP",
+      icon: "bx-spreadsheet",
+      component: <PemasukanDB />,
     },
   ]);
 

@@ -23,32 +23,26 @@ const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
 const PemasukanDB = () => {
-  const [batch, setBatch] = useState(null);
-  const [btch, setBtch] = useState(null);
-  const [product, setProduct] = useState(null);
-  const [selectedProduct, setSelected] = useState(null);
+  const [order, setOrder] = useState(null);
+  const [ord, setOrd] = useState(null);
   const [loading, setLoading] = useState(true);
   const printPage = useRef(null);
-  // const [filtDate, setFiltDate] = useState(new Date());
-  const [filtDate, setFiltDate] = useState([new Date(), new Date()]);
-  const [phj, setPhj] = useState(null);
   const [filtersDate, setFiltersDate] = useState([new Date(), new Date()]);
   const [selectCus, setSelectCus] = useState(null);
   const [stCard, setStCard] = useState(null);
-  const [trans, setTrans] = useState(null);
   const [cp, setCp] = useState("");
   const chunkSize = 27;
 
+ 
   useEffect(() => {
     var d = new Date();
     d.setDate(d.getDate() - 7);
-    setFiltDate([d, new Date()]);
-    getBatch();
-    getBtch();
-    getPhj();
+    setFiltersDate([d, new Date()]);
+    getOrder();
+    getORD();
   }, []);
 
-  const getBatch = async () => {
+  const getOrder = async () => {
     const config = {
       ...endpoints.st_card,
       data: {},
@@ -62,7 +56,7 @@ const PemasukanDB = () => {
         const { data } = response;
         let filtered = [];
         data.forEach((el) => {
-          if (el.trx_type === "PR" || el.trx_type === "PM") {
+          if (el.trx_type === "JL") {
             filtered.push(el);
           }
         });
@@ -71,19 +65,17 @@ const PemasukanDB = () => {
           (el, i) =>
             i ===
             data.findIndex(
-              (ek) =>
-                el?.trx_code === ek?.trx_code &&
-                (el.trx_type === "PR" || el.trx_type === "PM")
+              (ek) => el?.trx_code === ek?.trx_code && el.trx_type === "JL"
             )
         );
-        setBatch(grouped);
+        setOrder(grouped);
       }
     } catch (error) {}
   };
 
-  const getBtch = async () => {
+  const getORD = async () => {
     const config = {
-      ...endpoints.batch,
+      ...endpoints.sale,
       data: {},
     };
     let response = null;
@@ -92,23 +84,7 @@ const PemasukanDB = () => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        setBtch(data);
-      }
-    } catch (error) {}
-  };
-
-  const getPhj = async () => {
-    const config = {
-      ...endpoints.phj,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setPhj(data);
+        setOrd(data);
       }
     } catch (error) {
       console.log(error);
@@ -129,175 +105,126 @@ const PemasukanDB = () => {
 
   const jsonForExcel = (stCard, excel = false) => {
     let data = [];
-
-    batch?.forEach((el) => {
-      phj?.forEach((ek) => {
-        if (ek.batch_id.bcode === el.trx_code) {
-          let prd = [
-            {
-              btc: el.trx_code,
-              type: "header",
-              value: {
-                prod: "Produk",
-                msn: "Mesin",
-                dep: "Departemen",
-                qty: "Kuantitas",
-                plan: "Planning",
-                jadi: "Hasil Jadi",
-                prc: "Harga",
-                total: "Total",
-              },
+    ord?.forEach((el) => {
+      stCard?.forEach((ek) => {
+        if (ek.trx_code === el.ord_code) {
+          let dt = new Date(`${el?.ord_date}Z`);
+          if (dt >= filtersDate[0] && dt <= filtersDate[1]) {
+          data.push({
+            type: "item",
+            value: {
+              no: null,
+              dep: `${el.slsm_id?.sales_name} - ${el.slsm_id?.sales_code}`,
+              doc: el.no_doc,
+              doc_dt: formatDate(el.doc_date),
+              ord_code: ek.trx_code,
+              ord_date: formatDate(ek.trx_date),
+              pel: `${el.pel_id?.cus_name} - ${el.pel_id?.cus_code}`,
+              prod_kd: ek.prod_id?.code,
+              prod_nm: ek.prod_id?.name,
+              unit: el.jprod.unit_id?.name,
+              qty: ek.trx_qty,
+              h_pok: `Rp. ${formatIdr(ek.trx_hpok)}`,
             },
-          ];
-
-          btch?.forEach((ej) => {
-            if (ej.bcode === ek.batch_id.bcode) {
-              let msin = [];
-              let qty_total = 0;
-              let hpok_total = 0;
-              let plan_total = 0;
-              let jadi_total = 0;
-              let bahan_total = 0;
-              let prc_total = 0;
-              let form_total = 0;
-              let used_total = 0;
-              let total = 0;
-
-              ej?.plan_id?.mesin?.forEach((ei) => {
-                msin.push(ei.mch_id.msn_name);
-              });
-
-              ej?.plan_id?.product?.forEach((ei, i) => {
-                stCard?.forEach((eh) => {
-                  if (
-                    ej.bcode === eh.trx_code &&
-                    ei.prod_id.id === eh.prod_id.id
-                  ) {
-                    prd.push({
-                      btc: el.trx_code,
-                      type: "item",
-                      value: {
-                        prod: ei.prod_id.name,
-                        msn: msin.join(", "),
-                        dep: `${ej.dep_id.ccost_code}-${ej.dep_id.ccost_name}`,
-                        qty: ei.qty,
-                        plan: ei.qty * ej.plan_id.total,
-                        jadi: ek.product[i].qty,
-                        prc: `Rp. ${formatIdr(eh.trx_hpok / eh.trx_qty)}`,
-                        total: `Rp. ${formatIdr(eh.trx_hpok)}`,
-                      },
-                    });
-                    qty_total += ei.qty;
-                    plan_total += ei.qty * ej.plan_id.total;
-                    jadi_total += ek.product[i].qty;
-                    hpok_total += eh.trx_hpok / eh.trx_qty;
-                    total += eh.trx_hpok;
-                  }
-                });
-              });
-
-              prd.push({
-                btc: el.trx_code,
-                type: "footer",
-                value: {
-                  prod: "Sub Total",
-                  msn: "",
-                  dep: "",
-                  qty: qty_total,
-                  plan: plan_total,
-                  jadi: jadi_total,
-                  prc: `Rp. ${formatIdr(hpok_total)}`,
-                  total: `Rp. ${formatIdr(total)}`,
-                },
-              });
-
-              prd.push({
-                btc: el.trx_code,
-                type: "header",
-                value: {
-                  prod: "",
-                  msn: "",
-                  dep: "",
-                  qty: "",
-                  plan: "",
-                  jadi: "",
-                  prc: "",
-                  total: "",
-                },
-              });
-
-              prd.push({
-                btc: el.trx_code,
-                type: "header",
-                value: {
-                  prod: "Bahan",
-                  msn: "",
-                  dep: "",
-                  qty: "",
-                  plan: "Formula",
-                  jadi: "Pemakaian",
-                  prc: "Harga",
-                  total: "Total",
-                },
-              });
-
-              ej.plan_id.material.forEach((ei) => {
-                stCard?.forEach((eh) => {
-                  if (
-                    ej.bcode === eh.trx_code &&
-                    ei.prod_id.id === eh.prod_id.id
-                  ) {
-                    prd.push({
-                      btc: el.trx_code,
-                      type: "item",
-                      value: {
-                        prod: ei.prod_id.name,
-                        msn: "",
-                        dep: "",
-                        qty: "",
-                        plan: ei.qty,
-                        jadi: ei.qty * ej.plan_id.total,
-                        prc: `Rp. ${formatIdr(eh.trx_hpok / eh.trx_qty)}`,
-                        total: `Rp. ${formatIdr(eh.trx_hpok)}`,
-                      },
-                    });
-                    bahan_total += eh.trx_hpok;
-                    prc_total += eh.trx_hpok / eh.trx_qty;
-                    used_total += ei.qty * ej.plan_id.total;
-                    form_total += ei.qty;
-                  }
-                });
-              });
-
-              prd.push({
-                btc: el.trx_code,
-                type: "footer",
-                value: {
-                  prod: "Sub Total",
-                  msn: "",
-                  dep: "",
-                  qty: "",
-                  plan: form_total,
-                  jadi: used_total,
-                  prc: `Rp. ${formatIdr(prc_total)}`,
-                  total: `Rp. ${formatIdr(bahan_total)}`,
-                },
-              });
-            }
           });
-
-          data.push(prd);
+        }
         }
       });
     });
 
-    console.log(data);
+    let item = [];
+
+    // data?.forEach((el) => {
+    //   el?.forEach((ek) => {
+    //     item.push([
+    //       {
+    //         value: ek.value.dep,
+    //         style: {
+    //           font: { sz: "14", bold: false },
+    //           alignment: { horizontal: "left", vertical: "center" },
+    //         },
+    //       },
+    //       {
+    //         value: ek.value.doc,
+    //         style: {
+    //           font: { sz: "14", bold: false },
+    //           alignment: { horizontal: "left", vertical: "center" },
+    //         },
+    //       },
+    //       {
+    //         value: ek.value.doc_dt,
+    //         style: {
+    //           font: { sz: "14", bold: false },
+    //           alignment: { horizontal: "left", vertical: "center" },
+    //         },
+    //       },
+    //       {
+    //         value: ek.value.ord_code,
+    //         style: {
+    //           font: { sz: "14", bold: false },
+    //           alignment: { horizontal: "center", vertical: "center" },
+    //         },
+    //       },
+    //       {
+    //         value: ek.value.ord_date,
+    //         style: {
+    //           font: { sz: "14", bold: false },
+    //           alignment: { horizontal: "right", vertical: "center" },
+    //         },
+    //       },
+    //       {
+    //         value: ek.value.sup,
+    //         style: {
+    //           font: { sz: "14", bold: false },
+    //           alignment: { horizontal: "right", vertical: "center" },
+    //         },
+    //       },
+    //       {
+    //         value: ek.value.prod_kd,
+    //         style: {
+    //           font: { sz: "14", bold: false },
+    //           alignment: { horizontal: "right", vertical: "center" },
+    //         },
+    //       },
+    //       {
+    //         value: ek.value.prod_nm,
+    //         style: {
+    //           font: { sz: "14", bold: false },
+    //           alignment: { horizontal: "right", vertical: "center" },
+    //         },
+    //       },
+    //       {
+    //         value: ek.value.unit,
+    //         style: {
+    //           font: { sz: "14", bold: false },
+    //           alignment: { horizontal: "right", vertical: "center" },
+    //         },
+    //       },
+    //       {
+    //         value: ek.value.qty,
+    //         style: {
+    //           font: { sz: "14", bold: false },
+    //           alignment: { horizontal: "right", vertical: "center" },
+    //         },
+    //       },
+    //       {
+    //         value: ek.value.h_pok,
+    //         style: {
+    //           font: { sz: "14", bold: false },
+    //           alignment: { horizontal: "right", vertical: "center" },
+    //         },
+    //       },
+    //     ]);
+    //   });
+    // });
+
+    console.log(item);
 
     let final = [
       {
         columns: [
           {
-            title: "Laporan Pemasukan Barang Perdokumen Pabean ",
+            title: "RPBB Card Report",
             width: { wch: 30 },
             style: {
               font: { sz: "14", bold: true },
@@ -320,10 +247,12 @@ const PemasukanDB = () => {
       {
         columns: [
           {
-            title: `Periode ${formatDate(filtDate)}`,
+            title: `Period ${formatDate(filtersDate[0])} to ${formatDate(
+              filtersDate[1]
+            )}`,
             width: { wch: 30 },
             style: {
-              font: { sz: "14", bold: true },
+              font: { sz: "14", bold: false },
               alignment: { horizontal: "left", vertical: "center" },
             },
           },
@@ -332,205 +261,94 @@ const PemasukanDB = () => {
       },
     ];
 
-    data.forEach((el) => {
-      let item_prd = [];
-      let item_mtr = [];
-      el.forEach((ek) => {
-        item_prd.push([
-          {
-            value: ek.value.prod,
-            style: {
-              font: {
-                sz: "14",
-                bold:
-                  ek.type === "header" || ek.type === "footer" ? true : false,
-              },
-              alignment: { horizontal: "left", vertical: "center" },
-            },
-          },
-          {
-            value: ek.value.msn,
-            style: {
-              font: { sz: "14", bold: ek.type === "header" ? true : false },
-              alignment: { horizontal: "left", vertical: "center" },
-            },
-          },
-          {
-            value: ek.value.dep,
-            style: {
-              font: { sz: "14", bold: ek.type === "header" ? true : false },
-              alignment: { horizontal: "left", vertical: "center" },
-            },
-          },
-          {
-            value: ek.value.qty,
-            style: {
-              font: {
-                sz: "14",
-                bold:
-                  ek.type === "header" || ek.type === "footer" ? true : false,
-              },
-              alignment: { horizontal: "right", vertical: "center" },
-            },
-          },
-          {
-            value: ek.value.plan,
-            style: {
-              font: {
-                sz: "14",
-                bold:
-                  ek.type === "header" || ek.type === "footer" ? true : false,
-              },
-              alignment: { horizontal: "right", vertical: "center" },
-            },
-          },
-          {
-            value: ek.value.jadi,
-            style: {
-              font: {
-                sz: "14",
-                bold:
-                  ek.type === "header" || ek.type === "footer" ? true : false,
-              },
-              alignment: { horizontal: "right", vertical: "center" },
-            },
-          },
-          {
-            value: ek.value.prc,
-            style: {
-              font: {
-                sz: "14",
-                bold:
-                  ek.type === "header" || ek.type === "footer" ? true : false,
-              },
-              alignment: { horizontal: "right", vertical: "center" },
-            },
-          },
-          {
-            value: ek.value.total,
-            style: {
-              font: {
-                sz: "14",
-                bold:
-                  ek.type === "header" || ek.type === "footer" ? true : false,
-              },
-              alignment: { horizontal: "right", vertical: "center" },
-            },
-          },
-        ]);
-
-        item_mtr.push([
-          {
-            value: ek.value.prod,
-            style: {
-              font: {
-                sz: "14",
-                bold:
-                  ek.type === "header" || ek.type === "footer" ? true : false,
-              },
-              alignment: { horizontal: "left", vertical: "center" },
-            },
-          },
-          {
-            value: ek.value.msn,
-            style: {
-              font: { sz: "14", bold: ek.type === "header" ? true : false },
-              alignment: { horizontal: "left", vertical: "center" },
-            },
-          },
-          {
-            value: ek.value.dep,
-            style: {
-              font: { sz: "14", bold: ek.type === "header" ? true : false },
-              alignment: { horizontal: "left", vertical: "center" },
-            },
-          },
-          {
-            value: ek.value.qty,
-            style: {
-              font: {
-                sz: "14",
-                bold:
-                  ek.type === "header" || ek.type === "footer" ? true : false,
-              },
-              alignment: { horizontal: "right", vertical: "center" },
-            },
-          },
-          {
-            value: ek.value.plan,
-            style: {
-              font: {
-                sz: "14",
-                bold:
-                  ek.type === "header" || ek.type === "footer" ? true : false,
-              },
-              alignment: { horizontal: "right", vertical: "center" },
-            },
-          },
-          {
-            value: ek.value.jadi,
-            style: {
-              font: {
-                sz: "14",
-                bold:
-                  ek.type === "header" || ek.type === "footer" ? true : false,
-              },
-              alignment: { horizontal: "right", vertical: "center" },
-            },
-          },
-          {
-            value: ek.value.prc,
-            style: {
-              font: {
-                sz: "14",
-                bold:
-                  ek.type === "header" || ek.type === "footer" ? true : false,
-              },
-              alignment: { horizontal: "right", vertical: "center" },
-            },
-          },
-          {
-            value: ek.value.total,
-            style: {
-              font: {
-                sz: "14",
-                bold:
-                  ek.type === "header" || ek.type === "footer" ? true : false,
-              },
-              alignment: { horizontal: "right", vertical: "center" },
-            },
-          },
-        ]);
-      });
-
-      item_prd.push([
+    final.push({
+      columns: [
         {
-          value: "",
+          title: "Kode Planning",
+          width: { wch: 20 },
           style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "left", vertical: "center" },
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "center", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
           },
         },
-      ]);
-
-      final.push({
-        columns: [
-          {
-            title: `${el[0].btc}`,
-            width: { wch: 30 },
-            style: {
-              font: { sz: "14", bold: false },
-              alignment: { horizontal: "left", vertical: "center" },
-              fill: {
-                paternType: "solid",
-                fgColor: { rgb: "F3F3F3" },
-              },
+        {
+          title: "Kode Produk",
+          width: { wch: 20 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "center", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
             },
           },
-        ],
-        data: item_prd,
-        data: item_mtr,
-      });
+        },
+        {
+          title: "Nama Produk",
+          width: { wch: 50 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "center", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          title: "Saldo Produk",
+          width: { wch: 17 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "center", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          title: "Rencana Pemakaian",
+          width: { wch: 17 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "center", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          title: "Sisa Saldo",
+          width: { wch: 13 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "center", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          title: "Saran Pembelian",
+          width: { wch: 17 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "center", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+      ],
+      data: item,
     });
 
     if (excel) {
@@ -556,11 +374,11 @@ const PemasukanDB = () => {
                 <i className="pi pi-calendar" />
               </span>
               <Calendar
-                value={filtDate}
+                value={filtersDate}
                 id="range"
                 onChange={(e) => {
                   console.log(e.value);
-                  setFiltDate(e.value);
+                  setFiltersDate(e.value);
                 }}
                 selectionMode="range"
                 placeholder="Pilih Tanggal"
@@ -587,7 +405,7 @@ const PemasukanDB = () => {
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
             <ExcelFile
-              filename={`Laporan Pemasukan Barang Perdokumen Pabean report export ${new Date().getTime()}`}
+              filename={`Laporan Pemasukan Barang report export ${new Date().getTime()}`}
               element={
                 <PrimeSingleButton
                   label="Excel"
@@ -597,7 +415,7 @@ const PemasukanDB = () => {
             >
               <ExcelSheet
                 dataSet={stCard ? jsonForExcel(stCard, true) : null}
-                name="Laporan Pemasukkan Barang Perdokumen Pabean Report"
+                name="Laporan Pemasukan Barang"
               />
             </ExcelFile>
           </div>
@@ -641,9 +459,9 @@ const PemasukanDB = () => {
             <Card className="ml-1 mr-1 mt-2">
               <Card.Body className="p-0">
                 <CustomeWrapper
-                horizontal
+                  horizontal
                   tittle={"Laporan Pemasukan Barang Perdokumen Pabean"}
-                  subTittle={`Laporan Pemasukkan Barang Perdokumen Pabean as ${formatDate(
+                  subTittle={`Periode ${formatDate(
                     filtersDate[0]
                   )} to ${formatDate(filtersDate[1])}`}
                   onComplete={(cp) => setCp(cp)}
@@ -677,7 +495,7 @@ const PemasukanDB = () => {
                                 className="center-header border"
                               />
                               <Column
-                                header={"Dokumen Penerimaan"}
+                                header={"Dokumen Pemasukan"}
                                 colSpan={2}
                                 className="center-header border"
                               />
@@ -743,7 +561,7 @@ const PemasukanDB = () => {
                                   : ""
                               }
                             >
-                              {}
+                              {e.value.no}
                             </div>
                           )}
                         />
@@ -757,7 +575,7 @@ const PemasukanDB = () => {
                                   : ""
                               }`}
                             >
-                              {}
+                              {e.value.dep}
                             </div>
                           )}
                         />
@@ -771,13 +589,13 @@ const PemasukanDB = () => {
                                   : ""
                               }
                             >
-                              {}
+                              {e.value.doc}
                             </div>
                           )}
                         />
                         <Column
                           className=""
-                          header="Bukti Dokumen Pengeluaran"
+                          header="Bukti Dokumen Pemasukan"
                           body={(e) => (
                             <div
                               className={
@@ -786,7 +604,7 @@ const PemasukanDB = () => {
                                   : ""
                               }
                             >
-                              {}
+                              {e.value.doc_dt}
                             </div>
                           )}
                         />
@@ -801,7 +619,7 @@ const PemasukanDB = () => {
                                   : ""
                               }
                             >
-                              {}
+                              {e.value.ord_code}
                             </div>
                           )}
                         />
@@ -815,7 +633,7 @@ const PemasukanDB = () => {
                                   : ""
                               }
                             >
-                              {}
+                              {e.value.ord_date}
                             </div>
                           )}
                         />
@@ -829,7 +647,7 @@ const PemasukanDB = () => {
                                   : ""
                               }
                             >
-                              {}
+                              {e.value.pel}
                             </div>
                           )}
                         />
@@ -843,7 +661,7 @@ const PemasukanDB = () => {
                                   : ""
                               }
                             >
-                              {}
+                              {e.value.prod_kd}
                             </div>
                           )}
                         />
@@ -857,7 +675,7 @@ const PemasukanDB = () => {
                                   : ""
                               }
                             >
-                              {}
+                              {e.value.prod_nm}
                             </div>
                           )}
                         />
@@ -871,7 +689,7 @@ const PemasukanDB = () => {
                                   : ""
                               }
                             >
-                              {}
+                              {e.value.unit}
                             </div>
                           )}
                         />
@@ -885,7 +703,7 @@ const PemasukanDB = () => {
                                   : ""
                               }
                             >
-                              {}
+                              {e.value.qty}
                             </div>
                           )}
                         />
@@ -899,7 +717,7 @@ const PemasukanDB = () => {
                                   : ""
                               }
                             >
-                              {}
+                              {e.value.h_pok}
                             </div>
                           )}
                         />

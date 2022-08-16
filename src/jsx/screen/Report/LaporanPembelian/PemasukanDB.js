@@ -56,7 +56,7 @@ const PemasukanDB = () => {
         const { data } = response;
         let filtered = [];
         data.forEach((el) => {
-          if (el.trx_type === "JL") {
+          if (el.trx_type === "BL") {
             filtered.push(el);
           }
         });
@@ -65,7 +65,7 @@ const PemasukanDB = () => {
           (el, i) =>
             i ===
             data.findIndex(
-              (ek) => el?.trx_code === ek?.trx_code && el.trx_type === "JL"
+              (ek) => el?.trx_code === ek?.trx_code && el.trx_type === "BL"
             )
         );
         setOrder(grouped);

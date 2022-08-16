@@ -374,7 +374,7 @@ const KasBankOutList = ({ onAdd, onEdit }) => {
           body={loading && <Skeleton />}
         />
         <Column
-          header="Tipe Pengeluaran"
+          header="Tipe"
           field={(e) => e?.exp_type ?? ""}
           style={{ minWidth: "8rem" }}
           body={(e) =>
@@ -397,7 +397,7 @@ const KasBankOutList = ({ onAdd, onEdit }) => {
           }
         />
         <Column
-          header="Jenis Pengeluaran"
+          header="Jenis Pelunasan"
           className="align-text-center"
           field={(e) => e?.acq_pay ?? ""}
           style={{ minWidth: "8rem" }}
@@ -420,6 +420,29 @@ const KasBankOutList = ({ onAdd, onEdit }) => {
                   </Badge>
                 ) : (
                   <span className="center"> - </span>
+                )}
+              </div>
+            )
+          }
+        />
+        <Column
+          header="Status"
+          field={(e) => e?.approve ?? ""}
+          style={{ minWidth: "8rem" }}
+          body={(e) =>
+            loading ? (
+              <Skeleton />
+            ) : (
+              <div>
+                {e.approve === true ? (
+                  <Badge variant="info light">
+                    <i className="bx bx-check text-info mr-1"></i> Disetujui
+                  </Badge>
+                ) : (
+                  <Badge variant="danger light">
+                    <i className="bx bx-x text-danger mr-1"></i>{" "}
+                    Belum Disetujui
+                  </Badge>
                 )}
               </div>
             )

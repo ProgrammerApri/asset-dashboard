@@ -10,9 +10,6 @@ import { Skeleton } from "primereact/skeleton";
 
 import ReactExport from "react-data-export";
 import ReactToPrint from "react-to-print";
-// import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
-// import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
-import { el } from "date-fns/locale";
 import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { Dropdown } from "primereact/dropdown";
@@ -28,7 +25,7 @@ const PengeluaranBDP = () => {
   const [loading, setLoading] = useState(true);
   const printPage = useRef(null);
   const [filtersDate, setFiltersDate] = useState([new Date(), new Date()]);
-  const [selectCus, setSelectCus] = useState(null);
+  const [selectCode, setSelectCode] = useState(null);
   const [stCard, setStCard] = useState(null);
   const [cp, setCp] = useState("");
   const chunkSize = 27;
@@ -104,126 +101,139 @@ const PengeluaranBDP = () => {
 
   const jsonForExcel = (stCard, excel = false) => {
     let data = [];
+    let unt = [];
     ord?.forEach((el) => {
-      stCard?.forEach((ek) => {
-        if (ek.trx_code === el.ord_code) {
-          let dt = new Date(`${el?.ord_date}Z`);
-          if (dt >= filtersDate[0] && dt <= filtersDate[1]) {
-          data.push({
-            type: "item",
-            value: {
-              no: null,
-              dep: `${el.slsm_id?.sales_name} - ${el.slsm_id?.sales_code}`,
-              doc: el.no_doc,
-              doc_dt: formatDate(el.doc_date),
-              ord_code: ek.trx_code,
-              ord_date: formatDate(ek.trx_date),
-              pel: `${el.pel_id?.cus_name} - ${el.pel_id?.cus_code}`,
-              prod_kd: ek.prod_id?.code,
-              prod_nm: ek.prod_id?.name,
-              unit: el.jprod.unit_id?.name,
-              qty: ek.trx_qty,
-              h_pok: `Rp. ${formatIdr(ek.trx_hpok)}`,
-            },
-          });
-        }
-        }
+      el.jprod?.forEach((element) => {
+        unt = element.unit_id.name;
       });
+      // if (selectCode.trx_code === el.ord_code) {
+        stCard?.forEach((ek) => {
+          if (ek.trx_code === el.ord_code) {
+            let dt = new Date(`${el?.ord_date}Z`);
+            if (dt >= filtersDate[0] && dt <= filtersDate[1]) {
+              data.push({
+                type: "item",
+                value: {
+                  no: null,
+                  dep: `${el.slsm_id?.sales_name} - ${el.slsm_id?.sales_code}`,
+                  doc: el.no_doc,
+                  doc_dt: formatDate(el.doc_date),
+                  ord_code: ek.trx_code,
+                  ord_date: formatDate(ek.trx_date),
+                  pel: `${el.pel_id?.cus_name} - ${el.pel_id?.cus_code}`,
+                  prod_kd: ek.prod_id?.code,
+                  prod_nm: ek.prod_id?.name,
+                  unit: unt,
+                  qty: ek.trx_qty,
+                  h_pok: `Rp. ${formatIdr(ek.trx_hpok)}`,
+                },
+              });
+            }
+          }
+        });
+      // }
     });
 
     let item = [];
 
-    // data?.forEach((el) => {
-    //   el?.forEach((ek) => {
-    //     item.push([
-    //       {
-    //         value: ek.value.dep,
-    //         style: {
-    //           font: { sz: "14", bold: false },
-    //           alignment: { horizontal: "left", vertical: "center" },
-    //         },
-    //       },
-    //       {
-    //         value: ek.value.doc,
-    //         style: {
-    //           font: { sz: "14", bold: false },
-    //           alignment: { horizontal: "left", vertical: "center" },
-    //         },
-    //       },
-    //       {
-    //         value: ek.value.doc_dt,
-    //         style: {
-    //           font: { sz: "14", bold: false },
-    //           alignment: { horizontal: "left", vertical: "center" },
-    //         },
-    //       },
-    //       {
-    //         value: ek.value.ord_code,
-    //         style: {
-    //           font: { sz: "14", bold: false },
-    //           alignment: { horizontal: "center", vertical: "center" },
-    //         },
-    //       },
-    //       {
-    //         value: ek.value.ord_date,
-    //         style: {
-    //           font: { sz: "14", bold: false },
-    //           alignment: { horizontal: "right", vertical: "center" },
-    //         },
-    //       },
-    //       {
-    //         value: ek.value.sup,
-    //         style: {
-    //           font: { sz: "14", bold: false },
-    //           alignment: { horizontal: "right", vertical: "center" },
-    //         },
-    //       },
-    //       {
-    //         value: ek.value.prod_kd,
-    //         style: {
-    //           font: { sz: "14", bold: false },
-    //           alignment: { horizontal: "right", vertical: "center" },
-    //         },
-    //       },
-    //       {
-    //         value: ek.value.prod_nm,
-    //         style: {
-    //           font: { sz: "14", bold: false },
-    //           alignment: { horizontal: "right", vertical: "center" },
-    //         },
-    //       },
-    //       {
-    //         value: ek.value.unit,
-    //         style: {
-    //           font: { sz: "14", bold: false },
-    //           alignment: { horizontal: "right", vertical: "center" },
-    //         },
-    //       },
-    //       {
-    //         value: ek.value.qty,
-    //         style: {
-    //           font: { sz: "14", bold: false },
-    //           alignment: { horizontal: "right", vertical: "center" },
-    //         },
-    //       },
-    //       {
-    //         value: ek.value.h_pok,
-    //         style: {
-    //           font: { sz: "14", bold: false },
-    //           alignment: { horizontal: "right", vertical: "center" },
-    //         },
-    //       },
-    //     ]);
-    //   });
-    // });
+    data.forEach((el, i) => {
+      el.value.no = i + 1;
+      item.push([
+        {
+          value: el.value.no = i + 1,
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: el.value.dep,
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: el.value.doc,
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: el.value.doc_dt,
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: el.value.ord_code,
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "center", vertical: "center" },
+          },
+        },
+        {
+          value: el.value.ord_date,
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: el.value.pel,
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: el.value.prod_kd,
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: el.value.prod_nm,
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: el.value.unit,
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: el.value.qty,
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: el.value.h_pok,
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+      ]);
+    });
 
+    console.log("ceekkk");
     console.log(item);
 
     let final = [
       {
         columns: [
           {
-            title: "RPBB Card Report",
+            title: "Laporan Pengeluaran Barang",
             width: { wch: 30 },
             style: {
               font: { sz: "14", bold: true },
@@ -263,7 +273,7 @@ const PengeluaranBDP = () => {
     final.push({
       columns: [
         {
-          title: "Kode Planning",
+          title: "No",
           width: { wch: 20 },
           style: {
             font: { sz: "14", bold: true },
@@ -275,7 +285,7 @@ const PengeluaranBDP = () => {
           },
         },
         {
-          title: "Kode Produk",
+          title: "Departemen",
           width: { wch: 20 },
           style: {
             font: { sz: "14", bold: true },
@@ -287,7 +297,7 @@ const PengeluaranBDP = () => {
           },
         },
         {
-          title: "Nama Produk",
+          title: "No. Dokumen",
           width: { wch: 50 },
           style: {
             font: { sz: "14", bold: true },
@@ -299,7 +309,7 @@ const PengeluaranBDP = () => {
           },
         },
         {
-          title: "Saldo Produk",
+          title: "Tanggal Dokumen",
           width: { wch: 17 },
           style: {
             font: { sz: "14", bold: true },
@@ -311,7 +321,7 @@ const PengeluaranBDP = () => {
           },
         },
         {
-          title: "Rencana Pemakaian",
+          title: "No. Transaksi",
           width: { wch: 17 },
           style: {
             font: { sz: "14", bold: true },
@@ -323,7 +333,7 @@ const PengeluaranBDP = () => {
           },
         },
         {
-          title: "Sisa Saldo",
+          title: "Tanggal Transaksi",
           width: { wch: 13 },
           style: {
             font: { sz: "14", bold: true },
@@ -335,7 +345,67 @@ const PengeluaranBDP = () => {
           },
         },
         {
-          title: "Saran Pembelian",
+          title: "Customer",
+          width: { wch: 17 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "center", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          title: "Kode Produk",
+          width: { wch: 17 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "center", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          title: "Nama Produk",
+          width: { wch: 17 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "center", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          title: "Satuan",
+          width: { wch: 17 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "center", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          title: "Kuantitas",
+          width: { wch: 17 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "center", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          title: "Harga Pokok",
           width: { wch: 17 },
           style: {
             font: { sz: "14", bold: true },
@@ -368,7 +438,7 @@ const PengeluaranBDP = () => {
       <div className="flex justify-content-between">
         <div className="col-6 ml-0 mr-0 pl-0 pt-0">
           <Row className="mt-0">
-            <div className="p-inputgroup col-6">
+            <div className="p-inputgroup col-5">
               <span className="p-inputgroup-addon">
                 <i className="pi pi-calendar" />
               </span>
@@ -387,12 +457,12 @@ const PengeluaranBDP = () => {
             </div>
             {/* <div className="col-4">
               <Dropdown
-                value={selectedProduct ?? null}
-                options={batch}
+                value={selectCode ?? null}
+                options={order}
                 onChange={(e) => {
-                  setSelected(e.value);
+                  setSelectCode(e.value);
                 }}
-                placeholder="Pilih Batch"
+                placeholder="Pilih Kode Transaksi"
                 optionLabel="trx_code"
                 filter
                 filterBy="trx_code"
@@ -404,7 +474,7 @@ const PengeluaranBDP = () => {
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
             <ExcelFile
-              filename={`Laporan Pengeluaran Barang report export ${new Date().getTime()}`}
+              filename={`pengeluaran_barang_report_export_${new Date().getTime()}`}
               element={
                 <PrimeSingleButton
                   label="Excel"
@@ -459,7 +529,7 @@ const PengeluaranBDP = () => {
               <Card.Body className="p-0">
                 <CustomeWrapper
                   horizontal
-                  tittle={"Laporan Pengeluaran Barang Perdokumen Pabean"}
+                  tittle={"Laporan Pengeluaran Barang"}
                   subTittle={`Periode ${formatDate(
                     filtersDate[0]
                   )} to ${formatDate(filtersDate[1])}`}
@@ -608,7 +678,7 @@ const PengeluaranBDP = () => {
                           )}
                         />
                         <Column
-                          className=""
+                          className="center"
                           style={{ width: "11rem" }}
                           body={(e) => (
                             <div

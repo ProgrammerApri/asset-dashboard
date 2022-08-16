@@ -23,6 +23,7 @@ import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 import { InputNumber } from "primereact/inputnumber";
+import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 
 const defError = {
   code: false,
@@ -30,8 +31,8 @@ const defError = {
   sup: false,
   akn: false,
   btc: false,
-  proj: false,
-  dep: false,
+  // proj: false,
+  // dep: false,
   acco: false,
   bn_code: false,
   bn_acc: false,
@@ -44,11 +45,11 @@ const defError = {
       nil: false,
     },
   ],
-  acq: [
-    {
-      pay: false,
-    },
-  ],
+  // acq: [
+  //   {
+  //     pay: false,
+  //   },
+  // ],
 };
 
 const KasBankOutInput = ({ onCancel, onSuccess }) => {
@@ -117,8 +118,8 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
       date: !exp.exp_date || exp.exp_date === "",
       sup: exp.exp_type === 1 ? !exp.acq_sup : false,
       akn: exp.exp_type === 2 ? !exp.exp_acc : false,
-      proj: exp.exp_type === 2 ? !exp.exp_prj : false,
-      dep: exp.exp_dep === 2 ? !exp.exp_dep : false,
+      // proj: exp.exp_type === 2 ? !exp.exp_prj : false,
+      // dep: exp.exp_dep === 2 ? !exp.exp_dep : false,
       btc: exp.exp_type === 3 ? !exp.batch_id : false,
       acco: exp.acq_pay === 1 ? !exp.kas_acc : false,
       bn_code: exp.acq_pay === 2 ? !exp.bank_ref : false,
@@ -127,7 +128,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
       tgl: exp.acq_pay === 3 ? !exp.giro_date : false,
       bn_id: exp.acq_pay === 3 ? !exp.bank_id : false,
       exp: [],
-      acq: [],
+      // acq: [],
     };
 
     exp?.exp.forEach((element, i) => {
@@ -147,25 +148,25 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
       }
     });
 
-    exp?.acq?.forEach((element, i) => {
-      if (i > 0) {
-        if (element.payment) {
-          errors.acq[i] = {
-            pay:
-              !element.payment ||
-              element.payment === "" ||
-              element.payment === "0",
-          };
-        }
-      } else {
-        errors.acq[i] = {
-          pay:
-            !element.payment ||
-            element.payment === "" ||
-            element.payment === "0",
-        };
-      }
-    });
+    // exp?.acq?.forEach((element, i) => {
+    //   if (i > 0) {
+    //     if (element.payment) {
+    //       errors.acq[i] = {
+    //         pay:
+    //           !element.payment ||
+    //           element.payment === "" ||
+    //           element.payment === "0",
+    //       };
+    //     }
+    //   } else {
+    //     errors.acq[i] = {
+    //       pay:
+    //         !element.payment ||
+    //         element.payment === "" ||
+    //         element.payment === "0",
+    //     };
+    //   }
+    // });
 
     // if (exp !== null && exp.exp_type === 2) {
     if (!errors.exp[0].acc && !errors.exp[0].nil) {
@@ -178,15 +179,15 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
     // }
 
     // if (exp !== null && exp.exp_type === 1) {
-    if (exp?.acq.length) {
-      if (!errors.acq[0]?.pay) {
-        errors.exp?.forEach((e) => {
-          for (var key in e) {
-            e[key] = false;
-          }
-        });
-      }
-    }
+    // if (exp?.acq.length) {
+    //   if (!errors.acq[0]?.pay) {
+    //     errors.exp?.forEach((e) => {
+    //       for (var key in e) {
+    //         e[key] = false;
+    //       }
+    //     });
+    //   }
+    // }
     // }
 
     let validExp = false;
@@ -196,13 +197,13 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
         validExp = !el[k];
       }
     });
-    if (!validExp) {
-      errors.acq?.forEach((el) => {
-        for (var k in el) {
-          validAcq = !el[k];
-        }
-      });
-    }
+    // if (!validExp) {
+    //   errors.acq?.forEach((el) => {
+    //     for (var k in el) {
+    //       validAcq = !el[k];
+    //     }
+    //   });
+    // }
 
     setError(errors);
 
@@ -212,8 +213,6 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
       !errors.sup &&
       !errors.akn &&
       !errors.btc &&
-      !errors.proj &&
-      !errors.dep &&
       !errors.acco &&
       !errors.bn_code &&
       !errors.bn_acc &&
@@ -350,7 +349,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
           }
         });
         console.log(data);
-        setAccKas(filt);
+        setAccKas(data);
       }
     } catch (error) {}
   };
@@ -580,6 +579,54 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
+  const glTemplate = (option) => {
+    return (
+      <div>
+        {option !== null
+          ? `${option.account.acc_name} - ${option.account.acc_code}`
+          : ""}
+      </div>
+    );
+  };
+
+  const valTemp = (option, props) => {
+    if (option) {
+      return (
+        <div>
+          {option !== null
+            ? `${option.account.acc_name} - ${option.account.acc_code}`
+            : ""}
+        </div>
+      );
+    }
+
+    return <span>{props.placeholder}</span>;
+  };
+
+  const bankTemplate = (option) => {
+    return (
+      <div>
+        {option !== null
+          ? `${option.bank.BANK_NAME} - ${option.bank.BANK_CODE}`
+          : ""}
+      </div>
+    );
+  };
+
+  const valBTemp = (option, props) => {
+    if (option) {
+      return (
+        <div>
+          {option !== null
+            ? `${option.bank.BANK_NAME} - ${option.bank.BANK_CODE}`
+            : ""}
+        </div>
+      );
+    }
+
+    return <span>{props.placeholder}</span>;
+  };
+
   const onSubmit = () => {
     if (isValid()) {
       if (isEdit) {
@@ -667,7 +714,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
             <Divider className="mt-1"></Divider>
           </div>
 
-          <div className="col-4 mb-2">
+          <div className="col-12 mb-2">
             <label className="text-label">Tipe Pengeluaran</label>
             <div className="p-inputgroup">
               <SelectButton
@@ -694,22 +741,19 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-8"></div>
-
           {/* Type Pembayaran */}
           {exp !== null && exp.exp_type === 1 ? (
             <>
               <div className="col-4">
-                <label className="text-label">Kode Pemasok</label>
-                <div className="p-inputgroup"></div>
-                <CustomDropdown
+                <PrimeDropdown
+                  label={"Supplier"}
                   value={exp.acq_sup && supp(exp.acq_sup)}
-                  option={supplier}
+                  options={supplier}
                   onChange={(e) => {
                     updateExp({
                       ...exp,
-                      acq_sup: e.supplier?.id,
-                      acq: e.ap?.map((v) => {
+                      acq_sup: e.value.supplier?.id,
+                      acq: e.value.ap?.map((v) => {
                         return {
                           id: null,
                           fk_id: v.ord_id?.id,
@@ -721,13 +765,13 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
 
                     let newError = error;
                     newError.sup = false;
-                    newError.acq.push({ pay: false });
                     setError(newError);
                   }}
-                  label={"[supplier.sup_name]"}
-                  placeholder="Pilih Pemasok"
-                  detail
-                  errorMessage="Pemasok Belum Dipilih"
+                  optionLabel="supplier.sup_name"
+                  placeholder="Pilih Supplier"
+                  filter
+                  filterBy="supplier.sup_name"
+                  errorMessage="Supplier Belum Dipilih"
                   error={error?.sup}
                 />
               </div>
@@ -758,22 +802,23 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
               {exp !== null && exp.acq_pay === 1 ? (
                 <>
                   <div className="col-4">
-                    <label className="text-label">Kode Akun</label>
-                    <div className="p-inputgroup"></div>
-                    <CustomDropdown
+                    <PrimeDropdown
+                      label={"Kode Akun"}
                       value={exp.kas_acc && checkAccKas(exp.kas_acc)}
-                      option={accKas}
+                      options={accKas}
                       onChange={(e) => {
-                        updateExp({ ...exp, kas_acc: e.account.id });
+                        updateExp({ ...exp, kas_acc: e.value.account.id });
 
                         let newError = error;
                         newError.acco = false;
                         setError(newError);
                       }}
-                      label={"[account.acc_name] - [account.acc_code]"}
+                      optionLabel="account.acc_name"
                       placeholder="Pilih Kode Akun"
-                      detail
-                      onDetail={() => setShowAccKas(true)}
+                      filter
+                      filterBy="account.acc_name"
+                      itemTemplate={glTemplate}
+                      valueTemplate={valTemp}
                       errorMessage="Akun Belum Dipilih"
                       error={error?.acco}
                     />
@@ -799,26 +844,26 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                   </div>
 
                   <div className="col-4">
-                    <label className="text-label">Akun Bank</label>
-                    <div className="p-inputgroup"></div>
-                    <CustomDropdown
-                      value={exp.bank_id && checkBank(exp.bank_id)}
-                      option={bank}
+                    <PrimeDropdown
+                      label={"Kode Bank"}
+                      value={exp.bank_acc && checkBank(exp.bank_acc)}
+                      options={bank}
                       onChange={(e) => {
                         updateExp({
                           ...exp,
-                          bank_id: e.bank?.id,
-                          bank_acc: e.bank?.acc_id,
+                          bank_acc: e.value.bank?.id,
                         });
 
                         let newError = error;
                         newError.bn_acc = false;
                         setError(newError);
                       }}
-                      label={"[bank.BANK_NAME] - [bank.BANK_CODE]"}
+                      optionLabel="bank.BANK_NAME"
                       placeholder="Pilih Akun Bank"
-                      detail
-                      onDetail={() => setShowBank(true)}
+                      filter
+                      filterBy="bank.BANK_CODE"
+                      itemTemplate={bankTemplate}
+                      valueTemplate={valBTemp}
                       errorMessage="Akun Bank Belum Dipilih"
                       error={error?.bn_acc}
                     />
@@ -862,26 +907,26 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                   </div>
 
                   <div className="col-4">
-                    <label className="text-label">Kode Bank</label>
-                    <div className="p-inputgroup"></div>
-                    <CustomDropdown
+                    <PrimeDropdown
+                      label={"Kode Bank"}
                       value={exp.bank_id && checkBank(exp.bank_id)}
-                      option={bank}
+                      options={bank}
                       onChange={(e) => {
                         updateExp({
                           ...exp,
-                          bank_id: e.bank?.id,
-                          bank_acc: e.bank?.acc_id,
+                          bank_id: e.value.bank?.id,
                         });
 
                         let newError = error;
                         newError.bn_id = false;
                         setError(newError);
                       }}
-                      label={"[bank.BANK_NAME] - [bank.BANK_CODE]"}
+                      optionLabel="bank.BANK_NAME"
                       placeholder="Pilih Kode Bank"
-                      onDetail={() => setShowBankG(true)}
-                      detail
+                      filter
+                      filterBy="bank.BANK_CODE"
+                      itemTemplate={bankTemplate}
+                      valueTemplate={valBTemp}
                       errorMessage="Akun Bank Belum Dipilih"
                       error={error?.bn_id}
                     />
@@ -999,20 +1044,20 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                           field={""}
                           body={(e) => (
                             <PrimeNumber
-                            price
+                              price
                               value={e.payment && e.payment}
                               onChange={(u) => {
                                 let temp = [...exp.acq];
                                 temp[e.index].payment = u.value;
                                 updateExp({ ...exp, acq: temp });
 
-                                let newError = error;
-                                newError.acq[e.index].pay = false;
-                                setError(newError);
+                                // let newError = error;
+                                // newError.acq[e.index].pay = false;
+                                // setError(newError);
                               }}
                               placeholder="0"
                               min={0}
-                              error={error?.acq[e.index]?.pay}
+                              // error={error?.acq[e.index]?.pay}
                             />
                           )}
                         />
@@ -1023,6 +1068,10 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                               // e.index === out.rprod.length - 1 ? (
                               <Link
                                 onClick={() => {
+                                  let newError = error;
+                                  newError.acq.push({ pay: false });
+                                  setError(newError);
+
                                   let temp = [...exp.acq];
                                   temp.splice(e.index, 1);
                                   updateExp({
@@ -1085,17 +1134,11 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                       ...exp,
                       exp_dep: e.id,
                     });
-
-                    let newError = error;
-                    newError.dep = false;
-                    setError(newError);
                   }}
                   label={"[ccost_name] - [ccost_code]"}
                   placeholder="Pilih Departemen"
                   detail
                   onDetail={() => setShowDept(true)}
-                  errorMessage="Kode Departemen Belum Dipilih"
-                  error={error?.dep}
                 />
               </div>
               <div className="col-3">
@@ -1122,6 +1165,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                   error={error?.proj}
                 />
               </div>
+              
               <CustomAccordion
                 className="col-12 mt-4"
                 tittle={"Pengeluaran Kas / Bank"}
@@ -1157,22 +1201,25 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                         }}
                         field={""}
                         body={(e) => (
-                          <CustomDropdown
+                          <PrimeDropdown
                             value={e.acc_code && checkAcc(e.acc_code)}
-                            option={account}
+                            options={account}
                             onChange={(u) => {
                               console.log(e.value);
                               let temp = [...exp.exp];
-                              temp[e.index].acc_code = u.account.id;
+                              temp[e.index].acc_code = u.value.account.id;
                               updateExp({ ...exp, exp: temp });
 
                               let newError = error;
                               newError.exp[e.index].acc = false;
                               setError(newError);
                             }}
-                            label={"[account.acc_name] - [account.acc_code]"}
+                            optionLabel="account.acc_name"
+                            itemTemplate={glTemplate}
+                            valueTemplate={valTemp}
+                            filter
+                            filterBy="account.acc_name"
                             placeholder="Pilih Kode Akun"
-                            detail
                             errorMessage="Akun Belum Dipilih"
                             error={error?.exp[e.index]?.acc}
                           />
@@ -1210,7 +1257,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                         field={""}
                         body={(e) => (
                           <PrimeNumber
-                          price
+                            price
                             value={e.value && e.value}
                             onChange={(u) => {
                               let temp = [...exp.exp];
@@ -1277,6 +1324,10 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                           ) : (
                             <Link
                               onClick={() => {
+                                let newError = error;
+                                newError.exp.push({ nil: false });
+                                setError(newError);
+
                                 let temp = [...exp.exp];
                                 temp.splice(e.index, 1);
                                 updateExp({
@@ -1468,7 +1519,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                         field={""}
                         body={(e) => (
                           <PrimeNumber
-                          price
+                            price
                             value={e.value && e.value}
                             onChange={(u) => {
                               let temp = [...exp.exp];

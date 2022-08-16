@@ -1121,12 +1121,12 @@ const endpoints = {
   //   data: {},
   // },
 
-  /// RPBB_REPORT
-  // rpbb: {
-  //   endpoint: "/v1/api/rpbb",
-  //   method: "GET",
-  //   data: {},
-  // },
+  // RPBB_REPORT
+  rpbb: {
+    endpoint: "/v1/api/rpbb",
+    method: "GET",
+    data: {},
+  },
   // delPbn: {
   //   endpoint: "/v1/api/pbn/",
   //   method: "DELETE",

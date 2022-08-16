@@ -93,14 +93,14 @@ const LaporanPembelian = () => {
       component: <RencanaPemakaianBB />,
     },
     {
-      tittle: "Pengeluaran Barang DP",
-      icon: "bx-spreadsheet",
-      component: <PengeluaranBDP />,
-    },
-    {
-      tittle: "Pemasukan Barang DP",
+      tittle: "Pemasukan Barang",
       icon: "bx-spreadsheet",
       component: <PemasukanDB />,
+    },
+    {
+      tittle: "Pengeluaran Barang",
+      icon: "bx-spreadsheet",
+      component: <PengeluaranBDP />,
     },
   ]);
 

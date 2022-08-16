@@ -33,6 +33,8 @@ import { InputNumber } from "primereact/inputnumber";
 const defError = {
   code: false,
   date: false,
+  doc_cd: false,
+  doc_date: false,
   pel: false,
   rul: false,
   sls: false,
@@ -114,6 +116,8 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     let errors = {
       code: !sale.ord_code || sale.ord_code === "",
       date: !sale.ord_date || sale.ord_date === "",
+      doc_cd: !sale.no_doc || sale.no_doc === "",
+      doc_date: !sale.doc_date || sale.doc_date === "",
       pel: !sale.pel_id,
       rul: !sale.top,
       sls: !sale.slsm_id,
@@ -208,6 +212,8 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     valid =
       !errors.code &&
       !errors.date &&
+      !errors.doc_cd &&
+      !errors.doc_date &&
       !errors.pel &&
       !errors.rul &&
       !errors.sls &&
@@ -498,7 +504,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
   const addSale = async () => {
     const config = {
       ...endpoints.addSale,
-      data: sale,
+      data: {...sale, doc_date: currentDate(sale.doc_date)},
     };
     console.log(config.data);
     let response = null;
@@ -680,6 +686,20 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     return [day, month, year].join("-");
   };
 
+  const currentDate = (date) => {
+    let now = new Date();
+    let newDate = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      now.getHours(),
+      now.getMinutes(),
+      now.getSeconds(),
+      now.getMilliseconds()
+    );
+    return newDate.toISOString();
+  };
+
   const updateSL = (e) => {
     dispatch({
       type: SET_CURRENT_SL,
@@ -745,7 +765,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
         {/* Put content body here */}
         <Toast ref={toast} />
         <Row className="mb-4">
-          <div className="col-3">
+          <div className="col-2">
             <PrimeInput
               label={"No. Penjualan"}
               value={sale.ord_code}
@@ -791,6 +811,43 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
             />
           </div>
 
+          <div className="col-2">
+            <PrimeInput
+              label={"No. Dokumen"}
+              value={sale.no_doc}
+              onChange={(e) => {
+                updateSL({ ...sale, no_doc: e.target.value });
+
+                let newError = error;
+                newError.doc_cd = false;
+                setError(newError);
+              }}
+              placeholder="Masukan No. Dokumen"
+              error={error?.doc_cd}
+            />
+          </div>
+
+          <div className="col-2">
+            <PrimeCalendar
+              label={"Tanggal Dokumen"}
+              value={new Date(`${sale.doc_date}Z`)}
+              onChange={(e) => {
+                updateSL({
+                  ...sale,
+                  doc_date: e.value,
+                });
+
+                let newError = error;
+                newError.doc_date = false;
+                setError(newError);
+              }}
+              placeholder="Pilih Tanggal"
+              showIcon
+              dateFormat="dd-mm-yy"
+              error={error?.doc_date}
+            />
+          </div>
+
           <div className="col-12 mt-0">
             <span className="fs-14">
               <b>Informasi Pesanan</b>
@@ -807,8 +864,8 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
               options={so}
               onChange={(e) => {
                 let result = null;
-                if (sale.top) {
-                  result = new Date(`${sale?.ord_date}Z`);
+                if (sale.so_id?.top) {
+                  result = new Date(`${sale.ord_date}Z`);
                   result.setDate(
                     result.getDate() + checkRulesP(sale?.top)?.day
                   );
@@ -949,7 +1006,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
               label={"[name] ([day] Hari)"}
               errorMessage="Syarat Pembayaran Belum Dipilih"
               error={error?.rul}
-              disabled={sale && sale.so_id}
+              // disabled={sale && sale.so_id}
             />
           </div>
 

@@ -648,6 +648,7 @@ const PengeluaranBDP = () => {
                   )} to ${formatDate(filtersDate[1])}`}
                   onComplete={(cp) => setCp(cp)}
                   page={idx + 1}
+                  horizontal
                   body={
                     <>
                       <DataTable

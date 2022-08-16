@@ -143,7 +143,7 @@ const PengeluaranBDP = () => {
           value: el.value.no = i + 1,
           style: {
             font: { sz: "14", bold: false },
-            alignment: { horizontal: "left", vertical: "center" },
+            alignment: { horizontal: "center", vertical: "center" },
           },
         },
         {
@@ -157,14 +157,14 @@ const PengeluaranBDP = () => {
           value: el.value.doc,
           style: {
             font: { sz: "14", bold: false },
-            alignment: { horizontal: "left", vertical: "center" },
+            alignment: { horizontal: "center", vertical: "center" },
           },
         },
         {
           value: el.value.doc_dt,
           style: {
             font: { sz: "14", bold: false },
-            alignment: { horizontal: "left", vertical: "center" },
+            alignment: { horizontal: "center", vertical: "center" },
           },
         },
         {
@@ -178,42 +178,42 @@ const PengeluaranBDP = () => {
           value: el.value.ord_date,
           style: {
             font: { sz: "14", bold: false },
-            alignment: { horizontal: "right", vertical: "center" },
+            alignment: { horizontal: "center", vertical: "center" },
           },
         },
         {
           value: el.value.pel,
           style: {
             font: { sz: "14", bold: false },
-            alignment: { horizontal: "right", vertical: "center" },
+            alignment: { horizontal: "left", vertical: "center" },
           },
         },
         {
           value: el.value.prod_kd,
           style: {
             font: { sz: "14", bold: false },
-            alignment: { horizontal: "right", vertical: "center" },
+            alignment: { horizontal: "left", vertical: "center" },
           },
         },
         {
           value: el.value.prod_nm,
           style: {
             font: { sz: "14", bold: false },
-            alignment: { horizontal: "right", vertical: "center" },
+            alignment: { horizontal: "left", vertical: "center" },
           },
         },
         {
           value: el.value.unit,
           style: {
             font: { sz: "14", bold: false },
-            alignment: { horizontal: "right", vertical: "center" },
+            alignment: { horizontal: "left", vertical: "center" },
           },
         },
         {
           value: el.value.qty,
           style: {
             font: { sz: "14", bold: false },
-            alignment: { horizontal: "right", vertical: "center" },
+            alignment: { horizontal: "center", vertical: "center" },
           },
         },
         {
@@ -274,7 +274,7 @@ const PengeluaranBDP = () => {
       columns: [
         {
           title: "No",
-          width: { wch: 20 },
+          width: { wch: 8 },
           style: {
             font: { sz: "14", bold: true },
             alignment: { horizontal: "center", vertical: "center" },
@@ -286,7 +286,7 @@ const PengeluaranBDP = () => {
         },
         {
           title: "Departemen",
-          width: { wch: 20 },
+          width: { wch: 30 },
           style: {
             font: { sz: "14", bold: true },
             alignment: { horizontal: "center", vertical: "center" },
@@ -298,7 +298,7 @@ const PengeluaranBDP = () => {
         },
         {
           title: "No. Dokumen",
-          width: { wch: 50 },
+          width: { wch: 20 },
           style: {
             font: { sz: "14", bold: true },
             alignment: { horizontal: "center", vertical: "center" },
@@ -310,7 +310,7 @@ const PengeluaranBDP = () => {
         },
         {
           title: "Tanggal Dokumen",
-          width: { wch: 17 },
+          width: { wch: 18 },
           style: {
             font: { sz: "14", bold: true },
             alignment: { horizontal: "center", vertical: "center" },
@@ -334,7 +334,7 @@ const PengeluaranBDP = () => {
         },
         {
           title: "Tanggal Transaksi",
-          width: { wch: 13 },
+          width: { wch: 18 },
           style: {
             font: { sz: "14", bold: true },
             alignment: { horizontal: "center", vertical: "center" },
@@ -346,7 +346,7 @@ const PengeluaranBDP = () => {
         },
         {
           title: "Customer",
-          width: { wch: 17 },
+          width: { wch: 30 },
           style: {
             font: { sz: "14", bold: true },
             alignment: { horizontal: "center", vertical: "center" },
@@ -370,7 +370,7 @@ const PengeluaranBDP = () => {
         },
         {
           title: "Nama Produk",
-          width: { wch: 17 },
+          width: { wch: 50 },
           style: {
             font: { sz: "14", bold: true },
             alignment: { horizontal: "center", vertical: "center" },

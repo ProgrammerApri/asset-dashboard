@@ -10,9 +10,6 @@ import { Skeleton } from "primereact/skeleton";
 
 import ReactExport from "react-data-export";
 import ReactToPrint from "react-to-print";
-// import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
-// import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
-import { el } from "date-fns/locale";
 import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { Dropdown } from "primereact/dropdown";
@@ -33,7 +30,6 @@ const PemasukanDB = () => {
   const [cp, setCp] = useState("");
   const chunkSize = 27;
 
- 
   useEffect(() => {
     var d = new Date();
     d.setDate(d.getDate() - 7);
@@ -75,7 +71,7 @@ const PemasukanDB = () => {
 
   const getORD = async () => {
     const config = {
-      ...endpoints.sale,
+      ...endpoints.order,
       data: {},
     };
     let response = null;
@@ -105,126 +101,137 @@ const PemasukanDB = () => {
 
   const jsonForExcel = (stCard, excel = false) => {
     let data = [];
+    let unt = [];
     ord?.forEach((el) => {
+      el?.dprod.forEach((element) => {
+        unt = element.unit_id.name;
+      });
       stCard?.forEach((ek) => {
         if (ek.trx_code === el.ord_code) {
           let dt = new Date(`${el?.ord_date}Z`);
           if (dt >= filtersDate[0] && dt <= filtersDate[1]) {
-          data.push({
-            type: "item",
-            value: {
-              no: null,
-              dep: `${el.slsm_id?.sales_name} - ${el.slsm_id?.sales_code}`,
-              doc: el.no_doc,
-              doc_dt: formatDate(el.doc_date),
-              ord_code: ek.trx_code,
-              ord_date: formatDate(ek.trx_date),
-              pel: `${el.pel_id?.cus_name} - ${el.pel_id?.cus_code}`,
-              prod_kd: ek.prod_id?.code,
-              prod_nm: ek.prod_id?.name,
-              unit: el.jprod.unit_id?.name,
-              qty: ek.trx_qty,
-              h_pok: `Rp. ${formatIdr(ek.trx_hpok)}`,
-            },
-          });
-        }
+            data.push({
+              type: "item",
+              value: {
+                no: null,
+                dep: `${el.dep_id?.ccost_name} - ${el.dep_id?.ccost_code}`,
+                doc: el.no_doc,
+                doc_dt: formatDate(el.doc_date),
+                ord_code: ek.trx_code,
+                ord_date: formatDate(ek.trx_date),
+                sup: `${el.sup_id?.sup_name} - ${el.sup_id?.sup_code}`,
+                prod_kd: ek.prod_id?.code,
+                prod_nm: ek.prod_id?.name,
+                unit: unt,
+                qty: ek.trx_qty,
+                h_pok: `Rp. ${formatIdr(ek.trx_hpok)}`,
+              },
+            });
+          }
         }
       });
     });
 
     let item = [];
 
-    // data?.forEach((el) => {
-    //   el?.forEach((ek) => {
-    //     item.push([
-    //       {
-    //         value: ek.value.dep,
-    //         style: {
-    //           font: { sz: "14", bold: false },
-    //           alignment: { horizontal: "left", vertical: "center" },
-    //         },
-    //       },
-    //       {
-    //         value: ek.value.doc,
-    //         style: {
-    //           font: { sz: "14", bold: false },
-    //           alignment: { horizontal: "left", vertical: "center" },
-    //         },
-    //       },
-    //       {
-    //         value: ek.value.doc_dt,
-    //         style: {
-    //           font: { sz: "14", bold: false },
-    //           alignment: { horizontal: "left", vertical: "center" },
-    //         },
-    //       },
-    //       {
-    //         value: ek.value.ord_code,
-    //         style: {
-    //           font: { sz: "14", bold: false },
-    //           alignment: { horizontal: "center", vertical: "center" },
-    //         },
-    //       },
-    //       {
-    //         value: ek.value.ord_date,
-    //         style: {
-    //           font: { sz: "14", bold: false },
-    //           alignment: { horizontal: "right", vertical: "center" },
-    //         },
-    //       },
-    //       {
-    //         value: ek.value.sup,
-    //         style: {
-    //           font: { sz: "14", bold: false },
-    //           alignment: { horizontal: "right", vertical: "center" },
-    //         },
-    //       },
-    //       {
-    //         value: ek.value.prod_kd,
-    //         style: {
-    //           font: { sz: "14", bold: false },
-    //           alignment: { horizontal: "right", vertical: "center" },
-    //         },
-    //       },
-    //       {
-    //         value: ek.value.prod_nm,
-    //         style: {
-    //           font: { sz: "14", bold: false },
-    //           alignment: { horizontal: "right", vertical: "center" },
-    //         },
-    //       },
-    //       {
-    //         value: ek.value.unit,
-    //         style: {
-    //           font: { sz: "14", bold: false },
-    //           alignment: { horizontal: "right", vertical: "center" },
-    //         },
-    //       },
-    //       {
-    //         value: ek.value.qty,
-    //         style: {
-    //           font: { sz: "14", bold: false },
-    //           alignment: { horizontal: "right", vertical: "center" },
-    //         },
-    //       },
-    //       {
-    //         value: ek.value.h_pok,
-    //         style: {
-    //           font: { sz: "14", bold: false },
-    //           alignment: { horizontal: "right", vertical: "center" },
-    //         },
-    //       },
-    //     ]);
-    //   });
-    // });
+    data.forEach((el, i) => {
+      el.value.no = i + 1;
+      item.push([
+        {
+          value: el.value.no = i + 1,
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "center", vertical: "center" },
+          },
+        },
+        {
+          value: el.value.dep,
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: el.value.doc,
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "center", vertical: "center" },
+          },
+        },
+        {
+          value: el.value.doc_dt,
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "center", vertical: "center" },
+          },
+        },
+        {
+          value: el.value.ord_code,
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "center", vertical: "center" },
+          },
+        },
+        {
+          value: el.value.ord_date,
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "center", vertical: "center" },
+          },
+        },
+        {
+          value: el.value.sup,
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: el.value.prod_kd,
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: el.value.prod_nm,
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: el.value.unit,
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: el.value.qty,
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "center", vertical: "center" },
+          },
+        },
+        {
+          value: el.value.h_pok,
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+      ]);
+    });
 
+    console.log("ceekkk");
     console.log(item);
 
     let final = [
       {
         columns: [
           {
-            title: "RPBB Card Report",
+            title: "Laporan Pemasukan Barang",
             width: { wch: 30 },
             style: {
               font: { sz: "14", bold: true },
@@ -264,7 +271,31 @@ const PemasukanDB = () => {
     final.push({
       columns: [
         {
-          title: "Kode Planning",
+          title: "No",
+          width: { wch: 5 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "center", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          title: "Departemen",
+          width: { wch: 30 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "center", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          title: "No. Dokumen",
           width: { wch: 20 },
           style: {
             font: { sz: "14", bold: true },
@@ -276,8 +307,56 @@ const PemasukanDB = () => {
           },
         },
         {
+          title: "Tanggal Dokumen",
+          width: { wch: 18 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "center", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          title: "No. Transaksi",
+          width: { wch: 17 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "center", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          title: "Tanggal Transaksi",
+          width: { wch: 18 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "center", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          title: "Supplier",
+          width: { wch: 30 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "center", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
           title: "Kode Produk",
-          width: { wch: 20 },
+          width: { wch: 17 },
           style: {
             font: { sz: "14", bold: true },
             alignment: { horizontal: "center", vertical: "center" },
@@ -300,7 +379,7 @@ const PemasukanDB = () => {
           },
         },
         {
-          title: "Saldo Produk",
+          title: "Satuan",
           width: { wch: 17 },
           style: {
             font: { sz: "14", bold: true },
@@ -312,7 +391,7 @@ const PemasukanDB = () => {
           },
         },
         {
-          title: "Rencana Pemakaian",
+          title: "Kuantitas",
           width: { wch: 17 },
           style: {
             font: { sz: "14", bold: true },
@@ -324,19 +403,7 @@ const PemasukanDB = () => {
           },
         },
         {
-          title: "Sisa Saldo",
-          width: { wch: 13 },
-          style: {
-            font: { sz: "14", bold: true },
-            alignment: { horizontal: "center", vertical: "center" },
-            fill: {
-              paternType: "solid",
-              fgColor: { rgb: "F3F3F3" },
-            },
-          },
-        },
-        {
-          title: "Saran Pembelian",
+          title: "Harga Pokok",
           width: { wch: 17 },
           style: {
             font: { sz: "14", bold: true },
@@ -369,7 +436,7 @@ const PemasukanDB = () => {
       <div className="flex justify-content-between">
         <div className="col-6 ml-0 mr-0 pl-0 pt-0">
           <Row className="mt-0">
-            <div className="p-inputgroup col-6">
+            <div className="p-inputgroup col-5">
               <span className="p-inputgroup-addon">
                 <i className="pi pi-calendar" />
               </span>
@@ -405,7 +472,7 @@ const PemasukanDB = () => {
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
             <ExcelFile
-              filename={`Laporan Pemasukan Barang report export ${new Date().getTime()}`}
+              filename={`pemasukan_barang_report_export_${new Date().getTime()}`}
               element={
                 <PrimeSingleButton
                   label="Excel"
@@ -460,7 +527,7 @@ const PemasukanDB = () => {
               <Card.Body className="p-0">
                 <CustomeWrapper
                   horizontal
-                  tittle={"Laporan Pemasukan Barang Perdokumen Pabean"}
+                  tittle={"Laporan Pemasukan Barang"}
                   subTittle={`Periode ${formatDate(
                     filtersDate[0]
                   )} to ${formatDate(filtersDate[1])}`}
@@ -610,7 +677,7 @@ const PemasukanDB = () => {
                         />
                         <Column
                           className=""
-                          style={{ width: "11rem" }}
+                          // style={{ width: "11rem" }}
                           body={(e) => (
                             <div
                               className={
@@ -647,7 +714,7 @@ const PemasukanDB = () => {
                                   : ""
                               }
                             >
-                              {e.value.pel}
+                              {e.value.sup}
                             </div>
                           )}
                         />

@@ -10,6 +10,7 @@ const CustomeWrapper = ({
   subTittle1,
   tittle,
   page,
+  horizontal = false, //for big layout
   onComplete = () => {},
 }) => {
   const [comp, setComp] = useState(null);
@@ -52,7 +53,7 @@ const CustomeWrapper = ({
 
   return (
     <div className="book">
-      <div className="page">
+      <div className={`page ${horizontal ? "horizontal" : ""}`}>
         <div className="subpage">
           <h3 className="center">
             <b>

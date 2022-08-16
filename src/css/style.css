@@ -47785,6 +47785,19 @@ a .sidebar-logo .logo{
   text-align: center;
 }
 
+.page.horizontal{
+  min-height: 54.5cm;
+  width: 40cm;
+  /* padding: 5mm; */
+  margin: auto;
+  background: white;
+}
+.page.horizontal .subpage {
+  padding: 1cm;
+  height: 54.5cm;
+  text-align: center;
+}
+
 * {
   box-sizing: border-box;
   -moz-box-sizing: border-box;

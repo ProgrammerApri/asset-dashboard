@@ -16,6 +16,8 @@ import { el } from "date-fns/locale";
 import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { Dropdown } from "primereact/dropdown";
+import { ColumnGroup } from "primereact/columngroup";
+import { Row as PRow } from "primereact/row";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -296,7 +298,7 @@ const PemasukanDB = () => {
         columns: [
           {
             title:
-              "Laporan Pemasukan Barang Perdokumen Pabean Kawasan Berikat Java Agritech",
+              "Laporan Pemasukan Barang Perdokumen Pabean ",
             width: { wch: 30 },
             style: {
               font: { sz: "14", bold: true },
@@ -586,7 +588,7 @@ const PemasukanDB = () => {
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
             <ExcelFile
-              filename={`Laporan Pemasukan Barang Perdokumen Pabean Kawasan Berikat Java Agritech report export ${new Date().getTime()}`}
+              filename={`Laporan Pemasukan Barang Perdokumen Pabean report export ${new Date().getTime()}`}
               element={
                 <PrimeSingleButton
                   label="Excel"
@@ -641,7 +643,7 @@ const PemasukanDB = () => {
               <Card.Body className="p-0">
                 <CustomeWrapper
                   tittle={
-                    "Laporan Pemasukan Barang Perdokumen Pabean Kawasan Berikat Java Agritech"
+                    "Laporan Pemasukan Barang Perdokumen Pabean"
                   }
                   subTittle={`Laporan Pemasukkan Barang Perdokumen Pabean as ${formatDate(
                     filtersDate[0]
@@ -658,47 +660,40 @@ const PemasukanDB = () => {
                         rowHover
                         emptyMessage="Data Tidak Ditemukan"
                         className="mt-4"
-                      >
-                        <Column
-                          className=""
-                          header="No."
-                          style={{ width: "1rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header" || e.type === "footer"
-                                  ? "font-weight-bold"
-                                  : ""
-                              }
-                            >
-                              {}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className=""
-                          header="Jenis Dokumen"
-                          style={{ width: "14rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header" || e.type === "footer"
-                                  ? "font-weight-bold"
-                                  : ""
-                              }
-                            >
-                             
-                              {}
-                            </div>
-                          )}
-                        />
 
-<Column header="Profits" colSpan={2} />
-
+                        headerColumnGroup={
+                          <ColumnGroup>
+                            <PRow>
+                              <Column header={"No."} rowSpan={2} className="center-header border"/>
+                              <Column header={"Departement"} rowSpan={2} className="center-header border"/>
+                              <Column
+                                header={"Dokumen Pabean"}
+                                colSpan={2}
+                                className="center-header border"
+                              />
+                              <Column
+                                header={"Dokumen Penerimaan"}
+                                colSpan={2}
+                                className="center-header border"
+                              />
+                              <Column header={"Pemasok/Pengirim"} rowSpan={2} className="center-header border"/>
+                              <Column header={"Kode Produk"} rowSpan={2} className="center-header border"/>
+                              <Column header={"Nama Produk"} rowSpan={2} className="center-header border"/>
+                              <Column header={"Satuan"} rowSpan={2} className="center-header border"/>
+                              <Column header={"Kuantitas"} rowSpan={2} className="center-header border"/>
+                              <Column header={"Harga Pokok"} rowSpan={2} className="center-header border"/>
+                            </PRow>
+                            <PRow>
+                              <Column header={"Nomor"} className="center-header border"/>
+                              <Column header={"Tanggal"} className="center-header border"/>
+                              <Column header={"Nomor"} className="center-header border"/>
+                              <Column header={"Tanggal"} className="center-header border"/>
+                            </PRow>
+                          </ColumnGroup>
+                        }
+                        >
                         <Column
                           className=""
-                          header="Dokumen Pabean"
-                          style={{ width: "14rem" }}
                           body={(e) => (
                             <div
                               className={
@@ -707,19 +702,26 @@ const PemasukanDB = () => {
                                   : ""
                               }
                             >
-                               <tr colspan="2" header></tr>
-                              <tr>
-                                <th className="colspan-1">Nomor</th>
-                                <th className="col-1">Tanggal</th>
-                              </tr>
                               {}
                             </div>
                           )}
                         />
                         <Column
                           className=""
-                          header="Bukti Penerimaan Barang"
-                          style={{ width: "20rem" }}
+                          body={(e) => (
+                            <div
+                              className={
+                                `${e.type === "header" || e.type === "footer"
+                                  ? "font-weight-bold"
+                                  : ""}`
+                              }
+                            >
+                              {}
+                            </div>
+                          )}
+                        />
+                        <Column
+                          className=""
                           body={(e) => (
                             <div
                               className={
@@ -728,18 +730,27 @@ const PemasukanDB = () => {
                                   : ""
                               }
                             >
-                               <tr colspan="2" header></tr>
-                              <tr>
-                                <th className="colspan-1">Nomor</th>
-                                <th className="col-1">Tanggal</th>
-                              </tr>
                               {}
                             </div>
                           )}
                         />
                         <Column
                           className=""
-                          header="Pemasok/Pengirim"
+                          header="Bukti Dokumen Pengeluaran"
+                          body={(e) => (
+                            <div
+                              className={
+                                e.type === "header" || e.type === "footer"
+                                  ? "font-weight-bold"
+                                  : ""
+                              }
+                            >
+                              {}
+                            </div>
+                          )}
+                        />
+                        <Column
+                          className=""
                           style={{ width: "11rem" }}
                           body={(e) => (
                             <div
@@ -755,8 +766,6 @@ const PemasukanDB = () => {
                         />
                         <Column
                           className=""
-                          header="Kode Barang"
-                          style={{ width: "11rem" }}
                           body={(e) => (
                             <div
                               className={
@@ -771,8 +780,6 @@ const PemasukanDB = () => {
                         />
                         <Column
                           className=""
-                          header="Nama Barang"
-                          style={{ width: "11rem" }}
                           body={(e) => (
                             <div
                               className={
@@ -787,8 +794,62 @@ const PemasukanDB = () => {
                         />
                         <Column
                           className=""
-                          header="Satuan"
-                          style={{ width: "11rem" }}
+                          body={(e) => (
+                            <div
+                              className={
+                                e.type === "header" || e.type === "footer"
+                                  ? "font-weight-bold"
+                                  : ""
+                              }
+                            >
+                              {}
+                            </div>
+                          )}
+                        />
+                        <Column
+                          className=""
+                          body={(e) => (
+                            <div
+                              className={
+                                e.type === "header" || e.type === "footer"
+                                  ? "font-weight-bold"
+                                  : ""
+                              }
+                            >
+                              {}
+                            </div>
+                          )}
+                        />
+                        <Column
+                          className=""
+                          body={(e) => (
+                            <div
+                              className={
+                                e.type === "header" || e.type === "footer"
+                                  ? "font-weight-bold"
+                                  : ""
+                              }
+                            >
+                              {}
+                            </div>
+                          )}
+                        />
+                        <Column
+                          className=""
+                          body={(e) => (
+                            <div
+                              className={
+                                e.type === "header" || e.type === "footer"
+                                  ? "font-weight-bold"
+                                  : ""
+                              }
+                            >
+                              {}
+                            </div>
+                          )}
+                        />
+                        <Column
+                          className=""
                           body={(e) => (
                             <div
                               className={

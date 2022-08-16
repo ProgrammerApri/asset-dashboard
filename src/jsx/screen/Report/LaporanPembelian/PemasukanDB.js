@@ -641,6 +641,7 @@ const PemasukanDB = () => {
             <Card className="ml-1 mr-1 mt-2">
               <Card.Body className="p-0">
                 <CustomeWrapper
+                horizontal
                   tittle={"Laporan Pemasukan Barang Perdokumen Pabean"}
                   subTittle={`Laporan Pemasukkan Barang Perdokumen Pabean as ${formatDate(
                     filtersDate[0]

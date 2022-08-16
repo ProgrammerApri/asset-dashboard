@@ -297,8 +297,7 @@ const PemasukanDB = () => {
       {
         columns: [
           {
-            title:
-              "Laporan Pemasukan Barang Perdokumen Pabean ",
+            title: "Laporan Pemasukan Barang Perdokumen Pabean ",
             width: { wch: 30 },
             style: {
               font: { sz: "14", bold: true },
@@ -642,9 +641,7 @@ const PemasukanDB = () => {
             <Card className="ml-1 mr-1 mt-2">
               <Card.Body className="p-0">
                 <CustomeWrapper
-                  tittle={
-                    "Laporan Pemasukan Barang Perdokumen Pabean"
-                  }
+                  tittle={"Laporan Pemasukan Barang Perdokumen Pabean"}
                   subTittle={`Laporan Pemasukkan Barang Perdokumen Pabean as ${formatDate(
                     filtersDate[0]
                   )} to ${formatDate(filtersDate[1])}`}
@@ -659,13 +656,20 @@ const PemasukanDB = () => {
                         dataKey="id"
                         rowHover
                         emptyMessage="Data Tidak Ditemukan"
-                        className="mt-4"
-
+                        className="mt-4 header-white"
                         headerColumnGroup={
                           <ColumnGroup>
                             <PRow>
-                              <Column header={"No."} rowSpan={2} className="center-header border"/>
-                              <Column header={"Departement"} rowSpan={2} className="center-header border"/>
+                              <Column
+                                header={"No."}
+                                rowSpan={2}
+                                className="center-header border"
+                              />
+                              <Column
+                                header={"Departement"}
+                                rowSpan={2}
+                                className="center-header border"
+                              />
                               <Column
                                 header={"Dokumen Pabean"}
                                 colSpan={2}
@@ -676,22 +680,58 @@ const PemasukanDB = () => {
                                 colSpan={2}
                                 className="center-header border"
                               />
-                              <Column header={"Pemasok/Pengirim"} rowSpan={2} className="center-header border"/>
-                              <Column header={"Kode Produk"} rowSpan={2} className="center-header border"/>
-                              <Column header={"Nama Produk"} rowSpan={2} className="center-header border"/>
-                              <Column header={"Satuan"} rowSpan={2} className="center-header border"/>
-                              <Column header={"Kuantitas"} rowSpan={2} className="center-header border"/>
-                              <Column header={"Harga Pokok"} rowSpan={2} className="center-header border"/>
+                              <Column
+                                header={"Pemasok/Pengirim"}
+                                rowSpan={2}
+                                className="center-header border"
+                              />
+                              <Column
+                                header={"Kode Produk"}
+                                rowSpan={2}
+                                className="center-header border"
+                              />
+                              <Column
+                                header={"Nama Produk"}
+                                rowSpan={2}
+                                className="center-header border"
+                              />
+                              <Column
+                                header={"Satuan"}
+                                rowSpan={2}
+                                className="center-header border"
+                              />
+                              <Column
+                                header={"Kuantitas"}
+                                rowSpan={2}
+                                className="center-header border"
+                              />
+                              <Column
+                                header={"Harga Pokok"}
+                                rowSpan={2}
+                                className="center-header border"
+                              />
                             </PRow>
                             <PRow>
-                              <Column header={"Nomor"} className="center-header border"/>
-                              <Column header={"Tanggal"} className="center-header border"/>
-                              <Column header={"Nomor"} className="center-header border"/>
-                              <Column header={"Tanggal"} className="center-header border"/>
+                              <Column
+                                header={"Nomor"}
+                                className="center-header border"
+                              />
+                              <Column
+                                header={"Tanggal"}
+                                className="center-header border"
+                              />
+                              <Column
+                                header={"Nomor"}
+                                className="center-header border"
+                              />
+                              <Column
+                                header={"Tanggal"}
+                                className="center-header border"
+                              />
                             </PRow>
                           </ColumnGroup>
                         }
-                        >
+                      >
                         <Column
                           className=""
                           body={(e) => (
@@ -710,11 +750,11 @@ const PemasukanDB = () => {
                           className=""
                           body={(e) => (
                             <div
-                              className={
-                                `${e.type === "header" || e.type === "footer"
+                              className={`${
+                                e.type === "header" || e.type === "footer"
                                   ? "font-weight-bold"
-                                  : ""}`
-                              }
+                                  : ""
+                              }`}
                             >
                               {}
                             </div>

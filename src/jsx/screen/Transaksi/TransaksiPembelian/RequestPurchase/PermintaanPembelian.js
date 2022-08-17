@@ -56,7 +56,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
     setLoading(true);
     const config = {
       ...endpoints.rPurchase,
-      data: rp,
+      data: {},
     };
     console.log(config.data);
     let response = null;

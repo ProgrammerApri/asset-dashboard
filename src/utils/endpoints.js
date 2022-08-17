@@ -1121,6 +1121,31 @@ const endpoints = {
     data: {},
   },
 
+  // /// Pembebanan
+  mutasi: {
+    endpoint: "/v1/api/mutasi",
+    method: "GET",
+    data: {},
+  },
+
+  addMutasi: {
+    endpoint: "/v1/api/mutasi",
+    method: "POST",
+    data: {},
+  },
+
+  editMutasi: {
+    endpoint: "/v1/api/mutasi/",
+    method: "PUT",
+    data: {},
+  },
+
+  delMutasi: {
+    endpoint: "/v1/api/mutasi/",
+    method: "DELETE",
+    data: {},
+  },
+
   // RPBB_REPORT
   rpbb: {
     endpoint: "/v1/api/rpbb",

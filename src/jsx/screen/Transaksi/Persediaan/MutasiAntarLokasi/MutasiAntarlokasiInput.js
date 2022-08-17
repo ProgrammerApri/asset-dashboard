@@ -20,13 +20,16 @@ import DataLokasi from "src/jsx/screen/Master/Lokasi/DataLokasi";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
+import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 
 const defError = {
   code: false,
   date: false,
+  doc: false,
+  doc_date: false,
   asl: false,
   tjn: false,
-  prod: [
+  mut: [
     {
       id: false,
       jum: false,
@@ -74,33 +77,34 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
   const isValid = () => {
     let valid = false;
     let errors = {
-      code: !lm.lm_code || lm.lm_code === "",
-      date: !lm.lm_date || lm.lm_date === "",
-      asl: !lm.lok_asl,
-      tjn: !lm.lok_tjn,
+      code: !lm.mtsi_code || lm.mtsi_code === "",
+      date: !lm.mtsi_date || lm.mtsi_date === "",
+      doc: !lm.doc || lm.doc === "",
+      doc_date: !lm.doc_date || lm.doc_date === "",
+      asl: !lm.loc_from,
+      tjn: !lm.loc_to,
       // proj: !lm.proj_id,
-      prod: [],
+      mut: [],
     };
 
-    lm?.product.forEach((element, i) => {
+    lm?.mutasi.forEach((element, i) => {
       if (i > 0) {
-        if (element.prod_id || element.order) {
-          errors.prod[i] = {
+        if (element.prod_id || element.qty) {
+          errors.mut[i] = {
             id: !element.prod_id,
-            jum:
-              !element.order || element.order === "" || element.order === "0",
+            jum: !element.qty || element.qty === "" || element.qty === "0",
           };
         }
       } else {
-        errors.prod[i] = {
+        errors.mut[i] = {
           id: !element.prod_id,
-          jum: !element.order || element.order === "" || element.order === "0",
+          jum: !element.qty || element.qty === "" || element.qty === "0",
         };
       }
     });
 
-    if (!errors.prod[0].id && !errors.prod[0].jum) {
-      errors.prod?.forEach((e) => {
+    if (!errors.mut[0].id && !errors.mut[0].jum) {
+      errors.mut?.forEach((e) => {
         for (var key in e) {
           e[key] = false;
         }
@@ -108,7 +112,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
     }
 
     let validProduct = false;
-    errors.prod?.forEach((el) => {
+    errors.mut?.forEach((el) => {
       for (var k in el) {
         validProduct = !el[k];
       }
@@ -117,6 +121,8 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
     valid =
       !errors.code &&
       !errors.date &&
+      !errors.doc &&
+      !errors.doc_date &&
       !errors.asl &&
       !errors.tjn &&
       validProduct;
@@ -222,8 +228,8 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
 
   const editLM = async () => {
     const config = {
-      ...endpoints.editLM,
-      endpoint: endpoints.editLM.endpoint + lm.id,
+      ...endpoints.editMutasi,
+      endpoint: endpoints.editMutasi.endpoint + lm.id,
       data: lm,
     };
     console.log(config.data);
@@ -249,8 +255,8 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
 
   const addLM = async () => {
     const config = {
-      ...endpoints.addLM,
-      data: lm,
+      ...endpoints.addMutasi,
+      data: { ...lm, doc_date: currentDate(lm.doc_date) },
     };
     console.log(config.data);
     let response = null;
@@ -268,7 +274,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${lm.lm_code} Sudah Digunakan`,
+            detail: `Kode ${lm.mtsi_code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -367,6 +373,20 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
     return [year, month, day].join("-");
   };
 
+  const currentDate = (date) => {
+    let now = new Date();
+    let newDate = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      now.getHours(),
+      now.getMinutes(),
+      now.getSeconds(),
+      now.getMilliseconds()
+    );
+    return newDate.toISOString();
+  };
+
   const updateLM = (e) => {
     dispatch({
       type: SET_CURRENT_LM,
@@ -392,9 +412,9 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
           <div className="col-3 mr-0 ml-0">
             <PrimeInput
               label={"Kode Referensi"}
-              value={lm.lm_code}
+              value={lm.mtsi_code}
               onChange={(e) => {
-                updateLM({ ...lm, lm_code: e.target.value });
+                updateLM({ ...lm, mtsi_code: e.target.value });
 
                 let newError = error;
                 newError.code = false;
@@ -408,9 +428,9 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
           <div className="col-2">
             <PrimeCalendar
               label={"Tanggal"}
-              value={new Date(`${lm.lm_date}Z`)}
+              value={new Date(`${lm.mtsi_date}Z`)}
               onChange={(e) => {
-                updateLM({ ...lm, lm_date: e.value });
+                updateLM({ ...lm, mtsi_date: e.value });
 
                 let newError = error;
                 newError.date = false;
@@ -423,18 +443,52 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
             />
           </div>
 
+          <div className="col-3 mr-0 ml-0">
+            <PrimeInput
+              label={"Kode Dokumen"}
+              value={lm.doc}
+              onChange={(e) => {
+                updateLM({ ...lm, doc: e.target.value });
+
+                let newError = error;
+                newError.doc = false;
+                setError(newError);
+              }}
+              placeholder="Masukan Kode Dokumen"
+              error={error?.doc}
+            />
+          </div>
+
+          <div className="col-2">
+            <PrimeCalendar
+              label={"Tanggal"}
+              value={new Date(`${lm.doc_date}Z`)}
+              onChange={(e) => {
+                updateLM({ ...lm, doc_date: e.value });
+
+                let newError = error;
+                newError.doc_date = false;
+                setError(newError);
+              }}
+              placeholder="Pilih Tanggal"
+              showIcon
+              dateFormat="dd-mm-yy"
+              error={error?.doc_date}
+            />
+          </div>
+
           <div className="col-12 mr-0 ml-0"></div>
 
           <div className="col-3">
             <label className="text-label">Lokasi Asal</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
-              value={lm.lok_asl ? checkLok(lm?.lok_asl) : null}
+              value={lm.loc_from ? checkLok(lm?.loc_from) : null}
               option={lokasi}
               onChange={(e) => {
                 updateLM({
                   ...lm,
-                  lok_asl: e.id,
+                  loc_from: e.id,
                 });
 
                 let newError = error;
@@ -454,12 +508,12 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
             <label className="text-label">Lokasi Tujuan</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
-              value={lm.lok_tjn ? checkLok(lm?.lok_tjn) : null}
+              value={lm.loc_to ? checkLok(lm?.loc_to) : null}
               option={lokasi}
               onChange={(e) => {
                 updateLM({
                   ...lm,
-                  lok_tjn: e.id,
+                  loc_to: e.id,
                 });
 
                 let newError = error;
@@ -495,15 +549,13 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
             <label className="text-label">Project</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
-              value={lm.proj_id ? prj(lm?.proj_id) : null}
+              value={lm.prj_id ? prj(lm?.prj_id) : null}
               option={proj}
               onChange={(e) => {
                 updateLM({
                   ...lm,
-                  proj_id: e.id,
+                  prj_id: e.id,
                 });
-
-                
               }}
               label={"[proj_name] - [proj_code]"}
               placeholder="Pilih Project"
@@ -529,7 +581,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
             <>
               <DataTable
                 responsiveLayout="none"
-                value={lm.product?.map((v, i) => {
+                value={lm.mutasi?.map((v, i) => {
                   return {
                     ...v,
                     index: i,
@@ -547,44 +599,41 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                   }}
                   field={""}
                   body={(e) => (
-                    <CustomDropdown
-                      value={lm.prod_id && checkProd(lm.prod_id)}
-                      option={product}
-                      onChange={(e) => {
+                    <PrimeDropdown
+                      value={e.prod_id && checkProd(e.prod_id)}
+                      options={product}
+                      onChange={(u) => {
+                        // looping satuan
                         let sat = [];
                         satuan.forEach((element) => {
-                          if (element.id === e.unit.id) {
+                          if (element.id === u.value.unit.id) {
                             sat.push(element);
                           } else {
-                            if (element.u_from?.id === e.unit.id) {
+                            if (element.u_from?.id === u.value.unit.id) {
                               sat.push(element);
                             }
                           }
                         });
                         setSatuan(sat);
 
-                        let temp = [...lm.product];
-                        temp[e.index].prod_id = e.id;
-                        temp[e.index].unit_id = e.unit?.id;
-                        updateLM({ ...lm, product: temp });
+                        let temp = [...lm.mutasi];
+                        temp[e.index].prod_id = u.value.id;
+                        temp[e.index].unit_id = u.value.unit?.id;
+                        updateLM({ ...lm, mutasi: temp });
 
                         let newError = error;
-                        newError.prod[e.index].id = false;
+                        newError.mut[e.index].id = false;
                         setError(newError);
                       }}
+                      optionLabel="name"
                       placeholder="Pilih Produk"
-                      label={"[name]"}
-                      detail
-                      onDetail={() => {
-                        setShowProd(true);
-                        setCurrentIndex(e.index);
-                      }}
+                      filter
+                      filterBy="name"
                       errorMessage="Produk Belum Dipilih"
-                      error={error?.prod[e.index]?.id}
+                      error={error?.mut[e.index]?.id}
                     />
                   )}
                 />
-
                 <Column
                   header="Jumlah Mutasi"
                   className="align-text-top"
@@ -594,20 +643,20 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                   field={""}
                   body={(e) => (
                     <PrimeNumber
-                      value={lm.order ? lm.order : null}
+                      value={e.qty ? e.qty : null}
                       onChange={(a) => {
-                        let temp = [...lm.product];
-                        temp[e.index].order = a.target.value;
-                        updateLM({ ...lm, product: temp });
+                        let temp = [...lm.mutasi];
+                        temp[e.index].qty = a.target.value;
+                        updateLM({ ...lm, mutasi: temp });
 
                         let newError = error;
-                        newError.prod[e.index].jum = false;
+                        newError.mut[e.index].jum = false;
                         setError(newError);
                       }}
                       placeholder="0"
                       type="number"
                       min={0}
-                      error={error?.prod[e.index]?.jum}
+                      error={error?.mut[e.index]?.jum}
                     />
                   )}
                 />
@@ -620,21 +669,18 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                   }}
                   field={""}
                   body={(e) => (
-                    <CustomDropdown
-                      value={lm.unit_id && checkUnit(lm.unit_id)}
+                    <PrimeDropdown
+                      value={e.unit_id && checkUnit(e.unit_id)}
                       onChange={(e) => {
-                        let temp = [...lm.product];
-                        temp[e.index].unit_id = e.id;
-                        updateLM({ ...lm, product: temp });
+                        let temp = [...lm.mutasi];
+                        temp[e.index].unit_id = e.value.id;
+                        updateLM({ ...lm, mutasi: temp });
                       }}
-                      option={satuan}
-                      label={"[name]"}
+                      options={satuan}
+                      optionLabel="name"
                       placeholder="Pilih Satuan"
-                      detail
-                      onDetail={() => {
-                        setShowSat(true);
-                        setCurrentIndex(e.index);
-                      }}
+                      filter
+                      filterBy="name"
                     />
                   )}
                 />
@@ -642,22 +688,22 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                 <Column
                   className="align-text-top"
                   body={(e) =>
-                    e.index === lm.product.length - 1 ? (
+                    e.index === lm.mutasi.length - 1 ? (
                       <Link
                         onClick={() => {
                           let newError = error;
-                          newError.prod.push({ jum: false });
+                          newError.mut.push({ jum: false });
                           setError(newError);
 
                           updateLM({
                             ...lm,
-                            product: [
-                              ...lm.product,
+                            mutasi: [
+                              ...lm.mutasi,
                               {
                                 id: 0,
                                 prod_id: null,
                                 unit_id: null,
-                                order: null,
+                                qty: null,
                               },
                             ],
                           });
@@ -669,11 +715,15 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                     ) : (
                       <Link
                         onClick={() => {
-                          let temp = [...lm.product];
+                          let newError = error;
+                          newError.mut.push({ jum: false });
+                          setError(newError);
+
+                          let temp = [...lm.mutasi];
                           temp.splice(e.index, 1);
                           updateLM({
                             ...lm,
-                            product: temp,
+                            mutasi: temp,
                           });
                         }}
                         className="btn btn-danger shadow btn-xs sharp ml-1"
@@ -714,9 +764,17 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
 
   return (
     <>
-      {/* {header()} */}
-      {body()}
-      {footer()}
+      <Row>
+        <Col>
+          <Card>
+            <Card.Body>
+              {/* {header()} */}
+              {body()}
+              {footer()}
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
 
       <DataPusatBiaya
         data={pusatBiaya}

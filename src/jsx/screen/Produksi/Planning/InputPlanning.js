@@ -1030,14 +1030,14 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
       <div className="mt-5 flex justify-content-end">
         <div className="justify-content-left col-6">
           <div className="col-12 mt-0 ml-0 p-0 fs-12 text-left">
-            <label className="text-label">
+            {/* <label className="text-label">
               <b>Jumlah Produk : </b>
             </label>
             <span> {}</span>
             <label className="ml-8">
               <b>Jumlah Bahan : </b>
             </label>
-            <span>{}</span>
+            <span>{}</span> */}
           </div>
         </div>
 

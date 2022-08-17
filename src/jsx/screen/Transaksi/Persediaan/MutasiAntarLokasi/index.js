@@ -3,6 +3,7 @@ import { Toast } from "primereact/toast";
 import { Row, Col, Card } from "react-bootstrap";
 import MutasiAntarList from "./MutasiAntarlokasiList";
 import MutasiAntarInput from "./MutasiAntarlokasiInput";
+import DetailMutasi from "./DetailMutasi";
 
 const MutasiLokasi = ({ trigger }) => {
   const [active, setActive] = useState(0);
@@ -13,11 +14,17 @@ const MutasiLokasi = ({ trigger }) => {
       setActive(0);
     }
   }, [trigger]);
-  
+
   const [view, setView] = useState([
     <MutasiAntarList
       onAdd={() => {
         setActive(1);
+      }}
+      onEdit={() => {
+        setActive(1);
+      }}
+      onDetail={() => {
+        setActive(2);
       }}
     />,
 
@@ -35,18 +42,13 @@ const MutasiLokasi = ({ trigger }) => {
         }, 500);
       }}
     />,
+    <DetailMutasi onCancel={() => setActive(0)} />,
   ]);
 
   return (
     <>
       <Toast ref={toast} />
-      <Row>
-        <Col className="pt-0">
-          <Card>
-            <Card.Body>{view[active]}</Card.Body>
-          </Card>
-        </Col>
-      </Row>
+      {view[active]}
     </>
   );
 };

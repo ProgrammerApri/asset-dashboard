@@ -18,17 +18,17 @@ const Persediaan = () => {
         setTrigger((current) => current + 1);
       }}
     >
-      <TabPanel header="Koreksi Persediaan">
-        <KoreksiStok trigger={trigger}/>
-      </TabPanel>
       <TabPanel header="Mutasi Antar Lokasi">
-        <MutasiLokasi trigger={trigger}/>
+        <MutasiLokasi trigger={trigger} />
+      </TabPanel>
+      <TabPanel header="Koreksi Persediaan">
+        <KoreksiStok trigger={trigger} />
       </TabPanel>
       <TabPanel header="Pemakaian Bahan Baku">
-        <PemakaianBahan trigger={trigger}/>
+        <PemakaianBahan trigger={trigger} />
       </TabPanel>
       <TabPanel header="Penerimaan Hasil Jadi">
-        <PenerimaanHasil trigger={trigger}/>
+        <PenerimaanHasil trigger={trigger} />
       </TabPanel>
     </TabView>
   );

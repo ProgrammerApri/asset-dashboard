@@ -59,10 +59,7 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
 
   const getPO = async (isUpdate = false) => {
     setLoading(true);
-    const config = {
-      ...endpoints.po,
-      data: PO,
-    };
+    const config = endpoints.po;
     console.log(config.data);
     let response = null;
     try {

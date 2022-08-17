@@ -45,8 +45,7 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
   const getMemorial = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.memorial,
-      data: memorial,
+      ...endpoints.memorial
     };
     console.log(config.data);
     let response = null;

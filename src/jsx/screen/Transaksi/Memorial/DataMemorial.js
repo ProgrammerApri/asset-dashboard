@@ -69,9 +69,10 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
   };
 
   const delMM = async (id) => {
+    setLoading(true);
     const config = {
-      ...endpoints.delMM,
-      endpoint: endpoints.delMM.endpoint + currentItem.id,
+      ...endpoints.delMemorial,
+      endpoint: endpoints.delMemorial.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -89,7 +90,7 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
             detail: "Data Berhasil Dihapus",
             life: 3000,
           });
-        }, 500);
+        }, 100);
       }
     } catch (error) {
       console.log(error);
@@ -120,8 +121,8 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
             });
             memo.forEach((el) => {
               el.acc_id = el.acc_id?.id;
-              el.dep_id = el.dep_id?.id;
-              el.currency = el.currency?.id;
+              el.dep_id = el.dep_id?.id ?? null;
+              el.currency = el.currency?.id ?? null;
             });
             dispatch({
               type: SET_CURRENT_MM,

@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect, useRef } from "react";
 import { request, endpoints } from "src/utils";
 import { Row, Col, Card } from "react-bootstrap";
@@ -55,6 +53,7 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
   const [currency, setCurrency] = useState(null);
   const [active, setActive] = useState(0);
   const [state, setState] = useState(0);
+  const [stateType, setStateType] = useState("");
   const [accor, setAccor] = useState({
     akun: true,
   });
@@ -297,7 +296,7 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
 
     memorial?.memo.forEach((element, i) => {
       if (i > 0) {
-        if (element.acc_id || element.dep_id || element.dbcr || element.price) {
+        if (element.acc_id || element.dep_id || element.dbcr || element.amnt) {
           errors.akn[i] = {
             id: !element.acc_id,
             dep: !element.dep_id,
@@ -334,28 +333,32 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
       });
       if (nom_k < nom_d) {
         errors.akn.forEach((element, i) => {
-          if (memorial.memo[i].dbcr === "k") {
-            element.nom =true;
+          if (memorial?.memo[i].dbcr === "k") {
+            element.nom = true;
           }
         });
-      }else{
-        errors.akn.forEach((element, i) => {
+      } else {
+        errors?.akn.forEach((element, i) => {
           if (memorial.memo[i].dbcr === "d") {
-            element.nom =true;
+            element.nom = true;
           }
         });
       }
     }
 
-
-    let validMemo = false;
+    
+    let count = errors.akn.length;
+    let total_valid = 0;
     errors.akn?.forEach((el, i) => {
       for (var k in el) {
-        validMemo = !el[k];
+        
+        if (!el[k]) {
+          total_valid++;
+        }
       }
     });
-
-    valid = !errors.code && !errors.name && !errors.date && validMemo;
+    let validMemo = count === total_valid;
+    valid = !errors.code && !errors.date && validMemo;
 
     setError(errors);
 
@@ -371,8 +374,6 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
 
     return valid;
   };
-
-
 
   const glTemplate = (option) => {
     return (
@@ -490,18 +491,24 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
                           onChange={(u) => {
                             let temp = [...memorial.memo];
                             temp[e.index].acc_id = u.value.account.id;
+                            // temp[e.index].dbcr = u.dbcr;
                             updateMM({ ...memorial, memo: temp });
 
                             let newError = error;
                             newError.akn[e.index].id = false;
                             setError(newError);
                           }}
+                          detail
+                          onDetail={() => {
+                            setCurrentIndex(e.index);
+                            setShowAcc(true);
+                          }}
+                          optionLabel="account.acc_name"
+                          placeholder="Pilih Akun"
                           filter
                           filterBy="account.acc_name"
-                          optionLabel="account.acc_name"
                           itemTemplate={glTemplate}
                           valueTemplate={valTemp}
-                          placeholder="Pilih Akun"
                           errorMessage="Akun Belum Dipilih"
                           error={error?.akn[e.index]?.id}
                         />
@@ -513,16 +520,12 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
                       field={""}
                       body={(e) => (
                         <CustomDropdown
-                          value={e.dep_id && checkDept(e.dep_id)}
+                          value={e.dep_id !== null ? checkDept(e.dep_id) : null}
                           option={dept}
                           onChange={(u) => {
                             let temp = [...memorial.memo];
                             temp[e.index].dep_id = u.id;
                             updateMM({ ...memorial, memo: temp });
-
-                            // let newError = error;
-                            // newError.akn[e.index].dep = false;
-                            // setError(newError);
                           }}
                           detail
                           onDetail={() => {
@@ -531,8 +534,6 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
                           }}
                           label={"[ccost_name] ([ccost_code])"}
                           placeholder="Pilih Departemen"
-                          errorMessage="Departemen Belum Dipilih"
-                          // error={error?.akn[e.index]?.dep}
                         />
                       )}
                     />
@@ -557,14 +558,13 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
                           }}
                           optionLabel="name"
                           placeholder="D/K"
-                          errorMessage="type Belum Dipilih"
+                          errorMessage="Tipe Belum Dipilih"
                           error={error?.akn[e.index]?.type}
                         />
                       )}
                     />
-                
                     <Column
-                      header="Nominal"
+                      header="Nominal Debit/Kredit"
                       className="align-text-top"
                       field={""}
                       body={(e) => (
@@ -644,6 +644,14 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
                         ) : (
                           <Link
                             onClick={() => {
+                              let newError = error;
+                              newError.akn.push({
+                                id: false,
+                                type: false,
+                                nom: false,
+                              });
+                              setError(newError);
+
                               let temp = [...memorial.memo];
                               temp.splice(e.index, 1);
                               updateMM({ ...memorial, memo: temp });
@@ -655,8 +663,6 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
                         )
                       }
                     />
-
-                   
                   </DataTable>
                 </>
               }
@@ -779,4 +785,3 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
 };
 
 export default InputMemorial;
-

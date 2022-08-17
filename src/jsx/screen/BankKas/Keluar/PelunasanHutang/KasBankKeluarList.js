@@ -36,7 +36,7 @@ const data = {
   exp: [],
 };
 
-const KasBankOutList = ({ onAdd, onEdit }) => {
+const KasBankOutList = ({ onAdd, onDetail }) => {
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayDel, setDisplayDel] = useState(false);
@@ -125,6 +125,15 @@ const KasBankOutList = ({ onAdd, onEdit }) => {
     return (
       // <React.Fragment>
       <div className="d-flex">
+        <Link
+          onClick={() => {
+            onDetail();
+            dispatch({ type: SET_CURRENT_EXP, payload: data });
+          }}
+          className="btn btn-info shadow btn-xs sharp ml-1"
+        >
+          <i className="bx bx-show mt-1"></i>
+        </Link>
         {/* <Link
           onClick={() => {
             onEdit(data);
@@ -340,140 +349,401 @@ const KasBankOutList = ({ onAdd, onEdit }) => {
 
   return (
     <>
-      <Toast ref={toast} />
-      <DataTable
-        responsiveLayout="scroll"
-        value={loading ? dummy : exp}
-        className="display w-150 datatable-wrapper"
-        showGridlines
-        dataKey="id"
-        rowHover
-        header={renderHeader}
-        filters={null}
-        globalFilterFields={["exp.exp_code"]}
-        emptyMessage="Tidak ada data"
-        paginator
-        paginatorTemplate={template2}
-        first={first2}
-        rows={rows2}
-        onPage={onCustomPage2}
-        paginatorClassName="justify-content-end mt-3"
-      >
-        <Column
-          header="Tanggal"
-          style={{
-            minWidth: "8rem",
-          }}
-          field={(e) => formatDate(e.exp_date)}
-          body={loading && <Skeleton />}
-        />
-        <Column
-          header="Nomor Referensi"
-          field={(e) => e.exp_code}
-          style={{ minWidth: "8rem" }}
-          body={loading && <Skeleton />}
-        />
-        <Column
-          header="Tipe"
-          field={(e) => e?.exp_type ?? ""}
-          style={{ minWidth: "8rem" }}
-          body={(e) =>
-            loading ? (
-              <Skeleton />
-            ) : (
-              <div>
-                {e.exp_type === 1 ? (
-                  <Badge variant="info light">
-                    <i className="bx bxs-circle text-info mr-1"></i> Pelunasan
-                  </Badge>
-                ) : (
-                  <Badge variant="warning light">
-                    <i className="bx bxs-circle text-warning mr-1"></i>{" "}
-                    Pengeluaran Kas/Bank
-                  </Badge>
-                )}
-              </div>
-            )
-          }
-        />
-        <Column
-          header="Jenis Pelunasan"
-          className="align-text-center"
-          field={(e) => e?.acq_pay ?? ""}
-          style={{ minWidth: "8rem" }}
-          body={(e) =>
-            loading ? (
-              <Skeleton />
-            ) : (
-              <div>
-                {e.acq_pay === 1 ? (
-                  <Badge variant="info light">
-                    <i className="bx bxs-circle text-info mr-1"></i> Kas
-                  </Badge>
-                ) : e.acq_pay === 2 ? (
-                  <Badge variant="warning light">
-                    <i className="bx bxs-circle text-warning mr-1"></i> Bank
-                  </Badge>
-                ) : e.acq_pay === 3 ? (
-                  <Badge variant="success light">
-                    <i className="bx bxs-circle text-success mr-1"></i> Giro
-                  </Badge>
-                ) : (
-                  <span className="center"> - </span>
-                )}
-              </div>
-            )
-          }
-        />
-        <Column
-          header="Status"
-          field={(e) => e?.approve ?? ""}
-          style={{ minWidth: "8rem" }}
-          body={(e) =>
-            loading ? (
-              <Skeleton />
-            ) : (
-              <div>
-                {e.approve === true ? (
-                  <Badge variant="info light">
-                    <i className="bx bx-check text-info mr-1"></i> Disetujui
-                  </Badge>
-                ) : (
-                  <Badge variant="danger light">
-                    <i className="bx bx-x text-danger mr-1"></i>{" "}
-                    Belum Disetujui
-                  </Badge>
-                )}
-              </div>
-            )
-          }
-        />
-        <Column
-          header="Action"
-          dataType="boolean"
-          bodyClassName="text-center"
-          style={{ minWidth: "2rem" }}
-          body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
-        />
-      </DataTable>
+      <Row>
+        <Col className="pt-0">
+          <Card>
+            <Card.Body>
+              <Toast ref={toast} />
+              <DataTable
+                responsiveLayout="scroll"
+                value={loading ? dummy : exp}
+                className="display w-150 datatable-wrapper"
+                showGridlines
+                dataKey="id"
+                rowHover
+                header={renderHeader}
+                filters={null}
+                globalFilterFields={["exp.exp_code"]}
+                emptyMessage="Tidak ada data"
+                paginator
+                paginatorTemplate={template2}
+                first={first2}
+                rows={rows2}
+                onPage={onCustomPage2}
+                paginatorClassName="justify-content-end mt-3"
+              >
+                <Column
+                  header="Tanggal"
+                  style={{
+                    minWidth: "8rem",
+                  }}
+                  field={(e) => formatDate(e.exp_date)}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Nomor Referensi"
+                  field={(e) => e.exp_code}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Tipe"
+                  field={(e) => e?.exp_type ?? ""}
+                  style={{ minWidth: "8rem" }}
+                  body={(e) =>
+                    loading ? (
+                      <Skeleton />
+                    ) : (
+                      <div>
+                        {e.exp_type === 1 ? (
+                          <Badge variant="info light">
+                            <i className="bx bxs-circle text-info mr-1"></i>{" "}
+                            Pelunasan
+                          </Badge>
+                        ) : (
+                          <Badge variant="warning light">
+                            <i className="bx bxs-circle text-warning mr-1"></i>{" "}
+                            Pengeluaran Kas/Bank
+                          </Badge>
+                        )}
+                      </div>
+                    )
+                  }
+                />
+                <Column
+                  header="Jenis Pelunasan"
+                  className="align-text-center"
+                  field={(e) => e?.acq_pay ?? ""}
+                  style={{ minWidth: "8rem" }}
+                  body={(e) =>
+                    loading ? (
+                      <Skeleton />
+                    ) : (
+                      <div>
+                        {e.acq_pay === 1 ? (
+                          <Badge variant="info light">
+                            <i className="bx bxs-circle text-info mr-1"></i> Kas
+                          </Badge>
+                        ) : e.acq_pay === 2 ? (
+                          <Badge variant="warning light">
+                            <i className="bx bxs-circle text-warning mr-1"></i>{" "}
+                            Bank
+                          </Badge>
+                        ) : e.acq_pay === 3 ? (
+                          <Badge variant="success light">
+                            <i className="bx bxs-circle text-success mr-1"></i>{" "}
+                            Giro
+                          </Badge>
+                        ) : (
+                          <span className="center"> - </span>
+                        )}
+                      </div>
+                    )
+                  }
+                />
+                <Column
+                  header="Status"
+                  field={(e) => e?.approve ?? ""}
+                  style={{ minWidth: "8rem" }}
+                  body={(e) =>
+                    loading ? (
+                      <Skeleton />
+                    ) : (
+                      <div>
+                        {e.approve === true ? (
+                          <Badge variant="info light">
+                            <i className="bx bx-check text-info mr-1"></i>{" "}
+                            Disetujui
+                          </Badge>
+                        ) : (
+                          <Badge variant="danger light">
+                            <i className="bx bx-x text-danger mr-1"></i> Belum
+                            Disetujui
+                          </Badge>
+                        )}
+                      </div>
+                    )
+                  }
+                />
+                <Column
+                  header="Action"
+                  dataType="boolean"
+                  bodyClassName="text-center"
+                  style={{ minWidth: "2rem" }}
+                  body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
+                />
+              </DataTable>
 
-      <Dialog
-        header={"Hapus Data"}
-        visible={displayDel}
-        style={{ width: "30vw" }}
-        footer={renderFooterDel("displayDel")}
+              {/* <Dialog
+        header={"Detail Pembelian"}
+        visible={displayData}
+        style={{ width: "40vw" }}
+        footer={renderFooter("displayData")}
         onHide={() => {
-          setDisplayDel(false);
+          setDisplayData(false);
         }}
       >
-        <div className="ml-3 mr-3">
-          <i
-            className="pi pi-exclamation-triangle mr-3 align-middle"
-            style={{ fontSize: "2rem" }}
-          />
-          <span>Apakah anda yakin ingin menghapus data ?</span>
-        </div>
-      </Dialog>
+        <Row className="ml-0 pt-0 fs-12">
+          <div className="col-8">
+            <label className="text-label">Tanggal Pembelian :</label>
+            <span className="ml-1">
+              <b>{formatDate(show.so_date)}</b>
+            </span>
+          </div>
+
+          <div className="col-4">
+            <label className="text-label">Jatuh Tempo :</label>
+            <span className="ml-1">
+              <b>{formatDate(show.due_date)}</b>
+            </span>
+          </div>
+
+          <Card className="col-12">
+            <div className="row">
+              <div className="col-8">
+                <label className="text-label">No. Pesanan :</label>
+                <span className="ml-1">
+                  <b>{show.so_code}</b>
+                </span>
+              </div>
+
+              <div className="col-4">
+                <label className="text-label">Pelanggan</label>
+                <div className="">
+                  <span className="ml-0">
+                    <b>{show.pel_id?.cus_name}</b>
+                  </span>
+                  <br />
+                  <span>{show.pel_id?.cus_address}</span>
+                  <br />
+                  <span>{show.pel_id?.cus_telp1}</span>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          <Row className="ml-1 mt-0">
+            <DataTable
+              className="display w-150 datatable-wrapper fs-12"
+              value={show?.sprod}
+            >
+              <Column
+                header="Produk"
+                field={(e) => `${e.prod_id?.name} (${e.prod_id?.code})`}
+                style={{ minWidth: "10rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header="Jumlah"
+                field={(e) => e.order}
+                style={{ minWidth: "6rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header="Satuan"
+                field={(e) => e.unit_id?.name}
+                style={{ minWidth: "6rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header="Harga Satuan"
+                field={(e) => formatIdr(e.price)}
+                style={{ minWidth: "10rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header="Total"
+                field={(e) => formatIdr(e.total)}
+                style={{ minWidth: "8rem" }}
+                // body={loading && <Skeleton />}
+              />
+            </DataTable>
+          </Row>
+
+          {So.sjasa?.length ? (
+            <Row className="ml-1 mt-5">
+              <>
+                <DataTable
+                  className="display w-150 datatable-wrapper fs-12"
+                  value={show?.sjasa.map((v, i) => {
+                    return {
+                      ...v,
+                      index: i,
+                      total: v?.total ?? 0,
+                    };
+                  })}
+                >
+                  <Column
+                    header="Supplier"
+                    field={(e) => e.sup_id?.sup_name}
+                    style={{ minWidth: "15rem" }}
+                    // body={loading && <Skeleton />}
+                  />
+                  <Column
+                    header="Jasa"
+                    field={(e) => e.jasa_id?.name}
+                    style={{ minWidth: "15rem" }}
+                    // body={loading && <Skeleton />}
+                  />
+                  <Column
+                    header="Total"
+                    field={(e) => formatIdr(e.total)}
+                    style={{ minWidth: "10rem" }}
+                    // body={loading && <Skeleton />}
+                  />
+                </DataTable>
+              </>
+              0
+            </Row>
+          ) : (
+            <></>
+          )}
+
+          <Row className="ml-0 mr-0 mb-0 mt-4 justify-content-between fs-12">
+            <div></div>
+            <div className="row justify-content-right col-6 mr-4">
+              <div className="col-12 mb-0">
+                <label className="text-label">
+                  <b>Detail Pembayaran</b>
+                </label>
+                <Divider className="ml-12"></Divider>
+              </div>
+
+              <div className="col-5 mt-2">
+                <label className="text-label">
+                  {show.split_inv ? "Sub Total Barang" : "Subtotal"}
+                </label>
+              </div>
+
+              <div className="col-7 mt-2 text-right">
+                <label className="text-label">
+                  {show.split_inv ? (
+                    <b>
+                      Rp.
+                      {formatIdr(getSubTotalBarang())}
+                    </b>
+                  ) : (
+                    <b>
+                      Rp.
+                      {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
+                    </b>
+                  )}
+                </label>
+              </div>
+
+              <div className="col-5">
+                <label className="text-label">
+                  {show.split_inv ? "DPP Barang" : "DPP"}
+                </label>
+              </div>
+
+              <div className="col-7 text-right">
+                <label className="text-label">
+                  {show.split_inv ? (
+                    <b>
+                      Rp.
+                      {formatIdr(getSubTotalBarang())}
+                    </b>
+                  ) : (
+                    <b>
+                      Rp.
+                      {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
+                    </b>
+                  )}
+                </label>
+              </div>
+
+              <div className="col-5">
+                <label className="text-label">
+                  {show.split_inv ? "Pajak Atas Barang (11%)" : "Pajak (11%)"}
+                </label>
+              </div>
+
+              <div className="col-7 text-right">
+                <label className="text-label">
+                  {show.split_inv ? (
+                    <b>
+                      Rp.
+                      {formatIdr((getSubTotalBarang() * 11) / 100)}
+                    </b>
+                  ) : (
+                    <b>
+                      Rp.{" "}
+                      {formatIdr(
+                        ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
+                      )}
+                    </b>
+                  )}
+                </label>
+              </div>
+
+              <div className="col-5 mt-0">
+                <label className="text-label">Diskon(%)</label>
+              </div>
+
+              <div className="col-7 text-right">
+                <label className="text-label">
+                  <b>{show.total_disc !== null ? show.total_disc : 0}</b>
+                </label>
+              </div>
+
+              <div className="col-12">
+                <Divider className="ml-12"></Divider>
+              </div>
+
+              <div className="col-5">
+                <label className="text-label">
+                  <b>Total</b>
+                </label>
+              </div>
+
+              <div className="col-7">
+                <label className="text-label fs-13">
+                  {show.split_inv ? (
+                    <b>
+                      Rp.{" "}
+                      {formatIdr(
+                        getSubTotalBarang() + (getSubTotalBarang() * 11) / 100
+                      )}
+                    </b>
+                  ) : (
+                    <b>
+                      Rp.{" "}
+                      {formatIdr(
+                        getSubTotalBarang() +
+                          getSubTotalJasa() +
+                          ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
+                      )}
+                    </b>
+                  )}
+                </label>
+              </div>
+            </div>
+          </Row>
+        </Row>
+      </Dialog> */}
+
+              <Dialog
+                header={"Hapus Data"}
+                visible={displayDel}
+                style={{ width: "30vw" }}
+                footer={renderFooterDel("displayDel")}
+                onHide={() => {
+                  setDisplayDel(false);
+                }}
+              >
+                <div className="ml-3 mr-3">
+                  <i
+                    className="pi pi-exclamation-triangle mr-3 align-middle"
+                    style={{ fontSize: "2rem" }}
+                  />
+                  <span>Apakah anda yakin ingin menghapus data ?</span>
+                </div>
+              </Dialog>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
     </>
   );
 };

@@ -3,6 +3,8 @@ import { Toast } from "primereact/toast";
 import { Row, Col, Card } from "react-bootstrap";
 import KasBankOutList from "./KasBankKeluarList";
 import KasBankOutInput from "./KasBankKeluarInput";
+import Detail from "../PencairanGiro/Detail";
+import DetailKasBank from "./DetailKasBank";
 
 const PelunasanHutang = ({ trigger }) => {
   const [active, setActive] = useState(0);
@@ -22,6 +24,9 @@ const PelunasanHutang = ({ trigger }) => {
       onEdit={() => {
         setActive(1);
       }}
+      onDetail={() => {
+        setActive(2);
+      }}
     />,
 
     <KasBankOutInput
@@ -38,18 +43,13 @@ const PelunasanHutang = ({ trigger }) => {
         }, 500);
       }}
     />,
+    <DetailKasBank onCancel={() => setActive(0)} />,
   ]);
 
   return (
     <>
       <Toast ref={toast} />
-      <Row>
-        <Col className="pt-0">
-          <Card>
-            <Card.Body>{view[active]}</Card.Body>
-          </Card>
-        </Col>
-      </Row>
+      {view[active]}
     </>
   );
 };

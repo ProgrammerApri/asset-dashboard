@@ -929,7 +929,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
               <div className="col-3">
                 <PrimeInput
                   label={"No. Telepon"}
-                  isNumber
+                  isNumber    
                   value={
                     po.sup_id !== null
                       ? supp(po.sup_id)?.supplier?.sup_telp1

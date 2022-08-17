@@ -1645,7 +1645,10 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
   };
 
   return (
-    <>
+    <Row>
+    <Col className="pt-0">
+      <Card>
+        <Card.Body>
       {/* {header()} */}
       {body()}
       {footer()}
@@ -1825,7 +1828,11 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
           }, 2000);
         }}
       />
-    </>
+    
+    </Card.Body>
+          </Card>
+        </Col>
+      </Row>
   );
 };
 

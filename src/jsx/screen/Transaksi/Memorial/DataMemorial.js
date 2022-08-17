@@ -80,10 +80,11 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
       response = await request(null, config);
       console.log(response);
       if (response.status) {
+        dispatch({ type: SET_MM, payload: [] });
+        getMemorial(true);
         setTimeout(() => {
           setUpdate(false);
           setDisplayDel(false);
-          getMemorial(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",

@@ -299,7 +299,6 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
         if (element.acc_id || element.dep_id || element.dbcr || element.amnt) {
           errors.akn[i] = {
             id: !element.acc_id,
-            dep: !element.dep_id,
             type: !element.dbcr,
             nom: !element.amnt || element.amnt === "" || element.amnt === "0",
           };
@@ -307,7 +306,6 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
       } else {
         errors.akn[i] = {
           id: !element.acc_id,
-          dep: !element.dep_id,
           type: !element.dbcr,
           nom: !element.amnt || element.amnt === "" || element.amnt === "0",
         };
@@ -319,8 +317,8 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
         nom_k += element.amnt;
       }
     });
-    console.log(nom_d);
-    console.log(nom_k);
+    // console.log(nom_d);
+    // console.log(nom_k);
 
     setState(nom_k !== nom_d);
     if (nom_k !== nom_d) {
@@ -337,7 +335,7 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
             element.nom = true;
           }
         });
-      } else {
+      } else if (nom_d < nom_k) {
         errors?.akn.forEach((element, i) => {
           if (memorial.memo[i].dbcr === "d") {
             element.nom = true;
@@ -350,13 +348,23 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
     let count = errors.akn.length;
     let total_valid = 0;
     errors.akn?.forEach((el, i) => {
+      let key_count = 0
+      let key_valid = 0
       for (var k in el) {
-        
+        key_count++
         if (!el[k]) {
-          total_valid++;
+          key_valid++
         }
       }
+      console.log(key_count);
+      console.log(`key_valid ${key_valid}`);
+      if (key_count === key_valid) {
+        total_valid++;
+      }
     });
+
+    console.log(count);
+    console.log(total_valid);
     let validMemo = count === total_valid;
     valid = !errors.code && !errors.date && validMemo;
 

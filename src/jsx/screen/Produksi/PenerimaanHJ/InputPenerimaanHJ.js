@@ -394,7 +394,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                 });
                 let newError = error;
                 newError.btc = false;
-                newError.prod[0].qty = false;
+                // newError.prod[0].qty = false;
                 setError(newError);
               }}
               label={"[bcode]"}

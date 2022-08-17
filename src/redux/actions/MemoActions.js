@@ -1,0 +1,5 @@
+export const SET_CURRENT_MM = "memo.SET_CURRENT_MM"
+export const SET_MM = "memo.SET_MM"
+export const RESET_CURRENT_MM = "memo.RESET_CURRENT_MM"
+export const UPDATE_CURRENT_MM = "memo.UPDATE_CURRENT_MM"
+export const SET_EDIT_MM = "memo.SET_EDIT_MM"

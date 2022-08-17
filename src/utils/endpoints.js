@@ -1097,29 +1097,29 @@ const endpoints = {
   },
 
   // /// Pembebanan
-  // pbn: {
-  //   endpoint: "/v1/api/pbn",
-  //   method: "GET",
-  //   data: {},
-  // },
+  memorial: {
+    endpoint: "/v1/api/memorial",
+    method: "GET",
+    data: {},
+  },
 
-  // addPbn: {
-  //   endpoint: "/v1/api/pbn",
-  //   method: "POST",
-  //   data: {},
-  // },
+  addMemorial: {
+    endpoint: "/v1/api/memorial",
+    method: "POST",
+    data: {},
+  },
 
-  // editPbn: {
-  //   endpoint: "/v1/api/pbn/",
-  //   method: "PUT",
-  //   data: {},
-  // },
+  editMemorial: {
+    endpoint: "/v1/api/memorial/",
+    method: "PUT",
+    data: {},
+  },
 
-  // delPbn: {
-  //   endpoint: "/v1/api/pbn/",
-  //   method: "DELETE",
-  //   data: {},
-  // },
+  delMemorial: {
+    endpoint: "/v1/api/memorial/",
+    method: "DELETE",
+    data: {},
+  },
 
   // RPBB_REPORT
   rpbb: {

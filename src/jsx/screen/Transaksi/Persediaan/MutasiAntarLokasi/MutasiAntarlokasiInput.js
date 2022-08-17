@@ -26,7 +26,6 @@ const defError = {
   date: false,
   asl: false,
   tjn: false,
-  proj: false,
   prod: [
     {
       id: false,
@@ -79,7 +78,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
       date: !lm.lm_date || lm.lm_date === "",
       asl: !lm.lok_asl,
       tjn: !lm.lok_tjn,
-      proj: !lm.proj_id,
+      // proj: !lm.proj_id,
       prod: [],
     };
 
@@ -120,7 +119,6 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
       !errors.date &&
       !errors.asl &&
       !errors.tjn &&
-      !errors.proj &&
       validProduct;
 
     setError(errors);
@@ -505,16 +503,12 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                   proj_id: e.id,
                 });
 
-                let newError = error;
-                newError.proj = false;
-                setError(newError);
+                
               }}
               label={"[proj_name] - [proj_code]"}
               placeholder="Pilih Project"
               detail
               onDetail={() => setShowProj(true)}
-              errorMessage="Project Belum Dipilih"
-              error={error?.proj}
             />
           </div>
           {/* kode suplier otomatis keluar, karena sudah melekat di faktur pembelian  */}
@@ -549,7 +543,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                   header="Produk"
                   className="align-text-top"
                   style={{
-                    maxWidth: "15rem",
+                    maxWidth: "20rem",
                   }}
                   field={""}
                   body={(e) => (

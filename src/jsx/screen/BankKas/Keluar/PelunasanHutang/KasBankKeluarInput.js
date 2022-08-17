@@ -1109,25 +1109,26 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
             <>
               {" "}
               <div className="col-3">
-                <label className="text-label">Kode Akun</label>
-                <div className="p-inputgroup"></div>
-                <CustomDropdown
+                <PrimeDropdown
+                label={"Kode Akun"}
                   value={exp.exp_acc && checkAcc(exp.exp_acc)}
-                  option={account}
+                  options={account}
                   onChange={(e) => {
                     updateExp({
                       ...exp,
-                      exp_acc: e.account.id,
+                      exp_acc: e.value.account.id,
                     });
 
                     let newError = error;
                     newError.akn = false;
                     setError(newError);
                   }}
-                  label={"[account.acc_name] - [account.acc_code]"}
+                  optionLabel="account.acc_name"
                   placeholder="Pilih Kode Akun"
-                  detail
-                  onDetail={() => setShowAcc(true)}
+                  filter
+                  filterBy="account.acc_name"
+                  itemTemplate={glTemplate}
+                  valueTemplate={valTemp}
                   errorMessage="Akun Belum Dipilih"
                   error={error?.akn}
                 />
@@ -1236,7 +1237,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                       />
 
                       <Column
-                        header="Type Saldo"
+                        header="Tipe Saldo"
                         className="align-text-top"
                         style={{
                           width: "8rem",
@@ -1250,7 +1251,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                                 checkAcc(e.acc_code)?.account?.sld_type
                               }
                               onChange={(e) => {}}
-                              placeholder="D/K"
+                              placeholder="Tipe Saldo"
                               disabled
                             />
                           </div>

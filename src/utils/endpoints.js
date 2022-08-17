@@ -1152,6 +1152,13 @@ const endpoints = {
     method: "GET",
     data: {},
   },
+
+  // 
+  sto_loc: {
+    endpoint: "/v1/api/sto/",
+    method: "GET",
+    data: {},
+  },
   // delPbn: {
   //   endpoint: "/v1/api/pbn/",
   //   method: "DELETE",

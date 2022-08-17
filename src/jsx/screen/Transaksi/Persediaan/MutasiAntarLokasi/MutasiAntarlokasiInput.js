@@ -47,6 +47,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
   const isEdit = useSelector((state) => state.lm.editLm);
   const dispatch = useDispatch();
   const [pusatBiaya, setPusatBiaya] = useState(null);
+  const [stoLoc, setStoLoc] = useState(null);
   const [showDepartemen, setShowDept] = useState(false);
   const [showProj, setShowProj] = useState(false);
   const [showProd, setShowProd] = useState(false);
@@ -70,8 +71,10 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
     getPusatBiaya();
     getLokasi();
     getProj();
-    getProduct();
     getSatuan();
+    if(isEdit) {
+      getStoLoc(lm.loc_from)
+    }
   }, []);
 
   const isValid = () => {
@@ -169,7 +172,24 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
+
         setLokasi(data);
+      }
+    } catch (error) {}
+  };
+
+  const getStoLoc = async (id) => {
+    const config = {
+      ...endpoints.sto_loc,
+      endpoint: endpoints.sto_loc.endpoint + id,
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setProduct(data);
       }
     } catch (error) {}
   };
@@ -486,9 +506,18 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
               value={lm.loc_from ? checkLok(lm?.loc_from) : null}
               option={lokasi}
               onChange={(e) => {
+                getStoLoc(e.id);
                 updateLM({
                   ...lm,
                   loc_from: e.id,
+                  mutasi: [
+                    {
+                      id: 0,
+                      prod_id: null,
+                      unit_id: null,
+                      qty: 0,
+                    },
+                  ],
                 });
 
                 let newError = error;
@@ -618,7 +647,10 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
 
                         let temp = [...lm.mutasi];
                         temp[e.index].prod_id = u.value.id;
-                        temp[e.index].unit_id = u.value.unit?.id;
+                        temp[e.index].unit_id = u.value.unit;
+                        if (temp[e.index].qty > checkProd(u.value.id)?.stock) {
+                          temp[e.index].qty = checkProd(u.value.id)?.stock;
+                        }
                         updateLM({ ...lm, mutasi: temp });
 
                         let newError = error;
@@ -635,6 +667,23 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                   )}
                 />
                 <Column
+                  header="Jumlah Stok"
+                  className="align-text-top"
+                  style={{
+                    width: "10rem",
+                  }}
+                  field={""}
+                  body={(e) => (
+                    <PrimeNumber
+                      value={checkProd(e?.prod_id)?.stock ?? ""}
+                      placeholder="0"
+                      type="number"
+                      min={0}
+                      disabled
+                    />
+                  )}
+                />
+                <Column
                   header="Jumlah Mutasi"
                   className="align-text-top"
                   style={{
@@ -643,10 +692,13 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                   field={""}
                   body={(e) => (
                     <PrimeNumber
-                      value={e.qty ? e.qty : null}
+                      value={e.qty ? e.qty : ""}
                       onChange={(a) => {
                         let temp = [...lm.mutasi];
                         temp[e.index].qty = a.target.value;
+                        if (temp[e.index].qty > checkProd(e?.prod_id)?.stock) {
+                          temp[e.index].qty = checkProd(e?.prod_id)?.stock;
+                        }
                         updateLM({ ...lm, mutasi: temp });
 
                         let newError = error;

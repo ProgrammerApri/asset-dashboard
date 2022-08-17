@@ -325,7 +325,16 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        setAccount(data);
+        let filt = [];
+        data?.forEach((element) => {
+          if (
+            element.account.dou_type === "D" &&
+            element.account.connect === false
+          ) {
+            filt.push(element);
+          }
+        });
+        setAccount(filt);
       }
     } catch (error) {}
   };
@@ -344,12 +353,12 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
         const { data } = response;
         let filt = [];
         data.forEach((elem) => {
-          if (elem.account.kat_code === 1 && elem.account.dou_type === "D") {
+          if (elem.account.dou_type === "D" && elem.account.connect === false) {
             filt.push(elem);
           }
         });
         console.log(data);
-        setAccKas(data);
+        setAccKas(filt);
       }
     } catch (error) {}
   };
@@ -1227,10 +1236,10 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                       />
 
                       <Column
-                        header="D/K"
+                        header="Type Saldo"
                         className="align-text-top"
                         style={{
-                          width: "6rem",
+                          width: "8rem",
                         }}
                         field={""}
                         body={(e) => (
@@ -1252,7 +1261,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                         header="Nilai"
                         className="align-text-top"
                         style={{
-                          maxWidth: "5rem",
+                          maxWidth: "10rem",
                         }}
                         field={""}
                         body={(e) => (
@@ -1352,23 +1361,23 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
               <div className="col-3">
                 <label className="text-label">Kode Akun</label>
                 <div className="p-inputgroup"></div>
-                <CustomDropdown
+                <PrimeDropdown
                   value={exp.exp_acc && checkAcc(exp.exp_acc)}
-                  option={account}
+                  options={account}
                   onChange={(e) => {
                     updateExp({
                       ...exp,
-                      exp_acc: e.account.id,
+                      exp_acc: e.value.account.id,
                     });
 
                     let newError = error;
                     newError.akn = false;
                     setError(newError);
                   }}
-                  label={"[account.acc_name] - [account.acc_code]"}
+                  optionLabel="account.acc_name"
                   placeholder="Pilih Kode Akun"
-                  detail
-                  onDetail={() => setShowAcc(true)}
+                  filter
+                  filterBy="account.acc_name"
                   errorMessage="Akun Belum Dipilih"
                   error={error?.akn}
                 />

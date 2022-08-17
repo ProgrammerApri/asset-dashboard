@@ -115,8 +115,8 @@ const PemasukanDB = () => {
               value: {
                 no: null,
                 dep: `${el.dep_id?.ccost_name} - ${el.dep_id?.ccost_code}`,
-                doc: el.no_doc,
-                doc_dt: formatDate(el.doc_date),
+                doc: el.no_doc !== null ? el.no_doc : "-",
+                doc_dt: el.no_doc !== null ? formatDate(el.doc_date) : "-",
                 ord_code: ek.trx_code,
                 ord_date: formatDate(ek.trx_date),
                 sup: `${el.sup_id?.sup_name} - ${el.sup_id?.sup_code}`,

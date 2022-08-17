@@ -129,8 +129,8 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
 
   const editMM = async () => {
     const config = {
-      ...endpoints.editMM,
-      endpoint: endpoints.editMM.endpoint + memorial.id,
+      ...endpoints.editMemorial,
+      endpoint: endpoints.editMemorial.endpoint + memorial.id,
       data: memorial,
     };
     console.log(config.data);
@@ -156,7 +156,7 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
 
   const addMM = async () => {
     const config = {
-      ...endpoints.addMM,
+      ...endpoints.addMemorial,
       data: { ...memorial, date: currentDate(memorial.date) },
     };
     console.log(config.data);
@@ -323,10 +323,30 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
     console.log(nom_d);
     console.log(nom_k);
 
-    setState(nom_d !== nom_k);
-    errors.akn.forEach((element) => {
-      element.nom = nom_d !== nom_k;
-    });
+    setState(nom_k !== nom_d);
+    if (nom_k !== nom_d) {
+      toast.current.show({
+        severity: "warn",
+        summary: "Warning !!",
+        detail: "Nominal Debit/Kredit Belum Balance",
+        // sticky: true,
+        life: 10000,
+      });
+      if (nom_k < nom_d) {
+        errors.akn.forEach((element, i) => {
+          if (memorial.memo[i].dbcr === "k") {
+            element.nom =true;
+          }
+        });
+      }else{
+        errors.akn.forEach((element, i) => {
+          if (memorial.memo[i].dbcr === "d") {
+            element.nom =true;
+          }
+        });
+      }
+    }
+
 
     let validMemo = false;
     errors.akn?.forEach((el, i) => {
@@ -351,6 +371,8 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
 
     return valid;
   };
+
+
 
   const glTemplate = (option) => {
     return (

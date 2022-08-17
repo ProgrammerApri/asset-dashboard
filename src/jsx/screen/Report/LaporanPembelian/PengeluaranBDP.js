@@ -116,8 +116,8 @@ const PengeluaranBDP = () => {
                 value: {
                   no: null,
                   dep: `${el.slsm_id?.sales_name} - ${el.slsm_id?.sales_code}`,
-                  doc: el.no_doc,
-                  doc_dt: formatDate(el.doc_date),
+                  doc: el.no_doc !== null ? el.no_doc : "-",
+                  doc_dt: el.doc_date !== null ? formatDate(el.doc_date) : "-",
                   ord_code: ek.trx_code,
                   ord_date: formatDate(ek.trx_date),
                   pel: `${el.pel_id?.cus_name} - ${el.pel_id?.cus_code}`,

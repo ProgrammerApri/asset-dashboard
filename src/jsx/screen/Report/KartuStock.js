@@ -39,7 +39,9 @@ const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
 const KartuStock = () => {
   const [product, setProduct] = useState(null);
+  const [location, setLoc] = useState(null);
   const [selectedProduct, setSelected] = useState(null);
+  const [selectedLoc, setSelectedLoc] = useState(null);
   const [stCard, setStCard] = useState(null);
   const printPage = useRef(null);
   const [filtersDate, setFiltersDate] = useState([new Date(), new Date()]);
@@ -72,14 +74,19 @@ const KartuStock = () => {
           (el, i) =>
             i === data.findIndex((ek) => el?.prod_id?.id === ek?.prod_id?.id)
         );
+        let grouploc = data?.filter(
+          (el, i) =>
+            i === data.findIndex((ek) => el?.loc_id?.id === ek?.loc_id?.id)
+        );
         setProduct(grouped);
+        setLoc(grouploc);
       }
     } catch (error) {}
   };
 
   const jsonForExcel = (stCard, excel = false) => {
     let data = [];
-    if (selectedProduct && filtersDate[0] && filtersDate[1]) {
+    if (selectedProduct && selectedLoc && filtersDate[0] && filtersDate[1]) {
       let saldo = 0;
       data.push({
         type: "item",
@@ -95,25 +102,27 @@ const KartuStock = () => {
       });
       stCard?.forEach((el) => {
         if (selectedProduct.prod_id.id === el.prod_id.id) {
-          let dt = new Date(`${el?.trx_date}Z`);
-          if (dt >= filtersDate[0] && dt <= filtersDate[1]) {
-            if (el.trx_dbcr === "d") {
-              saldo += el.trx_qty;
-            } else {
-              saldo -= el.trx_qty;
+          if (selectedLoc.loc_id.id === el.loc_id.id) {
+            let dt = new Date(`${el?.trx_date}Z`);
+            if (dt >= filtersDate[0] && dt <= filtersDate[1]) {
+              if (el.trx_dbcr === "d") {
+                saldo += el.trx_qty;
+              } else {
+                saldo -= el.trx_qty;
+              }
+              data.push({
+                type: "item",
+                value: {
+                  trx_code: el.trx_code,
+                  trx_date: formatDate(el.trx_date),
+                  product: `${el.prod_id?.name} (${el.prod_id?.code})`,
+                  trx_type: el.trx_type,
+                  trx_debit: el.trx_dbcr === "d" ? el.trx_qty : 0,
+                  trx_kredit: el.trx_dbcr === "k" ? el.trx_qty : 0,
+                  sld: saldo,
+                },
+              });
             }
-            data.push({
-              type: "item",
-              value: {
-                trx_code: el.trx_code,
-                trx_date: formatDate(el.trx_date),
-                product: `${el.prod_id?.name} (${el.prod_id?.code})`,
-                trx_type: el.trx_type,
-                trx_debit: el.trx_dbcr === "d" ? el.trx_qty : 0,
-                trx_kredit: el.trx_dbcr === "k" ? el.trx_qty : 0,
-                sld: saldo,
-              },
-            });
           }
         }
       });
@@ -318,9 +327,9 @@ const KartuStock = () => {
   const renderHeader = () => {
     return (
       <div className="flex justify-content-between">
-        <div className="col-6 ml-0 mr-0 pl-0">
+        <div className="col-8 ml-0 mr-0 pl-0">
           <Row className="m-0">
-            <div className="col-5 mr-3 p-0">
+            <div className="col-4 mr-3 p-0">
               <div className="p-inputgroup">
                 <span className="p-inputgroup-addon">
                   <i className="pi pi-calendar" />
@@ -348,6 +357,19 @@ const KartuStock = () => {
                 optionLabel="prod_id.name"
                 filter
                 filterBy="prod_id.name"
+                showClear
+              />
+            </div>
+
+            <div className="col-3 ml-3 p-0">
+              <Dropdown
+                value={selectedLoc ?? null}
+                options={location}
+                onChange={(e) => {
+                  setSelectedLoc(e.value);
+                }}
+                placeholder="Pilih Lokasi"
+                optionLabel="loc_id.name"
                 showClear
               />
             </div>

@@ -42,19 +42,25 @@ const KasBankOutList = ({ onAdd, onDetail }) => {
   const [displayDel, setDisplayDel] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
+  const [dep, setDep] = useState(null);
+  const [proj, setProj] = useState(null);
   const [isEdit, setEdit] = useState(false);
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+  const [displayData, setDisplayDat] = useState(false);
   const dispatch = useDispatch();
   const exp = useSelector((state) => state.exp.exp);
+  const show = useSelector((state) => state.exp.current);
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
     getEXP();
     initFilters1();
+    getDep();
+    getProj();
   }, []);
 
   const getEXP = async (isUpdate = false) => {
@@ -81,6 +87,42 @@ const KasBankOutList = ({ onAdd, onDetail }) => {
         setLoading(false);
       }, 500);
     }
+  };
+
+  const getProj = async () => {
+    const config = {
+      ...endpoints.project,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setProj(data);
+      }
+    } catch (error) {}
+  };
+
+  const getDep = async () => {
+    const config = {
+      ...endpoints.pusatBiaya,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setDep(data);
+      }
+    } catch (error) {}
   };
 
   const delEXP = async (id) => {
@@ -121,13 +163,35 @@ const KasBankOutList = ({ onAdd, onDetail }) => {
     }
   };
 
+  const checkdep = (value) => {
+    let selected = {};
+    dep?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+    return selected;
+  };
+
+  const checkproj = (value) => {
+    let selected = {};
+    proj?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
   const actionBodyTemplate = (data) => {
     return (
       // <React.Fragment>
       <div className="d-flex">
         <Link
           onClick={() => {
-            onDetail();
+            // onDetail();
+            setDisplayDat(data);
             dispatch({ type: SET_CURRENT_EXP, payload: data });
           }}
           className="btn btn-info shadow btn-xs sharp ml-1"
@@ -218,6 +282,18 @@ const KasBankOutList = ({ onAdd, onDetail }) => {
           }}
           autoFocus
           loading={loading}
+        />
+      </div>
+    );
+  };
+
+  const renderFooter = () => {
+    return (
+      <div>
+        <PButton
+          label="Batal"
+          onClick={() => setDisplayDat(false)}
+          className="p-button-text btn-primary"
         />
       </div>
     );
@@ -473,255 +549,213 @@ const KasBankOutList = ({ onAdd, onDetail }) => {
                   body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
                 />
               </DataTable>
+              <Dialog
+                header={"Detail Kas/Bank"}
+                visible={displayData}
+                style={{ width: "60vw" }}
+                footer={renderFooter("displayData")}
+                onHide={() => {
+                  setDisplayDat(false);
+                }}
+              >
+                <Row className="ml-0 pt-0 fs-12">
+                  <div className="col-9"></div>
+                  <div className="col-3">
+                    <label className="text-label">Tanggal Pengeluaran :</label>
+                    <span className="ml-1">
+                      <b>{formatDate(show?.exp_date)}</b>
+                    </span>
+                  </div>
 
-              {/* <Dialog
-        header={"Detail Pembelian"}
-        visible={displayData}
-        style={{ width: "40vw" }}
-        footer={renderFooter("displayData")}
-        onHide={() => {
-          setDisplayData(false);
-        }}
-      >
-        <Row className="ml-0 pt-0 fs-12">
-          <div className="col-8">
-            <label className="text-label">Tanggal Pembelian :</label>
-            <span className="ml-1">
-              <b>{formatDate(show.so_date)}</b>
-            </span>
-          </div>
+                  <Card className="col-12 ml-0 mr-3">
+                    <div className="col-12">
+                      {/* </div> */}
 
-          <div className="col-4">
-            <label className="text-label">Jatuh Tempo :</label>
-            <span className="ml-1">
-              <b>{formatDate(show.due_date)}</b>
-            </span>
-          </div>
+                      {show.exp_type === 1 && (
+                        <>
+                          <label className="text-label">
+                            <b>Informasi Pelunasan</b>
+                          </label>
 
-          <Card className="col-12">
-            <div className="row">
-              <div className="col-8">
-                <label className="text-label">No. Pesanan :</label>
-                <span className="ml-1">
-                  <b>{show.so_code}</b>
-                </span>
-              </div>
+                          <br></br>
+                          <br></br>
+                          <span className="ml-0 fs-14">
+                            <b>{show?.exp_code}</b>
+                          </span>
+                          <br></br>
+                          <br></br>
+                          <br></br>
+                          <span className="ml-0">
+                            Tipe Pengeluaran : {""}
+                            <b>
+                              {show?.exp_type === 1
+                                ? "Pelunasan"
+                                : show?.exp_type === 2
+                                ? "Pengeluaran Kas/Bank"
+                                : "Biaya Batch"}
+                            </b>
+                          </span>
 
-              <div className="col-4">
-                <label className="text-label">Pelanggan</label>
-                <div className="">
-                  <span className="ml-0">
-                    <b>{show.pel_id?.cus_name}</b>
-                  </span>
-                  <br />
-                  <span>{show.pel_id?.cus_address}</span>
-                  <br />
-                  <span>{show.pel_id?.cus_telp1}</span>
-                </div>
-              </div>
-            </div>
-          </Card>
+                          <br></br>
 
-          <Row className="ml-1 mt-0">
-            <DataTable
-              className="display w-150 datatable-wrapper fs-12"
-              value={show?.sprod}
-            >
-              <Column
-                header="Produk"
-                field={(e) => `${e.prod_id?.name} (${e.prod_id?.code})`}
-                style={{ minWidth: "10rem" }}
-                // body={loading && <Skeleton />}
-              />
-              <Column
-                header="Jumlah"
-                field={(e) => e.order}
-                style={{ minWidth: "6rem" }}
-                // body={loading && <Skeleton />}
-              />
-              <Column
-                header="Satuan"
-                field={(e) => e.unit_id?.name}
-                style={{ minWidth: "6rem" }}
-                // body={loading && <Skeleton />}
-              />
-              <Column
-                header="Harga Satuan"
-                field={(e) => formatIdr(e.price)}
-                style={{ minWidth: "10rem" }}
-                // body={loading && <Skeleton />}
-              />
-              <Column
-                header="Total"
-                field={(e) => formatIdr(e.total)}
-                style={{ minWidth: "8rem" }}
-                // body={loading && <Skeleton />}
-              />
-            </DataTable>
-          </Row>
+                          <span className="ml-0">
+                            Supplier :{" "}
+                            <b>{`${show?.acq_sup?.sup_code}-${show?.acq_sup?.sup_name}`}</b>
+                          </span>
 
-          {So.sjasa?.length ? (
-            <Row className="ml-1 mt-5">
-              <>
-                <DataTable
-                  className="display w-150 datatable-wrapper fs-12"
-                  value={show?.sjasa.map((v, i) => {
-                    return {
-                      ...v,
-                      index: i,
-                      total: v?.total ?? 0,
-                    };
-                  })}
-                >
-                  <Column
-                    header="Supplier"
-                    field={(e) => e.sup_id?.sup_name}
-                    style={{ minWidth: "15rem" }}
-                    // body={loading && <Skeleton />}
-                  />
-                  <Column
-                    header="Jasa"
-                    field={(e) => e.jasa_id?.name}
-                    style={{ minWidth: "15rem" }}
-                    // body={loading && <Skeleton />}
-                  />
-                  <Column
-                    header="Total"
-                    field={(e) => formatIdr(e.total)}
-                    style={{ minWidth: "10rem" }}
-                    // body={loading && <Skeleton />}
-                  />
-                </DataTable>
-              </>
-              0
-            </Row>
-          ) : (
-            <></>
-          )}
+                          <br></br>
+                          <span className="ml-0">
+                            Akun Pengeluaran :{" "}
+                            <b>{`${show?.exp_acc?.acc_code}-${show?.exp_acc?.acc_name}`}</b>
+                          </span>
 
-          <Row className="ml-0 mr-0 mb-0 mt-4 justify-content-between fs-12">
-            <div></div>
-            <div className="row justify-content-right col-6 mr-4">
-              <div className="col-12 mb-0">
-                <label className="text-label">
-                  <b>Detail Pembayaran</b>
-                </label>
-                <Divider className="ml-12"></Divider>
-              </div>
+                          <br></br>
+                          <span className="ml-0">
+                            Jenis Pelunasan : {""}
+                            <b>
+                              {show?.acq_pay === 1
+                                ? "Kas"
+                                : show?.acq_pay === 2
+                                ? "Bank"
+                                : "Giro"}
+                            </b>
+                          </span>
+                          <br></br>
+                          {show.acq_pay === 1 ? (
+                            <>
+                              <span className="ml-0">
+                                Akun Pengeluaran :{" "}
+                                <b>{`${show?.kas_acc?.acc_code}-${show?.kas_acc?.acc_name}`}</b>
+                              </span>
+                            </>
+                          ) : show.acq_pay === 2 ? (
+                            <>
+                              <span className="ml-0">
+                                Kode Referensi : <b>{show?.bank_ref}</b>
+                              </span>
 
-              <div className="col-5 mt-2">
-                <label className="text-label">
-                  {show.split_inv ? "Sub Total Barang" : "Subtotal"}
-                </label>
-              </div>
+                              <br></br>
+                              <span className="ml-0">
+                                Kode Bank :{" "}
+                                <b>{`${show?.bank_acc?.BANK_CODE}-${show?.bank_acc?.BANK_NAME}`}</b>
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="ml-0">
+                                Nomor Giro : <b>{show?.giro_num}</b>
+                              </span>
 
-              <div className="col-7 mt-2 text-right">
-                <label className="text-label">
-                  {show.split_inv ? (
-                    <b>
-                      Rp.
-                      {formatIdr(getSubTotalBarang())}
-                    </b>
-                  ) : (
-                    <b>
-                      Rp.
-                      {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
-                    </b>
-                  )}
-                </label>
-              </div>
+                              <br></br>
+                              <span className="ml-0">
+                                Tanggal Cair : <b>{`${formatDate( show?.giro_date)}`}</b>
+                              </span>
+                              <br></br>
 
-              <div className="col-5">
-                <label className="text-label">
-                  {show.split_inv ? "DPP Barang" : "DPP"}
-                </label>
-              </div>
-
-              <div className="col-7 text-right">
-                <label className="text-label">
-                  {show.split_inv ? (
-                    <b>
-                      Rp.
-                      {formatIdr(getSubTotalBarang())}
-                    </b>
-                  ) : (
-                    <b>
-                      Rp.
-                      {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
-                    </b>
-                  )}
-                </label>
-              </div>
-
-              <div className="col-5">
-                <label className="text-label">
-                  {show.split_inv ? "Pajak Atas Barang (11%)" : "Pajak (11%)"}
-                </label>
-              </div>
-
-              <div className="col-7 text-right">
-                <label className="text-label">
-                  {show.split_inv ? (
-                    <b>
-                      Rp.
-                      {formatIdr((getSubTotalBarang() * 11) / 100)}
-                    </b>
-                  ) : (
-                    <b>
-                      Rp.{" "}
-                      {formatIdr(
-                        ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
+                              <span className="ml-0">
+                                Kode Bank :{" "}
+                                <b>{`${show?.bank_id?.BANK_CODE}-${show?.bank_id?.BANK_NAME}`}</b>
+                              </span>
+                            </>
+                          )}
+                        </>
                       )}
-                    </b>
-                  )}
-                </label>
-              </div>
 
-              <div className="col-5 mt-0">
-                <label className="text-label">Diskon(%)</label>
-              </div>
+                      {show.exp_type === 2 && (
+                        <>
+                          <label className="text-label">
+                            <b>Informasi Pengeluaran</b>
+                          </label>
 
-              <div className="col-7 text-right">
-                <label className="text-label">
-                  <b>{show.total_disc !== null ? show.total_disc : 0}</b>
-                </label>
-              </div>
+                          <br></br>
+                          <br></br>
+                          <span className="ml-0 fs-14">
+                            <b>{show?.exp_code}</b>
+                          </span>
+                          <br></br>
+                          <br></br>
+                          <br></br>
+                          <span className="ml-0">
+                            Tipe Pengeluaran : {""}
+                            <b>
+                              {show?.exp_type === 1
+                                ? "Pelunasan"
+                                : show?.exp_type === 2
+                                ? "Pengeluaran Kas/Bank"
+                                : "Biaya Batch"}
+                            </b>
+                          </span>
 
-              <div className="col-12">
-                <Divider className="ml-12"></Divider>
-              </div>
+                          <br></br>
 
-              <div className="col-5">
-                <label className="text-label">
-                  <b>Total</b>
-                </label>
-              </div>
+                          <span className="ml-0">
+                            Akun Pengeluaran :{" "}
+                            <b>{`${show?.exp_acc.acc_code}-${show?.exp_acc.acc_name}`}</b>
+                          </span>
 
-              <div className="col-7">
-                <label className="text-label fs-13">
-                  {show.split_inv ? (
-                    <b>
-                      Rp.{" "}
-                      {formatIdr(
-                        getSubTotalBarang() + (getSubTotalBarang() * 11) / 100
+                          <br></br>
+                          <span className="ml-0">
+                            Departement :{" "}
+                            <b>{`${checkdep(show?.exp_dep)?.ccost_name} (${
+                              checkdep(show?.exp_dep)?.ccost_code
+                            })`}</b>
+                          </span>
+
+                          <br></br>
+                          <span className="ml-0">
+                            Project :{" "}
+                            <b>{`${checkproj(show?.exp_prj)?.proj_code} (${
+                              checkproj(show?.exp_prj)?.proj_name
+                            })`}</b>
+                          </span>
+                        </>
                       )}
-                    </b>
-                  ) : (
-                    <b>
-                      Rp.{" "}
-                      {formatIdr(
-                        getSubTotalBarang() +
-                          getSubTotalJasa() +
-                          ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
-                      )}
-                    </b>
-                  )}
-                </label>
-              </div>
-            </div>
-          </Row>
-        </Row>
-      </Dialog> */}
+                    </div>
+                  </Card>
+
+                  <Row className="ml-2 mt-0">
+                    {show.exp_type === 2 && (
+                      <Row className="ml-1 mt-0">
+                        <DataTable
+                          value={show.exp}
+                          responsiveLayout="scroll"
+                          className="display w-150 datatable-wrapper fs-12"
+                          showGridlines
+                          dataKey="id"
+                          rowHover
+                        >
+                          <Column
+                            header="Akun"
+                            field={(e) =>
+                              `${e.acc_code?.acc_code}-${e.acc_code?.acc_name}`
+                            }
+                            style={{ minWidth: "20rem" }}
+                            // body={loading && <Skeleton />}
+                          />
+                          <Column
+                            header="Tipe Pengeluaran"
+                            field={(e) => "Debit"}
+                            style={{ minWidth: "11rem" }}
+                            // body={loading && <Skeleton />}
+                          />
+                          <Column
+                            header="Nilai"
+                            field={(e) => e.value}
+                            style={{ minWidth: "10rem" }}
+                            // body={loading && <Skeleton />}
+                          />
+                          <Column
+                            header="Keterangan"
+                            field={(e) => e.desc}
+                            style={{ minWidth: "18rem" }}
+                            // body={loading && <Skeleton />}
+                          />
+                        </DataTable>
+                      </Row>
+                    )}
+                  </Row>
+                </Row>
+              </Dialog>
 
               <Dialog
                 header={"Hapus Data"}

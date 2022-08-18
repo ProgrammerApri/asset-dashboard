@@ -17,10 +17,10 @@ const DetailKasBank = ({ onCancel }) => {
   const printPage = useRef(null);
   const [comp, setComp] = useState(null);
   const so = useSelector((state) => state.so.so);
-  const [city, setCity] = useState(null);
+  const [dep, setDep] = useState(null);
   const [lok, setLok] = useState(null);
   const [customer, setCus] = useState(null);
-  const [jas, setJas] = useState(null);
+  const [proj, setProj] = useState(null);
   const [prod, setProd] = useState(null);
   const [unit, setUnit] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -34,10 +34,10 @@ const DetailKasBank = ({ onCancel }) => {
     });
     getCus();
     getProduct();
-    getJasa();
+    getProj();
     getSatuan();
     getComp();
-    getCity();
+    getDep();
     getLok();
   }, []);
 
@@ -75,9 +75,9 @@ const DetailKasBank = ({ onCancel }) => {
     } catch (error) {}
   };
 
-  const getJasa = async () => {
+  const getProj = async () => {
     const config = {
-      ...endpoints.jasa,
+      ...endpoints.project,
       data: {},
     };
     console.log(config.data);
@@ -88,7 +88,7 @@ const DetailKasBank = ({ onCancel }) => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        setJas(data);
+        setProj(data);
       }
     } catch (error) {}
   };
@@ -129,9 +129,9 @@ const DetailKasBank = ({ onCancel }) => {
     } catch (error) {}
   };
 
-  const getCity = async () => {
+  const getDep = async () => {
     const config = {
-      ...endpoints.city,
+      ...endpoints.pusatBiaya,
       data: {},
     };
     console.log(config.data);
@@ -142,7 +142,7 @@ const DetailKasBank = ({ onCancel }) => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        setCity(data);
+        setDep(data);
       }
     } catch (error) {}
   };
@@ -165,10 +165,10 @@ const DetailKasBank = ({ onCancel }) => {
     } catch (error) {}
   };
 
-  const jasa = (value) => {
+  const checkproj = (value) => {
     let selected = {};
-    jas?.forEach((element) => {
-      if (value === element.jasa.id) {
+    proj?.forEach((element) => {
+      if (value === element.id) {
         selected = element;
       }
     });
@@ -176,10 +176,10 @@ const DetailKasBank = ({ onCancel }) => {
     return selected;
   };
 
-  const kota = (value) => {
+  const checkdep = (value) => {
     let selected = {};
-    city?.forEach((element) => {
-      if (element.city_id === `${value}`) {
+    dep?.forEach((element) => {
+      if (value === element.id) {
         selected = element;
       }
     });
@@ -389,6 +389,8 @@ const DetailKasBank = ({ onCancel }) => {
                         <b>{show?.exp_code}</b>
                       </span>
                       <br></br>
+                      <br></br>
+
                       <span className="ml-0">
                         Tipe Pengeluaran :{" "}
                         <b>
@@ -417,12 +419,18 @@ const DetailKasBank = ({ onCancel }) => {
 
                           <br></br>
                           <span className="ml-0">
-                            Kode Departement : <b>{`${show?.exp_dep}`}</b>
+                            Departement :{" "}
+                            <b>{`${checkdep(show?.exp_dep)?.ccost_name} (${
+                              checkdep(show?.exp_dep)?.ccost_code
+                            })`}</b>
                           </span>
 
                           <br></br>
                           <span className="ml-0">
-                            Project : <b>{`${show?.exp_prj}`}</b>
+                            Project :{" "}
+                            <b>{`${checkproj(show?.exp_prj)?.proj_code} (${
+                              checkproj(show?.exp_prj)?.proj_name
+                            })`}</b>
                           </span>
                         </>
                       )}
@@ -437,25 +445,13 @@ const DetailKasBank = ({ onCancel }) => {
                       </label>
                     </div> */}
 
-                    <div className="col-6 fs-12 ml-0">
-                      <span className="ml-0 fs-14">
-                        <b>{show?.so_code}</b>
-                      </span>
-                      <br></br>
-                      {/* <span className="ml-0">
-                        Nomor PO : <b>{show?.po_id?.po_code}</b>
-                      </span> */}
-                      <br></br>
-                      {/* <span className="ml-0">
-                        Jatuh Tempo : <b>{formatDate(show?.due_date)}</b>
-                      </span> */}
-                    </div>
+                   
 
                     <div className="col-6 fs-12 ml-0 text-right">
                       {/* <span className="ml-0 fs-14">
                         <b>{show?.pel_id?.cus_name}</b>
                       </span> */}
-                      <br></br>
+                     
                       {/* <span className="ml-0">
                         Cp : <b>{show?.pel_id?.cus_cp}</b>
                       </span>
@@ -490,14 +486,16 @@ const DetailKasBank = ({ onCancel }) => {
                     >
                       <Column
                         header="Akun"
-                        field={(e) => `${e.acc_code?.acc_code}-${e.acc_code?.acc_name}`}
-                        style={{ minWidth: "19rem" }}
+                        field={(e) =>
+                          `${e.acc_code?.acc_code}-${e.acc_code?.acc_name}`
+                        }
+                        style={{ minWidth: "20rem" }}
                         // body={loading && <Skeleton />}
                       />
                       <Column
                         header="Tipe Pengeluaran"
                         field={(e) => "Debit"}
-                        style={{ minWidth: "10rem" }}
+                        style={{ minWidth: "11rem" }}
                         // body={loading && <Skeleton />}
                       />
                       <Column
@@ -512,7 +510,6 @@ const DetailKasBank = ({ onCancel }) => {
                         style={{ minWidth: "20rem" }}
                         // body={loading && <Skeleton />}
                       />
-                     
                     </DataTable>
                   </Row>
                 )}

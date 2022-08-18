@@ -499,12 +499,6 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
               style={{ minWidth: "8rem" }}
               body={loading && <Skeleton />}
             />
-            <Column
-              header="Status"
-              field={(e) => e.status}
-              style={{ minWidth: "8rem" }}
-              body={loading && <Skeleton />}
-            />
 
             <Column
               header="Action"

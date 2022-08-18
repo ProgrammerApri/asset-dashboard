@@ -84,8 +84,7 @@ const RencanaPemakaianBB = () => {
     let data = [];
     // if (selectedPlan && selectedLocat && filtersDate[0] && filtersDate[1] ) {
     rpBB?.forEach((el) => {
-      // if (selectedPlan.pl_id.id === el.pl_id.id) {
-        
+      if (selectedPlan?.pl_id?.pcode === el?.pl_id?.pcode) {
         let dt = new Date(`${el?.date_created}Z`);
         if (dt >= filtersDate[0] && dt <= filtersDate[1]) {
           data.push({
@@ -101,7 +100,7 @@ const RencanaPemakaianBB = () => {
             },
           });
         }
-      // }
+      }
     });
     // }
 
@@ -422,7 +421,11 @@ const RencanaPemakaianBB = () => {
                   subTittle={`Raw Material Usage Plan Report for Date Plan ${formatDate(
                     filtersDate[0]
                   )} - ${formatDate(filtersDate[1])}`}
-                  subTittle1={selectedPlan ? `Lokasi Gudang : ${rpBB[0].loc_id.name}` : null}
+                  subTittle1={
+                    selectedPlan
+                      ? `Lokasi Gudang : ${rpBB[0].loc_id.name}`
+                      : null
+                  }
                   onComplete={(cp) => setCp(cp)}
                   page={idx + 1}
                   body={

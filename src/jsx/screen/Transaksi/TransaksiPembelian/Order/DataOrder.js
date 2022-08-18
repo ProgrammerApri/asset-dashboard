@@ -63,7 +63,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
     setLoading(true);
     const config = {
       ...endpoints.order,
-      data: order,
+      data: {},
     };
     console.log(config.data);
     let response = null;

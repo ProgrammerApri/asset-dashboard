@@ -13,50 +13,126 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
-import { useDispatch } from "react-redux";
-import { SET_CURRENT_LM, SET_EDIT_LM } from "src/redux/actions";
+import { useDispatch, useSelector } from "react-redux";
+import { SET_CURRENT_LM, SET_EDIT_LM, SET_LM } from "src/redux/actions";
+import { formatDate } from "@fullcalendar/core";
 
 const data = {
-  data: [
-    {
-      //   id: 1,
-      date: "2022-06-26",
-      ref: "MT-00001",
-      asal: "(JKT01)	Jakarta 01",
-      tjn: "(SMG01)	Semarang 01",
-      ket: "-"
-    },
-    {
-      //   id: 1,
-      date: "2022-06-29",
-      ref: "MT-00002",
-      asal: "(SMG01)	Semarang 01",
-      tjn: "(SMG02)	Semarang 02",
-      ket: "-"
-    },
-    {
-      //   id: 1,
-      date: "2022-06-30",
-      ref: "MT-00003",
-      asal: "(JKT02)	Jakarta 02",
-      tjn: "(SMG01)	Semarang 01",
-      ket: "-"
-    },
-  ],
+  id: null,
+  mtsi_code: null,
+  mtsi_date: null,
+  loc_from: null,
+  loc_to: null,
+  dep_id: null,
+  prj_id: null,
+  mutasi: null,
 };
 
-const MutasiAntarList = ({ onAdd }) => {
-  const [mutasi, setMutasi] = useState(null);
+const MutasiAntarList = ({ onAdd, onEdit, onDetail }) => {
+  const mutasi = useSelector((state) => state.lm.lm);
+  const [update, setUpdate] = useState(true);
+  const [displayDel, setDisplayDel] = useState(false);
+  const [currentItem, setCurrentItem] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [filters1, setFilters1] = useState(null);
+  const [globalFilterValue1, setGlobalFilterValue1] = useState("");
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const dispatch = useDispatch();
   const toast = useRef(null);
 
+  const dummy = Array.from({ length: 10 });
+
   useEffect(() => {
-    console.log(data);
-    setMutasi(data.data);
+    initFilters1();
+    getMutasi();
   }, []);
+
+  const getMutasi = async (isUpdate = false) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.mutasi,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        dispatch({ type: SET_LM, payload: data });
+      }
+    } catch (error) {}
+    if (isUpdate) {
+      setLoading(false);
+    } else {
+      setTimeout(() => {
+        setLoading(false);
+      }, 500);
+    }
+  };
+
+  const delMut = async (id) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.delMutasi,
+      endpoint: endpoints.delMutasi.endpoint + currentItem.id,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setTimeout(() => {
+          setUpdate(false);
+          setDisplayDel(false);
+          getMutasi(true);
+          toast.current.show({
+            severity: "info",
+            summary: "Berhasil",
+            detail: "Data Berhasil Dihapus",
+            life: 3000,
+          });
+        }, 100);
+      }
+    } catch (error) {
+      console.log(error);
+      setTimeout(() => {
+        setUpdate(false);
+        setDisplayDel(false);
+        toast.current.show({
+          severity: "error",
+          summary: "Gagal",
+          detail: `Tidak Dapat Menghapus Data`,
+          life: 3000,
+        });
+      }, 500);
+    }
+  };
+
+  const renderFooterDel = () => {
+    return (
+      <div>
+        <PButton
+          label="Batal"
+          onClick={() => setDisplayDel(false)}
+          className="p-button-text btn-primary"
+        />
+        <PButton
+          label="Hapus"
+          icon="pi pi-trash"
+          onClick={() => {
+            delMut();
+          }}
+          autoFocus
+          loading={loading}
+        />
+      </div>
+    );
+  };
 
   const renderHeader = () => {
     return (
@@ -64,8 +140,8 @@ const MutasiAntarList = ({ onAdd }) => {
         <span className="p-input-icon-left">
           <i className="pi pi-search" />
           <InputText
-            // value={globalFilterValue1}
-            // onChange={onGlobalFilterChange1}
+            value={globalFilterValue1}
+            onChange={onGlobalFilterChange1}
             placeholder="Cari disini"
           />
         </span>
@@ -82,12 +158,12 @@ const MutasiAntarList = ({ onAdd }) => {
               type: SET_CURRENT_LM,
               payload: {
                 ...data,
-                product: [
+                mutasi: [
                   {
                     id: 0,
                     prod_id: null,
                     unit_id: null,
-                    order: null,
+                    qty: null,
                   },
                 ],
               },
@@ -95,6 +171,92 @@ const MutasiAntarList = ({ onAdd }) => {
           }}
         />
       </div>
+    );
+  };
+
+  const actionBodyTemplate = (data) => {
+    return (
+      // <React.Fragment>
+      <div className="d-flex">
+        <Link
+          onClick={() => {
+            onDetail();
+            let mutasi = data.mutasi;
+            dispatch({
+              type: SET_CURRENT_LM,
+              payload: {
+                ...data,
+                mutasi:
+                  mutasi.length > 0
+                    ? mutasi
+                    : [
+                        {
+                          id: 0,
+                          prod_id: null,
+                          unit_id: null,
+                          qty: null,
+                        },
+                      ],
+              },
+            });
+          }}
+          className="btn btn-info shadow btn-xs sharp ml-1"
+        >
+          <i className="bx bx-show mt-1"></i>
+        </Link>
+
+        <Link
+          onClick={() => {
+            onEdit(data);
+            let mutasi = data.mutasi;
+            dispatch({
+              type: SET_EDIT_LM,
+              payload: true,
+            });
+            mutasi.forEach((el) => {
+              el.prod_id = el.prod_id?.id;
+              el.unit_id = el.unit_id?.id;
+            });
+
+            dispatch({
+              type: SET_CURRENT_LM,
+              payload: {
+                ...data,
+                loc_from: data?.loc_from?.id ?? null,
+                loc_to: data?.loc_to?.id ?? null,
+                dep_id: data?.dep_id?.id ?? null,
+                prj_id: data?.prj_id?.id ?? null,
+                mutasi:
+                  mutasi.length > 0
+                    ? mutasi
+                    : [
+                        {
+                          id: 0,
+                          prod_id: null,
+                          unit_id: null,
+                          qty: null,
+                        },
+                      ],
+              },
+            });
+          }}
+          className="btn btn-primary shadow btn-xs sharp ml-1"
+        >
+          <i className="fa fa-pencil"></i>
+        </Link>
+
+        <Link
+          onClick={() => {
+            // setEdit(true);
+            setDisplayDel(true);
+            setCurrentItem(data);
+          }}
+          className="btn btn-danger shadow btn-xs sharp ml-1"
+        >
+          <i className="fa fa-trash"></i>
+        </Link>
+      </div>
+      // </React.Fragment>
     );
   };
 
@@ -144,64 +306,114 @@ const MutasiAntarList = ({ onAdd }) => {
     setRows2(event.rows);
   };
 
+  const onGlobalFilterChange1 = (e) => {
+    const value = e.target.value;
+    let _filters1 = { ...filters1 };
+    _filters1["global"].value = value;
+
+    setFilters1(_filters1);
+    setGlobalFilterValue1(value);
+  };
+
+  const initFilters1 = () => {
+    setFilters1({
+      global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    });
+  };
+
+  const formatDate = (date) => {
+    var d = new Date(`${date}Z`),
+      month = "" + (d.getMonth() + 1),
+      day = "" + d.getDate(),
+      year = d.getFullYear();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+
+    return [day, month, year].join("-");
+  };
+
   return (
     <>
-    <Toast ref={toast} />
+      <Toast ref={toast} />
       <Row>
         <Col className="pt-0">
-          <DataTable
-            responsiveLayout="scroll"
-            value={mutasi}
-            className="display w-150 datatable-wrapper"
-            showGridlines
-            dataKey="id"
-            rowHover
-            header={renderHeader}
-            filters={null}
-            globalFilterFields={["ref"]}
-            emptyMessage="Tidak ada data"
-            paginator
-            paginatorTemplate={template2}
-            first={first2}
-            rows={rows2}
-            onPage={onCustomPage2}
-            paginatorClassName="justify-content-end mt-3"
-          >
-            <Column
-              header="Tanggal"
-              style={{
-                minWidth: "8rem",
-              }}
-              field="date"
-              // body={loading && <Skeleton />}
-            />
-            <Column
-              header="Nomor Mutasi Persediaan"
-              field="ref"
-              style={{ minWidth: "8rem" }}
-              //  body={loading && <Skeleton />}
-            />
-            <Column
-              header="Mutasi Asal"
-              field="asal"
-              style={{ minWidth: "8rem" }}
-              // body={loading && <Skeleton />}
-            />
-            <Column
-              header="Mutasi Tujuan"
-              field="tjn"
-              style={{ minWidth: "8rem" }}
-              // body={loading && <Skeleton />}
-            />
-            <Column
-              header="Keterangan"
-              field="ket"
-              style={{ minWidth: "8rem" }}
-              // body={loading && <Skeleton />}
-            />
-          </DataTable>
+          <Card>
+            <Card.Body>
+              <DataTable
+                responsiveLayout="scroll"
+                value={loading ? dummy : mutasi}
+                className="display w-150 datatable-wrapper"
+                showGridlines
+                dataKey="id"
+                rowHover
+                header={renderHeader}
+                filters={null}
+                globalFilterFields={["mtsi_code"]}
+                emptyMessage="Tidak ada data"
+                paginator
+                paginatorTemplate={template2}
+                first={first2}
+                rows={rows2}
+                onPage={onCustomPage2}
+                paginatorClassName="justify-content-end mt-3"
+              >
+                <Column
+                  header="Tanggal"
+                  style={{
+                    minWidth: "8rem",
+                  }}
+                  field={(e) => formatDate(e.mtsi_date)}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Nomor Mutasi Persediaan"
+                  field={(e) => e.mtsi_code}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Mutasi Asal"
+                  field={(e) => (e.loc_from !== null ? e.loc_from.name : "-")}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Mutasi Tujuan"
+                  field={(e) => (e.loc_to !== null ? e.loc_to.name : "-")}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Action"
+                  dataType="boolean"
+                  bodyClassName="text-center"
+                  style={{ minWidth: "1rem" }}
+                  body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
+                />
+              </DataTable>
+            </Card.Body>
+          </Card>
         </Col>
       </Row>
+
+      <Dialog
+        header={"Hapus Data"}
+        visible={displayDel}
+        style={{ width: "30vw" }}
+        footer={renderFooterDel("displayDel")}
+        onHide={() => {
+          setDisplayDel(false);
+        }}
+      >
+        <div className="ml-3 mr-3">
+          <i
+            className="pi pi-exclamation-triangle mr-3 align-middle"
+            style={{ fontSize: "2rem" }}
+          />
+          <span>Apakah anda yakin ingin menghapus data ?</span>
+        </div>
+      </Dialog>
     </>
   );
 };

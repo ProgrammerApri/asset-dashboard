@@ -140,7 +140,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
     const config = {
       ...endpoints.editPHJ,
       endpoint: endpoints.editPHJ.endpoint + phj.id,
-      data: { ...phj, phj_date: currentDate(phj.phj_date) },
+      data: phj,
     };
     console.log(config.data);
     let response = null;
@@ -394,7 +394,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                 });
                 let newError = error;
                 newError.btc = false;
-                newError.prod[0].qty = false;
+                // newError.prod[0].qty = false;
                 setError(newError);
               }}
               label={"[bcode]"}

@@ -156,7 +156,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${pbb.bcode} Sudah Digunakan`,
+            detail: `Kode ${pbb.pbb_code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -197,16 +197,42 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
-  const onSubmit = () => {
-    // if (isValid()) {
-    if (isEdit) {
-      setUpdate(true);
-      editPBB();
-    } else {
-      setUpdate(true);
-      addPBB();
+  const isValid = () => {
+    let valid = false;
+    let active = 1;
+    let errors = {
+      code: !pbb.pbb_code || pbb.pbb_code === "",
+      date: !pbb.pbb_date || pbb.pbb_date === "",
+      btc: !pbb.batch_id,
+    };
+
+    valid = !errors.code && !errors.date && !errors.btc;
+
+    setError(errors);
+
+    if (!valid) {
+      window.scrollTo({
+        top: 180,
+        left: 0,
+        behavior: "smooth",
+      });
+
+      // setActive(active);
     }
-    // }
+
+    return valid;
+  };
+
+  const onSubmit = () => {
+    if (isValid()) {
+      if (isEdit) {
+        setUpdate(true);
+        editPBB();
+      } else {
+        setUpdate(true);
+        addPBB();
+      }
+    }
   };
 
   const formatDate = (date) => {
@@ -300,13 +326,14 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
               value={pbb.batch_id && checkbtc(pbb.dept_id)}
               option={batch}
               onChange={(e) => {
-                updatePBB({ ...pbb, batch_id: e.id, });
+                updatePBB({ ...pbb, batch_id: e.id });
                 let newError = error;
                 newError.code = false;
                 setError(newError);
               }}
               label={"[bcode]"}
               placeholder="Pilih Kode Batch"
+              errorMessage="Kode Batch Belum DIpilih"
               error={error?.btc}
             />
           </div>
@@ -440,7 +467,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                         <Link
                           onClick={() => {
                             let newError = error;
-                            newError.prod.push({
+                            newError.uph.push({
                               qty: false,
                               aloc: false,
                             });
@@ -485,7 +512,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
               <Card.Body>
                 <DataTable
                   responsiveLayout="none"
-                  value={"p".overhead?.map((v, i) => {
+                  value={pbb.overhead?.map((v, i) => {
                     return {
                       ...v,
                       index: i,
@@ -504,13 +531,13 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                       <CustomDropdown
                         value={e.acc_id && checkAcc(e.acc_id)}
                         option={acc}
-                        onChange={(p) => {
-                          let temp = [...p.overhead];
-                          temp[e.index].acc_id = p.account.id;
-                          updatePBB({ ...p, overhead: temp });
+                        onChange={(u) => {
+                          let temp = [...pbb.overhead];
+                          temp[e.index].acc_id = u.account.id;
+                          updatePBB({ ...pbb, overhead: temp });
 
                           // let newError = error;
-                          // newError.prod[e.index].id = false;
+                          // // newError.prod[e.index].id = false;
                           // setError(newError);
                         }}
                         detail
@@ -533,11 +560,11 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                     className="align-text-top"
                     field={""}
                     body={(e) =>
-                      e.index === pbb.overhead.length - 1 ? (
+                      e.index === pbb.upah.length - 1 ? (
                         <Link
                           onClick={() => {
                             let newError = error;
-                            newError.prod.push({
+                            newError.ovr.push({
                               qty: false,
                               aloc: false,
                             });
@@ -545,8 +572,8 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
 
                             updatePBB({
                               ...pbb,
-                              overhead: [
-                                ...pbb.overhead,
+                              upah: [
+                                ...pbb.upah,
                                 {
                                   id: 0,
                                   acc_id: null,
@@ -561,9 +588,9 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                       ) : (
                         <Link
                           onClick={() => {
-                            let temp = [...pbb.overhead];
+                            let temp = [...pbb.upah];
                             temp.splice(e.index, 1);
-                            updatePBB({ ...pbb, overhead: temp });
+                            updatePBB({ ...pbb, upah: temp });
                           }}
                           className="btn btn-danger shadow btn-xs sharp"
                         >

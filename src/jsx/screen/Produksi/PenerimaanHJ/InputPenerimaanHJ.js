@@ -24,6 +24,9 @@ const defError = {
   code: false,
   date: false,
   btc: false,
+  rej: [{
+    qty: false,
+  }]
 };
 
 const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {

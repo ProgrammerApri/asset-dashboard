@@ -532,7 +532,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                         value={e.acc_id && checkAcc(e.acc_id)}
                         option={acc}
                         onChange={(u) => {
-                          let temp = [...pbb.overhead];
+                          let temp = [...pbb.upah];
                           temp[e.index].acc_id = u.account.id;
                           updatePBB({ ...pbb, overhead: temp });
 
@@ -556,48 +556,48 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                   {/* <div className="col-"></div> */}
 
                   <Column
-                    header=""
-                    className="align-text-top"
-                    field={""}
-                    body={(e) =>
-                      e.index === pbb.upah.length - 1 ? (
-                        <Link
-                          onClick={() => {
-                            let newError = error;
-                            newError.ovr.push({
-                              qty: false,
-                              aloc: false,
-                            });
-                            setError(newError);
+                   header=""
+                   className="align-text-top"
+                   field={""}
+                   body={(e) =>
+                     e.index === pbb.upah.length - 1 ? (
+                       <Link
+                         onClick={() => {
+                           let newError = error;
+                           newError.ovr.push({
+                             qty: false,
+                             aloc: false,
+                           });
+                           setError(newError);
 
-                            updatePBB({
-                              ...pbb,
-                              upah: [
-                                ...pbb.upah,
-                                {
-                                  id: 0,
-                                  acc_id: null,
-                                },
-                              ],
-                            });
-                          }}
-                          className="btn btn-primary shadow btn-xs sharp"
-                        >
-                          <i className="fa fa-plus"></i>
-                        </Link>
-                      ) : (
-                        <Link
-                          onClick={() => {
-                            let temp = [...pbb.upah];
-                            temp.splice(e.index, 1);
-                            updatePBB({ ...pbb, upah: temp });
-                          }}
-                          className="btn btn-danger shadow btn-xs sharp"
-                        >
-                          <i className="fa fa-trash"></i>
-                        </Link>
-                      )
-                    }
+                           updatePBB({
+                             ...pbb,
+                             upah: [
+                               ...pbb.upah,
+                               {
+                                 id: 0,
+                                 acc_id: null,
+                               },
+                             ],
+                           });
+                         }}
+                         className="btn btn-primary shadow btn-xs sharp"
+                       >
+                         <i className="fa fa-plus"></i>
+                       </Link>
+                     ) : (
+                       <Link
+                         onClick={() => {
+                           let temp = [...pbb.upah];
+                           temp.splice(e.index, 1);
+                           updatePBB({ ...pbb, upah: temp });
+                         }}
+                         className="btn btn-danger shadow btn-xs sharp"
+                       >
+                         <i className="fa fa-trash"></i>
+                       </Link>
+                     )
+                   }
                   />
                 </DataTable>
               </Card.Body>

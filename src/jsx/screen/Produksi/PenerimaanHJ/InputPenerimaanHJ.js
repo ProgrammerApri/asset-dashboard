@@ -490,7 +490,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                     className="col-5 align-text"
                     field={""}
                     body={(e) => (
-                      <CustomDropdown
+                      <PrimeInput
                         value={e.prod_id && checkProd(e.prod_id)}
                         option={product}
                         onChange={(u) => {
@@ -517,7 +517,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                           setCurrentIndex(e.index);
                           setShowProd(true);
                         }}
-                        label={"[name]"}
+                        // label={"[name]"}
                         placeholder="Pilih Produk"
                         disabled
                       />
@@ -529,7 +529,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                     className="align-text-top"
                     field={""}
                     body={(e) => (
-                      <CustomDropdown
+                      <PrimeInput
                         value={e.unit_id && checkUnit(e.unit_id)}
                         onChange={(u) => {
                           let temp = [...phj.product];
@@ -542,7 +542,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                           setCurrentIndex(e.index);
                           setShowSatuan(true);
                         }}
-                        label={"[name]"}
+                        // label={"[name]"}
                         placeholder="Pilih Satuan"
                         disabled
                       />
@@ -593,7 +593,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                     className="col-5 align-text"
                     field={""}
                     body={(e) => (
-                      <CustomDropdown
+                      <PrimeInput
                         value={e.prod_id && checkProd(e.prod_id)}
                         option={product}
                         onChange={(u) => {
@@ -620,9 +620,10 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                           setCurrentIndex(e.index);
                           setShowProd(true);
                         }}
-                        label={"[name]"}
+                        // label={"[name]"}
                         placeholder="Pilih Produk"
                         errorMessage="Produk Belum Dipilih"
+                        disabled
                       />
                     )}
                   />
@@ -632,7 +633,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                     className="align-text-top"
                     field={""}
                     body={(e) => (
-                      <CustomDropdown
+                      <PrimeInput
                         value={e.unit_id && checkUnit(e.unit_id)}
                         onChange={(u) => {
                           let temp = [...phj.reject];
@@ -645,8 +646,9 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                           setCurrentIndex(e.index);
                           setShowSatuan(true);
                         }}
-                        label={"[name]"}
+                        // label={"[name]"}
                         placeholder="Pilih Satuan"
+                        disabled
                       />
                     )}
                   />
@@ -670,51 +672,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                     )}
                   />
 
-                  <Column
-                    header=""
-                    className=" align-text-top"
-                    field={""}
-                    body={(e) =>
-                      e.index === phj.reject.length - 1 ? (
-                        <Link
-                          onClick={() => {
-                            let newError = error;
-                            newError.rej.push({
-                              qty: false,
-                            });
-                            setError(newError);
-
-                            updatePHJ({
-                              ...phj,
-                              reject: [
-                                ...phj.reject,
-                                {
-                                  id: 0,
-                                  prod_id: null,
-                                  unit_id: null,
-                                  qty: null,
-                                },
-                              ],
-                            });
-                          }}
-                          className="btn btn-primary shadow btn-xs sharp"
-                        >
-                          <i className="fa fa-plus"></i>
-                        </Link>
-                      ) : (
-                        <Link
-                          onClick={() => {
-                            let temp = [...phj.reject];
-                            temp.splice(e.index, 1);
-                            updatePHJ({ ...phj, reject: temp });
-                          }}
-                          className="btn btn-danger shadow btn-xs sharp"
-                        >
-                          <i className="fa fa-trash"></i>
-                        </Link>
-                      )
-                    }
-                  />
+                
                 </DataTable>
               </Card.Body>
             </Card>

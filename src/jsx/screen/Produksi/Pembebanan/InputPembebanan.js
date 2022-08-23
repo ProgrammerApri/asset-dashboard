@@ -21,6 +21,7 @@ const defError = {
   code: false,
   name: false,
   btc: false,
+  account: false,
   uph: [
     {
       id: false,
@@ -204,9 +205,12 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
       code: !pbb.pbb_code || pbb.pbb_code === "",
       date: !pbb.pbb_date || pbb.pbb_date === "",
       btc: !pbb.batch_id,
+      acc: !pbb.acc_cred || pbb.acc_cred === "",
+      uph: !pbb.acc_id || pbb.acc_id === "",
+      ovr: !pbb.acc_id || pbb.acc_id === "",
     };
 
-    valid = !errors.code && !errors.date && !errors.btc;
+    valid = !errors.code && !errors.date && !errors.btc && !errors.account && !errors.uph && !errors.ovr;
 
     setError(errors);
 
@@ -387,7 +391,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
               label={"[account.acc_name] - [account.acc_code]"}
               placeholder="Pilih Akun Kredit"
               errorMessage="Akun Belum Dipilih"
-              error={error?.id}
+              error={error?.acc}
             />
           </div>
 
@@ -398,6 +402,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                 value={pbb.desc}
                 onChange={(e) => updatePBB({ ...pbb, desc: e.target.value })}
                 placeholder="Masukan Keterangan"
+                error={error?.desc}
               />
             </div>
           </div>
@@ -451,6 +456,8 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                         label={"[account.acc_name] - [account.acc_code]"}
                         placeholder="Pilih Akun Upah"
                         errorMessage="Akun Belum Dipilih"
+                        // errorMessage="Akun Belum Dipilih"
+                        error={error?.uph}
                         // error={error?.prod[e.index]?.id}
                       />
                     )}
@@ -532,7 +539,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                         value={e.acc_id && checkAcc(e.acc_id)}
                         option={acc}
                         onChange={(u) => {
-                          let temp = [...pbb.upah];
+                          let temp = [...pbb.overhead];
                           temp[e.index].acc_id = u.account.id;
                           updatePBB({ ...pbb, overhead: temp });
 
@@ -548,6 +555,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                         label={"[account.acc_name] - [account.acc_code]"}
                         placeholder="Pilih Akun Overhead"
                         errorMessage="Akun Belum Dipilih"
+                        error={error?.ovr}
                         // error={error?.prod[e.index]?.id}
                       />
                     )}
@@ -560,7 +568,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                    className="align-text-top"
                    field={""}
                    body={(e) =>
-                     e.index === pbb.upah.length - 1 ? (
+                     e.index === pbb.overhead.length - 1 ? (
                        <Link
                          onClick={() => {
                            let newError = error;
@@ -572,8 +580,8 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
 
                            updatePBB({
                              ...pbb,
-                             upah: [
-                               ...pbb.upah,
+                             overhead: [
+                               ...pbb.overhead,
                                {
                                  id: 0,
                                  acc_id: null,
@@ -588,9 +596,9 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                      ) : (
                        <Link
                          onClick={() => {
-                           let temp = [...pbb.upah];
+                           let temp = [...pbb.overhead];
                            temp.splice(e.index, 1);
-                           updatePBB({ ...pbb, upah: temp });
+                           updatePBB({ ...pbb, overhead: temp });
                          }}
                          className="btn btn-danger shadow btn-xs sharp"
                        >

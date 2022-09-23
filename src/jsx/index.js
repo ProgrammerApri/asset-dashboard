@@ -72,11 +72,14 @@ const Markup = ({ width }) => {
     { url: "login", component: Login },
 
     { url: "master", component: Master },
+    { url: "master/:active", component: Master },
     { url: "master-lainnya", component: MasterLainnya },
+    { url: "master-lainnya/:active", component: MasterLainnya },
     { url: "transaksi", component: Transaksi },
     { url: "bank-&-kas", component: BankKas },
     { url: "transaksi-persediaan", component: TransaksiPersediaan },
     { url: "laporan", component: LaporanPembelian },
+    { url: "laporan/:active", component: LaporanPembelian },
     { url: "jurnal", component: ReportJurnal },
     { url: "kartu-buku-besar", component: ReportKBB },
 
@@ -97,8 +100,6 @@ const Markup = ({ width }) => {
     { url: "syarat-pembayaran", component: RulesPay },
     { url: "divisi", component: Divisi },
     { url: "non-stok", component: PPN },
-    
-
 
     // { url: "sub-pelanggan", component: SubCustomer },
     { url: "setup-perkiraan", component: SetupKhusus },
@@ -106,8 +107,8 @@ const Markup = ({ width }) => {
     { url: "group-produk", component: GroupProduk },
     { url: "pajak", component: Pajak },
     { url: "jasa", component: Jasa },
-    
-    { url: "data-mesin", component:DataMesin },
+
+    { url: "data-mesin", component: DataMesin },
     // Report
     { url: "neraca", component: Neraca },
     { url: "report", component: ReportGRA },

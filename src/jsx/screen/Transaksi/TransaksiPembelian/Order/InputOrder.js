@@ -1013,7 +1013,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                             }
                           }
                         });
-                        setSatuan(sat);
+                        // setSatuan(sat);
 
                         let temp = [...order.dprod];
                         temp[e.index].prod_id = u.id;
@@ -1972,7 +1972,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                 }
               }
             });
-            setSatuan(sat);
+            // setSatuan(sat);
 
             let temp = [...order.dprod];
             temp[currentIndex].prod_id = e.data.id;

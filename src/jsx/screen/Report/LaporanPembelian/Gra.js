@@ -39,14 +39,21 @@ const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 const ReportGRA = () => {
   const [gra, setGra] = useState(null);
   const [produk, setProduk] = useState(null);
+  const [supplier, setSupplier] = useState(null);
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const printPage = useRef(null);
   const [filtersDate, setFiltersDate] = useState([new Date(), new Date()]);
   const [cp, setCp] = useState("");
+  const [selectedSup, setSelected] = useState(null);
+  const chunkSize = 4;
 
   useEffect(() => {
-    initFilters1();
+    var d = new Date();
+    d.setDate(d.getDate() - 30);
+    setFiltersDate([d, new Date()]);
+
+    // initFilters1();
     getOrd();
   }, []);
 
@@ -63,26 +70,30 @@ const ReportGRA = () => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        let gra = [];
-        data.forEach((element) => {
-          element.dprod.forEach((el) => {
-            gra.push({
-              kd_gra: element.ord_code,
-              tgl_gra: element.ord_date,
-              no_po: element.po_id.po_code,
-              kd_sup: element.sup_id.sup_code,
-              nm_sup: element.sup_id.sup_name,
-              prod_kd: el.prod_id.code,
-              prod_nm: el.prod_id.name,
-              sat: el.unit_id.code,
-              ord: el.order,
-              prc: el.price,
-              total: el.total,
-            });
-          });
-        });
-        setGra(gra);
-        // setSupplier(sup);
+        // let gra = [];
+        // data.forEach((element) => {
+        //   element.dprod.forEach((el) => {
+        //     gra.push({
+        //       kd_gra: element.ord_code,
+        //       tgl_gra: element.ord_date,
+        //       no_po: element.po_id.po_code,
+        //       kd_sup: element.sup_id.sup_code,
+        //       nm_sup: element.sup_id.sup_name,
+        //       prod_kd: el.prod_id.code,
+        //       prod_nm: el.prod_id.name,
+        //       sat: el.unit_id.code,
+        //       ord: el.order,
+        //       prc: el.price,
+        //       total: el.total,
+        //     });
+        //   });
+        // });
+        setGra(data);
+        let grouped = data?.filter(
+          (el, i) =>
+            i === data.findIndex((ek) => el?.sup_id?.id === ek?.sup_id?.id)
+        );
+        setSupplier(grouped);
       }
     } catch (error) {}
     if (isUpdate) {
@@ -158,58 +169,144 @@ const ReportGRA = () => {
 
   const jsonForExcel = (gra, excel = false) => {
     let data = [];
+    // let grouped = gra?.filter(
+    //   (el, i) => i === gra.findIndex((ek) => el?.kd_gra === ek?.kd_gra)
+    // );
+    // let new_gra = [];
+    // grouped?.forEach((el) => {
+    //       let trx = [];
+    //       gra?.forEach((ek) => {
+    //         if (el.kd_gra === ek.kd_gra) {
+    //           trx.push(ek);
+    //         }
+    //       });
+    //       new_gra.push({
+    //         kd_gra: el.kd_gra,
+    //         tgl_gra: formatDate(el.tgl_gra),
+    //         trx: trx,
+    //       });
+    //     }
+    //   }
+    // });
+    if (selectedSup) {
+      gra?.forEach((el) => {
+        let tgl_gra = new Date(`${el?.ord_date}Z`);
+        if (tgl_gra >= filtersDate[0] && tgl_gra <= filtersDate[1]) {
+          if (selectedSup?.sup_id?.id === el.sup_id?.id) {
+            let val = [
+              {
+                ref: `No. Trans : ${el.ord_code}`,
+                type: "header",
+                // style: { font: { sz: "14", bold: true } },
+                value: {
+                  date: "Date",
+                  po: "PO Code",
+                  sup: "Supplier",
+                  prod: "Product Name",
+                  ord: "Quantity",
+                  unit: "Unit",
+                  prc: "Price",
+                  tot: "Total",
+                },
+              },
+            ];
 
-    gra?.forEach((el) => {
-      let dt = new Date(`${el?.tgl_gra}Z`);
-      if (dt >= filtersDate[0] && dt <= filtersDate[1]) {
-        let val = [
-          {
-            ref: el.kd_gra,
-            type: "header",
-            style: { font: { sz: "14", bold: true } },
-            value: {
-              date: "Date",
-              po: "Code",
-              sup: "Supplier",
-              prod: "Product Name",
-              ord: "Quantity",
-              unit: "Unit",
-              prc: "Price",
-              tot: "Total",
+            let total = 0;
+            el.dprod?.forEach((ek) => {
+              val.push({
+                // ref: el.kd_gra,
+                type: "item",
+                value: {
+                  date: formatDate(el.ord_date),
+                  po: el.po_id.po_code,
+                  sup: `${el.sup_id.sup_name} (${el.sup_id.sup_name})`,
+                  prod: `${ek.prod_id.name} (${ek.prod_id.code})`,
+                  ord: ek.order,
+                  unit: ek.unit_id.name,
+                  prc: `Rp. ${formatIdr(ek.price)}`,
+                  tot: `Rp. ${formatIdr(ek.total)}`,
+                },
+              });
+              total += ek.total;
+            });
+
+            val.push({
+              // ref: el.kd_gra,
+              type: "footer",
+              value: {
+                date: "Total",
+                po: "",
+                sup: "",
+                prod: "",
+                ord: "",
+                unit: "",
+                prc: "",
+                tot: `Rp. ${formatIdr(total)}`,
+              },
+            });
+            data.push(val);
+          }
+        }
+      });
+    } else {
+      gra?.forEach((el) => {
+        let tgl_gra = new Date(`${el?.ord_date}Z`);
+        if (tgl_gra >= filtersDate[0] && tgl_gra <= filtersDate[1]) {
+          let val = [
+            {
+              ref: `No. Trans : ${el.ord_code}`,
+              type: "header",
+              // style: { font: { sz: "14", bold: true } },
+              value: {
+                date: "Date",
+                po: "PO Code",
+                sup: "Supplier",
+                prod: "Product Name",
+                ord: "Quantity",
+                unit: "Unit",
+                prc: "Price",
+                tot: "Total",
+              },
             },
-          },
-        ];
-        val.push({
-          ref: el.kd_gra,
-          type: "item",
-          value: {
-            date: formatDate(el.tgl_gra),
-            po: el.no_po,
-            sup: `${el.nm_sup} (${el.kd_sup})`,
-            prod: `${el.prod_nm} (${el.prod_kd})`,
-            ord: el.ord,
-            unit: el.sat,
-            prc: `Rp. ${formatIdr(el.prc)}`,
-            tot: `Rp. ${formatIdr(el.total)}`,
-          },
-        });
-        val.push({
-          ref: el.kd_gra,
-          type: "footer",
-          value: {
-            date: "Total",
-            po: "",
-            sup: "",
-            prod: "",
-            ord: "",
-            unit: "",
-            prc: "",
-            tot: `Rp. ${formatIdr(el.total)}`,
-          },
-        });
-        data.push(val);
-      }
-    });
+          ];
+
+          let total = 0;
+          el.dprod?.forEach((ek) => {
+            val.push({
+              // ref: el.kd_gra,
+              type: "item",
+              value: {
+                date: formatDate(el.ord_date),
+                po: el.po_id.po_code,
+                sup: `${el.sup_id.sup_name} (${el.sup_id.sup_name})`,
+                prod: `${ek.prod_id.name} (${ek.prod_id.code})`,
+                ord: ek.order,
+                unit: ek.unit_id.name,
+                prc: `Rp. ${formatIdr(ek.price)}`,
+                tot: `Rp. ${formatIdr(ek.total)}`,
+              },
+            });
+            total += ek.total;
+          });
+
+          val.push({
+            // ref: el.kd_gra,
+            type: "footer",
+            value: {
+              date: "Total",
+              po: "",
+              sup: "",
+              prod: "",
+              ord: "",
+              unit: "",
+              prc: "",
+              tot: `Rp. ${formatIdr(total)}`,
+            },
+          });
+          data.push(val);
+        }
+      });
+    }
 
     let final = [
       {
@@ -516,22 +613,40 @@ const ReportGRA = () => {
   const renderHeader = () => {
     return (
       <div className="flex justify-content-between">
-        <div className="col-3 ml-0 mr-0 pl-0">
-          <div className="p-inputgroup">
-            <span className="p-inputgroup-addon">
-              <i className="pi pi-calendar" />
-            </span>
-            <Calendar
-              value={filtersDate}
-              onChange={(e) => {
-                console.log(e.value);
-                setFiltersDate(e.value);
-              }}
-              selectionMode="range"
-              placeholder="Pilih Tanggal"
-              dateFormat="dd-mm-yy"
-            />
-          </div>
+        <div className="col-8 ml-0 mr-0 pl-0">
+          <Row className="m-0">
+            <div className="col-3 mr-3 p-0">
+              <div className="p-inputgroup">
+                <span className="p-inputgroup-addon">
+                  <i className="pi pi-calendar" />
+                </span>
+                <Calendar
+                  value={filtersDate}
+                  onChange={(e) => {
+                    setFiltersDate(e.value);
+                  }}
+                  selectionMode="range"
+                  placeholder="Pilih Tanggal"
+                  dateFormat="dd-mm-yy"
+                  readOnlyInput
+                />
+              </div>
+            </div>
+            <div className="">
+              <Dropdown
+                value={selectedSup ?? null}
+                options={supplier}
+                onChange={(e) => {
+                  setSelected(e.value);
+                }}
+                placeholder="Pilih Supplier"
+                optionLabel="sup_id.sup_name"
+                filter
+                filterBy="sup_id.sup_name"
+                showClear
+              />
+            </div>
+          </Row>
         </div>
         <div style={{ height: "1rem" }}></div>
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
@@ -585,303 +700,184 @@ const ReportGRA = () => {
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
 
+  const chunk = (arr, size) =>
+    arr.reduce(
+      (acc, e, i) => (
+        i % size ? acc[acc.length - 1].push(e) : acc.push([e]), acc
+      ),
+      []
+    );
+
   return (
     <>
       {/* <Toast ref={toast} /> */}
       <Row>
         <Col>
           <Card>
-            <Card.Body>
-              {renderHeader()}
-              {jsonForExcel(gra, false)?.map((v) => {
-                return (
-                  <DataTable
-                    responsiveLayout="scroll"
-                    value={v}
-                    showGridlines
-                    dataKey="id"
-                    rowHover
-                    emptyMessage="Data Tidak Ditemukan"
-                    className="mt-4"
-                  >
-                    <Column
-                      className="header-center"
-                      header={(e) =>
-                        e.props.value ? e.props?.value[0]?.ref : null
-                      }
-                      style={{ width: "15rem" }}
-                      body={(e) => (
-                        <div
-                          className={
-                            e.type === "header" || e.type === "footer"
-                              ? "font-weight-bold"
-                              : ""
-                          }
-                        >
-                          {e.value.date}
-                        </div>
-                      )}
-                    />
-                    <Column
-                      className="header-center"
-                      header=""
-                      style={{ minWidht: "10rem" }}
-                      body={(e) => (
-                        <div
-                          className={e.type === "header" && "font-weight-bold"}
-                        >
-                          {e.value.po}
-                        </div>
-                      )}
-                    />
-                    <Column
-                      className="header-center"
-                      header=""
-                      style={{ minWidht: "10rem" }}
-                      body={(e) => (
-                        <div
-                          className={e.type === "header" && "font-weight-bold"}
-                        >
-                          {e.value.sup}
-                        </div>
-                      )}
-                    />
-                    <Column
-                      className="header-center"
-                      header=""
-                      style={{ minWidht: "10rem" }}
-                      body={(e) => (
-                        <div
-                          className={e.type === "header" && "font-weight-bold"}
-                        >
-                          {e.value.prod}
-                        </div>
-                      )}
-                    />
-                    <Column
-                      className="header-center"
-                      header=""
-                      style={{ minWidht: "10rem" }}
-                      body={(e) => (
-                        <div
-                          className={e.type === "header" && "font-weight-bold"}
-                        >
-                          {e.value.ord}
-                        </div>
-                      )}
-                    />
-                    <Column
-                      className="header-center"
-                      header=""
-                      style={{ minWidht: "10rem" }}
-                      body={(e) => (
-                        <div
-                          className={e.type === "header" && "font-weight-bold"}
-                        >
-                          {e.value.unit}
-                        </div>
-                      )}
-                    />
-                    <Column
-                      className="header-center"
-                      header=""
-                      style={{ minWidht: "10rem" }}
-                      body={(e) => (
-                        <div
-                          className={
-                            e.type === "header"
-                              ? "font-weight-bold text-right"
-                              : e.type === "footer"
-                              ? "font-weight-bold text-right"
-                              : "text-right"
-                          }
-                        >
-                          {e.value.prc}
-                        </div>
-                      )}
-                    />
-                    <Column
-                      className="header-center"
-                      header=""
-                      style={{ minWidht: "10rem" }}
-                      body={(e) => (
-                        <div
-                          className={
-                            e.type === "header"
-                              ? "font-weight-bold text-right"
-                              : e.type === "footer"
-                              ? "font-weight-bold text-right"
-                              : "text-right"
-                          }
-                        >
-                          {e.value.tot}
-                        </div>
-                      )}
-                    />
-                  </DataTable>
-                );
-              })}
-            </Card.Body>
+            <Card.Body>{renderHeader()}</Card.Body>
           </Card>
         </Col>
       </Row>
 
-      <Row className="m-0 justify-content-center d-none">
-        <Card className="ml-1 mr-1 mt-2">
-          <Card.Body className="p-0" ref={printPage}>
-            <CustomeWrapper
-              tittle={"Purchase Report"}
-              subTittle={`Purchase Report for Period ${formatDate(
-                filtersDate[0]
-              )} to ${formatDate(filtersDate[1])}`}
-              onComplete={(cp) => {
-                setCp(cp);
-              }}
-              body={
-                <>
-                  {jsonForExcel(gra, false)?.map((v) => {
-                    return (
-                      <DataTable
-                        responsiveLayout="scroll"
-                        value={v}
-                        showGridlines
-                        dataKey="id"
-                        rowHover
-                        emptyMessage="Data Tidak Ditemukan"
-                        className="mt-4"
-                      >
-                        <Column
-                          className="header-center"
-                          header={(e) =>
-                            e.props.value ? e.props?.value[0]?.ref : null
-                          }
-                          style={{ width: "10rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header" || e.type === "footer"
-                                  ? "font-weight-bold"
-                                  : ""
+      <Row className="m-0 justify-content-center" ref={printPage}>
+        {chunk(jsonForExcel(gra) ?? [], chunkSize)?.map((val, idx) => {
+          return (
+            <Card className="ml-1 mr-1 mt-2">
+              <Card.Body className="p-0 m-0">
+                <CustomeWrapper
+                  tittle={"Purchase Report"}
+                  subTittle={`Purchase Report From ${formatDate(
+                    filtersDate[0]
+                  )} To ${formatDate(filtersDate[1])}`}
+                  onComplete={(cp) => setCp(cp)}
+                  page={idx + 1}
+                  body={
+                    <>
+                      {val.map((v) => {
+                        return (
+                          <DataTable
+                            responsiveLayout="scroll"
+                            value={v}
+                            showGridlines
+                            dataKey="id"
+                            rowHover
+                            emptyMessage="Tidak Ada Transaksi"
+                            className="mt-4"
+                          >
+                            <Column
+                              className="header-center"
+                              header={(e) =>
+                                e.props.value ? e.props?.value[0]?.ref : null
                               }
-                            >
-                              {e.value.date}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center"
-                          header=""
-                          style={{ width: "10rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header" && "font-weight-bold"
-                              }
-                            >
-                              {e.value.po}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center"
-                          header=""
-                          style={{ minWidht: "10rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header" && "font-weight-bold"
-                              }
-                            >
-                              {e.value.sup}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center"
-                          header=""
-                          style={{ width: "10rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header" && "font-weight-bold"
-                              }
-                            >
-                              {e.value.prod}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center"
-                          header=""
-                          style={{ maxWidth: "10rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header" && "font-weight-bold"
-                              }
-                            >
-                              {e.value.ord}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center"
-                          header=""
-                          style={{ minWidht: "10rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header" && "font-weight-bold"
-                              }
-                            >
-                              {e.value.unit}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center"
-                          header=""
-                          style={{ minWidht: "10rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header"
-                                  ? "font-weight-bold text-right"
-                                  : e.type === "footer"
-                                  ? "font-weight-bold text-right"
-                                  : "text-right"
-                              }
-                            >
-                              {e.value.prc}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center"
-                          header=""
-                          style={{ minWidht: "10rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header"
-                                  ? "font-weight-bold text-right"
-                                  : e.type === "footer"
-                                  ? "font-weight-bold text-right"
-                                  : "text-right"
-                              }
-                            >
-                              {e.value.tot}
-                            </div>
-                          )}
-                        />
-                      </DataTable>
-                    );
-                  })}
-                </>
-              }
-            />
-          </Card.Body>
-        </Card>
+                              style={{ width: "11rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header" || e.type === "footer"
+                                      ? "font-weight-bold"
+                                      : ""
+                                  }
+                                >
+                                  {e.value.date}
+                                </div>
+                              )}
+                            />
+                            <Column
+                              className="header-center"
+                              header=""
+                              style={{ minWidht: "10rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header" && "font-weight-bold"
+                                  }
+                                >
+                                  {e.value.po}
+                                </div>
+                              )}
+                            />
+                            <Column
+                              className="header-center"
+                              header=""
+                              style={{ minWidht: "10rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header" && "font-weight-bold"
+                                  }
+                                >
+                                  {e.value.sup}
+                                </div>
+                              )}
+                            />
+                            <Column
+                              className="header-center"
+                              header=""
+                              style={{ minWidht: "10rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header" && "font-weight-bold"
+                                  }
+                                >
+                                  {e.value.prod}
+                                </div>
+                              )}
+                            />
+                            <Column
+                              className="header-center"
+                              header=""
+                              style={{ minWidht: "10rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header" && "font-weight-bold"
+                                  }
+                                >
+                                  {e.value.ord}
+                                </div>
+                              )}
+                            />
+                            <Column
+                              className="header-center"
+                              header=""
+                              style={{ minWidht: "10rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header" && "font-weight-bold"
+                                  }
+                                >
+                                  {e.value.unit}
+                                </div>
+                              )}
+                            />
+                            <Column
+                              className="header-center"
+                              header=""
+                              style={{ minWidht: "10rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header"
+                                      ? "font-weight-bold text-right"
+                                      : e.type === "footer"
+                                      ? "font-weight-bold text-right"
+                                      : "text-right"
+                                  }
+                                >
+                                  {e.value.prc}
+                                </div>
+                              )}
+                            />
+                            <Column
+                              className="header-center"
+                              header=""
+                              style={{ minWidht: "10rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header"
+                                      ? "font-weight-bold text-right"
+                                      : e.type === "footer"
+                                      ? "font-weight-bold text-right"
+                                      : "text-right"
+                                  }
+                                >
+                                  {e.value.tot}
+                                </div>
+                              )}
+                            />
+                          </DataTable>
+                        );
+                      })}
+                    </>
+                  }
+                />
+              </Card.Body>
+            </Card>
+          );
+        })}
       </Row>
     </>
   );

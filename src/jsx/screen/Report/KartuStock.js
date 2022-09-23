@@ -52,7 +52,7 @@ const KartuStock = () => {
 
   useEffect(() => {
     var d = new Date();
-    d.setDate(d.getDate() - 7);
+    d.setDate(d.getDate() - 30);
     setFiltersDate([d, new Date()]);
     getSt();
   }, []);
@@ -86,23 +86,30 @@ const KartuStock = () => {
 
   const jsonForExcel = (stCard, excel = false) => {
     let data = [];
-    if (selectedProduct && selectedLoc && filtersDate[0] && filtersDate[1]) {
+    if (selectedProduct && selectedLoc) {
       let saldo = 0;
-      data.push({
-        type: "item",
-        value: {
-          trx_code: "Saldo Awal",
-          trx_date: "-",
-          product: `${selectedProduct?.prod_id?.name} (${selectedProduct?.prod_id?.code})`,
-          trx_type: "-",
-          trx_debit: "-",
-          trx_kredit: "-",
-          sld: 0,
+
+      let trn = [
+        {
+          type: "header",
+          value: {
+            trx_code: "Kode Trans",
+            trx_date: "Tanggal",
+            trx_type: "Jenis Trans",
+            lok: "Lokasi",
+            trx_debit: "Debet",
+            trx_kredit: "Kredit",
+            sld: "Saldo",
+          },
         },
-      });
+      ];
+
+      let t_deb = 0;
+      let t_kre = 0;
+
       stCard?.forEach((el) => {
-        if (selectedProduct.prod_id.id === el.prod_id.id) {
-          if (selectedLoc.loc_id.id === el.loc_id.id) {
+        if (selectedProduct?.prod_id?.id === el?.prod_id?.id) {
+          if (selectedLoc?.loc_id?.id === el?.loc_id?.id) {
             let dt = new Date(`${el?.trx_date}Z`);
             if (dt >= filtersDate[0] && dt <= filtersDate[1]) {
               if (el.trx_dbcr === "d") {
@@ -110,81 +117,136 @@ const KartuStock = () => {
               } else {
                 saldo -= el.trx_qty;
               }
-              data.push({
+              trn.push({
                 type: "item",
                 value: {
                   trx_code: el.trx_code,
                   trx_date: formatDate(el.trx_date),
-                  product: `${el.prod_id?.name} (${el.prod_id?.code})`,
                   trx_type: el.trx_type,
+                  lok: `${el.loc_id?.name}`,
                   trx_debit: el.trx_dbcr === "d" ? el.trx_qty : 0,
                   trx_kredit: el.trx_dbcr === "k" ? el.trx_qty : 0,
                   sld: saldo,
                 },
               });
+
+              t_deb += el.trx_dbcr === "d" ? el.trx_qty : 0;
+              t_kre += el.trx_dbcr === "k" ? el.trx_qty : 0;
             }
           }
         }
       });
+
+      trn.push({
+        type: "footer",
+        value: {
+          trx_code: "Total",
+          trx_date: "",
+          trx_type: "",
+          lok: "",
+          trx_debit: t_deb,
+          trx_kredit: t_kre,
+          sld: "",
+        },
+      });
+
+      data = {
+        header: [
+          {
+            prod:
+              selectedProduct === null
+                ? "-"
+                : `${selectedProduct?.prod_id?.code} (${selectedProduct?.prod_id?.name})`,
+            // lok:
+            //   selectedProduct === null ? "-" : `${selectedLoc?.loc_id?.name}`,
+            sld: selectedProduct === null ? "-" : `${t_deb - t_kre}`,
+          },
+        ],
+
+        trn: trn,
+      };
+    } else {
+      let saldo = 0;
+
+      let trn = [
+        {
+          type: "header",
+          value: {
+            trx_code: "Kode Trans",
+            trx_date: "Tanggal",
+            trx_type: "Jenis Trans",
+            lok: "Location",
+            trx_debit: "Debet",
+            trx_kredit: "Kredit",
+            sld: "Saldo",
+          },
+        },
+      ];
+
+      let t_deb = 0;
+      let t_kre = 0;
+
+      stCard?.forEach((el) => {
+        if (selectedProduct?.prod_id?.id === el?.prod_id?.id) {
+          // if (selectedLoc?.loc_id?.id === el?.loc_id?.id) {
+          let dt = new Date(`${el?.trx_date}Z`);
+          if (dt >= filtersDate[0] && dt <= filtersDate[1]) {
+            if (el.trx_dbcr === "d") {
+              saldo += el.trx_qty;
+            } else {
+              saldo -= el.trx_qty;
+            }
+            trn.push({
+              type: "item",
+              value: {
+                trx_code: el.trx_code,
+                trx_date: formatDate(el.trx_date),
+                trx_type: el.trx_type,
+                lok: `${el.loc_id?.name}`,
+                trx_debit: el.trx_dbcr === "d" ? el.trx_qty : 0,
+                trx_kredit: el.trx_dbcr === "k" ? el.trx_qty : 0,
+                sld: saldo,
+              },
+            });
+
+            t_deb += el.trx_dbcr === "d" ? el.trx_qty : 0;
+            t_kre += el.trx_dbcr === "k" ? el.trx_qty : 0;
+          }
+          // }
+        }
+      });
+
+      trn.push({
+        type: "footer",
+        value: {
+          trx_code: "Total",
+          trx_date: "",
+          trx_type: "",
+          lok: "",
+          trx_debit: t_deb,
+          trx_kredit: t_kre,
+          sld: "",
+        },
+      });
+
+      data = {
+        header: [
+          {
+            prod:
+              selectedProduct === null
+                ? "-"
+                : `${selectedProduct?.prod_id?.code} (${selectedProduct?.prod_id?.name})`,
+            // lok:
+            //   selectedProduct === null ? "-" : `${selectedLoc?.loc_id?.name}`,
+            sld: selectedProduct === null ? "-" : `${t_deb - t_kre}`,
+          },
+        ],
+
+        trn: trn,
+      };
     }
 
     let item = [];
-
-    data.forEach((el) => {
-      item.push([
-        {
-          value: el.value.trx_code,
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "left", vertical: "center" },
-          },
-        },
-        {
-          value: el.value.trx_date,
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "left", vertical: "center" },
-          },
-        },
-        {
-          value: el.value.product,
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "left", vertical: "center" },
-          },
-        },
-        {
-          value: el.value.trx_type,
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "center", vertical: "center" },
-          },
-        },
-        {
-          value: el.value.trx_debit,
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "right", vertical: "center" },
-          },
-        },
-        {
-          value: el.value.trx_kredit,
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "right", vertical: "center" },
-          },
-        },
-        {
-          value: el.value.sld,
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "right", vertical: "center" },
-          },
-        },
-      ]);
-    });
-
-    console.log(item);
 
     let final = [
       {
@@ -227,14 +289,254 @@ const KartuStock = () => {
       },
     ];
 
+    data?.header?.forEach((el) => {
+      item.push([
+        {
+          value: `${el.prod}`,
+          style: {
+            font: {
+              sz: "14",
+              bold: false,
+            },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: `${el.lok}`,
+          style: {
+            font: {
+              sz: "14",
+              bold: false,
+            },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: {
+              sz: "14",
+              bold: false,
+            },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: {
+              sz: "14",
+              bold: false,
+            },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: {
+              sz: "14",
+              bold: false,
+            },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: `${el.sld}`,
+          style: {
+            font: {
+              sz: "14",
+              bold: false,
+            },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+      ]);
+    });
+
+    item.push([
+      {
+        value: "",
+        style: {
+          font: { sz: "14", bold: true },
+          alignment: { horizontal: "left", vertical: "center" },
+        },
+      },
+    ]);
+
+    item.push([
+      {
+        value: "Detail Transaksi",
+        style: {
+          height: { wch: 18 },
+          font: { sz: "14", bold: true },
+          alignment: { horizontal: "left", vertical: "center" },
+          fill: {
+            paternType: "solid",
+            fgColor: { rgb: "F3F3F3" },
+          },
+        },
+      },
+      {
+        value: "",
+        style: {
+          height: { wch: 18 },
+          font: { sz: "14", bold: true },
+          alignment: { horizontal: "left", vertical: "center" },
+          fill: {
+            paternType: "solid",
+            fgColor: { rgb: "F3F3F3" },
+          },
+        },
+      },
+      {
+        value: "",
+        style: {
+          height: { wch: 18 },
+          font: { sz: "14", bold: true },
+          alignment: { horizontal: "left", vertical: "center" },
+          fill: {
+            paternType: "solid",
+            fgColor: { rgb: "F3F3F3" },
+          },
+        },
+      },
+      {
+        value: "",
+        style: {
+          height: { wch: 18 },
+          font: { sz: "14", bold: true },
+          alignment: { horizontal: "left", vertical: "center" },
+          fill: {
+            paternType: "solid",
+            fgColor: { rgb: "F3F3F3" },
+          },
+        },
+      },
+      {
+        value: "",
+        style: {
+          height: { wch: 18 },
+          font: { sz: "14", bold: true },
+          alignment: { horizontal: "left", vertical: "center" },
+          fill: {
+            paternType: "solid",
+            fgColor: { rgb: "F3F3F3" },
+          },
+        },
+      },
+      {
+        value: "",
+        style: {
+          height: { wch: 18 },
+          font: { sz: "14", bold: true },
+          alignment: { horizontal: "left", vertical: "center" },
+          fill: {
+            paternType: "solid",
+            fgColor: { rgb: "F3F3F3" },
+          },
+        },
+      },
+    ]);
+
+    data?.trn?.forEach((ek) => {
+      item.push([
+        {
+          value: `${ek.value.trx_code}`,
+          style: {
+            font: {
+              sz: "14",
+              bold: ek.type === "header" || ek.type === "footer",
+            },
+
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: `${ek.value.trx_date}`,
+          style: {
+            font: {
+              sz: "14",
+              bold: ek.type === "header" || ek.type === "footer",
+            },
+            alignment: { horizontal: "center", vertical: "center" },
+          },
+        },
+        {
+          value: `${ek.value.trx_type}`,
+          style: {
+            font: {
+              sz: "14",
+              bold: ek.type === "header" || ek.type === "footer",
+            },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: `${ek.value.trx_debit}`,
+          style: {
+            font: {
+              sz: "14",
+              bold: ek.type === "header" || ek.type === "footer",
+            },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: `${ek.value.trx_kredit}`,
+          style: {
+            font: {
+              sz: "14",
+              bold: ek.type === "header" || ek.type === "footer",
+            },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: `${ek.value.sld}`,
+          style: {
+            font: {
+              sz: "14",
+              bold: ek.type === "header" || ek.type === "footer",
+            },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+      ]);
+    });
+
     final.push({
       columns: [
         {
-          title: "Kode Transaksi",
+          title: "Produk",
+          width: { wch: 40 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "left", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          title: "Lokasi",
+          width: { wch: 15 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "center", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          title: "",
           width: { wch: 20 },
           style: {
             font: { sz: "14", bold: true },
-            alignment: { horizontal: "center", vertical: "center" },
+            alignment: { horizontal: "right", vertical: "center" },
             fill: {
               paternType: "solid",
               fgColor: { rgb: "F3F3F3" },
@@ -242,11 +544,11 @@ const KartuStock = () => {
           },
         },
         {
-          title: "Tanggal Transaksi",
+          title: "",
           width: { wch: 20 },
           style: {
             font: { sz: "14", bold: true },
-            alignment: { horizontal: "center", vertical: "center" },
+            alignment: { horizontal: "right", vertical: "center" },
             fill: {
               paternType: "solid",
               fgColor: { rgb: "F3F3F3" },
@@ -254,47 +556,11 @@ const KartuStock = () => {
           },
         },
         {
-          title: "Kode Produk",
-          width: { wch: 50 },
+          title: "",
+          width: { wch: 20 },
           style: {
             font: { sz: "14", bold: true },
-            alignment: { horizontal: "center", vertical: "center" },
-            fill: {
-              paternType: "solid",
-              fgColor: { rgb: "F3F3F3" },
-            },
-          },
-        },
-        {
-          title: "Jenis Transaksi",
-          width: { wch: 13 },
-          style: {
-            font: { sz: "14", bold: true },
-            alignment: { horizontal: "center", vertical: "center" },
-            fill: {
-              paternType: "solid",
-              fgColor: { rgb: "F3F3F3" },
-            },
-          },
-        },
-        {
-          title: "Debit",
-          width: { wch: 13 },
-          style: {
-            font: { sz: "14", bold: true },
-            alignment: { horizontal: "center", vertical: "center" },
-            fill: {
-              paternType: "solid",
-              fgColor: { rgb: "F3F3F3" },
-            },
-          },
-        },
-        {
-          title: "Kredit",
-          width: { wch: 13 },
-          style: {
-            font: { sz: "14", bold: true },
-            alignment: { horizontal: "center", vertical: "center" },
+            alignment: { horizontal: "right", vertical: "center" },
             fill: {
               paternType: "solid",
               fgColor: { rgb: "F3F3F3" },
@@ -303,10 +569,10 @@ const KartuStock = () => {
         },
         {
           title: "Saldo",
-          width: { wch: 13 },
+          width: { wch: 45 },
           style: {
             font: { sz: "14", bold: true },
-            alignment: { horizontal: "center", vertical: "center" },
+            alignment: { horizontal: "right", vertical: "center" },
             fill: {
               paternType: "solid",
               fgColor: { rgb: "F3F3F3" },
@@ -447,118 +713,205 @@ const KartuStock = () => {
       </Row>
 
       <Row className="m-0 justify-content-center" ref={printPage}>
-        {chunk(jsonForExcel(stCard) ?? [], chunkSize)?.map((val, idx) => {
-          return (
-            <Card className="ml-1 mr-1 mt-2">
-              <Card.Body className="p-0">
-                <CustomeWrapper
-                  tittle={"Stock Card Report"}
-                  subTittle={`Stock Card Report for Period ${formatDate(
-                    filtersDate[0]
-                  )} to ${formatDate(filtersDate[1])}`}
-                  onComplete={(cp) => setCp(cp)}
-                  page={idx + 1}
-                  body={
-                    <>
-                      <DataTable
-                        responsiveLayout="scroll"
-                        value={val}
-                        showGridlines
-                        dataKey="id"
-                        rowHover
-                        emptyMessage="Data Tidak Ditemukan"
-                        className="mt-4"
-                      >
-                        <Column
-                          className=""
-                          header="Transaction Code"
-                          style={{ width: "11rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header" || e.type === "footer"
-                                  ? "font-weight-bold"
-                                  : ""
-                              }
-                            >
-                              {e.value.trx_code}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className=""
-                          header="Transaction Date"
-                          style={{ width: "11" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header" && "font-weight-bold"
-                              }
-                            >
-                              {e.value.trx_date}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className=""
-                          header="Product"
-                          style={{ minWidht: "20rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header" && "font-weight-bold"
-                              }
-                            >
-                              {e.value.product}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center"
-                          header="Type"
-                          style={{ minWidht: "10rem" }}
-                          body={(e) => (
-                            <div className="text-center">
-                              {e.value.trx_type}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center"
-                          header="Debit"
-                          style={{ minWidht: "10rem" }}
-                          body={(e) => (
-                            <div className="text-right">
-                              {e.value.trx_debit}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center"
-                          header="Kredit"
-                          style={{ minWidht: "10rem" }}
-                          body={(e) => (
-                            <div className="text-right">
-                              {e.value.trx_kredit}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center"
-                          header="Saldo"
-                          style={{ minWidht: "10rem" }}
-                          body={(e) => (
-                            <div className={"text-right"}>{e.value.sld}</div>
-                          )}
-                        />
-                      </DataTable>
-                    </>
-                  }
-                />
-              </Card.Body>
-            </Card>
-          );
-        })}
+        {/* {chunk(jsonForExcel(stCard) ?? [], chunkSize)?.map((val, idx) => {
+          return ( */}
+        <Card className="ml-1 mr-1 mt-2">
+          <Card.Body className="p-0">
+            <CustomeWrapper
+              tittle={"Stock Card Details Report"}
+              subTittle={`Stock Card Details Report for Period ${formatDate(
+                filtersDate[0]
+              )} to ${formatDate(filtersDate[1])}`}
+              onComplete={(cp) => setCp(cp)}
+              // page={idx + 1}
+              body={
+                <>
+                  <DataTable
+                    responsiveLayout="none"
+                    value={jsonForExcel(stCard).header}
+                    showGridlines
+                    dataKey="id"
+                    rowHover
+                    emptyMessage="Belum Ada Produk"
+                  >
+                    <Column
+                      className="header-center"
+                      header="Produk"
+                      style={{ width: "15rem" }}
+                      field={(e) => (
+                        <div className="font-weight-bold text-left">
+                          {e.prod}
+                        </div>
+                      )}
+                    />
+                    <Column
+                      className="header-right text-left"
+                      header={(e) => <div className="ml-0 text-left"></div>}
+                      style={{ width: "15rem" }}
+                      field={(e) => (
+                        <div className="font-weight-bold text-left">
+                          {/* {e.lok} */}
+                        </div>
+                      )}
+                    />
+                    <Column
+                      className="header-right text-right"
+                      header={(e) => (
+                        <div className="ml-5 mr-0 text-right">Saldo</div>
+                      )}
+                      style={{ width: "6rem" }}
+                      field={(e) => (
+                        <div className="font-weight-bold text-right">
+                          {e.sld}
+                        </div>
+                      )}
+                    />
+                  </DataTable>
+
+                  <DataTable
+                    responsiveLayout="scroll"
+                    value={jsonForExcel(stCard).trn}
+                    showGridlines
+                    dataKey="id"
+                    rowHover
+                    emptyMessage="Tidak Ada Transaksi"
+                    className="mt-0"
+                  >
+                    <Column
+                      header={(e) => (
+                        <div className="text-left">Detail Transaksi</div>
+                      )}
+                      style={{ width: "9rem" }}
+                      body={(e) => (
+                        <div
+                          className={
+                            e.type === "header"
+                              ? "font-weight-bold text-left"
+                              : e.type === "footer"
+                              ? "font-weight-bold text-left"
+                              : "text-left"
+                          }
+                        >
+                          {e.value.trx_code}
+                        </div>
+                      )}
+                    />
+                    <Column
+                      // className="header-center"
+                      // header=""
+                      style={{ width: "9rem" }}
+                      body={(e) => (
+                        <div
+                          className={
+                            e.type == "header"
+                              ? "font-weight-bold text-left"
+                              : e.type == "footer"
+                              ? "font-weight-bold text-left"
+                              : "text-left"
+                          }
+                        >
+                          {e.value.trx_date}
+                        </div>
+                      )}
+                    />
+                    <Column
+                      // className="header-center"
+                      // header=""
+                      style={{ width: "7rem" }}
+                      body={(e) => (
+                        <div
+                          className={
+                            e.type == "header"
+                              ? "font-weight-bold text-center"
+                              : e.type == "footer"
+                              ? "font-weight-bold text-center"
+                              : "text-center"
+                          }
+                        >
+                          {e.value.trx_type}
+                        </div>
+                      )}
+                    />
+                    <Column
+                      // className="header-center"
+                      // header=""
+                      style={{ width: "7rem" }}
+                      body={(e) => (
+                        <div
+                          className={
+                            e.type == "header"
+                              ? "font-weight-bold text-left"
+                              : e.type == "footer"
+                              ? "font-weight-bold text-left"
+                              : "text-left"
+                          }
+                        >
+                          {e.value.lok}
+                        </div>
+                      )}
+                    />
+                    <Column
+                      // className="header-center"
+                      // header=""
+                      style={{ width: "6rem" }}
+                      body={(e) => (
+                        <div
+                          className={
+                            e.type == "header"
+                              ? "font-weight-bold text-right"
+                              : e.type == "footer"
+                              ? "font-weight-bold text-right"
+                              : "text-right"
+                          }
+                        >
+                          {e.value.trx_debit}
+                        </div>
+                      )}
+                    />
+                    <Column
+                      // className="header-center"
+                      // header=""
+                      style={{ width: "6rem" }}
+                      body={(e) => (
+                        <div
+                          className={
+                            e.type == "header"
+                              ? "font-weight-bold text-right"
+                              : e.type == "footer"
+                              ? "font-weight-bold text-right"
+                              : "text-right"
+                          }
+                        >
+                          {e.value.trx_kredit}
+                        </div>
+                      )}
+                    />
+                    <Column
+                      // className="header-center"
+                      // header=""
+                      style={{ width: "10rem" }}
+                      body={(e) => (
+                        <div
+                          className={
+                            e.type == "header"
+                              ? "font-weight-bold text-right"
+                              : e.type == "footer"
+                              ? "font-weight-bold text-right"
+                              : "text-right"
+                          }
+                        >
+                          {e.value.sld}
+                        </div>
+                      )}
+                    />
+                  </DataTable>
+                </>
+              }
+            />
+          </Card.Body>
+        </Card>
+        {/* );
+        })} */}
       </Row>
     </>
   );

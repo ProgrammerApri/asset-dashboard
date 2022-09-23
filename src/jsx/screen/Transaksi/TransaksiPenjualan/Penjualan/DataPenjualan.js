@@ -327,6 +327,7 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
                     prod_id: null,
                     unit_id: null,
                     location: null,
+                    stock: null,
                     order: null,
                     price: null,
                     disc: null,

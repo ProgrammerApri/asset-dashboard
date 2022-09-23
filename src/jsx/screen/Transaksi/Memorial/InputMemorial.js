@@ -327,7 +327,7 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
         summary: "Warning !!",
         detail: "Nominal Debit/Kredit Belum Balance",
         // sticky: true,
-        life: 10000,
+        life: 1000,
       });
       if (nom_k < nom_d) {
         errors.akn.forEach((element, i) => {
@@ -342,18 +342,33 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
           }
         });
       }
+
+      if (nom_d) {
+        errors?.akn.forEach((element, i) => {
+          if (memorial.memo[i].dbcr === "d") {
+            element.nom = true;
+          }
+        });
+      }
+
+      if (nom_k) {
+        errors?.akn.forEach((element, i) => {
+          if (memorial.memo[i].dbcr === "k") {
+            element.nom = true;
+          }
+        });
+      }
     }
 
-    
     let count = errors.akn.length;
     let total_valid = 0;
     errors.akn?.forEach((el, i) => {
-      let key_count = 0
-      let key_valid = 0
+      let key_count = 0;
+      let key_valid = 0;
       for (var k in el) {
-        key_count++
+        key_count++;
         if (!el[k]) {
-          key_valid++
+          key_valid++;
         }
       }
       console.log(key_count);

@@ -127,10 +127,10 @@ const UmurHutang = () => {
             day3: "30 Day",
             day4: "60 Day",
             older: "Older",
-            nota: "Debit",
-            rtr: "Retur",
+            // nota: "Debit",
+            // rtr: "Retur",
             total: "Total",
-            giro: "Giro",
+            // giro: "Giro",
           },
         },
       ];
@@ -160,10 +160,10 @@ const UmurHutang = () => {
             day4:
               diff <= 60 && diff > 30 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
             older: diff > 60 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
-            nota: `Rp. ${formatIdr(0)}`,
-            rtr: `Rp. ${formatIdr(0)}`,
+            // nota: `Rp. ${formatIdr(0)}`,
+            // rtr: `Rp. ${formatIdr(0)}`,
             total: `Rp. ${formatIdr(ek.trx_amnh)}`,
-            giro: `Rp. ${formatIdr(0)}`,
+            // giro: `Rp. ${formatIdr(0)}`,
           },
         });
         amn += ek.trx_amnh;
@@ -186,8 +186,8 @@ const UmurHutang = () => {
           day3: `Rp. ${formatIdr(t_day3)}`,
           day4: `Rp. ${formatIdr(t_day4)}`,
           older: `Rp. ${formatIdr(t_older)}`,
-          nota: "",
-          rtr: "",
+          // nota: "",
+          // rtr: "",
           total: `Rp. ${formatIdr(amn)}`,
         },
       });
@@ -314,28 +314,28 @@ const UmurHutang = () => {
               alignment: { horizontal: "right", vertical: "center" },
             },
           },
-          {
-            value: `${ek.value.nota}`,
-            style: {
-              font: {
-                sz: "14",
-                bold:
-                  ek.type === "header" || ek.type === "footer" ? true : false,
-              },
-              alignment: { horizontal: "right", vertical: "center" },
-            },
-          },
-          {
-            value: `${ek.value.rtr}`,
-            style: {
-              font: {
-                sz: "14",
-                bold:
-                  ek.type === "header" || ek.type === "footer" ? true : false,
-              },
-              alignment: { horizontal: "right", vertical: "center" },
-            },
-          },
+          // {
+          //   value: `${ek.value.nota}`,
+          //   style: {
+          //     font: {
+          //       sz: "14",
+          //       bold:
+          //         ek.type === "header" || ek.type === "footer" ? true : false,
+          //     },
+          //     alignment: { horizontal: "right", vertical: "center" },
+          //   },
+          // },
+          // {
+          //   value: `${ek.value.rtr}`,
+          //   style: {
+          //     font: {
+          //       sz: "14",
+          //       bold:
+          //         ek.type === "header" || ek.type === "footer" ? true : false,
+          //     },
+          //     alignment: { horizontal: "right", vertical: "center" },
+          //   },
+          // },
           {
             value: `${ek.value.total}`,
             style: {
@@ -358,69 +358,7 @@ const UmurHutang = () => {
             alignment: { horizontal: "left", vertical: "center" },
           },
         },
-        {
-          value: "",
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "left", vertical: "center" },
-          },
-        },
-        {
-          value: "",
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "left", vertical: "center" },
-          },
-        },
-        {
-          value: "",
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "left", vertical: "center" },
-          },
-        },
-        {
-          value: "",
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "right", vertical: "center" },
-          },
-        },
-        {
-          value: "",
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "right", vertical: "center" },
-          },
-        },
-        {
-          value: "",
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "right", vertical: "center" },
-          },
-        },
-        {
-          value: "",
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "right", vertical: "center" },
-          },
-        },
-        {
-          value: "",
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "right", vertical: "center" },
-          },
-        },
-        {
-          value: "",
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "right", vertical: "center" },
-          },
-        },
+       
       ]);
 
       final.push({
@@ -467,18 +405,6 @@ const UmurHutang = () => {
             style: {
               font: { sz: "14", bold: true },
               alignment: { horizontal: "left", vertical: "center" },
-              fill: {
-                paternType: "solid",
-                fgColor: { rgb: "F3F3F3" },
-              },
-            },
-          },
-          {
-            title: "",
-            width: { wch: 15 },
-            style: {
-              font: { sz: "14", bold: true },
-              alignment: { horizontal: "right", vertical: "center" },
               fill: {
                 paternType: "solid",
                 fgColor: { rgb: "F3F3F3" },
@@ -813,7 +739,7 @@ const UmurHutang = () => {
                                 </div>
                               )}
                             />
-                            <Column
+                            {/* <Column
                               className="header-center border-right"
                               header=""
                               style={{ minWidht: "13rem" }}
@@ -848,7 +774,7 @@ const UmurHutang = () => {
                                   {e.value.rtr}
                                 </div>
                               )}
-                            />
+                            /> */}
                             <Column
                               className="header-center border-right"
                               header=""
@@ -867,7 +793,7 @@ const UmurHutang = () => {
                                 </div>
                               )}
                             />
-                            <Column
+                            {/* <Column
                               className="header-center border-right"
                               header=""
                               style={{ minWidht: "13rem" }}
@@ -884,7 +810,7 @@ const UmurHutang = () => {
                                   {e.value.giro}
                                 </div>
                               )}
-                            />
+                            /> */}
                           </DataTable>
                         );
                       })}

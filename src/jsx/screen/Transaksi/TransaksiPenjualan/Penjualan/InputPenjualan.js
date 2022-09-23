@@ -29,6 +29,7 @@ import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 import { Dropdown } from "primereact/dropdown";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import { InputNumber } from "primereact/inputnumber";
+import { Dialog } from "primereact/dialog";
 
 const defError = {
   code: false,
@@ -86,6 +87,10 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
   const [jasa, setJasa] = useState(null);
   const [satuan, setSatuan] = useState(null);
   const [lokasi, setLoc] = useState(null);
+  const [setup, setSetup] = useState(null);
+  const [sto, setSto] = useState(null);
+  const [state, setState] = useState(0);
+  const [display, setDisplay] = useState(false);
   const [error, setError] = useState(defError);
   const [accor, setAccor] = useState({
     produk: true,
@@ -109,6 +114,8 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     getSatuan();
     getLoct();
     getSalesman();
+    getStoLoc();
+    getSetup();
   }, []);
 
   const isValid = () => {
@@ -125,6 +132,9 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
       prod: [],
       jasa: [],
     };
+
+    let ord = 0;
+    let sto = 0;
 
     sale?.jprod.forEach((element, i) => {
       if (i > 0) {
@@ -151,6 +161,9 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
           jum: !element.order || element.order === "" || element.order === "0",
         };
       }
+
+      ord += element.order;
+      sto += element.stock;
     });
 
     sale?.jjasa.forEach((element, i) => {
@@ -194,11 +207,35 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
       });
     }
 
+    setState(ord > sto);
+    if (ord > sto && setup.over_stock === false) {
+      toast.current.show({
+        severity: "warn",
+        summary: "Warning !!",
+        detail: "Pesanan Melebihi Stok !!",
+        // sticky: true,
+        life: 3000,
+      });
+      errors.prod.forEach((el) => {
+        el.jum = true;
+      });
+    }
+
+    if (ord > sto && setup.over_stock === true) {
+      errors.prod.forEach((el) => {
+        el.jum = true;
+      });
+    }
+
     let validProduct = false;
     let validJasa = false;
     errors.prod?.forEach((el) => {
       for (var k in el) {
-        validProduct = !el[k];
+        if (k === "jum" && setup.over_stock) {
+          validProduct = true;
+        } else {
+          validProduct = !el[k];
+        }
       }
     });
     if (!validProduct) {
@@ -364,44 +401,46 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
         const { data } = response;
         let filt = [];
         data.forEach((elem) => {
-          let prod = [];
-          elem.sprod.forEach((el) => {
-            el.prod_id = el.prod_id.id;
-            el.unit_id = el.unit_id.id;
-            prod.push({
-              ...el,
-              r_order: el.order,
-            });
+          if (elem.status !== 1) {
+            let prod = [];
+            elem.sprod.forEach((el) => {
+              el.prod_id = el.prod_id.id;
+              el.unit_id = el.unit_id.id;
+              prod.push({
+                ...el,
+                r_order: el.order,
+              });
 
-            let temp = [...sale.jprod];
-            sale.jprod.forEach((e, i) => {
-              if (el.id === e.sprod_id) {
-                temp[i].order = el.order;
-                updateSL({ ...sale, jprod: temp });
-              }
+              let temp = [...sale.jprod];
+              sale.jprod.forEach((e, i) => {
+                if (el.id === e.sprod_id) {
+                  temp[i].order = el.order;
+                  updateSL({ ...sale, jprod: temp });
+                }
+              });
             });
-          });
-          elem.sprod = prod;
+            elem.sprod = prod;
 
-          let jasa = [];
-          elem.sjasa.forEach((element) => {
-            element.jasa_id = element.jasa_id.id;
-            element.unit_id = element.unit_id.id;
-            jasa.push({
-              ...element,
-              r_order: element.order,
-            });
+            let jasa = [];
+            elem.sjasa.forEach((element) => {
+              element.jasa_id = element.jasa_id.id;
+              element.unit_id = element.unit_id.id;
+              jasa.push({
+                ...element,
+                r_order: element.order,
+              });
 
-            let temp = [...sale.jjasa];
-            sale.jjasa.forEach((e, i) => {
-              if (el.id === e.sjasa_id) {
-                temp[i].order = el.order;
-                updateSL({ ...sale, jjasa: temp });
-              }
+              let temp = [...sale.jjasa];
+              sale.jjasa.forEach((e, i) => {
+                if (el.id === e.sjasa_id) {
+                  temp[i].order = el.order;
+                  updateSL({ ...sale, jjasa: temp });
+                }
+              });
             });
-          });
-          elem.sjasa = jasa;
-          filt.push(elem);
+            elem.sjasa = jasa;
+            filt.push(elem);
+          }
         });
         setSO(filt);
       }
@@ -474,6 +513,38 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
+  const getSetup = async () => {
+    const config = {
+      ...endpoints.getCompany,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setSetup(data);
+      }
+    } catch (error) {}
+  };
+
+  const getStoLoc = async (id, e) => {
+    const config = {
+      ...endpoints.sto,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setSto(data);
+      }
+    } catch (error) {}
+  };
+
   const editSale = async () => {
     const config = {
       ...endpoints.editSales,
@@ -504,7 +575,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
   const addSale = async () => {
     const config = {
       ...endpoints.addSale,
-      data: {...sale, doc_date: currentDate(sale.doc_date)},
+      data: { ...sale, doc_date: currentDate(sale.doc_date) },
     };
     console.log(config.data);
     let response = null;
@@ -664,12 +735,16 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
 
   const onSubmit = () => {
     if (isValid()) {
-      if (isEdit) {
-        setUpdate(true);
-        editSale();
+      if (state) {
+        setDisplay(true);
       } else {
-        setUpdate(true);
-        addSale();
+        if (isEdit) {
+          setUpdate(true);
+          editSale();
+        } else {
+          setUpdate(true);
+          addSale();
+        }
       }
     }
   };
@@ -863,14 +938,23 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
               value={sale.so_id && checkSO(sale.so_id)}
               options={so}
               onChange={(e) => {
-                let result = null;
-                if (sale.so_id?.top) {
-                  result = new Date(`${sale.ord_date}Z`);
-                  result.setDate(
-                    result.getDate() + checkRulesP(sale?.top)?.day
-                  );
-                  console.log(result);
-                }
+                let result = new Date(`${sale.ord_date}Z`);
+                result.setDate(
+                  result.getDate() + checkRulesP(e.value.top?.id)?.day
+                );
+
+                e.value.sprod?.forEach((element) => {
+                  element.stock = 0;
+                  sto?.forEach((elem) => {
+                    if (
+                      element.location === elem.loc_id &&
+                      element.prod_id === elem.id
+                    ) {
+                      element.stock = elem.stock;
+                    }
+                  });
+                });
+
                 updateSL({
                   ...sale,
                   so_id: e.value.id,
@@ -889,11 +973,18 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                 newError.rul = false;
                 newError.prod[0].id = false;
                 newError.prod[0].lok = false;
-                newError.prod[0].jum = false;
+                // newError.prod[0].jum = false;
                 newError.prod[0].prc = false;
-                newError.jasa[0].id = false;
-                newError.jasa[0].jum = false;
-                newError.jasa[0].prc = false;
+                let ejasa = [];
+                e?.sjasa?.forEach((el) => {
+                  ejasa.push({
+                    id: false,
+                    jum: false,
+                    prc: false,
+                  });
+                });
+                newError.jasa = ejasa;
+
                 setError(newError);
               }}
               optionLabel={"[so_code] ([pel_id.cus_name])"}
@@ -1168,7 +1259,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                             }
                           }
                         });
-                        setSatuan(sat);
+                        // setSatuan(sat);
 
                         let temp = [...sale.jprod];
                         temp[e.index].prod_id = u.id;
@@ -1204,8 +1295,20 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                     <CustomDropdown
                       value={e.location && checkLoc(e.location)}
                       onChange={(u) => {
+                        let st = 0;
+
+                        sto?.forEach((element) => {
+                          if (
+                            element.loc_id === u.id &&
+                            element.id === sale?.jprod[e.index].prod_id
+                          ) {
+                            st = element.stock;
+                          }
+                        });
+
                         let temp = [...sale.jprod];
                         temp[e.index].location = u.id;
+                        temp[e.index].stock = st;
                         updateSL({ ...sale, jprod: temp });
 
                         let newError = error;
@@ -1223,6 +1326,24 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                       errorMessage="Lokasi Belum Dipilih"
                       error={error?.prod[e.index]?.lok}
                       disabled={sale && sale.so_id}
+                    />
+                  )}
+                />
+
+                <Column
+                  header="Stok"
+                  className="align-text-top"
+                  style={{
+                    width: "7rem",
+                  }}
+                  field={""}
+                  body={(e) => (
+                    <PrimeNumber
+                      value={e?.stock ?? 0}
+                      placeholder="0"
+                      type="number"
+                      min={0}
+                      disabled
                     />
                   )}
                 />
@@ -1253,6 +1374,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                       type="number"
                       min={0}
                       error={error?.prod[e.index]?.jum}
+                      errorMessage={state ? "Pesanan Melebihi Stok" : null}
                       disabled={sale && sale.so_id}
                     />
                   )}
@@ -1295,7 +1417,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   field={""}
                   body={(e) => (
                     <PrimeNumber
-                    price
+                      price
                       value={e.price && e.price}
                       onChange={(u) => {
                         let temp = [...sale.jprod];
@@ -1407,6 +1529,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                                 prod_id: null,
                                 unit_id: null,
                                 location: null,
+                                stock: null,
                                 order: null,
                                 price: null,
                                 disc: null,
@@ -1594,7 +1717,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   }}
                   body={(e) => (
                     <PrimeNumber
-                    price
+                      price
                       value={e.price && e.price}
                       onChange={(t) => {
                         let temp = [...sale.jjasa];
@@ -1992,9 +2115,59 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
             ) : null}
           </div>
         </div>
+
+        <Dialog
+          header={"Pesanan Melebihi Jumlah Stock !!"}
+          visible={display}
+          style={{ width: "30vw" }}
+          footer={footerVal("display")}
+          onHide={() => {
+            setDisplay(false);
+          }}
+        >
+          <div className="ml-3 mr-3">
+            <i
+              className="pi pi-exclamation-triangle mr-3 align-middle"
+              style={{ fontSize: "3rem" }}
+            />
+            <span>Apakah anda yakin ingin melanjutkan ?</span>
+          </div>
+        </Dialog>
       </>
     );
   };
+
+  const footerVal = () => {
+    return (
+      <div className="mt-5 flex justify-content-end">
+        <div>
+          <PButton
+            label="Batal"
+            onClick={() => {
+              setDisplay(false);
+            }}
+            className="p-button-text btn-primary"
+          />
+          <PButton
+            label="Simpan"
+            icon="pi pi-check"
+            onClick={() => {
+              if (isEdit) {
+                setUpdate(true);
+                editSale();
+              } else {
+                setUpdate(true);
+                addSale();
+              }
+            }}
+            autoFocus
+            loading={update}
+          />
+        </div>
+      </div>
+    );
+  };
+
 
   const footer = () => {
     return (

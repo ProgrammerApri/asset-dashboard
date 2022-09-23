@@ -14,6 +14,7 @@ import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import { el } from "date-fns/locale";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import { Dropdown } from "primereact/dropdown";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -24,10 +25,11 @@ const ReportPiutang = () => {
   const printPage = useRef(null);
   const [filtDate, setFiltDate] = useState(new Date());
   const [customer, setCustomer] = useState(null);
-  const [selectCus, setSelectCus] = useState(null);
+  const [selectedCus, setSelected] = useState(null);
   const [ar, setAr] = useState(null);
   const [total, setTotal] = useState(null);
   const [cp, setCp] = useState("");
+  const chunkSize = 5;
 
   useEffect(() => {
     getCustomer();
@@ -70,6 +72,12 @@ const ReportPiutang = () => {
         });
         setAr(pel);
         setTotal(total);
+
+        let grouped = data?.filter(
+          (el, i) =>
+            i === data.findIndex((ek) => el?.cus_id?.id === ek?.cus_id?.id)
+        );
+        setCustomer(grouped);
       }
     } catch (error) {
       console.log(error);
@@ -110,60 +118,113 @@ const ReportPiutang = () => {
   const jsonForExcel = (ar, excel = false) => {
     let data = [];
 
-    ar?.forEach((el) => {
-      // let selC = `${el.customer.cus_name} (${el.customer.cus_code})`;
-      // if (selectCus === selC) {
-      let val = [
-        {
-          cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
-          type: "header",
-          value: {
-            ref: "Code",
-            date: "Date",
-            jt: "Due Date",
-            value: "Receivable",
-            lns: "Total Paid",
-            sisa: "Remain",
-          },
-        },
-      ];
-      let amn = 0;
-      let acq = 0;
-      el.ar.forEach((ek) => {
-        let filt = new Date(`${ek?.trx_date}Z`);
-        console.log(filt);
-        if (filt <= filtDate) {
+    if (selectedCus) {
+      ar?.forEach((el) => {
+        if (selectedCus?.cus_id?.id === el.customer?.id) {
+          let val = [
+            {
+              cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
+              type: "header",
+              value: {
+                ref: "Code",
+                date: "Date",
+                jt: "Due Date",
+                value: "Receivable",
+                lns: "Total Paid",
+                sisa: "Remain",
+              },
+            },
+          ];
+          let amn = 0;
+          let acq = 0;
+          el.ar.forEach((ek) => {
+            let filt = new Date(`${ek?.trx_date}Z`);
+            console.log(filt);
+            if (filt <= filtDate) {
+              val.push({
+                cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
+                type: "item",
+                value: {
+                  ref: ek.trx_code,
+                  date: formatDate(ek.trx_date),
+                  jt: ek.trx_due ? formatDate(ek.trx_due) : "-",
+                  value: `Rp. ${formatIdr(ek.trx_amnh)}`,
+                  lns: `Rp. ${formatIdr(ek.acq_amnh)}`,
+                  sisa: `Rp. ${formatIdr(ek.trx_amnh - ek.acq_amnh)}`,
+                },
+              });
+              amn += ek.trx_amnh;
+              acq += ek.acq_amnh;
+            }
+          });
           val.push({
             cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
-            type: "item",
+            type: "footer",
             value: {
-              ref: ek.trx_code,
-              date: formatDate(ek.trx_date),
-              jt: ek.trx_due ? formatDate(ek.trx_due) : "-",
-              value: `Rp. ${formatIdr(ek.trx_amnh)}`,
-              lns: `Rp. ${formatIdr(ek.acq_amnh)}`,
-              sisa: `Rp. ${formatIdr(ek.trx_amnh - ek.acq_amnh)}`,
+              ref: "Total",
+              date: "",
+              jt: "",
+              value: `Rp. ${formatIdr(amn)}`,
+              lns: `Rp. ${formatIdr(acq)}`,
+              sisa: `Rp. ${formatIdr(amn - acq)}`,
             },
           });
-          amn += ek.trx_amnh;
-          acq += ek.acq_amnh;
+          data.push(val);
         }
       });
-      val.push({
-        cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
-        type: "footer",
-        value: {
-          ref: "Total",
-          date: "",
-          jt: "",
-          value: `Rp. ${formatIdr(amn)}`,
-          lns: `Rp. ${formatIdr(acq)}`,
-          sisa: `Rp. ${formatIdr(amn - acq)}`,
-        },
+    } else {
+      ar?.forEach((el) => {
+        let val = [
+          {
+            cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
+            type: "header",
+            value: {
+              ref: "Code",
+              date: "Date",
+              jt: "Due Date",
+              value: "Receivable",
+              lns: "Total Paid",
+              sisa: "Remain",
+            },
+          },
+        ];
+        let amn = 0;
+        let acq = 0;
+        el.ar.forEach((ek) => {
+          let filt = new Date(`${ek?.trx_date}Z`);
+          console.log(filt);
+          if (filt <= filtDate) {
+            val.push({
+              cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
+              type: "item",
+              value: {
+                ref: ek.trx_code,
+                date: formatDate(ek.trx_date),
+                jt: ek.trx_due ? formatDate(ek.trx_due) : "-",
+                value: `Rp. ${formatIdr(ek.trx_amnh)}`,
+                lns: `Rp. ${formatIdr(ek.acq_amnh)}`,
+                sisa: `Rp. ${formatIdr(ek.trx_amnh - ek.acq_amnh)}`,
+              },
+            });
+            amn += ek.trx_amnh;
+            acq += ek.acq_amnh;
+          }
+        });
+        val.push({
+          cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
+          type: "footer",
+          value: {
+            ref: "Total",
+            date: "",
+            jt: "",
+            value: `Rp. ${formatIdr(amn)}`,
+            lns: `Rp. ${formatIdr(acq)}`,
+            sisa: `Rp. ${formatIdr(amn - acq)}`,
+          },
+        });
+        data.push(val);
       });
-      data.push(val);
-      // }
-    });
+    }
 
     let final = [
       {
@@ -418,7 +479,7 @@ const ReportPiutang = () => {
       <div className="flex justify-content-between">
         <div className="col-6 ml-0 mr-0 pl-0 pt-0">
           <Row className="mt-0">
-            <div className="p-inputgroup col-6">
+            <div className="p-inputgroup col-4">
               <span className="p-inputgroup-addon">
                 <i className="pi pi-calendar" />
               </span>
@@ -435,17 +496,20 @@ const ReportPiutang = () => {
                 dateFormat="dd-mm-yy"
               />
             </div>
-            {/* <div className="col-4">
-              <CustomDropdown
-                value={customer && selectCus}
-                option={customer}
+            <div className="col-4">
+              <Dropdown
+                value={selectedCus ?? null}
+                options={customer}
                 onChange={(e) => {
-                  setSelectCus(e);
+                  setSelected(e.value);
                 }}
-                label={"[customer.cus_name] ([customer.cus_code])"}
-                placeholder="Pilih Pelanggan"
+                placeholder="Pilih Customer"
+                optionLabel="cus_id.cus_name"
+                filter
+                filterBy="cus_id.cus_name"
+                showClear
               />
-            </div> */}
+            </div>
           </Row>
         </div>
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
@@ -481,132 +545,174 @@ const ReportPiutang = () => {
     );
   };
 
+  const renderFooter = () => {
+    return (
+      <Row className="m-0 mt-0">
+        <div className="text-left font-weight-bold col-6">Total Hutang</div>
+        <div className="col-6 text-right font-weight-bold">
+          Rp. {formatIdr(total)}
+        </div>
+      </Row>
+    );
+  };
+
+  const chunk = (arr, size) =>
+    arr.reduce(
+      (acc, e, i) => (
+        i % size ? acc[acc.length - 1].push(e) : acc.push([e]), acc
+      ),
+      []
+    );
+
   return (
     <>
       {/* <Toast ref={toast} /> */}
       <Row>
         <Col>
           <Card>
-            <Card.Body>
-              {renderHeader()}
-              {jsonForExcel(ar, false)?.map((v) => {
-                return (
-                  <DataTable
-                    responsiveLayout="scroll"
-                    value={v}
-                    showGridlines
-                    dataKey="id"
-                    rowHover
-                    emptyMessage="Data Tidak Ditemukan"
-                  >
-                    <Column
-                      className="header-center"
-                      header={(e) =>
-                        e.props.value ? e.props?.value[0]?.cus : null
-                      }
-                      style={{ width: "15rem" }}
-                      body={(e) => (
-                        <div
-                          className={
-                            e.type === "header" || e.type === "footer"
-                              ? "font-weight-bold"
-                              : ""
-                          }
-                        >
-                          {e.value.ref}
-                        </div>
-                      )}
-                    />
-                    <Column
-                      className="header-center"
-                      header=""
-                      style={{ minWidht: "10rem" }}
-                      body={(e) => (
-                        <div
-                          className={e.type === "header" && "font-weight-bold"}
-                        >
-                          {e.value.date}
-                        </div>
-                      )}
-                    />
-                    <Column
-                      className="header-center"
-                      header=""
-                      style={{ minWidht: "10rem" }}
-                      body={(e) => (
-                        <div
-                          className={e.type === "header" && "font-weight-bold"}
-                        >
-                          {e.value.jt}
-                        </div>
-                      )}
-                    />
-                    <Column
-                      className="header-center"
-                      header=""
-                      style={{ minWidht: "10rem" }}
-                      body={(e) => (
-                        <div
-                          className={
-                            e.type === "header"
-                              ? "font-weight-bold text-right"
-                              : e.type === "footer"
-                              ? "font-weight-bold text-right"
-                              : "text-right"
-                          }
-                        >
-                          {e.value.value}
-                        </div>
-                      )}
-                    />
-                    <Column
-                      className="header-center"
-                      header=""
-                      style={{ minWidht: "10rem" }}
-                      body={(e) => (
-                        <div
-                          className={
-                            e.type === "header"
-                              ? "font-weight-bold text-right"
-                              : e.type === "footer"
-                              ? "font-weight-bold text-right"
-                              : "text-right"
-                          }
-                        >
-                          {e.value.lns}
-                        </div>
-                      )}
-                    />
-                    <Column
-                      className="header-center"
-                      header=""
-                      style={{ minWidht: "10rem" }}
-                      body={(e) => (
-                        <div
-                          className={
-                            e.type === "header"
-                              ? "font-weight-bold text-right"
-                              : e.type === "footer"
-                              ? "font-weight-bold text-right"
-                              : "text-right"
-                          }
-                        >
-                          {e.value.sisa}
-                        </div>
-                      )}
-                    />
-                  </DataTable>
-                );
-              })}
-              <Row className="m-0 mt-5">
-                <div className="font-weight-bold col-6">
-                  Total Saldo Piutang
-                </div>
-                <div className="col-6 text-right font-weight-bold">
-                  Rp. {formatIdr(total)}
-                </div>
-              </Row>
-            </Card.Body>
+            <Card.Body>{renderHeader()}</Card.Body>
+          </Card>
+        </Col>
+      </Row>
+
+      <Row className="m-0 justify-content-center" ref={printPage}>
+        {chunk(jsonForExcel(ar) ?? [], chunkSize)?.map((val, idx) => {
+          return (
+            <Card className="ml-1 mr-1 mt-2">
+              <Card.Body className="p-0 m-0">
+                <CustomeWrapper
+                  tittle={"Receivable Report"}
+                  subTittle={`Receivable Report as ${formatDate(filtDate)}`}
+                  onComplete={(cp) => setCp(cp)}
+                  page={idx + 1}
+                  body={
+                    <>
+                      {val.map((v) => {
+                        return (
+                          <DataTable
+                            responsiveLayout="scroll"
+                            value={v}
+                            showGridlines
+                            dataKey="id"
+                            rowHover
+                            emptyMessage="Data Tidak Ditemukan"
+                          >
+                            <Column
+                              className="header-center"
+                              header={(e) =>
+                                e.props.value ? e.props?.value[0]?.cus : null
+                              }
+                              style={{ width: "15rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header" || e.type === "footer"
+                                      ? "font-weight-bold"
+                                      : ""
+                                  }
+                                >
+                                  {e.value.ref}
+                                </div>
+                              )}
+                            />
+                            <Column
+                              className="header-center"
+                              header=""
+                              style={{ minWidht: "10rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header" && "font-weight-bold"
+                                  }
+                                >
+                                  {e.value.date}
+                                </div>
+                              )}
+                            />
+                            <Column
+                              className="header-center"
+                              header=""
+                              style={{ minWidht: "10rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header" && "font-weight-bold"
+                                  }
+                                >
+                                  {e.value.jt}
+                                </div>
+                              )}
+                            />
+                            <Column
+                              className="header-center"
+                              header=""
+                              style={{ minWidht: "10rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header"
+                                      ? "font-weight-bold text-right"
+                                      : e.type === "footer"
+                                      ? "font-weight-bold text-right"
+                                      : "text-right"
+                                  }
+                                >
+                                  {e.value.value}
+                                </div>
+                              )}
+                            />
+                            <Column
+                              className="header-center"
+                              header=""
+                              style={{ minWidht: "10rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header"
+                                      ? "font-weight-bold text-right"
+                                      : e.type === "footer"
+                                      ? "font-weight-bold text-right"
+                                      : "text-right"
+                                  }
+                                >
+                                  {e.value.lns}
+                                </div>
+                              )}
+                            />
+                            <Column
+                              className="header-center"
+                              header=""
+                              style={{ minWidht: "10rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header"
+                                      ? "font-weight-bold text-right"
+                                      : e.type === "footer"
+                                      ? "font-weight-bold text-right"
+                                      : "text-right"
+                                  }
+                                >
+                                  {e.value.sisa}
+                                </div>
+                              )}
+                            />
+                          </DataTable>
+                        );
+                      })}
+                    </>
+                  }
+                />
+              </Card.Body>
+            </Card>
+          );
+        })}
+      </Row>
+
+      <Row>
+        <Col>
+          <Card>
+            <Card.Body>{renderFooter()}</Card.Body>
           </Card>
         </Col>
       </Row>

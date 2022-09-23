@@ -1362,7 +1362,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                                   }
                                 }
                               });
-                              setSatuan(sat);
+                              // setSatuan(sat);
 
                               let temp = [...po.pprod];
                               temp[e.index].prod_id = t.id;
@@ -2457,7 +2457,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                 }
               }
             });
-            setSatuan(sat);
+            // setSatuan(sat);
 
             let temp = [...po.pprod];
             temp[currentIndex].prod_id = e.data?.id;

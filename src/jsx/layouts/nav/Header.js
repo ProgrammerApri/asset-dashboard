@@ -49,6 +49,8 @@ const Header = ({
               >
                 {name.length === 0
                   ? "Dashboard"
+                  : finalName.includes("/")
+                  ? finalName.substring(0, finalName.indexOf("/"))
                   : finalName}
               </div>
             </div>

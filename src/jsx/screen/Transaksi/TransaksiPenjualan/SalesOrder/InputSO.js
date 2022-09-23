@@ -80,6 +80,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
   const [ppn, setPpn] = useState(null);
   const [customer, setCustomer] = useState(null);
   const [subCus, setSubCus] = useState(null);
+  const [sto, setSto] = useState(null);
   const [error, setError] = useState(defError);
   const [accor, setAccor] = useState({
     produk: true,
@@ -101,6 +102,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
     getCustomer();
     getSubCus();
     getloct();
+    getSto();
   }, []);
 
   const isValid = () => {
@@ -295,6 +297,22 @@ const InputSO = ({ onCancel, onSuccess }) => {
         addSO();
       }
     }
+  };
+
+  const getSto = async (id, e) => {
+    const config = {
+      ...endpoints.sto,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setSto(data);
+      }
+    } catch (error) {}
   };
 
   const getProduk = async () => {
@@ -913,7 +931,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                             }
                           }
                         });
-                        setSatuan(sat);
+                        // setSatuan(sat);
 
                         let temp = [...so.sprod];
                         temp[e.index].prod_id = u.id;
@@ -945,8 +963,20 @@ const InputSO = ({ onCancel, onSuccess }) => {
                     <CustomDropdown
                       value={e.location && checkLoc(e.location)}
                       onChange={(u) => {
+                        let st = 0;
+                        
+                        sto.forEach((element) => {
+                          if (
+                            element.loc_id === u.id &&
+                            element.id === so?.sprod[e.index].prod_id
+                          ) {
+                            st = element.stock;
+                          }
+                        });
+
                         let temp = [...so.sprod];
                         temp[e.index].location = u.id;
+                        temp[e.index].stock = st;
                         updateSo({ ...so, sprod: temp });
 
                         let newError = error;
@@ -968,6 +998,24 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
+                  header="Stok"
+                  className="align-text-top"
+                  style={{
+                    width: "7rem",
+                  }}
+                  field={""}
+                  body={(e) => (
+                    <PrimeNumber
+                      value={e?.stock ?? 0}
+                      placeholder="0"
+                      type="number"
+                      min={0}
+                      disabled
+                    />
+                  )}
+                />
+
+                <Column
                   header="Jumlah"
                   className="align-text-top"
                   field={""}
@@ -980,6 +1028,18 @@ const InputSO = ({ onCancel, onSuccess }) => {
                           temp[e.index].order = u.target.value;
                           temp[e.index].total =
                             temp[e.index].order * temp[e.index].price;
+
+                          if (temp[e.index].order > temp[e.index].stock) {
+                            // temp[e.index].order = checkProd(e?.prod_id)?.stock;
+
+                            toast.current.show({
+                              severity: "warn",
+                              summary: "Warning",
+                              detail: "Pesanan Melebihi Stok !!",
+                              life: 3000,
+                            });
+                          }
+
                           updateSo({ ...so, sprod: temp });
                           console.log(temp);
                           let newError = error;
@@ -1126,9 +1186,8 @@ const InputSO = ({ onCancel, onSuccess }) => {
                                 id: 0,
                                 prod_id: null,
                                 unit_id: null,
-                                request: null,
+                                location: null,
                                 order: null,
-                                remain: null,
                                 price: null,
                                 disc: null,
                                 nett_price: null,

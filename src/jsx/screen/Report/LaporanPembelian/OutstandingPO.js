@@ -5,63 +5,39 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Calendar } from "primereact/calendar";
 import { Button, Card, Col, Row } from "react-bootstrap";
-import { Button as PButton } from "primereact/button";
-import { Toast } from "primereact/toast";
-import { Skeleton } from "primereact/skeleton";
-
 import ReactExport from "react-data-export";
 import ReactToPrint from "react-to-print";
 import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 import { Dropdown } from "primereact/dropdown";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 
-const data = {
-  id: 0,
-  ord_code: null,
-  ord_date: null,
-  faktur: null,
-  po_id: null,
-  dep_id: null,
-  sup_id: null,
-  top: null,
-  due_date: null,
-  split_inv: null,
-  prod_disc: null,
-  jasa_disc: null,
-  total_disc: null,
-  dprod: [],
-  djasa: [],
-};
+const data = {};
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
-const SalesReport = () => {
-  const [sales, setSales] = useState(null);
+const OutstandingPO = () => {
+  const [po, setPo] = useState(null);
   const [produk, setProduk] = useState(null);
-  const [customer, setCustomer] = useState(null);
-  const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const printPage = useRef(null);
   const [filtersDate, setFiltersDate] = useState([new Date(), new Date()]);
-  const [globalFilterValue1, setGlobalFilterValue1] = useState("");
-  const chunkSize = 5;
   const [cp, setCp] = useState("");
-  const [selectedCus, setSelected] = useState(null);
-
-  const dummy = Array.from({ length: 10 });
+  const chunkSize = 6;
 
   useEffect(() => {
     var d = new Date();
     d.setDate(d.getDate() - 30);
     setFiltersDate([d, new Date()]);
-    getSale();
+
+    // initFilters1();
+    getPo();
   }, []);
 
-  const getSale = async (isUpdate = false) => {
+  const getPo = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.sale,
+      ...endpoints.po,
       data: {},
     };
     console.log(config.data);
@@ -71,12 +47,7 @@ const SalesReport = () => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        setSales(data);
-        let grouped = data?.filter(
-          (el, i) =>
-            i === data.findIndex((ek) => el?.pel_id?.id === ek?.pel_id?.id)
-        );
-        setCustomer(grouped);
+        setPo(data);
       }
     } catch (error) {}
     if (isUpdate) {
@@ -88,199 +59,79 @@ const SalesReport = () => {
     }
   };
 
-  const getCus = async () => {
-    const config = {
-      ...endpoints.customer,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setCustomer(data);
-      }
-    } catch (error) {}
-  };
-
-  const exportExcel = () => {
+  const jsonForExcel = (po, excel = false) => {
     let data = [];
-    // gra.forEach((el) => {
-    //   data.push({
-    //     Nomor_GRA: el.ord_code,
-    //     Tanggal: formatDate(el.ord_date),
-    //     Nomor_PO: el.po_id.po_code,
-    //     Kode_Supplier: el.sup_id.sup_code,
-    //     Nama_Supplier: el.sup_id.sup_name,
-    //     Kode_Barang: el.dprod.prod_id,
-    //     Nama_Barang: el.dprod.prod_id,
-    //     Satuan: el.dprod.unit_id,
-    //     Jumlah: el.dprod.order,
-    //     Harga: el.dprod.price,
-    //   });
-    // });
 
-    import("xlsx").then((xlsx) => {
-      const worksheet = xlsx.utils.json_to_sheet(data);
-      const workbook = { Sheets: { data: worksheet }, SheetNames: ["data"] };
-      const excelBuffer = xlsx.write(workbook, {
-        bookType: "xlsx",
-        type: "array",
-      });
-      saveAsExcelFile(excelBuffer, "reportGRA");
-    });
-  };
+    po?.forEach((el) => {
+      if (el.status !== 1) {
+        let tgl_gra = new Date(`${el?.po_date}Z`);
+      if (tgl_gra >= filtersDate[0] && tgl_gra <= filtersDate[1]) {
+        let val = [
+          {
+            ref: `PO Code : ${el.po_code}`,
+            type: "header",
+            value: {
+              date: "Date",
+              rp: "Req Code",
+              sup: "Supplier",
+              prod: "Product Name",
+              ord: "Qty",
+              unit: "Unit",
+              prc: "Price",
+              t_prc: "Total Price",
+              st_gra: "Status",
+            },
+          },
+        ];
 
-  const saveAsExcelFile = (buffer, fileName) => {
-    import("file-saver").then((module) => {
-      if (module && module.default) {
-        let EXCEL_TYPE =
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-        let EXCEL_EXTENSION = ".xlsx";
-        const data = new Blob([buffer], {
-          type: EXCEL_TYPE,
+        let total = 0;
+        el.pprod?.forEach((ek) => {
+          val.push({
+            type: "item",
+            value: {
+              date: formatDate(el.po_date),
+              rp: el.preq_id?.req_code,
+              sup: el.sup_id !== null ? `${el.sup_id.sup_name}` : "-",
+              prod: `${ek.prod_id.name}`,
+              ord: ek.order,
+              unit: ek.unit_id.code,
+              prc: `Rp. ${formatIdr(ek.price)}`,
+              t_prc: `Rp. ${formatIdr(ek.total)}`,
+              st_gra: ek.status !== 1 ? "Open" : "Close",
+            },
+          });
+          // total += ek.total;
         });
 
-        module.default.saveAs(
-          data,
-          fileName + "_export_" + new Date().getTime() + EXCEL_EXTENSION
-        );
+        //   val.push({
+        //     // ref: el.kd_gra,
+        //     type: "footer",
+        //     value: {
+        //       date: "Total",
+        //       sup: "",
+        //       prod: "",
+        //       ord: "",
+        //       unit: "",
+        //       prc: "",
+        //       tot: `Rp. ${formatIdr(total)}`,
+        //     },
+        //   });
+        data.push(val);
       }
+      }
+      console.log("========fddfdfdfdfdfdf===");
+      console.log(data);
+      console.log("========fddfdfdfdfdfdf===");
     });
-  };
-
-  const jsonForExcel = (sales, excel = false) => {
-    let data = [];
-
-    if (selectedCus) {
-      sales?.forEach((el) => {
-        let dt = new Date(`${el?.ord_date}Z`);
-        if (dt >= filtersDate[0] && dt <= filtersDate[1]) {
-          if (selectedCus?.pel_id?.id === el.pel_id?.id) {
-            let val = [
-              {
-                ref: `No. Trans : ${el.ord_code}`,
-                type: "header",
-                value: {
-                  date: "Date",
-                  po: "Code",
-                  sup: "Customer",
-                  prod: "Product Name",
-                  ord: "Quantity",
-                  unit: "Unit",
-                  prc: "Price",
-                  tot: "Total",
-                },
-              },
-            ];
-
-            let total = 0;
-            el.jprod.forEach((ek) => {
-              total += ek.total;
-              val.push({
-                ref: el.ord_code,
-                type: "item",
-                value: {
-                  date: formatDate(el.ord_date),
-                  po: el.so_id.so_code,
-                  sup: `${el.pel_id.cus_name} (${el.pel_id.cus_code})`,
-                  prod: `${ek.prod_id.name} (${ek.prod_id.code})`,
-                  ord: ek.order,
-                  unit: ek.unit_id.code,
-                  prc: `Rp. ${formatIdr(ek.price)}`,
-                  tot: `Rp. ${formatIdr(ek.total)}`,
-                },
-              });
-            });
-
-            val.push({
-              ref: el.ord_code,
-              type: "footer",
-              value: {
-                date: "Total",
-                po: "",
-                sup: "",
-                prod: "",
-                ord: "",
-                unit: "",
-                prc: "",
-                tot: `Rp. ${formatIdr(total)}`,
-              },
-            });
-
-            data.push(val);
-          }
-        }
-      });
-    } else {
-      sales?.forEach((el) => {
-        let dt = new Date(`${el?.ord_date}Z`);
-        if (dt >= filtersDate[0] && dt <= filtersDate[1]) {
-          let val = [
-            {
-              ref: `No. Trans : ${el.ord_code}`,
-              type: "header",
-              value: {
-                date: "Date",
-                po: "Code",
-                sup: "Customer",
-                prod: "Product Name",
-                ord: "Quantity",
-                unit: "Unit",
-                prc: "Price",
-                tot: "Total",
-              },
-            },
-          ];
-
-          let total = 0;
-          el.jprod.forEach((ek) => {
-            total += ek.total;
-            val.push({
-              ref: el.ord_code,
-              type: "item",
-              value: {
-                date: formatDate(el.ord_date),
-                po: el.so_id.so_code,
-                sup: `${el.pel_id.cus_name} (${el.pel_id.cus_code})`,
-                prod: `${ek.prod_id.name} (${ek.prod_id.code})`,
-                ord: ek.order,
-                unit: ek.unit_id.code,
-                prc: `Rp. ${formatIdr(ek.price)}`,
-                tot: `Rp. ${formatIdr(ek.total)}`,
-              },
-            });
-          });
-
-          val.push({
-            ref: el.ord_code,
-            type: "footer",
-            value: {
-              date: "Total",
-              po: "",
-              sup: "",
-              prod: "",
-              ord: "",
-              unit: "",
-              prc: "",
-              tot: `Rp. ${formatIdr(total)}`,
-            },
-          });
-
-          data.push(val);
-        }
-      });
-    }
 
     let final = [
       {
         columns: [
           {
-            title: "Sales Report",
+            title: "Purchase Order Report",
             width: { wch: 30 },
             style: {
-              font: { sz: "14", bold: true },
+              font: { sz: "16", bold: true },
               alignment: { horizontal: "left", vertical: "center" },
             },
           },
@@ -329,7 +180,7 @@ const SalesReport = () => {
             },
           },
           {
-            value: `${ek.value.po}`,
+            value: `${ek.value.rp}`,
             style: {
               font: { sz: "14", bold: ek.type === "header" ? true : false },
               alignment: { horizontal: "left", vertical: "center" },
@@ -350,7 +201,7 @@ const SalesReport = () => {
                 bold:
                   ek.type === "header" || ek.type === "footer" ? true : false,
               },
-              alignment: { horizontal: "right", vertical: "center" },
+              alignment: { horizontal: "left", vertical: "center" },
             },
           },
           {
@@ -387,7 +238,18 @@ const SalesReport = () => {
             },
           },
           {
-            value: `${ek.value.tot}`,
+            value: `${ek.value.t_prc}`,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.value.st_gra}`,
             style: {
               font: {
                 sz: "14",
@@ -406,55 +268,6 @@ const SalesReport = () => {
           style: {
             font: { sz: "14", bold: false },
             alignment: { horizontal: "left", vertical: "center" },
-          },
-        },
-        {
-          value: "",
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "left", vertical: "center" },
-          },
-        },
-        {
-          value: "",
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "left", vertical: "center" },
-          },
-        },
-        {
-          value: "",
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "right", vertical: "center" },
-          },
-        },
-        {
-          value: "",
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "right", vertical: "center" },
-          },
-        },
-        {
-          value: "",
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "right", vertical: "center" },
-          },
-        },
-        {
-          value: "",
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "right", vertical: "center" },
-          },
-        },
-        {
-          value: "",
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "right", vertical: "center" },
           },
         },
       ]);
@@ -499,7 +312,7 @@ const SalesReport = () => {
           },
           {
             title: "",
-            width: { wch: 30 },
+            width: { wch: 35 },
             style: {
               font: { sz: "14", bold: true },
               alignment: { horizontal: "right", vertical: "center" },
@@ -511,7 +324,7 @@ const SalesReport = () => {
           },
           {
             title: "",
-            width: { wch: 13 },
+            width: { wch: 10 },
             style: {
               font: { sz: "14", bold: true },
               alignment: { horizontal: "right", vertical: "center" },
@@ -523,7 +336,19 @@ const SalesReport = () => {
           },
           {
             title: "",
-            width: { wch: 12 },
+            width: { wch: 10 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 20 },
             style: {
               font: { sz: "14", bold: true },
               alignment: { horizontal: "right", vertical: "center" },
@@ -588,38 +413,36 @@ const SalesReport = () => {
                 <Calendar
                   value={filtersDate}
                   onChange={(e) => {
-                    console.log(e.value);
                     setFiltersDate(e.value);
                   }}
                   selectionMode="range"
                   placeholder="Pilih Tanggal"
                   dateFormat="dd-mm-yy"
+                  readOnlyInput
                 />
               </div>
             </div>
-
-            <div className="">
+            {/* <div className="">
               <Dropdown
-                value={selectedCus ?? null}
-                options={customer}
+                value={selectedSup ?? null}
+                options={supplier}
                 onChange={(e) => {
                   setSelected(e.value);
                 }}
-                placeholder="Pilih Customer"
-                optionLabel="pel_id.cus_name"
+                placeholder="Pilih Supplier"
+                optionLabel="sup_id.sup_name"
                 filter
-                filterBy="pel_id.cus_name"
+                filterBy="sup_id.sup_name"
                 showClear
               />
-            </div>
+            </div> */}
           </Row>
         </div>
-
         <div style={{ height: "1rem" }}></div>
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
             <ExcelFile
-              filename={`sales_report_export_${new Date().getTime()}`}
+              filename={`purchase_order_report_export_${new Date().getTime()}`}
               element={
                 <PrimeSingleButton
                   label="Excel"
@@ -628,8 +451,8 @@ const SalesReport = () => {
               }
             >
               <ExcelSheet
-                dataSet={sales ? jsonForExcel(sales, true) : null}
-                name="Report Sales"
+                dataSet={po ? jsonForExcel(po, true) : null}
+                name={"Purchase Order"}
               />
             </ExcelFile>
           </div>
@@ -687,15 +510,15 @@ const SalesReport = () => {
       </Row>
 
       <Row className="m-0 justify-content-center" ref={printPage}>
-        {chunk(jsonForExcel(sales) ?? [], chunkSize)?.map((val, idx) => {
+        {chunk(jsonForExcel(po) ?? [], chunkSize)?.map((val, idx) => {
           return (
-            <Card className="ml-1 mr-1 mt-2">
-              <Card.Body className="p-0">
+            <Card className="ml-1 mr-1 mt-0">
+              <Card.Body className="p-0 m-0">
                 <CustomeWrapper
-                  tittle={"Sales Report"}
-                  subTittle={`Sales Report for Period ${formatDate(
+                  tittle={"Purchase Order Report"}
+                  subTittle={`Purchase Order Report From ${formatDate(
                     filtersDate[0]
-                  )} to ${formatDate(filtersDate[1])}`}
+                  )} To ${formatDate(filtersDate[1])}`}
                   onComplete={(cp) => setCp(cp)}
                   page={idx + 1}
                   body={
@@ -708,15 +531,15 @@ const SalesReport = () => {
                             showGridlines
                             dataKey="id"
                             rowHover
-                            emptyMessage="Data Tidak Ditemukan"
-                            className="mt-4"
+                            emptyMessage="Tidak Ada Transaksi"
+                            className="mt-0"
                           >
                             <Column
                               className="header-center"
                               header={(e) =>
                                 e.props.value ? e.props?.value[0]?.ref : null
                               }
-                              style={{ width: "11rem" }}
+                              style={{ minWidht: "6rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -732,14 +555,14 @@ const SalesReport = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ width: "7rem" }}
+                              style={{ minWidht: "10rem" }}
                               body={(e) => (
                                 <div
                                   className={
                                     e.type === "header" && "font-weight-bold"
                                   }
                                 >
-                                  {e.value.po}
+                                  {e.value.rp}
                                 </div>
                               )}
                             />
@@ -802,13 +625,13 @@ const SalesReport = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ width: "10rem" }}
+                              style={{ minWidht: "10rem" }}
                               body={(e) => (
                                 <div
                                   className={
-                                    e.type === "header"
+                                    e.type == "header"
                                       ? "font-weight-bold text-right"
-                                      : e.type === "footer"
+                                      : e.type == "footer"
                                       ? "font-weight-bold text-right"
                                       : "text-right"
                                   }
@@ -820,18 +643,36 @@ const SalesReport = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ width: "10rem" }}
+                              style={{ minWidht: "10rem" }}
                               body={(e) => (
                                 <div
                                   className={
-                                    e.type === "header"
+                                    e.type == "header"
                                       ? "font-weight-bold text-right"
-                                      : e.type === "footer"
+                                      : e.type == "footer"
                                       ? "font-weight-bold text-right"
                                       : "text-right"
                                   }
                                 >
-                                  {e.value.tot}
+                                  {e.value.t_prc}
+                                </div>
+                              )}
+                            />
+                            <Column
+                              className="header-center"
+                              header=""
+                              style={{ minWidht: "10rem" }}
+                              body={(e) => (
+                                <div
+                                className={
+                                  e.type == "header"
+                                    ? "font-weight-bold text-right"
+                                    : e.type == "footer"
+                                    ? "font-weight-bold text-right"
+                                    : "text-right"
+                                  }
+                                >
+                                  {e.value.st_gra}
                                 </div>
                               )}
                             />
@@ -850,4 +691,4 @@ const SalesReport = () => {
   );
 };
 
-export default SalesReport;
+export default OutstandingPO;

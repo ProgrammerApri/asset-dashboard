@@ -130,24 +130,26 @@ const Customer = () => {
     }
   };
 
-  const getPiutangJT = () => {
-    let jte = 0;
-    ar?.forEach((element) => {
-      jte +=
-        (new Date() - new Date(`${element?.trx_due}Z`)) / (1000 * 60 * 60 * 24) > 60
-          ? element.trx_amnh
-          : 0;
-    });
-  };
-
   const getPiutangBJT = () => {
     let jt = 0;
     ar?.forEach((element) => {
-      jt +=
-        (new Date() - new Date(`${element?.trx_due}Z`)) / (1000 * 60 * 60 * 24) <= 0
-          ? element.trx_amnh
-          : 0;
+      let due = new Date(`${element?.trx_due}Z`);
+      let diff = (date - due) / (1000 * 60 * 60 * 24);
+
+      jt += diff <= 0 ? element.trx_amnh : 0;
     });
+    return jt;
+  };
+
+  const getPiutangJT = () => {
+    let jte = 0;
+    ar?.forEach((element) => {
+      let due = new Date(`${element?.trx_due}Z`);
+      let diff = (date - due) / (1000 * 60 * 60 * 24);
+
+      jte += diff > 60 ? element.trx_amnh : 0;
+    });
+    return jte;
   };
 
   const getTotal = () => {
@@ -155,9 +157,10 @@ const Customer = () => {
     ar?.forEach((element) => {
       total += element.trx_amnh;
 
-      console.log("cek");
-      console.log(total);
+      // console.log("cek");
+      // console.log(total);
     });
+    return total;
   };
 
   const formatIdr = (value) => {
@@ -222,7 +225,7 @@ const Customer = () => {
                     Piutang Jatuh Tempo Lebih Dari <b>60 Hari</b>
                   </span>
                   <h4 className="fs-140 text-black font-w600 mt-1">
-                    <b>Rp. {getPiutangJT()}</b>
+                    <b>Rp. {formatIdr(getPiutangJT())}</b>
                   </h4>
                 </div>
               </Row>
@@ -283,7 +286,7 @@ const Customer = () => {
                     Piutang Jatuh Tempo <b>Belum Jatuh Tempo</b>
                   </span>
                   <h4 className="fs-140 text-black font-w600 mt-1">
-                    <b>Rp. {getPiutangBJT()}</b>
+                    <b>Rp. {formatIdr(getPiutangBJT())}</b>
                   </h4>
                 </div>
               </Row>
@@ -344,7 +347,7 @@ const Customer = () => {
                     <b>Total Piutang</b>
                   </span>
                   <h4 className="fs-140 text-black font-w600 mt-1">
-                    <b>Rp. {getTotal()}</b>
+                    <b>Rp. {formatIdr(getTotal())}</b>
                   </h4>
                 </div>
               </Row>

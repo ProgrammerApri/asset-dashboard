@@ -1159,11 +1159,12 @@ const endpoints = {
     method: "GET",
     data: {},
   },
-  // delPbn: {
-  //   endpoint: "/v1/api/pbn/",
-  //   method: "DELETE",
-  //   data: {},
-  // },
+
+  sto: {
+    endpoint: "/v1/api/sto",
+    method: "GET",
+    data: {},
+  },
 };
 
 export default endpoints;

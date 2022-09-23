@@ -41,10 +41,7 @@ const SideMenu = () => {
         icon: "bx-barcode",
       },
 
-      {tittle: "Produksi",
-      to: "produksi",
-      icon: "bx-barcode",
-    },
+      { tittle: "Produksi", to: "produksi", icon: "bx-barcode" },
     ],
     Laporan: [
       {
@@ -107,9 +104,18 @@ const SideMenu = () => {
           <>
             <Link
               className={`menu-${key}-${i} ${
-                el.to === path.replace(patern, "") ? "active" : ""
+                el.to ===
+                `${
+                  path.replace(patern, "").includes("/")
+                    ? path
+                        .replace(patern, "")
+                        .substring(0, path.replace(patern, "").indexOf("/"))
+                    : path.replace(patern, "")
+                }`
+                  ? "active"
+                  : ""
               }`}
-              to={el.to}
+              to={"/" + el.to}
             >
               <i className={`bx ${el.icon}`}></i>
               <span className="sub-tittle">{el.tittle}</span>
@@ -122,7 +128,7 @@ const SideMenu = () => {
           </>
         );
       });
-      console.log(key);
+      // console.log(key);
       out.push(
         <div className="sidebar-menu">
           <div

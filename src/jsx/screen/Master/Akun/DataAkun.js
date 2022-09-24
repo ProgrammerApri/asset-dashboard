@@ -19,6 +19,8 @@ import { Badge } from "react-bootstrap";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
+import { ProgressBar } from "primereact/progressbar";
 
 const def = {
   account: {
@@ -62,6 +64,7 @@ const DataAkun = ({
   onInput = () => {},
   onRowSelect,
   onSuccessInput,
+  onSuccessImport,
 }) => {
   const [account, setAccount] = useState(null);
   const [kategori, setKategori] = useState(null);
@@ -83,6 +86,10 @@ const DataAkun = ({
   const [firstKat, setFirstKat] = useState(0);
   const [eName, setEname] = useState(false);
   const [eKat, setEkat] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const picker = useRef(null);
+  const progressBar = useRef(null);
+  const interval = useRef(null);
 
   useEffect(() => {
     getKategori();
@@ -248,8 +255,22 @@ const DataAkun = ({
     } catch (error) {}
   };
 
+  const addAccountImport = async (data, onSuccess) => {
+    const config = {
+      ...endpoints.addAccountImport,
+      data: data,
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      if (response.status) {
+        onSuccess();
+      }
+    } catch ({ error }) {}
+  };
+
   const editAccount = async () => {
-    setLoading(true);
+    setUpdate(true);
     const config = {
       ...endpoints.editAccount,
       endpoint: endpoints.editAccount.endpoint + currentItem.account.id,
@@ -272,7 +293,7 @@ const DataAkun = ({
       if (response.status) {
         setTimeout(() => {
           onSuccessInput();
-          setLoading(false);
+          setUpdate(false);
           onHideInput();
           onInput(false);
           getKategori(true);
@@ -299,7 +320,7 @@ const DataAkun = ({
   };
 
   const addAccount = async () => {
-    setLoading(true);
+    setUpdate(true);
     const config = {
       ...endpoints.addAccount,
       data: {
@@ -321,7 +342,7 @@ const DataAkun = ({
       if (response.status) {
         setTimeout(() => {
           onSuccessInput();
-          setLoading(false);
+          setUpdate(false);
           onHideInput();
           onInput(false);
           getKategori(true);
@@ -349,7 +370,7 @@ const DataAkun = ({
   };
 
   const delAccount = async (id) => {
-    setLoading(true);
+    // setLoading(true);
     const config = {
       ...endpoints.delAccount,
       endpoint: endpoints.delAccount.endpoint + id,
@@ -361,12 +382,11 @@ const DataAkun = ({
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setLoading(false);
+          setUpdate(false);
           setShowDelete(false);
           onSuccessInput();
           onInput(false);
           getKategori(true);
-          getAccount(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -378,7 +398,7 @@ const DataAkun = ({
     } catch (error) {
       console.log(error);
       setTimeout(() => {
-        setLoading(false);
+        setUpdate(false);
         setShowDelete(false);
         onSuccessInput();
         onInput(false);
@@ -495,7 +515,7 @@ const DataAkun = ({
           label="Batal"
           onClick={() => {
             setShowDelete(false);
-            setLoading(false);
+            setUpdate(false);
             onInput(false);
           }}
           className="p-button-text btn-primary"
@@ -537,7 +557,7 @@ const DataAkun = ({
             }
           }}
           autoFocus
-          loading={loading}
+          loading={update}
         />
       </div>
     );
@@ -560,38 +580,66 @@ const DataAkun = ({
 
   const renderHeader = () => {
     return (
-      <div className="flex justify-content-between">
-        <span className="p-input-icon-left">
-          <i className="pi pi-search" />
-          <InputText
-            value={globalFilterValue1}
-            onChange={onGlobalFilterChange1}
-            placeholder="Cari disini"
-          />
-        </span>
-        <Row className="mr-1">
-          <PrimeSingleButton
-            className="mr-3"
-            label="Export"
-            icon={<i className="pi pi-file-excel px-2"></i>}
-            onClick={() => {
-              exportExcel();
-            }}
-          />
-          <PrimeSingleButton
-            label="Tambah"
-            icon={<i class="bx bx-plus px-2"></i>}
-            onClick={() => {
-              setShowInput(true);
-              setEdit(false);
-              setLoading(false);
-              setCurrentItem(def);
-              onInput(true);
-            }}
-          />
-        </Row>
-      </div>
+      <Row>
+        <div className="flex justify-content-between col-12 pt-0">
+          <span className="p-input-icon-left">
+            <i className="pi pi-search" />
+            <InputText
+              value={globalFilterValue1}
+              onChange={onGlobalFilterChange1}
+              placeholder="Cari disini"
+            />
+          </span>
+          <Row className="mr-1">
+            <PrimeSingleButton
+              className="mr-3"
+              label="Export"
+              icon={<i className="pi pi-file-excel px-2"></i>}
+              onClick={() => {
+                exportExcel();
+              }}
+            />
+            <PrimeSingleButton
+              className="mr-3"
+              label="Import"
+              icon={<i className="pi pi-file-excel px-2"></i>}
+              onClick={(e) => {
+                confirmImport(e);
+              }}
+            />
+            <PrimeSingleButton
+              label="Tambah"
+              icon={<i class="bx bx-plus px-2"></i>}
+              onClick={() => {
+                setShowInput(true);
+                setEdit(false);
+                setLoading(false);
+                setCurrentItem(def);
+                onInput(true);
+              }}
+            />
+          </Row>
+        </div>
+        <div className="col-12" ref={progressBar} style={{ display: "none" }}>
+          <ProgressBar
+            mode="indeterminate"
+            style={{ height: "6px" }}
+          ></ProgressBar>
+        </div>
+      </Row>
     );
+  };
+
+  const confirmImport = (event) => {
+    // console.log(event);
+    confirmPopup({
+      target: event.currentTarget,
+      message: "Anda yakin ingin mengimport ?",
+      icon: "pi pi-exclamation-triangle",
+      accept: () => {
+        picker.current.click();
+      },
+    });
   };
 
   const umumTemplate = (option) => {
@@ -671,6 +719,9 @@ const DataAkun = ({
         KODE_ACC: el.account.acc_code,
         ACC_NAME: el.account.acc_name,
         KODE_UMM: el.account.umm_code != null ? el.account.umm_code : "-",
+        KLASI_CODE: el.klasifikasi.id,
+        KLASIFIKASI: el.klasifikasi.klasiname,
+        KAT_CODE: el.kategory.id,
         KAT_ACC: el.kategory.name,
         D_OR_U: el.account.dou_type,
         SLD_TYPE: el.account.sld_type,
@@ -717,10 +768,109 @@ const DataAkun = ({
     setEname(false);
   };
 
+  const processExcel = (file) => {
+    import("xlsx").then((xlsx) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const wb = xlsx.read(e.target.result, { type: "array" });
+        const wsname = wb.SheetNames[0];
+        const ws = wb.Sheets[wsname];
+        const data = xlsx.utils.sheet_to_json(ws, { header: 1 });
+
+        // Prepare DataTable
+        const cols = data[0];
+        data.shift();
+
+        let _importedData = data.map((d) => {
+          return cols.reduce((obj, c, i) => {
+            obj[c] = d[i];
+            return obj;
+          }, {});
+        });
+
+        _importedData = _importedData.filter(
+          (el) => el?.KLASI_CODE && el?.KAT_CODE
+        );
+
+        console.log(_importedData);
+        onSuccessImport();
+        progressBar.current.style.display = "";
+        let totalData = _importedData.length;
+        let totalSuccess = 0;
+        let val = progress;
+
+        let grouped = { umum: [], detail: [] };
+
+        let indexUmum = 0;
+        let indexDetail = 0;
+
+        _importedData.forEach((el) => {
+          if (el.D_OR_U === "U") {
+            grouped.umum.push({
+              acc_name: el.ACC_NAME,
+              kode_umum: el.KODE_UMM === "-" ? null : el?.KODE_UMM,
+              kode_kategori: el.KAT_CODE,
+              du: el.D_OR_U,
+              terhubung: el.TERHUBUNG,
+              kode_saldo: el.SLD_TYPE,
+              saldo_awal: el.SLD_AWAL ?? 0,
+            });
+          } else {
+            grouped.detail.push({
+              acc_name: el.ACC_NAME,
+              kode_umum: el.KODE_UMM
+                ? el.KODE_UMM === "-"
+                  ? null
+                  : el?.KODE_UMM
+                : null,
+              kode_kategori: el.KAT_CODE,
+              du: el.D_OR_U,
+              terhubung: el.TERHUBUNG,
+              kode_saldo: el.SLD_TYPE,
+              saldo_awal: el.SLD_AWAL ?? 0,
+            });
+          }
+        });
+
+        console.log(grouped.umum.length);
+        console.log(grouped.detail.length);
+        addAccountImport(grouped, () => {
+          setTimeout(() => {
+            toast.current.show({
+              severity: "info",
+              summary: "Berhasil",
+              detail: "Data berhasil diperbarui",
+              life: 3000,
+            });
+            onSuccessInput();
+            picker.current.value = null;
+            progressBar.current.style.display = "none";
+          }, 1000);
+        });
+      };
+
+      reader.readAsArrayBuffer(file);
+    });
+  };
+
   const renderBody = () => {
     return (
       <>
+        <ConfirmPopup />
         <Toast ref={toast} />
+        <input
+          type="file"
+          id="file"
+          ref={picker}
+          accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          style={{ display: "none" }}
+          onChange={(e) => {
+            console.log(e.target.value);
+            // setFile(e.target.files[0]);
+            const file = e.target.files[0];
+            processExcel(file);
+          }}
+        />
         <DataTable
           responsiveLayout="scroll"
           value={data}

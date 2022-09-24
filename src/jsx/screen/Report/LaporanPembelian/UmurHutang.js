@@ -618,7 +618,7 @@ const UmurHutang = () => {
                             <Column
                               className="header-center border-right"
                               header=""
-                              style={{ minWidht: "13rem" }}
+                              style={{ width: "13rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -634,7 +634,7 @@ const UmurHutang = () => {
                             <Column
                               className="header-center border-right"
                               header=""
-                              style={{ minWidht: "13rem" }}
+                              style={{ width: "13rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -652,7 +652,7 @@ const UmurHutang = () => {
                             <Column
                               className="header-center border-right"
                               header=""
-                              style={{ minWidht: "13rem" }}
+                              style={{ width: "13rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -670,7 +670,7 @@ const UmurHutang = () => {
                             <Column
                               className="header-center border-right"
                               header=""
-                              style={{ minWidht: "11rem" }}
+                              style={{ width: "11rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -688,7 +688,7 @@ const UmurHutang = () => {
                             <Column
                               className="header-center border-right"
                               header=""
-                              style={{ minWidht: "13rem" }}
+                              style={{ width: "13rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -706,7 +706,7 @@ const UmurHutang = () => {
                             <Column
                               className="header-center border-right"
                               header=""
-                              style={{ minWidht: "13rem" }}
+                              style={{ width: "13rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -724,7 +724,7 @@ const UmurHutang = () => {
                             <Column
                               className="header-center border-right"
                               header=""
-                              style={{ minWidht: "13rem" }}
+                              style={{ width: "13rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -778,7 +778,7 @@ const UmurHutang = () => {
                             <Column
                               className="header-center border-right"
                               header=""
-                              style={{ minWidht: "13rem" }}
+                              style={{ width: "13rem" }}
                               body={(e) => (
                                 <div
                                   className={

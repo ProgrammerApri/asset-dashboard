@@ -709,7 +709,7 @@ const SalesReport = () => {
                             dataKey="id"
                             rowHover
                             emptyMessage="Data Tidak Ditemukan"
-                            className="mt-4"
+                            className="mt-0"
                           >
                             <Column
                               className="header-center"
@@ -746,7 +746,7 @@ const SalesReport = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{ width: "12rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -760,7 +760,7 @@ const SalesReport = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{ width: "16rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -774,7 +774,7 @@ const SalesReport = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{ width: "6rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -788,7 +788,7 @@ const SalesReport = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{ width: "6rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -802,7 +802,7 @@ const SalesReport = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ width: "10rem" }}
+                              style={{ width: "9rem" }}
                               body={(e) => (
                                 <div
                                   className={

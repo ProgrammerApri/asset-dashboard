@@ -38,6 +38,12 @@ const endpoints = {
     data: {},
   },
 
+  addKategImport: {
+    endpoint: "/v1/api/import/kategori",
+    method: "POST",
+    data: {},
+  },
+
   /// Account
   account: {
     endpoint: "/v1/api/account",
@@ -53,6 +59,12 @@ const endpoints = {
 
   addAccount: {
     endpoint: "/v1/api/account",
+    method: "POST",
+    data: {},
+  },
+
+  addAccountImport: {
+    endpoint: "/v1/api/import/account",
     method: "POST",
     data: {},
   },
@@ -394,6 +406,46 @@ const endpoints = {
 
   editSetup: {
     endpoint: "/v1/api/setup/account/",
+    method: "PUT",
+    data: {},
+  },
+
+  // Setup Neraca
+
+  getNeraca: {
+    endpoint: "/v1/api/setup/neraca",
+    method: "GET",
+    data: {},
+  },
+
+  addNeraca: {
+    endpoint: "/v1/api/setup/neraca",
+    method: "POST",
+    data: {},
+  },
+
+  editNeraca: {
+    endpoint: "/v1/api/setup/neraca/",
+    method: "PUT",
+    data: {},
+  },
+
+  // Setup P/L
+
+  getPnl: {
+    endpoint: "/v1/api/setup/pnl",
+    method: "GET",
+    data: {},
+  },
+
+  addPnl: {
+    endpoint: "/v1/api/setup/pnl",
+    method: "POST",
+    data: {},
+  },
+
+  editPnl: {
+    endpoint: "/v1/api/setup/pnl/",
     method: "PUT",
     data: {},
   },
@@ -1103,19 +1155,25 @@ const endpoints = {
     data: {},
   },
 
-  addMemorial: {
+  addMemorialImport: {
+    endpoint: "/v1/api/import/memorial",
+    method: "POST",
+    data: {},
+  },
+
+  addMM: {
     endpoint: "/v1/api/memorial",
     method: "POST",
     data: {},
   },
 
-  editMemorial: {
+  editMM: {
     endpoint: "/v1/api/memorial/",
     method: "PUT",
     data: {},
   },
 
-  delMemorial: {
+  delMM: {
     endpoint: "/v1/api/memorial/",
     method: "DELETE",
     data: {},

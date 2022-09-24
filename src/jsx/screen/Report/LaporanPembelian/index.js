@@ -27,6 +27,7 @@ import OutstandingPO from "./OutstandingPO";
 import OutstandingRP from "./OutstandingRP";
 import UmurHutangRingkasan from "./UmurHutangRingkasan";
 import UmurPiutangRingkasan from "./UmurPiutangRingkasan";
+import OutstandingGRA from "./OutstandingGRA";
 
 const LaporanPembelian = (self) => {
   const [active, setActive] = useState(0);
@@ -55,6 +56,11 @@ const LaporanPembelian = (self) => {
       tittle: "Outstanding PO",
       icon: "bx-receipt",
       component: <OutstandingPO />,
+    },
+    {
+      tittle: "Outstanding Pembelian",
+      icon: "bx-receipt",
+      component: <OutstandingGRA />,
     },
     {
       tittle: "Penjualan",

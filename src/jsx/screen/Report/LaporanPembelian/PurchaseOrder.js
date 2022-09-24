@@ -510,6 +510,7 @@ const ReportPO = () => {
             <Card className="ml-1 mr-1 mt-0">
               <Card.Body className="p-0 m-0">
                 <CustomeWrapper
+                // horizontal
                   tittle={"Purchase Order Report"}
                   subTittle={`Purchase Order Report From ${formatDate(
                     filtersDate[0]
@@ -521,7 +522,7 @@ const ReportPO = () => {
                       {val.map((v) => {
                         return (
                           <DataTable
-                            responsiveLayout="scroll"
+                            responsiveLayout="none"
                             value={v}
                             showGridlines
                             dataKey="id"
@@ -534,7 +535,7 @@ const ReportPO = () => {
                               header={(e) =>
                                 e.props.value ? e.props?.value[0]?.ref : null
                               }
-                              style={{ minWidht: "6rem" }}
+                              style={{ width: "12rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -550,7 +551,7 @@ const ReportPO = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{ width: "9rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -564,7 +565,7 @@ const ReportPO = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{width: "9rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -578,7 +579,7 @@ const ReportPO = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{ width: "10rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -592,7 +593,7 @@ const ReportPO = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{ width: "5rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -606,7 +607,7 @@ const ReportPO = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{ width: "5rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -620,7 +621,7 @@ const ReportPO = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{ width: "6rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -638,7 +639,7 @@ const ReportPO = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{ width: "7rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -656,7 +657,7 @@ const ReportPO = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{ width: "6rem" }}
                               body={(e) => (
                                 <div
                                 className={

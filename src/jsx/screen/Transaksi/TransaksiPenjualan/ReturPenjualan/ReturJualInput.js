@@ -46,6 +46,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
   const [showSatuan, setShowSatuan] = useState(false);
   const [product, setProduct] = useState(null);
   const [satuan, setSatuan] = useState(null);
+  const [lokasi, setLoc] = useState(null);
   const [error, setError] = useState(defError);
   const [accor, setAccor] = useState({
     produk: true,
@@ -63,6 +64,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
     getSale();
     getProduct();
     getSatuan();
+    getLoc();
   }, []);
 
   const isValid = () => {
@@ -225,6 +227,22 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
+  const getLoc = async () => {
+    const config = {
+      ...endpoints.lokasi,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setLoc(data);
+      }
+    } catch (error) {}
+  };
+
   const editSR = async () => {
     const config = {
       ...endpoints.editSR,
@@ -348,6 +366,17 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
+  const checkLoc = (value) => {
+    let selected = {};
+    lokasi?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
   const onSubmit = () => {
     if (isValid()) {
       if (isEdit) {
@@ -378,7 +407,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
       if (el.nett_price && el.nett_price > 0) {
         total += parseInt(el.nett_price);
       } else {
-        total += el.total - (el.total * el.disc) / 100;
+        total += el.totl - (el.totl * el.disc) / 100;
       }
     });
 
@@ -483,7 +512,9 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                   ...sr,
                   sale_id: e.value.id,
                   pel_id: e.value?.pel_id?.id,
-                  product: e.value.jprod,
+                  product: e.value.jprod.map((v) => {
+                    return { ...v, totl: 0 };
+                  }),
                 });
                 let newError = error;
                 newError.sal = false;
@@ -595,7 +626,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                       // price: v?.price ?? 0,
                       // disc: v?.disc ?? 0,
                       // nett_price: v?.nett_price ?? 0,
-                      total: v?.total ?? 0,
+                      total: v?.totl ?? 0,
                     };
                   })}
                   className="display w-150 datatable-wrapper header-white no-border"
@@ -605,32 +636,82 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                   <Column
                     header="Produk"
                     className="align-text-top"
+                    style={{
+                      width: "20rem",
+                    }}
                     field={""}
                     body={(e) => (
-                      <CustomDropdown
-                        value={e.prod_id && checkProd(e.prod_id)}
-                        option={product}
-                        onChange={(u) => {
-                          let sat = [];
-                          satuan?.forEach((element) => {
-                            if (element.id === u.unit.id) {
-                              sat.push(element);
-                            } else {
-                              if (element.u_from?.id === u.unit.id) {
-                                sat.push(element);
-                              }
-                            }
-                          });
-                          setSatuan(sat);
+                      <PrimeInput
+                        value={e.prod_id && checkProd(e.prod_id).name}
+                        // option={product}
+                        // onChange={(u) => {
+                        //   let sat = [];
+                        //   satuan?.forEach((element) => {
+                        //     if (element.id === u.unit.id) {
+                        //       sat.push(element);
+                        //     } else {
+                        //       if (element.u_from?.id === u.unit.id) {
+                        //         sat.push(element);
+                        //       }
+                        //     }
+                        //   });
+                        //   // setSatuan(sat);
 
-                          let temp = [...sr.product];
-                          temp[e.index].prod_id = u.id;
-                          temp[e.index].unit_id = u.unit?.id;
-                          updateSr({ ...sr, product: temp });
-                        }}
+                        //   let temp = [...sr.product];
+                        //   temp[e.index].prod_id = u.id;
+                        //   temp[e.index].unit_id = u.unit?.id;
+                        //   updateSr({ ...sr, product: temp });
+                        // }}
                         placeholder="Pilih Kode Produk"
-                        label={"[name]"}
-                        detail
+                        // label={"[name]"}
+                        // detail
+                        disabled={sr.sale_id !== null}
+                      />
+                    )}
+                  />
+
+                  <Column
+                    header="Satuan"
+                    className="align-text-top"
+                    style={{
+                      width: "8rem",
+                    }}
+                    field={""}
+                    body={(e) => (
+                      <PrimeInput
+                        value={e.unit_id && checkUnit(e.unit_id).code}
+                        // onChange={(t) => {
+                        //   let temp = [...sr.product];
+                        //   temp[e.index].unit_id = t.id;
+                        //   updateSr({ ...sr, product: temp });
+                        // }}
+                        // option={satuan}
+                        // label={"[name]"}
+                        placeholder="Pilih Satuan"
+                        // detail
+                        // onDetail={() => setShowSatuan(true)}
+                        disabled={sr.sale_id !== null}
+                      />
+                    )}
+                  />
+
+                  <Column
+                    header="Lokasi"
+                    className="align-text-top"
+                    field={""}
+                    body={(e) => (
+                      <PrimeInput
+                        value={e.location && checkLoc(e.location).name}
+                        // onChange={(t) => {
+                        //   let temp = [...sr.product];
+                        //   temp[e.index].location = t.id;
+                        //   updateSr({ ...sr, product: temp });
+                        // }}
+                        // option={satuan}
+                        // label={"[name]"}
+                        placeholder="Pilih Satuan"
+                        // detail
+                        // onDetail={() => setShowSatuan(true)}
                         disabled={sr.sale_id !== null}
                       />
                     )}
@@ -646,40 +727,20 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                         onChange={(u) => {
                           let temp = [...sr.product];
                           temp[e.index].retur = u.target.value;
-                          temp[e.index].total =
+                          temp[e.index].totl =
                             temp[e.index].retur * temp[e.index].price;
                           updateSr({ ...sr, product: temp });
 
                           let newError = error;
                           newError.prod[e.index].ret = false;
+
+                          newError.prod.push({ ret: false });
                           setError(newError);
                         }}
                         placeholder="0"
                         type="number"
                         min={0}
                         error={error?.prod[e.index]?.ret}
-                      />
-                    )}
-                  />
-
-                  <Column
-                    header="Satuan"
-                    className="align-text-top"
-                    field={""}
-                    body={(e) => (
-                      <CustomDropdown
-                        value={e.unit_id && checkUnit(e.unit_id)}
-                        onChange={(t) => {
-                          let temp = [...sr.product];
-                          temp[e.index].unit_id = t.id;
-                          updateSr({ ...sr, product: temp });
-                        }}
-                        option={satuan}
-                        label={"[name]"}
-                        placeholder="Pilih Satuan"
-                        detail
-                        onDetail={() => setShowSatuan(true)}
-                        disabled={sr.sale_id !== null}
                       />
                     )}
                   />
@@ -695,7 +756,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                           onChange={(u) => {
                             let temp = [...sr.product];
                             temp[e.index].price = u.target.value;
-                            temp[e.index].total =
+                            temp[e.index].totl =
                               temp[e.index].retur * temp[e.index].price;
                             updateSr({ ...sr, product: temp });
                             console.log(temp);
@@ -764,7 +825,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                           {formatIdr(
                             e.nett_price && e.nett_price != 0
                               ? e.nett_price
-                              : e.total - (e.total * e.disc) / 100
+                              : e.totl - (e.totl * e.disc) / 100
                           )}
                         </b>
                       </label>
@@ -773,51 +834,27 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
 
                   <Column
                     className="align-text-top"
-                    body={(e) =>
-                      e.index === sr.product.length - 1 ? (
-                        <Link
-                          onClick={() => {
-                            let newError = error;
-                            newError.prod.push({ ret: false });
-                            setError(newError);
+                    body={(e) => (
+                      <Link
+                        onClick={() => {
+                          let newError = error;
+                          newError.prod.push({
+                            ret: false,
+                          });
+                          setError(newError);
 
-                            updateSr({
-                              ...sr,
-                              product: [
-                                ...sr.product,
-                                {
-                                  id: 0,
-                                  prod_id: null,
-                                  unit_id: null,
-                                  retur: null,
-                                  price: null,
-                                  disc: null,
-                                  nett_price: null,
-                                  total: null,
-                                },
-                              ],
-                            });
-                          }}
-                          className="btn btn-primary shadow btn-xs sharp ml-1"
-                        >
-                          <i className="fa fa-plus"></i>
-                        </Link>
-                      ) : (
-                        <Link
-                          onClick={() => {
-                            let temp = [...sr.product];
-                            temp.splice(e.index, 1);
-                            updateSr({
-                              ...sr,
-                              product: temp,
-                            });
-                          }}
-                          className="btn btn-danger shadow btn-xs sharp ml-1"
-                        >
-                          <i className="fa fa-trash"></i>
-                        </Link>
-                      )
-                    }
+                          let temp = [...sr.product];
+                          temp.splice(e.index, 1);
+                          updateSr({
+                            ...sr,
+                            product: temp,
+                          });
+                        }}
+                        className="btn btn-danger shadow btn-xs sharp ml-1"
+                      >
+                        <i className="fa fa-trash"></i>
+                      </Link>
+                    )}
                   />
                 </DataTable>
               </>

@@ -510,7 +510,7 @@ const UmurHutangRingkasan = () => {
         columns: [
           {
             title: "Supplier",
-            width: { wch: 20 },
+            width: { wch: 30 },
             style: {
               font: { sz: "14", bold: true },
               alignment: { horizontal: "left", vertical: "center" },
@@ -522,10 +522,10 @@ const UmurHutangRingkasan = () => {
           },
           {
             title: "Before Due",
-            width: { wch: 15 },
+            width: { wch: 20 },
             style: {
               font: { sz: "14", bold: true },
-              alignment: { horizontal: "left", vertical: "center" },
+              alignment: { horizontal: "right", vertical: "center" },
               fill: {
                 paternType: "solid",
                 fgColor: { rgb: "F3F3F3" },
@@ -534,10 +534,10 @@ const UmurHutangRingkasan = () => {
           },
           {
             title: "7 Day",
-            width: { wch: 15 },
+            width: { wch: 20 },
             style: {
               font: { sz: "14", bold: true },
-              alignment: { horizontal: "left", vertical: "center" },
+              alignment: { horizontal: "right", vertical: "center" },
               fill: {
                 paternType: "solid",
                 fgColor: { rgb: "F3F3F3" },
@@ -546,10 +546,10 @@ const UmurHutangRingkasan = () => {
           },
           {
             title: "14 Day",
-            width: { wch: 15 },
+            width: { wch: 20 },
             style: {
               font: { sz: "14", bold: true },
-              alignment: { horizontal: "left", vertical: "center" },
+              alignment: { horizontal: "right", vertical: "center" },
               fill: {
                 paternType: "solid",
                 fgColor: { rgb: "F3F3F3" },
@@ -558,7 +558,7 @@ const UmurHutangRingkasan = () => {
           },
           {
             title: "30 Day",
-            width: { wch: 15 },
+            width: { wch: 20 },
             style: {
               font: { sz: "14", bold: true },
               alignment: { horizontal: "right", vertical: "center" },
@@ -570,7 +570,7 @@ const UmurHutangRingkasan = () => {
           },
           {
             title: "60 Day",
-            width: { wch: 15 },
+            width: { wch: 20 },
             style: {
               font: { sz: "14", bold: true },
               alignment: { horizontal: "right", vertical: "center" },
@@ -582,7 +582,7 @@ const UmurHutangRingkasan = () => {
           },
           {
             title: "Older",
-            width: { wch: 15 },
+            width: { wch: 20 },
             style: {
               font: { sz: "14", bold: true },
               alignment: { horizontal: "right", vertical: "center" },
@@ -594,7 +594,7 @@ const UmurHutangRingkasan = () => {
           },
           {
             title: "Total",
-            width: { wch: 15 },
+            width: { wch: 20 },
             style: {
               font: { sz: "14", bold: true },
               alignment: { horizontal: "right", vertical: "center" },
@@ -664,7 +664,7 @@ const UmurHutangRingkasan = () => {
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
             <ExcelFile
-              filename={`due_date_payable_${formatDate(new Date())
+              filename={`summary_debt_age${formatDate(new Date())
                 .replace("-", "")
                 .replace("-", "")}`}
               element={
@@ -736,59 +736,53 @@ const UmurHutangRingkasan = () => {
                         rowHover
                         emptyMessage="Data Tidak Ditemukan"
                       >
-                        {/* <Column
-                          className="header-center border-right border-left"
-                          header={"Invoice"}
-                          style={{ width: "11rem" }}
-                          body={(e) => e[e.length-1].fk}
-                        /> */}
                         <Column
-                          className="header-center border-right border-left"
+                          className="border-right border-left"
                           header={"Supplier"}
-                          style={{ width: "15rem" }}
+                          style={{ width: "20rem" }}
                           body={(e) => e[e.length - 1].sup}
                         />
                         <Column
-                          className="header-center border-right"
+                          className="header-right text-right border-right"
                           header="Before Due"
-                          style={{ widht: "10rem" }}
+                          style={{ width: "10rem" }}
                           body={(e) => e[e.length - 1].value.jt}
                         />
                         <Column
-                          className="header-center border-right"
+                          className="header-right text-right border-right"
                           header="7 Day"
-                          style={{ widht: "10rem" }}
+                          style={{ width: "10rem" }}
                           body={(e) => e[e.length - 1].value.day1}
                         />
                         <Column
-                          className="header-center border-right"
+                          className="header-right text-right border-right"
                           header="14 Day"
-                          style={{ widht: "10rem" }}
+                          style={{ width: "10rem" }}
                           body={(e) => e[e.length - 1].value.day2}
                         />
                         <Column
-                          className="header-center border-right"
+                          className="header-right text-right border-right"
                           header="30 Day"
-                          style={{ widht: "10rem" }}
+                          style={{ width: "10rem" }}
                           body={(e) => e[e.length - 1].value.day3}
                         />
                         <Column
-                          className="header-center border-right"
+                          className="header-right text-right border-right"
                           header="60 Day"
-                          style={{ widht: "10rem" }}
+                          style={{ width: "10rem" }}
                           body={(e) => e[e.length - 1].value.day4}
                         />
                         <Column
-                          className="header-center border-right"
+                          className="header-right text-right border-right"
                           header="Older"
-                          style={{ widht: "10rem" }}
+                          style={{ width: "10rem" }}
                           body={(e) => e[e.length - 1].value.older}
                         />
 
                         <Column
-                          className="header-center border-right"
+                          className="header-right text-right border-right"
                           header="Total"
-                          style={{ widht: "10rem" }}
+                          style={{ width: "10rem" }}
                           body={(e) => e[e.length - 1].value.total}
                         />
                       </DataTable>

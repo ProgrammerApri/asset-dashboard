@@ -504,7 +504,7 @@ const ReportHutang = () => {
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
             <ExcelFile
-              filename={`payable_report_${formatDate(new Date())
+              filename={`payable_details_report_${formatDate(new Date())
                 .replace("-", "")
                 .replace("-", "")}`}
               element={
@@ -516,7 +516,7 @@ const ReportHutang = () => {
             >
               <ExcelSheet
                 dataSet={ap ? jsonForExcel(ap, true) : null}
-                name="Report"
+                name="Payable Details Report"
               />
             </ExcelFile>
           </div>
@@ -572,8 +572,8 @@ const ReportHutang = () => {
             <Card className="ml-1 mr-1 mt-2">
               <Card.Body className="p-0 m-0">
                 <CustomeWrapper
-                  tittle={"Payable Report"}
-                  subTittle={`Payable Report as ${formatDate(filtDate)}`}
+                  tittle={"Account Payable Details"}
+                  subTittle={`Account Payable Details as ${formatDate(filtDate)}`}
                   onComplete={(cp) => setCp(cp)}
                   page={idx + 1}
                   body={
@@ -609,7 +609,7 @@ const ReportHutang = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{ width: "10rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -623,7 +623,7 @@ const ReportHutang = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{ width: "10rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -637,7 +637,7 @@ const ReportHutang = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{ width: "10rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -655,7 +655,7 @@ const ReportHutang = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{ width: "10rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -673,7 +673,7 @@ const ReportHutang = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{ width: "10rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -712,8 +712,8 @@ const ReportHutang = () => {
         <Card ref={printPage}>
           <Card.Body className="p-0">
             <CustomeWrapper
-              tittle={"Payable Report"}
-              subTittle={`Payable Report as of ${formatDate(filtDate)}`}
+              tittle={"Account Payable Details"}
+              subTittle={`Account Payable Details as of ${formatDate(filtDate)}`}
               onComplete={(cp) => setCp(cp)}
               body={
                 <>
@@ -748,7 +748,7 @@ const ReportHutang = () => {
                         <Column
                           className="header-center"
                           header=""
-                          style={{ minWidht: "10rem" }}
+                          style={{ width: "10rem" }}
                           body={(e) => (
                             <div
                               className={
@@ -762,7 +762,7 @@ const ReportHutang = () => {
                         <Column
                           className="header-center"
                           header=""
-                          style={{ minWidht: "10rem" }}
+                          style={{ width: "10rem" }}
                           body={(e) => (
                             <div
                               className={
@@ -776,7 +776,7 @@ const ReportHutang = () => {
                         <Column
                           className="header-center"
                           header=""
-                          style={{ minWidht: "10rem" }}
+                          style={{ width: "10rem" }}
                           body={(e) => (
                             <div
                               className={
@@ -794,7 +794,7 @@ const ReportHutang = () => {
                         <Column
                           className="header-center"
                           header=""
-                          style={{ minWidht: "10rem" }}
+                          style={{ width: "10rem" }}
                           body={(e) => (
                             <div
                               className={
@@ -812,7 +812,7 @@ const ReportHutang = () => {
                         <Column
                           className="header-center"
                           header=""
-                          style={{ minWidht: "10rem" }}
+                          style={{ width: "10rem" }}
                           body={(e) => (
                             <div
                               className={

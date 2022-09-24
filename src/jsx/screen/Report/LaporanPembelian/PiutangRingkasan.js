@@ -127,8 +127,9 @@ const ReportPiutangRingkasan = () => {
               type: "header",
               value: {
                 ref: "Code",
-                PB: "Pembayaran ",
-                SB: "Sisa Bayar ",
+                NB: "Nilai Bukti",
+                PB: "Pembayaran",
+                SB: "Sisa Bayar",
                 SE: "Saldo Efektif ",
               },
             },
@@ -144,9 +145,9 @@ const ReportPiutangRingkasan = () => {
                 type: "item",
                 value: {
                   ref: `${el.customer.cus_name} (${el.customer.cus_code})`,
-
-                  PB: `Rp. ${formatIdr(ek.trx_amnh)}`,
-                  SB: `Rp. ${formatIdr(ek.acq_amnh)}`,
+                  NB: `Rp. ${formatIdr(ek.trx_amnh)}`,
+                  PB: `Rp. ${formatIdr(ek.acq_amnh)}`,
+                  SB: `Rp. ${formatIdr(ek.trx_amnh - ek.acq_amnh)}`,
                   SE: `Rp. ${formatIdr(ek.trx_amnh - ek.acq_amnh)}`,
                 },
               });
@@ -160,8 +161,9 @@ const ReportPiutangRingkasan = () => {
             type: "footer",
             value: {
               ref: "Total",
-              PB: `Rp. ${formatIdr(amn)}`,
-              SB: `Rp. ${formatIdr(acq)}`,
+              NB: `Rp. ${formatIdr(amn)}`,
+              PB: `Rp. ${formatIdr(acq)}`,
+              SB: `Rp. ${formatIdr(amn - acq)}`,
               SE: `Rp. ${formatIdr(amn - acq)}`,
             },
           });
@@ -212,14 +214,11 @@ const ReportPiutangRingkasan = () => {
             ref: `${el.customer.cus_code} - ${el.customer.cus_name} `,
 
             NB: `Rp. ${formatIdr(amn)}`,
-            PB: `Rp. ${formatIdr(amn)}`,
-            SB: `Rp. ${formatIdr(acq)}`,
+            PB: `Rp. ${formatIdr(acq)}`,
+            SB: `Rp. ${formatIdr(amn - acq)}`,
             SE: `Rp. ${formatIdr(amn - acq)}`,
           },
         });
-        console.log("===ooo=o=o=o=o=o=o=");
-        console.log(data);
-        console.log("jhjhjhkhjkhhkjjkhjhkjhjkhkjhhkjhjkh===========");
         data.push(val);
       });
     }
@@ -228,7 +227,7 @@ const ReportPiutangRingkasan = () => {
       {
         columns: [
           {
-            title: "summary accounts receivable",
+            title: "Accounts Receivable Summary",
             width: { wch: 30 },
             style: {
               font: { sz: "14", bold: true },
@@ -284,7 +283,16 @@ const ReportPiutangRingkasan = () => {
             alignment: { horizontal: "left", vertical: "center" },
           },
         },
-
+        {
+          value: `${ek[ek.length - 1].value.NB}`,
+          style: {
+            font: {
+              sz: "14",
+              bold: ek.type === "header" || ek.type === "footer" ? true : false,
+            },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
         {
           value: `${ek[ek.length - 1].value.PB}`,
           style: {
@@ -394,7 +402,7 @@ const ReportPiutangRingkasan = () => {
         value: "",
         style: {
           font: { sz: "14", bold: false },
-          alignment: { horizontal: "left", vertical: "center" },
+          alignment: { horizontal: "right", vertical: "center" },
         },
       },
     ]);
@@ -414,11 +422,23 @@ const ReportPiutangRingkasan = () => {
           },
         },
         {
+          title: "Nilai Bukti",
+          width: { wch: 17 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "right", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
           title: "Pembayaran",
           width: { wch: 17 },
           style: {
             font: { sz: "14", bold: true },
-            alignment: { horizontal: "left", vertical: "center" },
+            alignment: { horizontal: "right", vertical: "center" },
             fill: {
               paternType: "solid",
               fgColor: { rgb: "F3F3F3" },
@@ -430,7 +450,7 @@ const ReportPiutangRingkasan = () => {
           width: { wch: 17 },
           style: {
             font: { sz: "14", bold: true },
-            alignment: { horizontal: "left", vertical: "center" },
+            alignment: { horizontal: "right", vertical: "center" },
             fill: {
               paternType: "solid",
               fgColor: { rgb: "F3F3F3" },
@@ -507,7 +527,7 @@ const ReportPiutangRingkasan = () => {
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
             <ExcelFile
-              filename={`receivable_report_export_${new Date().getTime()}`}
+              filename={`receivable_report_summary_export_${new Date().getTime()}`}
               element={
                 <PrimeSingleButton
                   label="Excel"
@@ -517,7 +537,7 @@ const ReportPiutangRingkasan = () => {
             >
               <ExcelSheet
                 dataSet={ar ? jsonForExcel(ar, true) : null}
-                name="summary accounts receivable"
+                name="report"
               />
             </ExcelFile>
           </div>
@@ -573,8 +593,8 @@ const ReportPiutangRingkasan = () => {
             <Card className="ml-1 mr-1 mt-2">
               <Card.Body className="p-0 m-0">
                 <CustomeWrapper
-                  tittle={"summary accounts receivable"}
-                  subTittle={`summary accounts receivable as ${formatDate(
+                  tittle={"Accounts Receivable Summary"}
+                  subTittle={`Accounts Receivable Summary as ${formatDate(
                     filtDate
                   )}`}
                   onComplete={(cp) => setCp(cp)}
@@ -590,39 +610,30 @@ const ReportPiutangRingkasan = () => {
                         emptyMessage="Data Tidak Ditemukan"
                       >
                         <Column
-                          className="header-center"
                           header="Customer"
                           style={{ width: "15rem" }}
                           body={(e) => e[e.length - 1].value.ref}
                         />
-
                         <Column
-                          className="header-center"
+                          className="header-right text-right"
+                          header="Nilai Bukti"
+                          style={{ minWidht: "7rem" }}
+                          body={(e) => e[e.length - 1].value.NB}
+                        />
+                        <Column
+                          className="header-right text-right"
                           header="Pembayaran"
                           style={{ minWidht: "7rem" }}
                           body={(e) => e[e.length - 1].value.PB}
                         />
                         <Column
-                          className="header-center"
+                          className="header-right text-right"
                           header="Sisa Bayar"
                           style={{ minWidht: "7rem" }}
                           body={(e) => e[e.length - 1].value.SB}
                         />
-
-                        {/* <Column
-                              className="header-center"
-                              header="Uang Muka"
-                              style={{ minWidht: "7rem" }}
-                              body={(e) => e[e.length - 1].value.UM}
-                            /> */}
-                        {/* <Column
-                              className="header-center"
-                              header="Nilai Giro"
-                              style={{ minWidht: "7rem" }}
-                              body={(e) => e[e.length - 1].value.NG}
-                            /> */}
                         <Column
-                          className="header-center"
+                          className="header-right text-right"
                           header="Saldo Efektif"
                           style={{ minWidht: "7rem" }}
                           body={(e) => e[e.length - 1].value.SE}

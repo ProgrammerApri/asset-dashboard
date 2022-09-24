@@ -48,6 +48,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
   const [showSupplier, setShowSupplier] = useState(false);
   const [product, setProduct] = useState(null);
   const [satuan, setSatuan] = useState(null);
+  const [lokasi, setLoc] = useState(null);
   const [error, setError] = useState(defError);
   const [accor, setAccor] = useState({
     produk: true,
@@ -65,6 +66,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
     getFK();
     getProduct();
     getSatuan();
+    getLoc();
   }, []);
 
   const isValid = () => {
@@ -205,8 +207,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
       if (response.status) {
         const { data } = response;
         setProduct(data);
-        console.log("jsdj");
-        console.log(data);
+        
       }
     } catch (error) {}
   };
@@ -223,6 +224,22 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
       if (response.status) {
         const { data } = response;
         setSatuan(data);
+      }
+    } catch (error) {}
+  };
+
+  const getLoc = async () => {
+    const config = {
+      ...endpoints.lokasi,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setLoc(data);
       }
     } catch (error) {}
   };
@@ -331,8 +348,6 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
     product?.forEach((element) => {
       if (value === element.id) {
         selected = element;
-        console.log("SELEC");
-        console.log(selected);
       }
     });
 
@@ -342,6 +357,17 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
   const checkUnit = (value) => {
     let selected = {};
     satuan?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkLoc = (value) => {
+    let selected = {};
+    lokasi?.forEach((element) => {
       if (value === element.id) {
         selected = element;
       }
@@ -380,7 +406,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
       if (el.nett_price && el.nett_price > 0) {
         total += parseInt(el.nett_price);
       } else {
-        total += el.total - (el.total * el.disc) / 100;
+        total += el.totl - (el.totl * el.disc) / 100;
       }
     });
 
@@ -466,7 +492,9 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                 updatePr({
                   ...pr,
                   fk_id: e.id,
-                  product: e.product,
+                  product: e.product.map((v) => {
+                    return { ...v, location: v.location.id };
+                  }),
                 });
                 let newError = error;
                 newError.fk = false;
@@ -487,7 +515,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
               <InputText
                 value={
                   pr.fk_id !== null
-                    ? supp(checkFK(pr.fk_id)?.ord_id.sup_id).supplier.sup_name
+                    ? supp(checkFK(pr.fk_id)?.ord_id.sup_id)?.supplier?.sup_name
                     : null
                 }
                 placeholder="Pilih Supplier"
@@ -568,7 +596,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                       // price: v?.price ?? 0,
                       // disc: v?.disc ?? 0,
                       // nett_price: v?.nett_price ?? 0,
-                      // total: v?.total ?? 0,
+                      totl: v?.totl ?? 0,
                     };
                   })}
                   className="display w-150 datatable-wrapper header-white no-border"
@@ -578,31 +606,34 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                   <Column
                     header="Produk"
                     className="align-text-top"
+                    style={{
+                      width: "20rem",
+                    }}
                     field={""}
                     body={(e) => (
-                      <CustomDropdown
-                        value={e.prod_id && checkProd(e.prod_id)}
-                        option={product}
-                        onChange={(u) => {
-                          let sat = [];
-                          satuan.forEach((element) => {
-                            if (element.id === u.unit.id) {
-                              sat.push(element);
-                            } else {
-                              if (element.u_from?.id === u.unit.id) {
-                                sat.push(element);
-                              }
-                            }
-                          });
-                          setSatuan(sat);
+                      <PrimeInput
+                        value={e.prod_id && checkProd(e.prod_id).name}
+                        // option={product}
+                        // onChange={(u) => {
+                        //   let sat = [];
+                        //   satuan.forEach((element) => {
+                        //     if (element.id === u.unit.id) {
+                        //       sat.push(element);
+                        //     } else {
+                        //       if (element.u_from?.id === u.unit.id) {
+                        //         sat.push(element);
+                        //       }
+                        //     }
+                        //   });
+                        //   // setSatuan(sat);
 
-                          let temp = [...pr.product];
-                          temp[e.index].prod_id = u.id;
-                          temp[e.index].unit_id = u.unit?.id;
-                          updatePr({ ...pr, product: temp });
-                        }}
+                        //   let temp = [...pr.product];
+                        //   temp[e.index].prod_id = u.id;
+                        //   temp[e.index].unit_id = u.unit?.id;
+                        //   updatePr({ ...pr, product: temp });
+                        // }}
                         placeholder="Pilih Kode Produk"
-                        label={"[name]"}
+                        // label={"[name]"}
                         disabled={pr.fk_id !== null}
                         // onDetail={() => setShowProduk(true)}
                       />
@@ -612,18 +643,41 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                   <Column
                     header="Satuan"
                     className="align-text-top"
+                    style={{
+                      width: "8rem",
+                    }}
                     field={""}
                     body={(e) => (
-                      <CustomDropdown
-                        value={e.unit_id && checkUnit(e.unit_id)}
-                        onChange={(t) => {
-                          let temp = [...pr.product];
-                          temp[e.index].unit_id = t.id;
-                          updatePr({ ...pr, product: temp });
-                        }}
-                        option={satuan}
-                        label={"[name]"}
+                      <PrimeInput
+                        value={e.unit_id && checkUnit(e.unit_id).code}
+                        // onChange={(t) => {
+                        //   let temp = [...pr.product];
+                        //   temp[e.index].unit_id = t.id;
+                        //   updatePr({ ...pr, product: temp });
+                        // }}
+                        // option={satuan}
+                        // label={"[name]"}
                         placeholder="Pilih Satuan"
+                        disabled={pr.fk_id !== null}
+                      />
+                    )}
+                  />
+
+                  <Column
+                    header="Lokasi"
+                    className="align-text-top"
+                    field={""}
+                    body={(e) => (
+                      <PrimeInput
+                        value={e.location && checkLoc(e.location)?.name}
+                        // onChange={(t) => {
+                        //   let temp = [...pr.product];
+                        //   temp[e.index].location = t.id;
+                        //   updatePr({ ...pr, product: temp });
+                        // }}
+                        // option={lokasi}
+                        // label={"[name]"}
+                        placeholder="Pilih Lokasi"
                         disabled={pr.fk_id !== null}
                       />
                     )}
@@ -632,6 +686,9 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                   <Column
                     header="Retur"
                     className="align-text-top"
+                    style={{
+                      width: "8rem",
+                    }}
                     field={""}
                     body={(e) => (
                       <div className="p-inputgroup">
@@ -640,12 +697,14 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                           onChange={(u) => {
                             let temp = [...pr.product];
                             temp[e.index].retur = u.target.value;
-                            temp[e.index].total =
+                            temp[e.index].totl =
                               temp[e.index].retur * temp[e.index].price;
                             updatePr({ ...pr, product: temp });
 
                             let newError = error;
                             newError.prod[e.index].ret = false;
+
+                            newError.prod.push({ ret: false });
                             setError(newError);
                           }}
                           placeholder="0"
@@ -668,7 +727,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                           onChange={(u) => {
                             let temp = [...pr.product];
                             temp[e.index].price = u.value;
-                            temp[e.index].total =
+                            temp[e.index].totl =
                               temp[e.index].retur * temp[e.index].price;
                             updatePr({ ...pr, product: temp });
                             console.log(temp);
@@ -683,6 +742,9 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                   <Column
                     header="Diskon"
                     className="align-text-top"
+                    style={{
+                      width: "10rem",
+                    }}
                     field={""}
                     body={(e) => (
                       <div className="p-inputgroup">
@@ -730,54 +792,41 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                     field={""}
                     body={(e) => (
                       <label className="text-nowrap">
-                        <b>Rp. {formatIdr(getSubTotalBarang())}</b>
+                        <b>
+                          Rp.{" "}
+                          {formatIdr(
+                            e.nett_price && e.nett_price != 0
+                              ? e.nett_price
+                              : e.totl - (e.totl * e.disc) / 100
+                          )}
+                        </b>
                       </label>
                     )}
                   />
 
-                  {/* <Column
-                    body={(e) =>
-                      e.index === pr.product.length - 1 ? (
-                        <Link
-                          onClick={() => {
-                            updatePr({
-                              ...pr,
-                              product: [
-                                ...pr.product,
-                                {
-                                  id: 0,
-                                  prod_id: null,
-                                  unit_id: null,
-                                  retur: null,
-                                  price: null,
-                                  disc: null,
-                                  nett_price: null,
-                                  total: null,
-                                },
-                              ],
-                            });
-                          }}
-                          className="btn btn-primary shadow btn-xs sharp ml-1"
-                        >
-                          <i className="fa fa-plus"></i>
-                        </Link>
-                      ) : (
-                        <Link
-                          onClick={() => {
-                            let temp = [...pr.product];
-                            temp.splice(e.index, 1);
-                            updatePr({
-                              ...pr,
-                              product: temp,
-                            });
-                          }}
-                          className="btn btn-danger shadow btn-xs sharp ml-1"
-                        >
-                          <i className="fa fa-trash"></i>
-                        </Link>
-                      )
-                    }
-                  /> */}
+                  <Column
+                    body={(e) => (
+                      <Link
+                        onClick={() => {
+                          let newError = error;
+                          newError.prod.push({
+                            ret: false,
+                          });
+                          setError(newError);
+
+                          let temp = [...pr.product];
+                          temp.splice(e.index, 1);
+                          updatePr({
+                            ...pr,
+                            product: temp,
+                          });
+                        }}
+                        className="btn btn-danger shadow btn-xs sharp ml-1"
+                      >
+                        <i className="fa fa-trash"></i>
+                      </Link>
+                    )}
+                  />
                 </DataTable>
               </>
             }

@@ -123,7 +123,6 @@ const ReportHutangRingkasan = () => {
         if (selectedSup?.sup_id?.id === el.supplier?.id) {
           let val = [
             {
-              // sup: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
               type: "header",
               value: {
                 ref: "No.Pemasok/Nama Pemasok",
@@ -141,7 +140,6 @@ const ReportHutangRingkasan = () => {
             let dt = new Date(`${ek.ord_id?.fk_date}Z`);
             if (dt <= filtDate) {
               val.push({
-                // sup: `${el.supplier.sup_code} - ${el.supplier.sup_name} `,
                 type: "item",
                 value: {
                   ref: ek.ord_id.fk_code,
@@ -157,18 +155,16 @@ const ReportHutangRingkasan = () => {
             }
           });
           val.push({
-            // sup: `${el.supplier.sup_code} - ${el.supplier.sup_name} `,
             type: "footer",
             value: {
               ref: `${el.supplier.sup_code} - ${el.supplier.sup_name} `,
-             
+
               typ: el.trx_type,
-             
+
               value: `Rp. ${formatIdr(amn)}`,
               lns: `Rp. ${formatIdr(acq)}`,
               sisa: `Rp. ${formatIdr(acq)}`,
               SE: `Rp. ${formatIdr(amn - acq)}`,
-              
             },
           });
           data.push(val);
@@ -178,7 +174,6 @@ const ReportHutangRingkasan = () => {
       ap?.forEach((el) => {
         let val = [
           {
-            // sup: `${el.supplier.sup_code} - ${el.supplier.sup_name} )`,
             type: "header",
             value: {
               ref: "Nama Pemasok",
@@ -196,10 +191,9 @@ const ReportHutangRingkasan = () => {
           let dt = new Date(`${ek.ord_id?.fk_date}Z`);
           if (dt <= filtDate) {
             val.push({
-              // sup: `${el.supplier.sup_code} - ${el.supplier.sup_name} `,
               type: "item",
               value: {
-                ref: ` ${el.supplier.sup_code} - ${el.supplier.sup_name} `,
+                ref: `${el.supplier.sup_code} - ${el.supplier.sup_name} `,
 
                 typ: `${ek.trx_type}`,
                 value: `Rp. ${formatIdr(ek.trx_amnh)}`,
@@ -213,17 +207,16 @@ const ReportHutangRingkasan = () => {
           }
 
           val.push({
-            // sup: `${el.supplier.sup_code} - ${el.supplier.sup_name} `,
             type: "footer",
             value: {
-              ref: ` ${el.supplier.sup_code} - ${el.supplier.sup_name} `,
+              ref: `${el.supplier.sup_code} - ${el.supplier.sup_name} `,
 
               typ: `${ek.trx_type}`,
 
               value: `Rp. ${formatIdr(amn)}`,
               lns: `Rp. ${formatIdr(acq)}`,
 
-              sisa: `Rp. ${formatIdr( acq)}`,
+              sisa: `Rp. ${formatIdr(amn - acq)}`,
               SE: `Rp. ${formatIdr(amn - acq)}`,
             },
           });
@@ -231,16 +224,13 @@ const ReportHutangRingkasan = () => {
 
         data.push(val);
       });
-      console.log("oooooooooooooooooooo");
-      console.log(data);
-      console.log("oooooooooooooooooooo");
     }
 
     let final = [
       {
         columns: [
           {
-            title: "Payable Report",
+            title: "Payable Report Summary",
             width: { wch: 30 },
             style: {
               font: { sz: "14", bold: true },
@@ -293,7 +283,7 @@ const ReportHutangRingkasan = () => {
           value: `${ek[ek.length - 1].value.typ}`,
           style: {
             font: { sz: "14", bold: ek.type === "header" ? true : false },
-            alignment: { horizontal: "left", vertical: "center" },
+            alignment: { horizontal: "center", vertical: "center" },
           },
         },
 
@@ -343,8 +333,6 @@ const ReportHutangRingkasan = () => {
     });
 
     item.push([
-      
-      
       {
         value: "",
         style: {
@@ -405,10 +393,10 @@ const ReportHutangRingkasan = () => {
         },
         {
           title: "Type",
-          width: { wch: 15 },
+          width: { wch: 8 },
           style: {
             font: { sz: "14", bold: true },
-            alignment: { horizontal: "left", vertical: "center" },
+            alignment: { horizontal: "center", vertical: "center" },
             fill: {
               paternType: "solid",
               fgColor: { rgb: "F3F3F3" },
@@ -417,19 +405,7 @@ const ReportHutangRingkasan = () => {
         },
         {
           title: "Nilai Terbukti",
-          width: { wch: 15 },
-          style: {
-            font: { sz: "14", bold: true },
-            alignment: { horizontal: "left", vertical: "center" },
-            fill: {
-              paternType: "solid",
-              fgColor: { rgb: "F3F3F3" },
-            },
-          },
-        },
-        {
-          title: "Pembayaran",
-          width: { wch: 15 },
+          width: { wch: 20 },
           style: {
             font: { sz: "14", bold: true },
             alignment: { horizontal: "right", vertical: "center" },
@@ -440,8 +416,20 @@ const ReportHutangRingkasan = () => {
           },
         },
         {
-          title: "Sisa Bayaran",
-          width: { wch: 15 },
+          title: "Pembayaran",
+          width: { wch: 20 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "right", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          title: "Sisa",
+          width: { wch: 20 },
           style: {
             font: { sz: "14", bold: true },
             alignment: { horizontal: "right", vertical: "center" },
@@ -453,7 +441,7 @@ const ReportHutangRingkasan = () => {
         },
         {
           title: "Saldo Efektif",
-          width: { wch: 15 },
+          width: { wch: 20 },
           style: {
             font: { sz: "14", bold: true },
             alignment: { horizontal: "right", vertical: "center" },
@@ -463,18 +451,9 @@ const ReportHutangRingkasan = () => {
             },
           },
         },
-        
-        
       ],
       data: item,
     });
-    
-    console.log("=======");
-    console.log(item);
-    console.log("=======");
-
-    console.log("========");
-    console.log(data);
 
     if (excel) {
       return final;
@@ -528,7 +507,7 @@ const ReportHutangRingkasan = () => {
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
             <ExcelFile
-              filename={`payable_report_${formatDate(new Date())
+              filename={`payable_report_summary_${formatDate(new Date())
                 .replace("-", "")
                 .replace("-", "")}`}
               element={
@@ -596,8 +575,10 @@ const ReportHutangRingkasan = () => {
             <Card className="ml-1 mr-1 mt-2">
               <Card.Body className="p-0 m-0">
                 <CustomeWrapper
-                  tittle={"Payable Report"}
-                  subTittle={`Payable Report as ${formatDate(filtDate)}`}
+                  tittle={"Payable Report Summary"}
+                  subTittle={`Payable Report Summary as ${formatDate(
+                    filtDate
+                  )}`}
                   onComplete={(cp) => setCp(cp)}
                   page={idx + 1}
                   body={
@@ -610,45 +591,41 @@ const ReportHutangRingkasan = () => {
                         rowHover
                         emptyMessage="Data Tidak Ditemukan"
                       >
-                       
                         <Column
-                          className="header-center"
                           header="Nama Supplier"
                           style={{ width: "20rem" }}
                           body={(e) => e[e.length - 1].value.ref}
                         />
 
                         <Column
-                          className="header-center"
                           header="Type"
-                          style={{ minWidht: "10rem" }}
+                          style={{ width: "10rem" }}
                           body={(e) => e[e.length - 1].value.typ}
                         />
-                       
 
                         <Column
-                          className="header-center"
+                          className="header-right text-right"
                           header="Nilai Terbukti"
-                          style={{ minWidht: "10rem" }}
+                          style={{ width: "10rem" }}
                           body={(e) => e[e.length - 1].value.value}
                         />
                         <Column
-                          className="header-center"
+                          className="header-right text-right"
                           header="Pembayaran"
-                          style={{ minWidht: "10rem" }}
+                          style={{ width: "10rem" }}
                           body={(e) => e[e.length - 1].value.lns}
                         />
                         <Column
-                          className="header-center"
+                          className="header-right text-right"
                           header="Sisa Bayar"
-                          style={{ minWidht: "10rem" }}
+                          style={{ width: "10rem" }}
                           body={(e) => e[e.length - 1].value.sisa}
                         />
-                      
+
                         <Column
-                          className="header-center"
+                          className="header-right text-right"
                           header="Saldo Efektif"
-                          style={{ minWidht: "10rem" }}
+                          style={{ width: "10rem" }}
                           body={(e) => e[e.length - 1].value.SE}
                         />
                       </DataTable>
@@ -660,8 +637,6 @@ const ReportHutangRingkasan = () => {
           );
         })}
       </Row>
-
-     
     </>
   );
 };

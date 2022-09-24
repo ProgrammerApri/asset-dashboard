@@ -442,7 +442,7 @@ const OutstandingPO = () => {
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
             <ExcelFile
-              filename={`purchase_order_report_export_${new Date().getTime()}`}
+              filename={`outstanding_po_report_export_${new Date().getTime()}`}
               element={
                 <PrimeSingleButton
                   label="Excel"
@@ -452,7 +452,7 @@ const OutstandingPO = () => {
             >
               <ExcelSheet
                 dataSet={po ? jsonForExcel(po, true) : null}
-                name={"Purchase Order"}
+                name={"Outstanding PO"}
               />
             </ExcelFile>
           </div>
@@ -515,8 +515,8 @@ const OutstandingPO = () => {
             <Card className="ml-1 mr-1 mt-0">
               <Card.Body className="p-0 m-0">
                 <CustomeWrapper
-                  tittle={"Purchase Order Report"}
-                  subTittle={`Purchase Order Report From ${formatDate(
+                  tittle={"Outstanding PO Report"}
+                  subTittle={`Outstanding PO Report From ${formatDate(
                     filtersDate[0]
                   )} To ${formatDate(filtersDate[1])}`}
                   onComplete={(cp) => setCp(cp)}
@@ -526,7 +526,7 @@ const OutstandingPO = () => {
                       {val.map((v) => {
                         return (
                           <DataTable
-                            responsiveLayout="scroll"
+                            responsiveLayout="none"
                             value={v}
                             showGridlines
                             dataKey="id"

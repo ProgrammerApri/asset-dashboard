@@ -42,10 +42,10 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [doubleClick, setDoubleClick] = useState(false);
-  const memorial = useSelector((state) => state.memo.current);
-  const isEdit = useSelector((state) => state.memo.editMemo);
+  const memorial = useSelector((state) => state.memorial.current);
+  const isEdit = useSelector((state) => state.memorial.editMemo);
   const dispatch = useDispatch();
-  const [date, setDate] = useState(new Date());
+  const [setup, setSetup] = useState(null);
   const [showAcc, setShowAcc] = useState(false);
   const [showDep, setShowDep] = useState(false);
   const [account, setAccount] = useState(null);
@@ -65,6 +65,7 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
       behavior: "smooth",
     });
     getAcc();
+    getSetup();
     getDept();
     getCurrency();
   }, []);
@@ -90,6 +91,22 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
           }
         });
         setAccount(filt);
+      }
+    } catch (error) {}
+  };
+
+  const getSetup = async () => {
+    const config = {
+      ...endpoints.getCompany,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setSetup(data);
       }
     } catch (error) {}
   };
@@ -128,8 +145,8 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
 
   const editMM = async () => {
     const config = {
-      ...endpoints.editMemorial,
-      endpoint: endpoints.editMemorial.endpoint + memorial.id,
+      ...endpoints.editMM,
+      endpoint: endpoints.editMM.endpoint + memorial.id,
       data: memorial,
     };
     console.log(config.data);
@@ -155,7 +172,7 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
 
   const addMM = async () => {
     const config = {
-      ...endpoints.addMemorial,
+      ...endpoints.addMM,
       data: { ...memorial, date: currentDate(memorial.date) },
     };
     console.log(config.data);
@@ -317,8 +334,6 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
         nom_k += element.amnt;
       }
     });
-    // console.log(nom_d);
-    // console.log(nom_k);
 
     setState(nom_k !== nom_d);
     if (nom_k !== nom_d) {
@@ -398,11 +413,20 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
     return valid;
   };
 
+  const header = () => {
+    return (
+      <h4 className="mb-5">
+        <b>Pembelian (PO)</b>
+        {/* <b>{isEdit ? "Edit" : "Buat"} Pembelian (PO)</b> */}
+      </h4>
+    );
+  };
+
   const glTemplate = (option) => {
     return (
       <div>
         {option !== null
-          ? `${option.account.acc_name} - ${option.account.acc_code}`
+          ? `${option.account?.acc_name} - ${option.account?.acc_code}`
           : ""}
       </div>
     );
@@ -413,7 +437,7 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
       return (
         <div>
           {option !== null
-            ? `${option.account.acc_name} - ${option.account.acc_code}`
+            ? `${option.account?.acc_name} - ${option.account?.acc_code}`
             : ""}
         </div>
       );
@@ -423,6 +447,7 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
   };
 
   const body = () => {
+    let date = new Date(new Date().getFullYear(), setup?.cutoff - 1, 31);
     return (
       <>
         {/* Put content body here */}
@@ -458,6 +483,7 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
               showIcon
               dateFormat="dd-mm-yy"
               error={error?.date}
+              minDate={date}
             />
           </div>
 
@@ -504,12 +530,12 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
                     emptyMessage={() => <div></div>}
                   >
                     <Column
-                      header="Account Memorial  "
+                      header="Account Memorial	"
                       className="align-text-top"
                       field={""}
                       body={(e) => (
                         <PrimeDropdown
-                          value={e.acc_id && checkAcc(e.acc_id)}
+                          value={e.acc_id && checkAcc(e?.acc_id)}
                           options={account}
                           onChange={(u) => {
                             let temp = [...memorial.memo];
@@ -527,11 +553,11 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
                             setShowAcc(true);
                           }}
                           optionLabel="account.acc_name"
-                          placeholder="Pilih Akun"
-                          filter
-                          filterBy="account.acc_name"
                           itemTemplate={glTemplate}
                           valueTemplate={valTemp}
+                          filter
+                          filterBy={"account.acc_name"}
+                          placeholder="Pilih Akun"
                           errorMessage="Akun Belum Dipilih"
                           error={error?.akn[e.index]?.id}
                         />
@@ -581,7 +607,7 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
                           }}
                           optionLabel="name"
                           placeholder="D/K"
-                          errorMessage="Tipe Belum Dipilih"
+                          errorMessage="Type Belum Dipilih"
                           error={error?.akn[e.index]?.type}
                         />
                       )}
@@ -601,6 +627,9 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
 
                             let newError = error;
                             newError.akn[e.index].nom = false;
+                            newError.akn.push({
+                              nom: false,
+                            });
                             setError(newError);
                           }}
                           min={0}

@@ -1,0 +1,5 @@
+export const SET_CURRENT_MM = "memorial.SET_CURRENT_MM"
+export const SET_MM = "memorial.SET_MM"
+export const RESET_CURRENT_MM = "memorial.RESET_CURRENT_MM"
+export const UPDATE_CURRENT_MM = "memorial.UPDATE_CURRENT_MM"
+export const SET_EDIT_MM = "memorial.SET_EDIT_MM"

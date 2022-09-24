@@ -31,6 +31,7 @@ const ReturJualList = ({ onAdd, onDetail, onEdit }) => {
   const [rows2, setRows2] = useState(20);
   const [displayDel, setDisplayDel] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
+  const [expandedRows, setExpandedRows] = useState(null);
   const toast = useRef(null);
   const dispatch = useDispatch();
   const sr = useSelector((state) => state.sr.sr);
@@ -316,9 +317,50 @@ const ReturJualList = ({ onAdd, onDetail, onEdit }) => {
     return [day, month, year].join("-");
   };
 
+  const formatIdr = (value) => {
+    return `${value}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
+  const rowExpansionTemplate = (data) => {
+    return (
+      <div className="">
+        <DataTable value={data.product} responsiveLayout="scroll">
+          <Column
+            header="Produk"
+            style={{ width: "31rem" }}
+            field={(e) => `${e.prod_id.name} - ${e.prod_id.code}`}
+          />
+          <Column
+            header="Satuan"
+            style={{ width: "24rem" }}
+            field={(e) => e.unit_id.code ?? "-"}
+          />
+          <Column
+            header="Lokasi"
+            style={{ width: "15rem" }}
+            field={(e) => e.location.name}
+          />
+          <Column
+            header="Retur"
+            style={{ width: "15rem" }}
+            field={(e) => e.retur}
+          />
+          <Column
+            header="Harga Satuan"
+            field={(e) => formatIdr(e.price)}
+            // style={{ minWidth: "8rem" }}
+            // body={loading && <Skeleton />}
+          />
+        </DataTable>
+      </div>
+    );
+  };
+
   return (
     <>
-    <Toast ref={toast} />
+      <Toast ref={toast} />
       <Row>
         <Col className="pt-0">
           <Card>
@@ -340,7 +382,11 @@ const ReturJualList = ({ onAdd, onDetail, onEdit }) => {
                 rows={rows2}
                 onPage={onCustomPage2}
                 paginatorClassName="justify-content-end mt-3"
+                expandedRows={expandedRows}
+                onRowToggle={(e) => setExpandedRows(e.data)}
+                rowExpansionTemplate={rowExpansionTemplate}
               >
+                <Column expander style={{ width: "3em" }} />
                 <Column
                   header="Tanggal"
                   style={{

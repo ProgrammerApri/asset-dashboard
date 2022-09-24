@@ -11,20 +11,22 @@ import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 import { Dropdown } from "primereact/dropdown";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 
-const data = {
-  
-};
+const data = {};
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
-const OutstandingRP = () => {
-  const [rp, setRp] = useState(null);
+const OutstandingSalesOrder = () => {
+  const [so, setSo] = useState(null);
   const [loading, setLoading] = useState(true);
   const printPage = useRef(null);
   const [filtersDate, setFiltersDate] = useState([new Date(), new Date()]);
   const [cp, setCp] = useState("");
-  const chunkSize = 5;
+  const chunkSize = 27;
+
+  const [satuanDasar, setSatuanDasar] = useState(null);
+  const [satuan, setSatuan] = useState(null);
+  const [lokasi, setLokasi] = useState(null);
 
   useEffect(() => {
     var d = new Date();
@@ -32,13 +34,15 @@ const OutstandingRP = () => {
     setFiltersDate([d, new Date()]);
 
     // initFilters1();
-    getRp();
+    getSo();
+    getLokasi();
+    getSatuan();
   }, []);
 
-  const getRp = async (isUpdate = false) => {
-    setLoading(true);
+  const getSatuan = async (isUpdate = false) => {
+    // setLoading(true);
     const config = {
-      ...endpoints.rPurchase,
+      ...endpoints.getSatuan,
       data: {},
     };
     console.log(config.data);
@@ -48,7 +52,15 @@ const OutstandingRP = () => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        setRp(data);
+        console.log(data);
+        setSatuan(data);
+        let dasar = [];
+        data.forEach((el) => {
+          if (el.type === "d") {
+            dasar.push(el);
+          }
+        });
+        setSatuanDasar(dasar);
       }
     } catch (error) {}
     if (isUpdate) {
@@ -60,68 +72,136 @@ const OutstandingRP = () => {
     }
   };
 
-  const jsonForExcel = (rp, excel = false) => {
+  const getLokasi = async () => {
+    const config = {
+      ...endpoints.lokasi,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setLokasi(data);
+      }
+    } catch (error) {}
+  };
+
+  let selected = {};
+  const checkLok = (value) => {
+    lokasi?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+  const checkUnit = (value) => {
+    let selected = {};
+    satuan.forEach((el) => {
+      if (value === el.id) {
+        selected = el;
+      }
+    });
+
+    return selected;
+  };
+
+  const getSo = async (isUpdate = false) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.so,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setSo(data);
+      }
+    } catch (error) {}
+    if (isUpdate) {
+      setLoading(false);
+    } else {
+      setTimeout(() => {
+        setLoading(false);
+      }, 500);
+    }
+  };
+
+  const jsonForExcel = (so, excel = false) => {
     let data = [];
 
-    rp?.forEach((el) => {
-      if (el.status !== 2) {
-        let tgl_gra = new Date(`${el?.req_date}Z`);
-      if (tgl_gra >= filtersDate[0] && tgl_gra <= filtersDate[1]) {
+    so?.forEach((el) => {
+      if (el.status !== 1) {
+        let tgl_gra = new Date(`${el?.so_date}Z`);
+        if (tgl_gra >= filtersDate[0] && tgl_gra <= filtersDate[1]) {
           let val = [
             {
-              ref: `No. Req : ${el.req_code}`,
+              ref: `No. Req : ${el.so_code}`,
               type: "header",
               value: {
-                date: "Date",
-                sup: "Ref. Supplier",
-                prod: "Product Name",
+                date: "Tanggal",
+                prod: "Product",
+                cus: "Ref. Customer",
+                lok: "Lokasi",
                 ord: "Quantity",
                 unit: "Unit",
-                st_po: "Status",
+                // hs: "Harga Satuan",
+                total: "Total",
               },
             },
           ];
 
           let total = 0;
-          el.rprod?.forEach((ek) => {
+          el.sprod?.forEach((ek) => {
             val.push({
               type: "item",
               value: {
-                date: formatDate(el.req_date),
-                sup: el.ref_sup !== null ?`${el.ref_sup.sup_name} (${el.ref_sup.sup_name})` : "-",
-                prod: `${ek.prod_id.name} (${ek.prod_id.code})`,
-                ord: ek.request,
-                unit: ek.unit_id.code,
-                st_po: ek.status !== 1 ? "Open" : "Close",
+                date: formatDate(el.so_date),
+                prod: `(${ek.prod_id.code}) ${ek.prod_id.name} `,
+                cus:
+                  el.pel_id !== null
+                    ? `(${el.pel_id.cus_code}) ${el.pel_id.cus_name}`
+                    : "-",
+                lok: checkLok(ek.location).name,
+                ord: ek.order,
+                unit: ek.prod_id.unit && ek.unit_id.name,
+                total: `Rp. ${formatIdr(ek.total)}`,
               },
             });
-            // total += ek.total;
           });
 
-        //   val.push({
-        //     // ref: el.kd_gra,
-        //     type: "footer",
-        //     value: {
-        //       date: "Total",
-        //       sup: "",
-        //       prod: "",
-        //       ord: "",
-        //       unit: "",
-        //       prc: "",
-        //       tot: `Rp. ${formatIdr(total)}`,
-        //     },
-        //   });
+          //   val.push({
+          //     // ref: el.kd_gra,
+          //     type: "footer",
+          //     value: {
+          //       date: "Total",
+          //       sup: "",
+          //       prod: "",
+          //       ord: "",
+          //       unit: "",
+          //       prc: "",
+          //       tot: `Rp. ${formatIdr(total)}`,
+          //     },
+          //   });
           data.push(val);
+        }
       }
-      }
-      
     });
 
     let final = [
       {
         columns: [
           {
-            title: "Request Purchase Report",
+            title: "Outstanding Sales Order Report",
             width: { wch: 30 },
             style: {
               font: { sz: "16", bold: true },
@@ -169,14 +249,7 @@ const OutstandingRP = () => {
                 bold:
                   ek.type === "header" || ek.type === "footer" ? true : false,
               },
-              alignment: { horizontal: "left", vertical: "center" },
-            },
-          },
-          {
-            value: `${ek.value.sup}`,
-            style: {
-              font: { sz: "14", bold: ek.type === "header" ? true : false },
-              alignment: { horizontal: "left", vertical: "center" },
+              alignment: { horizontal: "right", vertical: "center" },
             },
           },
           {
@@ -187,11 +260,18 @@ const OutstandingRP = () => {
                 bold:
                   ek.type === "header" || ek.type === "footer" ? true : false,
               },
-              alignment: { horizontal: "right", vertical: "center" },
+              alignment: { horizontal: "left", vertical: "center" },
             },
           },
           {
-            value: `${ek.value.ord}`,
+            value: `${ek.value.cus}`,
+            style: {
+              font: { sz: "14", bold: ek.type === "header" ? true : false },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.value.lok}`,
             style: {
               font: {
                 sz: "14",
@@ -202,7 +282,7 @@ const OutstandingRP = () => {
             },
           },
           {
-            value: `${ek.value.unit}`,
+            value: ek.value.ord,
             style: {
               font: {
                 sz: "14",
@@ -213,7 +293,19 @@ const OutstandingRP = () => {
             },
           },
           {
-            value: `${ek.value.st_po}`,
+            value: `${ek?.value?.unit}`,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+
+          {
+            value: `${ek.value.total}`,
             style: {
               font: {
                 sz: "14",
@@ -240,9 +332,33 @@ const OutstandingRP = () => {
         columns: [
           {
             title: `${el[0].ref}`,
-            width: { wch: 30 },
+            width: { wch: 20 },
             style: {
               font: { sz: "14", bold: false },
+              alignment: { horizontal: "left", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 40 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "left", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 30 },
+            style: {
+              font: { sz: "14", bold: true },
               alignment: { horizontal: "left", vertical: "center" },
               fill: {
                 paternType: "solid",
@@ -255,7 +371,7 @@ const OutstandingRP = () => {
             width: { wch: 15 },
             style: {
               font: { sz: "14", bold: true },
-              alignment: { horizontal: "left", vertical: "center" },
+              alignment: { horizontal: "right", vertical: "center" },
               fill: {
                 paternType: "solid",
                 fgColor: { rgb: "F3F3F3" },
@@ -264,19 +380,7 @@ const OutstandingRP = () => {
           },
           {
             title: "",
-            width: { wch: 35 },
-            style: {
-              font: { sz: "14", bold: true },
-              alignment: { horizontal: "left", vertical: "center" },
-              fill: {
-                paternType: "solid",
-                fgColor: { rgb: "F3F3F3" },
-              },
-            },
-          },
-          {
-            title: "",
-            width: { wch: 10 },
+            width: { wch: 15 },
             style: {
               font: { sz: "14", bold: true },
               alignment: { horizontal: "right", vertical: "center" },
@@ -288,7 +392,7 @@ const OutstandingRP = () => {
           },
           {
             title: "",
-            width: { wch: 13 },
+            width: { wch: 15 },
             style: {
               font: { sz: "14", bold: true },
               alignment: { horizontal: "right", vertical: "center" },
@@ -300,7 +404,7 @@ const OutstandingRP = () => {
           },
           {
             title: "",
-            width: { wch: 13 },
+            width: { wch: 15 },
             style: {
               font: { sz: "14", bold: true },
               alignment: { horizontal: "right", vertical: "center" },
@@ -370,7 +474,7 @@ const OutstandingRP = () => {
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
             <ExcelFile
-              filename={`outstanding_rp_report_export_${new Date().getTime()}`}
+              filename={`Outstanding_Sales_Order _report_export_${new Date().getTime()}`}
               element={
                 <PrimeSingleButton
                   label="Excel"
@@ -379,8 +483,8 @@ const OutstandingRP = () => {
               }
             >
               <ExcelSheet
-                dataSet={rp ? jsonForExcel(rp, true) : null}
-                name={"Outstanding RP"}
+                dataSet={so ? jsonForExcel(so, true) : null}
+                name={"Outstanding Sales Order "}
               />
             </ExcelFile>
           </div>
@@ -438,13 +542,13 @@ const OutstandingRP = () => {
       </Row>
 
       <Row className="m-0 justify-content-center" ref={printPage}>
-        {chunk(jsonForExcel(rp) ?? [], chunkSize)?.map((val, idx) => {
+        {chunk(jsonForExcel(so) ?? [], chunkSize)?.map((val, idx) => {
           return (
             <Card className="ml-1 mr-1 mt-0">
               <Card.Body className="p-0 m-0">
                 <CustomeWrapper
-                  tittle={"Outstanding RP Report"}
-                  subTittle={`Outstanding RP Report From ${formatDate(
+                  tittle={"Outstanding Sales Order Report"}
+                  subTittle={`Outstanding Sales Order Report From ${formatDate(
                     filtersDate[0]
                   )} To ${formatDate(filtersDate[1])}`}
                   onComplete={(cp) => setCp(cp)}
@@ -454,7 +558,7 @@ const OutstandingRP = () => {
                       {val.map((v) => {
                         return (
                           <DataTable
-                            responsiveLayout="scroll"
+                            responsiveLayout="none"
                             value={v}
                             showGridlines
                             dataKey="id"
@@ -467,7 +571,7 @@ const OutstandingRP = () => {
                               header={(e) =>
                                 e.props.value ? e.props?.value[0]?.ref : null
                               }
-                              style={{ minWidth: "11rem" }}
+                              style={{ minWidth: "10rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -483,21 +587,7 @@ const OutstandingRP = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidth: "12rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header" && "font-weight-bold"
-                                  }
-                                >
-                                  {e.value.sup}
-                                </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center"
-                              header=""
-                              style={{ minWidth: "10rem" }}
+                              style={{ minWidth: "15rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -511,7 +601,35 @@ const OutstandingRP = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidth: "8rem" }}
+                              style={{ minWidth: "15rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header" && "font-weight-bold"
+                                  }
+                                >
+                                  {e.value.cus}
+                                </div>
+                              )}
+                            />
+                            <Column
+                              className="header-center"
+                              header=""
+                              style={{ minWidth: "5rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header" && "font-weight-bold"
+                                  }
+                                >
+                                  {e.value.lok}
+                                </div>
+                              )}
+                            />
+                            <Column
+                              className="header-center"
+                              header=""
+                              style={{ minWidth: "5rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -525,7 +643,7 @@ const OutstandingRP = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidth: "8rem" }}
+                              style={{ minWidth: "5rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -546,7 +664,7 @@ const OutstandingRP = () => {
                                     e.type === "header" && "font-weight-bold"
                                   }
                                 >
-                                  {e.value.st_po}
+                                  {e.value.total}
                                 </div>
                               )}
                             />
@@ -565,4 +683,4 @@ const OutstandingRP = () => {
   );
 };
 
-export default OutstandingRP;
+export default OutstandingSalesOrder;

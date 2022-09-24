@@ -14,6 +14,8 @@ import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { SelectButton } from "primereact/selectbutton";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
+import { ProgressBar } from "primereact/progressbar";
 
 const data = {
   kategory: {
@@ -33,7 +35,7 @@ const kodesaldo = [
   { name: "Kredit", code: "K" },
 ];
 
-const KategoriAkun = () => {
+const KategoriAkun = ({ onSuccessImport }) => {
   const [klasifikasi, setKlasifikasi] = useState(null);
   const [kategori, setKategori] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -48,6 +50,10 @@ const KategoriAkun = () => {
   const [isEdit, setEdit] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+  const [progress, setProgress] = useState(0);
+  const picker = useRef(null);
+  const progressBar = useRef(null);
+  const interval = useRef(null);
 
   const dummy = Array.from({ length: 10 });
 
@@ -57,6 +63,7 @@ const KategoriAkun = () => {
 
   useEffect(() => {
     getKlasifikasi();
+    progressBar.current.style.display = "none";
     initFilters1();
   }, []);
 
@@ -266,27 +273,176 @@ const KategoriAkun = () => {
 
   const renderHeader = () => {
     return (
-      <div className="flex justify-content-between">
-        <span className="p-input-icon-left">
-          <i className="pi pi-search" />
-          <InputText
-            value={globalFilterValue1}
-            onChange={onGlobalFilterChange1}
-            placeholder="Cari disini"
-          />
-        </span>
-        <PrimeSingleButton
-          label="Tambah"
-          icon={<i class="bx bx-plus px-2"></i>}
-          onClick={() => {
-            setEdit(false);
-            setCurrentItem(data);
+      <Row>
+        <div className="flex justify-content-between col-12">
+          <span className="p-input-icon-left">
+            <i className="pi pi-search" />
+            <InputText
+              value={globalFilterValue1}
+              onChange={onGlobalFilterChange1}
+              placeholder="Cari disini"
+            />
+          </span>
+          <Row className="mr-1">
+            {/* <PrimeSingleButton
+            className="mr-3"
+            label="Export"
+            icon={<i className="pi pi-file-excel px-2"></i>}
+            onClick={() => {
+              exportExcel();
+            }}
+          /> */}
+            <PrimeSingleButton
+              className="mr-3"
+              label="Import"
+              icon={<i className="pi pi-file-excel px-2"></i>}
+              onClick={(e) => {
+                confirmImport(e);
+              }}
+            />
+            <PrimeSingleButton
+              label="Tambah"
+              icon={<i class="bx bx-plus px-2"></i>}
+              onClick={() => {
+                setEdit(false);
+                setCurrentItem(data);
 
-            onClick("displayData", data);
-          }}
-        />
-      </div>
+                onClick("displayData", data);
+              }}
+            />
+          </Row>
+        </div>
+        <div className="col-12" ref={progressBar}>
+          <ProgressBar
+            mode="indeterminate"
+            style={{ height: "6px" }}
+          ></ProgressBar>
+        </div>
+      </Row>
     );
+  };
+
+  const confirmImport = (event) => {
+    // console.log(event);
+    confirmPopup({
+      target: event.currentTarget,
+      message: "Anda yakin ingin mengimport ?",
+      icon: "pi pi-exclamation-triangle",
+      accept: () => {
+        picker.current.click();
+      },
+    });
+  };
+
+  const processExcel = (file) => {
+    import("xlsx").then((xlsx) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const wb = xlsx.read(e.target.result, { type: "array" });
+        const wsname = wb.SheetNames[0];
+        const ws = wb.Sheets[wsname];
+        const data = xlsx.utils.sheet_to_json(ws, { header: 1 });
+
+        // Prepare DataTable
+        const cols = data[0];
+        data.shift();
+
+        let _importedData = data.map((d) => {
+          return cols.reduce((obj, c, i) => {
+            obj[c] = d[i];
+            return obj;
+          }, {});
+        });
+        
+        _importedData = _importedData.filter(
+          (el) => el?.Kode_Klasifikasi
+        );
+
+        progressBar.current.style.display = "";
+        let totalData = _importedData.length;
+        let kateg = [];
+        let val = progress;
+
+        _importedData.forEach((el) => {
+          kateg?.push({
+            id: el.Kode,
+            name: el.Nama,
+            kode_klasi: el.Kode_Klasifikasi,
+            kode_saldo: el.Saldo,
+          });
+        });
+
+        addKategoriImport(kateg, () => {
+          setTimeout(() => {
+            toast.current.show({
+              severity: "info",
+              summary: "Berhasil",
+              detail: "Data berhasil diperbarui",
+              life: 3000,
+            });
+            getKategori(true);
+            picker.current.value = null;
+            progressBar.current.style.display = "none";
+          }, 1000);
+        });
+      };
+
+      reader.readAsArrayBuffer(file);
+    });
+  };
+
+  const addKategoriImport = async (data, onSuccess) => {
+    const config = {
+      ...endpoints.addKategImport,
+      data: { kateg: data },
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      if (response.status) {
+        onSuccess();
+      }
+    } catch ({ error }) {}
+  };
+
+  const exportExcel = () => {
+    let data = [];
+    kategori.forEach((el, i) => {
+      data.push({
+        Kode: i + 1,
+        Nama: el.kategory.name,
+        Klasifikasi: el.klasifikasi.klasiname,
+        Saldo: el.kategory.kode_saldo,
+      });
+    });
+
+    import("xlsx").then((xlsx) => {
+      const worksheet = xlsx.utils.json_to_sheet(data);
+      const workbook = { Sheets: { data: worksheet }, SheetNames: ["data"] };
+      const excelBuffer = xlsx.write(workbook, {
+        bookType: "xlsx",
+        type: "array",
+      });
+      saveAsExcelFile(excelBuffer, "account_kategory");
+    });
+  };
+
+  const saveAsExcelFile = (buffer, fileName) => {
+    import("file-saver").then((module) => {
+      if (module && module.default) {
+        let EXCEL_TYPE =
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+        let EXCEL_EXTENSION = ".xlsx";
+        const data = new Blob([buffer], {
+          type: EXCEL_TYPE,
+        });
+
+        module.default.saveAs(
+          data,
+          fileName + "_export_" + new Date().getTime() + EXCEL_EXTENSION
+        );
+      }
+    });
   };
 
   const template2 = {
@@ -337,11 +493,25 @@ const KategoriAkun = () => {
 
   return (
     <>
+      <ConfirmPopup />
       <Toast ref={toast} />
       <Row>
         <Col>
           <Card>
             <Card.Body>
+              <input
+                type="file"
+                id="file"
+                ref={picker}
+                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                style={{ display: "none" }}
+                onChange={(e) => {
+                  console.log(e.target.value);
+                  // setFile(e.target.files[0]);
+                  const file = e.target.files[0];
+                  processExcel(file);
+                }}
+              />
               <DataTable
                 responsive="scroll"
                 value={loading ? dummy : kategori}

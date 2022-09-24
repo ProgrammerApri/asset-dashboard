@@ -5,6 +5,8 @@ import Penjualan from "./Penjualan";
 import Pembelian from "./Pembelian";
 import Pengguna from "./Pengguna";
 import SetupAkun from "./SetupAkun";
+import SetupNeraca from "./SetupNeraca";
+import SetupPnl from "./SetupPnl";
 
 const Setup = () => {
   return (
@@ -23,6 +25,12 @@ const Setup = () => {
       </TabPanel>
       <TabPanel header="Setup Akun">
         <SetupAkun/>
+      </TabPanel>
+      <TabPanel header="Setup Neraca">
+        <SetupNeraca/>
+      </TabPanel>
+      <TabPanel header="Setup P/L">
+        <SetupPnl/>
       </TabPanel>
     </TabView>
   );

@@ -76,6 +76,7 @@ const Markup = ({ width }) => {
     { url: "master-lainnya", component: MasterLainnya },
     { url: "master-lainnya/:active", component: MasterLainnya },
     { url: "transaksi", component: Transaksi },
+    { url: "transaksi/:active", component: Transaksi },
     { url: "bank-&-kas", component: BankKas },
     { url: "transaksi-persediaan", component: TransaksiPersediaan },
     { url: "laporan", component: LaporanPembelian },

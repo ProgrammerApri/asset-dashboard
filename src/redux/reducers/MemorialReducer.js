@@ -2,12 +2,12 @@ import { SET_CURRENT_MM, SET_EDIT_MM, SET_MM } from "../actions";
 
 
 const initialState = {
-  memo: [],
+  memorial: [],
   current: {},
   editMemo: false
 };
 
-const MemoReducer = (state = initialState, { type, payload }) => {
+const MemorialReducer = (state = initialState, { type, payload }) => {
   switch (type) {
     case SET_CURRENT_MM:
       return {
@@ -17,7 +17,7 @@ const MemoReducer = (state = initialState, { type, payload }) => {
     case SET_MM:
       return {
         ...state,
-        memo: payload,
+        memorial: payload,
       };
       case SET_EDIT_MM:
         return {
@@ -30,4 +30,4 @@ const MemoReducer = (state = initialState, { type, payload }) => {
   }
 };
 
-export default MemoReducer;
+export default MemorialReducer;

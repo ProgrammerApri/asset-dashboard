@@ -742,7 +742,7 @@ const ReportGRA = () => {
                             dataKey="id"
                             rowHover
                             emptyMessage="Tidak Ada Transaksi"
-                            className="mt-4"
+                            className="mt-0"
                           >
                             <Column
                               className="header-center"
@@ -765,21 +765,21 @@ const ReportGRA = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{ width: "7rem" }}
                               body={(e) => (
                                 <div
                                   className={
                                     e.type === "header" && "font-weight-bold"
                                   }
                                 >
-                                  {e.value.po}
+                                  {e.value.po ?? "-"}
                                 </div>
                               )}
                             />
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{ width: "12rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -793,7 +793,7 @@ const ReportGRA = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{ width: "12rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -807,7 +807,7 @@ const ReportGRA = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{ width: "5rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -821,7 +821,7 @@ const ReportGRA = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{ width: "5rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -835,7 +835,7 @@ const ReportGRA = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{ width: "9rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -853,7 +853,7 @@ const ReportGRA = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{ width: "9rem" }}
                               body={(e) => (
                                 <div
                                   className={

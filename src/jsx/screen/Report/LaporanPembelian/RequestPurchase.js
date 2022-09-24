@@ -452,7 +452,7 @@ const ReportRP = () => {
                       {val.map((v) => {
                         return (
                           <DataTable
-                            responsiveLayout="scroll"
+                            responsiveLayout="none"
                             value={v}
                             showGridlines
                             dataKey="id"

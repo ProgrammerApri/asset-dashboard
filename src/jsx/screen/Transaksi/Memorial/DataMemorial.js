@@ -13,6 +13,9 @@ import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_MM, SET_EDIT_MM, SET_MM } from "src/redux/actions";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
+import { Card, Row } from "react-bootstrap";
+import { ProgressBar } from "primereact/progressbar";
 
 const data = {
   id: null,
@@ -24,6 +27,8 @@ const data = {
 
 const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
   const [loading, setLoading] = useState(true);
+  const [expandedRows, setExpandedRows] = useState(null);
+  const [account, setAccount] = useState(null);
   const [update, setUpdate] = useState(true);
   const [displayDel, setDisplayDel] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
@@ -33,19 +38,23 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const dispatch = useDispatch();
-  const memorial = useSelector((state) => state.memo.memo);
+  const picker = useRef(null);
+  const progressBar = useRef(null);
+  const memorial = useSelector((state) => state.memorial.memorial);
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
     getMemorial();
+    progressBar.current.style.display = "none";
     initFilters1();
+    getAcc();
   }, []);
 
   const getMemorial = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.memorial
+      ...endpoints.memorial,
     };
     console.log(config.data);
     let response = null;
@@ -70,8 +79,8 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
   const delMM = async (id) => {
     setLoading(true);
     const config = {
-      ...endpoints.delMemorial,
-      endpoint: endpoints.delMemorial.endpoint + currentItem.id,
+      ...endpoints.delMM,
+      endpoint: endpoints.delMM.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -79,11 +88,10 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
       response = await request(null, config);
       console.log(response);
       if (response.status) {
-        dispatch({ type: SET_MM, payload: [] });
-        getMemorial(true);
         setTimeout(() => {
           setUpdate(false);
           setDisplayDel(false);
+          getMemorial(true);
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -107,46 +115,79 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
     }
   };
 
+  const checkAcc = (value) => {
+    let selected = {};
+    account?.forEach((element) => {
+      if (value === element.account.acc_code) {
+        selected = element;
+        console.log(selected);
+      }
+    });
+
+    return selected;
+  };
+
+  const getAcc = async () => {
+    const config = {
+      ...endpoints.account,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+
+      if (response.status) {
+        const { data } = response;
+        let filt = [];
+
+        setAccount(data);
+      }
+    } catch (error) {}
+  };
+
   const actionBodyTemplate = (data) => {
     return (
       // <React.Fragment>
+
       <div className="d-flex">
         <Link
           onClick={() => {
-            onEdit(data);
-            let memo = data.memo;
-            dispatch({
-              type: SET_EDIT_MM,
-              payload: true,
-            });
-            memo.forEach((el) => {
-              el.acc_id = el.acc_id?.id;
-              el.dep_id = el.dep_id?.id ?? null;
-              el.currency = el.currency?.id ?? null;
-            });
-            dispatch({
-              type: SET_CURRENT_MM,
-              payload: {
-                ...data,
-                memo:
-                  memo.length > 0
-                    ? memo
-                    : [
-                        {
-                          id: 0,
-                          acc_id: null,
-                          dep_id: null,
-                          currency: null,
-                          dbcr: null,
-                          amnt: null,
-                          amnh: null,
-                          desc: null,
-                        },
-                      ],
-              },
-            });
+              onEdit(data);
+              let memo = data.memo;
+              dispatch({
+                type: SET_EDIT_MM,
+                payload: true,
+              });
+              memo.forEach((el) => {
+                el.acc_id = el.acc_id?.id;
+                el.dep_id = el.dep_id?.id ?? null;
+                el.currency = el.currency?.id ?? null;
+              });
+              dispatch({
+                type: SET_CURRENT_MM,
+                payload: {
+                  ...data,
+                  memo:
+                    memo.length > 0
+                      ? memo
+                      : [
+                          {
+                            id: 0,
+                            acc_id: null,
+                            dep_id: null,
+                            currency: null,
+                            dbcr: null,
+                            amnt: null,
+                            amnh: null,
+                            desc: null,
+                          },
+                        ],
+                },
+              });
           }}
-          className="btn btn-primary shadow btn-xs sharp ml-1"
+          className={`btn ${
+            data.imp === false ? "" : "hidden"
+          } btn-primary shadow btn-xs sharp ml-1`}
         >
           <i className="fa fa-pencil"></i>
         </Link>
@@ -196,6 +237,20 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
     setGlobalFilterValue1(value);
   };
 
+  const addMemoImport = async (data, onSuccess) => {
+    const config = {
+      ...endpoints.addMemorialImport,
+      data: { memo: data },
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      if (response.status) {
+        onSuccess();
+      }
+    } catch ({ error }) {}
+  };
+
   const initFilters1 = () => {
     setFilters1({
       global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -204,46 +259,196 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
 
   const renderHeader = () => {
     return (
-      <div className="flex justify-content-between">
-        <span className="p-input-icon-left">
-          <i className="pi pi-search" />
-          <InputText
-            value={globalFilterValue1}
-            onChange={onGlobalFilterChange1}
-            placeholder="Cari disini"
-          />
-        </span>
-        <PrimeSingleButton
-          label="Tambah"
-          icon={<i class="bx bx-plus px-2"></i>}
-          onClick={() => {
-            onAdd();
-            dispatch({
-              type: SET_EDIT_MM,
-              payload: false,
-            });
-            dispatch({
-              type: SET_CURRENT_MM,
-              payload: {
-                ...data,
-                memo: [
-                  {
-                    id: 0,
-                    acc_id: null,
-                    dep_id: null,
-                    currency: null,
-                    dbcr: null,
-                    amnt: null,
-                    amnh: 0,
-                    desc: null,
+      <Row>
+        <div className="flex justify-content-between col-12">
+          <span className="p-input-icon-left">
+            <i className="pi pi-search" />
+            <InputText
+              value={globalFilterValue1}
+              onChange={onGlobalFilterChange1}
+              placeholder="Cari disini"
+            />
+          </span>
+          <Row className="mr-1">
+            <PrimeSingleButton
+              className="mr-3"
+              label="Import"
+              icon={<i className="pi pi-file-excel px-2"></i>}
+              onClick={(e) => {
+                confirmImport(e);
+              }}
+            />
+            <PrimeSingleButton
+              label="Tambah"
+              icon={<i class="bx bx-plus px-2"></i>}
+              onClick={() => {
+                onAdd();
+                dispatch({
+                  type: SET_EDIT_MM,
+                  payload: false,
+                });
+                dispatch({
+                  type: SET_CURRENT_MM,
+                  payload: {
+                    ...data,
+                    memo: [
+                      {
+                        id: 0,
+                        acc_id: null,
+                        dep_id: null,
+                        currency: null,
+                        dbcr: null,
+                        amnt: null,
+                        amnh: 0,
+                        desc: null,
+                      },
+                    ],
                   },
-                ],
-              },
-            });
-          }}
-        />
-      </div>
+                });
+              }}
+            />
+          </Row>
+        </div>
+        <div className="col-12" ref={progressBar}>
+          <ProgressBar
+            mode="indeterminate"
+            style={{ height: "6px" }}
+          ></ProgressBar>
+        </div>
+      </Row>
     );
+  };
+
+  const confirmImport = (event) => {
+    // console.log(event);
+    confirmPopup({
+      target: event.currentTarget,
+      message: "Anda yakin ingin mengimport ?",
+      icon: "pi pi-exclamation-triangle",
+      accept: () => {
+        picker.current.click();
+      },
+    });
+  };
+
+  const processExcel = (file) => {
+    import("xlsx").then((xlsx) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const wb = xlsx.read(e.target.result, { type: "array" });
+        const wsname = wb.SheetNames[0];
+        const ws = wb.Sheets[wsname];
+        const data = xlsx.utils.sheet_to_json(ws, { header: 1 });
+
+        // Prepare DataTable
+        const cols = data[0];
+        data.shift();
+
+        let _importedData = data.map((d) => {
+          return cols.reduce((obj, c, i) => {
+            obj[c] = d[i];
+            return obj;
+          }, {});
+        });
+
+        progressBar.current.style.display = "";
+
+        _importedData = _importedData.filter(
+          (el) => el?.KODE
+        );
+
+        console.log(_importedData);
+        let grouped = _importedData.filter(
+          (el, i) =>
+            i === _importedData.findIndex((ek) => el?.KODE === ek?.KODE)
+        );
+        console.log(grouped);
+
+        let new_memorial = [];
+        let not_valid = [];
+        let accNotValid = [];
+        grouped?.forEach((el) => {
+          let memo = [];
+          let debit = 0;
+          let credit = 0;
+          let validAccount = 0;
+          let memoLength = 0;
+          _importedData.forEach((ek) => {
+            if (el.KODE === ek.KODE) {
+              memo.push({
+                acc_id: checkAcc(ek.ACC)?.account?.id,
+                dep_id: null,
+                currency: null,
+                dbcr: ek.DK.toLowerCase(),
+                amnt: ek.NILAI,
+                amnh: 0,
+                desc: null,
+              });
+              validAccount += checkAcc(ek.ACC)?.account?.id ? 1 : 0;
+              if (!checkAcc(ek.ACC)?.account?.id) {
+                accNotValid.push({
+                  acc: ek.ACC,
+                });
+              }
+              memoLength += 1;
+              debit += ek.DK === "D" ? ek.NILAI : 0;
+              credit += ek.DK === "K" ? ek.NILAI : 0;
+            }
+          });
+          if (debit === credit && validAccount === memoLength) {
+            let date = el.TGL.split("/")
+            new_memorial.push({
+              code: el.KODE,
+              date: `${date[1]}/${date[0]}/${date[2]}`,
+              desc: null,
+              memo: memo,
+            });
+          } else {
+            if (debit !== credit) {
+              not_valid.push({
+                kode: el.KODE,
+                message: "Nominal Belum Balance",
+              });
+            }
+            if (validAccount !== memoLength) {
+              accNotValid.forEach((e) => {
+                not_valid.push({
+                  kode: el.KODE,
+                  message: `Akun ${e.acc} tidak ditemukan`,
+                });
+              });
+            }
+          }
+        });
+
+        console.log(new_memorial);
+
+        not_valid.forEach((el) => {
+          toast.current.show({
+            severity: "error",
+            summary: el.kode,
+            detail: el.message,
+            sticky: true,
+          });
+        });
+
+        addMemoImport(new_memorial, () => {
+          setTimeout(() => {
+            toast.current.show({
+              severity: "info",
+              summary: "Berhasil",
+              detail: "Data berhasil diimport",
+              life: 3000,
+            });
+            getMemorial(true);
+            picker.current.value = null;
+            progressBar.current.style.display = "none";
+          }, 1000);
+        });
+      };
+
+      reader.readAsArrayBuffer(file);
+    });
   };
 
   const template2 = {
@@ -304,6 +509,41 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
     return [day, month, year].join("-");
   };
 
+  const rowExpansionTemplate = (data) => {
+    return (
+      <div className="">
+        <DataTable value={data.memo} responsiveLayout="scroll">
+          <Column
+            header="Akun"
+            style={{ width: "31rem" }}
+            field={(e) => `${e.acc_id.acc_name} - ${e.acc_id.acc_code}`}
+          />
+          <Column
+            header="Departemen"
+            style={{ width: "24rem" }}
+            field={(e) => e.dep_id.ccost_name ?? "-"}
+          />
+          <Column
+            header="Tipe Saldo"
+            style={{ width: "15rem" }}
+            field={(e) => e.dbcr.toUpperCase()}
+          />
+          <Column
+            header="Nominal"
+            style={{ width: "15rem" }}
+            field={(e) => formatIdr(e.amnt !== null ? e.amnt : "-")}
+          />
+          <Column
+            header="Deskripsi"
+            field={(e) => (e.desc !== null ? e.desc : "-")}
+            // style={{ minWidth: "8rem" }}
+            // body={loading && <Skeleton />}
+          />
+        </DataTable>
+      </div>
+    );
+  };
+
   const formatIdr = (value) => {
     return `${value}`
       .replace(".", ",")
@@ -312,13 +552,32 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
 
   return (
     <>
+      <ConfirmPopup />
       <Toast ref={toast} />
+
+      <input
+        type="file"
+        id="file"
+        ref={picker}
+        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        style={{ display: "none" }}
+        onChange={(e) => {
+          console.log(e.target.value);
+          // setFile(e.target.files[0]);
+          const file = e.target.files[0];
+          processExcel(file);
+        }}
+      />
+
       <DataTable
         responsiveLayout="scroll"
+        expandedRows={expandedRows}
+        onRowToggle={(e) => setExpandedRows(e.data)}
+        rowExpansionTemplate={rowExpansionTemplate}
+        dataKey="id"
         value={loading ? dummy : memorial}
         className="display w-150 datatable-wrapper"
         showGridlines
-        dataKey="id"
         rowHover
         header={renderHeader}
         filters={filters1}
@@ -331,6 +590,7 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
         onPage={onCustomPage2}
         paginatorClassName="justify-content-end mt-3"
       >
+        <Column expander style={{ width: "3em" }} />
         <Column
           header="Kode Memorial"
           style={{
@@ -340,7 +600,7 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
           body={loading && <Skeleton />}
         />
         <Column
-          header="Tanggal Memorial"
+          header="Tgl Memorial"
           field={(e) => formatDate(e.date)}
           style={{ minWidth: "4rem" }}
           body={loading && <Skeleton />}

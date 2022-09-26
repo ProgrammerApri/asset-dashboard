@@ -7,6 +7,8 @@ import Pnl from "./Pnl";
 import ReportKBB from "./KartuBB";
 import KartuStock from "./KartuStock";
 import Neraca from "./ReportNeraca";
+import KBBRincian from "./KbbRincian";
+import NeracaSaldo from "./NeracaSaldo";
 
 const LaporanNeraca = (self) => {
   const [active, setActive] = useState(0);
@@ -31,10 +33,60 @@ const LaporanNeraca = (self) => {
       icon: "bx-spreadsheet",
       component: <Pnl />,
     },
+  
+
     {
-      tittle: "Kartu Buku Besar",
+      tittle: "Neraca Saldo",
       icon: "bx-spreadsheet",
-      component: <ReportKBB />,
+      component: <NeracaSaldo />,
+    },
+
+
+
+
+    {
+      tittle: "Kartu Buku Besar Ringkasan",
+      icon: "bx-spreadsheet",
+      component: (
+        <ReportKBB
+          month={
+            self?.match?.params?.month &&
+            atob(self?.match?.params?.month)?.replace("m'", "")
+          }
+          year={
+            self?.match?.params?.year &&
+            atob(self?.match?.params?.year)?.replace("y'", "")
+          }
+          kategory={
+            self?.match?.params?.kat_id &&
+            JSON.parse(atob(atob(self?.match?.params?.kat_id))).kat_id
+          }
+        />
+      ),
+    },
+
+
+
+
+    {
+      tittle: "Kartu Buku Besar Rincian",
+      icon: "bx-spreadsheet",
+      component: (
+        <KBBRincian
+          month={
+            self?.match?.params?.month &&
+            atob(self?.match?.params?.month)?.replace("m'", "")
+          }
+          year={
+            self?.match?.params?.year &&
+            atob(self?.match?.params?.year)?.replace("y'", "")
+          }
+          accId={
+            self?.match?.params?.acc_id &&
+            JSON.parse(atob(atob(self?.match?.params?.acc_id))).acc_id
+          }
+        />
+      ),
     },
     // {
     //   tittle: "Kartu Stock",

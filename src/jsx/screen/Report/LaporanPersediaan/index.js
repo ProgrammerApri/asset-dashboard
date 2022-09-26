@@ -1,58 +1,31 @@
 import React, { useState, useEffect } from "react";
 import { Button, Col, Row } from "react-bootstrap";
-import ReportGRA from "./Gra";
-import ReportRP from "./RequestPurchase";
-import ReportPO from "./PurchaseOrder";
 import { Link } from "react-router-dom";
-import OutstandingPO from "./OutstandingPO";
-import OutstandingRP from "./OutstandingRP";
-import OutstandingGRA from "./OutstandingGRA";
-import ReportReturBeli from "./ReturPembelian";
-import HistoryPayOrder from "./HistoryPayOrd";
+import KartuStock from "./KartuStock";
+import KartuStock_ringkasan from "./KartuStock_ringkasan";
+import MutasiStock from "./MutasiStock";
 
-const LaporanPembelian = (self) => {
+const LaporanPersediaan = (self) => {
   const [active, setActive] = useState(0);
   const [subMenu, setSubMenu] = useState([
     {
-      tittle: "Permintaan Pembelian (RP)",
-      icon: "bx-receipt",
-      component: <ReportRP />,
+      tittle: "Mutasi Antar Lokasi",
+      icon: "bx-spreadsheet",
+      component: <MutasiStock />,
     },
     {
-      tittle: "Pesanan Pembelian (PO)",
-      icon: "bx-receipt",
-      component: <ReportPO />,
+      tittle: "Kartu Stock Ringkasan",
+      icon: "bx-spreadsheet",
+      component: <KartuStock_ringkasan />,
     },
     {
-      tittle: "Pembelian",
-      icon: "bx-receipt",
-      component: <ReportGRA />,
+      tittle: "Kartu Stock Rincian",
+      icon: "bx-spreadsheet",
+      component: <KartuStock />,
     },
-    {
-      tittle: "Outstanding RP",
-      icon: "bx-receipt",
-      component: <OutstandingRP />,
-    },
-    {
-      tittle: "Outstanding PO",
-      icon: "bx-receipt",
-      component: <OutstandingPO />,
-    },
-    {
-      tittle: "Outstanding Pembelian",
-      icon: "bx-receipt",
-      component: <OutstandingGRA />,
-    },    
-    {
-      tittle: "Retur Pembelian",
-      icon: "bx-receipt",
-      component: <ReportReturBeli />,
-    },
-    {
-      tittle: "Histori Pembayaran Pembelian",
-      icon: "bx-receipt",
-      component: <HistoryPayOrder />,
-    },
+
+
+
   ]);
 
   let id =
@@ -73,7 +46,7 @@ const LaporanPembelian = (self) => {
 
     subMenu.forEach((el, i) => {
       menu.push(
-        <Link to={"/laporan/pembelian/" + el.tittle.toLowerCase().replaceAll(" ", "-")}>
+        <Link to={"/laporan/persediaan/" + el.tittle.toLowerCase().replaceAll(" ", "-")}>
           <Button
             className={`sub-menu mr-4 mb-4 ${id == i ? "act" : ""}`}
             role="button"
@@ -100,4 +73,4 @@ const LaporanPembelian = (self) => {
   );
 };
 
-export default LaporanPembelian;
+export default LaporanPersediaan;

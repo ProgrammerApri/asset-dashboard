@@ -507,10 +507,10 @@ const ReportJurnal = () => {
                                   <div
                                     className={
                                       e.type == "header"
-                                        ? "font-weight-bold text-right"
+                                        ? "font-weight-bold text-right m-3"
                                         : e.type == "footer"
                                         ? "font-weight-bold text-right"
-                                        : "text-right"
+                                        : "text-right m-3"
                                     }
                                   >
                                     {e.value.kredit}
@@ -520,7 +520,7 @@ const ReportJurnal = () => {
                               <Column
                                 className="header-center"
                                 header=""
-                                style={{ width: "20rem" }}
+                                style={{ width: "25rem" }}
                                 body={(e) => (
                                   <div
                                     className={

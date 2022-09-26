@@ -40,6 +40,12 @@ export default function GroupReport() {
         total: 6,
         to: "neraca",
       },
+    {
+        tittle: "Laporan Persediaan",
+        icon: "bx-archive",
+        total: 1,
+        to: "persediaan",
+      },
   ]);
 
   const renderSubMenu = () => {

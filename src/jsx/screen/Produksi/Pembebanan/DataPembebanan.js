@@ -306,14 +306,14 @@ const DataPembebanan = ({ onAdd, onEdit, onDetail }) => {
               type: SET_CURRENT_PBB,
               payload: {
                 ...data,
-                upah: [
+                uph: [
                   {
                     id: 0,
                     pbb_id: 0,
                     acc_id: null,
                   },
                 ],
-                overhead: [
+                ovh: [
                   {
                     id: 0,
                     pbb_id: 0,

@@ -1,46 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Button, Col, Row } from "react-bootstrap";
-import ReportGRA from "./Gra";
-import ReportRP from "./RequestPurchase";
-import ReportPO from "./PurchaseOrder";
+import SalesReport from "./Penjualan";
 import { Link } from "react-router-dom";
-import OutstandingPO from "./OutstandingPO";
-import OutstandingRP from "./OutstandingRP";
-import OutstandingGRA from "./OutstandingGRA";
 
-const LaporanPembelian = (self) => {
+const LaporanPenjualan = (self) => {
   const [active, setActive] = useState(0);
   const [subMenu, setSubMenu] = useState([
     {
-      tittle: "Permintaan Pembelian (RP)",
+      tittle: "Penjualan",
       icon: "bx-receipt",
-      component: <ReportRP />,
+      component: <SalesReport />,
     },
-    {
-      tittle: "Pesanan Pembelian (PO)",
-      icon: "bx-receipt",
-      component: <ReportPO />,
-    },
-    {
-      tittle: "Pembelian",
-      icon: "bx-receipt",
-      component: <ReportGRA />,
-    },
-    {
-      tittle: "Outstanding RP",
-      icon: "bx-receipt",
-      component: <OutstandingRP />,
-    },
-    {
-      tittle: "Outstanding PO",
-      icon: "bx-receipt",
-      component: <OutstandingPO />,
-    },
-    {
-      tittle: "Outstanding Pembelian",
-      icon: "bx-receipt",
-      component: <OutstandingGRA />,
-    },    
   ]);
 
   let id =
@@ -61,7 +31,7 @@ const LaporanPembelian = (self) => {
 
     subMenu.forEach((el, i) => {
       menu.push(
-        <Link to={"/laporan/pembelian/" + el.tittle.toLowerCase().replaceAll(" ", "-")}>
+        <Link to={"/laporan/penjualan/" + el.tittle.toLowerCase().replaceAll(" ", "-")}>
           <Button
             className={`sub-menu mr-4 mb-4 ${id == i ? "act" : ""}`}
             role="button"
@@ -88,4 +58,4 @@ const LaporanPembelian = (self) => {
   );
 };
 
-export default LaporanPembelian;
+export default LaporanPenjualan;

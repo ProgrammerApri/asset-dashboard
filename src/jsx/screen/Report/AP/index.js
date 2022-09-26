@@ -1,46 +1,35 @@
 import React, { useState, useEffect } from "react";
 import { Button, Col, Row } from "react-bootstrap";
-import ReportGRA from "./Gra";
-import ReportRP from "./RequestPurchase";
-import ReportPO from "./PurchaseOrder";
 import { Link } from "react-router-dom";
-import OutstandingPO from "./OutstandingPO";
-import OutstandingRP from "./OutstandingRP";
-import OutstandingGRA from "./OutstandingGRA";
+import ReportHutang from "./Hutang";
+import ReportHutangRingkasan from "./HutangRingkasan";
+import UmurHutangRingkasan from "./UmurHutangRingkasan";
+import UmurHutang from "./UmurHutang";
 
-const LaporanPembelian = (self) => {
+const LaporanAp = (self) => {
   const [active, setActive] = useState(0);
   const [subMenu, setSubMenu] = useState([
     {
-      tittle: "Permintaan Pembelian (RP)",
-      icon: "bx-receipt",
-      component: <ReportRP />,
+      tittle: "Saldo Hutang Ringkasan",
+      icon: "bx-money",
+      component: <ReportHutangRingkasan />,
     },
     {
-      tittle: "Pesanan Pembelian (PO)",
-      icon: "bx-receipt",
-      component: <ReportPO />,
+      tittle: "Saldo Hutang Rincian",
+      icon: "bx-money",
+      component: <ReportHutang />,
     },
     {
-      tittle: "Pembelian",
-      icon: "bx-receipt",
-      component: <ReportGRA />,
+      tittle: "Umur Hutang Ringkasan",
+      icon: "bx-calendar-x",
+      component: <UmurHutangRingkasan />,
     },
     {
-      tittle: "Outstanding RP",
-      icon: "bx-receipt",
-      component: <OutstandingRP />,
+      tittle: "Umur Hutang Rincian",
+      icon: "bx-calendar-x",
+      component: <UmurHutang />,
     },
-    {
-      tittle: "Outstanding PO",
-      icon: "bx-receipt",
-      component: <OutstandingPO />,
-    },
-    {
-      tittle: "Outstanding Pembelian",
-      icon: "bx-receipt",
-      component: <OutstandingGRA />,
-    },    
+    
   ]);
 
   let id =
@@ -88,4 +77,4 @@ const LaporanPembelian = (self) => {
   );
 };
 
-export default LaporanPembelian;
+export default LaporanAp;

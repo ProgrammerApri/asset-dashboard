@@ -49,21 +49,6 @@ const SideMenu = () => {
         to: "laporan",
         icon: "bx-spreadsheet",
       },
-      // {
-      //   tittle: "Jurnal",
-      //   to: "jurnal",
-      //   icon: "bx-detail",
-      // },
-      // {
-      //   tittle: "Neraca",
-      //   to: "neraca",
-      //   icon: "bx-abacus",
-      // },
-      // {
-      //   tittle: "Kartu Buku Besar",
-      //   to: "kartu-buku-besar",
-      //   icon: "bx-abacus",
-      // },
     ],
     lainnya: [
       {

@@ -1,46 +1,46 @@
 import React, { useState, useEffect } from "react";
 import { Button, Col, Row } from "react-bootstrap";
-import ReportGRA from "./Gra";
-import ReportRP from "./RequestPurchase";
-import ReportPO from "./PurchaseOrder";
 import { Link } from "react-router-dom";
-import OutstandingPO from "./OutstandingPO";
-import OutstandingRP from "./OutstandingRP";
-import OutstandingGRA from "./OutstandingGRA";
+import ReportJurnal from "./Jurnal";
+import NeracaPerbandingan from "./NeracaPerbandingan";
+import Pnl from "./Pnl";
+import ReportKBB from "./KartuBB";
+import KartuStock from "./KartuStock";
+import Neraca from "./ReportNeraca";
 
-const LaporanPembelian = (self) => {
+const LaporanNeraca = (self) => {
   const [active, setActive] = useState(0);
   const [subMenu, setSubMenu] = useState([
     {
-      tittle: "Permintaan Pembelian (RP)",
-      icon: "bx-receipt",
-      component: <ReportRP />,
+      tittle: "Jurnal",
+      icon: "bx-spreadsheet",
+      component: <ReportJurnal />,
     },
     {
-      tittle: "Pesanan Pembelian (PO)",
-      icon: "bx-receipt",
-      component: <ReportPO />,
+      tittle: "Neraca",
+      icon: "bx-spreadsheet",
+      component: <Neraca />,
     },
     {
-      tittle: "Pembelian",
-      icon: "bx-receipt",
-      component: <ReportGRA />,
+      tittle: "Neraca Perbandingan",
+      icon: "bx-spreadsheet",
+      component: <NeracaPerbandingan />,
     },
     {
-      tittle: "Outstanding RP",
-      icon: "bx-receipt",
-      component: <OutstandingRP />,
+      tittle: "Laba Rugi",
+      icon: "bx-spreadsheet",
+      component: <Pnl />,
     },
     {
-      tittle: "Outstanding PO",
-      icon: "bx-receipt",
-      component: <OutstandingPO />,
+      tittle: "Kartu Buku Besar",
+      icon: "bx-spreadsheet",
+      component: <ReportKBB />,
     },
     {
-      tittle: "Outstanding Pembelian",
-      icon: "bx-receipt",
-      component: <OutstandingGRA />,
-    },    
+      tittle: "Kartu Stock",
+      icon: "bx-spreadsheet",
+      component: <KartuStock />,
+    },
   ]);
 
   let id =
@@ -61,7 +61,7 @@ const LaporanPembelian = (self) => {
 
     subMenu.forEach((el, i) => {
       menu.push(
-        <Link to={"/laporan/pembelian/" + el.tittle.toLowerCase().replaceAll(" ", "-")}>
+        <Link to={"/laporan/penjualan/" + el.tittle.toLowerCase().replaceAll(" ", "-")}>
           <Button
             className={`sub-menu mr-4 mb-4 ${id == i ? "act" : ""}`}
             role="button"
@@ -88,4 +88,4 @@ const LaporanPembelian = (self) => {
   );
 };
 
-export default LaporanPembelian;
+export default LaporanNeraca;

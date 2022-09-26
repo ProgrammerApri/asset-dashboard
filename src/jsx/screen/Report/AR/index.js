@@ -1,46 +1,34 @@
 import React, { useState, useEffect } from "react";
 import { Button, Col, Row } from "react-bootstrap";
-import ReportGRA from "./Gra";
-import ReportRP from "./RequestPurchase";
-import ReportPO from "./PurchaseOrder";
 import { Link } from "react-router-dom";
-import OutstandingPO from "./OutstandingPO";
-import OutstandingRP from "./OutstandingRP";
-import OutstandingGRA from "./OutstandingGRA";
+import ReportPiutangRingkasan from "./PiutangRingkasan";
+import ReportPiutang from "./Piutang";
+import UmurPiutangRingkasan from "./UmurPiutangRingkasan";
+import UmurPiutang from "./UmurPiutang";
 
-const LaporanPembelian = (self) => {
+const LaporanAr = (self) => {
   const [active, setActive] = useState(0);
   const [subMenu, setSubMenu] = useState([
     {
-      tittle: "Permintaan Pembelian (RP)",
-      icon: "bx-receipt",
-      component: <ReportRP />,
+      tittle: "Saldo Piutang Ringkasan",
+      icon: "bx-money",
+      component: <ReportPiutangRingkasan />,
     },
     {
-      tittle: "Pesanan Pembelian (PO)",
-      icon: "bx-receipt",
-      component: <ReportPO />,
+      tittle: "Saldo Piutang Rincian",
+      icon: "bx-money",
+      component: <ReportPiutang />,
     },
     {
-      tittle: "Pembelian",
-      icon: "bx-receipt",
-      component: <ReportGRA />,
+      tittle: "Umur Piutang Ringkasan",
+      icon: "bx-calendar-x",
+      component: <UmurPiutangRingkasan />,
     },
     {
-      tittle: "Outstanding RP",
-      icon: "bx-receipt",
-      component: <OutstandingRP />,
+      tittle: "Umur Piutang Rincian",
+      icon: "bx-calendar-x",
+      component: <UmurPiutang />,
     },
-    {
-      tittle: "Outstanding PO",
-      icon: "bx-receipt",
-      component: <OutstandingPO />,
-    },
-    {
-      tittle: "Outstanding Pembelian",
-      icon: "bx-receipt",
-      component: <OutstandingGRA />,
-    },    
   ]);
 
   let id =
@@ -61,7 +49,11 @@ const LaporanPembelian = (self) => {
 
     subMenu.forEach((el, i) => {
       menu.push(
-        <Link to={"/laporan/pembelian/" + el.tittle.toLowerCase().replaceAll(" ", "-")}>
+        <Link
+          to={
+            "/laporan/pembelian/" + el.tittle.toLowerCase().replaceAll(" ", "-")
+          }
+        >
           <Button
             className={`sub-menu mr-4 mb-4 ${id == i ? "act" : ""}`}
             role="button"
@@ -88,4 +80,4 @@ const LaporanPembelian = (self) => {
   );
 };
 
-export default LaporanPembelian;
+export default LaporanAr;

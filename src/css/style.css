@@ -47733,6 +47733,55 @@ a .sidebar-logo .logo{
   white-space: nowrap;
 }
 
+.group-menu {
+  position: relative;
+  color: #7A80AB;
+  background: var(--card-bg);
+  box-shadow: 0px 12px 23px 0px rgb(59 40 62 / 8%) !important;
+  border-radius: 0.7rem;
+  padding: 15px;
+  line-height: 1;
+  border-color: transparent;
+  font-weight: 500;
+  text-transform: capitalize;
+  width: 15rem;
+}
+
+.group-menu:hover {
+  background: var(--card-bg);
+  color: #7A80AB;
+  border-color: transparent;
+  box-shadow: 0px 12px 23px 0px rgb(59 40 62 / 8%) !important;
+}
+
+.group-menu:focus {
+  background: var(--card-bg);
+  color: #7A80AB;
+  border-color: transparent;
+  box-shadow: 0px 12px 23px 0px rgb(59 40 62 / 8%) !important;
+}
+
+.group-menu:active {
+  background: #EBF0FE !important;
+  color: #7A80AB !important;
+  border-color: transparent !important;
+  box-shadow: 0px 12px 23px 0px rgb(59 40 62 / 8%) !important;
+}
+
+.group-icon {
+  padding: 1rem;
+  background: var(--input-bg);
+  border-radius: 0.5rem;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.group-subtitle {
+ color: #B6B9CD;
+ margin-top: 8px;
+}
+
+
 .c-dropdown-header {
   padding: 0.75rem 1.25rem;
   border-bottom: 1px solid #dee2e6;

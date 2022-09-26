@@ -34,8 +34,6 @@ import JenisPemasok from "./screen/MasterLainnya/JenisPemasok/DataJenisPemasok";
 import Salesman from "./screen/MasterLainnya/Salesman/DataSalesman";
 import AreaPenjualan from "./screen/Master/AreaPenjualan";
 import SubArea from "./screen/Master/SubArea/SubArea";
-import Neraca from "./screen/Report/Neraca";
-import Perusahaan from "./screen/Setup/Perusahaan";
 import Currency from "./screen/Master/Currency";
 import Lokasi from "./screen/Master/Lokasi/DataLokasi";
 import RulesPay from "./screen/MasterLainnya/RulesPay/DataRulesPay";
@@ -58,10 +56,14 @@ import BankKas from "./screen/BankKas";
 import TransaksiPersediaan from "./screen/TransaksiPersediaan";
 import LaporanPembelian from "./screen/Report/LaporanPembelian";
 import ReportGRA from "./screen/Report/LaporanPembelian/Gra";
-import ReportJurnal from "./screen/Report/Jurnal";
-import ReportKBB from "./screen/Report/KartuBB";
 import Produksi from "./screen/Produksi";
 import DataMesin from "./screen/Produksi/Mesin/DataMesin";
+import GroupReport from "./screen/Report";
+import LaporanPenjualan from "./screen/Report/LaporanPenjualan";
+import LaporanProduksi from "./screen/Report/LaporanProduksi";
+import LaporanAr from "./screen/Report/AR";
+import LaporanAp from "./screen/Report/AP";
+import LaporanNeraca from "./screen/Report/Neraca";
 
 const Markup = ({ width }) => {
   const routes = [
@@ -79,10 +81,21 @@ const Markup = ({ width }) => {
     { url: "transaksi/:active", component: Transaksi },
     { url: "bank-&-kas", component: BankKas },
     { url: "transaksi-persediaan", component: TransaksiPersediaan },
-    { url: "laporan", component: LaporanPembelian },
-    { url: "laporan/:active", component: LaporanPembelian },
-    { url: "jurnal", component: ReportJurnal },
-    { url: "kartu-buku-besar", component: ReportKBB },
+
+
+    { url: "laporan/pembelian", component: LaporanPembelian },
+    { url: "laporan/pembelian/:active", component: LaporanPembelian },
+    { url: "laporan/penjualan", component: LaporanPenjualan },
+    { url: "laporan/penjualan/:active", component: LaporanPenjualan },
+    { url: "laporan/produksi", component: LaporanProduksi },
+    { url: "laporan/produksi/:active", component: LaporanProduksi },
+    { url: "laporan/ar", component: LaporanAr },
+    { url: "laporan/ar/:active", component: LaporanAr },
+    { url: "laporan/ap", component: LaporanAp },
+    { url: "laporan/ap/:active", component: LaporanAp },
+    { url: "laporan/neraca", component: LaporanNeraca },
+    { url: "laporan/neraca/:active", component: LaporanNeraca },
+    { url: "laporan", component: GroupReport },
 
     /// Klasifikasi
     { url: "klasifikasi", component: KlasifikasiAkun },
@@ -110,9 +123,6 @@ const Markup = ({ width }) => {
     { url: "jasa", component: Jasa },
 
     { url: "data-mesin", component: DataMesin },
-    // Report
-    { url: "neraca", component: Neraca },
-    { url: "report", component: ReportGRA },
 
     // Setup
     { url: "setup", component: Setup },

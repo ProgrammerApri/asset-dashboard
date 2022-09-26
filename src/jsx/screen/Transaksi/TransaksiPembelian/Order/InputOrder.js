@@ -28,6 +28,7 @@ import DataPusatBiaya from "src/jsx/screen/MasterLainnya/PusatBiaya/DataPusatBia
 import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
+import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 
 const defError = {
   code: false,
@@ -54,6 +55,7 @@ const defError = {
 
 const InputOrder = ({ onCancel, onSuccess }) => {
   const order = useSelector((state) => state.order.current);
+  const [ord, setOrd] = useState(null);
   const [dept, setDept] = useState(null);
   const [po, setPO] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -104,13 +106,14 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     getPjk();
     getPO();
     getLoc();
+    getOrd();
   }, []);
 
   const editODR = async () => {
     const config = {
       ...endpoints.editODR,
       endpoint: endpoints.editODR.endpoint + order.id,
-      data:{ ...order, doc_date: currentDate(order.doc_date) },
+      data: { ...order, doc_date: currentDate(order.doc_date) },
     };
     console.log(config.data);
     let response = null;
@@ -227,6 +230,22 @@ const InputOrder = ({ onCancel, onSuccess }) => {
           }
         });
         setPO(filt);
+      }
+    } catch (error) {}
+  };
+
+  const getOrd = async () => {
+    const config = {
+      ...endpoints.order,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setOrd(data);
       }
     } catch (error) {}
   };
@@ -506,6 +525,21 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     return total;
   };
 
+  const ppn = (value) => {
+    let nil = {};
+    ord?.forEach((el) => {
+      pajak?.forEach(elem => {
+        if (el.sup_id.sup_ppn === elem.id) {
+          nil = elem.nilai
+        }
+      });
+    });
+    console.log("nilaiiii");
+    console.log(nil);
+
+    return nil;
+  };
+
   const formatIdr = (value) => {
     return `${value}`
       .replace(".", ",")
@@ -755,40 +789,45 @@ const InputOrder = ({ onCancel, onSuccess }) => {
           <div className="col-3">
             <label className="text-label">No. Pesanan Pembelian</label>
             <div className="p-inputgroup"></div>
-            <CustomDropdown
+            <PrimeDropdown
               value={order.po_id !== null ? checkPO(order.po_id) : null}
-              option={po}
+              options={po}
               onChange={(e) => {
                 let result = new Date(`${order.ord_date}Z`);
-                result.setDate(result.getDate() + checRulPay(e.top?.id)?.day);
+                result.setDate(
+                  result.getDate() + checRulPay(e.value.top?.id)?.day
+                );
                 updateORD({
                   ...order,
-                  po_id: e.id ?? null,
-                  top: e.top?.id ?? null,
+                  po_id: e.value.id ?? null,
+                  top: e.value.top?.id ?? null,
                   due_date: result,
-                  sup_id: e.sup_id?.id ?? null,
-                  dep_id: e.preq_id?.req_dep?.id ?? null,
-                  split_inv: e.split_inv,
-                  dprod: e.pprod,
-                  djasa: e.pjasa,
+                  sup_id: e.value.sup_id?.id ?? null,
+                  dep_id: e.value.preq_id?.req_dep?.id ?? null,
+                  split_inv: e.value.split_inv,
+                  dprod: e.value.pprod,
+                  djasa: e.value.pjasa,
                 });
                 let newError = error;
                 newError.sup = false;
                 newError.rul = false;
+                newError.prod[0].id = false;
+                newError.prod[0].jum = false;
+                newError.prod[0].prc = false;
 
                 let eprod = [];
-                e.pprod.forEach((el) => {
-                  eprod.push({
-                    id: false,
-                    lok: false,
-                    jum: false,
-                    prc: false,
-                  });
-                });
-                newError.prod = eprod;
+                // e?.value.pprod.forEach((el) => {
+                // newError.prod.push({
+                //   id: false,
+                //   lok: false,
+                //   jum: false,
+                //   prc: false,
+                // });
+                // });
+                // newError.prod = eprod;
 
                 let ejasa = [];
-                e.pjasa.forEach((el) => {
+                e?.value.pjasa.forEach((el) => {
                   ejasa.push({
                     id: false,
                     jum: false,
@@ -799,7 +838,9 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                 setError(newError);
               }}
               placeholder="Pilih No. Pesanan Pembelian"
-              label={"[po_code]"}
+              optionLabel="po_code"
+              filter
+              filterBy="po_code"
             />
           </div>
 
@@ -1077,6 +1118,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
                         let newError = error;
                         newError.prod[e.index].lok = false;
+                        newError.prod.push({ lok: false });
                         setError(newError);
                       }}
                       option={lokasi}
@@ -1611,12 +1653,12 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             <div className="col-6">
               <label className="text-label">
                 {order.split_inv ? (
-                  <b>Rp. {formatIdr((getSubTotalBarang() * 11) / 100)}</b>
+                  <b>Rp. {formatIdr((getSubTotalBarang() * ppn()) / 100)}</b>
                 ) : (
                   <b>
                     Rp.{" "}
                     {formatIdr(
-                      ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
+                      ((getSubTotalBarang() + getSubTotalJasa()) * ppn()) / 100
                     )}
                   </b>
                 )}
@@ -1698,7 +1740,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                   <b>
                     Rp.{" "}
                     {formatIdr(
-                      getSubTotalBarang() + (getSubTotalBarang() * 11) / 100
+                      getSubTotalBarang() + (getSubTotalBarang() * ppn()) / 100
                     )}
                   </b>
                 ) : (
@@ -1707,7 +1749,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                     {formatIdr(
                       getSubTotalBarang() +
                         getSubTotalJasa() +
-                        ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
+                        ((getSubTotalBarang() + getSubTotalJasa()) * ppn()) / 100
                     )}
                   </b>
                 )}

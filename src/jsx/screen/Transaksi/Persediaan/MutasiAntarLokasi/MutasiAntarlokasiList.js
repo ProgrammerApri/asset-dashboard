@@ -332,6 +332,7 @@ const MutasiAntarList = ({ onAdd, onEdit, onDetail }) => {
 
     return [day, month, year].join("-");
   };
+  
 
   return (
     <>

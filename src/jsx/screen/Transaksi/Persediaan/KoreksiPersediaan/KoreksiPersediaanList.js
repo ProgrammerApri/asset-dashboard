@@ -16,53 +16,62 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { InputNumber } from "primereact/inputnumber";
 import { Divider } from "@material-ui/core";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_IC, SET_EDIT_IC } from "src/redux/actions";
+import { SET_CURRENT_IC, SET_EDIT_IC, SET_IC } from "src/redux/actions";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 // import data from "src/jsx/data";
 
 const data = {
-  data: [
-    {
-      //   id: 1,
-      date: "2022-06-28",
-      ref: "KP-00001",
-      acc: "Inventory (1.50001)",
-      dep: "Human Resourced (HRD)",
-      proj: "Projek Juni (PRY-0001)",
-    },
-    {
-      //   id: 1,
-      date: "2022-06-29",
-      ref: "KP-00002",
-      acc: "Inventory (1.50001)",
-      dep: "Human Resourced (HRD)",
-      proj: "Projek Juni (PRY-0001)",
-    },
-    {
-      //   id: 1,
-      date: "2022-06-30",
-      ref: "KP-00003",
-      acc: "Inventory (1.50001)",
-      dep: "Human Resourced (HRD)",
-      proj: "Projek Juni (PRY-0001)",
-    },
-  ],
+  id: null,
+  code: null,
+  date: null,
+  dep_id: null,
+  proj_id: null,
+  kprod: null,
 };
 
-const KoreksiPersediaanList = ({ onAdd }) => {
+const KoreksiPersediaanList = ({ onAdd, onEdit }) => {
   const dispatch = useDispatch();
-  const [koreksi, setKoreksi] = useState(null);
+  const ic = useSelector((state) => state.ic.ic);
   const [loading, setLoading] = useState(true);
+  const [update, setUpdate] = useState(true);
+  const [currentItem, setCurrentItem] = useState(null);
+  const [displayDel, setDisplayDel] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const toast = useRef(null);
+  const [expandedRows, setExpandedRows] = useState(null);
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    console.log(data);
-    setKoreksi(data.data);
+    getKorSto();
   }, []);
+
+  const getKorSto = async (isUpdate = false) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.korSto,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        dispatch({ type: SET_IC, payload: data });
+      }
+    } catch (error) {}
+    if (isUpdate) {
+      setLoading(false);
+    } else {
+      setTimeout(() => {
+        setLoading(false);
+      }, 500);
+    }
+  };
 
   const renderHeader = () => {
     return (
@@ -88,19 +97,139 @@ const KoreksiPersediaanList = ({ onAdd }) => {
               type: SET_CURRENT_IC,
               payload: {
                 ...data,
-                product: [
+                kprod: [
                   {
                     id: 0,
                     prod_id: null,
                     unit_id: null,
-                    type: null,
+                    dbcr: null,
                     location: null,
-                    order: null,
+                    qty: null,
                   },
                 ],
               },
             });
           }}
+        />
+      </div>
+    );
+  };
+
+  const actionBodyTemplate = (data) => {
+    return (
+      // <React.Fragment>
+      <div className="d-flex">
+        <Link
+          onClick={() => {
+            onEdit(data);
+            let kprod = data.kprod;
+            dispatch({
+              type: SET_EDIT_IC,
+              payload: true,
+            });
+            kprod.forEach((el) => {
+              el.prod_id = el.prod_id?.id;
+              el.unit_id = el.unit_id?.id ?? null;
+              el.location = el.location?.id ?? null;
+            });
+            dispatch({
+              type: SET_CURRENT_IC,
+              payload: {
+                ...data,
+                dep_id: data?.dep_id?.id ?? null,
+                proj_id: data?.proj_id?.id ?? null,
+                kprod:
+                  kprod.length > 0
+                    ? kprod
+                    : [
+                        {
+                          id: 0,
+                          kor_id: null,
+                          prod_id: null,
+                          unit_id: null,
+                          location: null,
+                          dbcr: null,
+                          qty: null,
+                        },
+                      ],
+              },
+            });
+          }}
+          className="btn btn-primary shadow btn-xs sharp ml-1"
+        >
+          <i className="fa fa-pencil"></i>
+        </Link>
+
+        <Link
+          onClick={() => {
+            setDisplayDel(true);
+            setCurrentItem(data);
+          }}
+          className="btn btn-danger shadow btn-xs sharp ml-1"
+        >
+          <i className="fa fa-trash"></i>
+        </Link>
+      </div>
+      // </React.Fragment>
+    );
+  };
+
+  const delKor = async (id) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.delKorSto,
+      endpoint: endpoints.delKorHut.endpoint + currentItem.id,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setTimeout(() => {
+          setUpdate(false);
+          setDisplayDel(false);
+          getKorSto(true);
+          toast.current.show({
+            severity: "info",
+            summary: "Berhasil",
+            detail: "Data Berhasil Dihapus",
+            life: 3000,
+          });
+        }, 100);
+      }
+    } catch (error) {
+      console.log(error);
+      setTimeout(() => {
+        setUpdate(false);
+        setDisplayDel(false);
+        toast.current.show({
+          severity: "error",
+          summary: "Gagal",
+          detail: `Tidak Dapat Menghapus Data`,
+          life: 3000,
+        });
+      }, 500);
+    }
+  };
+
+  const renderFooterDel = () => {
+    return (
+      <div>
+        <PButton
+          label="Batal"
+          onClick={() => setDisplayDel(false)}
+          className="p-button-text btn-primary"
+        />
+        <PButton
+          label="Hapus"
+          icon="pi pi-trash"
+          onClick={() => {
+            setLoading(true);
+            delKor();
+          }}
+          autoFocus
+          loading={loading}
         />
       </div>
     );
@@ -152,6 +281,56 @@ const KoreksiPersediaanList = ({ onAdd }) => {
     setRows2(event.rows);
   };
 
+  const formatDate = (date) => {
+    var d = new Date(`${date}Z`),
+      month = "" + (d.getMonth() + 1),
+      day = "" + d.getDate(),
+      year = d.getFullYear();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+
+    return [day, month, year].join("-");
+  };
+
+  const rowExpansionTemplate = (data) => {
+    return (
+      <div className="">
+        <DataTable value={data.kprod} responsiveLayout="scroll">
+          <Column
+            header="Produk"
+            style={{ width: "26rem" }}
+            field={(e) => `${e.prod_id.name} (${e.prod_id.code})`}
+          />
+          <Column
+            header="Lokasi"
+            style={{ width: "15rem" }}
+            field={(e) => e.location.name}
+          />
+          <Column
+            header="Kuantitas"
+            style={{ width: "15rem" }}
+            field={(e) => e.qty}
+          />
+          <Column
+            header="Satuan"
+            style={{ width: "24rem" }}
+            field={(e) => e.unit_id.code}
+            // style={{ minWidth: "8rem" }}
+            // body={loading && <Skeleton />}
+          />
+          <Column
+            header="Debit/Kredit"
+            style={{ width: "24rem" }}
+            field={(e) => e.dbcr === "D" ? "Debit" : "Kredit"}
+            // style={{ minWidth: "8rem" }}
+            // body={loading && <Skeleton />}
+          />
+        </DataTable>
+      </div>
+    );
+  };
+
   return (
     <>
       <Toast ref={toast} />
@@ -159,7 +338,7 @@ const KoreksiPersediaanList = ({ onAdd }) => {
         <Col className="pt-0">
           <DataTable
             responsiveLayout="scroll"
-            value={koreksi}
+            value={loading ? dummy : ic}
             className="display w-150 datatable-wrapper"
             showGridlines
             dataKey="id"
@@ -174,49 +353,71 @@ const KoreksiPersediaanList = ({ onAdd }) => {
             rows={rows2}
             onPage={onCustomPage2}
             paginatorClassName="justify-content-end mt-3"
+            expandedRows={expandedRows}
+            onRowToggle={(e) => setExpandedRows(e.data)}
+            rowExpansionTemplate={rowExpansionTemplate}
           >
+            <Column expander style={{ width: "3em" }} />
             <Column
               header="Tanggal"
               style={{
                 minWidth: "8rem",
               }}
-              field="date"
-              // body={loading && <Skeleton />}
+              field={(e) => formatDate(e.date)}
+              body={loading && <Skeleton />}
             />
             <Column
               header="Nomor Koreksi Persediaan"
-              field="ref"
+              field={(e) => e.code}
               style={{ minWidth: "8rem" }}
-              //  body={loading && <Skeleton />}
+              body={loading && <Skeleton />}
             />
-            <Column
+            {/* <Column
               header="Kode Akun"
               field="acc"
               style={{ minWidth: "8rem" }}
               // body={loading && <Skeleton />}
-            />
+            /> */}
             <Column
               header="Departemen"
-              field="dep"
+              field={(e) => e.dep_id.ccost_name ?? "-"}
               style={{ minWidth: "8rem" }}
-              // body={loading && <Skeleton />}
+              body={loading && <Skeleton />}
             />
             <Column
               header="Project"
-              field="proj"
+              field={(e) => e.proj_id.proj_name ?? "-"}
               style={{ minWidth: "8rem" }}
-              // body={loading && <Skeleton />}
+              body={loading && <Skeleton />}
             />
-            {/* <Column
+            <Column
               header="Action"
               dataType="boolean"
               bodyClassName="text-center"
               style={{ minWidth: "2rem" }}
-              // body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
-            /> */}
+              body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
+            />
           </DataTable>
         </Col>
       </Row>
+
+      <Dialog
+        header={"Hapus Data"}
+        visible={displayDel}
+        style={{ width: "30vw" }}
+        footer={renderFooterDel("displayDel")}
+        onHide={() => {
+          setDisplayDel(false);
+        }}
+      >
+        <div className="ml-3 mr-3">
+          <i
+            className="pi pi-exclamation-triangle mr-3 align-middle"
+            style={{ fontSize: "2rem" }}
+          />
+          <span>Apakah anda yakin ingin menghapus data ?</span>
+        </div>
+      </Dialog>
     </>
   );
 };

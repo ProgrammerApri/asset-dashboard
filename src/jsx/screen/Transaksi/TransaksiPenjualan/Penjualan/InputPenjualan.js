@@ -73,6 +73,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
   const [rulesPay, setRulesPay] = useState(null);
   const [ppn, setPpn] = useState(null);
   const [salesman, setSalesman] = useState(null);
+  const [sl, setSl] = useState(null);
   const [so, setSO] = useState(null);
   const [showSupplier, setShowSupplier] = useState(false);
   const [showSalesman, setShowSalesman] = useState(false);
@@ -116,6 +117,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     getSalesman();
     getStoLoc();
     getSetup();
+    getSl();
   }, []);
 
   const isValid = () => {
@@ -268,6 +270,23 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     }
 
     return valid;
+  };
+
+  const getSl = async () => {
+    const config = {
+      ...endpoints.sale,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setSl(data);
+      }
+    } catch (error) {}
   };
 
   const getCustomer = async () => {
@@ -733,6 +752,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
+
   const onSubmit = () => {
     if (isValid()) {
       if (state) {
@@ -810,6 +830,21 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     });
 
     return total;
+  };
+
+  const pjk = (value) => {
+    let nil = {};
+    // sl?.forEach((el) => {
+      ppn?.forEach(elem => {
+        if (checkCus(sale?.pel_id)?.customer?.cus_pjk === elem.id) {
+          nil = elem.nilai
+        }
+      });
+    // });
+    console.log("nilaiiii");
+    console.log(nil);
+
+    return nil;
   };
 
   const formatIdr = (value) => {
@@ -1899,19 +1934,19 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
 
             <div className="col-6">
               <label className="text-label">
-                {sale.split_inv ? "Pajak Atas Barang (11%)" : "Pajak (11%)"}
+                {sale.split_inv ? "Pajak Atas Barang" : "Pajak"}
               </label>
             </div>
 
             <div className="col-6">
               <label className="text-label">
                 {sale.split_inv ? (
-                  <b>Rp. {formatIdr((getSubTotalBarang() * 11) / 100)}</b>
+                  <b>Rp. {formatIdr((getSubTotalBarang() * pjk()) / 100)}</b>
                 ) : (
                   <b>
                     Rp.{" "}
                     {formatIdr(
-                      ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
+                      ((getSubTotalBarang() + getSubTotalJasa()) * pjk()) / 100
                     )}
                   </b>
                 )}
@@ -1993,7 +2028,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   <b>
                     Rp.{" "}
                     {formatIdr(
-                      getSubTotalBarang() + (getSubTotalBarang() * 11) / 100
+                      getSubTotalBarang() + (getSubTotalBarang() * pjk()) / 100
                     )}
                   </b>
                 ) : (
@@ -2002,7 +2037,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                     {formatIdr(
                       getSubTotalBarang() +
                         getSubTotalJasa() +
-                        ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
+                        ((getSubTotalBarang() + getSubTotalJasa()) * pjk()) / 100
                     )}
                   </b>
                 )}

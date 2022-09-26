@@ -51,7 +51,7 @@ const LaporanAr = (self) => {
       menu.push(
         <Link
           to={
-            "/laporan/pembelian/" + el.tittle.toLowerCase().replaceAll(" ", "-")
+            "/laporan/ar/" + el.tittle.toLowerCase().replaceAll(" ", "-")
           }
         >
           <Button

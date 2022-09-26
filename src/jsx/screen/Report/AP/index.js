@@ -50,7 +50,7 @@ const LaporanAp = (self) => {
 
     subMenu.forEach((el, i) => {
       menu.push(
-        <Link to={"/laporan/pembelian/" + el.tittle.toLowerCase().replaceAll(" ", "-")}>
+        <Link to={"/laporan/ap/" + el.tittle.toLowerCase().replaceAll(" ", "-")}>
           <Button
             className={`sub-menu mr-4 mb-4 ${id == i ? "act" : ""}`}
             role="button"

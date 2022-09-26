@@ -1,34 +1,19 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 // import { Chart } from 'primereact/chart';
 
 import loadable from "@loadable/component";
 import pMinDelay from "p-min-delay";
-
-import Slider from "react-slick";
-
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-
-import menu03 from "../../../images/menus/3.png";
-import menu02 from "../../../images/menus/2.png";
-import menu01 from "../../../images/menus/1.png";
-
-import testimonial from "../../../images/testimonial/1.jpg";
-import testimonial2 from "../../../images/testimonial/2.jpg";
-import testimonial3 from "../../../images/testimonial/3.jpg";
-
-import { Dropdown, Tab, Nav, Button } from "react-bootstrap";
-import CircleProgress from "../../components/CircleProgress/circleProgress";
-
-import ApexRadialBar from "../../components/charts/apexcharts/RadialBar";
 import ProductionStat from "../../components/charts/apexcharts/Line4";
 import { useDispatch, useSelector } from "react-redux";
 import { endpoints, request } from "src/utils";
 import { SET_DASHBOARD_DATA } from "src/redux/actions";
 import CircleProgressWhite from "../../components/CircleProgress/CircleProgressWhite";
-
-// import Ext from "../../layouts/Ext";
+import CustomCardAssets from "src/jsx/components/CustomCardChart/CustomCardAssets";
+import CustomCardBank from "src/jsx/components/CustomCardChart/CustomCardBank";
+import { Messages } from 'primereact/messages';
 
 const ApexLine4 = loadable(() =>
   pMinDelay(import("../../components/charts/apexcharts/Line4"), 500)
@@ -40,9 +25,18 @@ const ApexNagetivePosative = loadable(() =>
 const Home = () => {
   const dispatch = useDispatch();
   const dash = useSelector((state) => state.dash.dashboard);
+  const msgs1 = useRef(null);
 
   useEffect(() => {
     getDashboardInfo();
+    msgs1.current.show([
+      {
+        severity: "warn",
+        summary: "",
+        detail: "Warning Stock Product PD-0001 Menipis",
+        sticky: true,
+      },
+    ]);
   }, []);
 
   const getDashboardInfo = async () => {
@@ -222,48 +216,18 @@ const Home = () => {
             </div>
           </div>
         </div>
-        <div className="col-xl-3 col-xxl-4 col-md-6">
-          <div className="card">
-            <div className="card-header border-0 pb-0">
-              <h4 className="text-black fs-20 mb-0">Neraca</h4>
-            </div>
-            <div className="card-body">
-              <div className="media align-items-center border border-warning rounded p-3 mb-md-4 mb-3">
-                <CircleProgressWhite
-                  percent={dash?.assets/dash?.modal*100}
-                  colors={"#F2D182"}
-                  icon={<i class="bx bxs-factory"></i>}
-                />
-                <div>
-                  <h4 className="fs-18 text-black mb-0">Assets</h4>
-                  <span className="fs-14 text-warning">{`Rp. ${dash?.assets}`}</span>
-                </div>
-              </div>
-              <div className="media align-items-center border border-info rounded p-3 mb-md-4 mb-3">
-                <CircleProgressWhite
-                  percent={dash?.kewajiban/dash?.modal*100}
-                  colors={"#1EA7C5"}
-                  icon={<i class="bx bxs-error"></i>}
-                />
-                <div>
-                  <h4 className="fs-18 text-black mb-0">Kewajiban</h4>
-                  <span className="fs-14 text-info">{`Rp. ${dash?.kewajiban}`}</span>
-                </div>
-              </div>
-              <div className="media align-items-center border border-danger rounded p-3 mb-md-4 mb-3">
-                <CircleProgressWhite
-                  percent={100}
-                  colors={"#ff285c"}
-                  icon={<i class="bx bxs-zap"></i>}
-                />
-                <div>
-                  <h4 className="fs-18 text-black mb-0">P/L Month</h4>
-                  <span className="fs-14 text-danger">{`Rp. ${dash?.modal}`}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <CustomCardAssets
+          labels={["Assets", "Kewajiban", "Modal"]}
+          icons={[
+            <i class="bx bxs-rocket"></i>,
+            <i class="bx bxs-error-circle"></i>,
+            <i class="bx bxs-wallet"></i>,
+          ]}
+          colors={["#FF9432", "#1EA7C5", "#FF0000"]}
+          values={[dash?.assets, dash?.kewajiban, dash?.modal] ?? [0, 0, 0]}
+          trends={dash?.neraca?.trends ?? [0, 0, 0]}
+          compact
+        />
         <div className="col-xl-12 col-xxl-12">
           <div className="card">
             <div className="card-header d-sm-flex d-block pb-0 border-0">
@@ -298,6 +262,134 @@ const Home = () => {
                 })}
               />
             </div>
+          </div>
+        </div>
+        <CustomCardBank
+          tittle={"20 Sales"}
+          subTittle={"CUSTOMER 1"}
+          saldo={500000}
+        />
+        <CustomCardBank
+          tittle={"20 Sales"}
+          subTittle={"CUSTOMER 1"}
+          saldo={500000}
+        />
+        <CustomCardBank
+          tittle={"20 Sales"}
+          subTittle={"CUSTOMER 1"}
+          saldo={500000}
+        />
+        <CustomCardBank
+          tittle={"20 Sales"}
+          subTittle={"CUSTOMER 1"}
+          saldo={500000}
+        />
+        <CustomCardBank
+          tittle={"20 Sales"}
+          subTittle={"CUSTOMER 1"}
+          saldo={500000}
+        />
+        <CustomCardAssets
+          labels={[
+            "Daily Sales",
+            "Monthly Sales",
+            "Sales Last Month vs Current",
+          ]}
+          icons={[
+            <i class="bx bxs-rocket"></i>,
+            <i class="bx bxs-error-circle"></i>,
+            <i class="bx bxs-wallet"></i>,
+          ]}
+          colors={["#FF9432", "#1EA7C5", "#FF0000"]}
+          values={[0, 0, 0]}
+          trends={[0, 0, 0]}
+          compact
+        />
+        <div className="col-xl-6 col-xxl-8">
+          <div className="card">
+            <div className="card-header flex-wrap pb-0 border-0">
+              <div className="mr-auto pr-3 mb-2">
+                <h4 className="text-black fs-20">Sales Order</h4>
+                <p className="fs-13 mb-2 mb-sm-0 text-black">
+                  Hari ini - besok
+                </p>
+              </div>
+            </div>
+            <div className="card-body pt-3"></div>
+          </div>
+        </div>
+        <CustomCardAssets
+          labels={[
+            "Daily Purchase",
+            "Monthly Purchase",
+            "Purchase Last Month vs Current",
+          ]}
+          icons={[
+            <i class="bx bxs-rocket"></i>,
+            <i class="bx bxs-error-circle"></i>,
+            <i class="bx bxs-wallet"></i>,
+          ]}
+          colors={["#FF9432", "#1EA7C5", "#FF0000"]}
+          values={[0, 0, 0]}
+          trends={[0, 0, 0]}
+          compact
+        />
+        <div className="col-12 pt-0">
+        <Messages ref={msgs1} />
+        </div>
+        
+        <CustomCardBank
+          tittle={"Raw Material"}
+          subTittle={"RM-0001"}
+          saldo={50}
+          idr={false}
+        />
+        <CustomCardBank
+          tittle={"Raw Material"}
+          subTittle={"RM-0001"}
+          saldo={50}
+          idr={false}
+        />
+        <CustomCardBank
+          tittle={"Raw Material"}
+          subTittle={"RM-0001"}
+          saldo={50}
+          idr={false}
+        />
+        <CustomCardBank
+          tittle={"Raw Material"}
+          subTittle={"RM-0001"}
+          saldo={50}
+          idr={false}
+        />
+        <CustomCardBank
+          tittle={"Raw Material"}
+          subTittle={"RM-0001"}
+          saldo={50}
+          idr={false}
+        />
+        <div className="col-xl-6 col-xxl-8">
+          <div className="card">
+            <div className="card-header flex-wrap pb-0 border-0">
+              <div className="mr-auto pr-3 mb-2">
+                <h4 className="text-black fs-20">Sales Order</h4>
+                <p className="fs-13 mb-2 mb-sm-0 text-black">
+                  Hari ini - besok (Kondisi Stock)
+                </p>
+              </div>
+            </div>
+            <div className="card-body pt-3"></div>
+          </div>
+        </div>
+        <div className="col-xl-6 col-xxl-8">
+          <div className="card">
+            <div className="card-header flex-wrap pb-0 border-0">
+              <div className="mr-auto pr-3 mb-2">
+                <h4 className="text-black fs-20">Produk Terlaris</h4>
+                <p className="fs-13 mb-2 mb-sm-0 text-black">Minimal Stock</p>
+              </div>
+            </div>
+            <div className="card-body pt-3"></div>
           </div>
         </div>
       </div>

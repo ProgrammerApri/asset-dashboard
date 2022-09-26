@@ -1229,6 +1229,7 @@ pre code {
 .col-lg-auto,
 .col-xl-1,
 .col-xl-2,
+.col-xl-2-5,
 .col-xl-3,
 .col-xl-4,
 .col-xl-5,
@@ -2151,6 +2152,11 @@ pre code {
   .col-xl-2 {
     flex: 0 0 16.6666666667%;
     max-width: 16.6666666667%;
+  }
+
+  .col-xl-2-5 {
+    flex: 0 0 20%;
+    max-width: 20%;
   }
 
   .col-xl-3 {
@@ -47863,4 +47869,14 @@ a .sidebar-logo .logo{
   height: 40cm;
   /* text-align: left; */
   font-size: 12px;
+}
+
+.card-logo {
+  padding: 0.8rem 1rem;
+  border-radius: 13px;
+}
+
+.trends {
+  padding: 7px 10px;
+  border-radius: 10px;
 }

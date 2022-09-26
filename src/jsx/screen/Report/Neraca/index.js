@@ -36,11 +36,11 @@ const LaporanNeraca = (self) => {
       icon: "bx-spreadsheet",
       component: <ReportKBB />,
     },
-    {
-      tittle: "Kartu Stock",
-      icon: "bx-spreadsheet",
-      component: <KartuStock />,
-    },
+    // {
+    //   tittle: "Kartu Stock",
+    //   icon: "bx-spreadsheet",
+    //   component: <KartuStock />,
+    // },
   ]);
 
   let id =

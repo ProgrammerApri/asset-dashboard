@@ -7,13 +7,13 @@ export default function GroupReport() {
     {
       tittle: "Laporan Pembelian",
       icon: "bx-archive",
-      total: 6,
+      total: 8,
       to: "pembelian",
     },
     {
       tittle: "Laporan Penjualan",
       icon: "bx-archive",
-      total: 1,
+      total: 6,
       to: "penjualan",
     },
     {
@@ -37,13 +37,13 @@ export default function GroupReport() {
     {
         tittle: "Neraca",
         icon: "bx-archive",
-        total: 6,
+        total: 5,
         to: "neraca",
       },
     {
         tittle: "Laporan Persediaan",
         icon: "bx-archive",
-        total: 1,
+        total: 3,
         to: "persediaan",
       },
   ]);

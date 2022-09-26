@@ -33,16 +33,12 @@ const LaporanNeraca = (self) => {
       icon: "bx-spreadsheet",
       component: <Pnl />,
     },
-  
 
     {
       tittle: "Neraca Saldo",
       icon: "bx-spreadsheet",
       component: <NeracaSaldo />,
     },
-
-
-
 
     {
       tittle: "Kartu Buku Besar Ringkasan",
@@ -64,9 +60,6 @@ const LaporanNeraca = (self) => {
         />
       ),
     },
-
-
-
 
     {
       tittle: "Kartu Buku Besar Rincian",
@@ -113,7 +106,9 @@ const LaporanNeraca = (self) => {
 
     subMenu.forEach((el, i) => {
       menu.push(
-        <Link to={"/laporan/neraca/" + el.tittle.toLowerCase().replaceAll(" ", "-")}>
+        <Link
+          to={"/laporan/neraca/" + el.tittle.toLowerCase().replaceAll(" ", "-")}
+        >
           <Button
             className={`sub-menu mr-4 mb-4 ${id == i ? "act" : ""}`}
             role="button"

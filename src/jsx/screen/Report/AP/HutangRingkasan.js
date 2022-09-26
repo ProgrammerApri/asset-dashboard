@@ -230,7 +230,7 @@ const ReportHutangRingkasan = () => {
       {
         columns: [
           {
-            title: "Payable Report Summary",
+            title: "Debt Balance Summary",
             width: { wch: 30 },
             style: {
               font: { sz: "14", bold: true },
@@ -575,8 +575,8 @@ const ReportHutangRingkasan = () => {
             <Card className="ml-1 mr-1 mt-2">
               <Card.Body className="p-0 m-0">
                 <CustomeWrapper
-                  tittle={"Payable Report Summary"}
-                  subTittle={`Payable Report Summary as ${formatDate(
+                  tittle={"Debt Balance Summary"}
+                  subTittle={`Debt Balance Summary as ${formatDate(
                     filtDate
                   )}`}
                   onComplete={(cp) => setCp(cp)}

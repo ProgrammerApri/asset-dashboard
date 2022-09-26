@@ -365,7 +365,7 @@ const NeracaSaldo = ({ month, year, kategory }) => {
       {
         columns: [
           {
-            title: "General Ledger Card",
+            title: "Laporan Neraca Saldo",
             width: { wch: 40 },
             style: {
               font: { sz: "14", bold: true },
@@ -637,7 +637,7 @@ const NeracaSaldo = ({ month, year, kategory }) => {
               <Card.Body className="p-0">
                 <CustomeWrapper
                   tittle={"Balance Sheet Saldo"}
-                  subTittle={`General Ledger Card per ${formatDate(filtDate)}`}
+                  subTittle={`Laporan Neraca Saldo per ${formatDate(filtDate)}`}
                   onComplete={(cp) => setCp(cp)}
                   page={idx + 1}
                   body={
@@ -767,7 +767,7 @@ const NeracaSaldo = ({ month, year, kategory }) => {
                   <Card.Body className="p-0">
                     <CustomeWrapper
                       tittle={"Balance Sheet Saldo"}
-                      subTittle={`General Ledger Card per ${formatDate(
+                      subTittle={`Laporan Neraca Saldo per ${formatDate(
                         filtDate
                       )}`}
                       onComplete={(cp) => setCp(cp)}

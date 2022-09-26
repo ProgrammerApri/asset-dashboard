@@ -242,7 +242,7 @@ const ReportKBB = ({ month, year, kategory }) => {
       {
         columns: [
           {
-            title: "General Ledger Card",
+            title: "Ringkasan Kartu Buku Besar",
             width: { wch: 40 },
             style: {
               font: { sz: "14", bold: true },
@@ -505,8 +505,8 @@ const ReportKBB = ({ month, year, kategory }) => {
             <Card className="ml-1 mr-1 mt-2">
               <Card.Body className="p-0">
                 <CustomeWrapper
-                  tittle={"General Ledger Card"}
-                  subTittle={`General Ledger Card per ${formatDate(filtDate)}`}
+                  tittle={"Ringkasan Kartu Buku Besar"}
+                  subTittle={`Ringkasan Kartu Buku Besar per ${formatDate(filtDate)}`}
                   onComplete={(cp) => setCp(cp)}
                   page={idx + 1}
                   horizontal
@@ -581,8 +581,8 @@ const ReportKBB = ({ month, year, kategory }) => {
                 <Card className="ml-1 mr-1 mt-2">
                   <Card.Body className="p-0">
                     <CustomeWrapper
-                      tittle={"General Ledger Card"}
-                      subTittle={`General Ledger Card per ${formatDate(
+                      tittle={"Ringkasan Kartu Buku Besar"}
+                      subTittle={`Ringkasan Kartu Buku Besar per ${formatDate(
                         filtDate
                       )}`}
                       onComplete={(cp) => setCp(cp)}

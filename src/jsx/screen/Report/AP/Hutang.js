@@ -572,8 +572,8 @@ const ReportHutang = () => {
             <Card className="ml-1 mr-1 mt-2">
               <Card.Body className="p-0 m-0">
                 <CustomeWrapper
-                  tittle={"Account Payable Details"}
-                  subTittle={`Account Payable Details as ${formatDate(filtDate)}`}
+                  tittle={"Debt Balance Details"}
+                  subTittle={`Debt Balance Details as ${formatDate(filtDate)}`}
                   onComplete={(cp) => setCp(cp)}
                   page={idx + 1}
                   body={
@@ -712,8 +712,8 @@ const ReportHutang = () => {
         <Card ref={printPage}>
           <Card.Body className="p-0">
             <CustomeWrapper
-              tittle={"Account Payable Details"}
-              subTittle={`Account Payable Details as of ${formatDate(filtDate)}`}
+              tittle={"Debt Balance Details"}
+              subTittle={`Debt Balance Details as of ${formatDate(filtDate)}`}
               onComplete={(cp) => setCp(cp)}
               body={
                 <>

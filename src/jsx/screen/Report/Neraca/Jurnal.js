@@ -468,13 +468,13 @@ const ReportJurnal = () => {
                                     ? e.props?.value[0]?.trx_code
                                     : null
                                 }
-                                style={{ width: "20rem" }}
+                                style={{ width: "9rem" }}
                                 body={(e) => (
                                   <div
                                     className={
                                       e.type == "header" || e.type == "footer"
-                                        ? "font-weight-bold"
-                                        : ""
+                                        ? "font-weight-bold ml-2"
+                                        : "ml-2"
                                     }
                                   >
                                     {e.value.acc}
@@ -484,7 +484,7 @@ const ReportJurnal = () => {
                               <Column
                                 className="header-center"
                                 header=""
-                                style={{ minWidht: "10rem" }}
+                                style={{ width: "8rem" }}
                                 body={(e) => (
                                   <div
                                     className={
@@ -502,7 +502,7 @@ const ReportJurnal = () => {
                               <Column
                                 className="header-center"
                                 header=""
-                                style={{ minWidht: "10rem" }}
+                                style={{ width: "8rem" }}
                                 body={(e) => (
                                   <div
                                     className={
@@ -525,8 +525,8 @@ const ReportJurnal = () => {
                                   <div
                                     className={
                                       e.type === "header" || e.type === "footer"
-                                        ? "font-weight-bold"
-                                        : ""
+                                        ? "font-weight-bold ml-5"
+                                        : "ml-5"
                                     }
                                   >
                                     {e.value.desc}

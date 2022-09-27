@@ -107,7 +107,7 @@ const LaporanNeraca = (self) => {
     subMenu.forEach((el, i) => {
       menu.push(
         <Link
-          to={"/laporan/neraca/" + el.tittle.toLowerCase().replaceAll(" ", "-")}
+          to={"/laporan/gl/" + el.tittle.toLowerCase().replaceAll(" ", "-")}
         >
           <Button
             className={`sub-menu mr-4 mb-4 ${id == i ? "act" : ""}`}

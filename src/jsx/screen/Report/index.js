@@ -7,8 +7,8 @@ export default function GroupReport() {
     {
       tittle: "General Ledger",
       icon: "bx-archive",
-      total: 5,
-      to: "neraca",
+      total: 7,
+      to: "gl",
     },
     {
       tittle: "AR",

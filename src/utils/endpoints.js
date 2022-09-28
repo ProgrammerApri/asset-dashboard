@@ -867,6 +867,32 @@ const endpoints = {
     data: {},
   },
 
+
+  /// Income
+  income: {
+    endpoint: "/v1/api/income",
+    method: "GET",
+    data: {},
+  },
+
+  addINC: {
+    endpoint: "/v1/api/income",
+    method: "POST",
+    data: {},
+  },
+
+  editINC: {
+    endpoint: "/v1/api/income/",
+    method: "PUT",
+    data: {},
+  },
+
+  delINC: {
+    endpoint: "/v1/api/income/",
+    method: "DELETE",
+    data: {},
+  },
+
   /// Retur-Jual
   retur_sale: {
     endpoint: "/v1/api/retur-sales",
@@ -909,6 +935,13 @@ const endpoints = {
   /// GIRO
   giro: {
     endpoint: "/v1/api/giro",
+    method: "GET",
+    data: {},
+  },
+
+  /// GIRO INCOME
+  giro_inc: {
+    endpoint: "/v1/api/giro-inc",
     method: "GET",
     data: {},
   },

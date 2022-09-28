@@ -1,0 +1,5 @@
+export const SET_CURRENT_GIROIN = "giro_in.SET_CURRENT_GIROIN"
+export const SET_GIROIN = "giro_in.SET_GIROIN"
+export const RESET_CURRENT_GIROIN = "giro_in.RESET_CURRENT_GIROIN"
+export const UPDATE_CURRENT_GIROIN = "giro_in.UPDATE_CURRENT_GIROIN"
+export const SET_EDIT_GIROIN = "giro_in.SET_EDIT_GIROIN"

@@ -69,7 +69,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
         setAcc(data);
@@ -85,7 +85,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
         setAccount(data);
@@ -101,7 +101,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
         setBatch(data);
@@ -115,11 +115,11 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
       endpoint: endpoints.editPBB.endpoint + pbb.id,
       data: pbb,
     };
-    console.log(config.data);
+    
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         onSuccess();
       }
@@ -141,16 +141,16 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
       ...endpoints.addPBB,
       data: pbb,
     };
-    console.log(config.data);
+    
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         onSuccess();
       }
     } catch (error) {
-      console.log(error);
+      
       if (error.status === 400) {
         setTimeout(() => {
           setUpdate(false);
@@ -180,7 +180,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
     acc?.forEach((element) => {
       if (value === element.account.id) {
         selected = element;
-        console.log(selected);
+       
       }
     });
 
@@ -405,23 +405,6 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
               error={error?.btc}
             />
           </div>
-
-          {/* <div className="col-2 text-black">
-            <label className="text-black">Nama Batch</label>
-            <div className="p-inputgroup"></div>
-            <PrimeInput
-              value={pbn.fcode}
-              onChange={(e) => {
-                updatePBN({ ...pbn, fcode: e.target.value });
-                let newError = error;
-                newError.code = false;
-                setError(newError);
-              }}
-              placeholder="Otomatis"
-              error={error?.code}
-              disabled
-            />
-          </div> */}
 
           <div className="col-3 text-black">
             <label className="text-black">Departement</label>
@@ -730,16 +713,16 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
           if (doubleClick) {
             setShowAcc(false);
 
-            let temp = [...pbb.upah];
+            let temp = [...pbb.uph];
             temp[currentIndex].acc_id = e.data.account.id;
 
-            let tempm = [...pbb.overhead];
+            let tempm = [...pbb.ovh];
             temp[currentIndex].acc_id = e.data.account.id;
             updatePBB({
               ...pbb,
-              code_acc: e.data.account.id,
-              upah: temp,
-              overhead: tempm,
+              acc_cred: e.data.account.id,
+              uph: temp,
+              ovh: tempm,
             });
           }
 

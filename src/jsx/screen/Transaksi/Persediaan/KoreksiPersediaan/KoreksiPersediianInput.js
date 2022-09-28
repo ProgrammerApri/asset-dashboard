@@ -146,14 +146,14 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
       ...endpoints.pusatBiaya,
       data: {},
     };
-    console.log(config.data);
+    
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
-        console.log(data);
+        
         setPusatBiaya(data);
       }
     } catch (error) {}
@@ -164,14 +164,14 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
       ...endpoints.project,
       data: {},
     };
-    console.log(config.data);
+    
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
-        console.log(data);
+        
         setProj(data);
       }
     } catch (error) {}
@@ -182,14 +182,14 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
       ...endpoints.account,
       data: {},
     };
-    console.log(config.data);
+    
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
-        console.log(data);
+        
         setAcc(data);
       }
     } catch (error) {}
@@ -207,8 +207,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
       if (response.status) {
         const { data } = response;
         setProduct(data);
-        console.log("jsdj");
-        console.log(data);
+        
       }
     } catch (error) {}
   };
@@ -221,7 +220,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
         setLokasi(data);
@@ -237,7 +236,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
         setSatuan(data);
@@ -251,11 +250,11 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
       endpoint: endpoints.editKorSto.endpoint + ic.id,
       data: ic,
     };
-    console.log(config.data);
+    
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         onSuccess();
       }
@@ -277,16 +276,15 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
       ...endpoints.addKorSto,
       data: ic,
     };
-    console.log(config.data);
+    
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         onSuccess();
       }
     } catch (error) {
-      console.log(error);
       if (error.status === 400) {
         setTimeout(() => {
           setUpdate(false);
@@ -349,8 +347,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
     product?.forEach((element) => {
       if (value === element.id) {
         selected = element;
-        console.log("SELEC");
-        console.log(selected);
+       
       }
     });
 

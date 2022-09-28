@@ -73,7 +73,6 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
   const [rulesPay, setRulesPay] = useState(null);
   const [ppn, setPpn] = useState(null);
   const [salesman, setSalesman] = useState(null);
-  const [sl, setSl] = useState(null);
   const [so, setSO] = useState(null);
   const [showSupplier, setShowSupplier] = useState(false);
   const [showSalesman, setShowSalesman] = useState(false);
@@ -117,7 +116,6 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     getSalesman();
     getStoLoc();
     getSetup();
-    getSl();
   }, []);
 
   const isValid = () => {
@@ -272,33 +270,16 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     return valid;
   };
 
-  const getSl = async () => {
-    const config = {
-      ...endpoints.sale,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setSl(data);
-      }
-    } catch (error) {}
-  };
-
   const getCustomer = async () => {
     const config = {
       ...endpoints.customer,
       data: {},
     };
-    console.log(config.data);
+    
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
         let filt = [];
@@ -307,7 +288,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
             filt.push(elem);
           }
         });
-        console.log(data);
+        
         setCustomer(filt);
       }
     } catch (error) {}
@@ -318,11 +299,11 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
       ...endpoints.customer,
       data: {},
     };
-    console.log(config.data);
+    
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
         let filt = [];
@@ -331,7 +312,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
             filt.push(elem);
           }
         });
-        console.log(data);
+        
         setSubCus(filt);
       }
     } catch (error) {}
@@ -345,7 +326,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
         setSupplier(data);
@@ -358,14 +339,14 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
       ...endpoints.rules_pay,
       data: {},
     };
-    console.log(config.data);
+    
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
-        console.log(data);
+        
         setRulesPay(data);
       }
     } catch (error) {}
@@ -376,14 +357,14 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
       ...endpoints.pajak,
       data: {},
     };
-    console.log(config.data);
+    
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
-        console.log(data);
+        
         setPpn(data);
       }
     } catch (error) {}
@@ -394,14 +375,14 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
       ...endpoints.salesman,
       data: {},
     };
-    console.log(config.data);
+    
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
-        console.log(data);
+        
         setSalesman(data);
       }
     } catch (error) {}
@@ -415,7 +396,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
         let filt = [];
@@ -478,8 +459,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
       if (response.status) {
         const { data } = response;
         setProduct(data);
-        console.log("jsdj");
-        console.log(data);
+        
       }
     } catch (error) {}
   };
@@ -492,7 +472,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
         setJasa(data);
@@ -508,7 +488,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
         setSatuan(data);
@@ -524,7 +504,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
         setLoc(data);
@@ -540,7 +520,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
         setSetup(data);
@@ -556,7 +536,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
         setSto(data);
@@ -570,11 +550,11 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
       endpoint: endpoints.editSales.endpoint + sale.id,
       data: sale,
     };
-    console.log(config.data);
+    
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         onSuccess();
       }
@@ -596,16 +576,16 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
       ...endpoints.addSale,
       data: { ...sale, doc_date: currentDate(sale.doc_date) },
     };
-    console.log(config.data);
+    
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         onSuccess();
       }
     } catch (error) {
-      console.log(error);
+      
       if (error.status === 400) {
         setTimeout(() => {
           setUpdate(false);
@@ -712,7 +692,6 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     product?.forEach((element) => {
       if (value === element.id) {
         selected = element;
-        console.log(selected);
       }
     });
 
@@ -834,15 +813,11 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
 
   const pjk = (value) => {
     let nil = {};
-    // sl?.forEach((el) => {
       ppn?.forEach(elem => {
         if (checkCus(sale?.pel_id)?.customer?.cus_pjk === elem.id) {
           nil = elem.nilai
         }
       });
-    // });
-    console.log("nilaiiii");
-    console.log(nil);
 
     return nil;
   };
@@ -902,7 +877,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   result.setDate(
                     result.getDate() + checkRulesP(sale?.top)?.day
                   );
-                  console.log(result);
+                 
                 }
                 updateSL({
                   ...sale,
@@ -1118,7 +1093,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
               onChange={(e) => {
                 let result = new Date(`${sale.ord_date}Z`);
                 result.setDate(result.getDate() + e.day);
-                console.log(result);
+                
 
                 updateSL({ ...sale, top: e.id, due_date: result });
 
@@ -1399,7 +1374,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         temp[e.index].total =
                           temp[e.index].order * temp[e.index].price;
                         updateSL({ ...sale, jprod: temp });
-                        console.log(temp);
+                        
 
                         let newError = error;
                         newError.prod[e.index].jum = false;
@@ -1460,7 +1435,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         temp[e.index].total =
                           temp[e.index].order * temp[e.index].price;
                         updateSL({ ...sale, jprod: temp });
-                        console.log(temp);
+                        
 
                         let newError = error;
                         newError.prod[e.index].prc = false;
@@ -1489,10 +1464,10 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                           let temp = [...sale.jprod];
                           temp[e.index].disc = t.target.value;
                           // let disc = temp[e.index].total * temp[e.index].disc / 100
-                          // console.log(disc);
+                       
                           // temp[e.index].total -= disc;
                           updateSL({ ...sale, jprod: temp });
-                          console.log(temp);
+                          
                         }}
                         placeholder="0"
                         type="number"
@@ -1519,7 +1494,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                           let temp = [...sale.jprod];
                           temp[e.index].nett_price = t.value;
                           updateSL({ ...sale, jprod: temp });
-                          console.log(temp);
+                         
                         }}
                         placeholder="0"
                         disabled={sale && sale.so_id}
@@ -1641,7 +1616,6 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         let temp = [...sale.jjasa];
                         temp[e.index].sup_id = t.supplier.id;
                         updateSL({ ...sale, jjasa: temp });
-                        console.log(temp);
                       }}
                       label={"[supplier.sup_name]"}
                       placeholder="Pilih Supplier"
@@ -1729,7 +1703,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         temp[e.index].total =
                           temp[e.index].order * temp[e.index].price;
                         updateSL({ ...sale, jjasa: temp });
-                        console.log(temp);
+                      
                         let newError = error;
                         newError.jasa[e.index].jum = false;
                         setError(newError);
@@ -1760,7 +1734,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         temp[e.index].total =
                           temp[e.index].order * temp[e.index].price;
                         updateSL({ ...sale, jjasa: temp });
-                        console.log(temp);
+                      
                         let newError = error;
                         newError.jasa[e.index].prc = false;
                         setError(newError);
@@ -1788,7 +1762,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                           let temp = [...sale.jjasa];
                           temp[e.index].disc = t.target.value;
                           updateSL({ ...sale, jjasa: temp });
-                          console.log(temp);
+                       
                         }}
                         placeholder="0"
                         type="number"

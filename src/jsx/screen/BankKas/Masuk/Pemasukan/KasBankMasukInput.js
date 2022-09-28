@@ -8,7 +8,7 @@ import { Toast } from "primereact/toast";
 import { Calendar } from "primereact/calendar";
 import CustomAccordion from "../../../../components/Accordion/Accordion";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_EXP } from "src/redux/actions";
+import { SET_CURRENT_inc, SET_CURRENT_INC } from "src/redux/actions";
 import DataSupplier from "src/jsx/screen/Mitra/Pemasok/DataPemasok";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -19,20 +19,26 @@ import DataPusatBiaya from "src/jsx/screen/MasterLainnya/PusatBiaya/DataPusatBia
 import DataBank from "src/jsx/screen/MasterLainnya/Bank/DataBank";
 import DataProject from "src/jsx/screen/MasterLainnya/Project/DataProject";
 import { Divider } from "@material-ui/core";
+import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
+import { InputNumber } from "primereact/inputnumber";
+import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
+
+const dk = [
+  { name: "Debit", code: "D" },
+  { name: "Kredit", code: "K" },
+];
 
 const KasBankInInput = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
   const toast = useRef(null);
   const [doubleClick, setDoubleClick] = useState(false);
-  const exp = useSelector((state) => state.exp.current);
-  const isEdit = useSelector((state) => state.exp.editExp);
+  const inc = useSelector((state) => state.inc.current);
+  const isEdit = useSelector((state) => state.inc.editInc);
   const dispatch = useDispatch();
-  const [account, setAccount] = useState(null);
-  const [accKas, setAccKas] = useState(null);
   const [bank, setBank] = useState(null);
-  const [supplier, setSupplier] = useState(null);
-  const [faktur, setFaktur] = useState(null);
-  const [apcard, setAP] = useState(null);
+  const [acc, setAcc] = useState(null);
+  const [customer, setCustomer] = useState(null);
+  const [arcard, setAR] = useState(null);
   const [dept, setDept] = useState(null);
   const [proj, setProj] = useState(null);
   const [showSupplier, setShowSupplier] = useState(false);
@@ -47,7 +53,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
     keluar: false,
   });
 
-  const exp_type = [
+  const inc_type = [
     { typePengeluaran: "Pelunasan", kode: 1 },
     { typePengeluaran: "Pemasukan Kas/Bank", kode: 2 },
   ];
@@ -67,138 +73,57 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
       left: 0,
       behavior: "smooth",
     });
-    getAccKas();
     getBank();
-    getSupplier();
+    getCustomer();
     getDept();
     getProj();
-    getAccount();
+    getAcc();
   }, []);
 
-  const getAPCard = async (spl) => {
+  const getARCard = async (plg) => {
     const config = {
-      ...endpoints.apcard,
+      ...endpoints.arcard,
       data: {},
     };
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+
       if (response.status) {
         const { data } = response;
-        let sup = [];
-        spl.forEach((element) => {
-          element.ap = [];
+        let pel = [];
+
+        plg.forEach((element) => {
+          element.ar = [];
           data.forEach((el) => {
-            if (el.trx_type === "LP" && el.pay_type === "P1") {
-              if (element.supplier.id === el.sup_id.id) {
-                element.ap.push(el);
+            if (el.trx_type === "JL" && el.pay_type === "P1") {
+              if (element.customer.id === el.cus_id.id) {
+                element.ar.push(el);
               }
             }
           });
-          if (element.ap.length > 0) {
-            sup.push(element);
-          }
-          console.log("hdjsdjs");
-          console.log(element);
-        });
-        setAP(data);
-        setSupplier(sup);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const getFaktur = async () => {
-    const config = {
-      ...endpoints.faktur,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        let sup = [];
-        supplier.forEach((element) => {
-          element.fk = [];
-          data.forEach((el) => {
-            if (element.supplier.id === el.ord_id.sup_id) {
-              element.fk.push(el);
-            }
-          });
-          if (element.fk.length > 0) {
-            sup.push(element);
+          if (element.ar.length > 0) {
+            pel.push(element);
           }
         });
-        setFaktur(data);
-        setSupplier(sup);
+        setAR(data);
+        setCustomer(pel);
       }
     } catch (error) {}
   };
 
-  const getSupplier = async () => {
+  const getCustomer = async () => {
     const config = {
-      ...endpoints.supplier,
+      ...endpoints.customer,
       data: {},
     };
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        getAPCard(data);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
-  const getAccount = async () => {
-    const config = {
-      ...endpoints.account,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
       if (response.status) {
         const { data } = response;
-        // let filt = [];
-        // data.forEach((elem) => {
-        //   if (elem.account.kat_code === 1 & 2) {
-        //     filt.push(elem);
-        //   }
-        // });
-        setAccount(data);
-      }
-    } catch (error) {}
-  };
-
-  const getAccKas = async () => {
-    const config = {
-      ...endpoints.account,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        let filt = [];
-        data.forEach((elem) => {
-          if (elem.account.kat_code === 1 && elem.account.dou_type === "D") {
-            filt.push(elem);
-          }
-        });
-        console.log(data);
-        setAccKas(filt);
+        getARCard(data);
       }
     } catch (error) {}
   };
@@ -208,20 +133,33 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
       ...endpoints.bank,
       data: {},
     };
-    console.log(config.data);
+
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+
       if (response.status) {
         const { data } = response;
-        // let filt = [];
-        // data.forEach((elem) => {
-        //   if (elem.account.kat_code === 2) {
-        //     filt.push(elem);
-        //   }
-        // });
+
         setBank(data);
+      }
+    } catch (error) {}
+  };
+
+  const getAcc = async () => {
+    const config = {
+      ...endpoints.account,
+      data: {},
+    };
+
+    let response = null;
+    try {
+      response = await request(null, config);
+
+      if (response.status) {
+        const { data } = response;
+
+        setAcc(data);
       }
     } catch (error) {}
   };
@@ -234,7 +172,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+
       if (response.status) {
         const { data } = response;
         setDept(data);
@@ -250,7 +188,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+
       if (response.status) {
         const { data } = response;
         setProj(data);
@@ -258,17 +196,17 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
-  const editEXP = async () => {
+  const editINC = async () => {
     const config = {
-      ...endpoints.editEXP,
-      endpoint: endpoints.editEXP.endpoint + exp.id,
-      data: exp,
+      ...endpoints.editINC,
+      endpoint: endpoints.editINC.endpoint + inc.id,
+      data: inc,
     };
-    console.log(config.data);
+
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+
       if (response.status) {
         onSuccess();
       }
@@ -285,28 +223,27 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
     }
   };
 
-  const addEXP = async () => {
+  const addINC = async () => {
     const config = {
-      ...endpoints.addEXP,
-      data: exp,
+      ...endpoints.addINC,
+      data: inc,
     };
-    console.log(config.data);
+
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+
       if (response.status) {
         onSuccess();
       }
     } catch (error) {
-      console.log(error);
       if (error.status === 400) {
         setTimeout(() => {
           setUpdate(false);
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${exp.exp_code} Sudah Digunakan`,
+            detail: `Kode ${inc.inc_code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -346,21 +283,10 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
-  const supp = (value) => {
+  const cus = (value) => {
     let selected = {};
-    supplier?.forEach((element) => {
-      if (value === element.supplier.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const checkAccKas = (value) => {
-    let selected = {};
-    accKas?.forEach((element) => {
-      if (value === element.account.id) {
+    customer?.forEach((element) => {
+      if (value === element.customer.id) {
         selected = element;
       }
     });
@@ -381,7 +307,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
 
   const checkAcc = (value) => {
     let selected = {};
-    account?.forEach((element) => {
+    acc?.forEach((element) => {
       if (value === element.account.id) {
         selected = element;
       }
@@ -390,10 +316,10 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
-  const checkFk = (value) => {
+  const checkAR = (value) => {
     let selected = {};
-    faktur?.forEach((element) => {
-      if (value === element.id) {
+    arcard?.forEach((element) => {
+      if (value === element.bkt_id.id) {
         selected = element;
       }
     });
@@ -401,10 +327,10 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
-  const checkAP = (value) => {
+  const cekType = (value) => {
     let selected = {};
-    apcard?.forEach((element) => {
-      if (value === element.ord_id.id) {
+    dk?.forEach((element) => {
+      if (value === element.code) {
         selected = element;
       }
     });
@@ -415,10 +341,10 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
   const onSubmit = () => {
     if (isEdit) {
       setUpdate(true);
-      editEXP();
+      editINC();
     } else {
       setUpdate(true);
-      addEXP();
+      addINC();
     }
   };
 
@@ -434,9 +360,57 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
     return [year, month, day].join("-");
   };
 
-  const updateExp = (e) => {
+  const bankTemplate = (option) => {
+    return (
+      <div>
+        {option !== null
+          ? `${option.bank.BANK_NAME} - ${option.bank.BANK_CODE}`
+          : ""}
+      </div>
+    );
+  };
+
+  const valBTemp = (option, props) => {
+    if (option) {
+      return (
+        <div>
+          {option !== null
+            ? `${option.bank.BANK_NAME} - ${option.bank.BANK_CODE}`
+            : ""}
+        </div>
+      );
+    }
+
+    return <span>{props.placeholder}</span>;
+  };
+
+  const accTemplate = (option) => {
+    return (
+      <div>
+        {option !== null
+          ? `${option.account.acc_name} - ${option.account.acc_code}`
+          : ""}
+      </div>
+    );
+  };
+
+  const valATemp = (option, props) => {
+    if (option) {
+      return (
+        <div>
+          {option !== null
+            ? `${option.account.acc_name} - ${option.account.acc_code}`
+            : ""}
+        </div>
+      );
+    }
+
+    return <span>{props.placeholder}</span>;
+  };
+
+  const updateInc = (e) => {
     dispatch({
-      type: SET_CURRENT_EXP,
+      type: SET_CURRENT_INC,
       payload: e,
     });
   };
@@ -460,9 +434,9 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
             <label className="text-label">Kode Referensi</label>
             <div className="p-inputgroup">
               <InputText
-                value={exp.exp_code}
+                value={inc.inc_code}
                 onChange={(e) =>
-                  updateExp({ ...exp, exp_code: e.target.value })
+                  updateInc({ ...inc, inc_code: e.target.value })
                 }
                 placeholder="Masukan Kode Referensi"
               />
@@ -473,9 +447,9 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
             <label className="text-label">Tanggal</label>
             <div className="p-inputgroup">
               <Calendar
-                value={new Date(`${exp.exp_date}Z`)}
+                value={new Date(`${inc.inc_date}Z`)}
                 onChange={(e) => {
-                  updateExp({ ...exp, exp_date: e.value });
+                  updateInc({ ...inc, inc_date: e.value });
                 }}
                 placeholder="Pilih Tanggal"
                 showIcon
@@ -498,19 +472,18 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
             <div className="p-inputgroup">
               <SelectButton
                 value={
-                  exp !== null && exp.exp_type !== ""
-                    ? exp.exp_type === 1
+                  inc !== null && inc.inc_type !== ""
+                    ? inc.inc_type === 1
                       ? { kode: 1, typePengeluaran: "Pelunasan" }
                       : { kode: 2, typePengeluaran: "Pemasukan Kas/Bank" }
                     : null
                 }
-                options={exp_type}
+                options={inc_type}
                 onChange={(e) => {
-                  console.log(e.value);
-                  updateExp({
-                    ...exp,
-                    exp_type: e.value.kode,
-                    acq_pay: e.value.kode === 1 ? 1 : null,
+                  updateInc({
+                    ...inc,
+                    inc_type: e.value?.kode,
+                    acq_pay: e.value?.kode === 1 ? 1 : null,
                   });
                 }}
                 optionLabel="typePengeluaran"
@@ -521,29 +494,29 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
           <div className="col-8"></div>
 
           {/* Type Pembayaran */}
-          {exp !== null && exp.exp_type === 1 ? (
+          {inc !== null && inc.inc_type === 1 ? (
             <>
-              <div className="col-4">
+              <div className="col-3">
                 <label className="text-label">Pelanggan</label>
                 <div className="p-inputgroup"></div>
                 <CustomDropdown
-                  value={exp.acq_sup && supp(exp.acq_sup)}
-                  option={supplier}
+                  value={inc.acq_cus && cus(inc.acq_cus)}
+                  option={customer}
                   onChange={(e) => {
-                    updateExp({
-                      ...exp,
-                      acq_sup: e.supplier?.id,
-                      acq: e.ap?.map((v) => {
+                    updateInc({
+                      ...inc,
+                      acq_cus: e.customer?.id,
+                      acq: e.ar?.map((v) => {
                         return {
                           id: null,
-                          fk_id: v.ord_id?.id,
+                          sale_id: v.bkt_id?.id,
                           value: v.trx_amnh,
                           payment: 0,
                         };
                       }),
                     });
                   }}
-                  label={"[supplier.sup_name] ([supplier.sup_code])"}
+                  label={"[customer.cus_name] ([customer.cus_code])"}
                   placeholder="Pilih Pelanggan"
                   detail
                 />
@@ -554,56 +527,70 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                 <div className="p-inputgroup">
                   <SelectButton
                     value={
-                      exp !== null && exp.acq_pay !== ""
-                        ? exp.acq_pay === 1
+                      inc !== null && inc.acq_pay !== ""
+                        ? inc.acq_pay === 1
                           ? { kode: 1, jenisPengeluaran: "Kas" }
-                          : exp.acq_pay === 2
+                          : inc.acq_pay === 2
                           ? { kode: 2, jenisPengeluaran: "Bank" }
                           : { kode: 3, jenisPengeluaran: "Giro" }
                         : null
                     }
                     options={acq_pay}
                     onChange={(e) => {
-                      updateExp({ ...exp, acq_pay: e.value.kode });
+                      updateInc({ ...inc, acq_pay: e.value?.kode });
                     }}
                     optionLabel="jenisPengeluaran"
                   />
                 </div>
               </div>
 
-              {/* kode pembayaran cash  */}
-              {exp !== null && exp.acq_pay === 1 ? (
+              {/* kode pembayaran bank  */}
+              {inc !== null && inc.acq_pay === 1 ? (
                 <>
-                  <div className="col-4">
+                  <div className="col-3">
                     <label className="text-label">Kode Akun</label>
                     <div className="p-inputgroup"></div>
                     <CustomDropdown
-                      value={exp.kas_acc && checkAccKas(exp.kas_acc)}
-                      option={accKas}
+                      value={inc.acc_kas && checkAcc(inc.acc_kas)}
+                      option={acc}
                       onChange={(e) => {
-                        updateExp({ ...exp, kas_acc: e.account.id });
+                        updateInc({
+                          ...inc,
+                          acc_kas: e.account?.id,
+                        });
                       }}
-                      label={"[account.acc_name] ([account.acc_code])"}
+                      label={"[account.acc_name] - [account.acc_code]"}
                       placeholder="Pilih Kode Akun"
                       detail
-                      onDetail={() => setShowAccKas(true)}
+                      onDetail={() => setShowAcc(true)}
                     />
                   </div>
                 </>
-              ) : // pembayaran bank
-              exp !== null && exp.acq_pay === 2 ? (
+              ) : inc !== null && inc.acq_pay === 2 ? (
                 <>
-                  <div className="col-4">
+                  <div className="col-3">
+                    <label className="text-label">Kode Referensi Bank</label>
+                    <div className="p-inputgroup">
+                      <InputText
+                        value={inc.bank_ref}
+                        onChange={(e) =>
+                          updateInc({ ...inc, bank_ref: e.target.value })
+                        }
+                        placeholder="Masukan Kode Bank"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="col-3">
                     <label className="text-label">Kode Bank</label>
                     <div className="p-inputgroup"></div>
                     <CustomDropdown
-                      value={exp.bank_id && checkBank(exp.bank_id)}
+                      value={inc.bank_id && checkBank(inc.bank_id)}
                       option={bank}
                       onChange={(e) => {
-                        updateExp({
-                          ...exp,
+                        updateInc({
+                          ...inc,
                           bank_id: e.bank?.id,
-                          bank_acc: e.bank?.acc_id,
                         });
                       }}
                       label={"[bank.BANK_NAME] - [bank.BANK_CODE]"}
@@ -612,43 +599,30 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                       onDetail={() => setShowBank(true)}
                     />
                   </div>
-
-                  <div className="col-4">
-                    <label className="text-label">Kode Referensi Bank</label>
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={exp.bank_ref}
-                        onChange={(e) =>
-                          updateExp({ ...exp, bank_ref: e.target.value })
-                        }
-                        placeholder="Masukan Kode Bank"
-                      />
-                    </div>
-                  </div>
                 </>
               ) : (
                 // pembayran giro
                 <>
-                  <div className="col-4">
+                  <div className="col-3">
                     <label className="text-label">Nomor Giro</label>
                     <div className="p-inputgroup">
                       <InputText
-                        value={exp.giro_num}
+                        value={inc.giro_num}
                         onChange={(e) =>
-                          updateExp({ ...exp, giro_num: e.target.value })
+                          updateInc({ ...inc, giro_num: e.target.value })
                         }
                         placeholder="Nomor Giro"
                       />
                     </div>
                   </div>
 
-                  <div className="col-4">
+                  <div className="col-3">
                     <label className="text-label">Tanggal Cair</label>
                     <div className="p-inputgroup">
                       <Calendar
-                        value={new Date(`${exp.giro_date}Z`)}
+                        value={new Date(`${inc.giro_date}Z`)}
                         onChange={(e) => {
-                          updateExp({ ...exp, giro_date: e.value });
+                          updateInc({ ...inc, giro_date: e.value });
                         }}
                         placeholder="Pilih Tanggal"
                         showIcon
@@ -657,17 +631,16 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                     </div>
                   </div>
 
-                  <div className="col-4">
+                  <div className="col-3">
                     <label className="text-label">Kode Bank</label>
                     <div className="p-inputgroup"></div>
                     <CustomDropdown
-                      value={exp.bank_id && checkBank(exp.bank_id)}
+                      value={inc.giro_bnk && checkBank(inc.giro_bnk)}
                       option={bank}
                       onChange={(e) => {
-                        updateExp({
-                          ...exp,
-                          bank_id: e.bank.id,
-                          bank_acc: e.bank.acc_id,
+                        updateInc({
+                          ...inc,
+                          giro_bnk: e.bank.id,
                         });
                       }}
                       label={"[bank.BANK_NAME] - [bank.BANK_CODE]"}
@@ -679,7 +652,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                 </>
               )}
 
-              {exp?.acq?.length ? (
+              {inc?.acq?.length ? (
                 <CustomAccordion
                   className="col-12 mt-4"
                   tittle={"Data Pembayaran"}
@@ -696,12 +669,12 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                     <>
                       <DataTable
                         responsiveLayout="none"
-                        value={exp?.acq?.map((v, i) => {
+                        value={inc?.acq?.map((v, i) => {
                           return {
                             ...v,
                             index: i,
-                            value: v?.value ?? 0,
-                            payment: v?.payment ?? 0,
+                            // value: v?.value ?? 0,
+                            // payment: v?.payment ?? 0,
                           };
                         })}
                         className="display w-150 datatable-wrapper header-white no-border"
@@ -709,7 +682,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                         emptyMessage={() => <div></div>}
                       >
                         <Column
-                          header="Kode Faktur"
+                          header="Kode Trans"
                           style={{
                             maxWidth: "15rem",
                           }}
@@ -718,10 +691,11 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                             <div className="p-inputgroup">
                               <InputText
                                 value={
-                                  e.fk_id && checkAP(e.fk_id)?.ord_id?.fk_code
+                                  e.sale_id &&
+                                  checkAR(e.sale_id)?.bkt_id?.ord_code
                                 }
                                 onChange={(u) => {}}
-                                placeholder="Kode Faktur"
+                                placeholder="Kode Trans"
                                 disabled
                               />
                             </div>
@@ -736,7 +710,10 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                               <Calendar
                                 value={
                                   new Date(
-                                    `${e.fk_id && checkAP(e.fk_id).ord_due}Z`
+                                    `${
+                                      e.sale_id &&
+                                      checkAR(e.sale_id)?.bkt_id?.due_date
+                                    }Z`
                                   )
                                 }
                                 onChange={(e) => {}}
@@ -757,7 +734,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                           body={(e) => (
                             <div className="p-inputgroup">
                               <InputText
-                                value={e.fk_id && checkAP(e.fk_id).trx_type}
+                                value={e.sale_id && checkAR(e.sale_id).trx_type}
                                 onChange={(a) => {}}
                                 placeholder="Type"
                                 disabled
@@ -774,11 +751,10 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                           field={""}
                           body={(e) => (
                             <div className="p-inputgroup">
-                              <InputText
+                              <InputNumber
                                 value={e.value}
                                 onChange={(e) => {}}
                                 placeholder="0"
-                                type="number"
                                 disabled
                               />
                             </div>
@@ -793,12 +769,13 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                           field={""}
                           body={(e) => (
                             <div className="p-inputgroup">
-                              <InputText
-                                value={e.payment && e.payment}
+                              <PrimeNumber
+                                price
+                                value={e.payment ?? ""}
                                 onChange={(u) => {
-                                  let temp = [...exp.acq];
-                                  temp[e.index].payment = u.target.value;
-                                  updateExp({ ...exp, acq: temp });
+                                  let temp = [...inc.acq];
+                                  temp[e.index].payment = u.value;
+                                  updateInc({ ...inc, acq: temp });
                                 }}
                                 placeholder="0"
                                 type="number"
@@ -814,10 +791,10 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                               // e.index === out.rprod.length - 1 ? (
                               <Link
                                 onClick={() => {
-                                  let temp = [...exp.acq];
+                                  let temp = [...inc.acq];
                                   temp.splice(e.index, 1);
-                                  updateExp({
-                                    ...exp,
+                                  updateInc({
+                                    ...inc,
                                     acq: temp,
                                   });
                                 }}
@@ -845,30 +822,27 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                 <label className="text-label">Kode Akun</label>
                 <div className="p-inputgroup"></div>
                 <CustomDropdown
-                  value={exp.exp_acc && checkAcc(exp.exp_acc)}
-                  option={account}
-                  onChange={(e) => {
-                    updateExp({
-                      ...exp,
-                      exp_acc: e.account.id,
-                    });
+                  value={inc.inc_acc && checkAcc(inc.inc_acc)}
+                  option={acc}
+                  onChange={(u) => {
+                    updateInc({ ...inc, inc_acc: u.account.id });
                   }}
                   label={"[account.acc_name] - [account.acc_code]"}
                   placeholder="Pilih Kode Akun"
                   detail
-                  onDetail={() => setShowAcc(true)}
+                  onDetail={() => setShowAccKas(true)}
                 />
               </div>
               <div className="col-4">
                 <label className="text-label">Kode Departemen</label>
                 <div className="p-inputgroup"></div>
                 <CustomDropdown
-                  value={exp.exp_dep && checkDept(exp.exp_dep)}
+                  value={inc.inc_dep && checkDept(inc.inc_dep)}
                   option={dept}
                   onChange={(e) => {
-                    updateExp({
-                      ...exp,
-                      exp_dep: e.id,
+                    updateInc({
+                      ...inc,
+                      inc_dep: e.id,
                     });
                   }}
                   label={"[ccost_name] - [ccost_code]"}
@@ -881,12 +855,12 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                 <label className="text-label">Kode Project</label>
                 <div className="p-inputgroup"></div>
                 <CustomDropdown
-                  value={exp.exp_prj && checkProj(exp.exp_prj)}
+                  value={inc.inc_prj && checkProj(inc.inc_prj)}
                   option={proj}
                   onChange={(e) => {
-                    updateExp({
-                      ...exp,
-                      exp_prj: e.id,
+                    updateInc({
+                      ...inc,
+                      inc_prj: e.id,
                     });
                   }}
                   label={"[proj_name] - [proj_code]"}
@@ -897,7 +871,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
               </div>
               <CustomAccordion
                 className="col-12 mt-4"
-                tittle={"Pengeluaran Kas/Bank"}
+                tittle={"Pemasukan Kas/Bank"}
                 defaultActive={true}
                 active={accor.keluar}
                 onClick={() => {
@@ -911,11 +885,11 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                   <>
                     <DataTable
                       responsiveLayout="none"
-                      value={exp.exp?.map((v, i) => {
+                      value={inc.inc?.map((v, i) => {
                         return {
                           ...v,
                           index: i,
-                          value: v?.value ?? 0,
+                          // value: v?.value ?? 0,
                         };
                       })}
                       className="display w-150 datatable-wrapper header-white no-border"
@@ -929,60 +903,65 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                         // }}
                         field={""}
                         body={(e) => (
-                          <CustomDropdown
+                          <PrimeDropdown
                             value={e.acc_code && checkAcc(e.acc_code)}
-                            option={account}
+                            options={acc}
                             onChange={(u) => {
-                              console.log(e.value);
-                              let temp = [...exp.exp];
+                              let temp = [...inc.inc];
                               temp[e.index].acc_code = u.account.id;
-                              updateExp({ ...exp, exp: temp });
+                              updateInc({ ...inc, inc: temp });
                             }}
-                            label={"[account.acc_name] - [account.acc_code]"}
+                            optionLabel="account.acc_name"
                             placeholder="Pilih Kode Akun"
-                            detail
+                            filter
+                            filterBy="account.acc_name"
+                            itemTemplate={accTemplate}
+                            valueTemplate={valATemp}
                           />
                         )}
                       />
 
                       <Column
-                        header="D/K"
-                        // style={{
-                        //   width: "6rem",
-                        // }}
+                        header="Debit/Kredit"
+                        className="align-text-top"
+                        style={{
+                          width: "11rem",
+                        }}
                         field={""}
                         body={(e) => (
-                          <div className="p-inputgroup">
-                            <InputText
-                              value={
-                                e.acc_code &&
-                                checkAcc(e.acc_code).account.sld_type
-                              }
-                              onChange={(e) => {}}
-                              placeholder="Saldo"
-                              disabled
-                            />
-                          </div>
+                          <PrimeDropdown
+                            value={e.dbcr && cekType(e.dbcr)}
+                            options={dk}
+                            onChange={(a) => {
+                              let temp = [...inc.inc];
+                              temp[e.index].dbcr = a.value.code;
+                              updateInc({ ...inc, inc: temp });
+                            }}
+                            optionLabel="name"
+                            placeholder="Debit/Kredit"
+                          />
                         )}
                       />
 
                       <Column
                         header="Nilai"
+                        className="align-text-top"
                         field={""}
+                        style={{
+                          width: "15rem",
+                        }}
                         body={(e) => (
-                          <div className="p-inputgroup">
-                            <InputText
-                              value={e.value && e.value}
-                              onChange={(u) => {
-                                let temp = [...exp.exp];
-                                temp[e.index].value = u.target.value;
-                                updateExp({ ...exp, exp: temp });
-                              }}
-                              placeholder="Nilai"
-                              type="number"
-                              min={0}
-                            />
-                          </div>
+                          <PrimeNumber
+                            price
+                            value={e.value && e.value}
+                            onChange={(u) => {
+                              let temp = [...inc.inc];
+                              temp[e.index].value = u.target.value;
+                              updateInc({ ...inc, inc: temp });
+                            }}
+                            placeholder="0"
+                            min={0}
+                          />
                         )}
                       />
 
@@ -997,9 +976,9 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                             <InputText
                               value={e.desc && e.desc}
                               onChange={(u) => {
-                                let temp = [...exp.exp];
+                                let temp = [...inc.inc];
                                 temp[e.index].desc = u.target.value;
-                                updateExp({ ...exp, exp: temp });
+                                updateInc({ ...inc, inc: temp });
                               }}
                               placeholder="Masukan Keterangan"
                             />
@@ -1009,16 +988,16 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
 
                       <Column
                         body={(e) =>
-                          e.index === exp.exp.length - 1 ? (
+                          e.index === inc.inc.length - 1 ? (
                             <Link
                               onClick={() => {
-                                updateExp({
-                                  ...exp,
-                                  exp: [
-                                    ...exp.exp,
+                                updateInc({
+                                  ...inc,
+                                  inc: [
+                                    ...inc.inc,
                                     {
                                       id: null,
-                                      acc_code: null,
+                                      bnk_code: null,
                                       value: null,
                                       desc: null,
                                     },
@@ -1032,11 +1011,11 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                           ) : (
                             <Link
                               onClick={() => {
-                                let temp = [...exp.exp];
+                                let temp = [...inc.inc];
                                 temp.splice(e.index, 1);
-                                updateExp({
-                                  ...exp,
-                                  exp: temp,
+                                updateInc({
+                                  ...inc,
+                                  inc: temp,
                                 });
                               }}
                               className="btn btn-danger shadow btn-xs sharp ml-1"
@@ -1086,34 +1065,6 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
       {body()}
       {footer()}
 
-      <DataSupplier
-        data={supplier}
-        loading={false}
-        popUp={true}
-        show={showSupplier}
-        onHide={() => {
-          setShowSupplier(false);
-        }}
-        onInput={(e) => {
-          setShowSupplier(!e);
-        }}
-        onSuccessInput={(e) => {
-          getSupplier();
-        }}
-        onRowSelect={(e) => {
-          if (doubleClick) {
-            setShowSupplier(false);
-            updateExp({ ...exp, acq_sup: e.data.id });
-          }
-
-          setDoubleClick(true);
-
-          setTimeout(() => {
-            setDoubleClick(false);
-          }, 2000);
-        }}
-      />
-
       <DataPusatBiaya
         data={dept}
         loading={false}
@@ -1131,7 +1082,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowDept(false);
-            updateExp({ ...exp, exp_dep: e.data.id });
+            updateInc({ ...inc, inc_dep: e.data.id });
           }
 
           setDoubleClick(true);
@@ -1159,7 +1110,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowProj(false);
-            updateExp({ ...exp, exp_prj: e.data.id });
+            updateInc({ ...inc, inc_prj: e.data.id });
           }
 
           setDoubleClick(true);
@@ -1187,10 +1138,9 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowBank(false);
-            updateExp({
-              ...exp,
+            updateInc({
+              ...inc,
               bank_id: e.data.bank.id,
-              bank_acc: e.data.bank.acc_id,
             });
           }
 
@@ -1219,10 +1169,9 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowBankG(false);
-            updateExp({
-              ...exp,
-              bank_id: e.data.bank.id,
-              bank_acc: e.data.bank.acc_id,
+            updateInc({
+              ...inc,
+              giro_bnk: e.data.bank.id,
             });
           }
 
@@ -1235,23 +1184,26 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
       />
 
       <DataAkun
-        data={accKas}
+        data={acc}
         loading={false}
         popUp={true}
-        show={showAccKas}
+        show={showAcc}
         onHide={() => {
-          setShowAccKas(false);
+          setShowAcc(false);
         }}
         onInput={(e) => {
-          setShowAccKas(!e);
+          setShowAcc(!e);
         }}
         onSuccessInput={(e) => {
-          getAccKas();
+          getAcc();
         }}
         onRowSelect={(e) => {
           if (doubleClick) {
-            setShowAccKas(false);
-            updateExp({ ...exp, kas_acc: e.data.account.id });
+            setShowAcc(false);
+            updateInc({
+              ...inc,
+              acc_kas: e.data.account.id,
+            });
           }
 
           setDoubleClick(true);
@@ -1263,23 +1215,26 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
       />
 
       <DataAkun
-        data={account}
+        data={acc}
         loading={false}
         popUp={true}
-        show={showAcc}
+        show={showAccKas}
         onHide={() => {
-          setShowAcc(false);
+          setShowAccKas(false);
         }}
         onInput={(e) => {
-          setShowAcc(!e);
+          setShowAccKas(!e);
         }}
         onSuccessInput={(e) => {
-          getAccount();
+          getAcc();
         }}
         onRowSelect={(e) => {
           if (doubleClick) {
-            setShowAcc(false);
-            updateExp({ ...exp, exp_acc: e.data.account.id });
+            setShowAccKas(false);
+            updateInc({
+              ...inc,
+              inc_acc: e.data.account.id,
+            });
           }
 
           setDoubleClick(true);

@@ -24,7 +24,7 @@ const data = {
   inc_acc: null,
   inc_dep: null,
   inc_prj: null,
-  acq_sup: null,
+  acq_cus: null,
   acq_pay: null,
   acc_kas: null,
   kas_acc: null,

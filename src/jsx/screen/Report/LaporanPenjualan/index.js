@@ -2,6 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Button, Col, Row } from "react-bootstrap";
 import SalesReport from "./Penjualan";
 import { Link } from "react-router-dom";
+import ReportSO from "./SalesOrder";
+import OutstandingSalesOrder from "./OutstandingSalesOrder";
+import ReportReturJual from "./ReturPenjualan";
+import HistoryPaySale from "./HistoryPaySale";
+import OutstandingSales from "./OutstandingPenjualan";
 
 const LaporanPenjualan = (self) => {
   const [active, setActive] = useState(0);
@@ -11,6 +16,32 @@ const LaporanPenjualan = (self) => {
       icon: "bx-receipt",
       component: <SalesReport />,
     },
+    {
+      tittle: "Outstanding Penjualan",
+      icon: "bx-receipt",
+      component: <OutstandingSales />,
+    },
+    {
+      tittle: "Sales Order",
+      icon: "bx-receipt",
+      component: <ReportSO />,
+    },
+    {
+      tittle: "Outstanding Sales Order",
+      icon: "bx-receipt",
+      component: <OutstandingSalesOrder />,
+    },
+    {
+      tittle: "Retur Penjualan",
+      icon: "bx-receipt",
+      component: <ReportReturJual />,
+    },
+    {
+      tittle: "Histori Pembayaran Penjualan",
+      icon: "bx-receipt",
+      component: <HistoryPaySale />,
+    },
+   
   ]);
 
   let id =

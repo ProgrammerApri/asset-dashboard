@@ -15,24 +15,30 @@ import ReactToPrint from "react-to-print";
 import { el } from "date-fns/locale";
 import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import { Link } from "react-router-dom";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
-const ReportKBB = () => {
+const ReportKBB = ({ month, year, kategory }) => {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const printPage = useRef(null);
-  const [filtDate, setFiltDate] = useState(new Date());
+  const [filtDate, setFiltDate] = useState(
+    year && month ? new Date(year, month - 1, 1) : new Date()
+  );
   const [customer, setCustomer] = useState(null);
   const [selectCus, setSelectCus] = useState(null);
   const [account, setAcc] = useState(null);
   const [trans, setTrans] = useState(null);
   const [cp, setCp] = useState("");
-  const chunkSize = 27;
+  const [acc, setAccDdb] = useState(null);
+  const [maxDate, setMaxDate] = useState(new Date().getMonth() + 1);
+  const chunkSize = 17;
 
   useEffect(() => {
     getAcc();
+    getAccDdb();
   }, []);
 
   const getTrans = async (acc) => {
@@ -92,7 +98,40 @@ const ReportKBB = () => {
           }
         });
         setAcc(filt);
-        getTrans(data);
+        // getTrans(data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getAccDdb = async () => {
+    const config = {
+      ...endpoints.acc_ddb,
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setAccDdb(data);
+        let month = [];
+        data
+          .map((v) => !v.from_closing && v)
+          .forEach((ej) => {
+            if (
+              filtDate.getFullYear() === ej.acc_year &&
+              filtDate.getMonth() + 1 >= ej.acc_month
+            ) {
+              month.push(ej.acc_month);
+            }
+          });
+
+        setMaxDate(Math.max(...month));
+        setFiltDate(
+          new Date(new Date().getFullYear(), Math.max(...month) - 1, 1)
+        );
       }
     } catch (error) {
       console.log(error);
@@ -100,38 +139,101 @@ const ReportKBB = () => {
   };
 
   const formatDate = (date) => {
-    var d = new Date(`${date}Z`),
-      month = "" + (d.getMonth() + 1),
-      day = "" + d.getDate(),
-      year = d.getFullYear();
+    const m = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
 
-    if (month.length < 2) month = "0" + month;
-    if (day.length < 2) day = "0" + day;
+    if (typeof date === "string") {
+      var d = new Date(`${date}Z`),
+        month = d.getMonth(),
+        year = d.getFullYear();
+    } else {
+      var d = new Date(date),
+        month = d.getMonth(),
+        year = d.getFullYear();
+    }
 
-    return [day, month, year].join("-");
+    return [m[month], year].join(" ");
   };
 
   const jsonForExcel = (account, excel = false) => {
     let data = [];
 
+    let month = [];
+    acc?.forEach((ej) => {
+      if (
+        filtDate.getFullYear() === ej.acc_year &&
+        filtDate.getMonth() + 1 >= ej.acc_month
+      ) {
+        month.push(ej.acc_month);
+      }
+    });
+
     account?.forEach((el) => {
-      let dt = [];
-      let db = 0;
-      let kr = 0;
-      trans?.forEach((element) => {
-        if (element?.acc_id?.id === el?.account?.id) {
-          db += element.trx_dbcr === "D" ? element.trx_amnt : 0;
-          kr += element.trx_dbcr === "K" ? element.trx_amnt : 0;
-          dt = new Date(`${element?.trx_date}Z`);
+      if (kategory) {
+        if (Number(kategory) === el.kategory.id) {
+          let db = 0;
+          let kr = 0;
+          let sa = 0;
+          let bl = 0;
+          acc?.forEach((element) => {
+            if (element?.acc_code?.id === el?.account?.id) {
+              if (element.acc_year == filtDate.getFullYear()) {
+                if (Math.max(...month) == element.acc_month) {
+                  sa += element.acc_awal;
+                  db += element.acc_debit;
+                  kr += element.acc_kredit;
+                  bl += element.acc_akhir;
+                }
+              }
+            }
+          });
+          data.push({
+            acco: `${el.account?.acc_code}-${el.account?.acc_name}`,
+            acc_id: el.account?.id,
+            kat: el.kategory?.id,
+            slda: `${formatIdr(sa)}`,
+            debe: `${formatIdr(db)}`,
+            kred: `${formatIdr(kr)}`,
+            blce: `${formatIdr(bl)}`,
+          });
         }
-      });
-      if (dt <= filtDate) {
+      } else {
+        let db = 0;
+        let kr = 0;
+        let sa = 0;
+        let bl = 0;
+        acc?.forEach((element) => {
+          if (element?.acc_code?.id === el?.account?.id) {
+            if (element.acc_year == filtDate.getFullYear()) {
+              if (Math.max(...month) == element.acc_month) {
+                sa += element.acc_awal;
+                db += element.acc_debit;
+                kr += element.acc_kredit;
+                bl += element.acc_akhir;
+              }
+            }
+          }
+        });
         data.push({
-          acco: `${el.account.acc_name} (${el.account.acc_code})`,
-          slda: `Rp. ${formatIdr(0)}`,
-          debe: `Rp. ${formatIdr(db)}`,
-          kred: `Rp. ${formatIdr(kr)}`,
-          blce: `Rp. ${formatIdr(db + kr)}`,
+          acco: `${el.account?.acc_code}-${el.account?.acc_name}`,
+          acc_id: el.account?.id,
+          kat: el.kategory?.id,
+          slda: `${formatIdr(sa)}`,
+          debe: `${formatIdr(db)}`,
+          kred: `${formatIdr(kr)}`,
+          blce: `${formatIdr(bl)}`,
         });
       }
     });
@@ -299,9 +401,15 @@ const ReportKBB = () => {
   };
 
   const formatIdr = (value) => {
-    return `${value}`
+    if (value < 0) {
+      return `-Rp. ${`${value}`
+        .replace("-", "")
+        .replace(".", ",")
+        .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.")}`;
+    }
+    return `Rp. ${`${value}`
       .replace(".", ",")
-      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.")}`;
   };
 
   const renderHeader = () => {
@@ -320,10 +428,11 @@ const ReportKBB = () => {
                   console.log(e.value);
                   setFiltDate(e.value);
                 }}
-                // selectionMode="range"
+                view="month"
                 placeholder="Pilih Tanggal"
                 readOnlyInput
-                dateFormat="dd-mm-yy"
+                dateFormat="MM yy"
+                maxDate={new Date(new Date().getFullYear(), maxDate - 1, 1)}
               />
             </div>
             <div className="col-4">
@@ -382,126 +491,27 @@ const ReportKBB = () => {
 
   return (
     <>
-      {/* <Toast ref={toast} /> */}
       <Row>
         <Col>
           <Card>
-            <Card.Body>
-              {renderHeader()}
-              {/* <DataTable
-                responsiveLayout="scroll"
-                value={jsonForExcel(account)}
-                showGridlines
-                dataKey="id"
-                rowHover
-                emptyMessage="Data Tidak Ditemukan"
-              >
-                <Column
-                  className="header-center"
-                  header="Account"
-                  style={{ width: "20rem" }}
-                  field={(e) => e?.acco}
-                />
-                <Column
-                  className="header-center text-right"
-                  header="Begining Balance"
-                  style={{ minWidht: "8rem" }}
-                  field={(e) => e?.slda}
-                />
-                <Column
-                  className="header-center text-right"
-                  header="Debit"
-                  style={{ minWidht: "8rem" }}
-                  field={(e) => e?.debe}
-                />
-                <Column
-                  className="header-center text-right"
-                  header="Credit"
-                  style={{ minWidht: "10rem" }}
-                  field={(e) => e?.kred}
-                />
-                <Column
-                  className="header-center text-right"
-                  header="Balance"
-                  style={{ minWidht: "10rem" }}
-                  field={(e) => e?.blce}
-                />
-              </DataTable> */}
-            </Card.Body>
+            <Card.Body>{renderHeader()}</Card.Body>
           </Card>
         </Col>
       </Row>
 
-      {/* <Row className="m-0 d-none">
-        <Card ref={printPage}>
-          <Card.Body className="p-0">
-            <CustomeWrapper
-              tittle={"Kartu Buku Besar"}
-              subTittle={`Laporan Kartu Buku Besar Per ${formatDate(filtDate)}`}
-              body={
-                <>
-                  <DataTable
-                    responsiveLayout="scroll"
-                    value={jsonForExcel(account)}
-                    showGridlines
-                    dataKey="id"
-                    rowHover
-                    emptyMessage="Data Tidak Ditemukan"
-                  >
-                    <Column
-                      className="header-center"
-                      header="Akun"
-                      style={{ width: "20rem" }}
-                      field={(e) => e?.acco}
-                    />
-                    <Column
-                      className="header-center text-right"
-                      header="Saldo Awal"
-                      style={{ minWidht: "8rem" }}
-                      field={(e) => e?.slda}
-                    />
-                    <Column
-                      className="header-center text-right"
-                      header="Mutasi Debit"
-                      style={{ minWidht: "8rem" }}
-                      field={(e) => e?.debe}
-                    />
-                    <Column
-                      className="header-center text-right"
-                      header="Mutasi Kredit"
-                      style={{ minWidht: "10rem" }}
-                      field={(e) => e?.kred}
-                    />
-                    <Column
-                      className="header-center text-right"
-                      header="Balance"
-                      style={{ minWidht: "10rem" }}
-                      field={(e) => e?.blce}
-                    />
-                  </DataTable>
-                </>
-              }
-            />
-          </Card.Body>
-        </Card>
-      </Row> */}
-
-      <Row className="m-0 justify-content-center" ref={printPage}>
+      <Row className="m-0 justify-content-center">
         {chunk(jsonForExcel(account) ?? [], chunkSize)?.map((val, idx) => {
           return (
             <Card className="ml-1 mr-1 mt-2">
               <Card.Body className="p-0">
                 <CustomeWrapper
                   tittle={"Ringkasan Kartu Buku Besar"}
-                  subTittle={`Ringkasan Kartu Buku Besar as of ${formatDate(
-                    filtDate
-                  )}`}
+                  subTittle={`Ringkasan Kartu Buku Besar per ${formatDate(filtDate)}`}
                   onComplete={(cp) => setCp(cp)}
                   page={idx + 1}
+                  horizontal
                   body={
                     <>
-                      {/* {val.map((v) => { */}
-                      {/* return ( */}
                       <DataTable
                         responsiveLayout="scroll"
                         value={val}
@@ -515,34 +525,45 @@ const ReportKBB = () => {
                           header="Akun"
                           style={{ width: "20rem" }}
                           field={(e) => e?.acco}
+                          body={(e) => (
+                            <Link
+                              to={`/laporan/kartu-buku-besar-rincian/${btoa(
+                                `m'${filtDate.getMonth() + 1}`
+                              )}/${btoa(`y'${filtDate.getFullYear()}`)}/${btoa(
+                                `kat'${e.kat}`
+                              )}/${btoa(
+                                btoa(JSON.stringify({ acc_id: e.acc_id }))
+                              )}`}
+                            >
+                              <td className="header-center">{e?.acco}</td>
+                            </Link>
+                          )}
                         />
                         <Column
-                          className="header-center text-right"
+                          className="header-right text-right"
                           header="Saldo Awal"
                           style={{ minWidht: "8rem" }}
                           field={(e) => e?.slda}
                         />
                         <Column
-                          className="header-center text-right"
+                          className="header-right text-right"
                           header="Mutasi Debit"
                           style={{ minWidht: "8rem" }}
                           field={(e) => e?.debe}
                         />
                         <Column
-                          className="header-center text-right"
+                          className="header-right text-right"
                           header="Mutasi Kredit"
                           style={{ minWidht: "10rem" }}
                           field={(e) => e?.kred}
                         />
                         <Column
-                          className="header-center text-right"
+                          className="header-right text-right"
                           header="Balance"
                           style={{ minWidht: "10rem" }}
                           field={(e) => e?.blce}
                         />
                       </DataTable>
-                      {/* );
-                       })} */}
                     </>
                   }
                 />
@@ -550,6 +571,80 @@ const ReportKBB = () => {
             </Card>
           );
         })}
+      </Row>
+
+      <Row className="m-0 justify-content-center d-none">
+        <Card>
+          <Card.Body className="p-0" ref={printPage}>
+            {chunk(jsonForExcel(account) ?? [], chunkSize)?.map((val, idx) => {
+              return (
+                <Card className="ml-1 mr-1 mt-2">
+                  <Card.Body className="p-0">
+                    <CustomeWrapper
+                      tittle={"Ringkasan Kartu Buku Besar"}
+                      subTittle={`Ringkasan Kartu Buku Besar per ${formatDate(
+                        filtDate
+                      )}`}
+                      onComplete={(cp) => setCp(cp)}
+                      page={idx + 1}
+                      horizontal
+                      body={
+                        <>
+                          {/* {val.map((v) => { */}
+                          {/* return ( */}
+                          <DataTable
+                            responsiveLayout="scroll"
+                            value={val}
+                            showGridlines
+                            dataKey="id"
+                            rowHover
+                            emptyMessage="Data Tidak Ditemukan"
+                          >
+                            <Column
+                              className="header-center"
+                              header="Akun"
+                              style={{ width: "20rem" }}
+                              field={(e) => e?.acco}
+                              body={(e) => (
+                                <td className="header-center">{e?.acco}</td>
+                              )}
+                            />
+                            <Column
+                              className="header-right text-right"
+                              header="Saldo Awal"
+                              style={{ minWidht: "8rem" }}
+                              field={(e) => e?.slda}
+                            />
+                            <Column
+                              className="header-right text-right"
+                              header="Mutasi Debit"
+                              style={{ minWidht: "8rem" }}
+                              field={(e) => e?.debe}
+                            />
+                            <Column
+                              className="header-right text-right"
+                              header="Mutasi Kredit"
+                              style={{ minWidht: "10rem" }}
+                              field={(e) => e?.kred}
+                            />
+                            <Column
+                              className="header-right text-right"
+                              header="Balance"
+                              style={{ minWidht: "10rem" }}
+                              field={(e) => e?.blce}
+                            />
+                          </DataTable>
+                          {/* );
+                       })} */}
+                        </>
+                      }
+                    />
+                  </Card.Body>
+                </Card>
+              );
+            })}
+          </Card.Body>
+        </Card>
       </Row>
     </>
   );

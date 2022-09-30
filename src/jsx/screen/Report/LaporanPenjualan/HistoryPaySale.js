@@ -5,39 +5,36 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Calendar } from "primereact/calendar";
 import { Button, Card, Col, Row } from "react-bootstrap";
-import { Toast } from "primereact/toast";
-import { Skeleton } from "primereact/skeleton";
-
 import ReactExport from "react-data-export";
 import ReactToPrint from "react-to-print";
-import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
-import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
-import { el } from "date-fns/locale";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import { el } from "date-fns/locale";
+import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 import { Dropdown } from "primereact/dropdown";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
-const ReportHutang = () => {
-  const [report, setReport] = useState(null);
+const HistoryPaySale = () => {
+  const [inc, setInc] = useState(null);
   const [loading, setLoading] = useState(true);
   const printPage = useRef(null);
   const [filtDate, setFiltDate] = useState(new Date());
-  const [supplier, setSupplier] = useState(null);
-  const [selectedSup, setSelected] = useState(null);
-  const [ap, setAp] = useState(null);
+  const [customer, setCustomer] = useState(null);
+  const [selectedCus, setSelected] = useState(null);
+  const [ar, setAr] = useState(null);
   const [total, setTotal] = useState(null);
   const [cp, setCp] = useState("");
   const chunkSize = 4;
 
   useEffect(() => {
-    getSupplier();
+    getCustomer();
+    getInc();
   }, []);
 
-  const getAPCard = async (spl) => {
+  const getARCard = async (plg) => {
     const config = {
-      ...endpoints.apcard,
+      ...endpoints.arcard,
       data: {},
     };
     let response = null;
@@ -46,18 +43,18 @@ const ReportHutang = () => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        let sup = [];
+        let pel = [];
         let total = 0;
-        spl.forEach((element) => {
-          element.ap = [];
+        plg.forEach((element) => {
+          element.ar = [];
           data.forEach((el) => {
-            if (el.trx_type === "LP" && el.pay_type === "P1") {
-              if (element.supplier.id === el.sup_id.id) {
-                element.ap.push({ ...el, trx_amnh: 0, acq_amnh: 0 });
+            if (el.trx_type === "JL" && el.pay_type === "J4") {
+              if (element.customer.id === el.cus_id.id) {
+                element.ar.push({ ...el, trx_amnh: 0, acq_amnh: 0 });
               }
             }
           });
-          element.ap.forEach((el) => {
+          element.ar.forEach((el) => {
             data.forEach((ek) => {
               if (el.id === ek.id) {
                 el.trx_amnh = ek?.trx_amnh ?? 0;
@@ -66,27 +63,27 @@ const ReportHutang = () => {
             });
             total += el?.trx_amnh ?? 0 - el?.acq_amnh ?? 0;
           });
-          if (element.ap.length > 0) {
-            sup.push(element);
+          if (element.ar.length > 0) {
+            pel.push(element);
           }
         });
-        setAp(sup);
-        setTotal(total);
+        setAr(pel);
+        // setTotal(total);
 
         let grouped = data?.filter(
           (el, i) =>
-            i === data.findIndex((ek) => el?.sup_id?.id === ek?.sup_id?.id)
+            i === data.findIndex((ek) => el?.cus_id?.id === ek?.cus_id?.id)
         );
-        setSupplier(grouped);
+        setCustomer(grouped);
       }
     } catch (error) {
       console.log(error);
     }
   };
 
-  const getSupplier = async () => {
+  const getCustomer = async () => {
     const config = {
-      ...endpoints.supplier,
+      ...endpoints.customer,
       data: {},
     };
     let response = null;
@@ -95,12 +92,41 @@ const ReportHutang = () => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        setSupplier(data);
-        getAPCard(data);
+        setCustomer(data);
+        getARCard(data);
       }
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const getInc = async () => {
+    const config = {
+      ...endpoints.inc,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setInc(data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const checkInc = (value) => {
+    let selected = {};
+    inc?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
   };
 
   const formatDate = (date) => {
@@ -115,41 +141,46 @@ const ReportHutang = () => {
     return [day, month, year].join("-");
   };
 
-  const jsonForExcel = (ap, excel = false) => {
+  const jsonForExcel = (ar, excel = false) => {
     let data = [];
 
-    if (selectedSup) {
-      ap?.forEach((el) => {
-        if (selectedSup?.sup_id?.id === el.supplier?.id) {
+    if (selectedCus) {
+      ar?.forEach((el) => {
+        if (selectedCus?.cus_id?.id === el.customer?.id) {
           let val = [
             {
-              sup: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
+              cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
               type: "header",
               value: {
-                ref: "Invoice",
-                date: "Date",
-                jt: "Due Date",
-                value: "Payable",
-                lns: "Payment",
-                sisa: "Remain",
+                ref: "Transaction",
+                date: "Date Trans",
+                due: "Due Date",
+                pay_cd: "Payment Code",
+                pay_dt: "Payment Date",
+                amnh: "Amount",
+                pay: "Payment",
+                remain: "Remain",
               },
             },
           ];
           let amn = 0;
           let acq = 0;
-          el.ap.forEach((ek) => {
-            let dt = new Date(`${ek.ord_id?.fk_date}Z`);
+
+          el?.ar.forEach((ek) => {
+            let dt = new Date(`${ek.acq_date}Z`);
             if (dt <= filtDate) {
               val.push({
-                sup: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
+                cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
                 type: "item",
                 value: {
-                  ref: ek.ord_id.fk_code,
-                  date: formatDate(ek.ord_id.fk_date),
-                  jt: ek.ord_due ? formatDate(ek.ord_due) : "-",
-                  value: `Rp. ${formatIdr(ek.trx_amnh)}`,
-                  lns: `Rp. ${formatIdr(ek.acq_amnh)}`,
-                  sisa: `Rp. ${formatIdr(ek.trx_amnh - ek.acq_amnh)}`,
+                  ref: ek.bkt_id?.ord_code,
+                  date: formatDate(ek.bkt_id.ord_date),
+                  due: formatDate(ek.bkt_id.due_date),
+                  pay_cd: ek.trx_code,
+                  pay_dt: formatDate(ek.acq_date),
+                  amnh: `Rp. ${formatIdr(ek.trx_amnh)}`,
+                  pay: `Rp. ${formatIdr(ek.acq_amnh)}`,
+                  remain: `Rp. ${formatIdr(ek.trx_amnh - ek.acq_amnh)}`,
                 },
               });
               amn += ek.trx_amnh;
@@ -157,51 +188,58 @@ const ReportHutang = () => {
             }
           });
           val.push({
-            sup: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
+            cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
             type: "footer",
             value: {
               ref: "Total",
               date: "",
-              jt: "",
-              value: `Rp. ${formatIdr(amn)}`,
-              lns: `Rp. ${formatIdr(acq)}`,
-              sisa: `Rp. ${formatIdr(amn - acq)}`,
+              due: "",
+              pay_cd: "",
+              pay_dt: "",
+              amnh: `Rp. ${formatIdr(amn)}`,
+              pay: `Rp. ${formatIdr(acq)}`,
+              remain: `Rp. ${formatIdr(amn - acq)}`,
             },
           });
           data.push(val);
         }
       });
     } else {
-      ap?.forEach((el) => {
+      ar?.forEach((el) => {
         let val = [
           {
-            sup: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
+            cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
             type: "header",
             value: {
-              ref: "Invoice",
-              date: "Date",
-              jt: "Due Date",
-              value: "Payable",
-              lns: "Payment",
-              sisa: "Remain",
+              ref: "Trans Code",
+              date: "Trans Date",
+              due: "Due Date",
+              pay_cd: "Payment Code",
+              pay_dt: "Payment Date",
+              amnh: "Amount",
+              pay: "Payment",
+              remain: "Remain",
             },
           },
         ];
         let amn = 0;
         let acq = 0;
-        el.ap.forEach((ek) => {
-          let dt = new Date(`${ek.ord_id?.fk_date}Z`);
+
+        el?.ar.forEach((ek) => {
+          let dt = new Date(`${ek.acq_date}Z`);
           if (dt <= filtDate) {
             val.push({
-              sup: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
+              cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
               type: "item",
               value: {
-                ref: ek.ord_id.fk_code,
-                date: formatDate(ek.ord_id.fk_date),
-                jt: ek.ord_due ? formatDate(ek.ord_due) : "-",
-                value: `Rp. ${formatIdr(ek.trx_amnh)}`,
-                lns: `Rp. ${formatIdr(ek.acq_amnh)}`,
-                sisa: `Rp. ${formatIdr(ek.trx_amnh - ek.acq_amnh)}`,
+                ref: ek.bkt_id?.ord_code,
+                date: formatDate(ek.bkt_id.ord_date),
+                due: formatDate(ek.bkt_id.due_date),
+                pay_cd: ek.trx_code,
+                pay_dt: formatDate(ek.acq_date),
+                amnh: `Rp. ${formatIdr(ek.trx_amnh)}`,
+                pay: `Rp. ${formatIdr(ek.acq_amnh)}`,
+                remain: `Rp. ${formatIdr(ek.trx_amnh - ek.acq_amnh)}`,
               },
             });
             amn += ek.trx_amnh;
@@ -209,15 +247,17 @@ const ReportHutang = () => {
           }
         });
         val.push({
-          sup: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
+          cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
           type: "footer",
           value: {
             ref: "Total",
             date: "",
-            jt: "",
-            value: `Rp. ${formatIdr(amn)}`,
-            lns: `Rp. ${formatIdr(acq)}`,
-            sisa: `Rp. ${formatIdr(amn - acq)}`,
+            due: "",
+            pay_cd: "",
+            pay_dt: "",
+            amnh: `Rp. ${formatIdr(amn)}`,
+            pay: `Rp. ${formatIdr(acq)}`,
+            remain: `Rp. ${formatIdr(amn - acq)}`,
           },
         });
         data.push(val);
@@ -228,7 +268,7 @@ const ReportHutang = () => {
       {
         columns: [
           {
-            title: "Payable Report",
+            title: "Purchase Payment History",
             width: { wch: 30 },
             style: {
               font: { sz: "14", bold: true },
@@ -286,14 +326,28 @@ const ReportHutang = () => {
             },
           },
           {
-            value: `${ek.value.jt}`,
+            value: `${ek.value.due}`,
             style: {
               font: { sz: "14", bold: ek.type === "header" ? true : false },
               alignment: { horizontal: "left", vertical: "center" },
             },
           },
           {
-            value: `${ek.value.value}`,
+            value: `${ek.value.pay_cd}`,
+            style: {
+              font: { sz: "14", bold: ek.type === "header" ? true : false },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.value.pay_dt}`,
+            style: {
+              font: { sz: "14", bold: ek.type === "header" ? true : false },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.value.amnh}`,
             style: {
               font: {
                 sz: "14",
@@ -304,7 +358,7 @@ const ReportHutang = () => {
             },
           },
           {
-            value: `${ek.value.lns}`,
+            value: `${ek.value.pay}`,
             style: {
               font: {
                 sz: "14",
@@ -315,7 +369,7 @@ const ReportHutang = () => {
             },
           },
           {
-            value: `${ek.value.sisa}`,
+            value: `${ek.value.remain}`,
             style: {
               font: {
                 sz: "14",
@@ -336,47 +390,12 @@ const ReportHutang = () => {
             alignment: { horizontal: "left", vertical: "center" },
           },
         },
-        {
-          value: "",
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "left", vertical: "center" },
-          },
-        },
-        {
-          value: "",
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "left", vertical: "center" },
-          },
-        },
-        {
-          value: "",
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "right", vertical: "center" },
-          },
-        },
-        {
-          value: "",
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "right", vertical: "center" },
-          },
-        },
-        {
-          value: "",
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "right", vertical: "center" },
-          },
-        },
       ]);
 
       final.push({
         columns: [
           {
-            title: `${el[0].sup}`,
+            title: `${el[0].cus}`,
             width: { wch: 30 },
             style: {
               font: { sz: "14", bold: false },
@@ -405,6 +424,30 @@ const ReportHutang = () => {
             style: {
               font: { sz: "14", bold: true },
               alignment: { horizontal: "left", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
               fill: {
                 paternType: "solid",
                 fgColor: { rgb: "F3F3F3" },
@@ -487,15 +530,15 @@ const ReportHutang = () => {
             </div>
             <div className="mt-2">
               <Dropdown
-                value={selectedSup ?? null}
-                options={supplier}
+                value={selectedCus ?? null}
+                options={customer}
                 onChange={(e) => {
                   setSelected(e.value);
                 }}
-                placeholder="Pilih Supplier"
-                optionLabel="sup_id.sup_name"
+                placeholder="Pilih Customer"
+                optionLabel="cus_id.cus_name"
                 filter
-                filterBy="sup_id.sup_name"
+                filterBy="cus_id.cus_name"
                 showClear
               />
             </div>
@@ -504,7 +547,7 @@ const ReportHutang = () => {
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
             <ExcelFile
-              filename={`payable_details_report_${formatDate(new Date())
+              filename={`purchase_payment_report_${formatDate(new Date())
                 .replace("-", "")
                 .replace("-", "")}`}
               element={
@@ -515,8 +558,8 @@ const ReportHutang = () => {
               }
             >
               <ExcelSheet
-                dataSet={ap ? jsonForExcel(ap, true) : null}
-                name="Payable Details Report"
+                dataSet={ar ? jsonForExcel(ar, true) : null}
+                name="Purchase Payment"
               />
             </ExcelFile>
           </div>
@@ -533,17 +576,6 @@ const ReportHutang = () => {
           />
         </Row>
       </div>
-    );
-  };
-
-  const renderFooter = () => {
-    return (
-      <Row className="m-0 mt-0">
-        <div className="text-left font-weight-bold col-6">Total Hutang</div>
-        <div className="col-6 text-right font-weight-bold">
-          Rp. {formatIdr(total)}
-        </div>
-      </Row>
     );
   };
 
@@ -567,13 +599,13 @@ const ReportHutang = () => {
       </Row>
 
       <Row className="m-0 justify-content-center" ref={printPage}>
-        {chunk(jsonForExcel(ap) ?? [], chunkSize)?.map((val, idx) => {
+        {chunk(jsonForExcel(ar) ?? [], chunkSize)?.map((val, idx) => {
           return (
             <Card className="ml-1 mr-1 mt-2">
               <Card.Body className="p-0 m-0">
                 <CustomeWrapper
-                  tittle={"Debt Balance Details"}
-                  subTittle={`Debt Balance Details as ${formatDate(filtDate)}`}
+                  tittle={"Sales Payment History"}
+                  subTittle={`Sales Payment History as ${formatDate(filtDate)}`}
                   onComplete={(cp) => setCp(cp)}
                   page={idx + 1}
                   body={
@@ -591,9 +623,9 @@ const ReportHutang = () => {
                             <Column
                               className="header-center"
                               header={(e) =>
-                                e.props.value ? e.props?.value[0]?.sup : null
+                                e.props.value ? e.props?.value[0]?.cus : null
                               }
-                              style={{ width: "15rem" }}
+                              style={{ minWidht: "10rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -609,7 +641,7 @@ const ReportHutang = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ width: "10rem" }}
+                              style={{ minWidht: "10rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -623,21 +655,49 @@ const ReportHutang = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ width: "10rem" }}
+                              style={{ minWidht: "10rem" }}
                               body={(e) => (
                                 <div
                                   className={
                                     e.type === "header" && "font-weight-bold"
                                   }
                                 >
-                                  {e.value.jt}
+                                  {e.value.due}
                                 </div>
                               )}
                             />
                             <Column
                               className="header-center"
                               header=""
-                              style={{ width: "10rem" }}
+                              style={{ minWidht: "10rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header" && "font-weight-bold"
+                                  }
+                                >
+                                  {e.value.pay_cd}
+                                </div>
+                              )}
+                            />
+                            <Column
+                              className="header-center"
+                              header=""
+                              style={{ minWidht: "10rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header" && "font-weight-bold"
+                                  }
+                                >
+                                  {e.value.pay_dt}
+                                </div>
+                              )}
+                            />
+                            <Column
+                              className="header-center"
+                              header=""
+                              style={{ minWidht: "10rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -648,14 +708,14 @@ const ReportHutang = () => {
                                       : "text-right"
                                   }
                                 >
-                                  {e.value.value}
+                                  {e.value.amnh}
                                 </div>
                               )}
                             />
                             <Column
                               className="header-center"
                               header=""
-                              style={{ width: "10rem" }}
+                              style={{ minWidht: "10rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -666,14 +726,14 @@ const ReportHutang = () => {
                                       : "text-right"
                                   }
                                 >
-                                  {e.value.lns}
+                                  {e.value.pay}
                                 </div>
                               )}
                             />
                             <Column
                               className="header-center"
                               header=""
-                              style={{ width: "10rem" }}
+                              style={{ minWidht: "10rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -684,7 +744,7 @@ const ReportHutang = () => {
                                       : "text-right"
                                   }
                                 >
-                                  {e.value.sisa}
+                                  {e.value.remain}
                                 </div>
                               )}
                             />
@@ -699,153 +759,8 @@ const ReportHutang = () => {
           );
         })}
       </Row>
-
-      <Row>
-        <Col>
-          <Card>
-            <Card.Body>{renderFooter()}</Card.Body>
-          </Card>
-        </Col>
-      </Row>
-
-      <Row className="m-0 d-none">
-        <Card ref={printPage}>
-          <Card.Body className="p-0">
-            <CustomeWrapper
-              tittle={"Debt Balance Details"}
-              subTittle={`Debt Balance Details as of ${formatDate(filtDate)}`}
-              onComplete={(cp) => setCp(cp)}
-              body={
-                <>
-                  {jsonForExcel(ap, false)?.map((v) => {
-                    return (
-                      <DataTable
-                        responsiveLayout="scroll"
-                        value={v}
-                        showGridlines
-                        dataKey="id"
-                        rowHover
-                        emptyMessage="Data Tidak Ditemukan"
-                      >
-                        <Column
-                          className="header-center"
-                          header={(e) =>
-                            e.props.value ? e.props?.value[0]?.sup : null
-                          }
-                          style={{ width: "15rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header" || e.type === "footer"
-                                  ? "font-weight-bold"
-                                  : ""
-                              }
-                            >
-                              {e.value.ref}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center"
-                          header=""
-                          style={{ width: "10rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header" && "font-weight-bold"
-                              }
-                            >
-                              {e.value.date}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center"
-                          header=""
-                          style={{ width: "10rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header" && "font-weight-bold"
-                              }
-                            >
-                              {e.value.jt}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center"
-                          header=""
-                          style={{ width: "10rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header"
-                                  ? "font-weight-bold text-right"
-                                  : e.type === "footer"
-                                  ? "font-weight-bold text-right"
-                                  : "text-right"
-                              }
-                            >
-                              {e.value.value}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center"
-                          header=""
-                          style={{ width: "10rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header"
-                                  ? "font-weight-bold text-right"
-                                  : e.type === "footer"
-                                  ? "font-weight-bold text-right"
-                                  : "text-right"
-                              }
-                            >
-                              {e.value.lns}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center"
-                          header=""
-                          style={{ width: "10rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header"
-                                  ? "font-weight-bold text-right"
-                                  : e.type === "footer"
-                                  ? "font-weight-bold text-right"
-                                  : "text-right"
-                              }
-                            >
-                              {e.value.sisa}
-                            </div>
-                          )}
-                        />
-                      </DataTable>
-                    );
-                  })}
-                  <Row className="m-0 mt-5">
-                    <div className="text-left font-weight-bold col-6">
-                      Total Hutang
-                    </div>
-                    <div className="col-6 text-right font-weight-bold">
-                      Rp. {formatIdr(total)}
-                    </div>
-                  </Row>
-                </>
-              }
-            />
-          </Card.Body>
-        </Card>
-      </Row>
     </>
   );
 };
 
-export default ReportHutang;
+export default HistoryPaySale;

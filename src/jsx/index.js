@@ -64,6 +64,8 @@ import LaporanProduksi from "./screen/Report/LaporanProduksi";
 import LaporanAr from "./screen/Report/AR";
 import LaporanAp from "./screen/Report/AP";
 import LaporanNeraca from "./screen/Report/Neraca";
+import Persediaan from "./screen/Transaksi/Persediaan/Persediaan";
+import LaporanPersediaan from "./screen/Report/LaporanPersediaan";
 
 const Markup = ({ width }) => {
   const routes = [
@@ -93,8 +95,10 @@ const Markup = ({ width }) => {
     { url: "laporan/ar/:active", component: LaporanAr },
     { url: "laporan/ap", component: LaporanAp },
     { url: "laporan/ap/:active", component: LaporanAp },
-    { url: "laporan/neraca", component: LaporanNeraca },
-    { url: "laporan/neraca/:active", component: LaporanNeraca },
+    { url: "laporan/gl", component: LaporanNeraca },
+    { url: "laporan/gl/:active", component: LaporanNeraca },
+    { url: "laporan/persediaan", component: LaporanPersediaan },
+    { url: "laporan/persediaan/:active", component: LaporanPersediaan },
     { url: "laporan", component: GroupReport },
 
     /// Klasifikasi

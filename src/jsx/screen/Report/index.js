@@ -5,22 +5,10 @@ import { Link } from "react-router-dom";
 export default function GroupReport() {
   const [subMenu, setSubMenu] = useState([
     {
-      tittle: "Laporan Pembelian",
+      tittle: "General Ledger",
       icon: "bx-archive",
-      total: 6,
-      to: "pembelian",
-    },
-    {
-      tittle: "Laporan Penjualan",
-      icon: "bx-archive",
-      total: 1,
-      to: "penjualan",
-    },
-    {
-      tittle: "Laporan Produksi",
-      icon: "bx-archive",
-      total: 4,
-      to: "produksi",
+      total: 7,
+      to: "gl",
     },
     {
       tittle: "AR",
@@ -28,18 +16,40 @@ export default function GroupReport() {
       total: 4,
       to: "ar",
     },
+
+    {
+      tittle: "Laporan Penjualan",
+      icon: "bx-archive",
+      total: 6,
+      to: "penjualan",
+    },
+
     {
       tittle: "AP",
       icon: "bx-archive",
       total: 4,
       to: "ap",
     },
+
     {
-        tittle: "Neraca",
-        icon: "bx-archive",
-        total: 6,
-        to: "neraca",
-      },
+      tittle: "Laporan Pembelian",
+      icon: "bx-archive",
+      total: 8,
+      to: "pembelian",
+    },
+    {
+      tittle: "Laporan Persediaan",
+      icon: "bx-archive",
+      total: 3,
+      to: "persediaan",
+    },
+
+    {
+      tittle: "Laporan Produksi",
+      icon: "bx-archive",
+      total: 4,
+      to: "produksi",
+    },
   ]);
 
   const renderSubMenu = () => {

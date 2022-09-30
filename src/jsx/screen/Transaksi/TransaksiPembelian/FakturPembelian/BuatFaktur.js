@@ -18,6 +18,7 @@ import { InputSwitch } from "primereact/inputswitch";
 import DataOrder from "../Order/DataOrder";
 import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
+import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 
 const defError = {
   code: false,
@@ -541,24 +542,24 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
           <div className="col-4">
             <label className="text-label">No. Pembelian</label>
             <div className="p-inputgroup"></div>
-            <CustomDropdown
+            <PrimeDropdown
               value={inv.ord_id && checkOrd(inv?.ord_id)}
               onChange={(e) => {
                 console.log(e);
                 updateINV({
                   ...inv,
-                  ord_id: e?.id ?? null,
-                  product: e?.dprod ?? null,
-                  jasa: e?.djasa ?? null,
+                  ord_id: e?.value.id ?? null,
+                  product: e?.value.dprod ?? null,
+                  jasa: e?.value.djasa ?? null,
                 });
                 let newError = error;
                 newError.sale = false;
                 setError(newError);
               }}
-              option={order}
-              // detail
-              // onDetail={() => SetShowOrder(true)}
-              label={"[ord_code]"}
+              options={order}
+              filter
+              filterBy="ord_code"
+              optionLabel="ord_code"
               placeholder="No. Pembelian"
               errorMessage="Nomor Pembelian Belum Dipilih"
               error={error?.sale}

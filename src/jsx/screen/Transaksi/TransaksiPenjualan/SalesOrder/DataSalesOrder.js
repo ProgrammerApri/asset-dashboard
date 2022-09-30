@@ -3,7 +3,7 @@ import { request, endpoints } from "src/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Button, Card, Row, Col } from "react-bootstrap";
+import { Button, Card, Row, Col, Badge } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { Dialog } from "primereact/dialog";
@@ -239,7 +239,9 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
               },
             });
           }}
-          className="btn btn-primary shadow btn-xs sharp ml-1"
+          className={`btn ${
+            data.status === 0 ? "" : "disabled"
+          } btn-primary shadow btn-xs sharp ml-1`}
         >
           <i className="fa fa-pencil"></i>
         </Link>
@@ -250,7 +252,9 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
             setDisplayDel(true);
             setCurrentItem(data);
           }}
-          className="btn btn-danger shadow btn-xs sharp ml-1"
+          className={`btn ${
+            data.status === 0 ? "" : "disabled"
+          } btn-danger shadow btn-xs sharp ml-1`}
         >
           <i className="fa fa-trash"></i>
         </Link>
@@ -519,6 +523,29 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
                   field={(e) => formatDate(e.due_date)}
                   style={{ minWidth: "10rem" }}
                   body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Status"
+                  field={(e) => e?.status ?? ""}
+                  style={{ minWidth: "8rem" }}
+                  body={(e) =>
+                    loading ? (
+                      <Skeleton />
+                    ) : (
+                      <div>
+                        {e.status !== 1 ? (
+                          <Badge variant="success light">
+                            <i className="bx bx-check text-success mr-1"></i>{" "}
+                            Open
+                          </Badge>
+                        ) : (
+                          <Badge variant="danger light">
+                            <i className="bx bx-x text-danger mr-1"></i> Close
+                          </Badge>
+                        )}
+                      </div>
+                    )
+                  }
                 />
                 <Column
                   header="Action"

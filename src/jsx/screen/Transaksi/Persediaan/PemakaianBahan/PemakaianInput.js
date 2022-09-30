@@ -419,7 +419,7 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
               error={error?.akn}
             />
           </div>
-          {/* kode suplier otomatis keluar, karena sudah melekat di faktur pembelian  */}
+          
         </Row>
 
         <CustomAccordion
@@ -441,8 +441,8 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
                   return {
                     ...v,
                     index: i,
-                    end: v?.end ?? 0,
-                    order: v?.order ?? 0,
+                    // end: v?.end ?? 0,
+                    // order: v?.order ?? 0,
                   };
                 })}
                 className="display w-150 datatable-wrapper header-white no-border"
@@ -496,6 +496,33 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
+                  header="Satuan"
+                  className="align-text-top"
+                  style={{
+                    width: "10rem",
+                  }}
+                  field={""}
+                  body={(e) => (
+                    <CustomDropdown
+                      value={pb.unit_id && checkUnit(pb.unit_id)}
+                      onChange={(e) => {
+                        let temp = [...pb.product];
+                        temp[e.index].unit_id = e.id;
+                        updatePB({ ...pb, product: temp });
+                      }}
+                      option={satuan}
+                      label={"[name]"}
+                      placeholder="Pilih Satuan"
+                      detail
+                      onDetail={() => {
+                        setShowSat(true);
+                        setCurrentIndex(e.index);
+                      }}
+                    />
+                  )}
+                />
+
+                <Column
                   header="Lokasi"
                   className="align-text-top"
                   style={{
@@ -532,7 +559,7 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
                   header="Ending Stok"
                   className="align-text-top"
                   style={{
-                    width: "8rem",
+                    width: "10rem",
                   }}
                   field={""}
                   body={(e) => (
@@ -561,7 +588,7 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
                   header="Jumlah"
                   className="align-text-top"
                   style={{
-                    width: "7rem",
+                    width: "10rem",
                   }}
                   field={""}
                   body={(e) => (
@@ -583,33 +610,6 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
                         error={error?.prod[e.index]?.jum}
                       />
                     </div>
-                  )}
-                />
-
-                <Column
-                  header="Satuan"
-                  className="align-text-top"
-                  style={{
-                    width: "10rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <CustomDropdown
-                      value={pb.unit_id && checkUnit(pb.unit_id)}
-                      onChange={(e) => {
-                        let temp = [...pb.product];
-                        temp[e.index].unit_id = e.id;
-                        updatePB({ ...pb, product: temp });
-                      }}
-                      option={satuan}
-                      label={"[name]"}
-                      placeholder="Pilih Satuan"
-                      detail
-                      onDetail={() => {
-                        setShowSat(true);
-                        setCurrentIndex(e.index);
-                      }}
-                    />
                   )}
                 />
 

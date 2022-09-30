@@ -28,6 +28,7 @@ import DataPusatBiaya from "src/jsx/screen/MasterLainnya/PusatBiaya/DataPusatBia
 import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
+import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 
 const defError = {
   code: false,
@@ -110,13 +111,13 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     const config = {
       ...endpoints.editODR,
       endpoint: endpoints.editODR.endpoint + order.id,
-      data:{ ...order, doc_date: currentDate(order.doc_date) },
+      data: { ...order, doc_date: currentDate(order.doc_date) },
     };
-    console.log(config.data);
+    
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         onSuccess();
       }
@@ -138,16 +139,15 @@ const InputOrder = ({ onCancel, onSuccess }) => {
       ...endpoints.addODR,
       data: { ...order, doc_date: currentDate(order.doc_date) },
     };
-    console.log(config.data);
+    
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         onSuccess();
       }
     } catch (error) {
-      console.log(error);
       if (error.status === 400) {
         setTimeout(() => {
           setUpdate(false);
@@ -180,7 +180,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
         let filt = [];
@@ -239,7 +239,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
         setSupplier(data);
@@ -252,14 +252,14 @@ const InputOrder = ({ onCancel, onSuccess }) => {
       ...endpoints.rules_pay,
       data: {},
     };
-    console.log(config.data);
+    
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
-        console.log(data);
+        
         setRulesPay(data);
       }
     } catch (error) {}
@@ -270,17 +270,16 @@ const InputOrder = ({ onCancel, onSuccess }) => {
       ...endpoints.pusatBiaya,
       data: {},
     };
-    console.log(config.data);
+    
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
         setDept(data);
       }
     } catch (error) {
-      console.log(error);
     }
   };
 
@@ -296,8 +295,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
       if (response.status) {
         const { data } = response;
         setProduct(data);
-        console.log("jsdj");
-        console.log(data);
+        
       }
     } catch (error) {}
   };
@@ -310,7 +308,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
         setJasa(data);
@@ -326,7 +324,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
         setSatuan(data);
@@ -342,7 +340,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
         setPajak(data);
@@ -358,7 +356,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
         setLokasi(data);
@@ -504,6 +502,17 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     });
 
     return total;
+  };
+
+  const ppn = (value) => {
+    let nil = 0;
+    pajak?.forEach((elem) => {
+      if (checkSupp(order.sup_id).supplier.sup_ppn === elem.id) {
+        nil = elem.nilai;
+      }
+    });
+
+    return nil;
   };
 
   const formatIdr = (value) => {
@@ -697,7 +706,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                   result.setDate(
                     result.getDate() + checRulPay(order?.top)?.day
                   );
-                  console.log(result);
+                  
                 }
                 updateORD({ ...order, ord_date: e.value, due_date: result });
 
@@ -755,40 +764,45 @@ const InputOrder = ({ onCancel, onSuccess }) => {
           <div className="col-3">
             <label className="text-label">No. Pesanan Pembelian</label>
             <div className="p-inputgroup"></div>
-            <CustomDropdown
+            <PrimeDropdown
               value={order.po_id !== null ? checkPO(order.po_id) : null}
-              option={po}
+              options={po}
               onChange={(e) => {
                 let result = new Date(`${order.ord_date}Z`);
-                result.setDate(result.getDate() + checRulPay(e.top?.id)?.day);
+                result.setDate(
+                  result.getDate() + checRulPay(e.value.top?.id)?.day
+                );
                 updateORD({
                   ...order,
-                  po_id: e.id ?? null,
-                  top: e.top?.id ?? null,
+                  po_id: e.value.id ?? null,
+                  top: e.value.top?.id ?? null,
                   due_date: result,
-                  sup_id: e.sup_id?.id ?? null,
-                  dep_id: e.preq_id?.req_dep?.id ?? null,
-                  split_inv: e.split_inv,
-                  dprod: e.pprod,
-                  djasa: e.pjasa,
+                  sup_id: e.value.sup_id?.id ?? null,
+                  dep_id: e.value.preq_id?.req_dep?.id ?? null,
+                  split_inv: e.value.split_inv,
+                  dprod: e.value.pprod,
+                  djasa: e.value.pjasa,
                 });
                 let newError = error;
                 newError.sup = false;
                 newError.rul = false;
+                newError.prod[0].id = false;
+                newError.prod[0].jum = false;
+                newError.prod[0].prc = false;
 
                 let eprod = [];
-                e.pprod.forEach((el) => {
-                  eprod.push({
-                    id: false,
-                    lok: false,
-                    jum: false,
-                    prc: false,
-                  });
-                });
-                newError.prod = eprod;
+                // e?.value.pprod.forEach((el) => {
+                // newError.prod.push({
+                //   id: false,
+                //   lok: false,
+                //   jum: false,
+                //   prc: false,
+                // });
+                // });
+                // newError.prod = eprod;
 
                 let ejasa = [];
-                e.pjasa.forEach((el) => {
+                e?.value.pjasa.forEach((el) => {
                   ejasa.push({
                     id: false,
                     jum: false,
@@ -799,7 +813,9 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                 setError(newError);
               }}
               placeholder="Pilih No. Pesanan Pembelian"
-              label={"[po_code]"}
+              optionLabel="po_code"
+              filter
+              filterBy="po_code"
             />
           </div>
 
@@ -909,7 +925,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
               onChange={(e) => {
                 let result = new Date(`${order.ord_date}Z`);
                 result.setDate(result.getDate() + e.day);
-                console.log(result);
+               
 
                 updateORD({ ...order, top: e.id, due_date: result });
                 let newError = error;
@@ -952,7 +968,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                 }
                 options={faktur}
                 onChange={(e) => {
-                  console.log(e.value);
+                 
                   updateORD({
                     ...order,
                     faktur: e.value.sts,
@@ -1077,6 +1093,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
                         let newError = error;
                         newError.prod[e.index].lok = false;
+                        newError.prod.push({ lok: false });
                         setError(newError);
                       }}
                       option={lokasi}
@@ -1159,7 +1176,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                           let temp = [...order.dprod];
                           temp[e.index].disc = u.target.value;
                           updateORD({ ...order, dprod: temp });
-                          console.log(temp);
+                         
                         }}
                         placeholder="0"
                         type="number"
@@ -1183,7 +1200,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                           let temp = [...order.dprod];
                           temp[e.index].nett_price = u.target.value;
                           updateORD({ ...order, dprod: temp });
-                          console.log(temp);
+                       
                         }}
                         placeholder="0"
                         type="number"
@@ -1309,7 +1326,6 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                       value={e.sup_id && checkSupp(e.sup_id)}
                       option={supplier}
                       onChange={(u) => {
-                        console.log(e.value);
                         let temp = [...order.djasa];
                         temp[e.index].sup_id = u.supplier.id;
                         updateORD({ ...order, djasa: temp });
@@ -1332,7 +1348,6 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                       value={e.jasa_id && checkJasa(e.jasa_id)}
                       option={jasa}
                       onChange={(u) => {
-                        console.log(e.value);
                         let temp = [...order.djasa];
                         temp[e.index].jasa_id = u.jasa.id;
                         updateORD({ ...order, djasa: temp });
@@ -1363,7 +1378,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                       value={e.unit_id && checkUnit(e.unit_id)}
                       option={satuan}
                       onChange={(u) => {
-                        console.log(e.value);
+                        
                         let temp = [...order.djasa];
                         temp[e.index].unit_id = u.id;
                         updateORD({ ...order, djasa: temp });
@@ -1397,7 +1412,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                         let newError = error;
                         newError.jasa[e.index].jum = false;
                         setError(newError);
-                        console.log(temp);
+                        
                       }}
                       placeholder="0"
                       type="number"
@@ -1422,7 +1437,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                           temp[e.index].total =
                             temp[e.index].order * temp[e.index].price;
                           updateORD({ ...order, djasa: temp });
-                          console.log(temp);
+                          
 
                           let newError = error;
                           newError.jasa[e.index].prc = false;
@@ -1450,7 +1465,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                           let temp = [...order.djasa];
                           temp[e.index].disc = u.target.value;
                           updateORD({ ...order, djasa: temp });
-                          console.log(temp);
+                          
                         }}
                         placeholder="0"
                         type="number"
@@ -1611,12 +1626,12 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             <div className="col-6">
               <label className="text-label">
                 {order.split_inv ? (
-                  <b>Rp. {formatIdr((getSubTotalBarang() * 11) / 100)}</b>
+                  <b>Rp. {formatIdr((getSubTotalBarang() * ppn()) / 100)}</b>
                 ) : (
                   <b>
                     Rp.{" "}
                     {formatIdr(
-                      ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
+                      ((getSubTotalBarang() + getSubTotalJasa()) * ppn()) / 100
                     )}
                   </b>
                 )}
@@ -1698,7 +1713,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                   <b>
                     Rp.{" "}
                     {formatIdr(
-                      getSubTotalBarang() + (getSubTotalBarang() * 11) / 100
+                      getSubTotalBarang() + (getSubTotalBarang() * ppn()) / 100
                     )}
                   </b>
                 ) : (
@@ -1707,7 +1722,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                     {formatIdr(
                       getSubTotalBarang() +
                         getSubTotalJasa() +
-                        ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
+                        ((getSubTotalBarang() + getSubTotalJasa()) * ppn()) /
+                          100
                     )}
                   </b>
                 )}

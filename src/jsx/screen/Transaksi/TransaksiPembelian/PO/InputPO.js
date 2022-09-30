@@ -30,6 +30,7 @@ import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 import Histori from "../Histori/Index";
 import DataHistori from "../Histori/DataHistori";
 import { InputNumber } from "primereact/inputnumber";
+import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 
 const defError = {
   code: false,
@@ -813,9 +814,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
           <div className="col-3">
             <label className="text-label">No. Permintaan Pembelian</label>
             <div className="p-inputgroup"></div>
-            <CustomDropdown
+            <PrimeDropdown
               value={po.preq_id && req_pur(po.preq_id)}
-              option={rp}
+              options={rp}
               onChange={(e) => {
                 let result = null;
                 if (po.top) {
@@ -826,7 +827,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
                 let prod = [];
                 let prc = [];
-                e.rprod.forEach((element) => {
+                e?.value.rprod.forEach((element) => {
                   prod.push(element.prod_id);
                   prc.push(0);
                 });
@@ -841,13 +842,13 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
                 updatePo({
                   ...po,
-                  preq_id: e.id,
+                  preq_id: e.value.id,
                   due_date: result,
-                  sup_id: e.ref_sup?.id ?? null,
-                  dep_id: e.req_dep?.id ?? null,
+                  sup_id: e.value.ref_sup?.id ?? null,
+                  dep_id: e.value.req_dep?.id ?? null,
                   split_inv: false,
-                  pprod: e.rprod ?? null,
-                  pjasa: e.rjasa ?? null,
+                  pprod: e.value.rprod ?? null,
+                  pjasa: e.value.rjasa ?? null,
                   psup: psup,
                 });
 
@@ -855,7 +856,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                 let ep = [];
                 newError.req = false;
                 newError.sup = false;
-                e.rprod?.forEach((element) => {
+                e?.value.rprod?.forEach((element) => {
                   ep.push({
                     jum: false,
                     prc: false,
@@ -866,8 +867,10 @@ const InputPO = ({ onCancel, onSuccess }) => {
                 newError.jasa.push({ jum: false, prc: false });
                 setError(newError);
               }}
-              label={"[req_code]"}
+              optionLabel="req_code"
               placeholder="Pilih Kode Permintaan"
+              filter
+              filterBy="req_code"
               errorMessage="No. Permintaan Belum Dipilih"
               error={error?.req}
               disabled={isEdit}

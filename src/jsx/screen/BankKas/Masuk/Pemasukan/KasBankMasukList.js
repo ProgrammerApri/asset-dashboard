@@ -12,49 +12,82 @@ import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_EXP, SET_EDIT_EXP, SET_EXP } from "src/redux/actions";
+import { SET_CURRENT_INC, SET_EDIT_INC, SET_INC } from "src/redux/actions";
 import { Skeleton } from "primereact/skeleton";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 
 const data = {
-  data: [
-    {
-      //   id: 1,
-      date: "2022-06-28",
-      ref: "KH-00001",
-      sup: "(CS01)	Customer 01",
-      type: "pemasukan"
-    },
-    {
-      //   id: 1,
-      date: "2022-06-29",
-      ref: "KH-00002",
-      sup: "(CS01)	Customer 01",
-      type: "pemasukan"
-    },
-    {
-      //   id: 1,
-      date: "2022-06-30",
-      ref: "KH-00003",
-      sup: "(CS01)	Customer 01",
-      type: "pemasukan"
-    },
-  ],
+  id: null,
+  inc_code: null,
+  inc_date: null,
+  inc_type: null,
+  inc_acc: null,
+  inc_dep: null,
+  inc_prj: null,
+  acq_sup: null,
+  acq_pay: null,
+  acc_kas: null,
+  kas_acc: null,
+  giro_bnk: null,
+  bank_id: null,
+  bank_ref: null,
+  giro_num: null,
+  giro_date: null,
+  acq: [],
+  inc: [],
 };
 
 const KasBankInList = ({ onAdd }) => {
-  const [masuk, setMasuk] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [update, setUpdate] = useState(false);
+  const [displayDel, setDisplayDel] = useState(false);
+  const [currentItem, setCurrentItem] = useState(null);
+  const toast = useRef(null);
+  const [dep, setDep] = useState(null);
+  const [proj, setProj] = useState(null);
+  const [ord, setOrd] = useState(null);
+  const [isEdit, setEdit] = useState(false);
+  const [filters1, setFilters1] = useState(null);
+  const [globalFilterValue1, setGlobalFilterValue1] = useState("");
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+  const [displayData, setDisplayDat] = useState(false);
   const dispatch = useDispatch();
+  const inc = useSelector((state) => state.inc.inc);
+  const [expandedRows, setExpandedRows] = useState(null);
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    console.log(data);
-    setMasuk(data.data);
+    initFilters1();
+    getINC();
   }, []);
+
+  const getINC = async (isUpdate = false) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.income,
+      data: {},
+    };
+
+    let response = null;
+    try {
+      response = await request(null, config);
+
+      if (response.status) {
+        const { data } = response;
+
+        dispatch({ type: SET_INC, payload: data });
+      }
+    } catch (error) {}
+    if (isUpdate) {
+      setLoading(false);
+    } else {
+      setTimeout(() => {
+        setLoading(false);
+      }, 500);
+    }
+  };
 
   const renderHeader = () => {
     return (
@@ -73,14 +106,14 @@ const KasBankInList = ({ onAdd }) => {
           onClick={() => {
             onAdd();
             dispatch({
-              type: SET_EDIT_EXP,
+              type: SET_EDIT_INC,
               payload: false,
             });
             dispatch({
-              type: SET_CURRENT_EXP,
+              type: SET_CURRENT_INC,
               payload: {
                 ...data,
-                exp_type: 1,
+                inc_type: 1,
                 acq_pay: 1,
                 acq: [
                   // {
@@ -91,10 +124,11 @@ const KasBankInList = ({ onAdd }) => {
                   //   payment: null,
                   // },
                 ],
-                exp: [
+                inc: [
                   {
                     id: null,
                     acc_code: null,
+                    dbcr: null,
                     value: null,
                     desc: null,
                   },
@@ -153,28 +187,37 @@ const KasBankInList = ({ onAdd }) => {
     setRows2(event.rows);
   };
 
-  const statusBodyTemplate = (rowData) => {
-    return rowData.type === "pemasukan" ? (
-      <Badge variant="success light">
-        <i className="fa fa-circle text-success mr-1"></i>
-        Pemasukan
-      </Badge>
-    ) : rowData.type === "unqualified" ? (
-      <Badge variant="danger light">
-        <i className="fa fa-circle text-danger mr-1"></i>
-        Unqualified
-      </Badge>
-    ) : rowData.type === "proposal" ? (
-      <Badge variant="warning light">
-        <i className="fa fa-circle text-warning mr-1"></i>
-        Proposal
-      </Badge>
-    ) : (
-        <Badge variant="warning light">
-        <i className="fa fa-circle text-warning mr-1"></i>
-        {rowData.type}
-      </Badge>
-    );
+  const onGlobalFilterChange1 = (e) => {
+    const value = e.target.value;
+    let _filters1 = { ...filters1 };
+    _filters1["global"].value = value;
+
+    setFilters1(_filters1);
+    setGlobalFilterValue1(value);
+  };
+
+  const initFilters1 = () => {
+    setFilters1({
+      global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    });
+  };
+
+  const formatDate = (date) => {
+    var d = new Date(`${date}Z`),
+      month = "" + (d.getMonth() + 1),
+      day = "" + d.getDate(),
+      year = d.getFullYear();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+
+    return [day, month, year].join("-");
+  };
+
+  const formatIdr = (value) => {
+    return `${value}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
 
   return (
@@ -183,14 +226,14 @@ const KasBankInList = ({ onAdd }) => {
         <Col className="pt-0">
           <DataTable
             responsiveLayout="scroll"
-            value={masuk}
+            value={loading ? dummy : inc}
             className="display w-150 datatable-wrapper"
             showGridlines
             dataKey="id"
             rowHover
             header={renderHeader}
-            filters={null}
-            globalFilterFields={["ref"]}
+            filters={filters1}
+            globalFilterFields={["inc.inc_code"]}
             emptyMessage="Tidak ada data"
             paginator
             paginatorTemplate={template2}
@@ -204,26 +247,74 @@ const KasBankInList = ({ onAdd }) => {
               style={{
                 minWidth: "8rem",
               }}
-              field="date"
-              // body={loading && <Skeleton />}
+              field={(e) => formatDate(e.inc_date)}
+              body={loading && <Skeleton />}
             />
             <Column
               header="Nomor Referensi"
-              field="ref"
+              field={(e) => e.inc_code}
               style={{ minWidth: "8rem" }}
-              //  body={loading && <Skeleton />}
+              body={loading && <Skeleton />}
             />
             <Column
-              header="Pelanggan"
-              field="sup"
+              header="Tipe"
+              field={(e) => e?.inc_type ?? ""}
               style={{ minWidth: "8rem" }}
-              //  body={loading && <Skeleton />}
+              body={(e) =>
+                loading ? (
+                  <Skeleton />
+                ) : (
+                  <div>
+                    {e.inc_type === 1 ? (
+                      <Badge variant="info light">
+                        <i className="bx bxs-circle text-info mr-1"></i>{" "}
+                        Pelunasan
+                      </Badge>
+                    ) : (
+                      <Badge variant="warning light">
+                        <i className="bx bxs-circle text-warning mr-1"></i>{" "}
+                        Pemasukan Kas/Bank
+                      </Badge>
+                    )}
+                  </div>
+                )
+              }
             />
             <Column
-              header="Type"
-              field="type"
+              header="Jenis Pelunasan"
+              className="align-text-center"
+              field={(e) => e?.acq_pay ?? ""}
               style={{ minWidth: "8rem" }}
-               body={statusBodyTemplate}
+              body={(e) =>
+                loading ? (
+                  <Skeleton />
+                ) : (
+                  <div>
+                    {e.acq_pay === 1 ? (
+                      <Badge variant="primary light">
+                        <i className="bx bxs-circle text-primary mr-1"></i> Kas
+                      </Badge>
+                    ) : e.acq_pay === 2 ? (
+                      <Badge variant="warning light">
+                        <i className="bx bxs-circle text-warning mr-1"></i> Bank
+                      </Badge>
+                    ) : e.acq_pay === 3 ? (
+                      <Badge variant="info light">
+                        <i className="bx bxs-circle text-info mr-1"></i> Giro
+                      </Badge>
+                    ) : (
+                      <span className="center"> - </span>
+                    )}
+                  </div>
+                )
+              }
+            />
+            <Column
+              header="Action"
+              dataType="boolean"
+              bodyClassName="text-center"
+              style={{ minWidth: "2rem" }}
+              // body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
             />
           </DataTable>
         </Col>

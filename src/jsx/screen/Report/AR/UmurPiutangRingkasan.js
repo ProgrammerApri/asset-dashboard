@@ -293,7 +293,7 @@ const UmurPiutangRingkasan = () => {
       {
         columns: [
           {
-            title: "age of accounts receivable summary",
+            title: "Age of Accounts Receivable Summary",
             width: { wch: 20 },
             style: {
               font: { sz: "14", bold: true },
@@ -771,8 +771,8 @@ const UmurPiutangRingkasan = () => {
               <Card.Body className="p-0 m-0">
                 <CustomeWrapper
                   horizontal
-                  tittle={"age of accounts receivable summary"}
-                  subTittle={`age of accounts receivable summary as of ${formatDate(
+                  tittle={"Age of Accounts Receivable Summary"}
+                  subTittle={`Age of Accounts Receivable Summary as of ${formatDate(
                     date
                   )}`}
                   onComplete={(cp) => setCp(cp)}

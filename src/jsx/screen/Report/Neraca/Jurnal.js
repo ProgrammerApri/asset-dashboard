@@ -23,7 +23,7 @@ const ReportJurnal = () => {
   const [date, setDate] = useState([new Date(), new Date()]);
   const [trans, setTrans] = useState(null);
   const [cp, setCp] = useState("");
-  const chunkSize = 4;
+  const chunkSize = 3;
 
   useEffect(() => {
     var d = new Date();
@@ -468,7 +468,7 @@ const ReportJurnal = () => {
                                     ? e.props?.value[0]?.trx_code
                                     : null
                                 }
-                                style={{ width: "9rem" }}
+                                style={{ width: "15rem" }}
                                 body={(e) => (
                                   <div
                                     className={
@@ -507,10 +507,10 @@ const ReportJurnal = () => {
                                   <div
                                     className={
                                       e.type == "header"
-                                        ? "font-weight-bold text-right"
+                                        ? "font-weight-bold text-right m-3"
                                         : e.type == "footer"
                                         ? "font-weight-bold text-right"
-                                        : "text-right"
+                                        : "text-right m-3"
                                     }
                                   >
                                     {e.value.kredit}
@@ -520,7 +520,7 @@ const ReportJurnal = () => {
                               <Column
                                 className="header-center"
                                 header=""
-                                style={{ width: "20rem" }}
+                                style={{ width: "25rem" }}
                                 body={(e) => (
                                   <div
                                     className={

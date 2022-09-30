@@ -21,11 +21,12 @@ import DataLokasi from "src/jsx/screen/Master/Lokasi/DataLokasi";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
+import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 
 const defError = {
   code: false,
   date: false,
-  akn: false,
+  // akn: false,
   dep: false,
   proj: false,
   prod: [
@@ -36,6 +37,11 @@ const defError = {
     },
   ],
 };
+
+const type = [
+  { name: "Debit", code: "D" },
+  { name: "Kredit", code: "K" },
+];
 
 const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
@@ -79,29 +85,28 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
   const isValid = () => {
     let valid = false;
     let errors = {
-      code: !ic.ic_code || ic.ic_code === "",
-      date: !ic.ic_date || ic.ic_date === "",
-      akn: !ic.acc_id,
-      dep: !ic.dep_id,
-      proj: !ic.proj_id,
+      code: !ic.code || ic.code === "",
+      date: !ic.date || ic.date === "",
+      // akn: !ic.acc_id,
+      // dep: !ic.dep_id,
+      // proj: !ic.proj_id,
       prod: [],
     };
 
-    ic?.product.forEach((element, i) => {
+    ic?.kprod.forEach((element, i) => {
       if (i > 0) {
         if (element.prod_id || element.location || element.order) {
           errors.prod[i] = {
             id: !element.prod_id,
             lok: !element.location,
-            jum:
-              !element.order || element.order === "" || element.order === "0",
+            jum: !element.qty || element.qty === "" || element.qty === "0",
           };
         }
       } else {
         errors.prod[i] = {
           id: !element.prod_id,
           lok: !element.location,
-          jum: !element.order || element.order === "" || element.order === "0",
+          jum: !element.qty || element.qty === "" || element.qty === "0",
         };
       }
     });
@@ -121,13 +126,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
       }
     });
 
-    valid =
-      !errors.code &&
-      !errors.date &&
-      !errors.akn &&
-      !errors.dep &&
-      !errors.proj &&
-      validProduct;
+    valid = !errors.code && !errors.date && validProduct;
 
     setError(errors);
 
@@ -147,14 +146,14 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
       ...endpoints.pusatBiaya,
       data: {},
     };
-    console.log(config.data);
+    
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
-        console.log(data);
+        
         setPusatBiaya(data);
       }
     } catch (error) {}
@@ -165,14 +164,14 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
       ...endpoints.project,
       data: {},
     };
-    console.log(config.data);
+    
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
-        console.log(data);
+        
         setProj(data);
       }
     } catch (error) {}
@@ -183,14 +182,14 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
       ...endpoints.account,
       data: {},
     };
-    console.log(config.data);
+    
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
-        console.log(data);
+        
         setAcc(data);
       }
     } catch (error) {}
@@ -208,8 +207,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
       if (response.status) {
         const { data } = response;
         setProduct(data);
-        console.log("jsdj");
-        console.log(data);
+        
       }
     } catch (error) {}
   };
@@ -222,7 +220,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
         setLokasi(data);
@@ -238,7 +236,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         const { data } = response;
         setSatuan(data);
@@ -248,15 +246,15 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
 
   const editIC = async () => {
     const config = {
-      ...endpoints.editIC,
-      endpoint: endpoints.editIC.endpoint + ic.id,
+      ...endpoints.editKorSto,
+      endpoint: endpoints.editKorSto.endpoint + ic.id,
       data: ic,
     };
-    console.log(config.data);
+    
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         onSuccess();
       }
@@ -275,26 +273,25 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
 
   const addIC = async () => {
     const config = {
-      ...endpoints.addIC,
+      ...endpoints.addKorSto,
       data: ic,
     };
-    console.log(config.data);
+    
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      
       if (response.status) {
         onSuccess();
       }
     } catch (error) {
-      console.log(error);
       if (error.status === 400) {
         setTimeout(() => {
           setUpdate(false);
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${ic.ic_code} Sudah Digunakan`,
+            detail: `Kode ${ic.code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -350,8 +347,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
     product?.forEach((element) => {
       if (value === element.id) {
         selected = element;
-        console.log("SELEC");
-        console.log(selected);
+       
       }
     });
 
@@ -373,6 +369,17 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
     let selected = {};
     lokasi?.forEach((element) => {
       if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const cekType = (value) => {
+    let selected = {};
+    type?.forEach((element) => {
+      if (value === element.code) {
         selected = element;
       }
     });
@@ -429,9 +436,9 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
           <div className="col-4">
             <PrimeInput
               label={"Kode Referensi"}
-              value={ic.ic_code}
+              value={ic.code}
               onChange={(e) => {
-                updateIC({ ...ic, ic_code: e.target.value });
+                updateIC({ ...ic, code: e.target.value });
 
                 let newError = error;
                 newError.code = false;
@@ -445,9 +452,9 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
           <div className="col-2">
             <PrimeCalendar
               label={"Tanggal"}
-              value={new Date(`${ic.ic_date}Z`)}
+              value={new Date(`${ic.date}Z`)}
               onChange={(e) => {
-                updateIC({ ...ic, ic_date: e.value });
+                updateIC({ ...ic, date: e.value });
 
                 let newError = error;
                 newError.date = false;
@@ -461,30 +468,6 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-4"></div>
-          <div className="col-4 mt-2">
-            <label className="text-label">Kode Akun</label>
-            <div className="p-inputgroup"></div>
-            <CustomDropdown
-              value={ic.acc_id ? acco(ic?.acc_id) : null}
-              option={acc}
-              onChange={(e) => {
-                updateIC({
-                  ...ic,
-                  acc_id: e.account?.id,
-                });
-
-                let newError = error;
-                newError.akn = false;
-                setError(newError);
-              }}
-              placeholder="Pilih Kode Akun"
-              label={"[account.acc_name] - [account.acc_code]"}
-              detail
-              onDetail={() => setShowAcc(true)}
-              errorMessage="Akun Belum Dipilih"
-              error={error?.akn}
-            />
-          </div>
 
           <div className="col-4 mt-2">
             <label className="text-label">Departemen</label>
@@ -495,16 +478,16 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
               onChange={(e) => {
                 updateIC({ ...ic, dep_id: e.id });
 
-                let newError = error;
-                newError.dep = false;
-                setError(newError);
+                // let newError = error;
+                // newError.dep = false;
+                // setError(newError);
               }}
               label={"[ccost_name] - [ccost_code]"}
               placeholder="Pilih Departemen"
               detail
               onDetail={() => setShowDept(true)}
-              errorMessage="Departemen Belum Dipilih"
-              error={error?.dep}
+              // errorMessage="Departemen Belum Dipilih"
+              // error={error?.dep}
             />
           </div>
 
@@ -519,16 +502,16 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                   ...ic,
                   proj_id: e.id,
                 });
-                let newError = error;
-                newError.proj = false;
-                setError(newError);
+                // let newError = error;
+                // newError.proj = false;
+                // setError(newError);
               }}
               label={"[proj_name] - [proj_code]"}
               placeholder="Pilih Project"
               detail
               onDetail={() => setShowProj(true)}
-              errorMessage="Project Belum Dipilih"
-              error={error?.proj}
+              // errorMessage="Project Belum Dipilih"
+              // error={error?.proj}
             />
           </div>
         </Row>
@@ -544,11 +527,12 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
             });
           }}
           key={1}
+          style={{ width: "10vw" }}
           body={
             <>
               <DataTable
                 responsiveLayout="none"
-                value={ic.product?.map((v, i) => {
+                value={ic.kprod?.map((v, i) => {
                   return {
                     ...v,
                     index: i,
@@ -566,40 +550,62 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                   }}
                   field={""}
                   body={(e) => (
-                    <CustomDropdown
-                      value={ic.prod_id && checkProd(ic.prod_id)}
-                      option={product}
-                      onChange={(e) => {
+                    <PrimeDropdown
+                      value={e.prod_id && checkProd(e.prod_id)}
+                      options={product}
+                      onChange={(u) => {
+                        // looping satuan
                         let sat = [];
                         satuan.forEach((element) => {
-                          if (element.id === e.unit.id) {
+                          if (element.id === u.value.unit.id) {
                             sat.push(element);
                           } else {
-                            if (element.u_from?.id === e.unit.id) {
+                            if (element.u_from?.id === u.value.unit.id) {
                               sat.push(element);
                             }
                           }
                         });
-                        setSatuan(sat);
+                        // setSatuan(sat);
 
-                        let temp = [...ic.product];
-                        temp[e.index].prod_id = e.id;
-                        temp[e.index].unit_id = e.unit?.id;
-                        updateIC({ ...ic, product: temp });
+                        let temp = [...ic.kprod];
+                        temp[e.index].prod_id = u.value.id;
+                        temp[e.index].unit_id = u.value.unit.id;
+                        updateIC({ ...ic, kprod: temp });
 
                         let newError = error;
                         newError.prod[e.index].id = false;
                         setError(newError);
                       }}
-                      placeholder="Pilih Kode Produk"
-                      label={"[name]"}
-                      detail
-                      onDetail={() => {
-                        setShowProd(true);
-                        setCurrentIndex(e.index);
-                      }}
+                      optionLabel="name"
+                      placeholder="Pilih Produk"
+                      filter
+                      filterBy="name"
                       errorMessage="Produk Belum Dipilih"
                       error={error?.prod[e.index]?.id}
+                    />
+                  )}
+                />
+
+                <Column
+                  header="Satuan"
+                  className="align-text-top"
+                  style={{
+                    maxWidth: "10rem",
+                  }}
+                  field={""}
+                  body={(e) => (
+                    <PrimeDropdown
+                      value={e.unit_id && checkUnit(e.unit_id)}
+                      onChange={(u) => {
+                        let temp = [...ic.kprod];
+                        temp[e.index].unit_id = u.value.id;
+                        updateIC({ ...ic, kprod: temp });
+                      }}
+                      options={satuan}
+                      optionLabel="name"
+                      placeholder="Pilih Satuan"
+                      filter
+                      filterBy="name"
                     />
                   )}
                 />
@@ -612,28 +618,49 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                   }}
                   field={""}
                   body={(e) => (
-                    <CustomDropdown
-                      value={ic.location && checkLok(ic.location)}
-                      onChange={(e) => {
-                        let temp = [...ic.product];
-                        temp[e.index].location = e.id;
-                        updateIC({ ...ic, product: temp });
+                    <PrimeDropdown
+                      value={e.location && checkLok(e.location)}
+                      onChange={(u) => {
+                        let temp = [...ic.kprod];
+                        temp[e.index].location = u.value.id;
+                        updateIC({ ...ic, kprod: temp });
 
                         let newError = error;
                         newError.prod[e.index].lok = false;
                         setError(newError);
                       }}
-                      option={lokasi}
-                      label={"[name]"}
+                      options={lokasi}
+                      optionLabel="name"
                       placeholder="Pilih Lokasi"
-                      detail
-                      onDetail={() => {
-                        setShowLok(true);
-                        setCurrentIndex(e.index);
-                      }}
+                      filter
+                      filterBy={"name"}
                       errorMessage="Lokasi Belum Dipilih"
                       error={error?.prod[e.index]?.lok}
                     />
+                  )}
+                />
+
+                <Column
+                  header="Debit/Kredit"
+                  className="align-text-top"
+                  style={{
+                    width: "8rem",
+                  }}
+                  field={""}
+                  body={(e) => (
+                    <div className="p-inputgroup">
+                      <PrimeDropdown
+                        value={e.dbcr && cekType(e.dbcr)}
+                        options={type}
+                        onChange={(a) => {
+                          let temp = [...ic.kprod];
+                          temp[e.index].dbcr = a.value.code;
+                          updateIC({ ...ic, kprod: temp });
+                        }}
+                        optionLabel="name"
+                        placeholder="Debit/Kredit"
+                      />
+                    </div>
                   )}
                 />
 
@@ -646,11 +673,11 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                   field={""}
                   body={(e) => (
                     <PrimeNumber
-                      value={ic.order ? ic.order : null}
+                      value={e.qty ? e.qty : null}
                       onChange={(a) => {
-                        let temp = [...ic.product];
-                        temp[e.index].order = a.target.value;
-                        updateIC({ ...ic, product: temp });
+                        let temp = [...ic.kprod];
+                        temp[e.index].qty = a.target.value;
+                        updateIC({ ...ic, kprod: temp });
 
                         let newError = error;
                         newError.prod[e.index].jum = false;
@@ -665,55 +692,9 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
-                  header="Satuan"
-                  className="align-text-top"
-                  style={{
-                    width: "13rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <CustomDropdown
-                      value={ic.unit_id && checkUnit(ic.unit_id)}
-                      onChange={(e) => {
-                        let temp = [...ic.product];
-                        temp[e.index].unit_id = e.id;
-                        updateIC({ ...ic, product: temp });
-                      }}
-                      option={satuan}
-                      label={"[name]"}
-                      placeholder="Pilih Satuan"
-                      detail
-                      onDetail={() => {
-                        setShowSat(true);
-                        setCurrentIndex(e.index);
-                      }}
-                    />
-                  )}
-                />
-
-                <Column
-                  header="D/K"
-                  className="align-text-top"
-                  style={{
-                    width: "7rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={e.acc_id && acco(e.acc_id)?.account?.sld_type}
-                        onChange={(a) => {}}
-                        placeholder="D/K"
-                        // type="number"
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
                   className="align-text-top"
                   body={(e) =>
-                    e.index === ic.product.length - 1 ? (
+                    e.index === ic.kprod.length - 1 ? (
                       <Link
                         onClick={() => {
                           let newError = error;
@@ -722,15 +703,15 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
 
                           updateIC({
                             ...ic,
-                            product: [
-                              ...ic.product,
+                            kprod: [
+                              ...ic.kprod,
                               {
                                 id: 0,
                                 prod_id: null,
                                 unit_id: null,
-                                type: null,
                                 location: null,
-                                order: null,
+                                dbcr: null,
+                                qty: null,
                               },
                             ],
                           });
@@ -742,7 +723,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                     ) : (
                       <Link
                         onClick={() => {
-                          let temp = [...ic.product];
+                          let temp = [...ic.kprod];
                           temp.splice(e.index, 1);
                           updateIC({
                             ...ic,

@@ -194,7 +194,7 @@ const UmurPiutang = () => {
       {
         columns: [
           {
-            title: "Due Date Receivable",
+            title: "Age of Accounts Receivable Details",
             width: { wch: 20 },
             style: {
               font: { sz: "14", bold: true },
@@ -589,8 +589,8 @@ const UmurPiutang = () => {
             <Card>
               <Card.Body className="p-0 m-0">
                 <CustomeWrapper
-                  tittle={"Due Date Receivable"}
-                  subTittle={`Due Date Receivable as of ${formatDate(date)}`}
+                  tittle={"Age of Accounts Receivable Details"}
+                  subTittle={`Age of Accounts Receivable Details as of ${formatDate(date)}`}
                   onComplete={(cp) => setCp(cp)}
                   page={idx + 1}
                   body={
@@ -835,8 +835,8 @@ const UmurPiutang = () => {
         <Card ref={printPage}>
           <Card.Body className="p-0">
             <CustomeWrapper
-              tittle={"Due Date Receivable"}
-              subTittle={`Due Date Receivable as of ${formatDate(date)}`}
+              tittle={"Age of Accounts Receivable Details"}
+              subTittle={`Age of Accounts Receivable Details as of ${formatDate(date)}`}
               body={
                 <>
                   {jsonForExcel(ar, false)?.map((v) => {

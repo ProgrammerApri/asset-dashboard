@@ -198,7 +198,7 @@ const UmurHutang = () => {
       {
         columns: [
           {
-            title: "Due Date Payable",
+            title: "Debt Age Details",
             width: { wch: 20 },
             style: {
               font: { sz: "14", bold: true },
@@ -582,8 +582,8 @@ const UmurHutang = () => {
             <Card>
               <Card.Body className="p-0 m-0">
                 <CustomeWrapper
-                  tittle={"Due Date Payable"}
-                  subTittle={`Due Date Payable as of ${formatDate(date)}`}
+                  tittle={"Debt Age Details"}
+                  subTittle={`Debt Age Details as of ${formatDate(date)}`}
                   onComplete={(cp) => setCp(cp)}
                   body={
                     <>
@@ -827,8 +827,8 @@ const UmurHutang = () => {
         <Card ref={printPage}>
           <Card.Body className="p-0">
             <CustomeWrapper
-              tittle={"Due Date Payable"}
-              subTittle={`Due Date Payable as of ${formatDate(date)}`}
+              tittle={"Debt Age Details"}
+              subTittle={`Debt Age Details as of ${formatDate(date)}`}
               body={
                 <>
                   {jsonForExcel(ap, false)?.map((v) => {

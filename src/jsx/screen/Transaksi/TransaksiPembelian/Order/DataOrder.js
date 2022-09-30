@@ -516,7 +516,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
-                <Column
+                {/* <Column
                   header="PO Status"
                   field={(e) => (e.po_id.status !== null ? e.po_id.status : "")}
                   style={{ minWidth: "8rem" }}
@@ -538,7 +538,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
                       </div>
                     )
                   }
-                />
+                /> */}
                 <Column
                   header="Supplier"
                   field={(e) => e?.sup_id?.sup_name}

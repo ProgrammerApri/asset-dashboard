@@ -24,6 +24,8 @@ import MSNReducer from "./MSNReducer";
 import PLReducer from "./PLReducer";
 import BTCReducer from "./BTCReducer";
 import MemorialReducer from "./MemorialReducer";
+import IncReducer from "./IncReducer";
+import GIROINReducer from "./GiroIncReducer";
 // import PBNReducer from "./PBNReducer";
 
 
@@ -52,7 +54,9 @@ const rootReducer = combineReducers({
   msn: MSNReducer,
   plan: PLReducer,
   btc: BTCReducer,
-  memorial: MemorialReducer
+  memorial: MemorialReducer,
+  inc: IncReducer,
+  giro_in: GIROINReducer
 });
 
 export default rootReducer;

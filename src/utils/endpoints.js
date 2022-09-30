@@ -939,10 +939,22 @@ const endpoints = {
     data: {},
   },
 
+  editGiro: {
+    endpoint: "/v1/api/giro/",
+    method: "PUT",
+    data: {},
+  },
+
   /// GIRO INCOME
   giro_inc: {
     endpoint: "/v1/api/giro-inc",
     method: "GET",
+    data: {},
+  },
+
+  editGr: {
+    endpoint: "/v1/api/giro-inc/",
+    method: "PUT",
     data: {},
   },
 

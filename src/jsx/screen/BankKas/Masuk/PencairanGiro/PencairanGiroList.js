@@ -13,7 +13,7 @@ import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_GIROIN, SET_GIROIN } from "src/redux/actions";
+import { SET_CURRENT_GIROIN, SET_EDIT_GIROIN, SET_GIROIN } from "src/redux/actions";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import { Link } from "react-router-dom";
 
@@ -40,7 +40,9 @@ const PencairanGiroIncList = ({ onSuccess, onCancel }) => {
   const dispatch = useDispatch();
   const [bank, setBank] = useState(null);
   const [comp, setComp] = useState(null);
-  const [showBank, setShowBank] = useState(false);
+  const [city, setCity] = useState(null);
+  const [customer, setCustomer] = useState(null);
+  const [inc, setInc] = useState(null);
   const [displayData, setDisplayData] = useState(false);
   const [displayDel, setDisplayDel] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
@@ -60,6 +62,9 @@ const PencairanGiroIncList = ({ onSuccess, onCancel }) => {
     getGiro();
     getBank();
     getComp();
+    getCity();
+    getCus();
+    getInc();
     initFilters1();
   }, []);
 
@@ -71,7 +76,7 @@ const PencairanGiroIncList = ({ onSuccess, onCancel }) => {
     let response = null;
     try {
       response = await request(null, config);
-   
+
       if (response.status) {
         const { data } = response;
         dispatch({ type: SET_GIROIN, payload: data });
@@ -102,6 +107,38 @@ const PencairanGiroIncList = ({ onSuccess, onCancel }) => {
     } catch (error) {}
   };
 
+  const getCus = async () => {
+    const config = {
+      ...endpoints.customer,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+
+      if (response.status) {
+        const { data } = response;
+        setCustomer(data);
+      }
+    } catch (error) {}
+  };
+
+  const getInc = async () => {
+    const config = {
+      ...endpoints.income,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+
+      if (response.status) {
+        const { data } = response;
+        setInc(data);
+      }
+    } catch (error) {}
+  };
+
   const getComp = async () => {
     const config = {
       ...endpoints.getCompany,
@@ -114,23 +151,41 @@ const PencairanGiroIncList = ({ onSuccess, onCancel }) => {
 
       if (response.status) {
         const { data } = response;
-   
+
         setComp(data);
+      }
+    } catch (error) {}
+  };
+
+  const getCity = async () => {
+    const config = {
+      ...endpoints.city,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setCity(data);
       }
     } catch (error) {}
   };
 
   const editGiro = async () => {
     const config = {
-      ...endpoints.editGiro,
-      endpoint: endpoints.editGiro.endpoint + giro.id,
+      ...endpoints.editGr,
+      endpoint: endpoints.editGr.endpoint + giro.id,
       data: giro,
     };
 
     let response = null;
     try {
       response = await request(null, config);
-    
+
       if (response.status) {
         onSuccess();
       }
@@ -158,10 +213,35 @@ const PencairanGiroIncList = ({ onSuccess, onCancel }) => {
     return selected;
   };
 
-  const onSubmit = () => {
-    setUpdate(true);
-    editGiro();
+  const checkCus = (value) => {
+    let selected = {};
+    customer?.forEach((element) => {
+      if (value === element.customer.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
   };
+
+  const checkInc = (value) => {
+    let selected = {};
+    inc?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const onSubmit = () => {
+    if (isEdit) {
+      setUpdate(true);
+      editGiro();
+    }
+  };
+
 
   const onGlobalFilterChange1 = (e) => {
     const value = e.target.value;
@@ -186,11 +266,22 @@ const PencairanGiroIncList = ({ onSuccess, onCancel }) => {
           onClick={() => {
             setDisplayData(data);
             dispatch({
+              type: SET_EDIT_GIROIN,
+              payload: true,
+            });
+            dispatch({
               type: SET_CURRENT_GIROIN,
-              payload: data,
+              payload: {
+                ...data,
+                bank_id: data?.bank_id?.id ?? null,
+                pay_code: data?.pay_code?.id ?? null,
+                cus_id: data?.cus_id?.id ?? null,
+              },
             });
           }}
-          className="btn btn-success shadow btn-xs sharp ml-1"
+          className={`btn ${
+            data.status === 0 ? "" : "disabled"
+          } btn-primary shadow btn-xs sharp ml-1`}
         >
           <i className="bx bx-check mt-1"></i>
         </Link>
@@ -225,6 +316,16 @@ const PencairanGiroIncList = ({ onSuccess, onCancel }) => {
     );
   };
 
+  const kota = (value) => {
+    let selected = {};
+    city?.forEach((element) => {
+      if (element.city_id === `${value}`) {
+        selected = element;
+      }
+    });
+    return selected;
+  };
+
   const formatDate = (date) => {
     var d = new Date(`${date}Z`),
       month = "" + (d.getMonth() + 1),
@@ -248,27 +349,6 @@ const PencairanGiroIncList = ({ onSuccess, onCancel }) => {
       type: SET_CURRENT_GIROIN,
       payload: e,
     });
-  };
-
-  const footer = () => {
-    return (
-      <div>
-        {/* <div>
-          <PButton
-            label="Batal"
-            onClick={() => setDisplayData(false)}
-            className="p-button-text btn-primary"
-          />
-          <PButton
-            label="Simpan"
-            icon="pi pi-check"
-            onClick={() => onSubmit()}
-            autoFocus
-            loading={update}
-          />
-        </div> */}
-      </div>
-    );
   };
 
   const template2 = {
@@ -320,126 +400,117 @@ const PencairanGiroIncList = ({ onSuccess, onCancel }) => {
   return (
     <>
       <Toast ref={toast} />
-      {/* <Row>
-        <Col className="pt-0">
-          <Card>
-            <Card.Body> */}
-              <DataTable
-                responsiveLayout="scroll"
-                value={loading ? dummy : giro}
-                className="display w-150 datatable-wrapper"
-                showGridlines
-                dataKey="id"
-                rowHover
-                header={renderHeader}
-                filters={filters1}
-                globalFilterFields={["giro_code"]}
-                emptyMessage="Tidak ada data"
-                paginator
-                paginatorTemplate={template2}
-                first={first2}
-                rows={rows2}
-                onPage={onCustomPage2}
-                onRowSelect={(e) => {
-                  if (doubleClick) {
-                    setDisplayData(false);
-                  }
+      <DataTable
+        responsiveLayout="scroll"
+        value={loading ? dummy : giro}
+        className="display w-150 datatable-wrapper"
+        showGridlines
+        dataKey="id"
+        rowHover
+        header={renderHeader}
+        filters={filters1}
+        globalFilterFields={["giro_code"]}
+        emptyMessage="Tidak ada data"
+        paginator
+        paginatorTemplate={template2}
+        first={first2}
+        rows={rows2}
+        onPage={onCustomPage2}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setDisplayData(false);
+          }
 
-                  setDoubleClick(true);
+          setDoubleClick(true);
 
-                  setTimeout(() => {
-                    setDoubleClick(false);
-                  }, 2000);
-                }}
-                paginatorClassName="justify-content-end mt-3"
-              >
-                <Column
-                  header="Tanggal Pencairan"
-                  style={{
-                    minWidth: "8rem",
-                  }}
-                  field={(e) => formatDate(e.giro_date)}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Nomor Giro"
-                  field={(e) => e.giro_num}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Bank"
-                  field={(e) => e.bank_id.BANK_NAME}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Kode Pembayaran"
-                  field={(e) => e.pay_code?.inc_code ?? "-"}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Tanggal Pembayaran"
-                  field={(e) => formatDate(e.pay_date)}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                {/* <Column
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+        paginatorClassName="justify-content-end mt-3"
+      >
+        <Column
+          header="Tanggal Pencairan"
+          style={{
+            minWidth: "8rem",
+          }}
+          field={(e) => formatDate(e.giro_date)}
+          body={loading && <Skeleton />}
+        />
+        <Column
+          header="Nomor Giro"
+          field={(e) => e.giro_num}
+          style={{ minWidth: "8rem" }}
+          body={loading && <Skeleton />}
+        />
+        <Column
+          header="Bank"
+          field={(e) => e.bank_id.BANK_NAME}
+          style={{ minWidth: "8rem" }}
+          body={loading && <Skeleton />}
+        />
+        <Column
+          header="Kode Pembayaran"
+          field={(e) => e.pay_code?.inc_code ?? "-"}
+          style={{ minWidth: "8rem" }}
+          body={loading && <Skeleton />}
+        />
+        <Column
+          header="Tanggal Pembayaran"
+          field={(e) => formatDate(e.pay_date)}
+          style={{ minWidth: "8rem" }}
+          body={loading && <Skeleton />}
+        />
+        {/* <Column
                   header="Pemasok"
                   field={(e) => e.sup_id?.sup_name}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 /> */}
-                <Column
-                  header="Nilai"
-                  field={(e) => formatIdr(e.value)}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Status"
-                  field={(e) => e.status}
-                  style={{ minWidth: "8rem" }}
-                  body={(e) =>
-                    loading ? (
-                      <Skeleton />
-                    ) : (
-                      <div>
-                        {e.status === 0 ? (
-                          <Badge variant="info light">
-                            <i className="bx bxs-check-circle text-info mr-1 mt-1"></i>{" "}
-                            
-                          </Badge>
-                        ) : (
-                          <Badge variant="warning light">
-                            <i className="bx bxs-x-circle text-warning mr-1 mt-1"></i>{" "}
-                            
-                          </Badge>
-                        )}
-                      </div>
-                    )
-                  }
-                />
-                <Column
-                  header="Action"
-                  dataType="boolean"
-                  bodyClassName="text-center"
-                  style={{ minWidth: "2rem" }}
-                  body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
-                />
-                
-              </DataTable>
-            {/* </Card.Body>
-          </Card>
-        </Col>
-      </Row> */}
+        <Column
+          header="Nilai"
+          field={(e) => formatIdr(e.value)}
+          style={{ minWidth: "8rem" }}
+          body={loading && <Skeleton />}
+        />
+        <Column
+          header="Status Giro"
+          field={(e) => e.status}
+          style={{ minWidth: "8rem" }}
+          body={(e) =>
+            loading ? (
+              <Skeleton />
+            ) : (
+              <div>
+                {e.status === 0 ? (
+                  <Badge variant="warning light">
+                    <i className="bx bxs-check-circle text-warning mr-1 mt-1"></i>{" "}
+                    Belum Dicairkan
+                  </Badge>
+                ) : (
+                  <Badge variant="info light">
+                    <i className="bx bxs-x-circle text-info mr-1 mt-1"></i>{" "}
+                    Sudah Dicairkan
+                  </Badge>
+                )}
+              </div>
+            )
+          }
+        />
+        <Column
+          header="Accept"
+          dataType="boolean"
+          bodyClassName="text-center"
+          style={{ minWidth: "2rem" }}
+          body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
+        />
+      </DataTable>
 
       <Dialog
         header={"Pencairan Giro"}
         visible={displayData}
-        style={{ width: "35vw"}}
-        footer={footer}
+        style={{ width: "45vw" }}
+        footer
         onHide={() => {
           setDisplayData(false);
         }}
@@ -450,6 +521,7 @@ const PencairanGiroIncList = ({ onSuccess, onCancel }) => {
               <div className="flex justify-content-between align-items-center">
                 <div className="">
                   <img
+                    className="ml-2"
                     style={{
                       height: "40px",
                       width: "40px",
@@ -466,21 +538,18 @@ const PencairanGiroIncList = ({ onSuccess, onCancel }) => {
                 <div className="">
                   <label className="text-label ml-2">Nomor Giro</label>
                   <br></br>
-                  <Badge variant="info light" className="ml-0 fs-12">
-                    <i className="bx bxs-circle text-info mt-1"></i>
-                    <b>{show?.giro_num}</b>
+                  <Badge variant="primary light" className="ml-1 fs-12">
+                    {show?.giro_num}
                   </Badge>
                 </div>
 
-                {/* <div className="">
-                <label className="text-label">Bank</label>
-                <br></br>
-                <span className="ml-0 fs-14">
-                  <b>{`${show?.bank_id?.BANK_NAME} (${
-                    show?.bank_id?.BANK_CODE
-                  })`}</b>
-                </span>
-              </div> */}
+                <div className="">
+                  <label className="text-label ml-1">Kode Bank</label>
+                  <br></br>
+                  <Badge variant="warning light" className="ml-0 fs-12">
+                    {`${checkBank(show?.bank_id)?.bank?.BANK_NAME} (${checkBank(show?.bank_id)?.bank?.BANK_CODE})`}
+                  </Badge>
+                </div>
 
                 <div className="">
                   <span className="p-buttonset">
@@ -500,14 +569,16 @@ const PencairanGiroIncList = ({ onSuccess, onCancel }) => {
                   /> */}
                     <Button
                       className="p-button-info"
-                      style={{ width: "6rem", height: "2rem" }}
+                      style={{ width: "6rem", height: "3rem" }}
                       label="Cairkan"
                       icon="bx bx-money-withdraw"
-                      onClick={() => {}}
+                      onClick={() => onSubmit()}
+                      autoFocus
+                      loading={update}
                       // disabled={show?.apprv === false}
                     />
                     <Button
-                      style={{ width: "6rem", height: "2rem" }}
+                      style={{ width: "6rem", height: "3rem" }}
                       label="Batal"
                       onClick={() => setDisplayData(false)}
                       className="p-button-info"
@@ -525,75 +596,99 @@ const PencairanGiroIncList = ({ onSuccess, onCancel }) => {
           <div className="row justify-content-right col-6 mb-0">
             {/* <div className="col-12 mt-0 fs-12 text-right"> */}
             {/* <label className="text-label">Tanggal Pencairan : </label> */}
-            {/* <div className="p-inputgroup"> */}
-            <Calendar
-              style={{ width: "12rem", height: "2rem" }}
-              className="ml-5 fs-12"
-              value={new Date(`${giro.giro_date}Z`)}
-              onChange={(e) => {
-                updateGIn({ ...giro, giro_date: e.value });
-              }}
-              placeholder="Tanggal Pencairan"
-              showIcon
-              dateFormat="dd-mm-yy"
-            />
-            {/* </div> */}
+            {/* <div className="p-inputgroup">
+              <Calendar
+                style={{ width: "10rem", height: "2rem" }}
+                className="ml-5 fs-12"
+                value={new Date(`${giro.giro_date}Z`)}
+                onChange={(e) => {
+                  updateGIn({ ...giro, giro_date: e.value });
+                }}
+                placeholder="Tanggal Pencairan"
+                showIcon
+                dateFormat="dd-mm-yy"
+              />
+            </div> */}
             {/* </div> */}
           </div>
 
-          <Card className="col-12 mt-0">
+          <Card className="col-12 mt-2">
             <div className="row col-12">
-              <div className="col-7 fs-12 ml-0">
-                <label className="text-label">
-                  <b>Informasi Bank</b>
-                </label>
-              </div>
-
-              <div className="col-5 fs-12 text-right">
-                <label className="text-label">
+              <div className="col-7 fs-13 ml-0">
+                <Badge variant="info light" className="ml-0 fs-12">
                   <b>Informasi Pembayaran</b>
-                </label>
+                </Badge>
+              </div>
+
+              <div className="col-5 fs-13 text-right">
+                <Badge variant="info light" className="ml-0 fs-12">
+                  <b>Informasi Pelanggan</b>
+                </Badge>
               </div>
 
               <div className="col-7 fs-12 ml-0">
-                {/* <br></br>
-                <br></br> */}
-                <span className="ml-0">
-                  <b>{show?.bank_id?.BANK_CODE}</b>
+                <br></br>
+                <label className="text-label">Kode Pelunasan</label>
+                <br></br>
+                <span className="">
+                  <b>{checkInc(show?.pay_code)?.inc_code ?? "-"}</b>
                 </span>
-                <br></br>
+                <br />
+                <br />
+                <label className="text-label">Tanggal Pelunasan</label>
                 <br></br>
                 <span className="ml-0">
-                  <b>{show?.bank_id?.BANK_NAME}</b>
+                  <b>{formatDate(show?.pay_date)}</b>
                 </span>
+                <br />
+                <br />
+                <label className="text-label">Tanggal Pencairan</label>
                 <br></br>
-                <br></br>
+                <span className="ml-0">
+                  <b>{formatDate(show?.giro_date)}</b>
+                </span>
+                <br />
               </div>
 
-              <div className="col-5 fs-12 ml-0 text-right">
+              <div className="col-5 ml-0 text-right">
+                {/* <label className="text-label">Pelanggan</label> */}
+                <br></br>
                 <span className="fs-13">
-                  <b>{show?.pay_code ?? "-"}</b>
+                  <b>{`${checkCus(show?.cus_id)?.customer?.cus_name} (${checkCus(show?.cus_id)?.customer?.cus_code})`}</b>
                 </span>
                 <br />
                 <br />
-                <span className="ml-0">
-                  Tanggal : <b>{formatDate(show?.pay_date)}</b>
-                </span>
-                <br />
-                <br />
-                <span className="ml-0">
-                  <b>{show?.sup_id?.sup_name}</b>
-                </span>
+                <label className="text-label">Alamat Pelanggan</label>
                 <br></br>
                 <span className="ml-0">
-                  Cp : <b>{show?.sup_id?.sup_cp}</b>
+                  <b>
+                    {checkCus(show?.cus_id)?.customer?.cus_address},{" "}
+                    {checkCus(kota(show?.cus_id)?.customer?.cus_kota)?.city_name},{" "}
+                    {checkCus(show?.cus_id)?.customer?.cus_kpos}
+                  </b>
+                </span>
+                <br />
+                <br />
+                <label className="text-label">No. Telepon</label>
+                <br></br>
+                <span className="ml-0">
+                  <b>(+62) {checkCus(show?.cus_id)?.customer?.cus_telp1}</b>
+                </span>
+                <br></br>
+                <br></br>
+                <label className="text-label">Contact Person</label>
+                <br></br>
+                <span className="ml-0">
+                  <b>{checkCus(show?.cus_id)?.customer?.cus_cp}</b>
                 </span>
               </div>
             </div>
 
             <div className="col-6"></div>
             <div className="col-6 fs-14 mt-8">
-              <span><b>Nilai Giro :</b> Rp. {formatIdr(show?.value)}</span>
+              <span>
+                <b>Nilai Giro :</b> Rp. {formatIdr(show?.value)}
+              </span>
             </div>
           </Card>
         </Row>

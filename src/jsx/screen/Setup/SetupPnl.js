@@ -8,10 +8,12 @@ import CustomAccordion from "src/jsx/components/Accordion/Accordion";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Link } from "react-router-dom";
+import PusatBiaya from "../MasterLainnya/PusatBiaya";
 
 const set = {
   id: 0,
   klasi: [null],
+  name: [null],
 };
 
 const SetupPnl = () => {
@@ -21,6 +23,7 @@ const SetupPnl = () => {
   const [setup, setSetup] = useState(set);
   const [available, setAvailable] = useState(false);
   const [klasifikasi, setKlasifikasi] = useState(null);
+  const [pusatBiaya, setPusatBiaya] = useState(null);
   const [accor, setAccor] = useState({
     aktiva: true,
     passiva: true,
@@ -55,6 +58,7 @@ const SetupPnl = () => {
 
     getCompany();
   };
+
 
   const getCompany = async () => {
     const config = endpoints.getCompany;
@@ -118,6 +122,7 @@ const SetupPnl = () => {
       setLoading(false);
     }
   };
+
 
   const postCompany = async (data) => {
     let config = {
@@ -194,6 +199,8 @@ const SetupPnl = () => {
     getSetup(false);
   };
 
+ 
+
   const editSetup = async (data) => {
     let d = data;
     for (var key in d) {
@@ -236,6 +243,7 @@ const SetupPnl = () => {
     getSetup(false);
   };
 
+  
   const submitUpdate = (data) => {
     if (available) {
       if (data.id) {
@@ -247,6 +255,8 @@ const SetupPnl = () => {
       postCompany(data);
     }
   };
+  
+  
 
   const checkKlasifikasi = (value) => {
     let selected = {};
@@ -258,6 +268,8 @@ const SetupPnl = () => {
 
     return selected;
   };
+
+
 
   const renderKategoriDropdown = (
     label,
@@ -354,6 +366,7 @@ const SetupPnl = () => {
     );
   };
 
+
   const renderAktiva = () => {
     return (
       <CustomAccordion
@@ -395,11 +408,14 @@ const SetupPnl = () => {
     );
   };
 
+ 
+
   return (
     <>
       <Toast ref={toast} />
       <Row>
         <Col className="col-lg-12 col-sm-12 col-xs-12">{renderAktiva()}</Col>
+       
       </Row>
     </>
   );

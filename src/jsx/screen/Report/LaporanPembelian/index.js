@@ -48,11 +48,7 @@ const LaporanPembelian = (self) => {
       icon: "bx-receipt",
       component: <ReportReturBeli />,
     },
-    {
-      tittle: "Histori Pembayaran Pembelian",
-      icon: "bx-receipt",
-      component: <HistoryPayOrder />,
-    },
+   
   ]);
 
   let id =

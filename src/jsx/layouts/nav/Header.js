@@ -187,7 +187,7 @@ const Header = ({
                   onClick={() => onProfile()}
                 >
                   <img
-                    src={"http://103.179.56.92/static/upload/andy.jpg"}
+                    src={"https://cf.shopee.co.id/file/f5565e148a808d6ae49c09c137e71138"}
                     width={20}
                     alt
                   />

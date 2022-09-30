@@ -81,6 +81,7 @@ const LaporanNeraca = (self) => {
         />
       ),
     },
+   
     // {
     //   tittle: "Kartu Stock",
     //   icon: "bx-spreadsheet",

@@ -449,6 +449,7 @@ const endpoints = {
     method: "PUT",
     data: {},
   },
+  
 
   editCustomer: {
     endpoint: "/v1/api/customer/",

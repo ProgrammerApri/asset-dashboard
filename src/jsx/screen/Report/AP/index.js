@@ -5,6 +5,7 @@ import ReportHutang from "./Hutang";
 import ReportHutangRingkasan from "./HutangRingkasan";
 import UmurHutangRingkasan from "./UmurHutangRingkasan";
 import UmurHutang from "./UmurHutang";
+import HistoryPayOrder from "./HistoryPayOrd";
 
 const LaporanAp = (self) => {
   const [active, setActive] = useState(0);
@@ -29,7 +30,11 @@ const LaporanAp = (self) => {
       icon: "bx-calendar-x",
       component: <UmurHutang />,
     },
-    
+    {
+      tittle: "Histori Pembayaran Pembelian",
+      icon: "bx-receipt",
+      component: <HistoryPayOrder />,
+    },
   ]);
 
   let id =
@@ -50,7 +55,9 @@ const LaporanAp = (self) => {
 
     subMenu.forEach((el, i) => {
       menu.push(
-        <Link to={"/laporan/ap/" + el.tittle.toLowerCase().replaceAll(" ", "-")}>
+        <Link
+          to={"/laporan/ap/" + el.tittle.toLowerCase().replaceAll(" ", "-")}
+        >
           <Button
             className={`sub-menu mr-4 mb-4 ${id == i ? "act" : ""}`}
             role="button"

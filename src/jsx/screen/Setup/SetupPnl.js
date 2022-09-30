@@ -31,7 +31,6 @@ const SetupPnl = () => {
 
   useEffect(() => {
     getKlasifikasi();
-    getPusatBiaya();
   }, []);
 
   const getKlasifikasi = async (isUpdate = false) => {
@@ -59,31 +58,7 @@ const SetupPnl = () => {
 
     getCompany();
   };
-  const getPusatBiaya = async (isUpdate = false) => {
-    setLoading(true);
-    const config = {
-      ...endpoints.pusatBiaya,
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setPusatBiaya(data);
-      }
-    } catch (error) {}
-    if (isUpdate) {
-      setLoading(false);
-    } else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 500);
-    }
 
-    getCompany();
-  };
 
   const getCompany = async () => {
     const config = endpoints.getCompany;
@@ -148,6 +123,7 @@ const SetupPnl = () => {
     }
   };
 
+
   const postCompany = async (data) => {
     let config = {
       ...endpoints.addCompany,
@@ -199,7 +175,6 @@ const SetupPnl = () => {
       ...endpoints.addPnl,
       data: d,
     };
-    
     let response = null;
     try {
       response = await request(null, config);
@@ -223,47 +198,8 @@ const SetupPnl = () => {
 
     getSetup(false);
   };
-  const addSetupi = async (data) => {
-    let d = data;
-    for (var key in d) {
-      if (key !== "id" && key !== "cp_id") {
-        let val = [];
-        d[key].forEach((el) => {
-          if (el) {
-            val.push(Number(el));
-          }
-        });
-        d[key] = val.length > 0 ? val : null;
-      }
-    }
-    let config = {
-      ...endpoints.addDep,
-      data: d,
-    };
-    
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        toast.current.show({
-          severity: "info",
-          summary: "Berhasil",
-          detail: "Data berhasil diperbarui",
-          life: 3000,
-        });
-      }
-    } catch (error) {
-      toast.current.show({
-        severity: "error",
-        summary: "Gagal",
-        detail: "Gagal memperbarui data",
-        life: 3000,
-      });
-    }
 
-    getSetup(false);
-  };
+ 
 
   const editSetup = async (data) => {
     let d = data;
@@ -306,48 +242,8 @@ const SetupPnl = () => {
 
     getSetup(false);
   };
-  const editSetupi = async (data) => {
-    let d = data;
-    for (var key in d) {
-      if (key !== "id" && key !== "cp_id") {
-        let val = [];
-        d[key].forEach((el) => {
-          if (el) {
-            val.push(Number(el));
-          }
-        });
-        d[key] = val.length > 0 ? val : null;
-      }
-    }
-    let config = {
-      ...endpoints.editDep,
-      endpoint: endpoints.editDep.endpoint + data.id,
-      data: d,
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        toast.current.show({
-          severity: "info",
-          summary: "Berhasil",
-          detail: "Data berhasil diperbarui",
-          life: 3000,
-        });
-      }
-    } catch (error) {
-      toast.current.show({
-        severity: "error",
-        summary: "Gagal",
-        detail: "Gagal memperbarui data",
-        life: 3000,
-      });
-    }
 
-    getSetup(false);
-  };
-
+  
   const submitUpdate = (data) => {
     if (available) {
       if (data.id) {
@@ -359,17 +255,8 @@ const SetupPnl = () => {
       postCompany(data);
     }
   };
-  const submitUpdatedep = (data) => {
-    if (available) {
-      if (data.id) {
-        editSetupi(data);
-      } else {
-        addSetupi(data);
-      }
-    } else {
-      postCompany(data);
-    }
-  };
+  
+  
 
   const checkKlasifikasi = (value) => {
     let selected = {};
@@ -381,16 +268,8 @@ const SetupPnl = () => {
 
     return selected;
   };
-  const checkCost = (value) => {
-    let selected = {};
-    pusatBiaya?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
 
-    return selected;
-  };
+
 
   const renderKategoriDropdown = (
     label,
@@ -486,100 +365,7 @@ const SetupPnl = () => {
       </div>
     );
   };
-  const renderDepartemenDropdown = (
-    label,
-    value,
-    onChange,
-    expanded = false,
-    onAdd,
-    onRemove
-  ) => {
-    return (
-      <div className={`${expanded ? "col-12" : "col-6"} mb-2 p-0`}>
-        {loading ? (
-          <>
-            <Skeleton width="200px" />
-            <Skeleton className="mt-3" height="45px" />
-          </>
-        ) : (
-          <>
-            <DataTable
-              responsiveLayout="scroll"
-              value={value?.map((e, i) => {
-                return { index: i, id: Number(e) };
-              })}
-              className="display w-150 datatable-wrapper header-white no-border"
-              showGridlines={false}
-              emptyMessage={() => <div></div>}
-            >
-              <Column
-                header={label}
-                className="align-text-top p-2"
-                field={""}
-                body={(e) => (
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={checkCost(e.id)}
-                      options={pusatBiaya && pusatBiaya}
-                      onChange={(a) => {
-                        onChange(e, a.value.id);
-                      }}
-                      optionLabel={(option) => (
-                        <div>
-                          {option !== null
-                            ? `${option.id}. ${option.ccost_name}`
-                            : ""}
-                        </div>
-                      )}
-                      filter
-                      filterBy="ccost_name"
-                      placeholder="Pilih Departemen"
-                      itemTemplate={(option) => (
-                        <div>
-                          {option !== null
-                            ? `${option.id}. ${option.ccost_name}`
-                            : ""}
-                        </div>
-                      )}
-                    />
-                  </div>
-                )}
-              />
-              <Column
-                header=""
-                className="align-text-top"
-                field={""}
-                style={{
-                  width: "3rem",
-                }}
-                body={(e) =>
-                  e.index === value.length - 1 ? (
-                    <Link
-                      onClick={() => {
-                        onAdd(e);
-                      }}
-                      className="btn btn-primary shadow btn-xs sharp"
-                    >
-                      <i className="fa fa-plus"></i>
-                    </Link>
-                  ) : (
-                    <Link
-                      onClick={() => {
-                        onRemove(e);
-                      }}
-                      className="btn btn-danger shadow btn-xs sharp"
-                    >
-                      <i className="fa fa-trash"></i>
-                    </Link>
-                  )
-                }
-              />
-            </DataTable>
-          </>
-        )}
-      </div>
-    );
-  };
+
 
   const renderAktiva = () => {
     return (
@@ -616,60 +402,20 @@ const SetupPnl = () => {
                 submitUpdate({ ...setup, klasi: temp });
               }
             )}
-           
-          </Row>
-        }
-      />
-    );
-  };
-  const renderPasive = () => {
-    return (
-      <CustomAccordion
-        tittle={"Laba Rugi"}
-        active={accor.aktiva}
-        key={1}
-        defaultActive={true}
-        onClick={() => {
-          setAccor({
-            ...accor,
-            aktiva: !accor.aktiva,
-          });
-        }}
-        body={
-          <Row className="mr-0 ml-0">
-            {renderDepartemenDropdown(
-              "Departemen",
-              setup?.name ?? [null],
-              (e, id) => {
-                let temp = setup.name;
-                temp[e.index] = id;
-                setSetup({ ...setup, name: temp });
-                submitUpdatedep({ ...setup, name: temp });
-              },
-              true,
-              (e) => {
-                setSetup({ ...setup, name: [...setup.name, null] });
-              },
-              (e) => {
-                let temp = setup.name;
-                temp.splice(e.index, 1);
-                setSetup({ ...setup, name: temp });
-                submitUpdatedep({ ...setup, name: temp });
-              }
-            )}
-           
           </Row>
         }
       />
     );
   };
 
+ 
+
   return (
     <>
       <Toast ref={toast} />
       <Row>
         <Col className="col-lg-12 col-sm-12 col-xs-12">{renderAktiva()}</Col>
-        <Col className="col-lg-12 col-sm-12 col-xs-12">{renderPasive()}</Col>
+       
       </Row>
     </>
   );

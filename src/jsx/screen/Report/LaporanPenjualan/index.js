@@ -36,11 +36,7 @@ const LaporanPenjualan = (self) => {
       icon: "bx-receipt",
       component: <ReportReturJual />,
     },
-    {
-      tittle: "Histori Pembayaran Penjualan",
-      icon: "bx-receipt",
-      component: <HistoryPaySale />,
-    },
+    
    
   ]);
 

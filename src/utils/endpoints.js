@@ -449,25 +449,7 @@ const endpoints = {
     method: "PUT",
     data: {},
   },
-  // Setup P/L departemen
-
-  getDep: {
-    endpoint: "/v1/api/setup/dep",
-    method: "GET",
-    data: {},
-  },
-
-  addDep: {
-    endpoint: "/v1/api/setup/dep",
-    method: "POST",
-    data: {},
-  },
-
-  editDep: {
-    endpoint: "/v1/api/setup/dep/",
-    method: "PUT",
-    data: {},
-  },
+  
 
   editCustomer: {
     endpoint: "/v1/api/customer/",

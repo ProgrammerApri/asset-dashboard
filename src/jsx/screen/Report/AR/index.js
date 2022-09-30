@@ -5,6 +5,7 @@ import ReportPiutangRingkasan from "./PiutangRingkasan";
 import ReportPiutang from "./Piutang";
 import UmurPiutangRingkasan from "./UmurPiutangRingkasan";
 import UmurPiutang from "./UmurPiutang";
+import HistoryPaySale from "../LaporanPenjualan/HistoryPaySale";
 
 const LaporanAr = (self) => {
   const [active, setActive] = useState(0);
@@ -29,6 +30,11 @@ const LaporanAr = (self) => {
       icon: "bx-calendar-x",
       component: <UmurPiutang />,
     },
+    {
+      tittle: "Histori Pembayaran Penjualan",
+      icon: "bx-receipt",
+      component: <HistoryPaySale />,
+    },
   ]);
 
   let id =
@@ -50,9 +56,7 @@ const LaporanAr = (self) => {
     subMenu.forEach((el, i) => {
       menu.push(
         <Link
-          to={
-            "/laporan/ar/" + el.tittle.toLowerCase().replaceAll(" ", "-")
-          }
+          to={"/laporan/ar/" + el.tittle.toLowerCase().replaceAll(" ", "-")}
         >
           <Button
             className={`sub-menu mr-4 mb-4 ${id == i ? "act" : ""}`}

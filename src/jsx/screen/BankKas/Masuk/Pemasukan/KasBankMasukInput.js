@@ -22,6 +22,7 @@ import { Divider } from "@material-ui/core";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import { InputNumber } from "primereact/inputnumber";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
+import { ar } from "date-fns/locale";
 
 const dk = [
   { name: "Debit", code: "D" },
@@ -48,6 +49,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
   const [showAcc, setShowAcc] = useState(false);
   const [showBank, setShowBank] = useState(false);
   const [showBankG, setShowBankG] = useState(false);
+  const [sisa, setSisa] = useState(null);
   const [accor, setAccor] = useState({
     bayar: true,
     keluar: false,
@@ -92,7 +94,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
       if (response.status) {
         const { data } = response;
         let pel = [];
-
+        let sisa = 0;
         plg.forEach((element) => {
           element.ar = [];
           data.forEach((el) => {
@@ -102,12 +104,24 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
               }
             }
           });
+
+          // element.ar.forEach((el) => {
+          //   data.forEach((ek) => {
+          //     if (el.trx_code === ek.id) {
+          //       el.trx_amnh = ek?.trx_amnh ?? 0;
+          //       el.acq_amnh += ek?.acq_amnh ?? 0;
+          //     }
+          //   });
+          //   sisa = el?.trx_amnh ?? 0 - el?.acq_amnh ?? 0;
+          // });
+
           if (element.ar.length > 0) {
             pel.push(element);
           }
         });
         setAR(data);
         setCustomer(pel);
+        setSisa(sisa);
       }
     } catch (error) {}
   };
@@ -511,6 +525,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                           id: null,
                           sale_id: v.bkt_id?.id,
                           value: v.trx_amnh,
+                          sisa: sisa,
                           payment: 0,
                         };
                       }),
@@ -758,6 +773,23 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                                 disabled
                               />
                             </div>
+                          )}
+                        />
+
+                        <Column
+                          header="Sisa"
+                          style={{
+                            maxWidth: "15rem",
+                          }}
+                          field={""}
+                          body={(e) => (
+                            <PrimeNumber
+                              price
+                              value={e.sisa}
+                              onChange={(e) => {}}
+                              placeholder="0"
+                              disabled
+                            />
                           )}
                         />
 

@@ -21,6 +21,7 @@ import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import { ProgressBar } from "primereact/progressbar";
+import { tr } from "src/data/tr";
 
 const def = {
   account: {
@@ -900,7 +901,7 @@ const DataAkun = ({
           onRowSelect={onRowSelect}
         >
           <Column
-            header="Kode Akun"
+            header={tr[localStorage.getItem("language")].code_account}
             style={{
               width: "10rem",
               minWidth: "8rem",

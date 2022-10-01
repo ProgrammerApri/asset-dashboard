@@ -11,6 +11,9 @@ import "./css/style.css";
 
 const App = () => {
   const token = localStorage.getItem("token");
+  if (!localStorage.getItem("language")) {
+    localStorage.setItem("language", "en");
+  }
   return (
     <Fragment>
        {token ? (<Markup/>) : (<Login/>)}

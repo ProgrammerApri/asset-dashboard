@@ -278,6 +278,15 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
         </Link>
 
         <Link
+          onClick={() => {}}
+          className={`btn ${
+            data.status === 0 ? "" : "disabled"
+          } btn-warning shadow btn-xs sharp ml-1`}
+        >
+          <i className="bx bx-x mt-1"></i>
+        </Link>
+
+        <Link
           onClick={() => {
             setEdit(true);
             setDisplayDel(true);
@@ -488,19 +497,16 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
                       <Skeleton />
                     ) : (
                       <div>
-                        {
-                          e.status !== 1 ? (
-                            <Badge variant="success light">
-                              <i className="bx bx-check text-success mr-1"></i>{" "}
-                              Open
-                            </Badge>
-                          ) : (
-                            <Badge variant="danger light">
-                              <i className="bx bx-x text-danger mr-1"></i>{" "}
-                              Close
-                            </Badge>
-                          )
-                        }
+                        {e.status !== 1 ? (
+                          <Badge variant="success light">
+                            <i className="bx bx-check text-success mr-1"></i>{" "}
+                            Open
+                          </Badge>
+                        ) : (
+                          <Badge variant="danger light">
+                            <i className="bx bx-x text-danger mr-1"></i> Close
+                          </Badge>
+                        )}
                       </div>
                     )
                   }

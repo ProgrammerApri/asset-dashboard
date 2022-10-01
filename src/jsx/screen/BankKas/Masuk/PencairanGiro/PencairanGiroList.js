@@ -13,7 +13,11 @@ import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_GIROIN, SET_EDIT_GIROIN, SET_GIROIN } from "src/redux/actions";
+import {
+  SET_CURRENT_GIROIN,
+  SET_EDIT_GIROIN,
+  SET_GIROIN,
+} from "src/redux/actions";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import { Link } from "react-router-dom";
 
@@ -29,7 +33,7 @@ const data = {
   status: null,
 };
 
-const PencairanGiroIncList = ({ onSuccess, onCancel }) => {
+const PencairanGiroIncList = ({ onSuccess }) => {
   const [update, setUpdate] = useState(false);
   const [loading, setLoading] = useState(true);
   const [doubleClick, setDoubleClick] = useState(false);
@@ -178,8 +182,8 @@ const PencairanGiroIncList = ({ onSuccess, onCancel }) => {
   const editGiro = async () => {
     const config = {
       ...endpoints.editGr,
-      endpoint: endpoints.editGr.endpoint + giro.id,
-      data: giro,
+      endpoint: endpoints.editGr.endpoint + show.id,
+      data: show,
     };
 
     let response = null;
@@ -187,7 +191,15 @@ const PencairanGiroIncList = ({ onSuccess, onCancel }) => {
       response = await request(null, config);
 
       if (response.status) {
-        onSuccess();
+        setTimeout(() => {
+          setDisplayData(false);
+          toast.current.show({
+            severity: "info",
+            summary: "Berhasil",
+            detail: "Data Berhasil Diperbarui",
+            life: 3000,
+          });
+        }, 500);
       }
     } catch (error) {
       setTimeout(() => {
@@ -242,7 +254,6 @@ const PencairanGiroIncList = ({ onSuccess, onCancel }) => {
     }
   };
 
-
   const onGlobalFilterChange1 = (e) => {
     const value = e.target.value;
     let _filters1 = { ...filters1 };
@@ -279,11 +290,9 @@ const PencairanGiroIncList = ({ onSuccess, onCancel }) => {
               },
             });
           }}
-          className={`btn ${
-            data.status === 0 ? "" : "disabled"
-          } btn-primary shadow btn-xs sharp ml-1`}
+          className="btn btn-primary shadow btn-xs sharp ml-1"
         >
-          <i className="bx bx-check mt-1"></i>
+          <i className="bx bx-show mt-1"></i>
         </Link>
 
         {/* <Link
@@ -547,7 +556,9 @@ const PencairanGiroIncList = ({ onSuccess, onCancel }) => {
                   <label className="text-label ml-1">Kode Bank</label>
                   <br></br>
                   <Badge variant="warning light" className="ml-0 fs-12">
-                    {`${checkBank(show?.bank_id)?.bank?.BANK_NAME} (${checkBank(show?.bank_id)?.bank?.BANK_CODE})`}
+                    {`${checkBank(show?.bank_id)?.bank?.BANK_NAME} (${
+                      checkBank(show?.bank_id)?.bank?.BANK_CODE
+                    })`}
                   </Badge>
                 </div>
 
@@ -575,7 +586,7 @@ const PencairanGiroIncList = ({ onSuccess, onCancel }) => {
                       onClick={() => onSubmit()}
                       autoFocus
                       loading={update}
-                      // disabled={show?.apprv === false}
+                      disabled={show?.status === 1}
                     />
                     <Button
                       style={{ width: "6rem", height: "3rem" }}
@@ -613,69 +624,103 @@ const PencairanGiroIncList = ({ onSuccess, onCancel }) => {
           </div>
 
           <Card className="col-12 mt-2">
-            <div className="row col-12">
-              <div className="col-7 fs-13 ml-0">
+            <div className="col-12 p-0 text-black">
+              <div className="mt-4 mb-3 ml-0 mr-0 fs-13">
                 <Badge variant="info light" className="ml-0 fs-12">
                   <b>Informasi Pembayaran</b>
                 </Badge>
               </div>
+            </div>
 
-              <div className="col-5 fs-13 text-right">
-                <Badge variant="info light" className="ml-0 fs-12">
-                  <b>Informasi Pelanggan</b>
-                </Badge>
-              </div>
-
-              <div className="col-7 fs-12 ml-0">
-                <br></br>
+            <div className="row ml-0 mt-0">
+              <div className="col-3 text-black">
                 <label className="text-label">Kode Pelunasan</label>
                 <br></br>
                 <span className="">
                   <b>{checkInc(show?.pay_code)?.inc_code ?? "-"}</b>
                 </span>
-                <br />
-                <br />
+              </div>
+
+              <div className="col-3 text-black">
                 <label className="text-label">Tanggal Pelunasan</label>
                 <br></br>
                 <span className="ml-0">
                   <b>{formatDate(show?.pay_date)}</b>
                 </span>
-                <br />
-                <br />
+              </div>
+
+              <div className="col-3 text-black">
                 <label className="text-label">Tanggal Pencairan</label>
                 <br></br>
                 <span className="ml-0">
-                  <b>{formatDate(show?.giro_date)}</b>
+                  {show?.status === 0 ? (
+                    <b>{formatDate(show?.giro_date)}</b>
+                  ) : (
+                    <b>{formatDate(show?.accp_date)}</b>
+                  )}
                 </span>
-                <br />
               </div>
 
-              <div className="col-5 ml-0 text-right">
-                {/* <label className="text-label">Pelanggan</label> */}
+              <div className="col-3 text-black">
+                <label className="text-label ml-0">Status Pencairan</label>
+                <br></br>
+                {show?.status === 0 ? (
+                  <Badge variant="warning light">
+                    <i className="bx bxs-check-circle text-warning mr-0 mt-1"></i>{" "}
+                    <b>Belum Dicairkan</b>
+                  </Badge>
+                ) : (
+                  <Badge variant="info light">
+                    <i className="bx bxs-x-circle text-info mr-0 mt-1"></i>{" "}
+                    <b>Sudah Dicairkan</b>
+                  </Badge>
+                )}
+              </div>
+            </div>
+
+            <div className="col-12 p-0 text-black">
+              <div className="mt-4 mb-3 ml-0 mr-0 fs-13">
+                <Badge variant="info light" className="ml-0 fs-12">
+                  <b>Informasi Pelanggan</b>
+                </Badge>
+              </div>
+            </div>
+
+            <div className="row ml-0 mt-0">
+              <div className="col-3 text-black">
+                <label className="text-label">Pelanggan</label>
                 <br></br>
                 <span className="fs-13">
-                  <b>{`${checkCus(show?.cus_id)?.customer?.cus_name} (${checkCus(show?.cus_id)?.customer?.cus_code})`}</b>
+                  <b>{`${checkCus(show?.cus_id)?.customer?.cus_name} (${
+                    checkCus(show?.cus_id)?.customer?.cus_code
+                  })`}</b>
                 </span>
-                <br />
-                <br />
+              </div>
+
+              <div className="col-3 text-black">
                 <label className="text-label">Alamat Pelanggan</label>
                 <br></br>
                 <span className="ml-0">
                   <b>
-                    {checkCus(show?.cus_id)?.customer?.cus_address},{" "}
-                    {checkCus(kota(show?.cus_id)?.customer?.cus_kota)?.city_name},{" "}
-                    {checkCus(show?.cus_id)?.customer?.cus_kpos}
+                    {checkCus(show?.cus_id)?.customer?.cus_address},
+                    {
+                      kota(checkCus(show?.cus_id)?.customer?.cus_kota)
+                        ?.city_name
+                    }
+                    , {checkCus(show?.cus_id)?.customer?.cus_kpos}
                   </b>
                 </span>
-                <br />
-                <br />
+              </div>
+
+              <div className="col-3 text-black">
                 <label className="text-label">No. Telepon</label>
                 <br></br>
                 <span className="ml-0">
                   <b>(+62) {checkCus(show?.cus_id)?.customer?.cus_telp1}</b>
                 </span>
-                <br></br>
-                <br></br>
+              </div>
+
+              <div className="col-3 text-black">
                 <label className="text-label">Contact Person</label>
                 <br></br>
                 <span className="ml-0">
@@ -684,10 +729,12 @@ const PencairanGiroIncList = ({ onSuccess, onCancel }) => {
               </div>
             </div>
 
+            {/* </div> */}
+
             <div className="col-6"></div>
-            <div className="col-6 fs-14 mt-8">
+            <div className="col-6 fs-14 mt-4">
               <span>
-                <b>Nilai Giro :</b> Rp. {formatIdr(show?.value)}
+                Nilai Giro : <b>Rp. {formatIdr(show?.value)}</b>
               </span>
             </div>
           </Card>

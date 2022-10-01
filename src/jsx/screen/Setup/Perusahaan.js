@@ -13,6 +13,12 @@ import { Skeleton } from "primereact/skeleton";
 import { InputSwitch } from "primereact/inputswitch";
 import { Toast } from "primereact/toast";
 import { Tooltip } from "primereact/tooltip";
+import { SelectButton } from "primereact/selectbutton";
+
+const lang = [
+  { name: "Indonesia", code: "ID" },
+  { name: "English", code: "EN" },
+];
 
 const data = {
   id: 0,
@@ -46,11 +52,13 @@ const Perusahaan = () => {
   const [sameValue, setSameValue] = useState(false);
   const [onSubmit, setSubmit] = useState(false);
   const [available, setAvailable] = useState(false);
+  const [language, setLanguage] = useState(localStorage.getItem("language"));
   const [isLoading, setLoading] = useState(true);
   const [accor, setAccor] = useState({
     main: true,
     other: false,
     approval: false,
+    bhs: false,
   });
 
   const renderDetail = (label, value) => {
@@ -120,7 +128,7 @@ const Perusahaan = () => {
   const onHide = () => {
     setDisplayDialog(false);
     setDisplayDialog2(false);
-    setFile(null)
+    setFile(null);
     getCompany(false);
   };
 
@@ -407,11 +415,15 @@ const Perusahaan = () => {
                     )}
                     {renderDetail(
                       "Nama Perusahaan",
-                      currentData && currentData.cp_name !== "" ? currentData.cp_name : "-"
+                      currentData && currentData.cp_name !== ""
+                        ? currentData.cp_name
+                        : "-"
                     )}
                     {renderDetail(
                       "Alamat Perusahaan",
-                      currentData && currentData.cp_addr !== "" ? currentData.cp_addr : "-"
+                      currentData && currentData.cp_addr !== ""
+                        ? currentData.cp_addr
+                        : "-"
                     )}
                     {renderDetail(
                       "Alamat Pengiriman",
@@ -421,7 +433,9 @@ const Perusahaan = () => {
                     )}
                     {renderDetail(
                       "Telp",
-                      currentData && currentData.cp_telp != "" ? currentData.cp_telp : "-"
+                      currentData && currentData.cp_telp != ""
+                        ? currentData.cp_telp
+                        : "-"
                     )}
                     <div className="mt-3 mb-1 flex justify-content-between">
                       <div></div>
@@ -551,19 +565,27 @@ const Perusahaan = () => {
                   <div className="accordion__body--text">
                     {renderDetail(
                       "Email",
-                      currentData && currentData.cp_email !== "" ? currentData.cp_email : "-"
+                      currentData && currentData.cp_email !== ""
+                        ? currentData.cp_email
+                        : "-"
                     )}
                     {renderDetail(
                       "Website",
-                      currentData && currentData.cp_webs !== "" ? currentData.cp_webs : "-"
+                      currentData && currentData.cp_webs !== ""
+                        ? currentData.cp_webs
+                        : "-"
                     )}
                     {renderDetail(
                       "NPWP Perusahaan",
-                      currentData && currentData.cp_npwp !== "" ? currentData.cp_npwp : "-"
+                      currentData && currentData.cp_npwp !== ""
+                        ? currentData.cp_npwp
+                        : "-"
                     )}
                     {renderDetail(
                       "Kontak Person",
-                      currentData && currentData.cp_coper !== "" ? currentData.cp_coper : "-"
+                      currentData && currentData.cp_coper !== ""
+                        ? currentData.cp_coper
+                        : "-"
                     )}
                     <div className="mt-3 mb-1 flex justify-content-between">
                       <div></div>
@@ -574,6 +596,52 @@ const Perusahaan = () => {
                         onClick={() => {
                           setDisplayDialog2(true);
                         }}
+                      />
+                    </div>
+                  </div>
+                </Accordion.Collapse>
+              </div>
+            </Accordion>
+
+            <Accordion className="acordion" defaultActiveKey="0">
+              <div className="accordion__item" key={1}>
+                <Accordion.Toggle
+                  as={Card.Text}
+                  eventKey={`0`}
+                  className={`accordion__header ${
+                    accor.bhs ? "collapsed" : ""
+                  }`}
+                  onClick={() => {
+                    setAccor({
+                      ...accor,
+                      bhs: !accor.other,
+                    });
+                  }}
+                >
+                  <span className="accordion__header--icon"></span>
+                  <span className="accordion__header--text">Bahasa</span>
+                  <span className="accordion__header--indicator indicator_bordered"></span>
+                </Accordion.Toggle>
+                <Accordion.Collapse eventKey={"0"}>
+                  <div className="accordion__body--text">
+                    <div className="d-flex col-12 align-items-center">
+                      <SelectButton
+                        value={
+                          language === "id"
+                            ? { name: "Indonesia", code: "ID" }
+                            : { name: "English", code: "EN" }
+                        }
+                        options={lang}
+                        onChange={(e) => {
+                          if (e.value.code === "ID") {
+                            setLanguage("id");
+                            localStorage.setItem("language", "id");
+                          } else {
+                            setLanguage("en");
+                            localStorage.setItem("language", "en");
+                          }
+                        }}
+                        optionLabel="name"
                       />
                     </div>
                   </div>

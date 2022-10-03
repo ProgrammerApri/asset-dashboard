@@ -18,10 +18,11 @@ const Header = ({
   onDark,
 }) => {
   const origin = window.location.origin;
-  const patern = origin+"/#/"
+  const patern = origin + "/#/";
   var path = window.location.href;
   var name = path.replace(patern, "");
-  var finalName = name.length > 0 && name.includes("-") ? name.replaceAll("-", " ") : name;
+  var finalName =
+    name.length > 0 && name.includes("-") ? name.replaceAll("-", " ") : name;
   const [isDark, setDark] = useState(false);
 
   const body = document.querySelector("body");
@@ -187,7 +188,9 @@ const Header = ({
                   onClick={() => onProfile()}
                 >
                   <img
-                    src={"https://cf.shopee.co.id/file/f5565e148a808d6ae49c09c137e71138"}
+                    src={
+                      "https://cf.shopee.co.id/file/f5565e148a808d6ae49c09c137e71138"
+                    }
                     width={20}
                     alt
                   />
@@ -235,7 +238,14 @@ const Header = ({
                     </svg>
                     <span className="ml-2">Inbox </span>
                   </Link>
-                  <Link to="/page-login" className="dropdown-item ai-icon">
+                  <Link
+                    to="#/"
+                    className="dropdown-item ai-icon"
+                    onClick={() => {
+                      localStorage.removeItem("token");
+                      window.location.reload();
+                    }}
+                  >
                     <svg
                       id="icon-logout"
                       xmlns="http://www.w3.org/2000/svg"

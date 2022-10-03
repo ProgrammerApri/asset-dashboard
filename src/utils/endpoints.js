@@ -1,3 +1,5 @@
+import data from "src/jsx/data";
+
 const endpoints = {
   /// Login
   login: {
@@ -893,6 +895,29 @@ const endpoints = {
     method: "DELETE",
     data: {},
   },
+
+//User
+user: {
+  endpoint: "/v1/api/user",
+  method: "GET",
+  data: {},
+},
+addUSER: {
+  endpoint: "/v1/api/user",
+  method: "POST",
+  data: {},
+},
+editUSER: {
+  endpoint: "/v1/api/user/",
+  method: "PUT",
+  data: {},
+},
+delUSER: {
+  endpoint: "/v1/api/user/",
+  method: "DELETE",
+  data: {},
+},
+
 
   /// Retur-Jual
   retur_sale: {

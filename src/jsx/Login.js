@@ -55,7 +55,7 @@ const Login = () => {
       <Row>
         <div className="login-left col-lg-4 col-md-6 vh-100">
           <div className="login-header col-12 ml-3 mt-4">
-            <img className="login-logo" src={ApiConfig.baseUrl+"logo.jpeg"} alt="" />
+            <img className="login-logo" src={ApiConfig.baseUrl+"/v1/api/upload/logo.jpeg"} alt="" />
           </div>
           <div className="d-flex align-items-center mt-5">
             <div className="mr-3 ml-3 mt-5" style={{ width: "40rem" }}>

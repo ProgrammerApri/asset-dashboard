@@ -940,7 +940,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                             options={acc}
                             onChange={(u) => {
                               let temp = [...inc.inc];
-                              temp[e.index].acc_code = u.account.id;
+                              temp[e.index].acc_code = u.value.account.id;
                               updateInc({ ...inc, inc: temp });
                             }}
                             optionLabel="account.acc_name"
@@ -988,7 +988,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                             value={e.value && e.value}
                             onChange={(u) => {
                               let temp = [...inc.inc];
-                              temp[e.index].value = u.target.value;
+                              temp[e.index].value = u.value;
                               updateInc({ ...inc, inc: temp });
                             }}
                             placeholder="0"

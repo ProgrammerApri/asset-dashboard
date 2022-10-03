@@ -18,10 +18,11 @@ const Header = ({
   onDark,
 }) => {
   const origin = window.location.origin;
-  const patern = origin+"/#/"
+  const patern = origin + "/#/";
   var path = window.location.href;
   var name = path.replace(patern, "");
-  var finalName = name.length > 0 && name.includes("-") ? name.replaceAll("-", " ") : name;
+  var finalName =
+    name.length > 0 && name.includes("-") ? name.replaceAll("-", " ") : name;
   const [isDark, setDark] = useState(false);
 
   const body = document.querySelector("body");
@@ -55,7 +56,7 @@ const Header = ({
               </div>
             </div>
             <ul className="navbar-nav header-right">
-              <li className="nav-item dropdown notification_dropdown">
+              {/* <li className="nav-item dropdown notification_dropdown">
                 <Button
                   className="nav-link ai-icon"
                   role="button"
@@ -161,7 +162,7 @@ const Header = ({
                     See all notifications <i className="ti-arrow-right" />
                   </Link>
                 </div>
-              </li>
+              </li> */}
               <li className="nav-item dropdown notification_dropdown">
                 <Button
                   className="nav-link ai-icon"
@@ -177,8 +178,8 @@ const Header = ({
                 </Button>
               </li>
               <li className="nav-item dropdown header-profile">
-                <Link
-                  to="#"
+                <Button
+                  to="#/"
                   role="button"
                   data-toggle="dropdown"
                   className={`nav-item dropdown header-profile ${
@@ -187,17 +188,19 @@ const Header = ({
                   onClick={() => onProfile()}
                 >
                   <img
-                    src={"https://cf.shopee.co.id/file/f5565e148a808d6ae49c09c137e71138"}
+                    src={
+                      "https://cf.shopee.co.id/file/f5565e148a808d6ae49c09c137e71138"
+                    }
                     width={20}
                     alt
                   />
-                </Link>
+                </Button>
                 <div
                   className={`dropdown-menu dropdown-menu-right ${
                     toggle === "profile" ? "show" : ""
                   }`}
                 >
-                  <Link to="/app-profile" className="dropdown-item ai-icon">
+                  {/* <Link to="/app-profile" className="dropdown-item ai-icon">
                     <svg
                       id="icon-user1"
                       xmlns="http://www.w3.org/2000/svg"
@@ -234,8 +237,15 @@ const Header = ({
                       <polyline points="22,6 12,13 2,6" />
                     </svg>
                     <span className="ml-2">Inbox </span>
-                  </Link>
-                  <Link to="/page-login" className="dropdown-item ai-icon">
+                  </Link> */}
+                  <Link
+                    to="#/"
+                    className="dropdown-item ai-icon"
+                    onClick={() => {
+                      localStorage.removeItem("token");
+                      window.location.reload();
+                    }}
+                  >
                     <svg
                       id="icon-logout"
                       xmlns="http://www.w3.org/2000/svg"

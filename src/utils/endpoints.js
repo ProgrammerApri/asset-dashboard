@@ -714,6 +714,12 @@ const endpoints = {
     data: {},
   },
 
+  closePO: {
+    endpoint: "/v1/api/po-close/",
+    method: "PUT",
+    data: {},
+  },
+
   /// SO
   so: {
     endpoint: "/v1/api/so",
@@ -965,10 +971,22 @@ delUSER: {
     data: {},
   },
 
+  editGiro: {
+    endpoint: "/v1/api/giro/",
+    method: "PUT",
+    data: {},
+  },
+
   /// GIRO INCOME
   giro_inc: {
     endpoint: "/v1/api/giro-inc",
     method: "GET",
+    data: {},
+  },
+
+  editGr: {
+    endpoint: "/v1/api/giro-inc/",
+    method: "PUT",
     data: {},
   },
 

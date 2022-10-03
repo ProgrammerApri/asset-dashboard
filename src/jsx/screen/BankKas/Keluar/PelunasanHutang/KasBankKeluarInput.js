@@ -637,7 +637,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
   };
 
   const onSubmit = () => {
-    if (isValid()) {
+    // if (isValid()) {
       if (isEdit) {
         setUpdate(true);
         editEXP();
@@ -645,7 +645,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
         setUpdate(true);
         addEXP();
       }
-    }
+    // }
   };
 
   const formatDate = (date) => {

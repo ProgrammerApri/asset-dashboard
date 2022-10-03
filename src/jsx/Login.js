@@ -6,6 +6,7 @@ import { InputText } from "primereact/inputtext";
 import { Button, Image, Row } from "react-bootstrap";
 import logo from "../images/logo-large.png";
 import ilustration from "../images/header-mobile.png";
+import { ApiConfig } from "src/data/config";
 
 const Login = () => {
   const [password, setPassword] = useState("");
@@ -54,11 +55,15 @@ const Login = () => {
       <Row>
         <div className="login-left col-lg-4 col-md-6 vh-100">
           <div className="login-header col-12 ml-3 mt-4">
-            <img className="login-logo" src={logo} alt="" />
+            <img className="login-logo" src={ApiConfig.baseUrl+"/v1/api/upload/logo.jpeg"} alt="" />
           </div>
           <div className="d-flex align-items-center mt-5">
-            <div className="mr-3 ml-3 mt-5" style={{ width: "40rem" }}>
-              <div className="col-12 mt-6">
+            {/* for small logo */}
+            {/* <div className="mr-3 ml-3 mt-5" style={{ width: "40rem" }}> */}
+            <div className="mr-3 ml-3" style={{ width: "40rem" }}>
+              {/* for small logo */}
+              {/* <div className="col-12 mt-6"> */}
+              <div className="col-12">
                 <h2 className="fw-bold">Sign In</h2>
               </div>
               <div className="col-12 mb-2 mt-6">

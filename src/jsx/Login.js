@@ -58,8 +58,12 @@ const Login = () => {
             <img className="login-logo" src={ApiConfig.baseUrl+"/v1/api/upload/logo.jpeg"} alt="" />
           </div>
           <div className="d-flex align-items-center mt-5">
-            <div className="mr-3 ml-3 mt-5" style={{ width: "40rem" }}>
-              <div className="col-12 mt-6">
+            {/* for small logo */}
+            {/* <div className="mr-3 ml-3 mt-5" style={{ width: "40rem" }}> */}
+            <div className="mr-3 ml-3" style={{ width: "40rem" }}>
+              {/* for small logo */}
+              {/* <div className="col-12 mt-6"> */}
+              <div className="col-12">
                 <h2 className="fw-bold">Sign In</h2>
               </div>
               <div className="col-12 mb-2 mt-6">

@@ -56,7 +56,7 @@ const Header = ({
               </div>
             </div>
             <ul className="navbar-nav header-right">
-              <li className="nav-item dropdown notification_dropdown">
+              {/* <li className="nav-item dropdown notification_dropdown">
                 <Button
                   className="nav-link ai-icon"
                   role="button"
@@ -162,7 +162,7 @@ const Header = ({
                     See all notifications <i className="ti-arrow-right" />
                   </Link>
                 </div>
-              </li>
+              </li> */}
               <li className="nav-item dropdown notification_dropdown">
                 <Button
                   className="nav-link ai-icon"
@@ -178,8 +178,8 @@ const Header = ({
                 </Button>
               </li>
               <li className="nav-item dropdown header-profile">
-                <Link
-                  to="#"
+                <Button
+                  to="#/"
                   role="button"
                   data-toggle="dropdown"
                   className={`nav-item dropdown header-profile ${
@@ -194,13 +194,13 @@ const Header = ({
                     width={20}
                     alt
                   />
-                </Link>
+                </Button>
                 <div
                   className={`dropdown-menu dropdown-menu-right ${
                     toggle === "profile" ? "show" : ""
                   }`}
                 >
-                  <Link to="/app-profile" className="dropdown-item ai-icon">
+                  {/* <Link to="/app-profile" className="dropdown-item ai-icon">
                     <svg
                       id="icon-user1"
                       xmlns="http://www.w3.org/2000/svg"
@@ -237,7 +237,7 @@ const Header = ({
                       <polyline points="22,6 12,13 2,6" />
                     </svg>
                     <span className="ml-2">Inbox </span>
-                  </Link>
+                  </Link> */}
                   <Link
                     to="#/"
                     className="dropdown-item ai-icon"

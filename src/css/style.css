@@ -47871,6 +47871,23 @@ a .sidebar-logo .logo{
   font-size: 12px;
 }
 
+.header-right .header-profile .nav-item {
+  position: relative;
+  color: #9b9b9b;
+  background: transparent;
+  box-shadow: 0px 12px 23px 0px rgb(59 40 62 / 8%) !important;
+  border-radius: 0.7rem;
+  padding: 0px;
+  line-height: 1;
+  height: 0;
+  border-color: transparent;
+}
+
+.header-right .header-profile .nav-item:active {
+  border-color: transparent;
+  background: transparent;
+}
+
 .card-logo {
   padding: 0.8rem 1rem;
   border-radius: 13px;

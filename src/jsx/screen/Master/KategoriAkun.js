@@ -16,18 +16,26 @@ import { SelectButton } from "primereact/selectbutton";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import { ProgressBar } from "primereact/progressbar";
+import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
+import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 
 const data = {
   kategory: {
     id: 1,
     name: "",
     kode_klasi: 0,
-    kode_saldo: "",
+    kode_saldo: "D",
   },
   klasifikasi: {
     id: 0,
     klasiname: "",
   },
+};
+
+const defError = {
+  name: false,
+  klasi: false,
+  // sld: false,
 };
 
 const kodesaldo = [
@@ -50,6 +58,7 @@ const KategoriAkun = ({ onSuccessImport }) => {
   const [isEdit, setEdit] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+  const [error, setError] = useState(defError);
   const [progress, setProgress] = useState(0);
   const picker = useRef(null);
   const progressBar = useRef(null);
@@ -227,13 +236,30 @@ const KategoriAkun = ({ onSuccessImport }) => {
     dialogFuncMap[`${kode}`](false);
   };
 
+  const isValid = () => {
+    let valid = false;
+    let errors = {
+      name: !currentItem.name || currentItem.name === "",
+      klasi: !currentItem.klasifikasi,
+      // sld: !currentItem?.kategory.kode_saldo,
+    };
+
+    setError(errors);
+
+    valid = !errors.name && !errors.klasi;
+
+    return valid;
+  };
+
   const onSubmit = () => {
-    if (isEdit) {
-      setUpdate(true);
-      editKategori();
-    } else {
-      setUpdate(true);
-      addKategori();
+    if (isValid) {
+      if (isEdit) {
+        setUpdate(true);
+        editKategori();
+      } else {
+        setUpdate(true);
+        addKategori();
+      }
     }
   };
 
@@ -353,10 +379,8 @@ const KategoriAkun = ({ onSuccessImport }) => {
             return obj;
           }, {});
         });
-        
-        _importedData = _importedData.filter(
-          (el) => el?.Kode_Klasifikasi
-        );
+
+        _importedData = _importedData.filter((el) => el?.Kode_Klasifikasi);
 
         progressBar.current.style.display = "";
         let totalData = _importedData.length;
@@ -602,41 +626,46 @@ const KategoriAkun = ({ onSuccessImport }) => {
       >
         <div className="row mr-0 ml-0">
           <div className="col-6 mb-2">
-            <label className="text-label">Nama Kategori</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={
-                  currentItem !== null ? `${currentItem.kategory.name}` : ""
-                }
-                onChange={(e) =>
-                  setCurrentItem({
-                    ...currentItem,
-                    kategory: { ...currentItem.kategory, name: e.target.value },
-                  })
-                }
-                placeholder="Masukan Nama Kategori"
-              />
-            </div>
+            <PrimeInput
+              label={"Nama Kategori"}
+              value={currentItem !== null ? `${currentItem.kategory.name}` : ""}
+              onChange={(e) => {
+                setCurrentItem({
+                  ...currentItem,
+                  kategory: { ...currentItem.kategory, name: e.target.value },
+                });
+
+                let newError = error;
+                newError.name = false;
+                setError(newError);
+              }}
+              placeholder="Masukan Nama Kategori"
+              error={error?.name}
+            />
           </div>
           <div className="col-6 mb-2">
-            <label className="text-label">Nama Klasifikasi</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={currentItem !== null ? currentItem.klasifikasi : null}
-                options={klasifikasi}
-                onChange={(e) => {
-                  console.log(e.value);
-                  setCurrentItem({
-                    ...currentItem,
-                    klasifikasi: e.value,
-                  });
-                }}
-                optionLabel="klasiname"
-                filter
-                filterBy="klasiname"
-                placeholder="Pilih Klasifikasi"
-              />
-            </div>
+            <PrimeDropdown
+              label={"Klasifikasi"}
+              value={currentItem !== null ? currentItem.klasifikasi : null}
+              options={klasifikasi}
+              onChange={(e) => {
+                console.log(e.value);
+                setCurrentItem({
+                  ...currentItem,
+                  klasifikasi: e.value,
+                });
+
+                let newError = error;
+                newError.klasi = false;
+                setError(newError);
+              }}
+              optionLabel="klasiname"
+              filter
+              filterBy="klasiname"
+              placeholder="Pilih Klasifikasi"
+              errorMessage="Klasifikasi Belum Dipilih"
+              error={error?.klasi}
+            />
           </div>
         </div>
 

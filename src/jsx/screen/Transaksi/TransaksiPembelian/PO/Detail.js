@@ -3,7 +3,7 @@ import { request, endpoints } from "src/utils";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
-import { Card, Col, Row } from "react-bootstrap";
+import { Badge, Card, Col, Row } from "react-bootstrap";
 import { SET_CURRENT_INV, SET_INV, SET_PO } from "src/redux/actions";
 import { useDispatch, useSelector } from "react-redux";
 import { InputText } from "primereact/inputtext";
@@ -342,6 +342,20 @@ const Detail = ({ onCancel }) => {
                       <span className="ml-0">
                         Jatuh Tempo : <b>{formatDate(show?.due_date)}</b>
                       </span>
+                      <br></br>
+                      <br></br>
+                      <span className="ml-0">
+                        {show.status !== 2 ? (
+                          <Badge variant="success light">
+                            <i className="bx bx-check text-success mr-1"></i>{" "}
+                            Status Open
+                          </Badge>
+                        ) : (
+                          <Badge variant="danger light">
+                            <i className="bx bx-x text-danger mr-1"></i> Status Close
+                          </Badge>
+                        )}
+                      </span>
                     </div>
 
                     <div className="col-6 fs-12 ml-0 text-right">
@@ -391,9 +405,15 @@ const Detail = ({ onCancel }) => {
                       // body={loading && <Skeleton />}
                     />
                     <Column
-                      header="Jumlah"
+                      header="Jumlah Pesanan"
                       field={(e) => e.order}
                       style={{ minWidth: "9rem" }}
+                      // body={loading && <Skeleton />}
+                    />
+                    <Column
+                      header="Sisa Pesanan"
+                      field={(e) => e.remain}
+                      style={{ minWidth: "6rem" }}
                       // body={loading && <Skeleton />}
                     />
                     <Column
@@ -405,13 +425,13 @@ const Detail = ({ onCancel }) => {
                     <Column
                       header="Harga Satuan"
                       field={(e) => `Rp. ${formatIdr(e.price)}`}
-                      style={{ minWidth: "13rem" }}
+                      style={{ minWidth: "10rem" }}
                       // body={loading && <Skeleton />}
                     />
                     <Column
                       header="Total"
                       field={(e) => `Rp. ${formatIdr(e.total)}`}
-                      style={{ minWidth: "13rem" }}
+                      style={{ minWidth: "10rem" }}
                       // body={loading && <Skeleton />}
                     />
                   </DataTable>

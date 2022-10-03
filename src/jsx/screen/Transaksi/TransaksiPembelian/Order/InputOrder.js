@@ -185,20 +185,22 @@ const InputOrder = ({ onCancel, onSuccess }) => {
         const { data } = response;
         let filt = [];
         data.forEach((elem) => {
-          if (elem.status !== 1) {
+          if (isEdit) {
             let prod = [];
             elem.pprod.forEach((el) => {
               el.prod_id = el.prod_id.id;
               el.unit_id = el.unit_id.id;
               prod.push({
                 ...el,
-                r_order: el.order,
+                r_remain: el.remain,
               });
 
               let temp = [...order.dprod];
               order.dprod.forEach((e, i) => {
                 if (el.id === e.pprod_id) {
-                  temp[i].order = el.order;
+                  temp[i].req = el.order;
+                  temp[i].r_remain = el.remain + e.order;
+                  temp[i].remain = el.remain;
                   updateORD({ ...order, dprod: temp });
                 }
               });
@@ -224,6 +226,40 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             });
             elem.pjasa = jasa;
             filt.push(elem);
+          } else {
+            if (elem.status !== 2) {
+              let prod = [];
+              elem.pprod.forEach((el) => {
+                if (el.remain > 0) {
+                  el.prod_id = el.prod_id.id;
+                  el.unit_id = el.unit_id.id;
+                  prod.push({
+                    ...el,
+                    r_remain: el.remain,
+                    req: el.order,
+                    // order: 0,
+                    // price: 0,
+                    // disc: 0,
+                    // nett_price: 0,
+                    // total: 0,
+                  });
+                }
+              });
+              elem.pprod = prod;
+              let jasa = [];
+              elem.pjasa.forEach((element) => {
+                // if (element.remain > 0) {
+                element.jasa_id = element.jasa_id.id;
+                element.unit_id = element.unit_id.id;
+                jasa.push({
+                  ...element,
+                  r_order: element.order,
+                });
+                // }
+              });
+              elem.pjasa = jasa;
+              filt.push(elem);
+            }
           }
         });
         setPO(filt);
@@ -778,7 +814,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                   dep_id: e.value.preq_id?.req_dep?.id ?? null,
                   split_inv: e.value.split_inv,
                   dprod: e.value.pprod.map((v) => {
-                    return { ...v, req: v.order, order: 0 };
+                    return { ...v, req: v.order, order: null };
                   }),
                   djasa: e.value.pjasa,
                 });
@@ -1117,8 +1153,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                       onChange={(u) => {
                         let temp = [...order.dprod];
                         temp[e.index].req = u.target.value;
-                        temp[e.index].total =
-                          temp[e.index].req * temp[e.index].price;
+                        // temp[e.index].total =
+                        //   temp[e.index].req * temp[e.index].price;
                         // updateORD({ ...order, dprod: temp });
                       }}
                       placeholder="0"
@@ -1138,23 +1174,31 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                       value={e.order && e.order}
                       onChange={(u) => {
                         let temp = [...order.dprod];
-                        let val =
-                          u.target.value > e.r_remain
-                            ? e.r_remain
-                            : u.target.value;
-                        let result =
-                          temp[e.index].order - val + temp[e.index].remain;
-                        temp[e.index].order = val;
+                        if (order.po_id) {
+                          let val =
+                            u.target.value > e.r_remain
+                              ? e.r_remain
+                              : u.target.value;
+                          let result =
+                            temp[e.index].order - val + temp[e.index].remain;
+                          temp[e.index].order = val;
 
+                          temp[e.index].order = u.target.value;
+                          temp[e.index].total =
+                            temp[e.index].order * temp[e.index].price;
+                          temp[e.index].remain = result;
+                        } else {
+                          temp[e.index].order = u.target.value;
+                          temp[e.index].total =
+                            temp[e.index].order * temp[e.index].price;
+                        }
 
-                        temp[e.index].order = u.target.value;
-                        temp[e.index].remain = result;
-                        // temp[e.index].total =
-                        //   temp[e.index].order * temp[e.index].price;
                         updateORD({ ...order, dprod: temp });
 
-                        if (temp[e.index].order > e?.req) {
-                          temp[e.index].order = e.req;
+                        if (order.po_id) {
+                          if (temp[e.index].order > e.req) {
+                            temp[e.index].order = e.req;
+                          }
                         }
 
                         let newError = error;
@@ -1172,15 +1216,36 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
+                  hidden
+                  header="Sisa"
+                  className="align-text-top"
+                  field={""}
+                  // style={{
+                  //   minWidth: "7rem",
+                  // }}
+                  body={(e) => (
+                    <div className="p-inputgroup">
+                      <InputText
+                        value={e.remain ? e.remain : ""}
+                        placeholder="0"
+                        type="number"
+                        disabled
+                      />
+                    </div>
+                  )}
+                />
+
+                <Column
                   header="Harga Satuan"
                   className="align-text-top"
                   field={""}
                   body={(e) => (
                     <PrimeNumber
+                      price
                       value={e.price && e.price}
                       onChange={(u) => {
                         let temp = [...order.dprod];
-                        temp[e.index].price = u.target.value;
+                        temp[e.index].price = u.value;
                         temp[e.index].total =
                           temp[e.index].order * temp[e.index].price;
                         updateORD({ ...order, dprod: temp });
@@ -1285,7 +1350,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                                 id: 0,
                                 prod_id: null,
                                 unit_id: null,
-                                request: null,
+                                req: null,
                                 order: null,
                                 remain: null,
                                 price: null,

@@ -712,6 +712,12 @@ const endpoints = {
     data: {},
   },
 
+  closePO: {
+    endpoint: "/v1/api/po-close/",
+    method: "PUT",
+    data: {},
+  },
+
   /// SO
   so: {
     endpoint: "/v1/api/so",

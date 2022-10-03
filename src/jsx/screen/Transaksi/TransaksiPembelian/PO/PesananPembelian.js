@@ -40,6 +40,7 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
   const [update, setUpdate] = useState(false);
   const [isEdit, setEdit] = useState(false);
   const [displayDel, setDisplayDel] = useState(false);
+  const [confirm, setDisplayConfirm] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
   const [filters1, setFilters1] = useState(null);
@@ -48,6 +49,7 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
   const [rows2, setRows2] = useState(20);
   const dispatch = useDispatch();
   const PO = useSelector((state) => state.po.po);
+  const closePo = useSelector((state) => state.po.current);
 
   const dummy = Array.from({ length: 10 });
 
@@ -132,6 +134,43 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
           severity: "error",
           summary: "Gagal",
           detail: `Tidak Dapat Menghapus Data`,
+          life: 3000,
+        });
+      }, 500);
+    }
+  };
+
+  const closePO = async () => {
+    const config = {
+      ...endpoints.closePO,
+      endpoint: endpoints.closePO.endpoint + closePo.id,
+      data: closePo,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setTimeout(() => {
+          setUpdate(false);
+          setDisplayConfirm(false);
+          getPO(true);
+          toast.current.show({
+            severity: "info",
+            summary: "Berhasil",
+            detail: "Data Berhasil Diperbarui",
+            life: 3000,
+          });
+        }, 500);
+      }
+    } catch (error) {
+      setTimeout(() => {
+        setUpdate(false);
+        toast.current.show({
+          severity: "error",
+          summary: "Gagal",
+          detail: "Gagal Memperbarui Data",
           life: 3000,
         });
       }, 500);
@@ -278,12 +317,70 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
         </Link>
 
         <Link
-          onClick={() => {}}
+          onClick={() => {
+            setDisplayConfirm(true);
+            dispatch({
+              type: SET_EDIT_PO,
+              payload: true,
+            });
+
+            let pprod = data.pprod;
+            pprod.forEach((el) => {
+              el.prod_id = el.prod_id.id;
+              el.unit_id = el.unit_id.id;
+            });
+            let pjasa = data.pjasa;
+            pjasa.forEach((el) => {
+              el.jasa_id = el.jasa_id.id;
+              el.unit_id = el.unit_id.id;
+            });
+
+            if (!pprod.length) {
+              pprod.push({
+                id: 0,
+                prod_id: null,
+                rprod_id: null,
+                unit_id: null,
+                order: null,
+                price: null,
+                disc: null,
+                nett_price: null,
+                total: null,
+              });
+            }
+
+            if (!pjasa.length) {
+              pjasa.push({
+                id: 0,
+                jasa_id: null,
+                rjasa_id: null,
+                unit_id: null,
+                sup_id: null,
+                order: null,
+                price: null,
+                disc: null,
+                nett_price: null,
+                total: null,
+              });
+            }
+
+            dispatch({
+              type: SET_CURRENT_PO,
+              payload: {
+                ...data,
+                preq_id: data?.preq_id?.id,
+                sup_id: data?.sup_id?.id,
+                top: data?.top?.id,
+                pprod: pprod,
+                pjasa: pjasa,
+              },
+            });
+          }}
           className={`btn ${
-            data.status === 0 ? "" : "disabled"
+            data.status !== 2 ? "" : "disabled"
           } btn-warning shadow btn-xs sharp ml-1`}
         >
-          <i className="bx bx-x mt-1"></i>
+          <i className="fa fa-times mt-0"></i>
         </Link>
 
         <Link
@@ -293,7 +390,7 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
             setCurrentItem(data);
           }}
           className={`btn ${
-            data.status === 0 ? "" : "disabled"
+            data.status !== 2 ? "" : "disabled"
           } btn-danger shadow btn-xs sharp ml-1`}
         >
           <i className="fa fa-trash"></i>
@@ -319,6 +416,28 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
           }}
           autoFocus
           loading={loading}
+        />
+      </div>
+    );
+  };
+
+  const footerClose = () => {
+    return (
+      <div>
+        <PButton
+          label="Batal"
+          onClick={() => setDisplayConfirm(false)}
+          className="p-button-text btn-primary"
+        />
+        <PButton
+          label="Ya"
+          icon="pi pi-check"
+          onClick={() => {
+            setUpdate(true);
+            closePO();
+          }}
+          autoFocus
+          loading={update}
         />
       </div>
     );
@@ -497,7 +616,7 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
                       <Skeleton />
                     ) : (
                       <div>
-                        {e.status !== 1 ? (
+                        {e.status !== 2 ? (
                           <Badge variant="success light">
                             <i className="bx bx-check text-success mr-1"></i>{" "}
                             Open
@@ -523,6 +642,24 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
           </Card>
         </Col>
       </Row>
+
+      <Dialog
+        header={"Tutup Pesanan Pembelian"}
+        visible={confirm}
+        style={{ width: "30vw" }}
+        footer={footerClose("confirm")}
+        onHide={() => {
+          setDisplayConfirm(false);
+        }}
+      >
+        <div className="ml-3 mr-3">
+          <i
+            className="pi pi-exclamation-triangle mr-3 align-middle"
+            style={{ fontSize: "2rem" }}
+          />
+          <span>Apakah Anda Yakin Ingin Menyelesaikan Pesanan Pembelian ?</span>
+        </div>
+      </Dialog>
 
       <Dialog
         header={"Hapus Data"}

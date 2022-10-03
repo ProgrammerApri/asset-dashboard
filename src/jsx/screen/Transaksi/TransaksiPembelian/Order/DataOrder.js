@@ -211,10 +211,14 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
                         {
                           id: 0,
                           do_id: null,
+                          // preq_id: null,
+                          pprod_id: null,
                           prod_id: null,
                           unit_id: null,
                           location: null,
+                          req: null,
                           order: null,
+                          remain: null,
                           price: null,
                           disc: null,
                           nett_price: null,
@@ -330,7 +334,9 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
                     prod_id: null,
                     unit_id: null,
                     location: null,
+                    req: null,
                     order: null,
+                    remain: null,
                     price: null,
                     disc: null,
                     nett_price: null,
@@ -511,7 +517,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
                 <Column
                   header="Nomor PO"
                   field={(e) =>
-                    e.po_id.po_code !== null ? e.po_id.po_code : "-"
+                    e.po_id?.po_code ?? "-"
                   }
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}

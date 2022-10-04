@@ -216,7 +216,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
             });
           }}
           className={`btn ${
-            data.status === 0 ? "" : "disabled"
+            data.status !== 2 ? "" : "disabled"
           } btn-primary shadow btn-xs sharp ml-1`}
         >
           <i className="fa fa-pencil"></i>
@@ -229,7 +229,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
             setCurrentItem(data);
           }}
           className={`btn ${
-            data.status === 0 ? "" : "disabled"
+            data.status !== 2 ? "" : "disabled"
           } btn-danger shadow btn-xs sharp ml-1`}
         >
           <i className="fa fa-trash"></i>

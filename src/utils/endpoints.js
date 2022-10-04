@@ -745,6 +745,12 @@ const endpoints = {
     data: {},
   },
 
+  closeSO: {
+    endpoint: "/v1/api/so-close/",
+    method: "PUT",
+    data: {},
+  },
+
   /// DP
   order: {
     endpoint: "/v1/api/order",

@@ -19,13 +19,14 @@ import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleB
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Password } from "primereact/password";
+import { InputSwitch } from "primereact/inputswitch";
 
 const def = {
   id: 1,
   username: "",
   name: "",
   email: "",
-  company: "",
+  hashed: "",
 };
 const defError = {
   username: false,
@@ -43,13 +44,18 @@ const Pengguna = ({
   onRowSelect,
   onSuccessInput,
 }) => {
-  const [value3, setValue3] = useState("");
+  const [password, setPassword] = useState("");
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const [showInput, setShowInput] = useState(false);
-  const [isEdit, setEdit] = useState(def);
   const [update, setUpdate] = useState(false);
   const toast = useRef(null);
+  const [filters1, setFilters1] = useState(null);
+  // const [update, setUpdate] = useState(false);
+  const [active, setActive] = useState(0);
+  const [currentData, setCurrentData] = useState(null);
+  const [isEdit, setEdit] = useState(def);
+  const passRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const [showDelete, setShowDelete] = useState(false);
   const [currentItem, setCurrentItem] = useState(def);
@@ -101,11 +107,12 @@ const Pengguna = ({
   const addUSER = async () => {
     const config = {
       ...endpoints.addUSER,
+      endpoint: endpoints.addUSER.endpoint + currentItem.id,
       data: {
         username: currentItem.username,
         email: currentItem.email,
         name: currentItem.name,
-        password: currentItem.password,
+        hashed: currentItem.hashed,
       },
     };
     console.log(config.data);
@@ -249,15 +256,17 @@ const Pengguna = ({
   };
 
   const onSubmit = () => {
-    // if (isValid()) {
+    if (isValid()) {
       if (isEdit) {
         setLoading(true);
         editUSER();
+        setUpdate(true)
       } else {
         setLoading(true);
         addUSER();
+        setUpdate(true)
       }
-    // }
+    }
   };
 
   const renderFooter = () => {
@@ -276,13 +285,11 @@ const Pengguna = ({
           icon="pi pi-check"
           onClick={() => onSubmit()}
           autoFocus
-          loading={loading}
+          loading={update}
         />
       </div>
     );
   };
-  console.log("-----------");
-  console.log(Button);
 
   const onCustomPage2 = (event) => {
     setFirst2(event.first);
@@ -382,12 +389,13 @@ const Pengguna = ({
         <Toast ref={toast} />
         <DataTable
           responsive
-          value={null}
+          value={data}
           className="display w-100 datatable-wrapper"
           showGridlines
           dataKey="id"
           rowHover
           header={renderHeader}
+          filters={filters1}
           emptyMessage="Tidak ada data"
           paginator
           paginatorTemplate={template2}
@@ -395,10 +403,12 @@ const Pengguna = ({
           rows={rows2}
           onPage={onCustomPage2}
           paginatorClassName="justify-content-end mt-3"
+          selectionMode="single"
+          onRowSelect={onRowSelect}
         >
           <Column
-            field={(e) => e.username}
             header="Username"
+            field={(e) => e?.username}
             style={{
               minWidth: "10rem",
             }}
@@ -406,13 +416,13 @@ const Pengguna = ({
           />
           <Column
             header="Email"
-            field={(e) => e.email}
+            field={(e) => e?.email}
             style={{ minWidth: "10rem" }}
             body={load && <Skeleton />}
           />
           <Column
             header="Perusahaan"
-            field={(e) => e.company}
+            field={(e) => e?.name}
             style={{ minWidth: "10rem" }}
             body={load && <Skeleton />}
           />
@@ -479,8 +489,10 @@ const Pengguna = ({
               <div className="p-inputgroup ">
                 <Password
                   label={"Password "}
-                  value={value3}
-                  onChange={(e) => setValue3(e.target.value)}
+                  id="password"
+                  ref={passRef}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.password)}
                   placeholder="Masukkan Password"
                   toggleMask
                 />
@@ -490,16 +502,35 @@ const Pengguna = ({
             <div className="col-12">
               <PrimeInput
                 label={"Perusahaan"}
-                value={currentItem !== null ? `${currentItem.company}` : ""}
+                value={currentItem !== null ? `${currentItem.name}` : ""}
                 onChange={(e) => {
-                  setCurrentItem({ ...currentItem, company: e.target.value });
+                  setCurrentItem({ ...currentItem, name: e.target.value });
                   let newError = error;
-                  newError.company = false;
+                  newError.name = false;
                   setError(newError);
                 }}
                 placeholder="Masukan Alamat"
-                error={error?.company}
+                error={error?.name}
               />
+            </div>
+
+
+            <div className="col-12 ">
+              <label>Aktif</label>
+              <div className="p-inputgroup">
+                <InputSwitch
+                  className="mr-3"
+                  inputId="email"
+                  checked={currentData && currentData.name}
+                  onChange={(e) => {
+                    setCurrentData({...currentData, name: e.value });
+                    // submitUpdate({ });
+                  }}
+                />
+                <label className="mr-3 mt-1" htmlFor="email">
+                  {"Periksa Untuk Pengguna Aktif"}
+                </label>
+              </div>
             </div>
           </div>
         </Dialog>

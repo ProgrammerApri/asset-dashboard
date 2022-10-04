@@ -759,6 +759,16 @@ const InputPO = ({ onCancel, onSuccess }) => {
     return valid;
   };
 
+  const pajk = (value) => {
+    let nil = 0;
+    ppn?.forEach((elem) => {
+      if (supp(po.sup_id)?.supplier?.sup_ppn === elem.id) {
+        nil = elem.nilai;
+      }
+    });
+    return nil;
+  };
+
   const body = () => {
     return (
       <>
@@ -932,7 +942,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
               <div className="col-3">
                 <PrimeInput
                   label={"No. Telepon"}
-                  isNumber    
+                  isNumber
                   value={
                     po.sup_id !== null
                       ? supp(po.sup_id)?.supplier?.sup_telp1
@@ -2041,19 +2051,20 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
               <div className="col-6">
                 <label className="text-label">
-                  {po.split_inv ? "Pajak Atas Barang (11%)" : "Pajak (11%)"}
+                  {po.split_inv ? "Pajak Atas Barang" : "Pajak"}
                 </label>
               </div>
 
               <div className="col-6">
                 <label className="text-label">
                   {po.split_inv ? (
-                    <b>Rp. {formatIdr((getSubTotalBarang() * 11) / 100)}</b>
+                    <b>Rp. {formatIdr((getSubTotalBarang() * pajk()) / 100)}</b>
                   ) : (
                     <b>
                       Rp.{" "}
                       {formatIdr(
-                        ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
+                        ((getSubTotalBarang() + getSubTotalJasa()) * pajk()) /
+                          100
                       )}
                     </b>
                   )}
@@ -2135,7 +2146,8 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     <b>
                       Rp.{" "}
                       {formatIdr(
-                        getSubTotalBarang() + (getSubTotalBarang() * 11) / 100
+                        getSubTotalBarang() +
+                          (getSubTotalBarang() * pajk()) / 100
                       )}
                     </b>
                   ) : (
@@ -2144,7 +2156,8 @@ const InputPO = ({ onCancel, onSuccess }) => {
                       {formatIdr(
                         getSubTotalBarang() +
                           getSubTotalJasa() +
-                          ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
+                          ((getSubTotalBarang() + getSubTotalJasa()) * pajk()) /
+                            100
                       )}
                     </b>
                   )}

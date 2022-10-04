@@ -42,6 +42,7 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
   const [update, setUpdate] = useState(false);
   const [displayDel, setDisplayDel] = useState(false);
   const [displayData, setDisplayData] = useState(false);
+  const [confirm, setDisplayConfirm] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
   const [filters1, setFilters1] = useState(null);
@@ -51,7 +52,7 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
   const [rows2, setRows2] = useState(20);
   const dispatch = useDispatch();
   const So = useSelector((state) => state.so.so);
-  const show = useSelector((state) => state.so.current);
+  const closeSo = useSelector((state) => state.so.current);
   const printPage = useRef(null);
 
   const dummy = Array.from({ length: 10 });
@@ -119,6 +120,43 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
           severity: "error",
           summary: "Gagal",
           detail: `Tidak Dapat Menghapus Data`,
+          life: 3000,
+        });
+      }, 500);
+    }
+  };
+
+  const closeSO = async () => {
+    const config = {
+      ...endpoints.closeSO,
+      endpoint: endpoints.closeSO.endpoint + closeSo.id,
+      data: closeSo,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setTimeout(() => {
+          setUpdate(false);
+          setDisplayConfirm(false);
+          getSO(true);
+          toast.current.show({
+            severity: "info",
+            summary: "Berhasil",
+            detail: "Data Berhasil Diperbarui",
+            life: 3000,
+          });
+        }, 500);
+      }
+    } catch (error) {
+      setTimeout(() => {
+        setUpdate(false);
+        toast.current.show({
+          severity: "error",
+          summary: "Gagal",
+          detail: "Gagal Memperbarui Data",
           life: 3000,
         });
       }, 500);
@@ -240,10 +278,77 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
             });
           }}
           className={`btn ${
-            data.status === 0 ? "" : "disabled"
+            data.status !== 2 ? "" : "disabled"
           } btn-primary shadow btn-xs sharp ml-1`}
         >
           <i className="fa fa-pencil"></i>
+        </Link>
+
+        <Link
+          onClick={() => {
+            setDisplayConfirm(true);
+            let sprod = data.sprod;
+            dispatch({
+              type: SET_EDIT_SO,
+              payload: true,
+            });
+            sprod.forEach((el) => {
+              el.prod_id = el.prod_id.id;
+              el.unit_id = el.unit_id.id;
+            });
+            let sjasa = data.sjasa;
+            sjasa.forEach((el) => {
+              el.jasa_id = el.jasa_id.id;
+              el.unit_id = el.unit_id.id;
+            });
+            dispatch({
+              type: SET_CURRENT_SO,
+              payload: {
+                ...data,
+                pel_id: data?.pel_id?.id ?? null,
+                sub_id: data?.sub_id?.id ?? null,
+                top: data?.top?.id ?? null,
+                sprod:
+                  sprod.length > 0
+                    ? sprod
+                    : [
+                        {
+                          id: 0,
+                          prod_id: null,
+                          unit_id: null,
+                          location: null,
+                          request: null,
+                          order: null,
+                          remain: null,
+                          price: null,
+                          disc: null,
+                          nett_price: null,
+                          total: null,
+                        },
+                      ],
+                sjasa:
+                  sjasa.length > 0
+                    ? sjasa
+                    : [
+                        {
+                          id: 0,
+                          jasa_id: null,
+                          sup_id: null,
+                          unit_id: null,
+                          qty: null,
+                          price: null,
+                          disc: null,
+                          total: null,
+                        },
+                      ],
+              },
+            });
+          }}
+          className={`btn ${
+            data.status !== 2 ? "" : "disabled"
+          } btn-warning shadow btn-xs sharp ml-1`}
+        >
+          <i className="fa fa-times mt-0"></i>
         </Link>
 
         <Link
@@ -253,7 +358,7 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
             setCurrentItem(data);
           }}
           className={`btn ${
-            data.status === 0 ? "" : "disabled"
+            data.status !== 2 ? "" : "disabled"
           } btn-danger shadow btn-xs sharp ml-1`}
         >
           <i className="fa fa-trash"></i>
@@ -358,26 +463,23 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
     );
   };
 
-  const renderFooter = () => {
+  const footerClose = () => {
     return (
       <div>
         <PButton
           label="Batal"
-          onClick={() => setDisplayData(false)}
+          onClick={() => setDisplayConfirm(false)}
           className="p-button-text btn-primary"
         />
-        <ReactToPrint
-          trigger={() => {
-            return (
-              <PButton variant="primary" onClick={() => {}}>
-                Print{" "}
-                <span className="btn-icon-right">
-                  <i class="bx bxs-printer"></i>
-                </span>
-              </PButton>
-            );
+        <PButton
+          label="Ya"
+          icon="pi pi-check"
+          onClick={() => {
+            setUpdate(true);
+            closeSO();
           }}
-          content={() => printPage.current}
+          autoFocus
+          loading={update}
         />
       </div>
     );
@@ -447,27 +549,6 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
 
-  const getSubTotalBarang = () => {
-    let total = 0;
-    show?.sprod?.forEach((el) => {
-      if (el.nett_price && el.nett_price > 0) {
-        total += parseInt(el.nett_price);
-      } else {
-        total += el.total - (el.total * el.disc) / 100;
-      }
-    });
-
-    return total;
-  };
-
-  const getSubTotalJasa = () => {
-    let total = 0;
-    show?.sjasa?.forEach((el) => {
-      total += el.total - (el.total * el.disc) / 100;
-    });
-
-    return total;
-  };
 
   return (
     <>
@@ -533,7 +614,7 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
                       <Skeleton />
                     ) : (
                       <div>
-                        {e.status !== 1 ? (
+                        {e.status !== 2 ? (
                           <Badge variant="success light">
                             <i className="bx bx-check text-success mr-1"></i>{" "}
                             Open
@@ -561,252 +642,21 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
       </Row>
 
       <Dialog
-        header={"Detail Pembelian"}
-        visible={displayData}
-        style={{ width: "40vw" }}
-        footer={renderFooter("displayData")}
+        header={"Tutup Pesanan Penjualan"}
+        visible={confirm}
+        style={{ width: "30vw" }}
+        footer={footerClose("confirm")}
         onHide={() => {
-          setDisplayData(false);
+          setDisplayConfirm(false);
         }}
       >
-        <Row className="ml-0 pt-0 fs-12">
-          <div className="col-8">
-            <label className="text-label">Tanggal Pembelian :</label>
-            <span className="ml-1">
-              <b>{formatDate(show.so_date)}</b>
-            </span>
-          </div>
-
-          <div className="col-4">
-            <label className="text-label">Jatuh Tempo :</label>
-            <span className="ml-1">
-              <b>{formatDate(show.due_date)}</b>
-            </span>
-          </div>
-
-          <Card className="col-12">
-            <div className="row">
-              <div className="col-8">
-                <label className="text-label">No. Pesanan :</label>
-                <span className="ml-1">
-                  <b>{show.so_code}</b>
-                </span>
-              </div>
-
-              <div className="col-4">
-                <label className="text-label">Pelanggan</label>
-                <div className="">
-                  <span className="ml-0">
-                    <b>{show.pel_id?.cus_name}</b>
-                  </span>
-                  <br />
-                  <span>{show.pel_id?.cus_address}</span>
-                  <br />
-                  <span>{show.pel_id?.cus_telp1}</span>
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          <Row className="ml-1 mt-0">
-            <DataTable
-              className="display w-150 datatable-wrapper fs-12"
-              value={show?.sprod}
-            >
-              <Column
-                header="Produk"
-                field={(e) => `${e.prod_id?.name} (${e.prod_id?.code})`}
-                style={{ minWidth: "10rem" }}
-                // body={loading && <Skeleton />}
-              />
-              <Column
-                header="Jumlah"
-                field={(e) => e.order}
-                style={{ minWidth: "6rem" }}
-                // body={loading && <Skeleton />}
-              />
-              <Column
-                header="Satuan"
-                field={(e) => e.unit_id?.name}
-                style={{ minWidth: "6rem" }}
-                // body={loading && <Skeleton />}
-              />
-              <Column
-                header="Harga Satuan"
-                field={(e) => formatIdr(e.price)}
-                style={{ minWidth: "10rem" }}
-                // body={loading && <Skeleton />}
-              />
-              <Column
-                header="Total"
-                field={(e) => formatIdr(e.total)}
-                style={{ minWidth: "8rem" }}
-                // body={loading && <Skeleton />}
-              />
-            </DataTable>
-          </Row>
-
-          {So.sjasa?.length ? (
-            <Row className="ml-1 mt-5">
-              <>
-                <DataTable
-                  className="display w-150 datatable-wrapper fs-12"
-                  value={show?.sjasa.map((v, i) => {
-                    return {
-                      ...v,
-                      index: i,
-                      total: v?.total ?? 0,
-                    };
-                  })}
-                >
-                  <Column
-                    header="Supplier"
-                    field={(e) => e.sup_id?.sup_name}
-                    style={{ minWidth: "15rem" }}
-                    // body={loading && <Skeleton />}
-                  />
-                  <Column
-                    header="Jasa"
-                    field={(e) => e.jasa_id?.name}
-                    style={{ minWidth: "15rem" }}
-                    // body={loading && <Skeleton />}
-                  />
-                  <Column
-                    header="Total"
-                    field={(e) => formatIdr(e.total)}
-                    style={{ minWidth: "10rem" }}
-                    // body={loading && <Skeleton />}
-                  />
-                </DataTable>
-              </>
-              0
-            </Row>
-          ) : (
-            <></>
-          )}
-
-          <Row className="ml-0 mr-0 mb-0 mt-4 justify-content-between fs-12">
-            <div></div>
-            <div className="row justify-content-right col-6 mr-4">
-              <div className="col-12 mb-0">
-                <label className="text-label">
-                  <b>Detail Pembayaran</b>
-                </label>
-                <Divider className="ml-12"></Divider>
-              </div>
-
-              <div className="col-5 mt-2">
-                <label className="text-label">
-                  {show.split_inv ? "Sub Total Barang" : "Subtotal"}
-                </label>
-              </div>
-
-              <div className="col-7 mt-2 text-right">
-                <label className="text-label">
-                  {show.split_inv ? (
-                    <b>
-                      Rp.
-                      {formatIdr(getSubTotalBarang())}
-                    </b>
-                  ) : (
-                    <b>
-                      Rp.
-                      {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
-                    </b>
-                  )}
-                </label>
-              </div>
-
-              <div className="col-5">
-                <label className="text-label">
-                  {show.split_inv ? "DPP Barang" : "DPP"}
-                </label>
-              </div>
-
-              <div className="col-7 text-right">
-                <label className="text-label">
-                  {show.split_inv ? (
-                    <b>
-                      Rp.
-                      {formatIdr(getSubTotalBarang())}
-                    </b>
-                  ) : (
-                    <b>
-                      Rp.
-                      {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
-                    </b>
-                  )}
-                </label>
-              </div>
-
-              <div className="col-5">
-                <label className="text-label">
-                  {show.split_inv ? "Pajak Atas Barang (11%)" : "Pajak (11%)"}
-                </label>
-              </div>
-
-              <div className="col-7 text-right">
-                <label className="text-label">
-                  {show.split_inv ? (
-                    <b>
-                      Rp.
-                      {formatIdr((getSubTotalBarang() * 11) / 100)}
-                    </b>
-                  ) : (
-                    <b>
-                      Rp.{" "}
-                      {formatIdr(
-                        ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
-                      )}
-                    </b>
-                  )}
-                </label>
-              </div>
-
-              <div className="col-5 mt-0">
-                <label className="text-label">Diskon(%)</label>
-              </div>
-
-              <div className="col-7 text-right">
-                <label className="text-label">
-                  <b>{show.total_disc !== null ? show.total_disc : 0}</b>
-                </label>
-              </div>
-
-              <div className="col-12">
-                <Divider className="ml-12"></Divider>
-              </div>
-
-              <div className="col-5">
-                <label className="text-label">
-                  <b>Total</b>
-                </label>
-              </div>
-
-              <div className="col-7">
-                <label className="text-label fs-13">
-                  {show.split_inv ? (
-                    <b>
-                      Rp.{" "}
-                      {formatIdr(
-                        getSubTotalBarang() + (getSubTotalBarang() * 11) / 100
-                      )}
-                    </b>
-                  ) : (
-                    <b>
-                      Rp.{" "}
-                      {formatIdr(
-                        getSubTotalBarang() +
-                          getSubTotalJasa() +
-                          ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
-                      )}
-                    </b>
-                  )}
-                </label>
-              </div>
-            </div>
-          </Row>
-        </Row>
+        <div className="ml-3 mr-3">
+          <i
+            className="pi pi-exclamation-triangle mr-3 align-middle"
+            style={{ fontSize: "2rem" }}
+          />
+          <span>Apakah Anda Yakin Ingin Menyelesaikan Pesanan Pembelian ?</span>
+        </div>
       </Dialog>
 
       <Dialog

@@ -7,6 +7,7 @@ import Pengguna from "./Pengguna";
 import SetupAkun from "./SetupAkun";
 import SetupNeraca from "./SetupNeraca";
 import SetupPnl from "./SetupPnl";
+import Menu from "./Menu";
 
 const Setup = () => {
   return (
@@ -22,6 +23,9 @@ const Setup = () => {
       </TabPanel>
       <TabPanel header="Pengguna">
         <Pengguna/>
+      </TabPanel>
+      <TabPanel header="Menu">
+        <Menu/>
       </TabPanel>
       <TabPanel header="Setup Akun">
         <SetupAkun/>

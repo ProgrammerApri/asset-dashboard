@@ -272,6 +272,7 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
           label="Hapus"
           icon="pi pi-trash"
           onClick={() => {
+            setUpdate(true);
             delSale();
           }}
           autoFocus
@@ -328,7 +329,9 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
                     unit_id: null,
                     location: null,
                     stock: null,
+                    req: null,
                     order: null,
+                    remain: null,
                     price: null,
                     disc: null,
                     nett_price: null,
@@ -514,7 +517,7 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
                 />
                 <Column
                   header="No. Pesanan Penjualan"
-                  field={(e) => e.so_id?.so_code}
+                  field={(e) => e.so_id?.so_code ?? "-"}
                   style={{ minWidth: "10rem" }}
                   body={loading && <Skeleton />}
                 />

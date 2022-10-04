@@ -162,7 +162,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
         };
       }
 
-      ord += element.order;
+      ord += parseInt(element.order);
       sto += element.stock;
     });
 
@@ -275,11 +275,11 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
       ...endpoints.customer,
       data: {},
     };
-    
+
     let response = null;
     try {
       response = await request(null, config);
-      
+
       if (response.status) {
         const { data } = response;
         let filt = [];
@@ -288,7 +288,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
             filt.push(elem);
           }
         });
-        
+
         setCustomer(filt);
       }
     } catch (error) {}
@@ -299,11 +299,11 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
       ...endpoints.customer,
       data: {},
     };
-    
+
     let response = null;
     try {
       response = await request(null, config);
-      
+
       if (response.status) {
         const { data } = response;
         let filt = [];
@@ -312,7 +312,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
             filt.push(elem);
           }
         });
-        
+
         setSubCus(filt);
       }
     } catch (error) {}
@@ -326,7 +326,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      
+
       if (response.status) {
         const { data } = response;
         setSupplier(data);
@@ -339,14 +339,14 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
       ...endpoints.rules_pay,
       data: {},
     };
-    
+
     let response = null;
     try {
       response = await request(null, config);
-      
+
       if (response.status) {
         const { data } = response;
-        
+
         setRulesPay(data);
       }
     } catch (error) {}
@@ -357,14 +357,14 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
       ...endpoints.pajak,
       data: {},
     };
-    
+
     let response = null;
     try {
       response = await request(null, config);
-      
+
       if (response.status) {
         const { data } = response;
-        
+
         setPpn(data);
       }
     } catch (error) {}
@@ -375,14 +375,14 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
       ...endpoints.salesman,
       data: {},
     };
-    
+
     let response = null;
     try {
       response = await request(null, config);
-      
+
       if (response.status) {
         const { data } = response;
-        
+
         setSalesman(data);
       }
     } catch (error) {}
@@ -396,25 +396,27 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      
+
       if (response.status) {
         const { data } = response;
         let filt = [];
         data.forEach((elem) => {
-          if (elem.status !== 1) {
+          if (isEdit) {
             let prod = [];
             elem.sprod.forEach((el) => {
               el.prod_id = el.prod_id.id;
               el.unit_id = el.unit_id.id;
               prod.push({
                 ...el,
-                r_order: el.order,
+                r_remain: el.remain,
               });
 
               let temp = [...sale.jprod];
               sale.jprod.forEach((e, i) => {
                 if (el.id === e.sprod_id) {
-                  temp[i].order = el.order;
+                  temp[i].req = el.order;
+                  temp[i].r_remain = el.remain + e.order;
+                  temp[i].remain = el.remain;
                   updateSL({ ...sale, jprod: temp });
                 }
               });
@@ -440,6 +442,36 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
             });
             elem.sjasa = jasa;
             filt.push(elem);
+          } else {
+            if (elem.status !== 2) {
+              let prod = [];
+              elem.sprod.forEach((el) => {
+                if (el.remain > 0) {
+                  el.prod_id = el.prod_id.id;
+                  el.unit_id = el.unit_id.id;
+                  prod.push({
+                    ...el,
+                    r_remain: el.remain,
+                    req: el.order,
+                  });
+                }
+              });
+              elem.sprod = prod;
+
+              let jasa = [];
+              elem.sjasa.forEach((element) => {
+                // if (element.remain > 0) {
+                element.jasa_id = element.jasa_id.id;
+                element.unit_id = element.unit_id.id;
+                jasa.push({
+                  ...element,
+                  r_order: element.order,
+                });
+                // }
+              });
+              elem.sjasa = jasa;
+              filt.push(elem);
+            }
           }
         });
         setSO(filt);
@@ -459,7 +491,6 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
       if (response.status) {
         const { data } = response;
         setProduct(data);
-        
       }
     } catch (error) {}
   };
@@ -472,7 +503,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      
+
       if (response.status) {
         const { data } = response;
         setJasa(data);
@@ -488,7 +519,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      
+
       if (response.status) {
         const { data } = response;
         setSatuan(data);
@@ -504,7 +535,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      
+
       if (response.status) {
         const { data } = response;
         setLoc(data);
@@ -520,7 +551,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      
+
       if (response.status) {
         const { data } = response;
         setSetup(data);
@@ -536,7 +567,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      
+
       if (response.status) {
         const { data } = response;
         setSto(data);
@@ -550,11 +581,11 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
       endpoint: endpoints.editSales.endpoint + sale.id,
       data: sale,
     };
-    
+
     let response = null;
     try {
       response = await request(null, config);
-      
+
       if (response.status) {
         onSuccess();
       }
@@ -576,16 +607,15 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
       ...endpoints.addSale,
       data: { ...sale, doc_date: currentDate(sale.doc_date) },
     };
-    
+
     let response = null;
     try {
       response = await request(null, config);
-      
+
       if (response.status) {
         onSuccess();
       }
     } catch (error) {
-      
       if (error.status === 400) {
         setTimeout(() => {
           setUpdate(false);
@@ -731,7 +761,6 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
-
   const onSubmit = () => {
     if (isValid()) {
       if (state) {
@@ -812,12 +841,12 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
   };
 
   const pjk = (value) => {
-    let nil = {};
-      ppn?.forEach(elem => {
-        if (checkCus(sale?.pel_id)?.customer?.cus_pjk === elem.id) {
-          nil = elem.nilai
-        }
-      });
+    let nil = 0;
+    ppn?.forEach((elem) => {
+      if (checkCus(sale?.pel_id)?.customer?.cus_pjk === elem.id) {
+        nil = elem.nilai;
+      }
+    });
 
     return nil;
   };
@@ -877,7 +906,6 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   result.setDate(
                     result.getDate() + checkRulesP(sale?.top)?.day
                   );
-                 
                 }
                 updateSL({
                   ...sale,
@@ -973,7 +1001,9 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   pel_id: e.value.pel_id?.id ?? null,
                   sub_addr: e.value.sub_addr ?? null,
                   sub_id: e.value.sub_id?.id ?? null,
-                  jprod: e.value.sprod,
+                  jprod: e.value.sprod.map((v) => {
+                    return { ...v, req: v.order, order: null };
+                  }),
                   jjasa: e.value.sjasa.map((v) => {
                     return { ...v, order: v.qty };
                   }),
@@ -1093,7 +1123,6 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
               onChange={(e) => {
                 let result = new Date(`${sale.ord_date}Z`);
                 result.setDate(result.getDate() + e.day);
-                
 
                 updateSL({ ...sale, top: e.id, due_date: result });
 
@@ -1359,7 +1388,29 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
-                  header="Jumlah"
+                  header="Pesanan"
+                  className="align-text-top"
+                  style={{
+                    width: "8rem",
+                  }}
+                  field={""}
+                  body={(e) => (
+                    <PrimeNumber
+                      value={e.req && e.req}
+                      onChange={(u) => {
+                        let temp = [...sale.jprod];
+                        temp[e.index].req = u.target.value;
+                      }}
+                      placeholder="0"
+                      type="number"
+                      min={0}
+                      disabled
+                    />
+                  )}
+                />
+
+                <Column
+                  header="Jumlah Kirim"
                   className="align-text-top"
                   style={{
                     width: "8rem",
@@ -1370,14 +1421,38 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                       value={e.order && e.order}
                       onChange={(u) => {
                         let temp = [...sale.jprod];
-                        temp[e.index].order = u.target.value;
-                        temp[e.index].total =
-                          temp[e.index].order * temp[e.index].price;
+                        if (sale.so_id) {
+                          let val =
+                            u.target.value > e.r_remain
+                              ? e.r_remain
+                              : u.target.value;
+                          let result =
+                            temp[e.index].order - val + temp[e.index].remain;
+                          temp[e.index].order = val;
+
+                          temp[e.index].order = u.target.value;
+                          temp[e.index].total =
+                            temp[e.index].order * temp[e.index].price;
+                          temp[e.index].remain = result;
+                        } else {
+                          temp[e.index].order = u.target.value;
+                          temp[e.index].total =
+                            temp[e.index].order * temp[e.index].price;
+                        }
+
                         updateSL({ ...sale, jprod: temp });
-                        
+
+                        if (sale.so_id) {
+                          if (temp[e.index].order > e.req) {
+                            temp[e.index].order = e.req;
+                            temp[e.index].total =
+                              temp[e.index].order * temp[e.index].price;
+                          }
+                        }
 
                         let newError = error;
                         newError.prod[e.index].jum = false;
+                        newError.prod.push({ jum: false });
                         setError(newError);
                       }}
                       placeholder="0"
@@ -1385,8 +1460,28 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                       min={0}
                       error={error?.prod[e.index]?.jum}
                       errorMessage={state ? "Pesanan Melebihi Stok" : null}
-                      disabled={sale && sale.so_id}
+                      // disabled={sale && sale.so_id}
                     />
+                  )}
+                />
+
+                <Column
+                  hidden
+                  header="Sisa"
+                  className="align-text-top"
+                  field={""}
+                  // style={{
+                  //   minWidth: "7rem",
+                  // }}
+                  body={(e) => (
+                    <div className="p-inputgroup">
+                      <InputText
+                        value={e.remain ? e.remain : ""}
+                        placeholder="0"
+                        type="number"
+                        disabled
+                      />
+                    </div>
                   )}
                 />
 
@@ -1435,7 +1530,6 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         temp[e.index].total =
                           temp[e.index].order * temp[e.index].price;
                         updateSL({ ...sale, jprod: temp });
-                        
 
                         let newError = error;
                         newError.prod[e.index].prc = false;
@@ -1454,7 +1548,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   className="align-text-top"
                   field={""}
                   style={{
-                    width: "15rem",
+                    width: "10rem",
                   }}
                   body={(e) => (
                     <div className="p-inputgroup">
@@ -1464,10 +1558,9 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                           let temp = [...sale.jprod];
                           temp[e.index].disc = t.target.value;
                           // let disc = temp[e.index].total * temp[e.index].disc / 100
-                       
+
                           // temp[e.index].total -= disc;
                           updateSL({ ...sale, jprod: temp });
-                          
                         }}
                         placeholder="0"
                         type="number"
@@ -1494,7 +1587,6 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                           let temp = [...sale.jprod];
                           temp[e.index].nett_price = t.value;
                           updateSL({ ...sale, jprod: temp });
-                         
                         }}
                         placeholder="0"
                         disabled={sale && sale.so_id}
@@ -1540,7 +1632,9 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                                 unit_id: null,
                                 location: null,
                                 stock: null,
+                                req: null,
                                 order: null,
+                                remain: null,
                                 price: null,
                                 disc: null,
                                 nett_price: null,
@@ -1703,7 +1797,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         temp[e.index].total =
                           temp[e.index].order * temp[e.index].price;
                         updateSL({ ...sale, jjasa: temp });
-                      
+
                         let newError = error;
                         newError.jasa[e.index].jum = false;
                         setError(newError);
@@ -1734,7 +1828,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         temp[e.index].total =
                           temp[e.index].order * temp[e.index].price;
                         updateSL({ ...sale, jjasa: temp });
-                      
+
                         let newError = error;
                         newError.jasa[e.index].prc = false;
                         setError(newError);
@@ -1762,7 +1856,6 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                           let temp = [...sale.jjasa];
                           temp[e.index].disc = t.target.value;
                           updateSL({ ...sale, jjasa: temp });
-                       
                         }}
                         placeholder="0"
                         type="number"
@@ -2011,7 +2104,8 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                     {formatIdr(
                       getSubTotalBarang() +
                         getSubTotalJasa() +
-                        ((getSubTotalBarang() + getSubTotalJasa()) * pjk()) / 100
+                        ((getSubTotalBarang() + getSubTotalJasa()) * pjk()) /
+                          100
                     )}
                   </b>
                 )}
@@ -2176,7 +2270,6 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
       </div>
     );
   };
-
 
   const footer = () => {
     return (

@@ -1198,6 +1198,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                         if (order.po_id) {
                           if (temp[e.index].order > e.req) {
                             temp[e.index].order = e.req;
+                            temp[e.index].total =
+                              temp[e.index].order * temp[e.index].price;
                           }
                         }
 

@@ -745,6 +745,12 @@ const endpoints = {
     data: {},
   },
 
+  closeSO: {
+    endpoint: "/v1/api/so-close/",
+    method: "PUT",
+    data: {},
+  },
+
   /// DP
   order: {
     endpoint: "/v1/api/order",
@@ -1298,6 +1304,30 @@ delUSER: {
   sto: {
     endpoint: "/v1/api/sto",
     method: "GET",
+    data: {},
+  },
+
+  addMenu: {
+    endpoint: "/v1/api/menu",
+    method: "POST",
+    data: {},
+  },
+
+  getMenu: {
+    endpoint: "/v1/api/menu",
+    method: "GET",
+    data: {},
+  },
+
+  editMenu: {
+    endpoint: "/v1/api/menu/",
+    method: "PUT",
+    data: {},
+  },
+
+  deleteMenu: {
+    endpoint: "/v1/api/menu/",
+    method: "DELETE",
     data: {},
   },
 };

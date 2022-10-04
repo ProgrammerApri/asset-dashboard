@@ -19,6 +19,7 @@ const Detail = ({ onCancel }) => {
   const [comp, setComp] = useState(null);
   const [city, setCity] = useState(null);
   const [supp, setSupp] = useState(null);
+  const [ppn, setPpn] = useState(null);
   const [date, setDate] = useState(new Date());
   const printPage = useRef(null);
 
@@ -31,6 +32,7 @@ const Detail = ({ onCancel }) => {
     getPO();
     getComp();
     getSupp();
+    getPpn();
   }, []);
 
   const getPO = async () => {
@@ -104,6 +106,36 @@ const Detail = ({ onCancel }) => {
         setSupp(data);
       }
     } catch (error) {}
+  };
+
+  const getPpn = async () => {
+    const config = {
+      ...endpoints.pajak,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setPpn(data);
+      }
+    } catch (error) {}
+  };
+
+  const pajk = (value) => {
+    let nil = 0;
+    ppn?.forEach((elem) => {
+      if (show.sup_id?.sup_ppn === elem.id) {
+        nil = elem.nilai;
+      }
+    });
+    console.log("ceeekkk");
+    console.log(nil);
+    return nil;
   };
 
   const renderHeader = () => {
@@ -244,10 +276,11 @@ const Detail = ({ onCancel }) => {
   const spl = (value) => {
     let selected = {};
     supp?.forEach((element) => {
-      if (element.supplier?.id === `${value}`) {
+      if (value === element.supplier.id) {
         selected = element;
       }
     });
+
     return selected;
   };
 
@@ -536,8 +569,8 @@ const Detail = ({ onCancel }) => {
                     <div className="col-5">
                       <label className="text-label">
                         {show.split_inv
-                          ? "Pajak Atas Barang (11%)"
-                          : "Pajak (11%)"}
+                          ? "Pajak Atas Barang"
+                          : "Pajak"}
                       </label>
                     </div>
 
@@ -546,13 +579,13 @@ const Detail = ({ onCancel }) => {
                         {show.split_inv ? (
                           <b>
                             Rp.
-                            {formatIdr((getSubTotalBarang() * 11) / 100)}
+                            {formatIdr((getSubTotalBarang() * pajk()) / 100)}
                           </b>
                         ) : (
                           <b>
                             Rp.{" "}
                             {formatIdr(
-                              ((getSubTotalBarang() + getSubTotalJasa()) * 11) /
+                              ((getSubTotalBarang() + getSubTotalJasa()) * pajk()) /
                                 100
                             )}
                           </b>
@@ -589,7 +622,7 @@ const Detail = ({ onCancel }) => {
                             Rp.{" "}
                             {formatIdr(
                               getSubTotalBarang() +
-                                (getSubTotalBarang() * 11) / 100
+                                (getSubTotalBarang() * pajk()) / 100
                             )}
                           </b>
                         ) : (
@@ -599,7 +632,7 @@ const Detail = ({ onCancel }) => {
                               getSubTotalBarang() +
                                 getSubTotalJasa() +
                                 ((getSubTotalBarang() + getSubTotalJasa()) *
-                                  11) /
+                                  pajk()) /
                                   100
                             )}
                           </b>

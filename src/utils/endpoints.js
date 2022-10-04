@@ -1300,6 +1300,30 @@ delUSER: {
     method: "GET",
     data: {},
   },
+
+  addMenu: {
+    endpoint: "/v1/api/menu",
+    method: "POST",
+    data: {},
+  },
+
+  getMenu: {
+    endpoint: "/v1/api/menu",
+    method: "GET",
+    data: {},
+  },
+
+  editMenu: {
+    endpoint: "/v1/api/menu/",
+    method: "PUT",
+    data: {},
+  },
+
+  deleteMenu: {
+    endpoint: "/v1/api/menu/",
+    method: "DELETE",
+    data: {},
+  },
 };
 
 export default endpoints;

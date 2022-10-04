@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import KartuStock from "./KartuStock";
 import KartuStock_ringkasan from "./KartuStock_ringkasan";
 import MutasiStock from "./MutasiStock";
+import PembelianPerProduk from "../LaporanPembelian/PembelianPerProduk";
+import ReportGRA from "../LaporanPembelian/Gra";
 
 const LaporanPersediaan = (self) => {
   const [active, setActive] = useState(0);
@@ -22,6 +24,16 @@ const LaporanPersediaan = (self) => {
       tittle: "Kartu Stock Rincian",
       icon: "bx-spreadsheet",
       component: <KartuStock />,
+    },
+    {
+      tittle: "Pembelian Per Produk",
+      icon: "bx-receipt",
+      component: <PembelianPerProduk />,
+    },
+    {
+      tittle: "Pembelian Per Supplier",
+      icon: "bx-receipt",
+      component: <ReportGRA />,
     },
 
 

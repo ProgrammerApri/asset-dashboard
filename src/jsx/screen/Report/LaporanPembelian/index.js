@@ -9,6 +9,7 @@ import OutstandingRP from "./OutstandingRP";
 import OutstandingGRA from "./OutstandingGRA";
 import ReportReturBeli from "./ReturPembelian";
 import HistoryPayOrder from "./HistoryPayOrd";
+import PembelianPerProduk from "./PembelianPerProduk";
 
 const LaporanPembelian = (self) => {
   const [active, setActive] = useState(0);
@@ -23,11 +24,7 @@ const LaporanPembelian = (self) => {
       icon: "bx-receipt",
       component: <ReportPO />,
     },
-    {
-      tittle: "Pembelian",
-      icon: "bx-receipt",
-      component: <ReportGRA />,
-    },
+   
     {
       tittle: "Outstanding RP",
       icon: "bx-receipt",
@@ -48,6 +45,7 @@ const LaporanPembelian = (self) => {
       icon: "bx-receipt",
       component: <ReportReturBeli />,
     },
+   
    
   ]);
 

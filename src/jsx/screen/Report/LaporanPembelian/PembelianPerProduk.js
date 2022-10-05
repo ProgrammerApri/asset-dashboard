@@ -56,6 +56,7 @@ const PembelianPerProduk = () => {
 
     // initFilters1();
     getOrd();
+    getSto();
   }, []);
 
   const getOrd = async (isUpdate = false) => {
@@ -71,24 +72,7 @@ const PembelianPerProduk = () => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        // let gra = [];
-        // data.forEach((element) => {
-        //   element.dprod.forEach((el) => {
-        //     gra.push({
-        //       kd_gra: element.ord_code,
-        //       tgl_gra: element.ord_date,
-        //       no_po: element.po_id.po_code,
-        //       kd_sup: element.sup_id.sup_code,
-        //       nm_sup: element.sup_id.sup_name,
-        //       prod_kd: el.prod_id.code,
-        //       prod_nm: el.prod_id.name,
-        //       sat: el.unit_id.code,
-        //       ord: el.order,
-        //       prc: el.price,
-        //       total: el.total,
-        //     });
-        //   });
-        // });
+
         setGra(data);
         let grouped = data?.filter(
           (el, i) =>
@@ -105,90 +89,40 @@ const PembelianPerProduk = () => {
       }, 500);
     }
   };
+  const getSto = async (isUpdate = false) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.sto,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
 
-  // const getProduk = async () => {
-  //   const config = {
-  //     ...endpoints.product,
-  //     data: {},
-  //   };
-  //   let response = null;
-  //   try {
-  //     response = await request(null, config);
-  //     console.log(response);
-  //     if (response.status) {
-  //       const { data } = response;
-  //       setProduk(data);
-  //     }
-  //   } catch (error) {}
-  // };
-
-  // const exportExcel = () => {
-  //   let data = [];
-  //   gra.forEach((el) => {
-  //     data.push({
-  //       Nomor_GRA: el.ord_code,
-  //       Tanggal: formatDate(el.ord_date),
-  //       Nomor_PO: el.po_id.po_code,
-  //       Kode_Supplier: el.sup_id.sup_code,
-  //       Nama_Supplier: el.sup_id.sup_name,
-  //       Kode_Barang: el.dprod.prod_id,
-  //       Nama_Barang: el.dprod.prod_id,
-  //       Satuan: el.dprod.unit_id,
-  //       Jumlah: el.dprod.order,
-  //       Harga: el.dprod.price,
-  //     });
-  //   });
-
-  //   import("xlsx").then((xlsx) => {
-  //     const worksheet = xlsx.utils.json_to_sheet(data);
-  //     const workbook = { Sheets: { data: worksheet }, SheetNames: ["data"] };
-  //     const excelBuffer = xlsx.write(workbook, {
-  //       bookType: "xlsx",
-  //       type: "array",
-  //     });
-  //     saveAsExcelFile(excelBuffer, "reportGRA");
-  //   });
-  // };
-
-  // const saveAsExcelFile = (buffer, fileName) => {
-  //   import("file-saver").then((module) => {
-  //     if (module && module.default) {
-  //       let EXCEL_TYPE =
-  //         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-  //       let EXCEL_EXTENSION = ".xlsx";
-  //       const data = new Blob([buffer], {
-  //         type: EXCEL_TYPE,
-  //       });
-
-  //       module.default.saveAs(
-  //         data,
-  //         fileName + "_export_" + new Date().getTime() + EXCEL_EXTENSION
-  //       );
-  //     }
-  //   });
-  // };
+        setGra(data);
+        let grouped = data?.filter(
+          (el, i) =>
+            i === data.findIndex((ek) => el?.stock?.id === ek?.stock?.id)
+        );
+        setProduct(grouped);
+      }
+    } catch (error) {}
+    if (isUpdate) {
+      setLoading(false);
+    } else {
+      setTimeout(() => {
+        setLoading(false);
+      }, 500);
+    }
+  };
 
   const jsonForExcel = (gra, excel = false) => {
     let data = [];
-    // let grouped = gra?.filter(
-    //   (el, i) => i === gra.findIndex((ek) => el?.kd_gra === ek?.kd_gra)
-    // );
-    // let new_gra = [];
-    // grouped?.forEach((el) => {
-    //       let trx = [];
-    //       gra?.forEach((ek) => {
-    //         if (el.kd_gra === ek.kd_gra) {
-    //           trx.push(ek);
-    //         }
-    //       });
-    //       new_gra.push({
-    //         kd_gra: el.kd_gra,
-    //         tgl_gra: formatDate(el.tgl_gra),
-    //         trx: trx,
-    //       });
-    //     }
-    //   }
-    // });
+
     if (selectedProd) {
       gra?.forEach((el) => {
         let tgl_gra = new Date(`${el?.ord_date}Z`);
@@ -207,7 +141,7 @@ const PembelianPerProduk = () => {
                   ord: "Purchased Quantity",
                   unit: "Unit",
                   prc: "Price",
-                  tot: "Total",
+                  tot: "Stock",
                 },
               },
             ];
@@ -223,8 +157,8 @@ const PembelianPerProduk = () => {
                   // sup: `${el.sup_id.sup_name} (${el.sup_id.sup_name})`,
                   prod: `${ek.prod_id.name} (${ek.prod_id.code})`,
                   ord: ek.order,
-                  unit: ek.unit_id.name,
-                  prc: `Rp. ${formatIdr(ek.price)}`,
+                  unit: ek.prod_id.name,
+                  prc: ek?.stock,
                   tot: `Rp. ${formatIdr(ek.total)}`,
                 },
               });
@@ -265,7 +199,7 @@ const PembelianPerProduk = () => {
                 prod: "Product Name",
                 ord: "Purchased Quantity",
                 unit: "Unit",
-                prc: "Price",
+                prc: "Stock",
                 tot: "Total",
               },
             },
@@ -283,10 +217,13 @@ const PembelianPerProduk = () => {
                 prod: `${ek.prod_id.name} (${ek.prod_id.code})`,
                 ord: ek.order,
                 unit: ek.unit_id.name,
-                prc: `Rp. ${formatIdr(ek.price)}`,
+                prc: ek.stock,
+
                 tot: `Rp. ${formatIdr(ek.total)}`,
               },
             });
+
+            console.log(ek);
             total += ek.total;
           });
 

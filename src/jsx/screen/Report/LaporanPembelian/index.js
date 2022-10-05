@@ -15,6 +15,11 @@ const LaporanPembelian = (self) => {
   const [active, setActive] = useState(0);
   const [subMenu, setSubMenu] = useState([
     {
+      tittle: "Pembelian",
+      icon: "bx-receipt",
+      component: <ReportGRA />,
+    },
+    {
       tittle: "Permintaan Pembelian (RP)",
       icon: "bx-receipt",
       component: <ReportRP />,
@@ -45,6 +50,7 @@ const LaporanPembelian = (self) => {
       icon: "bx-receipt",
       component: <ReportReturBeli />,
     },
+  
    
    
   ]);

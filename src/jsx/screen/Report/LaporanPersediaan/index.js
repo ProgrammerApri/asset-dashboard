@@ -30,11 +30,7 @@ const LaporanPersediaan = (self) => {
       icon: "bx-receipt",
       component: <PembelianPerProduk />,
     },
-    {
-      tittle: "Pembelian Per Supplier",
-      icon: "bx-receipt",
-      component: <ReportGRA />,
-    },
+  
 
 
 

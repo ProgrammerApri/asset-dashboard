@@ -3,7 +3,7 @@ import Perusahaan from "./Perusahaan";
 import { TabView, TabPanel } from 'primereact/tabview';
 import Penjualan from "./Penjualan";
 import Pembelian from "./Pembelian";
-import Pengguna from "./Pengguna";
+import Pengguna from "./SetupPengguna/Pengguna";
 import SetupAkun from "./SetupAkun";
 import SetupNeraca from "./SetupNeraca";
 import SetupPnl from "./SetupPnl";

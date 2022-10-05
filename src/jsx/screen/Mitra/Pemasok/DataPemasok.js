@@ -21,6 +21,7 @@ import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
+import { tr } from "src/data/tr";
 
 const def = {
   supplier: {
@@ -340,7 +341,7 @@ const DataSupplier = ({
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -351,7 +352,7 @@ const DataSupplier = ({
         toast.current.show({
           severity: "error",
           summary: "Gagal",
-          detail: "Gagal Memperbarui Data",
+          detail: tr[localStorage.getItem("language")].pesan_gagal,
           life: 3000,
         });
       }, 500);
@@ -395,7 +396,7 @@ const DataSupplier = ({
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -418,7 +419,7 @@ const DataSupplier = ({
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: "Gagal Memperbarui Data",
+            detail: tr[localStorage.getItem("language")].pesan_gagal,
             life: 3000,
           });
         }, 500);
@@ -446,7 +447,7 @@ const DataSupplier = ({
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
-            detail: "Data Berhasil Dihapus",
+            detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
         }, 500);
@@ -460,7 +461,7 @@ const DataSupplier = ({
         toast.current.show({
           severity: "error",
           summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Data`,
+          detail: tr[localStorage.getItem("language")].del_gagal,
           life: 3000,
         });
       }, 500);
@@ -517,7 +518,7 @@ const DataSupplier = ({
         <div className="mt-3">
           {active > 0 ? (
             <PButton
-              label="Sebelumnya"
+              label={tr[localStorage.getItem("language")].sebelumnya}
               onClick={() => {
                 if (active > 0) {
                   setActive(active - 1);
@@ -527,7 +528,7 @@ const DataSupplier = ({
             />
           ) : (
             <PButton
-              label="Batal"
+              label={tr[localStorage.getItem("language")].batal}
               onClick={() => {
                 onHideInput();
                 onInput(false);
@@ -536,7 +537,7 @@ const DataSupplier = ({
             />
           )}
           <PButton
-            label="Selanjutnya"
+            label={tr[localStorage.getItem("language")].selanjutnya}
             onClick={() => {
               if (active < 2) {
                 setActive(active + 1);
@@ -561,7 +562,7 @@ const DataSupplier = ({
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Simpan"
+          label={tr[localStorage.getItem("language")].simpan}
           icon="pi pi-check"
           onClick={() => onSubmit()}
           autoFocus
@@ -575,7 +576,7 @@ const DataSupplier = ({
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => {
             setShowDelete(false);
             setLoading(false);
@@ -584,7 +585,7 @@ const DataSupplier = ({
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Hapus"
+          label={tr[localStorage.getItem("language")].hapus}
           icon="pi pi-trash"
           onClick={() => {
             delSupplier();
@@ -619,11 +620,11 @@ const DataSupplier = ({
           <InputText
             value={globalFilterValue1}
             onChange={onGlobalFilterChange1}
-            placeholder="Cari disini"
+            placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
         <PrimeSingleButton
-          label="Tambah"
+          label={tr[localStorage.getItem("language")].tambh}
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             setShowInput(true);
@@ -650,7 +651,7 @@ const DataSupplier = ({
       const dropdownOptions = [
         { label: 20, value: 20 },
         { label: 50, value: 50 },
-        { label: "Semua", value: options.totalRecords },
+        { label: tr[localStorage.getItem("language")].hal, value: options.totalRecords },
       ];
 
       return (
@@ -659,7 +660,7 @@ const DataSupplier = ({
             className="mx-1"
             style={{ color: "var(--text-color)", userSelect: "none" }}
           >
-            Data per halaman:{" "}
+            {tr[localStorage.getItem("language")].page}{" "}
           </span>
           <Dropdown
             value={options.value}
@@ -679,7 +680,7 @@ const DataSupplier = ({
             textAlign: "center",
           }}
         >
-          {options.first} - {options.last} dari {options.totalRecords}
+          {options.first} - {options.last} {tr[localStorage.getItem("language")].dari} {options.totalRecords}
         </span>
       );
     },
@@ -853,7 +854,7 @@ const DataSupplier = ({
         onRowSelect={onRowSelect}
       >
         <Column
-          header="Kode Pemasok"
+          header={tr[localStorage.getItem("language")].kd_pem}
           style={{
             minWidth: "8rem",
           }}
@@ -861,25 +862,25 @@ const DataSupplier = ({
           body={load && <Skeleton />}
         />
         <Column
-          header="Nama Pemasok"
+          header={tr[localStorage.getItem("language")].nm_pem}
           field={(e) => e.supplier?.sup_name}
           style={{ minWidth: "8rem" }}
           body={load && <Skeleton />}
         />
         <Column
-          header="Alamat"
+          header={tr[localStorage.getItem("language")].alamat}
           field={(e) => e.supplier?.sup_address}
           style={{ minWidth: "8rem" }}
           body={load && <Skeleton />}
         />
         <Column
-          header="No. Telepon (+62)"
+          header={tr[localStorage.getItem("language")].telp}
           field={(e) => e.supplier?.sup_telp1 ?? "-"}
           style={{ minWidth: "8rem" }}
           body={load && <Skeleton />}
         />
         <Column
-          header="Limit Kredit"
+          header={tr[localStorage.getItem("language")].limit}
           field={(e) => formatIdr(e.supplier?.sup_limit ?? "0")}
           style={{ minWidth: "8rem" }}
           body={load && <Skeleton />}
@@ -900,7 +901,15 @@ const DataSupplier = ({
       <>
         <Toast ref={toast} />
         <Dialog
-          header={isEdit ? "Edit Data Pemasok" : "Tambah Data Pemasok"}
+          header={
+            isEdit
+              ? `${tr[localStorage.getItem("language")].edit} ${
+                  tr[localStorage.getItem("language")].supplier
+                }`
+              : `${tr[localStorage.getItem("language")].tambh} ${
+                  tr[localStorage.getItem("language")].supplier
+                }`
+          }
           visible={showInput}
           style={{ width: "50vw" }}
           footer={renderFooter()}
@@ -918,7 +927,7 @@ const DataSupplier = ({
               <div className="row ml-0 mt-0">
                 <div className="col-6 mt-0">
                   <PrimeInput
-                    label={"Kode Pemasok"}
+                    label={tr[localStorage.getItem("language")].kd_pem}
                     value={
                       currentItem !== null
                         ? currentItem?.supplier?.sup_code
@@ -936,14 +945,14 @@ const DataSupplier = ({
                       newError[0].code = false;
                       setError(newError);
                     }}
-                    placeholder="Masukan Kode Pemasok"
+                    placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[0]?.code}
                   />
                 </div>
 
                 <div className="col-6">
                   <PrimeInput
-                    label={"Nama Pemasok"}
+                    label={tr[localStorage.getItem("language")].nm_pem}
                     value={
                       currentItem !== null
                         ? `${currentItem?.supplier?.sup_name ?? ""}`
@@ -961,7 +970,7 @@ const DataSupplier = ({
                       newError[0].name = false;
                       setError(newError);
                     }}
-                    placeholder="Masukan Nama Pemasok"
+                    placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[0]?.name}
                   />
                 </div>
@@ -970,7 +979,7 @@ const DataSupplier = ({
               <div className="row ml-0 mt-0">
                 <div className="col-6 mt-0">
                   <PrimeDropdown
-                    label={"Jenis Pemasok"}
+                    label={tr[localStorage.getItem("language")].pem_type}
                     value={currentItem !== null ? currentItem.jpem : null}
                     options={jpem}
                     onChange={(e) => {
@@ -986,7 +995,7 @@ const DataSupplier = ({
                     optionLabel="jpem_name"
                     filter
                     filterBy="jpem_name"
-                    placeholder="Pilih Jenis Pemasok"
+                    placeholder={tr[localStorage.getItem("language")].pilih}
                     errorMessage="Jenis Pemasok Belum Dipilih"
                     error={error[0]?.jpem}
                   />
@@ -1013,7 +1022,7 @@ const DataSupplier = ({
                       newError[0].npwp = false;
                       setError(newError);
                     }}
-                    placeholder="Masukan NPWP"
+                    placeholder={tr[localStorage.getItem("language")].masuk}
                     type="number"
                     min={0}
                     maxLength={16}
@@ -1024,7 +1033,9 @@ const DataSupplier = ({
 
               <div className="col-12 p-0">
                 <div className="mt-4 ml-3 mr-3 fs-16 mb-1">
-                  <b>Alamat Pemasok</b>
+                  <b>{`${tr[localStorage.getItem("language")].supplier} ${
+                    tr[localStorage.getItem("language")].alamat
+                  }`}</b>
                 </div>
                 <Divider className="mb-2 ml-3 mr-3"></Divider>
               </div>
@@ -1032,7 +1043,7 @@ const DataSupplier = ({
               <div className="row ml-0 mt-0">
                 <div className="col-12">
                   <PrimeInput
-                    label={"Alamat Pemasok"}
+                    label={tr[localStorage.getItem("language")].alamat}
                     value={
                       currentItem !== null
                         ? `${currentItem?.supplier?.sup_address ?? ""}`
@@ -1050,7 +1061,7 @@ const DataSupplier = ({
                       newError[0].addrs = false;
                       setError(newError);
                     }}
-                    placeholder="Masukan Alamat"
+                    placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[0]?.addrs}
                   />
                 </div>
@@ -1059,7 +1070,7 @@ const DataSupplier = ({
               <div className="row ml-0 mt-0">
                 <div className="col-6 mt-0">
                   <PrimeDropdown
-                    label={"Kota"}
+                    label={tr[localStorage.getItem("language")].kota}
                     value={
                       currentItem !== null &&
                       currentItem.supplier.sup_kota !== null
@@ -1083,14 +1094,16 @@ const DataSupplier = ({
                     optionLabel="city_name"
                     filter
                     filterBy="city_name"
-                    placeholder="Pilih Kota"
+                    placeholder={tr[localStorage.getItem("language")].pilih}
                     errorMessage="Kota Belum Dipilih"
                     error={error[0]?.city}
                   />
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">Kode Pos</label>
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].kd_pos}
+                  </label>
                   <div className="p-inputgroup">
                     <InputText
                       value={
@@ -1108,7 +1121,7 @@ const DataSupplier = ({
                           },
                         })
                       }
-                      placeholder="Masukan Kode Pos"
+                      placeholder={tr[localStorage.getItem("language")].masuk}
                       type="number"
                     />
                   </div>
@@ -1123,7 +1136,7 @@ const DataSupplier = ({
               <div className="row ml-0 mt-0">
                 <div className="col-6 mt-0">
                   <PrimeInput
-                    label={"No. Telepon 1"}
+                    label={tr[localStorage.getItem("language")].telp}
                     value={
                       currentItem !== null
                         ? `${currentItem?.supplier?.sup_telp1 ?? ""}`
@@ -1141,7 +1154,7 @@ const DataSupplier = ({
                       newError[1].phone = false;
                       setError(newError);
                     }}
-                    placeholder="Masukan No. Telepon"
+                    placeholder={tr[localStorage.getItem("language")].masuk}
                     isNumber
                     error={error[1]?.phone}
                   />
@@ -1150,7 +1163,7 @@ const DataSupplier = ({
                 <div className="col-6">
                   <PrimeInput
                     isNumber
-                    label={"No. Telepon 2"}
+                    label={tr[localStorage.getItem("language")].telp}
                     value={
                       currentItem !== null
                         ? `${currentItem?.supplier?.sup_telp2 ?? ""}`
@@ -1191,7 +1204,7 @@ const DataSupplier = ({
                           },
                         })
                       }
-                      placeholder="Masukan Fax"
+                      placeholder={tr[localStorage.getItem("language")].masuk}
                     />
                   </div>
                 </div>
@@ -1216,7 +1229,7 @@ const DataSupplier = ({
                       newError[1].cp = false;
                       setError(newError);
                     }}
-                    placeholder="Masukan Contact Person"
+                    placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[1]?.cp}
                   />
                 </div>
@@ -1229,7 +1242,7 @@ const DataSupplier = ({
             >
               <div className="row ml-0 mt-0">
                 <div className="col-6">
-                  <label className="text-label">Kode Currency</label>
+                  <label className="text-label">Currency</label>
                   <div className="p-inputgroup">
                     <Dropdown
                       value={currentItem !== null ? currentItem.currency : null}
@@ -1244,7 +1257,7 @@ const DataSupplier = ({
                       optionLabel="code"
                       filter
                       filterBy="code"
-                      placeholder="Pilih Jenis Currency"
+                      placeholder={tr[localStorage.getItem("language")].pilih}
                       disabled={company && !company.multi_currency}
                     />
                   </div>
@@ -1279,7 +1292,7 @@ const DataSupplier = ({
                     optionLabel="name"
                     filter
                     filterBy="name"
-                    placeholder="Pilih Jenis Pajak"
+                    placeholder={tr[localStorage.getItem("language")].pilih}
                     errorMessage="Jenis Pajak Belum Dipilih"
                     error={error[2]?.ppn}
                   />
@@ -1288,7 +1301,9 @@ const DataSupplier = ({
 
               <div className="row ml-0 mt-0">
                 <div className="col-12">
-                  <label className="text-label">Keterangan</label>
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].ket}
+                  </label>
                   <div className="p-inputgroup">
                     <InputTextarea
                       value={
@@ -1305,7 +1320,7 @@ const DataSupplier = ({
                           },
                         })
                       }
-                      placeholder="Masukan Keterangan"
+                      placeholder={tr[localStorage.getItem("language")].masuk}
                     />
                   </div>
                 </div>
@@ -1347,7 +1362,7 @@ const DataSupplier = ({
                     itemTemplate={glTemplate}
                     filter
                     filterBy="account.acc_name"
-                    placeholder="Kode Distribusi Hutang"
+                    placeholder={tr[localStorage.getItem("language")].pilih}
                     showClear
                     // errorMessage="Kode Distribusi AP Belum Dipilih"
                     // error={error[2]?.ap}
@@ -1381,7 +1396,7 @@ const DataSupplier = ({
                     itemTemplate={glTemplate}
                     filter
                     filterBy="account.acc_name"
-                    placeholder="Kode Distribusi Uang Muka"
+                    placeholder={tr[localStorage.getItem("language")].pilih}
                     showClear
                     // errorMessage="Uang Muka Pembelian Belum Dipilih"
                     // error={error[2]?.um}
@@ -1391,7 +1406,9 @@ const DataSupplier = ({
 
               <div className="row ml-0 mt-0">
                 <div className="col-12">
-                  <label className="text-label">Limit Kredit</label>
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].limit}
+                  </label>
                   <div className="p-inputgroup">
                     <InputNumber
                       value={
@@ -1408,7 +1425,7 @@ const DataSupplier = ({
                           },
                         })
                       }
-                      placeholder="Masukan Limit Kredit"
+                      placeholder={tr[localStorage.getItem("language")].masuk}
                     />
                   </div>
                 </div>
@@ -1418,7 +1435,7 @@ const DataSupplier = ({
         </Dialog>
 
         <Dialog
-          header={"Hapus Data"}
+          header={`${tr[localStorage.getItem("language")].data} ${tr[localStorage.getItem("language")].hapus}` }
           visible={showDelete}
           style={{ width: "30vw" }}
           footer={renderFooterDel()}
@@ -1433,7 +1450,7 @@ const DataSupplier = ({
               className="pi pi-exclamation-triangle mr-3 align-middle"
               style={{ fontSize: "2rem" }}
             />
-            <span>Apakah anda yakin ingin menghapus data ?</span>
+            <span>{tr[localStorage.getItem("language")].pesan_hapus}</span>
           </div>
         </Dialog>
       </>

@@ -348,7 +348,7 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
             data.status !== 2 ? "" : "disabled"
           } btn-warning shadow btn-xs sharp ml-1`}
         >
-          <i className="fa fa-times mt-0"></i>
+          <i className="bx bx-task-x mt-1"></i>
         </Link>
 
         <Link
@@ -655,7 +655,7 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
             className="pi pi-exclamation-triangle mr-3 align-middle"
             style={{ fontSize: "2rem" }}
           />
-          <span>Apakah Anda Yakin Ingin Menyelesaikan Pesanan Pembelian ?</span>
+          <span>Apakah Anda Yakin Ingin Menyelesaikan Pesanan Penjualan ?</span>
         </div>
       </Dialog>
 

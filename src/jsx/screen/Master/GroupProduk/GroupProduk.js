@@ -19,6 +19,7 @@ import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { InputSwitch } from "primereact/inputswitch";
+import { tr } from "src/data/tr";
 
 const def = {
   groupPro: {
@@ -197,7 +198,7 @@ const DataGroupProduk = ({
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -208,7 +209,7 @@ const DataGroupProduk = ({
         toast.current.show({
           severity: "error",
           summary: "Gagal",
-          detail: "Gagal Memperbarui Data",
+          detail: tr[localStorage.getItem("language")].pesan_gagal,
           life: 3000,
         });
       }, 500);
@@ -249,7 +250,7 @@ const DataGroupProduk = ({
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -272,7 +273,7 @@ const DataGroupProduk = ({
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: "Gagal Memperbarui Data",
+            detail: tr[localStorage.getItem("language")].pesan_gagal,
             life: 3000,
           });
         }, 500);
@@ -299,7 +300,7 @@ const DataGroupProduk = ({
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
-            detail: "Data Berhasil Dihapus",
+            detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
         }, 500);
@@ -314,7 +315,7 @@ const DataGroupProduk = ({
         toast.current.show({
           severity: "error",
           summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Data`,
+          detail: tr[localStorage.getItem("language")].del_gagal,
           life: 3000,
         });
       }, 500);
@@ -383,7 +384,7 @@ const DataGroupProduk = ({
         <div className="mt-3">
           {active > 0 ? (
             <PButton
-              label="Sebelumnya"
+              label={tr[localStorage.getItem("language")].sebelumnya}
               onClick={() => {
                 if (active > 0) {
                   setActive(active - 1);
@@ -393,7 +394,7 @@ const DataGroupProduk = ({
             />
           ) : (
             <PButton
-              label="Batal"
+              label={tr[localStorage.getItem("language")].batal}
               onClick={() => {
                 setDisplayData(false);
                 setActive(0);
@@ -403,7 +404,7 @@ const DataGroupProduk = ({
             />
           )}
           <PButton
-            label="Selanjutnya"
+            label={tr[localStorage.getItem("language")].selanjutnya}
             onClick={() => {
               if (active < 2) {
                 setActive(active + 1);
@@ -419,7 +420,7 @@ const DataGroupProduk = ({
     return (
       <div className="mt-3">
         <PButton
-          label="Sebelumnya"
+          label={tr[localStorage.getItem("language")].sebelumnya}
           onClick={() => {
             if (active > 0) {
               setActive(active - 1);
@@ -428,7 +429,7 @@ const DataGroupProduk = ({
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Simpan"
+          label={tr[localStorage.getItem("language")].simpan}
           icon="pi pi-check"
           onClick={() => onSubmit()}
           autoFocus
@@ -442,7 +443,7 @@ const DataGroupProduk = ({
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => {
             setDisplayDel(false);
             onInput(false);
@@ -450,7 +451,7 @@ const DataGroupProduk = ({
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Hapus"
+          label={tr[localStorage.getItem("language")].hapus}
           icon="pi pi-trash"
           onClick={() => {
             delGroupProduk();
@@ -485,11 +486,11 @@ const DataGroupProduk = ({
           <InputText
             value={globalFilterValue1}
             onChange={onGlobalFilterChange1}
-            placeholder="Cari disini"
+            placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
         <PrimeSingleButton
-          label="Tambah"
+          label={tr[localStorage.getItem("language")].tambh}
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             setEdit(false);
@@ -523,7 +524,10 @@ const DataGroupProduk = ({
       const dropdownOptions = [
         { label: 20, value: 20 },
         { label: 50, value: 50 },
-        { label: "Semua", value: options.totalRecords },
+        {
+          label: tr[localStorage.getItem("language")].hal,
+          value: options.totalRecords,
+        },
       ];
 
       return (
@@ -532,7 +536,7 @@ const DataGroupProduk = ({
             className="mx-1"
             style={{ color: "var(--text-color)", userSelect: "none" }}
           >
-            Data per halaman:{" "}
+            {tr[localStorage.getItem("language")].page}{" "}
           </span>
           <Dropdown
             value={options.value}
@@ -552,7 +556,8 @@ const DataGroupProduk = ({
             textAlign: "center",
           }}
         >
-          {options.first} - {options.last} dari {options.totalRecords}
+          {options.first} - {options.last}{" "}
+          {tr[localStorage.getItem("language")].dari} {options.totalRecords}
         </span>
       );
     },
@@ -622,15 +627,33 @@ const DataGroupProduk = ({
         name: !currentItem.groupPro.name || currentItem.groupPro.name === "",
       },
       {
-        acc_1: currentItem.groupPro.wip ? false : !currentItem.groupPro?.acc_sto,
-        acc_2: currentItem.groupPro.wip ? false : !currentItem.groupPro?.acc_send,
-        acc_3: currentItem.groupPro.wip ? false : !currentItem.groupPro?.acc_terima,
-        acc_4: currentItem.groupPro.wip ? false : !currentItem.groupPro?.hrg_pokok,
-        acc_5: currentItem.groupPro.wip ? false : !currentItem.groupPro?.acc_penj,
-        acc_6: currentItem.groupPro.wip ? false : !currentItem.groupPro?.potongan,
-        acc_7: currentItem.groupPro.wip ? false : !currentItem.groupPro?.pengembalian,
-        acc_8: currentItem.groupPro.wip ? false : !currentItem.groupPro?.selisih,
-        acc_9: !currentItem.groupPro.wip ? false : !currentItem.groupPro?.acc_wip,
+        acc_1: currentItem.groupPro.wip
+          ? false
+          : !currentItem.groupPro?.acc_sto,
+        acc_2: currentItem.groupPro.wip
+          ? false
+          : !currentItem.groupPro?.acc_send,
+        acc_3: currentItem.groupPro.wip
+          ? false
+          : !currentItem.groupPro?.acc_terima,
+        acc_4: currentItem.groupPro.wip
+          ? false
+          : !currentItem.groupPro?.hrg_pokok,
+        acc_5: currentItem.groupPro.wip
+          ? false
+          : !currentItem.groupPro?.acc_penj,
+        acc_6: currentItem.groupPro.wip
+          ? false
+          : !currentItem.groupPro?.potongan,
+        acc_7: currentItem.groupPro.wip
+          ? false
+          : !currentItem.groupPro?.pengembalian,
+        acc_8: currentItem.groupPro.wip
+          ? false
+          : !currentItem.groupPro?.selisih,
+        acc_9: !currentItem.groupPro.wip
+          ? false
+          : !currentItem.groupPro?.acc_wip,
       },
     ];
 
@@ -679,7 +702,7 @@ const DataGroupProduk = ({
             "groupPro.name",
             "groupPro.div_code",
           ]}
-          emptyMessage="Tidak ada data"
+          emptyMessage={tr[localStorage.getItem("language")].empty_data}
           paginator
           paginatorTemplate={template2}
           first={first2}
@@ -690,7 +713,7 @@ const DataGroupProduk = ({
           onRowSelect={onRowSelect}
         >
           <Column
-            header="Kode Group"
+            header={tr[localStorage.getItem("language")].kd_grup}
             style={{
               minWidth: "8rem",
             }}
@@ -698,7 +721,7 @@ const DataGroupProduk = ({
             body={load && <Skeleton />}
           />
           <Column
-            header="Nama Group"
+            header={tr[localStorage.getItem("language")].nm_grup}
             style={{
               minWidth: "8rem",
             }}
@@ -706,7 +729,7 @@ const DataGroupProduk = ({
             body={load && <Skeleton />}
           />
           <Column
-            header="Divisi"
+            header={tr[localStorage.getItem("language")].divisi}
             field={(e) => e.divisi?.name ?? "-"}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
@@ -728,7 +751,15 @@ const DataGroupProduk = ({
       <>
         <Toast ref={toast} />
         <Dialog
-          header={isEdit ? "Edit Data" : "Tambah Data"}
+          header={
+            isEdit
+              ? `${tr[localStorage.getItem("language")].edit} ${
+                  tr[localStorage.getItem("language")].g_prod
+                }`
+              : `${tr[localStorage.getItem("language")].tambh} ${
+                  tr[localStorage.getItem("language")].g_prod
+                }`
+          }
           visible={displayData}
           style={{ width: "50vw" }}
           footer={renderFooter()}
@@ -747,7 +778,7 @@ const DataGroupProduk = ({
               <div className="row mr-0 ml-0">
                 <div className="col-6">
                   <PrimeInput
-                    label={"Kode Group"}
+                    label={tr[localStorage.getItem("language")].kd_grup}
                     value={`${currentItem?.groupPro?.code ?? ""}`}
                     onChange={(e) => {
                       setCurrentItem({
@@ -761,14 +792,14 @@ const DataGroupProduk = ({
                       newError[0].code = false;
                       setError(newError);
                     }}
-                    placeholder="Masukan Kode Group"
+                    placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[0]?.code}
                   />
                 </div>
 
                 <div className="col-6">
                   <PrimeInput
-                    label={"Nama Group"}
+                    label={tr[localStorage.getItem("language")].nm_grup}
                     value={`${currentItem?.groupPro?.name ?? ""}`}
                     onChange={(e) => {
                       setCurrentItem({
@@ -782,14 +813,16 @@ const DataGroupProduk = ({
                       newError[0].name = false;
                       setError(newError);
                     }}
-                    placeholder="Masukan Nama Group"
+                    placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[0]?.name}
                   />
                 </div>
               </div>
               <div className="row mr-0 ml-0">
                 <div className="col-6">
-                  <label className="text-label">Divisi</label>
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].divisi}
+                  </label>
                   <div className="p-inputgroup">
                     <Dropdown
                       value={currentItem !== null ? currentItem.divisi : null}
@@ -804,7 +837,7 @@ const DataGroupProduk = ({
                       optionLabel="name"
                       filter
                       filterBy="name"
-                      placeholder="Pilih Divisi"
+                      placeholder={tr[localStorage.getItem("language")].pilih}
                     />
                   </div>
                 </div>
@@ -828,7 +861,9 @@ const DataGroupProduk = ({
                           });
                         }}
                       />
-                      <label className="mr-5 mt-1">{"Group Produk WIP"}</label>
+                      <label className="mr-5 mt-1">{`${
+                        tr[localStorage.getItem("language")].g_prod
+                      } WIP`}</label>
                     </div>
                   </div>
                 </div>
@@ -868,7 +903,7 @@ const DataGroupProduk = ({
                     itemTemplate={glTemplate}
                     filter
                     filterBy="account.acc_name"
-                    placeholder="Pilih Akun Persediaan"
+                    placeholder={tr[localStorage.getItem("language")].pilih}
                     showClear
                     errorMessage="Akun Persediaan Belum Dipilih"
                     error={error[1]?.acc_1}
@@ -904,7 +939,7 @@ const DataGroupProduk = ({
                     itemTemplate={glTemplate}
                     filter
                     filterBy="account.acc_name"
-                    placeholder="Pilih Akun Pengiriman"
+                    placeholder={tr[localStorage.getItem("language")].pilih}
                     showClear
                     errorMessage="Akun Pengiriman Belum Dipilih"
                     error={error[1]?.acc_2}
@@ -942,7 +977,7 @@ const DataGroupProduk = ({
                     itemTemplate={glTemplate}
                     filter
                     filterBy="account.acc_name"
-                    placeholder="Pilih Akun Penerimaan"
+                    placeholder={tr[localStorage.getItem("language")].pilih}
                     showClear
                     errorMessage="Akun Penerimaan Belum Dipilih"
                     error={error[1]?.acc_3}
@@ -977,7 +1012,7 @@ const DataGroupProduk = ({
                     itemTemplate={glTemplate}
                     filter
                     filterBy="account.acc_name"
-                    placeholder="Pilih Akun WIP"
+                    placeholder={tr[localStorage.getItem("language")].pilih}
                     showClear
                     disabled={currentItem && !currentItem.groupPro.wip}
                     errorMessage="Akun wip harus dipilih"
@@ -1022,7 +1057,7 @@ const DataGroupProduk = ({
                     itemTemplate={glTemplate}
                     filter
                     filterBy="account.acc_name"
-                    placeholder="Pilih Harga Pokok Penjualan"
+                    placeholder={tr[localStorage.getItem("language")].pilih}
                     showClear
                     errorMessage="Akun HPP Belum Dipilih"
                     error={error[1]?.acc_4}
@@ -1058,7 +1093,7 @@ const DataGroupProduk = ({
                     itemTemplate={glTemplate}
                     filter
                     filterBy="account.acc_name"
-                    placeholder="Pilih Akun Penjualan"
+                    placeholder={tr[localStorage.getItem("language")].pilih}
                     showClear
                     errorMessage="Akun Penjualan Belum Dipilih"
                     error={error[1]?.acc_5}
@@ -1096,7 +1131,7 @@ const DataGroupProduk = ({
                     itemTemplate={glTemplate}
                     filter
                     filterBy="account.acc_name"
-                    placeholder="Pilih Akun Potongan Penjualan"
+                    placeholder={tr[localStorage.getItem("language")].pilih}
                     showClear
                     errorMessage="Akun Potongan Penjualan Belum Dipilih"
                     error={error[1]?.acc_6}
@@ -1132,7 +1167,7 @@ const DataGroupProduk = ({
                     itemTemplate={glTemplate}
                     filter
                     filterBy="account.acc_name"
-                    placeholder="Pilih Akun Pengembalian"
+                    placeholder={tr[localStorage.getItem("language")].pilih}
                     showClear
                     errorMessage="Akun Pengembalian Belum Dipilih"
                     error={error[1]?.acc_7}
@@ -1170,7 +1205,7 @@ const DataGroupProduk = ({
                     itemTemplate={glTemplate}
                     filter
                     filterBy="account.acc_name"
-                    placeholder="Pilih Akun Selisih Harga Pokok"
+                    placeholder={tr[localStorage.getItem("language")].pilih}
                     showClear
                     errorMessage="Akun Selisih Harga Belum Dipilih"
                     error={error[1]?.acc_8}
@@ -1183,7 +1218,9 @@ const DataGroupProduk = ({
         </Dialog>
 
         <Dialog
-          header={"Hapus Data"}
+          header={`${tr[localStorage.getItem("language")].g_prod} ${
+            tr[localStorage.getItem("language")].hapus
+          }`}
           visible={displayDel}
           style={{ width: "30vw" }}
           footer={renderFooterDel("displayDel")}
@@ -1197,7 +1234,7 @@ const DataGroupProduk = ({
               className="pi pi-exclamation-triangle mr-3 align-middle"
               style={{ fontSize: "2rem" }}
             />
-            <span>Apakah anda yakin ingin menghapus data ?</span>
+            <span>{tr[localStorage.getItem("language")].pesan_hapus}</span>
           </div>
         </Dialog>
       </>

@@ -24,6 +24,7 @@ import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
+import { tr } from "src/data/tr";
 
 const def = {
   customer: {
@@ -400,7 +401,7 @@ const DataCustomer = ({
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -411,7 +412,7 @@ const DataCustomer = ({
         toast.current.show({
           severity: "error",
           summary: "Gagal",
-          detail: "Gagal Memperbarui Data",
+          detail: tr[localStorage.getItem("language")].pesan_gagal,
           life: 3000,
         });
       }, 500);
@@ -460,7 +461,7 @@ const DataCustomer = ({
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -483,7 +484,7 @@ const DataCustomer = ({
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: "Gagal Memperbarui Data",
+            detail: tr[localStorage.getItem("language")].pesan_gagal,
             life: 3000,
           });
         }, 500);
@@ -511,7 +512,7 @@ const DataCustomer = ({
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
-            detail: "Data Berhasil Dihapus",
+            detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
         }, 500);
@@ -525,7 +526,7 @@ const DataCustomer = ({
         toast.current.show({
           severity: "error",
           summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Data`,
+          detail: tr[localStorage.getItem("language")].del_gagal,
           life: 3000,
         });
       }, 500);
@@ -646,7 +647,7 @@ const DataCustomer = ({
         <div className="mt-3">
           {active > 0 ? (
             <PButton
-              label="Sebelumnya"
+              label={tr[localStorage.getItem("language")].sebelumnya}
               onClick={() => {
                 if (active > 0) {
                   setActive(active - 1);
@@ -656,7 +657,7 @@ const DataCustomer = ({
             />
           ) : (
             <PButton
-              label="Batal"
+              label={tr[localStorage.getItem("language")].batal}
               onClick={() => {
                 onHideInput();
                 onInput(false);
@@ -665,7 +666,7 @@ const DataCustomer = ({
             />
           )}
           <PButton
-            label="Selanjutnya"
+            label={tr[localStorage.getItem("language")].selanjutnya}
             onClick={() => {
               if (active < 2) {
                 setActive(active + 1);
@@ -681,7 +682,7 @@ const DataCustomer = ({
     return (
       <div className="mt-3">
         <PButton
-          label="Sebelumnya"
+          label={tr[localStorage.getItem("language")].sebelumnya}
           onClick={() => {
             if (active > 0) {
               setActive(active - 1);
@@ -690,7 +691,7 @@ const DataCustomer = ({
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Simpan"
+          label={tr[localStorage.getItem("language")].simpan}
           icon="pi pi-check"
           onClick={() => onSubmit()}
           autoFocus
@@ -704,7 +705,7 @@ const DataCustomer = ({
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => {
             setShowDelete(false);
             setUpdate(false);
@@ -713,7 +714,7 @@ const DataCustomer = ({
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Hapus"
+          label={tr[localStorage.getItem("language")].hapus}
           icon="pi pi-trash"
           onClick={() => {
             delCustomer();
@@ -748,11 +749,11 @@ const DataCustomer = ({
           <InputText
             value={globalFilterValue1}
             onChange={onGlobalFilterChange1}
-            placeholder="Cari disini"
+            placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
         <PrimeSingleButton
-          label="Tambah"
+          label={tr[localStorage.getItem("language")].tambh}
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             setShowInput(true);
@@ -779,7 +780,10 @@ const DataCustomer = ({
       const dropdownOptions = [
         { label: 20, value: 20 },
         { label: 50, value: 50 },
-        { label: "Semua", value: options.totalRecords },
+        {
+          label: tr[localStorage.getItem("language")].hal,
+          value: options.totalRecords,
+        },
       ];
 
       return (
@@ -788,7 +792,7 @@ const DataCustomer = ({
             className="mx-1"
             style={{ color: "var(--text-color)", userSelect: "none" }}
           >
-            Data per halaman:{" "}
+            {tr[localStorage.getItem("language")].page}{" "}
           </span>
           <Dropdown
             value={options.value}
@@ -808,7 +812,8 @@ const DataCustomer = ({
             textAlign: "center",
           }}
         >
-          {options.first} - {options.last} dari {options.totalRecords}
+          {options.first} - {options.last}{" "}
+          {tr[localStorage.getItem("language")].dari} {options.totalRecords}
         </span>
       );
     },
@@ -954,7 +959,7 @@ const DataCustomer = ({
         onRowSelect={onRowSelect}
       >
         <Column
-          header="Kode Pelanggan"
+          header={tr[localStorage.getItem("language")].kd_pel}
           style={{
             minWidth: "8rem",
           }}
@@ -976,25 +981,25 @@ const DataCustomer = ({
           }
         />
         <Column
-          header="Nama Pelanggan"
+          header={tr[localStorage.getItem("language")].nm_pel}
           field={(e) => e?.customer?.cus_name}
           style={{ minWidth: "8rem" }}
           body={load && <Skeleton />}
         />
         <Column
-          header="Alamat"
+          header={tr[localStorage.getItem("language")].alamat}
           field={(e) => e?.customer?.cus_address}
           style={{ minWidth: "8rem" }}
           body={load && <Skeleton />}
         />
         <Column
-          header="No. Telepon (+62)"
+          header={tr[localStorage.getItem("language")].telp}
           field={(e) => e?.customer?.cus_telp1 ?? "-"}
           style={{ minWidth: "8rem" }}
           body={load && <Skeleton />}
         />
         <Column
-          header="Limit Kredit"
+          header={tr[localStorage.getItem("language")].limit}
           field={(e) => formatIdr(e?.customer?.cus_limit ?? "0")}
           style={{ minWidth: "8rem" }}
           body={load && <Skeleton />}
@@ -1016,7 +1021,15 @@ const DataCustomer = ({
         <Toast ref={toast} />
 
         <Dialog
-          header={isEdit ? "Edit Data Pelanggan" : "Tambah Data Pelanggan"}
+          header={
+            isEdit
+              ? `${tr[localStorage.getItem("language")].edit} ${
+                  tr[localStorage.getItem("language")].customer
+                }`
+              : `${tr[localStorage.getItem("language")].tambh} ${
+                  tr[localStorage.getItem("language")].customer
+                }`
+          }
           visible={showInput}
           style={{ width: "50vw" }}
           footer={renderFooter()}
@@ -1047,8 +1060,8 @@ const DataCustomer = ({
                       newError[0].code = false;
                       setError(newError);
                     }}
-                    label="Kode Pelanggan"
-                    placeholder="Masukan Kode Pelanggan"
+                    label={tr[localStorage.getItem("language")].kd_pel}
+                    placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[0]?.code}
                   />
                 </div>
@@ -1068,8 +1081,8 @@ const DataCustomer = ({
                       newError[0].name = false;
                       setError(newError);
                     }}
-                    placeholder="Masukan Nama Pelanggan"
-                    label="Nama Pelanggan"
+                    placeholder={tr[localStorage.getItem("language")].masuk}
+                    label={tr[localStorage.getItem("language")].nm_pel}
                     error={error[0]?.name}
                   />
                 </div>
@@ -1078,7 +1091,7 @@ const DataCustomer = ({
               <div className="row mr-0 ml-0">
                 <div className="col-6">
                   <PrimeDropdown
-                    label="Jenis Pelanggan"
+                    label={tr[localStorage.getItem("language")].pel_type}
                     value={currentItem !== null ? currentItem.jpel : null}
                     options={jpel}
                     onChange={(e) => {
@@ -1094,14 +1107,16 @@ const DataCustomer = ({
                     optionLabel="jpel_name"
                     filter
                     filterBy="jpel_name"
-                    placeholder="Pilih Jenis Pelanggan"
+                    placeholder={tr[localStorage.getItem("language")].pilih}
                     errorMessage="Jenis pelanggan harus dipilih"
                     error={error[0]?.jpel}
                   />
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">Sub Area Penjualan</label>
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].sub_area}
+                  </label>
                   <div className="p-inputgroup">
                     <Dropdown
                       value={currentItem !== null ? currentItem.subArea : null}
@@ -1116,7 +1131,7 @@ const DataCustomer = ({
                       optionLabel="sub_name"
                       filter
                       filterBy="sub_name"
-                      placeholder="Pilih Sub Area"
+                      placeholder={tr[localStorage.getItem("language")].pilih}
                     />
                   </div>
                 </div>
@@ -1139,7 +1154,7 @@ const DataCustomer = ({
                       newError[0].npwp = false;
                       setError(newError);
                     }}
-                    placeholder="Masukan NPWP"
+                    placeholder={tr[localStorage.getItem("language")].masuk}
                     type="number"
                     error={error[0]?.npwp}
                   />
@@ -1159,14 +1174,14 @@ const DataCustomer = ({
                   }}
                 />
                 <label className="mr-3 mt-1" htmlFor="email">
-                  {"Jadikan Sub Pelanggan"}
+                  {tr[localStorage.getItem("language")].sub_pel}
                 </label>
               </div>
 
               {currentItem?.customer?.sub_cus && (
                 <div className="col-12">
                   <PrimeDropdown
-                    label={"Induk Pelanggan"}
+                    label={tr[localStorage.getItem("language")].induk_pel}
                     value={
                       currentItem !== null
                         ? checkPelanggan(currentItem?.customer?.cus_id)
@@ -1189,7 +1204,7 @@ const DataCustomer = ({
                     optionLabel="customer.cus_name"
                     filter
                     filterBy="customer.cus_name"
-                    placeholder="Pilih Pelanggan"
+                    placeholder={tr[localStorage.getItem("language")].pilih}
                     itemTemplate={(e) => (
                       <div>{`${e?.customer.cus_name} (${e?.customer.cus_code})`}</div>
                     )}
@@ -1208,7 +1223,9 @@ const DataCustomer = ({
 
               <div className="col-12 p-0">
                 <div className="mt-4 ml-3 mr-3 fs-16 mb-1">
-                  <b>Alamat Pelanggan</b>
+                  <b>{`${tr[localStorage.getItem("language")].customer} ${
+                    tr[localStorage.getItem("language")].alamat
+                  }`}</b>
                 </div>
                 <Divider className="mb-2 ml-3 mr-3"></Divider>
               </div>
@@ -1216,7 +1233,7 @@ const DataCustomer = ({
               <div className="row mr-0 ml-0">
                 <div className="col-12">
                   <PrimeInput
-                    label={"Alamat"}
+                    label={tr[localStorage.getItem("language")].alamat}
                     value={`${currentItem?.customer?.cus_address ?? ""}`}
                     onChange={(e) => {
                       setCurrentItem({
@@ -1230,7 +1247,7 @@ const DataCustomer = ({
                       newError[0].addrs = false;
                       setError(newError);
                     }}
-                    placeholder="Masukan Alamat"
+                    placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[0]?.addrs}
                   />
                 </div>
@@ -1239,7 +1256,7 @@ const DataCustomer = ({
               <div className="row mr-0 ml-0">
                 <div className="col-6">
                   <PrimeDropdown
-                    label={"Kota"}
+                    label={tr[localStorage.getItem("language")].kota}
                     value={
                       currentItem !== null &&
                       currentItem.customer.cus_kota !== null
@@ -1263,14 +1280,16 @@ const DataCustomer = ({
                     optionLabel="city_name"
                     filter
                     filterBy="city_name"
-                    placeholder="Pilih Kota"
+                    placeholder={tr[localStorage.getItem("language")].pilih}
                     error={error[0]?.city}
                     errorMessage="Kota pelanggan harus dipilih"
                   />
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">Kode Pos</label>
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].kd_pos}
+                  </label>
                   <div className="p-inputgroup">
                     <InputNumber
                       value={
@@ -1288,7 +1307,7 @@ const DataCustomer = ({
                           },
                         })
                       }
-                      placeholder="Masukan Kode Pos"
+                      placeholder={tr[localStorage.getItem("language")].masuk}
                       mode="decimal"
                       useGrouping={false}
                     />
@@ -1304,7 +1323,7 @@ const DataCustomer = ({
               <div className="row mr-0 ml-0">
                 <div className="col-6">
                   <PrimeInput
-                    label={"No. Telpon 1"}
+                    label={tr[localStorage.getItem("language")].telp}
                     isNumber
                     value={`${currentItem?.customer?.cus_telp1 ?? ""}`}
                     onChange={(e) => {
@@ -1319,7 +1338,7 @@ const DataCustomer = ({
                       newError[1].phone = false;
                       setError(newError);
                     }}
-                    placeholder="Masukan No. Telepon"
+                    placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[1]?.phone}
                   />
                 </div>
@@ -1327,7 +1346,7 @@ const DataCustomer = ({
                 <div className="col-6">
                   <PrimeInput
                     isNumber
-                    label={"No. Telepon 2"}
+                    label={tr[localStorage.getItem("language")].telp}
                     value={`${currentItem?.customer?.cus_telp2 ?? ""}`}
                     onChange={(e) =>
                       setCurrentItem({
@@ -1348,7 +1367,7 @@ const DataCustomer = ({
               <div className="row mr-0 ml-0">
                 <div className="col-6">
                   <PrimeInput
-                    label={"Email"}
+                    label={tr[localStorage.getItem("language")].email}
                     isEmail
                     value={
                       currentItem !== null
@@ -1386,7 +1405,7 @@ const DataCustomer = ({
                           },
                         })
                       }
-                      placeholder="Masukan Fax"
+                      placeholder={tr[localStorage.getItem("language")].masuk}
                     />
                   </div>
                 </div>
@@ -1409,7 +1428,7 @@ const DataCustomer = ({
                       newError[1].cp = false;
                       setError(newError);
                     }}
-                    placeholder="Masukan Contact Person"
+                    placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[1]?.cp}
                   />
                 </div>
@@ -1437,7 +1456,7 @@ const DataCustomer = ({
                       optionLabel="code"
                       filter
                       filterBy="name"
-                      placeholder="Pilih Jenis Currency"
+                      placeholder={tr[localStorage.getItem("language")].pilih}
                       disabled={company && !company.multi_currency}
                     />
                   </div>
@@ -1472,7 +1491,7 @@ const DataCustomer = ({
                     optionLabel="name"
                     filter
                     filterBy="name"
-                    placeholder="Pilih Jenis Pajak"
+                    placeholder={tr[localStorage.getItem("language")].pilih}
                     error={error[2]?.ppn}
                     errorMessage="Jenis Pajak belum dipilih"
                   />
@@ -1481,7 +1500,9 @@ const DataCustomer = ({
 
               <div className="row mr-0 ml-0">
                 <div className="col-12">
-                  <label className="text-label">Keterangan</label>
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].ket}
+                  </label>
                   <div className="p-inputgroup">
                     <InputTextarea
                       value={`${currentItem?.customer?.cus_ket ?? ""}`}
@@ -1494,7 +1515,7 @@ const DataCustomer = ({
                           },
                         })
                       }
-                      placeholder="Masukan Keterangan"
+                      placeholder={tr[localStorage.getItem("language")].masuk}
                     />
                   </div>
                 </div>
@@ -1508,7 +1529,7 @@ const DataCustomer = ({
               <div className="row mr-0 ml-0">
                 <div className="col-6">
                   <PrimeDropdown
-                    label={"Kode Distribusi AR"}
+                    label={tr[localStorage.getItem("language")].code_account}
                     value={
                       currentItem !== null &&
                       currentItem.customer.cus_gl !== null
@@ -1534,7 +1555,7 @@ const DataCustomer = ({
                     itemTemplate={glTemplate}
                     filter
                     filterBy="account.acc_name"
-                    placeholder="Pilih Kode Distribusi"
+                    placeholder={tr[localStorage.getItem("language")].pilih}
                     showClear
                     // error={error[2]?.gl}
                     // errorMessage="Kode Distribusi AR belum dipilih"
@@ -1569,7 +1590,7 @@ const DataCustomer = ({
                     itemTemplate={glTemplate}
                     filter
                     filterBy="account.acc_name"
-                    placeholder="Pilih Kode Distribusi Uang Muka Penjualan"
+                    placeholder={tr[localStorage.getItem("language")].pilih}
                     showClear
                     // error={error[2]?.um}
                     // errorMessage="Kode Uang Muka Penjualan belum dipilih"
@@ -1579,7 +1600,9 @@ const DataCustomer = ({
 
               <div className="row mr-0 ml-0">
                 <div className="col-12">
-                  <label className="text-label">Limit Kredit</label>
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].limit}
+                  </label>
                   <div className="p-inputgroup">
                     <InputNumber
                       value={`${currentItem?.customer?.cus_limit ?? ""}`}
@@ -1592,7 +1615,7 @@ const DataCustomer = ({
                           },
                         })
                       }
-                      placeholder="Masukan Limit Kredit"
+                      placeholder={tr[localStorage.getItem("language")].masuk}
                     />
                   </div>
                 </div>
@@ -1602,7 +1625,9 @@ const DataCustomer = ({
         </Dialog>
 
         <Dialog
-          header={"Hapus Data"}
+          header={`${tr[localStorage.getItem("language")].data} ${
+            tr[localStorage.getItem("language")].hapus
+          }`}
           visible={showDelete}
           style={{ width: "30vw" }}
           footer={renderFooterDel}
@@ -1617,7 +1642,7 @@ const DataCustomer = ({
               className="pi pi-exclamation-triangle mr-3 align-middle"
               style={{ fontSize: "2rem" }}
             />
-            <span>Apakah anda yakin ingin menghapus data ?</span>
+            <span>{tr[localStorage.getItem("language")].pesan_hapus}</span>
           </div>
         </Dialog>
 

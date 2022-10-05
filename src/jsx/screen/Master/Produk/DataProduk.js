@@ -20,6 +20,7 @@ import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { Divider } from "@material-ui/core";
+import { tr } from "src/data/tr";
 
 const def = {
   id: null,
@@ -190,7 +191,7 @@ const DataProduk = ({
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -201,7 +202,7 @@ const DataProduk = ({
         toast.current.show({
           severity: "error",
           summary: "Gagal",
-          detail: "Gagal Memperbarui Data",
+          detail: tr[localStorage.getItem("language")].pesan_gagal,
           life: 3000,
         });
       }, 500);
@@ -235,7 +236,7 @@ const DataProduk = ({
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -258,7 +259,7 @@ const DataProduk = ({
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: "Gagal Memperbarui Data",
+            detail: tr[localStorage.getItem("language")].pesan_gagal,
             life: 3000,
           });
         }, 500);
@@ -286,7 +287,7 @@ const DataProduk = ({
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
-            detail: "Data Berhasil Dihapus",
+            detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
         }, 500);
@@ -301,7 +302,7 @@ const DataProduk = ({
         toast.current.show({
           severity: "error",
           summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Data`,
+          detail: tr[localStorage.getItem("language")].del_gagal,
           life: 3000,
         });
       }, 500);
@@ -401,7 +402,7 @@ const DataProduk = ({
         <div className="mt-3">
           {active > 0 ? (
             <PButton
-              label="Sebelumnya"
+              label={tr[localStorage.getItem("language")].sebelumnya}
               onClick={() => {
                 if (active > 0) {
                   setActive(active - 1);
@@ -411,7 +412,7 @@ const DataProduk = ({
             />
           ) : (
             <PButton
-              label="Batal"
+              label={tr[localStorage.getItem("language")].batal}
               onClick={() => {
                 setDisplayData(false);
                 setActive(0);
@@ -422,7 +423,7 @@ const DataProduk = ({
             />
           )}
           <PButton
-            label="Selanjutnya"
+            label={tr[localStorage.getItem("language")].selanjutnya}
             onClick={() => {
               if (active < 2) {
                 setActive(active + 1);
@@ -438,7 +439,7 @@ const DataProduk = ({
     return (
       <div className="mt-3">
         <PButton
-          label="Sebelumnya"
+          label={tr[localStorage.getItem("language")].sebelumnya}
           onClick={() => {
             if (active > 0) {
               setActive(active - 1);
@@ -447,7 +448,7 @@ const DataProduk = ({
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Simpan"
+          label={tr[localStorage.getItem("language")].simpan}
           icon="pi pi-check"
           onClick={() => onSubmit()}
           // onClick={() => {
@@ -466,7 +467,7 @@ const DataProduk = ({
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => {
             setDisplayDel(false);
             onInput(false);
@@ -474,7 +475,7 @@ const DataProduk = ({
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Hapus"
+          label={tr[localStorage.getItem("language")].hapus}
           icon="pi pi-trash"
           onClick={() => {
             delProduk();
@@ -509,11 +510,11 @@ const DataProduk = ({
           <InputText
             value={globalFilterValue1}
             onChange={onGlobalFilterChange1}
-            placeholder="Cari disini"
+            placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
         <PrimeSingleButton
-          label="Tambah"
+          label={tr[localStorage.getItem("language")].tambh}
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             setEdit(false);
@@ -532,7 +533,10 @@ const DataProduk = ({
       const dropdownOptions = [
         { label: 20, value: 20 },
         { label: 50, value: 50 },
-        { label: "Semua", value: options.totalRecords },
+        {
+          label: tr[localStorage.getItem("language")].hal,
+          value: options.totalRecords,
+        },
       ];
 
       return (
@@ -541,7 +545,7 @@ const DataProduk = ({
             className="mx-1"
             style={{ color: "var(--text-color)", userSelect: "none" }}
           >
-            Data per halaman:{" "}
+            {tr[localStorage.getItem("language")].page}{" "}
           </span>
           <Dropdown
             value={options.value}
@@ -561,7 +565,8 @@ const DataProduk = ({
             textAlign: "center",
           }}
         >
-          {options.first} - {options.last} dari {options.totalRecords}
+          {options.first} - {options.last}{" "}
+          {tr[localStorage.getItem("language")].dari} {options.totalRecords}
         </span>
       );
     },
@@ -667,7 +672,7 @@ const DataProduk = ({
             "type",
             "stock",
           ]}
-          emptyMessage="Tidak ada data"
+          emptyMessage={tr[localStorage.getItem("language")].empty_data}
           paginator
           paginatorTemplate={template2}
           first={first2}
@@ -678,7 +683,7 @@ const DataProduk = ({
           onRowSelect={onRowSelect}
         >
           <Column
-            header="Kode Barang"
+            header={tr[localStorage.getItem("language")].kd_prod}
             style={{
               minWidth: "8rem",
             }}
@@ -686,7 +691,7 @@ const DataProduk = ({
             body={load && <Skeleton />}
           />
           <Column
-            header="Kode Barcode"
+            header={tr[localStorage.getItem("language")].barcode}
             style={{
               minWidth: "8rem",
             }}
@@ -694,13 +699,13 @@ const DataProduk = ({
             body={load && <Skeleton />}
           />
           <Column
-            header="Nama Barang"
+            header={tr[localStorage.getItem("language")].nm_prod}
             field={(e) => e.name}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
           <Column
-            header="Group Barang"
+            header={tr[localStorage.getItem("language")].g_prod}
             field={(e) => e?.group?.name ?? ""}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
@@ -712,7 +717,7 @@ const DataProduk = ({
           body={load && <Skeleton />}
         /> */}
           <Column
-            header="Informasi Stock"
+            header={tr[localStorage.getItem("language")].stok}
             field={(e) => e?.max_stock ?? "-"}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
@@ -734,7 +739,15 @@ const DataProduk = ({
       <>
         <Toast ref={toast} />
         <Dialog
-          header={isEdit ? "Edit Data Produk" : "Tambah Data Produk"}
+          header={
+            isEdit
+              ? `${tr[localStorage.getItem("language")].edit} ${
+                  tr[localStorage.getItem("language")].prod
+                }`
+              : `${tr[localStorage.getItem("language")].tambh} ${
+                  tr[localStorage.getItem("language")].prod
+                }`
+          }
           visible={displayData}
           style={{ width: "50vw" }}
           footer={renderFooter()}
@@ -752,9 +765,9 @@ const DataProduk = ({
               headerTemplate={renderTabHeader}
             >
               <div className="row mr-0 ml-0">
-                <div className="col-6">
+                <div className="col-4">
                   <PrimeInput
-                    label={"Kode Produk"}
+                    label={tr[localStorage.getItem("language")].kd_prod}
                     value={`${currentItem?.code ?? ""}`}
                     onChange={(e) => {
                       setCurrentItem({ ...currentItem, code: e.target.value });
@@ -762,14 +775,14 @@ const DataProduk = ({
                       newError[0].code = false;
                       setError(newError);
                     }}
-                    placeholder="Masukan Kode Produk"
+                    placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[0]?.code}
                   />
                 </div>
 
-                <div className="col-6">
+                <div className="col-4">
                   <PrimeInput
-                    label={"Nama Produk"}
+                    label={tr[localStorage.getItem("language")].nm_prod}
                     value={`${currentItem?.name ?? ""}`}
                     onChange={(e) => {
                       setCurrentItem({ ...currentItem, name: e.target.value });
@@ -777,7 +790,7 @@ const DataProduk = ({
                       newError[0].name = false;
                       setError(newError);
                     }}
-                    placeholder="Masukan Nama Produk"
+                    placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[0]?.name}
                   />
                 </div>
@@ -786,7 +799,7 @@ const DataProduk = ({
               <div className="row mr-0 ml-0">
                 <div className="col-4">
                   <PrimeDropdown
-                    label={"Grup Produk"}
+                    label={tr[localStorage.getItem("language")].g_prod}
                     value={currentItem !== null ? currentItem.group : null}
                     options={group}
                     onChange={(e) => {
@@ -802,7 +815,7 @@ const DataProduk = ({
                     optionLabel="name"
                     filter
                     filterBy="name"
-                    placeholder="Pilih Grup Produk"
+                    placeholder={tr[localStorage.getItem("language")].pilih}
                     errorMessage="Grup Produk Belum Dipilih"
                     error={error[0]?.group}
                   />
@@ -810,7 +823,7 @@ const DataProduk = ({
 
                 <div className="col-4">
                   <PrimeDropdown
-                    label={"Tipe Produk"}
+                    label={tr[localStorage.getItem("language")].type_prod}
                     value={
                       currentItem !== null && currentItem.type !== null
                         ? getType(currentItem.type)
@@ -830,7 +843,7 @@ const DataProduk = ({
                     optionLabel="name"
                     filter
                     filterBy="name"
-                    placeholder="Pilih Tipe Produk"
+                    placeholder={tr[localStorage.getItem("language")].pilih}
                     errorMessage="Tipe Produk Belum Dipilih"
                     error={error[0]?.type}
                   />
@@ -838,7 +851,7 @@ const DataProduk = ({
 
                 <div className="col-4">
                   <PrimeDropdown
-                    label={"Satuan"}
+                    label={tr[localStorage.getItem("language")].satuan}
                     value={currentItem !== null ? currentItem.unit : null}
                     options={unit}
                     onChange={(e) => {
@@ -854,7 +867,7 @@ const DataProduk = ({
                     optionLabel="name"
                     filter
                     filterBy="name"
-                    placeholder="Pilih Satuan Produk"
+                    placeholder={tr[localStorage.getItem("language")].pilih}
                     errorMessage="Satuan Produk Belum Dipilih"
                     error={error[0]?.sat}
                   />
@@ -863,7 +876,7 @@ const DataProduk = ({
 
               <div className="col-12 p-0">
                 <div className="mt-4 ml-3 mr-3 fs-16 mb-1">
-                  <b>Pemasok</b>
+                  <b>{tr[localStorage.getItem("language")].supplier}</b>
                 </div>
                 <Divider className="mb-2 ml-3 mr-3"></Divider>
               </div>
@@ -871,7 +884,7 @@ const DataProduk = ({
               <div className="row mr-0 ml-0">
                 <div className="col-6">
                   <PrimeDropdown
-                    label={"Pemasok"}
+                    label={tr[localStorage.getItem("language")].supplier}
                     value={currentItem !== null ? currentItem.suplier : null}
                     options={suplier}
                     onChange={(e) => {
@@ -887,14 +900,16 @@ const DataProduk = ({
                     optionLabel="sup_name"
                     filter
                     filterBy="sup_name"
-                    placeholder="Pilih Pemasok"
+                    placeholder={tr[localStorage.getItem("language")].pilih}
                     errorMessage="Pemasok Belum Dipilih"
                     error={error[0]?.sup}
                   />
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">Kode Sebelumnya</label>
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].kd_prev}
+                  </label>
                   <div className="p-inputgroup">
                     <InputText
                       value={`${currentItem?.codeb ?? ""}`}
@@ -904,7 +919,7 @@ const DataProduk = ({
                           codeb: e.target.value,
                         })
                       }
-                      placeholder="Masukan Kode Sebelumnya"
+                      placeholder={tr[localStorage.getItem("language")].masuk}
                     />
                   </div>
                 </div>
@@ -912,27 +927,31 @@ const DataProduk = ({
 
               <div className="row mr-0 ml-0">
                 <div className="col-6">
-                  <label className="text-label">Harga Beli</label>
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].hrg_bl}
+                  </label>
                   <div className="p-inputgroup">
                     <InputNumber
                       value={`${currentItem?.b_price ?? ""}`}
                       onChange={(e) =>
                         setCurrentItem({ ...currentItem, b_price: e.value })
                       }
-                      placeholder="Masukan Harga Beli"
+                      placeholder={tr[localStorage.getItem("language")].masuk}
                     />
                   </div>
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">Harga Jual</label>
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].hrg_jl}
+                  </label>
                   <div className="p-inputgroup">
                     <InputNumber
                       value={`${currentItem?.s_price ?? ""}`}
                       onChange={(e) =>
                         setCurrentItem({ ...currentItem, s_price: e.value })
                       }
-                      placeholder="Masukan Harga Jual"
+                      placeholder={tr[localStorage.getItem("language")].masuk}
                     />
                   </div>
                 </div>
@@ -945,7 +964,9 @@ const DataProduk = ({
             >
               <div className="row mr-0 ml-0">
                 <div className="col-6">
-                  <label className="text-label">Kode Barcode</label>
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].barcode}
+                  </label>
                   <div className="p-inputgroup">
                     <InputText
                       value={`${currentItem?.barcode ?? ""}`}
@@ -955,14 +976,14 @@ const DataProduk = ({
                           barcode: e.target.value,
                         })
                       }
-                      placeholder="Masukan Kode Barcode"
+                      placeholder={tr[localStorage.getItem("language")].masuk}
                     />
                   </div>
                 </div>
 
                 <div className="col-6">
                   <PrimeDropdown
-                    label={"Metode HPP"}
+                    label={`HPP ${tr[localStorage.getItem("language")].metode}`}
                     value={
                       currentItem !== null && currentItem.metode !== null
                         ? getMetodeHPP(currentItem.metode)
@@ -982,7 +1003,7 @@ const DataProduk = ({
                     optionLabel="name"
                     filter
                     filterBy="name"
-                    placeholder="Pilih Metode HPP"
+                    placeholder={tr[localStorage.getItem("language")].pilih}
                     errorMessage="Metode HPP Belum Dipilih"
                     error={error[1]?.hpp}
                   />
@@ -991,28 +1012,32 @@ const DataProduk = ({
 
               <div className="row mr-0 ml-0">
                 <div className="col-6">
-                  <label className="text-label">Maksimum Stock</label>
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].max_sto}
+                  </label>
                   <div className="p-inputgroup">
                     <InputNumber
                       value={`${currentItem?.max_stock ?? ""}`}
                       onChange={(e) =>
                         setCurrentItem({ ...currentItem, max_stock: e.value })
                       }
-                      placeholder="Masukan Maksimum Stock"
+                      placeholder={tr[localStorage.getItem("language")].masuk}
                       showButtons
                     />
                   </div>
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">Minimum Stock</label>
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].min_sto}
+                  </label>
                   <div className="p-inputgroup">
                     <InputNumber
                       value={`${currentItem?.min_stock ?? ""}`}
                       onChange={(e) =>
                         setCurrentItem({ ...currentItem, min_stock: e.value })
                       }
-                      placeholder="Masukan Minimum Stock"
+                      placeholder={tr[localStorage.getItem("language")].masuk}
                       showButtons
                     />
                   </div>
@@ -1045,7 +1070,7 @@ const DataProduk = ({
                           lt_stock: e.target.value,
                         })
                       }
-                      placeholder="Masukan Lead Timeout Stock"
+                      placeholder={tr[localStorage.getItem("language")].masuk}
                     />
                   </div>
                 </div>
@@ -1053,7 +1078,9 @@ const DataProduk = ({
 
               <div className="row mr-0 ml-0">
                 <div className="col-12">
-                  <label className="text-label">Maksimal Order</label>
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].max_ord}
+                  </label>
                   <div className="p-inputgroup">
                     <InputNumber
                       value={`${currentItem?.max_order ?? ""}`}
@@ -1069,7 +1096,9 @@ const DataProduk = ({
 
               <div className="row mr-0 ml-0">
                 <div className="col-12">
-                  <label className="text-label">Gambar</label>
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].img}
+                  </label>
                   <Tooltip target=".upload" mouseTrack mouseTrackLeft={10} />
                   <input
                     type="file"
@@ -1132,7 +1161,9 @@ const DataProduk = ({
         </Dialog>
 
         <Dialog
-          header={"Hapus Data"}
+          header={`${tr[localStorage.getItem("language")].prod} ${
+            tr[localStorage.getItem("language")].hapus
+          }`}
           visible={displayDel}
           style={{ width: "30vw" }}
           footer={renderFooterDel("displayDel")}
@@ -1146,7 +1177,7 @@ const DataProduk = ({
               className="pi pi-exclamation-triangle mr-3 align-middle"
               style={{ fontSize: "2rem" }}
             />
-            <span>Apakah anda yakin ingin menghapus data ?</span>
+            <span>{tr[localStorage.getItem("language")].pesan_hapus}</span>
           </div>
         </Dialog>
       </>

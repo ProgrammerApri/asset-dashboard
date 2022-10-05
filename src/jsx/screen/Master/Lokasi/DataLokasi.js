@@ -16,6 +16,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { classNames } from "primereact/utils";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import { tr } from "src/data/tr";
 
 const def = {
   id: 1,
@@ -86,7 +87,7 @@ const DataLokasi = ({
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -97,7 +98,7 @@ const DataLokasi = ({
         toast.current.show({
           severity: "error",
           summary: "Gagal",
-          detail: "Gagal Memperbarui Data",
+          detail: tr[localStorage.getItem("language")].pesan_gagal,
           life: 3000,
         });
       }, 500);
@@ -128,7 +129,7 @@ const DataLokasi = ({
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -151,7 +152,7 @@ const DataLokasi = ({
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: "Gagal Memperbarui Data",
+            detail: tr[localStorage.getItem("language")].pesan_gagal,
             life: 3000,
           });
         }, 500);
@@ -160,7 +161,7 @@ const DataLokasi = ({
   };
 
   const delLokasi = async (id) => {
-    setLoading(true)
+    setLoading(true);
     const config = {
       ...endpoints.delLokasi,
       endpoint: endpoints.delLokasi.endpoint + currentItem.id,
@@ -179,7 +180,7 @@ const DataLokasi = ({
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
         }, 500);
@@ -192,7 +193,7 @@ const DataLokasi = ({
         toast.current.show({
           severity: "error",
           summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Project`,
+          detail: tr[localStorage.getItem("language")].del_gagal,
           life: 3000,
         });
       }, 500);
@@ -246,7 +247,7 @@ const DataLokasi = ({
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => {
             onHideInput();
             onInput(false);
@@ -254,7 +255,7 @@ const DataLokasi = ({
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Simpan"
+          label={tr[localStorage.getItem("language")].simpan}
           icon="pi pi-check"
           onClick={() => onSubmit()}
           autoFocus
@@ -268,7 +269,7 @@ const DataLokasi = ({
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => {
             setShowDelete(false);
             setLoading(false);
@@ -277,7 +278,7 @@ const DataLokasi = ({
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Hapus"
+          label={tr[localStorage.getItem("language")].hapus}
           icon="pi pi-trash"
           onClick={() => {
             delLokasi();
@@ -312,11 +313,11 @@ const DataLokasi = ({
           <InputText
             value={globalFilterValue1}
             onChange={onGlobalFilterChange1}
-            placeholder="Cari disini"
+            placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
         <PrimeSingleButton
-          label="Tambah"
+          label={tr[localStorage.getItem("language")].tambh}
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             setShowInput(true);
@@ -336,7 +337,10 @@ const DataLokasi = ({
       const dropdownOptions = [
         { label: 20, value: 20 },
         { label: 50, value: 50 },
-        { label: "Semua", value: options.totalRecords },
+        {
+          label: tr[localStorage.getItem("language")].hal,
+          value: options.totalRecords,
+        },
       ];
 
       return (
@@ -345,7 +349,7 @@ const DataLokasi = ({
             className="mx-1"
             style={{ color: "var(--text-color)", userSelect: "none" }}
           >
-            Data per halaman:{" "}
+            {tr[localStorage.getItem("language")].page}{" "}
           </span>
           <Dropdown
             value={options.value}
@@ -365,7 +369,8 @@ const DataLokasi = ({
             textAlign: "center",
           }}
         >
-          {options.first} - {options.last} dari {options.totalRecords}
+          {options.first} - {options.last}{" "}
+          {tr[localStorage.getItem("language")].dari} {options.totalRecords}
         </span>
       );
     },
@@ -405,7 +410,7 @@ const DataLokasi = ({
           header={renderHeader}
           filters={filters1}
           globalFilterFields={["code", "name", "address", "desc"]}
-          emptyMessage="Tidak ada data"
+          emptyMessage={tr[localStorage.getItem("language")].empty_data}
           paginator
           paginatorTemplate={template2}
           first={first2}
@@ -416,7 +421,7 @@ const DataLokasi = ({
           onRowSelect={onRowSelect}
         >
           <Column
-            header="Kode Lokasi"
+            header={tr[localStorage.getItem("language")].kd_loc}
             style={{
               minWidth: "8rem",
             }}
@@ -424,19 +429,19 @@ const DataLokasi = ({
             body={load && <Skeleton />}
           />
           <Column
-            header="Nama Lokasi"
+            header={tr[localStorage.getItem("language")].nm_loc}
             field={(e) => e.name}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
           <Column
-            header="Alamat"
+            header={tr[localStorage.getItem("language")].alamat}
             field={(e) => (e.address !== "" ? e.address : "-")}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
           <Column
-            header="Keterangan"
+            header={tr[localStorage.getItem("language")].ket}
             field={(e) => (e?.desc !== "" ? e.desc : "-")}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
@@ -458,7 +463,15 @@ const DataLokasi = ({
       <>
         <Toast ref={toast} />
         <Dialog
-          header={isEdit ? "Edit Lokasi" : "Tambah Lokasi"}
+          header={
+            isEdit
+              ? `${tr[localStorage.getItem("language")].edit} ${
+                  tr[localStorage.getItem("language")].gudang
+                }`
+              : `${tr[localStorage.getItem("language")].tambh} ${
+                  tr[localStorage.getItem("language")].gudang
+                }`
+          }
           visible={showInput}
           style={{ width: "40vw" }}
           footer={renderFooter()}
@@ -470,7 +483,7 @@ const DataLokasi = ({
           <div className="row ml-0 mt-0">
             <div className="col-6">
               <PrimeInput
-                label={"Kode Lokasi"}
+                label={tr[localStorage.getItem("language")].kd_loc}
                 value={currentItem !== null ? `${currentItem.code}` : ""}
                 onChange={(e) => {
                   setCurrentItem({ ...currentItem, code: e.target.value });
@@ -478,14 +491,14 @@ const DataLokasi = ({
                   newError.code = false;
                   setError(newError);
                 }}
-                placeholder="Masukan Kode Lokasi"
+                placeholder={tr[localStorage.getItem("language")].masuk}
                 error={error?.code}
               />
             </div>
 
             <div className="col-6">
               <PrimeInput
-                label={"Nama Lokasi"}
+                label={tr[localStorage.getItem("language")].nm_loc}
                 value={currentItem !== null ? `${currentItem.name}` : ""}
                 onChange={(e) => {
                   setCurrentItem({ ...currentItem, name: e.target.value });
@@ -493,7 +506,7 @@ const DataLokasi = ({
                   newError.name = false;
                   setError(newError);
                 }}
-                placeholder="Masukan Nama Lokasi"
+                placeholder={tr[localStorage.getItem("language")].masuk}
                 error={error?.name}
               />
             </div>
@@ -502,7 +515,7 @@ const DataLokasi = ({
           <div className="row ml-0 mt-0">
             <div className="col-12">
               <PrimeInput
-                label={"Alamat Lengkap"}
+                label={tr[localStorage.getItem("language")].alamat}
                 value={currentItem !== null ? `${currentItem.address}` : ""}
                 onChange={(e) => {
                   setCurrentItem({ ...currentItem, address: e.target.value });
@@ -510,7 +523,7 @@ const DataLokasi = ({
                   newError.addr = false;
                   setError(newError);
                 }}
-                placeholder="Masukan Alamat"
+                placeholder={tr[localStorage.getItem("language")].masuk}
                 error={error?.addr}
               />
             </div>
@@ -518,14 +531,16 @@ const DataLokasi = ({
 
           <div className="row ml-0 mt-0">
             <div className="col-12">
-              <label className="text-label">Keterangan</label>
+              <label className="text-label">
+                {tr[localStorage.getItem("language")].ket}
+              </label>
               <div className="p-inputgroup">
                 <InputTextarea
                   value={currentItem !== null ? `${currentItem.desc}` : ""}
                   onChange={(e) =>
                     setCurrentItem({ ...currentItem, desc: e.target.value })
                   }
-                  placeholder="Masukan Keterangan"
+                  placeholder={tr[localStorage.getItem("language")].masuk}
                 />
               </div>
             </div>
@@ -533,7 +548,9 @@ const DataLokasi = ({
         </Dialog>
 
         <Dialog
-          header={"Hapus Data"}
+          header={`${tr[localStorage.getItem("language")].hapus} ${
+            tr[localStorage.getItem("language")].gudang
+          }`}
           visible={showDelete}
           style={{ width: "30vw" }}
           footer={renderFooterDel()}
@@ -548,7 +565,7 @@ const DataLokasi = ({
               className="pi pi-exclamation-triangle mr-3 align-middle"
               style={{ fontSize: "2rem" }}
             />
-            <span>Apakah anda yakin ingin menghapus data ?</span>
+            <span>{tr[localStorage.getItem("language")].pesan_hapus}</span>
           </div>
         </Dialog>
       </>

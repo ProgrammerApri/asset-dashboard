@@ -16,6 +16,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import { tr } from "src/data/tr";
 
 const def = {
   bank: {
@@ -135,7 +136,7 @@ const DataBank = ({
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -146,7 +147,7 @@ const DataBank = ({
         toast.current.show({
           severity: "error",
           summary: "Gagal",
-          detail: "Gagal Memperbarui Data",
+          detail: tr[localStorage.getItem("language")].pesan_gagal,
           life: 3000,
         });
       }, 500);
@@ -177,7 +178,7 @@ const DataBank = ({
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -200,7 +201,7 @@ const DataBank = ({
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: "Gagal Memperbarui Data",
+            detail: tr[localStorage.getItem("language")].pesan_gagal,
             life: 3000,
           });
         }, 500);
@@ -227,7 +228,7 @@ const DataBank = ({
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
         }, 500);
@@ -242,7 +243,7 @@ const DataBank = ({
         toast.current.show({
           severity: "error",
           summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Data`,
+          detail: tr[localStorage.getItem("language")].del_gagal,
           life: 3000,
         });
       }, 500);
@@ -296,7 +297,7 @@ const DataBank = ({
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => {
             setLoading(false);
             onHideInput();
@@ -305,7 +306,7 @@ const DataBank = ({
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Simpan"
+          label={tr[localStorage.getItem("language")].simpan}
           icon="pi pi-check"
           onClick={() => onSubmit()}
           autoFocus
@@ -319,7 +320,7 @@ const DataBank = ({
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => {
             setShowDelete(false);
             setLoading(false);
@@ -328,7 +329,7 @@ const DataBank = ({
           className="p-button-text btn-s btn-primary"
         />
         <PButton
-          label="Hapus"
+          label={tr[localStorage.getItem("language")].hapus}
           className="p-button btn-s btn-primary"
           icon="pi pi-trash"
           onClick={() => {
@@ -364,11 +365,11 @@ const DataBank = ({
           <InputText
             value={globalFilterValue1}
             onChange={onGlobalFilterChange1}
-            placeholder="Cari disini"
+            placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
         <PrimeSingleButton
-          label="Tambah"
+          label={tr[localStorage.getItem("language")].tambh}
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             setShowInput(true);
@@ -388,7 +389,10 @@ const DataBank = ({
       const dropdownOptions = [
         { label: 20, value: 20 },
         { label: 50, value: 50 },
-        { label: "Semua", value: options.totalRecords },
+        {
+          label: tr[localStorage.getItem("language")].hal,
+          value: options.totalRecords,
+        },
       ];
 
       return (
@@ -397,7 +401,7 @@ const DataBank = ({
             className="mx-1"
             style={{ color: "var(--text-color)", userSelect: "none" }}
           >
-            Data per halaman:{" "}
+            {tr[localStorage.getItem("language")].page}{" "}
           </span>
           <Dropdown
             value={options.value}
@@ -417,7 +421,8 @@ const DataBank = ({
             textAlign: "center",
           }}
         >
-          {options.first} - {options.last} dari {options.totalRecords}
+          {options.first} - {options.last}{" "}
+          {tr[localStorage.getItem("language")].dari} {options.totalRecords}
         </span>
       );
     },
@@ -500,7 +505,7 @@ const DataBank = ({
           onRowSelect={onRowSelect}
         >
           <Column
-            header="Kode Bank"
+            header={tr[localStorage.getItem("language")].kd_bnk}
             style={{
               minWidth: "8rem",
             }}
@@ -508,20 +513,20 @@ const DataBank = ({
             body={load && <Skeleton />}
           />
           <Column
-            header="Nama Bank"
+            header={tr[localStorage.getItem("language")].nm_bnk}
             field={(e) => e.bank?.BANK_NAME}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
           <Column
-            header="Akun GL"
+            header={tr[localStorage.getItem("language")].akun}
             field={(e) => e.account?.acc_name}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
           <Column
-            header="Keterangan"
-            field={(e) => e.bank?.BANK_DESC !== "" ? e.bank?.BANK_DESC : "-"}
+            header={tr[localStorage.getItem("language")].ket}
+            field={(e) => (e.bank?.BANK_DESC !== "" ? e.bank?.BANK_DESC : "-")}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
@@ -542,7 +547,15 @@ const DataBank = ({
       <>
         <Toast ref={toast} />
         <Dialog
-          header={isEdit ? "Edit Bank" : "Tambah Bank"}
+          header={
+            isEdit
+              ? `${tr[localStorage.getItem("language")].edit} ${
+                  tr[localStorage.getItem("language")].bank
+                }`
+              : `${tr[localStorage.getItem("language")].tambh} ${
+                  tr[localStorage.getItem("language")].bank
+                }`
+          }
           visible={showInput}
           style={{ width: "40vw" }}
           footer={renderFooter()}
@@ -554,7 +567,7 @@ const DataBank = ({
           <div className="row ml-0 mt-0">
             <div className="col-6">
               <PrimeInput
-                label={"Kode Bank"}
+                label={tr[localStorage.getItem("language")].kd_bnk}
                 value={
                   currentItem !== null ? `${currentItem.bank.BANK_CODE}` : ""
                 }
@@ -567,14 +580,14 @@ const DataBank = ({
                   newError.code = false;
                   setError(newError);
                 }}
-                placeholder="Masukan Kode Bank"
+                placeholder={tr[localStorage.getItem("language")].masuk}
                 error={error?.code}
               />
             </div>
 
             <div className="col-6">
               <PrimeInput
-                label={"Nama Bank"}
+                label={tr[localStorage.getItem("language")].nm_bnk}
                 value={
                   currentItem !== null ? `${currentItem.bank.BANK_NAME}` : ""
                 }
@@ -587,7 +600,7 @@ const DataBank = ({
                   newError.name = false;
                   setError(newError);
                 }}
-                placeholder="Masukan Nama Akun"
+                placeholder={tr[localStorage.getItem("language")].masuk}
                 error={error?.name}
               />
             </div>
@@ -596,7 +609,7 @@ const DataBank = ({
           <div className="row ml-0 mt-0">
             <div className="col-12">
               <PrimeDropdown
-                label={"Akun Distribusi GL"}
+                label={tr[localStorage.getItem("language")].akun}
                 value={currentItem !== null ? currentItem.account : null}
                 options={account && account}
                 onChange={(e) => {
@@ -612,7 +625,7 @@ const DataBank = ({
                 optionLabel="acc_name"
                 filter
                 filterBy="acc_name"
-                placeholder="Pilih Akun GL"
+                placeholder={tr[localStorage.getItem("language")].pilih}
                 itemTemplate={glTemplate}
                 valueTemplate={valueTemp}
                 errorMessage="Akun Distribusi GL Belum Dipilih"
@@ -623,7 +636,9 @@ const DataBank = ({
 
           <div className="row ml-0 mt-0">
             <div className="col-12">
-              <label className="text-label">Keterangan</label>
+              <label className="text-label">
+                {tr[localStorage.getItem("language")].ket}
+              </label>
               <div className="p-inputgroup">
                 <InputTextarea
                   value={
@@ -635,7 +650,7 @@ const DataBank = ({
                       bank: { ...currentItem.bank, BANK_DESC: e.target.value },
                     })
                   }
-                  placeholder="Masukan Keterangan"
+                  placeholder={tr[localStorage.getItem("language")].masuk}
                 />
               </div>
             </div>
@@ -643,7 +658,9 @@ const DataBank = ({
         </Dialog>
 
         <Dialog
-          header={"Hapus Data"}
+          header={`${tr[localStorage.getItem("language")].data} ${
+            tr[localStorage.getItem("language")].hapus
+          }`}
           visible={showDelete}
           style={{ width: "30vw" }}
           footer={renderFooterDel()}
@@ -658,7 +675,7 @@ const DataBank = ({
               className="pi pi-exclamation-triangle mr-2 align-middle"
               style={{ fontSize: "1rem" }}
             />
-            <span>Apakah anda yakin ingin menghapus data ?</span>
+            <span>{tr[localStorage.getItem("language")].pesan_hapus}</span>
           </div>
         </Dialog>
       </>

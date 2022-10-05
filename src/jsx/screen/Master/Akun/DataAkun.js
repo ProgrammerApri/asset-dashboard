@@ -491,7 +491,7 @@ const DataAkun = ({
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => {
             onHideInput();
             onInput(false);
@@ -499,7 +499,7 @@ const DataAkun = ({
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Simpan"
+          label={tr[localStorage.getItem("language")].simpan}
           icon="pi pi-check"
           onClick={() => onSubmit()}
           autoFocus
@@ -588,7 +588,7 @@ const DataAkun = ({
             <InputText
               value={globalFilterValue1}
               onChange={onGlobalFilterChange1}
-              placeholder="Cari disini"
+              placeholder={tr[localStorage.getItem("language")].cari}
             />
           </span>
           <Row className="mr-1">
@@ -609,7 +609,7 @@ const DataAkun = ({
               }}
             />
             <PrimeSingleButton
-              label="Tambah"
+              label={tr[localStorage.getItem("language")].tambh}
               icon={<i class="bx bx-plus px-2"></i>}
               onClick={() => {
                 setShowInput(true);
@@ -910,19 +910,19 @@ const DataAkun = ({
             body={load && <Skeleton />}
           />
           <Column
-            header="Nama Akun"
+            header={tr[localStorage.getItem("language")].name_account}
             field={(e) => e.account.acc_name}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
           <Column
-            header="Kategori"
+            header={tr[localStorage.getItem("language")].kateg}
             field={(e) => e.kategory.name}
             style={{ minWidth: "6rem" }}
             body={load && <Skeleton />}
           />
           <Column
-            header="Akun Umum"
+            header={tr[localStorage.getItem("language")].acc_umum}
             // field={(e) => e.account.umm_code}
             style={{ minWidth: "8rem" }}
             body={(e) =>
@@ -934,7 +934,7 @@ const DataAkun = ({
             }
           />
           <Column
-            header="Jenis Akun"
+            header={tr[localStorage.getItem("language")].acc_type}
             field={(e) => e.account.dou_type}
             style={{ minWidth: "8rem" }}
             body={(e) =>
@@ -956,7 +956,7 @@ const DataAkun = ({
             }
           />
           <Column
-            header="Saldo Normal"
+            header={tr[localStorage.getItem("language")].sld_normal}
             field={(e) => e.account.sld_type}
             style={{ minWidth: "8rem" }}
             body={(e) =>
@@ -980,7 +980,7 @@ const DataAkun = ({
             }
           />
           <Column
-            header="Terhubung Sub Akun"
+            header={tr[localStorage.getItem("language")].sub_acc}
             field={(e) => e.account.connect}
             style={{ maxWidth: "8rem" }}
             body={(e) =>
@@ -1003,7 +1003,7 @@ const DataAkun = ({
             }
           />
           <Column
-            header="Saldo Awal"
+            header={tr[localStorage.getItem("language")].sld_awal}
             field={(e) => formatIdr(e.account.sld_awal)}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
@@ -1025,7 +1025,7 @@ const DataAkun = ({
       <>
         <Toast ref={toast} />
         <Dialog
-          header={isEdit ? "Edit Akun" : "Tambah Akun"}
+          header={isEdit ? tr[localStorage.getItem("language")].edit_acc : tr[localStorage.getItem("language")].tambh_acc}
           visible={showInput}
           style={{ width: "50vw" }}
           footer={renderFooter}
@@ -1037,7 +1037,7 @@ const DataAkun = ({
           <div className="row ml-0 mt-0">
             <div className="col-4">
               <PrimeInput
-                label={"Kode Akun"}
+                label={tr[localStorage.getItem("language")].code_account}
                 value={
                   currentItem !== null ? `${currentItem.account.acc_code}` : ""
                 }
@@ -1050,14 +1050,14 @@ const DataAkun = ({
                     },
                   })
                 }
-                placeholder="Masukan Kode Akun"
+                placeholder={tr[localStorage.getItem("language")].masuk}
                 disabled
               />
             </div>
 
             <div className="col-4">
               <PrimeInput
-                label={"Nama Akun"}
+                label={tr[localStorage.getItem("language")].name_account}
                 value={
                   currentItem !== null ? `${currentItem.account.acc_name}` : ""
                 }
@@ -1071,14 +1071,14 @@ const DataAkun = ({
                   });
                   setEname(false);
                 }}
-                placeholder={"Masukan Nama Akun"}
+                placeholder={tr[localStorage.getItem("language")].masuk}
                 error={eName}
               />
             </div>
 
             <div className="col-4">
               <PrimeDropdown
-                label={"Kategori"}
+                label={tr[localStorage.getItem("language")].kateg}
                 value={
                   currentItem !== null
                     ? {
@@ -1113,7 +1113,7 @@ const DataAkun = ({
                 optionLabel="kategory.name"
                 filter
                 filterBy="kategory.name"
-                placeholder="Pilih Kategori"
+                placeholder={tr[localStorage.getItem("language")].pilih}
                 error={eKat}
                 errorMessage={"Kategori harus dipilih"}
               />
@@ -1121,7 +1121,9 @@ const DataAkun = ({
           </div>
 
           <div className="col-12 mb-2">
-            <label className="text-label">Jenis Akun</label>
+            <label className="text-label">
+              {tr[localStorage.getItem("language")].acc_type}
+            </label>
             <div className="p-inputgroup">
               <SelectButton
                 value={
@@ -1171,7 +1173,9 @@ const DataAkun = ({
             currentItem.account.kat_code !== 0 ? (
               <>
                 <div className="col-12 mb-2">
-                  <label className="text-label">Akun Umum</label>
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].acc_umum}
+                  </label>
                   <div className="p-inputgroup">
                     <Dropdown
                       value={
@@ -1192,7 +1196,7 @@ const DataAkun = ({
                       itemTemplate={umumTemplate}
                       filter
                       filterBy="account.acc_name"
-                      placeholder="Pilih Kode Umum"
+                      placeholder={tr[localStorage.getItem("language")].pilih}
                       showClear
                       // disabled={isEdit ? currentItem.account.umm_code !== null : false}
                     />
@@ -1203,7 +1207,9 @@ const DataAkun = ({
           ) : null}
 
           <div className="col-12 mb-2">
-            <label className="text-label">Saldo Normal</label>
+            <label className="text-label">
+              {tr[localStorage.getItem("language")].sld_normal}
+            </label>
             <div className="p-inputgroup">
               <SelectButton
                 value={
@@ -1246,12 +1252,12 @@ const DataAkun = ({
                     }
                   />
                   <label className="ml-3" htmlFor="binary">
-                    {"Akun Terhubung"}
+                    {tr[localStorage.getItem("language")].sub_acc}
                   </label>
                 </div>
 
                 <div className="col-12 mb-2">
-                  <label className="text-label">Saldo Awal</label>
+                  <label className="text-label">{tr[localStorage.getItem("language")].sld_awal}</label>
                   <div className="p-inputgroup">
                     <InputNumber
                       value={
@@ -1267,7 +1273,7 @@ const DataAkun = ({
                           },
                         });
                       }}
-                      placeholder="Masukan Saldo Awal"
+                      placeholder={tr[localStorage.getItem("language")].masuk}
                       disabled={
                         currentItem ? currentItem.account.connect : false
                       }

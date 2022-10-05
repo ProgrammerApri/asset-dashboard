@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button, Col, Row } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { tr } from "src/data/tr";
 import Bank from "../MasterLainnya/Bank";
 import Mitra from "../Mitra/Mitra";
 import Akun from "./Akun";
@@ -14,32 +15,32 @@ const Master = (self) => {
   const [active, setActive] = useState(0);
   const [subMenu, setSubMenu] = useState([
     {
-      tittle: "akun",
+      tittle: tr[localStorage.getItem("language")].akun,
       icon: "bx-category-alt",
       component: <Akun />,
     },
     {
-      tittle: "mitra",
+      tittle: tr[localStorage.getItem("language")].mitra,
       icon: "bx-shape-circle",
       component: <Mitra />,
     },
     {
-      tittle: "Bank",
+      tittle: tr[localStorage.getItem("language")].bank,
       icon: "bx-money-withdraw",
       component: <Bank />,
     },
     {
-      tittle: "grup produk",
+      tittle: tr[localStorage.getItem("language")].g_prod,
       icon: "bx-cabinet",
       component: <GroupProduk />,
     },
     {
-      tittle: "produk",
+      tittle: tr[localStorage.getItem("language")].prod,
       icon: "bx-archive",
       component: <Produk />,
     },
     {
-      tittle: "Gudang",
+      tittle: tr[localStorage.getItem("language")].gudang,
       icon: "bx-building",
       component: <Lokasi/>,
     },

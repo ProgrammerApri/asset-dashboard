@@ -73,6 +73,8 @@ const DataGroupProduk = ({
   onInput = () => {},
   onRowSelect,
   onSuccessInput,
+  edit,
+  del,
 }) => {
   const [groupPro, setGroup] = useState(null);
   const [divisi, setDivisi] = useState(null);
@@ -326,7 +328,7 @@ const DataGroupProduk = ({
     return (
       // <React.Fragment>
       <div className="d-flex">
-        <Link
+        {edit && <Link
           onClick={() => {
             console.log(data);
             setEdit(true);
@@ -337,9 +339,9 @@ const DataGroupProduk = ({
           className="btn btn-primary shadow btn-xs sharp ml-1"
         >
           <i className="fa fa-pencil"></i>
-        </Link>
+        </Link>}
 
-        <Link
+        {del && <Link
           onClick={() => {
             setEdit(true);
             setDisplayDel(true);
@@ -349,7 +351,7 @@ const DataGroupProduk = ({
           className="btn btn-danger shadow btn-xs sharp ml-1"
         >
           <i className="fa fa-trash"></i>
-        </Link>
+        </Link>}
       </div>
       // </React.Fragment>
     );
@@ -489,31 +491,33 @@ const DataGroupProduk = ({
             placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
-        <PrimeSingleButton
-          label={tr[localStorage.getItem("language")].tambh}
-          icon={<i class="bx bx-plus px-2"></i>}
-          onClick={() => {
-            setEdit(false);
-            setCurrentItem({
-              ...def,
-              groupPro: {
-                ...def.groupPro,
-                wip: false,
-                acc_sto: setup?.sto?.id,
-                acc_send: setup?.pur_shipping?.id,
-                acc_terima: setup?.ap?.id,
-                // acc_wip: setup?.sto_wip?.id,
-                hrg_pokok: setup?.pur_cogs?.id,
-                acc_penj: setup?.sls_rev?.id,
-                potongan: setup?.sls_disc?.id,
-                pengembalian: setup?.sls_shipping?.id,
-                selisih: setup?.sto_hpp_diff?.id,
-              },
-            });
-            setDisplayData(true);
-            onInput(true);
-          }}
-        />
+        {edit && (
+          <PrimeSingleButton
+            label={tr[localStorage.getItem("language")].tambh}
+            icon={<i class="bx bx-plus px-2"></i>}
+            onClick={() => {
+              setEdit(false);
+              setCurrentItem({
+                ...def,
+                groupPro: {
+                  ...def.groupPro,
+                  wip: false,
+                  acc_sto: setup?.sto?.id,
+                  acc_send: setup?.pur_shipping?.id,
+                  acc_terima: setup?.ap?.id,
+                  // acc_wip: setup?.sto_wip?.id,
+                  hrg_pokok: setup?.pur_cogs?.id,
+                  acc_penj: setup?.sls_rev?.id,
+                  potongan: setup?.sls_disc?.id,
+                  pengembalian: setup?.sls_shipping?.id,
+                  selisih: setup?.sto_hpp_diff?.id,
+                },
+              });
+              setDisplayData(true);
+              onInput(true);
+            }}
+          />
+        )}
       </div>
     );
   };
@@ -734,13 +738,15 @@ const DataGroupProduk = ({
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
-          <Column
-            header="Action"
-            dataType="boolean"
-            bodyClassName="text-center"
-            style={{ minWidth: "2rem" }}
-            body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
-          />
+          {(edit || del) && (
+            <Column
+              header="Action"
+              dataType="boolean"
+              bodyClassName="text-center"
+              style={{ minWidth: "2rem" }}
+              body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
+            />
+          )}
         </DataTable>
       </>
     );

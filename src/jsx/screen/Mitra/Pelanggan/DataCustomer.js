@@ -105,6 +105,8 @@ const DataCustomer = ({
   onInput = () => {},
   onRowSelect,
   onSuccessInput,
+  edit,
+  del
 }) => {
   const [customer, setCustomer] = useState(null);
   const [nonSub, setNonSub] = useState(null);
@@ -537,7 +539,7 @@ const DataCustomer = ({
     return (
       // <React.Fragment>
       <div className="d-flex">
-        <Link
+        {edit && <Link
           onClick={() => {
             setEdit(true);
             setShowInput(true);
@@ -550,9 +552,9 @@ const DataCustomer = ({
           className="btn btn-primary shadow btn-xs sharp ml-1"
         >
           <i className="fa fa-pencil"></i>
-        </Link>
+        </Link>}
 
-        <Link
+        {del && <Link
           onClick={() => {
             setCurrentItem(data);
             setShowDelete(true);
@@ -561,7 +563,7 @@ const DataCustomer = ({
           className="btn btn-danger shadow btn-xs sharp ml-1"
         >
           <i className="fa fa-trash"></i>
-        </Link>
+        </Link>}
       </div>
       // </React.Fragment>
     );
@@ -752,7 +754,7 @@ const DataCustomer = ({
             placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
-        <PrimeSingleButton
+        {edit && <PrimeSingleButton
           label={tr[localStorage.getItem("language")].tambh}
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
@@ -769,7 +771,7 @@ const DataCustomer = ({
             });
             onInput(true);
           }}
-        />
+        />}
       </div>
     );
   };
@@ -1004,13 +1006,13 @@ const DataCustomer = ({
           style={{ minWidth: "8rem" }}
           body={load && <Skeleton />}
         />
-        <Column
+        {(edit || del) && <Column
           header="Action"
           dataType="boolean"
           bodyClassName="text-center"
           style={{ minWidth: "2rem" }}
           body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
-        />
+        />}
       </DataTable>
     );
   };

@@ -62,6 +62,8 @@ const DataBank = ({
   onInput = () => {},
   onRowSelect,
   onSuccessInput,
+  edit,
+  del,
 }) => {
   const [bank, setBank] = useState(null);
   const [account, setAccount] = useState(null);
@@ -254,7 +256,7 @@ const DataBank = ({
     return (
       // <React.Fragment>
       <div className="d-flex">
-        <Link
+        {edit && <Link
           onClick={() => {
             setEdit(true);
             setCurrentItem(data);
@@ -264,9 +266,9 @@ const DataBank = ({
           className="btn btn-primary shadow btn-xs sharp ml-2"
         >
           <i className="fa fa-pencil"></i>
-        </Link>
+        </Link>}
 
-        <Link
+        {del && <Link
           onClick={() => {
             setCurrentItem(data);
             setShowDelete(true);
@@ -275,7 +277,7 @@ const DataBank = ({
           className="btn btn-danger shadow btn-xs sharp ml-2"
         >
           <i className="fa fa-trash"></i>
-        </Link>
+        </Link>}
       </div>
       // </React.Fragment>
     );
@@ -368,7 +370,7 @@ const DataBank = ({
             placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
-        <PrimeSingleButton
+        {edit && <PrimeSingleButton
           label={tr[localStorage.getItem("language")].tambh}
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
@@ -378,7 +380,7 @@ const DataBank = ({
             setCurrentItem(def);
             onInput(true);
           }}
-        />
+        />}
       </div>
     );
   };
@@ -530,13 +532,13 @@ const DataBank = ({
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
-          <Column
+          {(edit || del) && <Column
             header="Action"
             dataType="boolean"
             bodyClassName="text-center"
             style={{ minWidth: "2rem" }}
             body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
-          />
+          />}
         </DataTable>
       </>
     );

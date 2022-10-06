@@ -27,7 +27,7 @@ const data = {
   },
 };
 
-const GroupProduk = () => {
+const GroupProduk = ({ edit, del }) => {
   const [group, setGroup] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -73,6 +73,8 @@ const GroupProduk = () => {
                 data={loading ? dummy : group}
                 load={loading}
                 onSuccessInput={() => getGroupProduk()}
+                edit={edit}
+                del={del}
               />
             </Card.Body>
           </Card>

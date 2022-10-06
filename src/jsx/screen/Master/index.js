@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Button, Col, Row } from "react-bootstrap";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { tr } from "src/data/tr";
 import Bank from "../MasterLainnya/Bank";
@@ -13,39 +14,77 @@ import Produk from "./Produk";
 
 const Master = (self) => {
   const [active, setActive] = useState(0);
-  const [subMenu, setSubMenu] = useState([
-    {
-      tittle: tr[localStorage.getItem("language")].akun,
-      icon: "bx-category-alt",
-      component: <Akun />,
-    },
-    {
-      tittle: tr[localStorage.getItem("language")].mitra,
-      icon: "bx-shape-circle",
-      component: <Mitra />,
-    },
-    {
-      tittle: tr[localStorage.getItem("language")].bank,
-      icon: "bx-money-withdraw",
-      component: <Bank />,
-    },
-    {
-      tittle: tr[localStorage.getItem("language")].g_prod,
-      icon: "bx-cabinet",
-      component: <GroupProduk />,
-    },
-    {
-      tittle: tr[localStorage.getItem("language")].prod,
-      icon: "bx-archive",
-      component: <Produk />,
-    },
-    {
-      tittle: tr[localStorage.getItem("language")].gudang,
-      icon: "bx-building",
-      component: <Lokasi/>,
-    },
-    
-  ]);
+  const accessMenu = useSelector((state) => state.profile.profile?.menu);
+  const [subMenu, setSubMenu] = useState([]);
+
+  useEffect(() => {
+    let sub = [];
+    accessMenu
+      ?.filter((v) => v.route_name === "master" && v.view)
+      ?.map((el) => {
+        el.submenu.forEach((e) => {
+          if (e.view) {
+            switch (e.route_name) {
+              case "akun":
+                sub.push({
+                  tittle: tr[localStorage.getItem("language")].akun,
+                  icon: e.icon_file,
+                  component: <Akun edit={e.edit} del={e.delete} />,
+                });
+                break;
+              case "mitra":
+                let last = [];
+                e.lastmenu.forEach((x) => {
+                  if (x.view) {
+                    last.push(x);
+                  }
+                });
+                if (last.length) {
+                  sub.push({
+                    tittle: tr[localStorage.getItem("language")].mitra,
+                    icon: e.icon_file,
+                    component: <Mitra item={last} />,
+                  });
+                }
+                break;
+              case "bank":
+                sub.push({
+                  tittle: tr[localStorage.getItem("language")].bank,
+                  icon: e.icon_file,
+                  component: <Bank edit={e.edit} del={e.delete} />,
+                });
+                break;
+              case "group-produk":
+                sub.push({
+                  tittle: tr[localStorage.getItem("language")].g_prod,
+                  icon: e.icon_file,
+                  component: <GroupProduk edit={e.edit} del={e.delete} />,
+                });
+                break;
+              case "produk":
+                sub.push({
+                  tittle: tr[localStorage.getItem("language")].prod,
+                  icon: e.icon_file,
+                  component: <Produk edit={e.edit} del={e.delete} />,
+                });
+                break;
+              case "gudang":
+                sub.push({
+                  tittle: tr[localStorage.getItem("language")].gudang,
+                  icon: e.icon_file,
+                  component: <Lokasi edit={e.edit} del={e.delete} />,
+                });
+                break;
+
+              default:
+                break;
+            }
+          }
+        });
+      });
+
+    setSubMenu(sub);
+  }, []);
 
   let id =
     subMenu.findIndex(
@@ -87,7 +126,9 @@ const Master = (self) => {
   return (
     <Row className="mb-0">
       <Col className="col-12 pb-0">{renderSubMenu()}</Col>
-      <Col className="mb-0 pt-0">{subMenu[id].component}</Col>
+      <Col className="mb-0 pt-0">
+        {subMenu.length ? subMenu[id].component : ""}
+      </Col>
     </Row>
   );
 };

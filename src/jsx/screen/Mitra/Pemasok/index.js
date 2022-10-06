@@ -49,7 +49,7 @@ const data = {
   },
 };
 
-const Supplier = () => {
+const Supplier = ({edit, del}) => {
   const [supplier, setSupplier] = useState(null);
   const [ap, setAp] = useState(null);
   const [date, setDate] = useState(new Date());
@@ -354,6 +354,8 @@ const Supplier = () => {
                 data={loading ? dummy : supplier}
                 load={loading}
                 onSuccessInput={() => getSupplier()}
+                edit ={edit}
+                del={del}
               />
             </Card.Body>
           </Card>

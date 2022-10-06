@@ -1,0 +1,5 @@
+export const SET_CURRENT_USER = "user.SET_CURRENT_USER"
+export const SET_USER = "user.SET_USER"
+export const RESET_CURRENT_USER = "rp.RESET_CURRENT_USER"
+export const UPDATE_CURRENT_USER = "user.UPDATE_CURRENT_USER"
+export const SET_EDIT = "user.SET_EDIT"

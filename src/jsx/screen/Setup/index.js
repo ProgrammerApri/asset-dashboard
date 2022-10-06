@@ -3,11 +3,12 @@ import Perusahaan from "./Perusahaan";
 import { TabView, TabPanel } from 'primereact/tabview';
 import Penjualan from "./Penjualan";
 import Pembelian from "./Pembelian";
-import Pengguna from "./Pengguna";
 import SetupAkun from "./SetupAkun";
 import SetupNeraca from "./SetupNeraca";
 import SetupPnl from "./SetupPnl";
 import Menu from "./Menu";
+import InputPengguna from "./SetupPenggunaa/InputPengguna";
+import Pengguna from "./SetupPenggunaa/Pengguna";
 
 const Setup = () => {
   return (
@@ -22,7 +23,7 @@ const Setup = () => {
         <Pembelian/>
       </TabPanel>
       <TabPanel header="Pengguna">
-        <Pengguna/>
+        <InputPengguna/>
       </TabPanel>
       <TabPanel header="Menu">
         <Menu/>

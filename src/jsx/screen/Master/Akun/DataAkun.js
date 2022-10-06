@@ -66,6 +66,8 @@ const DataAkun = ({
   onRowSelect,
   onSuccessInput,
   onSuccessImport,
+  edit,
+  del,
 }) => {
   const [account, setAccount] = useState(null);
   const [kategori, setKategori] = useState(null);
@@ -418,28 +420,32 @@ const DataAkun = ({
     return (
       // <React.Fragment>
       <div className="d-flex">
-        <Link
-          onClick={() => {
-            setEdit(true);
-            setCurrentItem(data);
-            setShowInput(true);
-            onInput(true);
-          }}
-          className="btn btn-primary shadow btn-xs sharp ml-2"
-        >
-          <i className="fa fa-pencil"></i>
-        </Link>
+        {edit && (
+          <Link
+            onClick={() => {
+              setEdit(true);
+              setCurrentItem(data);
+              setShowInput(true);
+              onInput(true);
+            }}
+            className="btn btn-primary shadow btn-xs sharp ml-2"
+          >
+            <i className="fa fa-pencil"></i>
+          </Link>
+        )}
 
-        <Link
-          onClick={() => {
-            setCurrentItem(data);
-            setShowDelete(true);
-            onInput(true);
-          }}
-          className="btn btn-danger shadow btn-xs sharp ml-2"
-        >
-          <i className="fa fa-trash"></i>
-        </Link>
+        {del && (
+          <Link
+            onClick={() => {
+              setCurrentItem(data);
+              setShowDelete(true);
+              onInput(true);
+            }}
+            className="btn btn-danger shadow btn-xs sharp ml-2"
+          >
+            <i className="fa fa-trash"></i>
+          </Link>
+        )}
       </div>
       // </React.Fragment>
     );
@@ -593,32 +599,34 @@ const DataAkun = ({
           </span>
           <Row className="mr-1">
             <PrimeSingleButton
-              className="mr-3"
+              className={edit && "mr-3"}
               label="Export"
               icon={<i className="pi pi-file-excel px-2"></i>}
               onClick={() => {
                 exportExcel();
               }}
             />
-            <PrimeSingleButton
-              className="mr-3"
-              label="Import"
-              icon={<i className="pi pi-file-excel px-2"></i>}
-              onClick={(e) => {
-                confirmImport(e);
-              }}
-            />
-            <PrimeSingleButton
-              label={tr[localStorage.getItem("language")].tambh}
-              icon={<i class="bx bx-plus px-2"></i>}
-              onClick={() => {
-                setShowInput(true);
-                setEdit(false);
-                setLoading(false);
-                setCurrentItem(def);
-                onInput(true);
-              }}
-            />
+            {edit && <>
+              <PrimeSingleButton
+                className="mr-3"
+                label="Import"
+                icon={<i className="pi pi-file-excel px-2"></i>}
+                onClick={(e) => {
+                  confirmImport(e);
+                }}
+              />
+              <PrimeSingleButton
+                label={tr[localStorage.getItem("language")].tambh}
+                icon={<i class="bx bx-plus px-2"></i>}
+                onClick={() => {
+                  setShowInput(true);
+                  setEdit(false);
+                  setLoading(false);
+                  setCurrentItem(def);
+                  onInput(true);
+                }}
+              />
+            </>}
           </Row>
         </div>
         <div className="col-12" ref={progressBar} style={{ display: "none" }}>
@@ -1012,13 +1020,15 @@ const DataAkun = ({
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
-          <Column
-            header="Action"
-            dataType="boolean"
-            bodyClassName="text-center"
-            style={{ minWidth: "2rem" }}
-            body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
-          />
+          {(edit || del) && (
+            <Column
+              header="Action"
+              dataType="boolean"
+              bodyClassName="text-center"
+              style={{ minWidth: "2rem" }}
+              body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
+            />
+          )}
         </DataTable>
       </>
     );

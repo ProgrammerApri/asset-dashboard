@@ -4,7 +4,7 @@ import { Row, Col, Card } from "react-bootstrap";
 import CircleProgress from "../../../components/CircleProgress/circleProgress";
 import DataProduk from "./DataProduk";
 
-const Produk = () => {
+const Produk = ({ edit, del }) => {
   const [product, setProduk] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -229,6 +229,8 @@ const Produk = () => {
                 data={loading ? dummy : product}
                 load={loading}
                 onSuccessInput={() => getProduk(true)}
+                edit={edit}
+                del={del}
               />
             </Card.Body>
           </Card>

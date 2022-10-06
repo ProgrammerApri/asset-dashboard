@@ -4,14 +4,14 @@ import { Row, Col, Card } from "react-bootstrap";
 import DataLokasi from "./DataLokasi";
 
 const data = {
-    id: 1,
-    code: "",
-    name: "",
-    address: "",
-    desc: "",
+  id: 1,
+  code: "",
+  name: "",
+  address: "",
+  desc: "",
 };
 
-const Lokasi = () => {
+const Lokasi = ({ edit, del }) => {
   const [lokasi, setLokasi] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -57,6 +57,8 @@ const Lokasi = () => {
                 data={loading ? dummy : lokasi}
                 load={loading}
                 onSuccessInput={() => getLokasi()}
+                edit={edit}
+                del={del}
               />
             </Card.Body>
           </Card>

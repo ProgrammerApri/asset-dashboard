@@ -22,6 +22,7 @@ import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 import { tr } from "src/data/tr";
+import { de } from "date-fns/locale";
 
 const def = {
   supplier: {
@@ -103,6 +104,8 @@ const DataSupplier = ({
   onInput = () => {},
   onRowSelect,
   onSuccessInput,
+  edit,
+  del,
 }) => {
   const [jpem, setJpem] = useState(null);
   const [currency, setCurrency] = useState(null);
@@ -472,27 +475,31 @@ const DataSupplier = ({
     return (
       // <React.Fragment>
       <div className="d-flex">
-        <Link
-          onClick={() => {
-            setEdit(true);
-            setCurrentItem(data);
-            setShowInput(true);
-            onInput(true);
-          }}
-          className="btn btn-primary shadow btn-xs sharp ml-1"
-        >
-          <i className="fa fa-pencil"></i>
-        </Link>
+        {edit && (
+          <Link
+            onClick={() => {
+              setEdit(true);
+              setCurrentItem(data);
+              setShowInput(true);
+              onInput(true);
+            }}
+            className="btn btn-primary shadow btn-xs sharp ml-1"
+          >
+            <i className="fa fa-pencil"></i>
+          </Link>
+        )}
 
-        <Link
-          onClick={() => {
-            setCurrentItem(data);
-            setShowDelete(true);
-          }}
-          className="btn btn-danger shadow btn-xs sharp ml-1"
-        >
-          <i className="fa fa-trash"></i>
-        </Link>
+        {del && (
+          <Link
+            onClick={() => {
+              setCurrentItem(data);
+              setShowDelete(true);
+            }}
+            className="btn btn-danger shadow btn-xs sharp ml-1"
+          >
+            <i className="fa fa-trash"></i>
+          </Link>
+        )}
       </div>
       // </React.Fragment>
     );
@@ -623,24 +630,26 @@ const DataSupplier = ({
             placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
-        <PrimeSingleButton
-          label={tr[localStorage.getItem("language")].tambh}
-          icon={<i class="bx bx-plus px-2"></i>}
-          onClick={() => {
-            setShowInput(true);
-            setEdit(false);
-            setLoading(false);
-            setCurrentItem({
-              ...def,
-              supplier: {
-                ...def.supplier,
-                sup_hutang: setup?.ap?.id,
-                sup_uang_muka: setup?.pur_advance?.id,
-              },
-            });
-            onInput(true);
-          }}
-        />
+        {edit && (
+          <PrimeSingleButton
+            label={tr[localStorage.getItem("language")].tambh}
+            icon={<i class="bx bx-plus px-2"></i>}
+            onClick={() => {
+              setShowInput(true);
+              setEdit(false);
+              setLoading(false);
+              setCurrentItem({
+                ...def,
+                supplier: {
+                  ...def.supplier,
+                  sup_hutang: setup?.ap?.id,
+                  sup_uang_muka: setup?.pur_advance?.id,
+                },
+              });
+              onInput(true);
+            }}
+          />
+        )}
       </div>
     );
   };
@@ -889,13 +898,15 @@ const DataSupplier = ({
           style={{ minWidth: "8rem" }}
           body={load && <Skeleton />}
         />
-        <Column
-          header="Action"
-          dataType="boolean"
-          bodyClassName="text-center"
-          style={{ minWidth: "3rem" }}
-          body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
-        />
+        {(edit || del) && (
+          <Column
+            header="Action"
+            dataType="boolean"
+            bodyClassName="text-center"
+            style={{ minWidth: "3rem" }}
+            body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
+          />
+        )}
       </DataTable>
     );
   };

@@ -13,6 +13,8 @@ import { Skeleton } from "primereact/skeleton";
 import { Dialog } from "primereact/dialog";
 import { endpoints, request } from "src/utils";
 import { InputSwitch } from "primereact/inputswitch";
+import { useDispatch } from "react-redux";
+import { SET_CURRENT_PROFILE } from "src/redux/actions";
 
 const data = {
   id: 0,
@@ -66,6 +68,7 @@ export default function Menu() {
           setLoadingSubmit(false);
           setDisplayInput(false);
           getMenu();
+          getProfile();
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -102,6 +105,7 @@ export default function Menu() {
           setLoadingSubmit(false);
           setDisplayInput(false);
           getMenu();
+          getProfile();
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -187,6 +191,24 @@ export default function Menu() {
         setLoading(false);
       }, 500);
     }
+  };
+
+  const dispatch = useDispatch();
+
+  const getProfile = async () => {
+    const config = {
+      ...endpoints.getProfile,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      if (response.status) {
+        const { data } = response;
+        dispatch({ type: SET_CURRENT_PROFILE, payload: data });
+      }
+    } catch (error) {}
+    
   };
 
   const onCustomPage2 = (event) => {

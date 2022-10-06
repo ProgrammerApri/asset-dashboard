@@ -26,6 +26,7 @@ import BTCReducer from "./BTCReducer";
 import MemorialReducer from "./MemorialReducer";
 import IncReducer from "./IncReducer";
 import GIROINReducer from "./GiroIncReducer";
+import ProfileReducer from "./ProfileReducer";
 // import PBNReducer from "./PBNReducer";
 
 
@@ -56,7 +57,8 @@ const rootReducer = combineReducers({
   btc: BTCReducer,
   memorial: MemorialReducer,
   inc: IncReducer,
-  giro_in: GIROINReducer
+  giro_in: GIROINReducer,
+  profile: ProfileReducer
 });
 
 export default rootReducer;

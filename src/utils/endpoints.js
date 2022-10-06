@@ -1330,6 +1330,12 @@ delUSER: {
     method: "DELETE",
     data: {},
   },
+
+  getProfile: {
+    endpoint: "/v1/api/myprofile",
+    method: "GET",
+    data: {},
+  },
 };
 
 export default endpoints;

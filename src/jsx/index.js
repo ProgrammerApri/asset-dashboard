@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 // import Login from "./screen/Login";
 
 /// React router dom
@@ -66,6 +66,10 @@ import LaporanAp from "./screen/Report/AP";
 import LaporanNeraca from "./screen/Report/Neraca";
 import Persediaan from "./screen/Transaksi/Persediaan/Persediaan";
 import LaporanPersediaan from "./screen/Report/LaporanPersediaan";
+import { endpoints, request } from "src/utils";
+import { useDispatch } from "react-redux";
+import { SET_CURRENT_PROFILE } from "src/redux/actions";
+import { ProgressBar } from "primereact/progressbar";
 
 const Markup = ({ width }) => {
   const routes = [
@@ -83,7 +87,6 @@ const Markup = ({ width }) => {
     { url: "transaksi/:active", component: Transaksi },
     { url: "bank-&-kas", component: BankKas },
     { url: "transaksi-persediaan", component: TransaksiPersediaan },
-
 
     { url: "laporan/pembelian", component: LaporanPembelian },
     { url: "laporan/pembelian/:active", component: LaporanPembelian },
@@ -148,7 +151,34 @@ const Markup = ({ width }) => {
     ? body.setAttribute("data-sidebar-style", "mini")
     : body.setAttribute("data-sidebar-style", "overlay");
 
-  return (
+  useEffect(() => {
+    getProfile();
+  }, []);
+
+  const dispatch = useDispatch();
+
+  const [loading, setLoading] = useState(true);
+
+  const getProfile = async () => {
+    const config = {
+      ...endpoints.getProfile,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      if (response.status) {
+        const { data } = response;
+        dispatch({ type: SET_CURRENT_PROFILE, payload: data });
+        setLoading(false)
+      }
+    } catch (error) {
+      setLoading(false)
+    }
+    
+  };
+
+  return loading ? <ProgressBar mode="indeterminate" style={{ height: '6px' }}/> : (
     <Router>
       <div id="main-wrapper" className="show">
         <Nav />

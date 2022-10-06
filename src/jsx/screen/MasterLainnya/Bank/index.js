@@ -29,7 +29,7 @@ const data = {
   },
 };
 
-const Bank = () => {
+const Bank = ({ edit, del }) => {
   const [bank, setBank] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -75,6 +75,8 @@ const Bank = () => {
                 data={loading ? dummy : bank}
                 load={loading}
                 onSuccessInput={() => getBank()}
+                edit={edit}
+                del={del}
               />
             </Card.Body>
           </Card>

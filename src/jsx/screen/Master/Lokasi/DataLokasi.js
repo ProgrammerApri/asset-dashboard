@@ -41,6 +41,8 @@ const DataLokasi = ({
   onInput = () => {},
   onRowSelect,
   onSuccessInput,
+  edit,
+  del,
 }) => {
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
@@ -204,7 +206,7 @@ const DataLokasi = ({
     return (
       // <React.Fragment>
       <div className="d-flex">
-        <Link
+        {edit && <Link
           onClick={() => {
             setEdit(true);
             setCurrentItem(data);
@@ -214,18 +216,20 @@ const DataLokasi = ({
           className="btn btn-primary shadow btn-xs sharp ml-1"
         >
           <i className="fa fa-pencil"></i>
-        </Link>
+        </Link>}
 
-        <Link
-          onClick={() => {
-            setCurrentItem(data);
-            setShowDelete(true);
-            onInput(true);
-          }}
-          className="btn btn-danger shadow btn-xs sharp ml-1"
-        >
-          <i className="fa fa-trash"></i>
-        </Link>
+        {del && (
+          <Link
+            onClick={() => {
+              setCurrentItem(data);
+              setShowDelete(true);
+              onInput(true);
+            }}
+            className="btn btn-danger shadow btn-xs sharp ml-1"
+          >
+            <i className="fa fa-trash"></i>
+          </Link>
+        )}
       </div>
       // </React.Fragment>
     );
@@ -316,17 +320,19 @@ const DataLokasi = ({
             placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
-        <PrimeSingleButton
-          label={tr[localStorage.getItem("language")].tambh}
-          icon={<i class="bx bx-plus px-2"></i>}
-          onClick={() => {
-            setShowInput(true);
-            setEdit(false);
-            setLoading(false);
-            setCurrentItem(def);
-            onInput(true);
-          }}
-        />
+        {edit && (
+          <PrimeSingleButton
+            label={tr[localStorage.getItem("language")].tambh}
+            icon={<i class="bx bx-plus px-2"></i>}
+            onClick={() => {
+              setShowInput(true);
+              setEdit(false);
+              setLoading(false);
+              setCurrentItem(def);
+              onInput(true);
+            }}
+          />
+        )}
       </div>
     );
   };
@@ -446,13 +452,15 @@ const DataLokasi = ({
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
-          <Column
-            header="Action"
-            dataType="boolean"
-            bodyClassName="text-center"
-            style={{ minWidth: "2rem" }}
-            body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
-          />
+          {(edit || del) && (
+            <Column
+              header="Action"
+              dataType="boolean"
+              bodyClassName="text-center"
+              style={{ minWidth: "2rem" }}
+              body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
+            />
+          )}
         </DataTable>
       </>
     );

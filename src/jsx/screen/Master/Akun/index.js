@@ -26,7 +26,7 @@ const data = {
   },
 };
 
-const Akun = () => {
+const Akun = ({ edit, del }) => {
   const [account, setAccount] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -72,6 +72,8 @@ const Akun = () => {
                 data={loading ? dummy : account}
                 load={loading}
                 onSuccessInput={() => getAccount()}
+                edit={edit}
+                del={del}
               />
             </Card.Body>
           </Card>

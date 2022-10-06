@@ -58,7 +58,7 @@ const pajak = [
   { name: "Non PPN", code: "N" },
 ];
 
-const Customer = () => {
+const Customer = ({edit, del}) => {
   const [customer, setCustomer] = useState(null);
   const [ar, setAr] = useState(null);
   const [date, setDate] = useState(new Date());
@@ -362,6 +362,8 @@ const Customer = () => {
                 data={loading ? dummy : customer}
                 load={loading}
                 onSuccessInput={() => getCustomer()}
+                edit ={edit}
+                del={del}
               />
             </Card.Body>
           </Card>

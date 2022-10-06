@@ -14,42 +14,43 @@ import Salesman from "./Salesman";
 import Pajak from "../Master/Pajak";
 import Jasa from "../Master/Jasa";
 import { Link } from "react-router-dom";
+import { tr } from "src/data/tr";
 
 const MasterLainnya = (self) => {
   const [active, setActive] = useState(0);
   const [subMenu, setSubMenu] = useState([
     {
-      tittle: "Satuan",
+      tittle: tr[localStorage.getItem("language")].sat,
       icon: "bx-barcode",
       component: <Satuan />,
     },
     {
-      tittle: "Divisi",
+      tittle: tr[localStorage.getItem("language")].divisi,
       icon: "bx-scatter-chart",
       component: <Divisi />,
     },
     {
-      tittle: "Departemen",
+      tittle: tr[localStorage.getItem("language")].dep,
       icon: "bx-globe-alt",
       component: <PusatBiaya />,
     },
     {
-      tittle: "Salesman",
+      tittle: tr[localStorage.getItem("language")].salesmn,
       icon: "bx-user",
       component: <Salesman />,
     },
     {
-      tittle: "Project",
+      tittle: tr[localStorage.getItem("language")].proj,
       icon: "bx-poll",
       component: <Project />,
     },
     {
-      tittle: "Currency",
+      tittle: tr[localStorage.getItem("language")].currency,
       icon: "bx-dollar-circle",
       component: <Currency />,
     },
     {
-      tittle: "Syarat Pembayaran",
+      tittle: tr[localStorage.getItem("language")].syarat,
       icon: "bx-dollar-circle",
       component: <RulesPay />,
     },
@@ -59,22 +60,22 @@ const MasterLainnya = (self) => {
       component: <></>,
     },
     {
-      tittle: "Pajak",
+      tittle: tr[localStorage.getItem("language")].pajak,
       icon: "bx-equalizer",
       component: <Pajak />,
     },
     {
-      tittle: "Jasa",
+      tittle: tr[localStorage.getItem("language")].jasa,
       icon: "bx-run",
       component: <Jasa />,
     },
     {
-      tittle: "jenis pelanggan",
+      tittle: tr[localStorage.getItem("language")].pel_type,
       icon: "bx-street-view",
       component: <JenisPelanggan />,
     },
     {
-      tittle: "jenis pemasok",
+      tittle: tr[localStorage.getItem("language")].pem_type,
       icon: "bx-user-voice",
       component: <JenisPemasok />,
     },
@@ -98,7 +99,9 @@ const MasterLainnya = (self) => {
 
     subMenu.forEach((el, i) => {
       menu.push(
-        <Link to={"/master-lainnya/" + el.tittle.toLowerCase().replaceAll(" ", "-")}>
+        <Link
+          to={"/master-lainnya/" + el.tittle.toLowerCase().replaceAll(" ", "-")}
+        >
           <Button
             className={`sub-menu mr-4 mb-4 ${id == i ? "act" : ""}`}
             role="button"

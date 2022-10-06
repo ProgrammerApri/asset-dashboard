@@ -16,6 +16,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { classNames } from "primereact/utils";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
+import { tr } from "src/data/tr";
 
 const def = {
   id: 1,
@@ -79,8 +80,8 @@ const DataProject = ({
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -90,8 +91,8 @@ const DataProject = ({
         setUpdate(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: "Gagal Memperbarui Data",
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].pesan_gagal,
           life: 3000,
         });
       }, 500);
@@ -120,8 +121,8 @@ const DataProject = ({
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -133,7 +134,7 @@ const DataProject = ({
           setUpdate(false);
           toast.current.show({
             severity: "error",
-            summary: "Gagal",
+            summary: tr[localStorage.getItem("language")].gagal,
             detail: `Kode Project ${currentItem.proj_code} Sudah Digunakan`,
             life: 3000,
           });
@@ -143,8 +144,8 @@ const DataProject = ({
           setUpdate(false);
           toast.current.show({
             severity: "error",
-            summary: "Gagal",
-            detail: "Gagal Memperbarui Data",
+            summary: tr[localStorage.getItem("language")].gagal,
+            detail: tr[localStorage.getItem("language")].pesan_gagal,
             life: 3000,
           });
         }, 500);
@@ -170,8 +171,8 @@ const DataProject = ({
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
         }, 500);
@@ -184,8 +185,8 @@ const DataProject = ({
         onInput(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Project`,
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].del_gagal,
           life: 3000,
         });
       }, 500);
@@ -239,7 +240,7 @@ const DataProject = ({
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => {
             onHideInput();
             onInput(false);
@@ -247,7 +248,7 @@ const DataProject = ({
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Simpan"
+          label={tr[localStorage.getItem("language")].simpan}
           icon="pi pi-check"
           onClick={() => onSubmit()}
           autoFocus
@@ -261,7 +262,7 @@ const DataProject = ({
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => {
             setShowDelete(false);
             setLoading(false);
@@ -270,7 +271,7 @@ const DataProject = ({
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Hapus"
+          label={tr[localStorage.getItem("language")].hapus}
           icon="pi pi-trash"
           onClick={() => {
             delProject();
@@ -305,11 +306,11 @@ const DataProject = ({
           <InputText
             value={globalFilterValue1}
             onChange={onGlobalFilterChange1}
-            placeholder="Cari disini"
+            placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
         <PrimeSingleButton
-          label="Tambah"
+          label={tr[localStorage.getItem("language")].tambh}
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             setShowInput(true);
@@ -329,7 +330,10 @@ const DataProject = ({
       const dropdownOptions = [
         { label: 20, value: 20 },
         { label: 50, value: 50 },
-        { label: "Semua", value: options.totalRecords },
+        {
+          label: tr[localStorage.getItem("language")].hal,
+          value: options.totalRecords,
+        },
       ];
 
       return (
@@ -338,7 +342,7 @@ const DataProject = ({
             className="mx-1"
             style={{ color: "var(--text-color)", userSelect: "none" }}
           >
-            Data per halaman:{" "}
+            {tr[localStorage.getItem("language")].page}{" "}
           </span>
           <Dropdown
             value={options.value}
@@ -358,7 +362,8 @@ const DataProject = ({
             textAlign: "center",
           }}
         >
-          {options.first} - {options.last} dari {options.totalRecords}
+          {options.first} - {options.last}{" "}
+          {tr[localStorage.getItem("language")].dari} {options.totalRecords}
         </span>
       );
     },
@@ -396,12 +401,8 @@ const DataProject = ({
           rowHover
           header={renderHeader}
           filters={filters1}
-          globalFilterFields={[
-            "proj_code",
-            "proj_name",
-            "proj_ket",
-          ]}
-          emptyMessage="Tidak ada data"
+          globalFilterFields={["proj_code", "proj_name", "proj_ket"]}
+          emptyMessage={tr[localStorage.getItem("language")].empty_data}
           paginator
           paginatorTemplate={template2}
           first={first2}
@@ -412,7 +413,7 @@ const DataProject = ({
           onRowSelect={onRowSelect}
         >
           <Column
-            header="Kode"
+            header={tr[localStorage.getItem("language")].kd_proj}
             style={{
               minWidth: "8rem",
             }}
@@ -420,13 +421,13 @@ const DataProject = ({
             body={load && <Skeleton />}
           />
           <Column
-            header="Nama"
+            header={tr[localStorage.getItem("language")].nm_proj}
             field={(e) => e.proj_name}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
           <Column
-            header="Keterangan"
+            header={tr[localStorage.getItem("language")].ket}
             field={(e) => (e?.proj_ket !== "" ? e.proj_ket : "-")}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
@@ -448,7 +449,15 @@ const DataProject = ({
       <>
         <Toast ref={toast} />
         <Dialog
-          header={isEdit ? "Edit Project" : "Tambah Project"}
+          header={
+            isEdit
+              ? `${tr[localStorage.getItem("language")].edit} ${
+                  tr[localStorage.getItem("language")].proj
+                }`
+              : `${tr[localStorage.getItem("language")].tambh} ${
+                  tr[localStorage.getItem("language")].proj
+                }`
+          }
           visible={showInput}
           style={{ width: "40vw" }}
           footer={renderFooter()}
@@ -460,7 +469,7 @@ const DataProject = ({
           <div className="row ml-0 mt-0">
             <div className="col-6">
               <PrimeInput
-                label={"Kode Project"}
+                label={tr[localStorage.getItem("language")].kd_proj}
                 value={currentItem !== null ? `${currentItem.proj_code}` : ""}
                 onChange={(e) => {
                   setCurrentItem({
@@ -471,14 +480,14 @@ const DataProject = ({
                   newError.code = false;
                   setError(newError);
                 }}
-                placeholder="Masukan Kode Project"
+                placeholder={tr[localStorage.getItem("language")].masuk}
                 error={error?.code}
               />
             </div>
 
             <div className="col-6">
               <PrimeInput
-                label={"Nama Project"}
+                label={tr[localStorage.getItem("language")].nm_proj}
                 value={currentItem !== null ? `${currentItem.proj_name}` : ""}
                 onChange={(e) => {
                   setCurrentItem({
@@ -489,7 +498,7 @@ const DataProject = ({
                   newError.name = false;
                   setError(newError);
                 }}
-                placeholder="Masukan Nama Project"
+                placeholder={tr[localStorage.getItem("language")].masuk}
                 error={error?.name}
               />
             </div>
@@ -497,14 +506,16 @@ const DataProject = ({
 
           <div className="row ml-0 mt-0">
             <div className="col-12">
-              <label className="text-label">Keterangan</label>
+              <label className="text-label">
+                {tr[localStorage.getItem("language")].ket}
+              </label>
               <div className="p-inputgroup">
                 <InputTextarea
                   value={currentItem !== null ? `${currentItem.proj_ket}` : ""}
                   onChange={(e) =>
                     setCurrentItem({ ...currentItem, proj_ket: e.target.value })
                   }
-                  placeholder="Masukan Keterangan"
+                  placeholder={tr[localStorage.getItem("language")].ket}
                 />
               </div>
             </div>
@@ -512,7 +523,9 @@ const DataProject = ({
         </Dialog>
 
         <Dialog
-          header={"Hapus Data"}
+          header={`${tr[localStorage.getItem("language")].hapus} ${
+            tr[localStorage.getItem("language")].proj
+          }`}
           visible={showDelete}
           style={{ width: "30vw" }}
           footer={renderFooterDel("displayDel")}
@@ -527,7 +540,7 @@ const DataProject = ({
               className="pi pi-exclamation-triangle mr-3 align-middle"
               style={{ fontSize: "2rem" }}
             />
-            <span>Apakah anda yakin ingin menghapus data ?</span>
+            <span>{tr[localStorage.getItem("language")].pesan_hapus}</span>
           </div>
         </Dialog>
       </>
@@ -545,7 +558,9 @@ const DataProject = ({
     return (
       <>
         <Dialog
-          header={"Data Project"}
+          header={`${tr[localStorage.getItem("language")].data} ${
+            tr[localStorage.getItem("language")].proj
+          }`}
           visible={show}
           footer={() => <div></div>}
           style={{ width: "60vw" }}

@@ -14,6 +14,7 @@ import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_RP, SET_EDIT, SET_RP } from "src/redux/actions";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import { tr } from "src/data/tr";
 
 const data = {
   id: null,
@@ -95,8 +96,8 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
           getPermintaan(true);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Dihapus",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
         }, 500);
@@ -108,8 +109,8 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
         setDisplayDel(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Data`,
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].del_gagal,
           life: 3000,
         });
       }, 500);
@@ -243,12 +244,12 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => setDisplayDel(false)}
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Hapus"
+          label={tr[localStorage.getItem("language")].hapus}
           icon="pi pi-trash"
           onClick={() => {
             delPermintaan();
@@ -327,7 +328,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => setDisplayDat(false)}
           className="p-button-text btn-primary"
         />
@@ -341,7 +342,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
       const dropdownOptions = [
         { label: 20, value: 20 },
         { label: 50, value: 50 },
-        { label: "Semua", value: options.totalRecords },
+        { label: tr[localStorage.getItem("language")].hal, value: options.totalRecords },
       ];
 
       return (
@@ -350,7 +351,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
             className="mx-1"
             style={{ color: "var(--text-color)", userSelect: "none" }}
           >
-            Data per halaman:{" "}
+            {tr[localStorage.getItem("language")].page}{" "}
           </span>
           <Dropdown
             value={options.value}
@@ -370,7 +371,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
             textAlign: "center",
           }}
         >
-          {options.first} - {options.last} dari {options.totalRecords}
+          {options.first} - {options.last} {tr[localStorage.getItem("language")].dari} {options.totalRecords}
         </span>
       );
     },
@@ -407,7 +408,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
         header={renderHeader}
         filters={filters1}
         globalFilterFields={["req_code", "req_dep.ccost_name"]}
-        emptyMessage="Tidak ada data"
+        emptyMessage={tr[localStorage.getItem("language")].empty_data}
         paginator
         paginatorTemplate={template2}
         first={first2}
@@ -416,7 +417,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
         paginatorClassName="justify-content-end mt-3"
       >
         <Column
-          header="Tanggal"
+          header={tr[localStorage.getItem("language")].tgl}
           style={{
             minWidth: "10rem",
           }}
@@ -430,13 +431,13 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
           body={loading && <Skeleton />}
         />
         <Column
-          header="Departemen"
+          header={tr[localStorage.getItem("language")].dep}
           field={(e) => e.req_dep?.ccost_name}
           style={{ minWidth: "10rem" }}
           body={loading && <Skeleton />}
         />
         <Column
-          header="Status"
+          header={tr[localStorage.getItem("language")].sts}
           field={(e) => e?.status ?? ""}
           style={{ minWidth: "8rem" }}
           body={(e) =>
@@ -451,7 +452,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
                     </Badge>
                   ) : (
                     <Badge variant="danger light">
-                      <i className="bx bxs-circle text-danger mr-1"></i> Selesai
+                      <i className="bx bxs-circle text-danger mr-1"></i> Close
                     </Badge>
                   )
                   // (

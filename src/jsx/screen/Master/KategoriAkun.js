@@ -18,6 +18,7 @@ import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import { ProgressBar } from "primereact/progressbar";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
+import { tr } from "src/data/tr";
 
 const data = {
   kategory: {
@@ -146,8 +147,8 @@ const KategoriAkun = ({ onSuccessImport }) => {
           getKategori(true);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data berhasil diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -157,8 +158,8 @@ const KategoriAkun = ({ onSuccessImport }) => {
         setUpdate(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: "Gagal memperbarui data",
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].pesan_gagal,
           life: 3000,
         });
       }, 500);
@@ -186,8 +187,8 @@ const KategoriAkun = ({ onSuccessImport }) => {
           getKategori(true);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data berhasil diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -197,8 +198,8 @@ const KategoriAkun = ({ onSuccessImport }) => {
         setUpdate(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: "Gagal memperbarui data",
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].pesan_gagal,
           life: 3000,
         });
       }, 500);
@@ -267,12 +268,12 @@ const KategoriAkun = ({ onSuccessImport }) => {
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => onHide(kode)}
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Simpan"
+          label={tr[localStorage.getItem("language")].simpan}
           icon="pi pi-check"
           onClick={() => onSubmit()}
           autoFocus
@@ -306,7 +307,7 @@ const KategoriAkun = ({ onSuccessImport }) => {
             <InputText
               value={globalFilterValue1}
               onChange={onGlobalFilterChange1}
-              placeholder="Cari disini"
+              placeholder={tr[localStorage.getItem("language")].cari}
             />
           </span>
           <Row className="mr-1">
@@ -327,7 +328,7 @@ const KategoriAkun = ({ onSuccessImport }) => {
               }}
             />
             <PrimeSingleButton
-              label="Tambah"
+              label={tr[localStorage.getItem("language")].tambh}
               icon={<i class="bx bx-plus px-2"></i>}
               onClick={() => {
                 setEdit(false);
@@ -475,7 +476,10 @@ const KategoriAkun = ({ onSuccessImport }) => {
       const dropdownOptions = [
         { label: 20, value: 20 },
         { label: 50, value: 50 },
-        { label: "Semua", value: options.totalRecords },
+        {
+          label: tr[localStorage.getItem("language")].hal,
+          value: options.totalRecords,
+        },
       ];
 
       return (
@@ -484,7 +488,7 @@ const KategoriAkun = ({ onSuccessImport }) => {
             className="mx-1"
             style={{ color: "var(--text-color)", userSelect: "none" }}
           >
-            Data per halaman:{" "}
+            {tr[localStorage.getItem("language")].page}{" "}
           </span>
           <Dropdown
             value={options.value}
@@ -504,7 +508,8 @@ const KategoriAkun = ({ onSuccessImport }) => {
             textAlign: "center",
           }}
         >
-          {options.first} - {options.last} dari {options.totalRecords}
+          {options.first} - {options.last}{" "}
+          {tr[localStorage.getItem("language")].dari} {options.totalRecords}
         </span>
       );
     },
@@ -615,7 +620,15 @@ const KategoriAkun = ({ onSuccessImport }) => {
         </Col>
       </Row>
       <Dialog
-        header={isEdit ? "Edit Kategori Akun" : "Tambah Kategori Akun"}
+        header={
+          isEdit
+            ? `${tr[localStorage.getItem("language")].edit} ${
+                tr[localStorage.getItem("language")].kateg
+              }`
+            : `${tr[localStorage.getItem("language")].tambh} ${
+                tr[localStorage.getItem("language")].kateg
+              }`
+        }
         visible={displayData}
         style={{ width: "40vw" }}
         footer={renderFooter("displayData")}
@@ -627,7 +640,7 @@ const KategoriAkun = ({ onSuccessImport }) => {
         <div className="row mr-0 ml-0">
           <div className="col-6 mb-2">
             <PrimeInput
-              label={"Nama Kategori"}
+              label={tr[localStorage.getItem("language")].nm_kateg}
               value={currentItem !== null ? `${currentItem.kategory.name}` : ""}
               onChange={(e) => {
                 setCurrentItem({
@@ -639,13 +652,13 @@ const KategoriAkun = ({ onSuccessImport }) => {
                 newError.name = false;
                 setError(newError);
               }}
-              placeholder="Masukan Nama Kategori"
+              placeholder={tr[localStorage.getItem("language")].masuk}
               error={error?.name}
             />
           </div>
           <div className="col-6 mb-2">
             <PrimeDropdown
-              label={"Klasifikasi"}
+              label={tr[localStorage.getItem("language")].klasifks}
               value={currentItem !== null ? currentItem.klasifikasi : null}
               options={klasifikasi}
               onChange={(e) => {
@@ -662,7 +675,7 @@ const KategoriAkun = ({ onSuccessImport }) => {
               optionLabel="klasiname"
               filter
               filterBy="klasiname"
-              placeholder="Pilih Klasifikasi"
+              placeholder={tr[localStorage.getItem("language")].pilih}
               errorMessage="Klasifikasi Belum Dipilih"
               error={error?.klasi}
             />
@@ -671,7 +684,7 @@ const KategoriAkun = ({ onSuccessImport }) => {
 
         <div className="row mr-0 ml-0">
           <div className="col-12 mb-2">
-            <label className="text-label">Kode Saldo Normal</label>
+            <label className="text-label">{tr[localStorage.getItem("language")].sld_normal}</label>
             <div className="p-inputgroup">
               <SelectButton
                 value={

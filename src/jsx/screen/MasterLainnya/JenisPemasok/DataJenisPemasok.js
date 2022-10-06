@@ -15,6 +15,7 @@ import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
+import { tr } from "src/data/tr";
 
 const def = {
   id: 1,
@@ -82,8 +83,8 @@ const DataJenisPemasok = ({
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -93,8 +94,8 @@ const DataJenisPemasok = ({
         setUpdate(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: "Gagal Memperbarui Data",
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].pesan_gagal,
           life: 3000,
         });
       }, 500);
@@ -123,8 +124,8 @@ const DataJenisPemasok = ({
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -136,7 +137,7 @@ const DataJenisPemasok = ({
           setUpdate(false);
           toast.current.show({
             severity: "error",
-            summary: "Gagal",
+            summary: tr[localStorage.getItem("language")].gagal,
             detail: `Kode ${currentItem.jpem_code} Sudah Digunakan`,
             life: 3000,
           });
@@ -146,8 +147,8 @@ const DataJenisPemasok = ({
           setUpdate(false);
           toast.current.show({
             severity: "error",
-            summary: "Gagal",
-            detail: "Gagal Memperbarui Data",
+            summary: tr[localStorage.getItem("language")].gagal,
+            detail: tr[localStorage.getItem("language")].pesan_gagal,
             life: 3000,
           });
         }, 500);
@@ -172,8 +173,8 @@ const DataJenisPemasok = ({
           onSuccessInput();
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
         }, 500);
@@ -185,8 +186,8 @@ const DataJenisPemasok = ({
         setShowDelete(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Project`,
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].del_gagal,
           life: 3000,
         });
       }, 500);
@@ -249,7 +250,7 @@ const DataJenisPemasok = ({
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => {
             onHideInput();
             onInput(false);
@@ -257,7 +258,7 @@ const DataJenisPemasok = ({
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Simpan"
+          label={tr[localStorage.getItem("language")].simpan}
           icon="pi pi-check"
           onClick={() => onSubmit()}
           autoFocus
@@ -271,7 +272,7 @@ const DataJenisPemasok = ({
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => {
             setLoading(false);
             setShowDelete(false);
@@ -280,7 +281,7 @@ const DataJenisPemasok = ({
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Hapus"
+          label={tr[localStorage.getItem("language")].hapus}
           icon="pi pi-trash"
           onClick={() => {
             delJenisPemasok();
@@ -315,11 +316,11 @@ const DataJenisPemasok = ({
           <InputText
             value={globalFilterValue1}
             onChange={onGlobalFilterChange1}
-            placeholder="Cari disini"
+            placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
         <PrimeSingleButton
-          label="Tambah"
+          label={tr[localStorage.getItem("language")].tambh}
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             setShowInput(true);
@@ -339,7 +340,10 @@ const DataJenisPemasok = ({
       const dropdownOptions = [
         { label: 20, value: 20 },
         { label: 50, value: 50 },
-        { label: "Semua", value: options.totalRecords },
+        {
+          label: tr[localStorage.getItem("language")].hal,
+          value: options.totalRecords,
+        },
       ];
 
       return (
@@ -348,7 +352,7 @@ const DataJenisPemasok = ({
             className="mx-1"
             style={{ color: "var(--text-color)", userSelect: "none" }}
           >
-            Data per halaman:{" "}
+            {tr[localStorage.getItem("language")].page}{" "}
           </span>
           <Dropdown
             value={options.value}
@@ -368,7 +372,8 @@ const DataJenisPemasok = ({
             textAlign: "center",
           }}
         >
-          {options.first} - {options.last} dari {options.totalRecords}
+          {options.first} - {options.last}{" "}
+          {tr[localStorage.getItem("language")].dari} {options.totalRecords}
         </span>
       );
     },
@@ -406,12 +411,8 @@ const DataJenisPemasok = ({
           rowHover
           header={renderHeader}
           filters={filters1}
-          globalFilterFields={[
-            "jpem_code",
-            "jpem_name",
-            "jpem_ket",
-          ]}
-          emptyMessage="Tidak ada data"
+          globalFilterFields={["jpem_code", "jpem_name", "jpem_ket"]}
+          emptyMessage={tr[localStorage.getItem("language")].empty_data}
           paginator
           paginatorTemplate={template2}
           first={first2}
@@ -422,7 +423,7 @@ const DataJenisPemasok = ({
           onRowSelect={onRowSelect}
         >
           <Column
-            header="Kode"
+            header={tr[localStorage.getItem("language")].kode}
             style={{
               minWidth: "8rem",
             }}
@@ -430,13 +431,13 @@ const DataJenisPemasok = ({
             body={load && <Skeleton />}
           />
           <Column
-            header="Nama"
+            header={tr[localStorage.getItem("language")].nama}
             field={(e) => e.jpem_name}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
           <Column
-            header="Keterangan"
+            header={tr[localStorage.getItem("language")].ket}
             field={(e) => (e?.jpem_ket !== "" ? e?.jpem_ket : "-")}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
@@ -458,7 +459,15 @@ const DataJenisPemasok = ({
       <>
         <Toast ref={toast} />
         <Dialog
-          header={isEdit ? "Edit Jenis Pemasok" : "Tambah Jenis Pemasok"}
+          header={
+            isEdit
+              ? `${tr[localStorage.getItem("language")].edit} ${
+                  tr[localStorage.getItem("language")].pem_type
+                }`
+              : `${tr[localStorage.getItem("language")].tambh} ${
+                  tr[localStorage.getItem("language")].pem_type
+                }`
+          }
           visible={showInput}
           style={{ width: "40vw" }}
           footer={renderFooter}
@@ -470,7 +479,7 @@ const DataJenisPemasok = ({
           <div className="row mr-0 ml-0">
             <div className="col-6">
               <PrimeInput
-                label={"Kode Jenis Pemasok"}
+                label={tr[localStorage.getItem("language")].kode}
                 value={currentItem !== null ? `${currentItem.jpem_code}` : ""}
                 onChange={(e) => {
                   setCurrentItem({
@@ -481,14 +490,14 @@ const DataJenisPemasok = ({
                   newError.code = false;
                   setError(newError);
                 }}
-                placeholder="Masukan Kode"
+                placeholder={tr[localStorage.getItem("language")].masuk}
                 error={error?.code}
               />
             </div>
 
             <div className="col-6">
               <PrimeInput
-                label={"Nama Jenis Pemasok"}
+                label={tr[localStorage.getItem("language")].nama}
                 value={currentItem !== null ? `${currentItem.jpem_name}` : ""}
                 onChange={(e) => {
                   setCurrentItem({
@@ -499,7 +508,7 @@ const DataJenisPemasok = ({
                   newError.name = false;
                   setError(newError);
                 }}
-                placeholder="Masukan Nama Jenis Pemasok"
+                placeholder={tr[localStorage.getItem("language")].masuk}
                 error={error?.name}
               />
             </div>
@@ -507,14 +516,16 @@ const DataJenisPemasok = ({
 
           <div className="row mr-0 ml-0">
             <div className="col-12">
-              <label className="text-label">Keterangan</label>
+              <label className="text-label">
+                {tr[localStorage.getItem("language")].ket}
+              </label>
               <div className="p-inputgroup">
                 <InputTextarea
                   value={currentItem !== null ? `${currentItem.jpem_ket}` : ""}
                   onChange={(e) =>
                     setCurrentItem({ ...currentItem, jpem_ket: e.target.value })
                   }
-                  placeholder="Masukan Keterangan"
+                  placeholder={tr[localStorage.getItem("language")].masuk}
                 />
               </div>
             </div>
@@ -522,7 +533,9 @@ const DataJenisPemasok = ({
         </Dialog>
 
         <Dialog
-          header={"Hapus Data"}
+          header={`${tr[localStorage.getItem("language")].hapus} ${
+            tr[localStorage.getItem("language")].pem_type
+          }`}
           visible={showDelete}
           style={{ width: "30vw" }}
           footer={renderFooterDel}
@@ -537,7 +550,7 @@ const DataJenisPemasok = ({
               className="pi pi-exclamation-triangle mr-3 align-middle"
               style={{ fontSize: "2rem" }}
             />
-            <span>Apakah anda yakin ingin menghapus data ?</span>
+            <span>{tr[localStorage.getItem("language")].pesan_hapus}</span>
           </div>
         </Dialog>
       </>
@@ -555,7 +568,9 @@ const DataJenisPemasok = ({
     return (
       <>
         <Dialog
-          header={"Data Jenis Pemasok"}
+          header={`${tr[localStorage.getItem("language")].data} ${
+            tr[localStorage.getItem("language")].pem_type
+          }`}
           visible={show}
           footer={() => <div></div>}
           style={{ width: "60vw" }}

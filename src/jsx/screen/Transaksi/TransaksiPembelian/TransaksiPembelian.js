@@ -5,6 +5,7 @@ import PermintaanPO from "./PO";
 import ReturBeli from "./ReturBeli";
 import FakturPembelian from "./FakturPembelian";
 import Order from "./Order";
+import { tr } from "src/data/tr";
 
 const TransaksiPembelian = () => {
   const [active, setActive] = useState(0);
@@ -17,19 +18,19 @@ const TransaksiPembelian = () => {
         setTrigger(current => current + 1);
       }}
     >
-      <TabPanel header="Permintaan Pembelian (RP)">
+      <TabPanel header={tr[localStorage.getItem("language")].req_pur}>
         <RequestPurchase trigger={trigger} />
       </TabPanel>
-      <TabPanel header="Pesanan Pembelian (PO)">
+      <TabPanel header={tr[localStorage.getItem("language")].ord_pur}>
         <PermintaanPO trigger={trigger}/>
       </TabPanel>
-      <TabPanel header="Pembelian">
+      <TabPanel header={tr[localStorage.getItem("language")].pur}>
         <Order trigger={trigger}/>
       </TabPanel>
-      <TabPanel header="Faktur">
+      <TabPanel header={tr[localStorage.getItem("language")].fak_pur}>
         <FakturPembelian trigger={trigger}/>
       </TabPanel>
-      <TabPanel header="Retur Pembelian">
+      <TabPanel header={tr[localStorage.getItem("language")].ret_pur}>
         <ReturBeli trigger={trigger}/>
       </TabPanel>
     </TabView>

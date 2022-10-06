@@ -16,6 +16,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { InputNumber } from "primereact/inputnumber";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
+import { tr } from "src/data/tr";
 
 const def = {
   id: 1,
@@ -78,8 +79,8 @@ const DataRulesPay = ({
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -89,8 +90,8 @@ const DataRulesPay = ({
         setLoading(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: "Gagal Memperbarui Data",
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].pesan_gagal,
           life: 3000,
         });
       }, 500);
@@ -119,8 +120,8 @@ const DataRulesPay = ({
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -132,7 +133,7 @@ const DataRulesPay = ({
           setLoading(false);
           toast.current.show({
             severity: "error",
-            summary: "Gagal",
+            summary: tr[localStorage.getItem("language")].gagal,
             // detail: `Kode ${currentItem.code} Sudah Digunakan`,
             life: 3000,
           });
@@ -142,8 +143,8 @@ const DataRulesPay = ({
           setLoading(false);
           toast.current.show({
             severity: "error",
-            summary: "Gagal",
-            detail: "Gagal Memperbarui Data",
+            summary: tr[localStorage.getItem("language")].gagal,
+            detail: tr[localStorage.getItem("language")].pesan_gagal,
             life: 3000,
           });
         }, 500);
@@ -170,8 +171,8 @@ const DataRulesPay = ({
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
         }, 500);
@@ -185,8 +186,8 @@ const DataRulesPay = ({
         onInput(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Data`,
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].del_gagal,
           life: 3000,
         });
       }, 500);
@@ -240,7 +241,7 @@ const DataRulesPay = ({
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => {
             onHideInput();
             onInput(false);
@@ -248,7 +249,7 @@ const DataRulesPay = ({
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Simpan"
+          label={tr[localStorage.getItem("language")].simpan}
           icon="pi pi-check"
           onClick={() => onSubmit()}
           autoFocus
@@ -262,7 +263,7 @@ const DataRulesPay = ({
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => {
             setShowDelete(false);
             setLoading(false);
@@ -271,7 +272,7 @@ const DataRulesPay = ({
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Hapus"
+          label={tr[localStorage.getItem("language")].hapus}
           icon="pi pi-trash"
           onClick={() => {
             delRulesPay();
@@ -306,11 +307,11 @@ const DataRulesPay = ({
           <InputText
             value={globalFilterValue1}
             onChange={onGlobalFilterChange1}
-            placeholder="Cari disini"
+            placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
         <PrimeSingleButton
-          label="Tambah"
+          label={tr[localStorage.getItem("language")].tambh}
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             setShowInput(true);
@@ -330,7 +331,10 @@ const DataRulesPay = ({
       const dropdownOptions = [
         { label: 20, value: 20 },
         { label: 50, value: 50 },
-        { label: "Semua", value: options.totalRecords },
+        {
+          label: tr[localStorage.getItem("language")].hal,
+          value: options.totalRecords,
+        },
       ];
 
       return (
@@ -339,7 +343,7 @@ const DataRulesPay = ({
             className="mx-1"
             style={{ color: "var(--text-color)", userSelect: "none" }}
           >
-            Data per halaman:{" "}
+            {tr[localStorage.getItem("language")].page}{" "}
           </span>
           <Dropdown
             value={options.value}
@@ -359,7 +363,8 @@ const DataRulesPay = ({
             textAlign: "center",
           }}
         >
-          {options.first} - {options.last} dari {options.totalRecords}
+          {options.first} - {options.last}{" "}
+          {tr[localStorage.getItem("language")].dari} {options.totalRecords}
         </span>
       );
     },
@@ -404,12 +409,8 @@ const DataRulesPay = ({
           rowHover
           header={renderHeader}
           filters={filters1}
-          globalFilterFields={[
-            "name",
-            "day",
-            "ket",
-          ]}
-          emptyMessage="Tidak ada data"
+          globalFilterFields={["name", "day", "ket"]}
+          emptyMessage={tr[localStorage.getItem("language")].empty_data}
           paginator
           paginatorTemplate={template2}
           first={first2}
@@ -420,19 +421,19 @@ const DataRulesPay = ({
           onRowSelect={onRowSelect}
         >
           <Column
-            header="Nama"
+            header={tr[localStorage.getItem("language")].wkt_rul}
             field={(e) => e.name}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
           <Column
-            header="Jumlah Hari"
+            header={tr[localStorage.getItem("language")].day_rul}
             field={(e) => e.day}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
           <Column
-            header="Keterangan"
+            header={tr[localStorage.getItem("language")].ket}
             field={(e) => (e?.ket !== "" ? e.ket : "-")}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
@@ -454,7 +455,13 @@ const DataRulesPay = ({
       <>
         <Dialog
           header={
-            isEdit ? "Edit Syarat Pembayaran" : "Tambah Syarat Pembayaran"
+            isEdit
+              ? `${tr[localStorage.getItem("language")].edit} ${
+                  tr[localStorage.getItem("language")].syarat
+                }`
+              : `${tr[localStorage.getItem("language")].tambh} ${
+                  tr[localStorage.getItem("language")].syarat
+                }`
           }
           visible={showInput}
           style={{ width: "40vw" }}
@@ -467,7 +474,7 @@ const DataRulesPay = ({
           <div className="row mr-0 mt-0">
             <div className="col-6">
               <PrimeInput
-                label={"Nama"}
+                label={tr[localStorage.getItem("language")].wkt_rul}
                 value={currentItem !== null ? `${currentItem.name}` : ""}
                 onChange={(e) => {
                   setCurrentItem({ ...currentItem, name: e.target.value });
@@ -475,14 +482,14 @@ const DataRulesPay = ({
                   newError.name = false;
                   setError(newError);
                 }}
-                placeholder="Masukan Nama"
+                placeholder="Cth. 1 Week"
                 error={error?.name}
               />
             </div>
 
             <div className="col-6">
               <PrimeInput
-                label={"Jumlah Hari"}
+                label={tr[localStorage.getItem("language")].day_rul}
                 number
                 value={currentItem !== null ? `${currentItem.day}` : "0"}
                 onChange={(e) => {
@@ -499,14 +506,16 @@ const DataRulesPay = ({
 
           <div className="row mr-0 mt-0">
             <div className="col-12">
-              <label className="text-label">Keterangan</label>
+              <label className="text-label">
+                {tr[localStorage.getItem("language")].ket}
+              </label>
               <div className="p-inputgroup">
                 <InputTextarea
                   value={currentItem !== null ? `${currentItem.ket}` : ""}
                   onChange={(e) =>
                     setCurrentItem({ ...currentItem, ket: e.target.value })
                   }
-                  placeholder="Masukan Keterangan"
+                  placeholder={tr[localStorage.getItem("language")].masuk}
                 />
               </div>
             </div>
@@ -514,7 +523,9 @@ const DataRulesPay = ({
         </Dialog>
 
         <Dialog
-          header={"Hapus Data"}
+          header={`${tr[localStorage.getItem("language")].hapus} ${
+            tr[localStorage.getItem("language")].syarat
+          }`}
           visible={showDelete}
           style={{ width: "30vw" }}
           footer={renderFooterDel()}
@@ -529,7 +540,7 @@ const DataRulesPay = ({
               className="pi pi-exclamation-triangle mr-3 align-middle"
               style={{ fontSize: "2rem" }}
             />
-            <span>Apakah anda yakin ingin menghapus data ?</span>
+            <span>{tr[localStorage.getItem("language")].pesan_hapus}</span>
           </div>
         </Dialog>
       </>
@@ -540,7 +551,9 @@ const DataRulesPay = ({
     return (
       <>
         <Dialog
-          header={"Data Syarat Pembayaran"}
+          header={`${tr[localStorage.getItem("language")].data} ${
+            tr[localStorage.getItem("language")].syarat
+          }`}
           visible={show}
           footer={() => <div></div>}
           style={{ width: "60vw" }}

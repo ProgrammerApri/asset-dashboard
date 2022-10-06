@@ -15,6 +15,7 @@ import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
+import { tr } from "src/data/tr";
 
 const def = {
   id: 1,
@@ -82,8 +83,8 @@ const DataDivisi = ({
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -93,8 +94,8 @@ const DataDivisi = ({
         setUpdate(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: "Gagal Memperbarui Data",
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].pesan_gagal,
           life: 3000,
         });
       }, 500);
@@ -124,8 +125,8 @@ const DataDivisi = ({
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -137,7 +138,7 @@ const DataDivisi = ({
           setUpdate(false);
           toast.current.show({
             severity: "error",
-            summary: "Gagal",
+            summary: tr[localStorage.getItem("language")].gagal,
             detail: `Kode ${currentItem.code} Sudah Digunakan`,
             life: 3000,
           });
@@ -147,8 +148,8 @@ const DataDivisi = ({
           setUpdate(false);
           toast.current.show({
             severity: "error",
-            summary: "Gagal",
-            detail: "Gagal Memperbarui Data",
+            summary: tr[localStorage.getItem("language")].gagal,
+            detail: tr[localStorage.getItem("language")].pesan_gagal,
             life: 3000,
           });
         }, 500);
@@ -157,7 +158,7 @@ const DataDivisi = ({
   };
 
   const delDivisi = async (id) => {
-    setUpdate(true)
+    setUpdate(true);
     const config = {
       ...endpoints.delDivisi,
       endpoint: endpoints.delDivisi.endpoint + currentItem.id,
@@ -175,8 +176,8 @@ const DataDivisi = ({
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
         }, 500);
@@ -189,8 +190,8 @@ const DataDivisi = ({
         onInput(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Data`,
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].del_gagal,
           life: 3000,
         });
       }, 500);
@@ -254,7 +255,7 @@ const DataDivisi = ({
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => {
             setDisplayData(false);
             onInput(false);
@@ -262,7 +263,7 @@ const DataDivisi = ({
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Simpan"
+          label={tr[localStorage.getItem("language")].simpan}
           icon="pi pi-check"
           onClick={() => onSubmit()}
           autoFocus
@@ -276,7 +277,7 @@ const DataDivisi = ({
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => {
             setDisplayDel(false);
             onInput(false);
@@ -284,7 +285,7 @@ const DataDivisi = ({
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Hapus"
+          label={tr[localStorage.getItem("language")].hapus}
           icon="pi pi-trash"
           onClick={() => {
             delDivisi();
@@ -319,11 +320,11 @@ const DataDivisi = ({
           <InputText
             value={globalFilterValue1}
             onChange={onGlobalFilterChange1}
-            placeholder="Cari disini"
+            placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
         <PrimeSingleButton
-          label="Tambah"
+          label={tr[localStorage.getItem("language")].tambh}
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             setEdit(false);
@@ -342,7 +343,10 @@ const DataDivisi = ({
       const dropdownOptions = [
         { label: 20, value: 20 },
         { label: 50, value: 50 },
-        { label: "Semua", value: options.totalRecords },
+        {
+          label: tr[localStorage.getItem("language")].hal,
+          value: options.totalRecords,
+        },
       ];
 
       return (
@@ -351,7 +355,7 @@ const DataDivisi = ({
             className="mx-1"
             style={{ color: "var(--text-color)", userSelect: "none" }}
           >
-            Data per halaman:{" "}
+            {tr[localStorage.getItem("language")].page}{" "}
           </span>
           <Dropdown
             value={options.value}
@@ -371,7 +375,8 @@ const DataDivisi = ({
             textAlign: "center",
           }}
         >
-          {options.first} - {options.last} dari {options.totalRecords}
+          {options.first} - {options.last}{" "}
+          {tr[localStorage.getItem("language")].dari} {options.totalRecords}
         </span>
       );
     },
@@ -392,7 +397,7 @@ const DataDivisi = ({
     setError(errors);
 
     valid = !errors.code && !errors.name;
-    
+
     return valid;
   };
 
@@ -410,19 +415,18 @@ const DataDivisi = ({
           header={renderHeader}
           filters={filters1}
           globalFilterFields={["code", "name", "desc"]}
-          emptyMessage="Tidak ada data"
+          emptyMessage={tr[localStorage.getItem("language")].empty_data}
           paginator
           paginatorTemplate={template2}
           first={first2}
           rows={rows2}
-          
           onPage={onCustomPage2}
           paginatorClassName="justify-content-end mt-3"
           selectionMode="single"
           onRowSelect={onRowSelect}
         >
           <Column
-            header="Kode Group"
+            header={tr[localStorage.getItem("language")].kd_div}
             style={{
               minWidth: "8rem",
             }}
@@ -430,13 +434,13 @@ const DataDivisi = ({
             body={load && <Skeleton />}
           />
           <Column
-            header="Nama Group"
+            header={tr[localStorage.getItem("language")].nm_div}
             field={(e) => e.name}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
           <Column
-            header="Keterangan"
+            header={tr[localStorage.getItem("language")].ket}
             field={(e) => (e?.desc !== "" ? e.desc : "-")}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
@@ -458,7 +462,15 @@ const DataDivisi = ({
       <>
         <Toast ref={toast} />
         <Dialog
-          header={isEdit ? "Edit Divisi" : "Tambah Divisi"}
+          header={
+            isEdit
+              ? `${tr[localStorage.getItem("language")].edit} ${
+                  tr[localStorage.getItem("language")].divisi
+                }`
+              : `${tr[localStorage.getItem("language")].tambh} ${
+                  tr[localStorage.getItem("language")].divisi
+                }`
+          }
           visible={displayData}
           style={{ width: "40vw" }}
           footer={renderFooter()}
@@ -471,7 +483,7 @@ const DataDivisi = ({
           <div className="row ml-0 mt-0">
             <div className="col-6">
               <PrimeInput
-                label={"Kode Grup"}
+                label={tr[localStorage.getItem("language")].kd_div}
                 value={currentItem !== null ? `${currentItem.code}` : ""}
                 onChange={(e) => {
                   setCurrentItem({ ...currentItem, code: e.target.value });
@@ -479,14 +491,14 @@ const DataDivisi = ({
                   newError.code = false;
                   setError(newError);
                 }}
-                placeholder="Masukan Kode Grup"
+                placeholder={tr[localStorage.getItem("language")].masuk}
                 error={error?.code}
               />
             </div>
 
             <div className="col-6">
               <PrimeInput
-                label={"Nama Grup"}
+                label={tr[localStorage.getItem("language")].nm_div}
                 value={currentItem !== null ? `${currentItem.name}` : ""}
                 onChange={(e) => {
                   setCurrentItem({ ...currentItem, name: e.target.value });
@@ -494,7 +506,7 @@ const DataDivisi = ({
                   newError.name = false;
                   setError(newError);
                 }}
-                placeholder="Masukan Nama Group"
+                placeholder={tr[localStorage.getItem("language")].masuk}
                 error={error?.name}
               />
             </div>
@@ -502,14 +514,16 @@ const DataDivisi = ({
 
           <div className="row ml-0 mt-0">
             <div className="col-12">
-              <label className="text-label">Keterangan</label>
+              <label className="text-label">
+                {tr[localStorage.getItem("language")].ket}
+              </label>
               <div className="p-inputgroup">
                 <InputTextarea
                   value={currentItem !== null ? `${currentItem.desc}` : ""}
                   onChange={(e) =>
                     setCurrentItem({ ...currentItem, desc: e.target.value })
                   }
-                  placeholder="Masukan Keterangan"
+                  placeholder={tr[localStorage.getItem("language")].masuk}
                 />
               </div>
             </div>
@@ -517,7 +531,9 @@ const DataDivisi = ({
         </Dialog>
 
         <Dialog
-          header={"Hapus Data"}
+          header={`${tr[localStorage.getItem("language")].hapus} ${
+            tr[localStorage.getItem("language")].divisi
+          }`}
           visible={displayDel}
           style={{ width: "30vw" }}
           footer={renderFooterDel("displayDel")}
@@ -531,7 +547,7 @@ const DataDivisi = ({
               className="pi pi-exclamation-triangle mr-3 align-middle"
               style={{ fontSize: "2rem" }}
             />
-            <span>Apakah anda yakin ingin menghapus data ?</span>
+            <span>{tr[localStorage.getItem("language")].pesan_hapus}</span>
           </div>
         </Dialog>
       </>
@@ -542,7 +558,9 @@ const DataDivisi = ({
     return (
       <>
         <Dialog
-          header={"Data Divisi"}
+          header={`${tr[localStorage.getItem("language")].data} ${
+            tr[localStorage.getItem("language")].divisi
+          }`}
           visible={show}
           footer={() => <div></div>}
           style={{ width: "60vw" }}

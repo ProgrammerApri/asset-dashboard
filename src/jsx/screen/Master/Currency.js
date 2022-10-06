@@ -16,6 +16,7 @@ import { InputNumber } from "primereact/inputnumber";
 import { Calendar } from "primereact/calendar";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
+import { tr } from "src/data/tr";
 
 const data = {
   id: 1,
@@ -103,8 +104,8 @@ const Currency = () => {
           getCurrency(true);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -114,8 +115,8 @@ const Currency = () => {
         setUpdate(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: "Gagal Memperbarui Data",
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].pesan_gagal,
           life: 3000,
         });
       }, 500);
@@ -144,8 +145,8 @@ const Currency = () => {
           getCurrency(true);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -157,7 +158,7 @@ const Currency = () => {
           setUpdate(false);
           toast.current.show({
             severity: "error",
-            summary: "Gagal",
+            summary: tr[localStorage.getItem("language")].gagal,
             detail: `Kode ${currentItem.code} Sudah Digunakan`,
             life: 3000,
           });
@@ -167,8 +168,8 @@ const Currency = () => {
           setUpdate(false);
           toast.current.show({
             severity: "error",
-            summary: "Gagal",
-            detail: "Gagal Memperbarui Data",
+            summary: tr[localStorage.getItem("language")].gagal,
+            detail: tr[localStorage.getItem("language")].pesan_gagal,
             life: 3000,
           });
         }, 500);
@@ -193,8 +194,8 @@ const Currency = () => {
           getCurrency(true);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
         }, 500);
@@ -206,8 +207,8 @@ const Currency = () => {
         setDisplayDel(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Project`,
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].del_gagal,
           life: 3000,
         });
       }, 500);
@@ -269,12 +270,12 @@ const Currency = () => {
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => setDisplayData(false)}
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Simpan"
+          label={tr[localStorage.getItem("language")].simpan}
           icon="pi pi-check"
           onClick={() => onSubmit()}
           autoFocus
@@ -288,12 +289,12 @@ const Currency = () => {
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => setDisplayDel(false)}
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Hapus"
+          label={tr[localStorage.getItem("language")].hapus}
           icon="pi pi-trash"
           onClick={() => {
             delCurrency();
@@ -328,11 +329,11 @@ const Currency = () => {
           <InputText
             value={globalFilterValue1}
             onChange={onGlobalFilterChange1}
-            placeholder="Cari disini"
+            placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
         <PrimeSingleButton
-          label="Tambah"
+          label={tr[localStorage.getItem("language")].tambh}
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             setEdit(false);
@@ -350,7 +351,10 @@ const Currency = () => {
       const dropdownOptions = [
         { label: 20, value: 20 },
         { label: 50, value: 50 },
-        { label: "Semua", value: options.totalRecords },
+        {
+          label: tr[localStorage.getItem("language")].hal,
+          value: options.totalRecords,
+        },
       ];
 
       return (
@@ -359,7 +363,7 @@ const Currency = () => {
             className="mx-1"
             style={{ color: "var(--text-color)", userSelect: "none" }}
           >
-            Data per halaman:{" "}
+            {tr[localStorage.getItem("language")].page}{" "}
           </span>
           <Dropdown
             value={options.value}
@@ -379,7 +383,8 @@ const Currency = () => {
             textAlign: "center",
           }}
         >
-          {options.first} - {options.last} dari {options.totalRecords}
+          {options.first} - {options.last}{" "}
+          {tr[localStorage.getItem("language")].dari} {options.totalRecords}
         </span>
       );
     },
@@ -439,13 +444,8 @@ const Currency = () => {
                 rowHover
                 header={renderHeader}
                 filters={filters1}
-                globalFilterFields={[
-                  "code",
-                  "name",
-                  "date",
-                  "rate",
-                ]}
-                emptyMessage="Tidak ada data"
+                globalFilterFields={["code", "name", "date", "rate"]}
+                emptyMessage={tr[localStorage.getItem("language")].empty_data}
                 paginator
                 paginatorTemplate={template2}
                 first={first2}
@@ -454,7 +454,7 @@ const Currency = () => {
                 paginatorClassName="justify-content-end mt-3"
               >
                 <Column
-                  header="Kode Currency"
+                  header={tr[localStorage.getItem("language")].kd_cr}
                   style={{
                     minWidth: "8rem",
                   }}
@@ -462,19 +462,19 @@ const Currency = () => {
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Nama Currency"
+                  header={tr[localStorage.getItem("language")].nm_cr}
                   field={(e) => e.name}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Tanggal"
+                  header={tr[localStorage.getItem("language")].tgl}
                   field={(e) => formatDate(e.date)}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Rate Currency"
+                  header={tr[localStorage.getItem("language")].rat_cr}
                   field={(e) => formatIdr(e.rate)}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
@@ -493,7 +493,15 @@ const Currency = () => {
       </Row>
 
       <Dialog
-        header={isEdit ? "Edit Currency" : "Tambah Currency"}
+        header={
+          isEdit
+            ? `${tr[localStorage.getItem("language")].edit} ${
+                tr[localStorage.getItem("language")].currency
+              }`
+            : `${tr[localStorage.getItem("language")].tambh} ${
+                tr[localStorage.getItem("language")].currency
+              }`
+        }
         visible={displayData}
         style={{ width: "40vw" }}
         footer={renderFooter("displayData")}
@@ -505,7 +513,7 @@ const Currency = () => {
         <div className="row mr-0 ml-0">
           <div className="col-6">
             <PrimeInput
-              label={"Kode Currency"}
+              label={tr[localStorage.getItem("language")].kd_cr}
               value={currentItem !== null ? `${currentItem.code}` : ""}
               onChange={(e) => {
                 setCurrentItem({ ...currentItem, code: e.target.value });
@@ -513,14 +521,14 @@ const Currency = () => {
                 newError.code = false;
                 setError(newError);
               }}
-              placeholder="Masukan Kode Currency"
+              placeholder={tr[localStorage.getItem("language")].masuk}
               error={error?.code}
             />
           </div>
 
           <div className="col-6">
             <PrimeInput
-              label={"Nama Currency"}
+              label={tr[localStorage.getItem("language")].nm_cr}
               value={currentItem !== null ? `${currentItem.name}` : ""}
               onChange={(e) => {
                 setCurrentItem({ ...currentItem, name: e.target.value });
@@ -528,7 +536,7 @@ const Currency = () => {
                 newError.name = false;
                 setError(newError);
               }}
-              placeholder="Masukan Nama Currency"
+              placeholder={tr[localStorage.getItem("language")].masuk}
               error={error?.name}
             />
           </div>
@@ -537,7 +545,7 @@ const Currency = () => {
         <div className="row mr-0 ml-0">
           <div className="col-6">
             <label className="text-label" htmlFor="tanggal">
-              Tanggal
+              {tr[localStorage.getItem("language")].tgl}
             </label>
             <div className="p-inputgroup">
               <Calendar
@@ -546,7 +554,7 @@ const Currency = () => {
                 onChange={(e) =>
                   setCurrentItem({ ...currentItem, date: e.target.value })
                 }
-                placeholder="Masukan Tanggal"
+                placeholder="DD-MM-YYYY"
                 dateFormat="dd-mm-yy"
                 showIcon
               />
@@ -555,7 +563,7 @@ const Currency = () => {
 
           <div className="col-6">
             <PrimeInput
-              label={"Rate Currency"}
+              label={tr[localStorage.getItem("language")].rat_cr}
               number
               value={currentItem !== null ? `${currentItem.rate}` : "0"}
               onChange={(e) => {
@@ -572,7 +580,9 @@ const Currency = () => {
       </Dialog>
 
       <Dialog
-        header={"Hapus Data"}
+        header={`${tr[localStorage.getItem("language")].hapus} ${
+          tr[localStorage.getItem("language")].currency
+        }`}
         visible={displayDel}
         style={{ width: "30vw" }}
         footer={renderFooterDel("displayDel")}
@@ -585,7 +595,7 @@ const Currency = () => {
             className="pi pi-exclamation-triangle mr-3 align-middle"
             style={{ fontSize: "2rem" }}
           />
-          <span>Apakah anda yakin ingin menghapus data ?</span>
+          <span>{tr[localStorage.getItem("language")].pesan_hapus}</span>
         </div>
       </Dialog>
     </>

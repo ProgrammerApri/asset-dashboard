@@ -19,6 +19,7 @@ import { MultiSelect } from "primereact/multiselect";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
+import { tr } from "src/data/tr";
 
 const def = {
   id: null,
@@ -143,8 +144,8 @@ const DataPajak = ({
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -154,8 +155,8 @@ const DataPajak = ({
         setLoading(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: "Gagal Memperbarui Data",
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].pesan_gagal,
           life: 3000,
         });
       }, 500);
@@ -180,8 +181,8 @@ const DataPajak = ({
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -192,8 +193,8 @@ const DataPajak = ({
         setLoading(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: "Gagal Memperbarui Data",
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].pesan_gagal,
           life: 3000,
         });
       }, 500);
@@ -219,8 +220,8 @@ const DataPajak = ({
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
         }, 500);
@@ -232,8 +233,8 @@ const DataPajak = ({
         setShowDelete(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Data`,
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].del_gagal,
           life: 3000,
         });
       }, 500);
@@ -287,7 +288,7 @@ const DataPajak = ({
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => {
             onHideInput();
             onInput(false);
@@ -295,7 +296,7 @@ const DataPajak = ({
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Simpan"
+          label={tr[localStorage.getItem("language")].simpan}
           icon="pi pi-check"
           onClick={() => onSubmit()}
           autoFocus
@@ -309,7 +310,7 @@ const DataPajak = ({
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => {
             setShowDelete(false);
             setLoading(false);
@@ -318,7 +319,7 @@ const DataPajak = ({
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Hapus"
+          label={tr[localStorage.getItem("language")].hapus}
           icon="pi pi-trash"
           onClick={() => {
             delPajak();
@@ -353,11 +354,11 @@ const DataPajak = ({
           <InputText
             value={globalFilterValue1}
             onChange={onGlobalFilterChange1}
-            placeholder="Cari disini"
+            placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
         <PrimeSingleButton
-          label="Tambah"
+          label={tr[localStorage.getItem("language")].tambh}
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             setShowInput(true);
@@ -377,7 +378,10 @@ const DataPajak = ({
       const dropdownOptions = [
         { label: 20, value: 20 },
         { label: 50, value: 50 },
-        { label: "Semua", value: options.totalRecords },
+        {
+          label: tr[localStorage.getItem("language")].hal,
+          value: options.totalRecords,
+        },
       ];
 
       return (
@@ -386,7 +390,7 @@ const DataPajak = ({
             className="mx-1"
             style={{ color: "var(--text-color)", userSelect: "none" }}
           >
-            Data per halaman:{" "}
+            {tr[localStorage.getItem("language")].page}{" "}
           </span>
           <Dropdown
             value={options.value}
@@ -406,7 +410,8 @@ const DataPajak = ({
             textAlign: "center",
           }}
         >
-          {options.first} - {options.last} dari {options.totalRecords}
+          {options.first} - {options.last}{" "}
+          {tr[localStorage.getItem("language")].dari} {options.totalRecords}
         </span>
       );
     },
@@ -484,7 +489,7 @@ const DataPajak = ({
           header={renderHeader}
           filters={filters1}
           globalFilterFields={["name", "nilai"]}
-          emptyMessage="Tidak ada data"
+          emptyMessage={tr[localStorage.getItem("language")].empty_data}
           paginator
           paginatorTemplate={template2}
           first={first2}
@@ -495,19 +500,19 @@ const DataPajak = ({
           onRowSelect={onRowSelect}
         >
           <Column
-            header="Nama"
+            header={tr[localStorage.getItem("language")].nm_pjk}
             field={(e) => e?.name ?? ""}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
           <Column
-            header="Nilai (%)"
+            header={tr[localStorage.getItem("language")].nil}
             field={(e) => e?.nilai ?? ""}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
           <Column
-            header="Tipe Pajak"
+            header={tr[localStorage.getItem("language")].type_pjk}
             field={(e) => e?.type ?? ""}
             style={{ minWidth: "8rem" }}
             body={(e) =>
@@ -530,7 +535,7 @@ const DataPajak = ({
             }
           />
           <Column
-            header="Pemotongan"
+            header={tr[localStorage.getItem("language")].pemotong}
             field={(e) => e?.cutting ?? ""}
             style={{ minWidth: "8rem" }}
             body={(e) =>
@@ -554,7 +559,7 @@ const DataPajak = ({
             }
           />
           <Column
-            header="Gabungan Dari"
+            header={tr[localStorage.getItem("language")].gabungan}
             field={(e) => e?.combined ?? "-"}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
@@ -576,7 +581,15 @@ const DataPajak = ({
       <>
         <Toast ref={toast} />
         <Dialog
-          header={isEdit ? "Edit Data Pajak" : "Tambah Data Pajak"}
+          header={
+            isEdit
+              ? `${tr[localStorage.getItem("language")].edit} ${
+                  tr[localStorage.getItem("language")].pajak
+                }`
+              : `${tr[localStorage.getItem("language")].tambh} ${
+                  tr[localStorage.getItem("language")].pajak
+                }`
+          }
           visible={showInput}
           style={{ width: "40vw" }}
           footer={renderFooter("displayData")}
@@ -586,7 +599,9 @@ const DataPajak = ({
           }}
         >
           <div className="col-12 mb-2">
-            <label className="text-label">Pajak</label>
+            <label className="text-label">
+              {tr[localStorage.getItem("language")].pajak}
+            </label>
             <div className="p-inputgroup">
               <SelectButton
                 value={
@@ -612,7 +627,7 @@ const DataPajak = ({
               <div className="row ml-0 mt-0">
                 <div className="col-6">
                   <PrimeInput
-                    label={"Nama Pajak"}
+                    label={tr[localStorage.getItem("language")].nm_pjk}
                     value={
                       currentItem !== null ? `${currentItem?.name ?? ""}` : ""
                     }
@@ -622,7 +637,7 @@ const DataPajak = ({
                       newError.name = false;
                       setError(newError);
                     }}
-                    placeholder="Masukan Nama Pajak"
+                    placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error?.name}
                   />
                 </div>
@@ -630,7 +645,7 @@ const DataPajak = ({
                 <div className="col-6">
                   {/* <div className="p-inputgroup"> */}
                   <PrimeInput
-                    label={"Nilai (%)"}
+                    label={tr[localStorage.getItem("language")].nil}
                     number
                     value={
                       currentItem !== null ? `${currentItem?.nilai ?? ""}` : ""
@@ -652,11 +667,11 @@ const DataPajak = ({
 
               <div className="row ml-0 mt-0">
                 <div className="col-12 mb-2">
-                  <label className="mt-2" htmlFor="binary">
-                    {"Pemotongan"}
+                  <label className="mt-3" htmlFor="binary">
+                    {tr[localStorage.getItem("language")].pemotong}
                   </label>
                   <Checkbox
-                    className="mt-0 ml-5"
+                    className="mt-0 mb-2 ml-4"
                     inputId="binary"
                     checked={currentItem ? currentItem.cutting : false}
                     onChange={(e) =>
@@ -669,7 +684,7 @@ const DataPajak = ({
               <div className="row ml-0 mt-0">
                 <div className="col-6">
                   <PrimeDropdown
-                    label={"Akun Pajak Pembelian"}
+                    label={tr[localStorage.getItem("language")].acc_pjk_bl}
                     value={
                       currentItem !== null && currentItem.acc_sls_tax !== null
                         ? acc(currentItem.acc_sls_tax)
@@ -691,7 +706,7 @@ const DataPajak = ({
                     itemTemplate={glTemplate}
                     filter
                     filterBy="acc_name"
-                    placeholder="Pilih Ppn Masukan"
+                    placeholder={tr[localStorage.getItem("language")].pilih}
                     errorMessage="Akun Pajak Pembelian Belum Dipilih"
                     error={error?.acc1}
                   />
@@ -699,7 +714,7 @@ const DataPajak = ({
 
                 <div className="col-6">
                   <PrimeDropdown
-                    label={"Akun Pajak Penjualan"}
+                    label={tr[localStorage.getItem("language")].acc_pjk_jl}
                     value={
                       currentItem !== null && currentItem.acc_pur_tax !== null
                         ? acc(currentItem.acc_pur_tax)
@@ -721,7 +736,7 @@ const DataPajak = ({
                     itemTemplate={glTemplate}
                     filter
                     filterBy="acc_name"
-                    placeholder="Pilih Ppn Keluaran"
+                    placeholder={tr[localStorage.getItem("language")].pilih}
                     errorMessage="Akun Pajak Penjualan Belum Dipilih"
                     error={error?.acc2}
                   />
@@ -734,7 +749,9 @@ const DataPajak = ({
               {" "}
               <div className="row ml-0 mt-0">
                 <div className="col-6">
-                  <label className="text-label">Nama Pajak</label>
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].nm_pjk}
+                  </label>
                   <div className="p-inputgroup">
                     <InputText
                       value={
@@ -743,13 +760,15 @@ const DataPajak = ({
                       onChange={(e) =>
                         setCurrentItem({ ...currentItem, name: e.target.value })
                       }
-                      placeholder="Masukan Nama Pajak"
+                      placeholder={tr[localStorage.getItem("language")].masuk}
                     />
                   </div>
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">Penggabungan Dari</label>
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].gabungan}
+                  </label>
                   <div className="p-inputgroup">
                     <MultiSelect
                       value={currentItem !== null ? currentItem.pajak : null}
@@ -764,7 +783,7 @@ const DataPajak = ({
                       optionLabel="name"
                       filter
                       filterBy="name"
-                      placeholder="Pilih Ppn"
+                      placeholder={tr[localStorage.getItem("language")].pilih}
                       display="chip"
                     />
                   </div>
@@ -804,7 +823,9 @@ const DataPajak = ({
         </Dialog>
 
         <Dialog
-          header={"Hapus Data"}
+          header={`${tr[localStorage.getItem("language")].hapus} ${
+            tr[localStorage.getItem("language")].pajak
+          }`}
           visible={showDelete}
           style={{ width: "30vw" }}
           footer={renderFooterDel("displayDel")}
@@ -819,7 +840,7 @@ const DataPajak = ({
               className="pi pi-exclamation-triangle mr-3 align-middle"
               style={{ fontSize: "2rem" }}
             />
-            <span>Apakah anda yakin ingin menghapus data ?</span>
+            <span>{tr[localStorage.getItem("language")].pesan_hapus}</span>
           </div>
         </Dialog>
       </>
@@ -830,7 +851,9 @@ const DataPajak = ({
     return (
       <>
         <Dialog
-          header={"Data Pajak"}
+          header={`${tr[localStorage.getItem("language")].data} ${
+            tr[localStorage.getItem("language")].pajak
+          }`}
           visible={show}
           footer={() => <div></div>}
           style={{ width: "60vw" }}

@@ -400,7 +400,7 @@ const DataCustomer = ({
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
+            summary: tr[localStorage.getItem("language")].berhsl,
             detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
@@ -411,7 +411,7 @@ const DataCustomer = ({
         setUpdate(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
+          summary: tr[localStorage.getItem("language")].gagal,
           detail: tr[localStorage.getItem("language")].pesan_gagal,
           life: 3000,
         });
@@ -460,7 +460,7 @@ const DataCustomer = ({
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
+            summary: tr[localStorage.getItem("language")].berhsl,
             detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
@@ -473,7 +473,7 @@ const DataCustomer = ({
           setUpdate(false);
           toast.current.show({
             severity: "error",
-            summary: "Gagal",
+            summary: tr[localStorage.getItem("language")].gagal,
             detail: `Kode ${currentItem.customer.cus_code} Sudah Digunakan`,
             life: 3000,
           });
@@ -483,7 +483,7 @@ const DataCustomer = ({
           setUpdate(false);
           toast.current.show({
             severity: "error",
-            summary: "Gagal",
+            summary: tr[localStorage.getItem("language")].gagal,
             detail: tr[localStorage.getItem("language")].pesan_gagal,
             life: 3000,
           });
@@ -511,7 +511,7 @@ const DataCustomer = ({
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
+            summary: tr[localStorage.getItem("language")].berhsl,
             detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
@@ -525,7 +525,7 @@ const DataCustomer = ({
         onInput(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
+          summary: tr[localStorage.getItem("language")].gagal,
           detail: tr[localStorage.getItem("language")].del_gagal,
           life: 3000,
         });
@@ -1625,8 +1625,8 @@ const DataCustomer = ({
         </Dialog>
 
         <Dialog
-          header={`${tr[localStorage.getItem("language")].data} ${
-            tr[localStorage.getItem("language")].hapus
+          header={`${tr[localStorage.getItem("language")].hapus} ${
+            tr[localStorage.getItem("language")].customer
           }`}
           visible={showDelete}
           style={{ width: "30vw" }}

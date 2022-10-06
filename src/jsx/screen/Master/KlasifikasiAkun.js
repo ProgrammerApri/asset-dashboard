@@ -12,6 +12,7 @@ import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
+import { tr } from "src/data/tr";
 
 const KlasifikasiAkun = () => {
   const [klasifikasi, setKlasifikasi] = useState(null);
@@ -78,8 +79,8 @@ const KlasifikasiAkun = () => {
           getKlasifikasi(true);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data berhasil diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -89,8 +90,8 @@ const KlasifikasiAkun = () => {
         setUpdate(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: "Gagal memperbarui data",
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].pesan_gagal,
           life: 3000,
         });
       }, 500);
@@ -134,12 +135,12 @@ const KlasifikasiAkun = () => {
     return (
       <div>
         <Button
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => onHide(kode)}
           className="p-button-text btn-primary"
         />
         <Button
-          label="Simpan"
+          label={tr[localStorage.getItem("language")].simpan}
           icon="pi pi-check"
           onClick={() => onSubmit()}
           autoFocus
@@ -169,14 +170,14 @@ const KlasifikasiAkun = () => {
               >
                 <Column
                   field="id"
-                  header="Kode"
+                  header={tr[localStorage.getItem("language")].kode}
                   style={{
                     width: "10rem",
                   }}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Nama Klasifikasi Akun"
+                  header={tr[localStorage.getItem("language")].klasifks}
                   field="klasiname"
                   style={{ minWidth: "25rem" }}
                   body={loading && <Skeleton />}
@@ -194,21 +195,23 @@ const KlasifikasiAkun = () => {
         </Col>
       </Row>
       <Dialog
-        header="Edit Klasifikasi Akun"
+        header={`${tr[localStorage.getItem("language")].edit} ${
+          tr[localStorage.getItem("language")].klasifks
+        }`}
         visible={displayData}
         style={{ width: "40vw" }}
         footer={renderFooter("displayData")}
         onHide={() => onHide("displayData")}
       >
         <div className="col-12 mb-2">
-          <label className="text-label">Kode Klasifikasi</label>
+          <label className="text-label">{tr[localStorage.getItem("language")].kode}</label>
           <div className="p-inputgroup">
             <InputText value={`${currentItem.id}`} disabled />
           </div>
         </div>
 
         <div className="col-12 mb-2">
-          <label className="text-label">Nama Klasifikasi</label>
+          <label className="text-label">{tr[localStorage.getItem("language")].klasifks}</label>
           <div className="p-inputgroup">
             <InputText
               value={currentItem.klasiname}

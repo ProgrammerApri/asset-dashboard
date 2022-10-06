@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button, Col, Row } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { tr } from "src/data/tr";
 import Memorial from "./Memorial";
 import Persediaan from "./Persediaan/Persediaan";
 import TransaksiPembelian from "./TransaksiPembelian/TransaksiPembelian";
@@ -10,22 +11,22 @@ const Transaksi = (self) => {
   const [active, setActive] = useState(0);
   const [subMenu, setSubMenu] = useState([
     {
-      tittle: "Transaksi Pembelian",
+      tittle: tr[localStorage.getItem("language")].tran_pur,
       icon: "bx-receipt",
       component: <TransaksiPembelian />,
     },
     {
-      tittle: "Transaksi Penjualan",
+      tittle: tr[localStorage.getItem("language")].tran_sale,
       icon: "bx-receipt",
       component: <TransaksiPenjualan />,
     },
     {
-      tittle: "Persediaan",
+      tittle: tr[localStorage.getItem("language")].inven,
       icon: "bx-receipt",
       component: <Persediaan />,
     },
     {
-      tittle: "Memorial",
+      tittle: tr[localStorage.getItem("language")].memo,
       icon: "bx-receipt",
       component: <Memorial />,
     },

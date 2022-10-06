@@ -22,6 +22,7 @@ import { Badge as PBadge } from "primereact/badge";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
+import { tr } from "src/data/tr";
 
 const def = {
   id: 0,
@@ -139,8 +140,8 @@ const DataSatuan = ({
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -150,8 +151,8 @@ const DataSatuan = ({
         setLoading(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: "Gagal Memperbarui Data",
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].pesan_gagal,
           life: 3000,
         });
       }, 500);
@@ -177,8 +178,8 @@ const DataSatuan = ({
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Ditambahkan",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -190,7 +191,7 @@ const DataSatuan = ({
           setLoading(false);
           toast.current.show({
             severity: "error",
-            summary: "Gagal",
+            summary: tr[localStorage.getItem("language")].gagal,
             detail: `Kode Project ${currentItem.proj_code} Sudah Digunakan`,
             life: 3000,
           });
@@ -200,8 +201,8 @@ const DataSatuan = ({
           setLoading(false);
           toast.current.show({
             severity: "error",
-            summary: "Gagal",
-            detail: "Gagal Memperbarui Data",
+            summary: tr[localStorage.getItem("language")].gagal,
+            detail: tr[localStorage.getItem("language")].pesan_gagal,
             life: 3000,
           });
         }, 500);
@@ -228,8 +229,8 @@ const DataSatuan = ({
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
         }, 500);
@@ -242,8 +243,8 @@ const DataSatuan = ({
         onInput(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Project`,
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].del_gagal,
           life: 3000,
         });
       }, 500);
@@ -346,7 +347,7 @@ const DataSatuan = ({
               s_small: !el.u_from,
             });
           } else {
-            errors.konv[i] = error.konv[i]
+            errors.konv[i] = error.konv[i];
           }
         } else {
           errors.konv.push({
@@ -362,19 +363,19 @@ const DataSatuan = ({
 
     for (var key in errors) {
       if (key !== "konv") {
-        valid = !errors[key]
+        valid = !errors[key];
       }
     }
 
     let validKonv = false;
 
-    errors.konv.forEach(el => {
+    errors.konv.forEach((el) => {
       for (var k in el) {
-        validKonv = !el[k]
+        validKonv = !el[k];
       }
     });
 
-    valid = valid && validKonv
+    valid = valid && validKonv;
 
     setError(errors);
 
@@ -385,7 +386,7 @@ const DataSatuan = ({
     return (
       <div className="mt-3">
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => {
             onHideInput();
             onInput(false);
@@ -393,7 +394,7 @@ const DataSatuan = ({
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Simpan"
+          label={tr[localStorage.getItem("language")].simpan}
           icon="pi pi-check"
           onClick={() => onSubmit()}
           autoFocus
@@ -407,7 +408,7 @@ const DataSatuan = ({
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => {
             setShowDelete(false);
             setLoading(false);
@@ -416,7 +417,7 @@ const DataSatuan = ({
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Hapus"
+          label={tr[localStorage.getItem("language")].hapus}
           icon="pi pi-trash"
           onClick={() => {
             setLoading(true);
@@ -452,11 +453,11 @@ const DataSatuan = ({
           <InputText
             value={globalFilterValue1}
             onChange={onGlobalFilterChange1}
-            placeholder="Cari disini"
+            placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
         <PrimeSingleButton
-          label="Tambah"
+          label={tr[localStorage.getItem("language")].tambh}
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             setEdit(false);
@@ -484,7 +485,10 @@ const DataSatuan = ({
       const dropdownOptions = [
         { label: 20, value: 20 },
         { label: 50, value: 50 },
-        { label: "Semua", value: options.totalRecords },
+        {
+          label: tr[localStorage.getItem("language")].hal,
+          value: options.totalRecords,
+        },
       ];
 
       return (
@@ -493,7 +497,7 @@ const DataSatuan = ({
             className="mx-1"
             style={{ color: "var(--text-color)", userSelect: "none" }}
           >
-            Data per halaman:{" "}
+            {tr[localStorage.getItem("language")].page}{" "}
           </span>
           <Dropdown
             value={options.value}
@@ -513,7 +517,8 @@ const DataSatuan = ({
             textAlign: "center",
           }}
         >
-          {options.first} - {options.last} dari {options.totalRecords}
+          {options.first} - {options.last}{" "}
+          {tr[localStorage.getItem("language")].dari} {options.totalRecords}
         </span>
       );
     },
@@ -540,7 +545,7 @@ const DataSatuan = ({
     setCurrentItem(def);
     setEdit(false);
     setShowInput(false);
-    setError(defError)
+    setError(defError);
   };
 
   const renderBody = () => {
@@ -565,13 +570,8 @@ const DataSatuan = ({
           }
           groupRowsBy="name"
           filters={filters1}
-          globalFilterFields={[
-            "code",
-            "name",
-            "status",
-            "ket",
-          ]}
-          emptyMessage="Tidak ada data"
+          globalFilterFields={["code", "name", "status", "ket"]}
+          emptyMessage={tr[localStorage.getItem("language")].empty_data}
           paginator
           paginatorTemplate={template2}
           first={first2}
@@ -590,31 +590,31 @@ const DataSatuan = ({
                   body={loading && <Skeleton />}
                 /> */}
           <Column
-            header="Kode Satuan"
+            header={tr[localStorage.getItem("language")].kd_sat}
             field="code"
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
           <Column
-            header="Kuantitas"
+            header={tr[localStorage.getItem("language")].qty}
             field={(e) => e?.qty ?? "-"}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
           <Column
-            header="Satuan Besar"
+            header={tr[localStorage.getItem("language")].sat_besar}
             field={(e) => e?.u_to?.code ?? e.code}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
           <Column
-            header="Satuan Kecil"
+            header={tr[localStorage.getItem("language")].sat_kecil}
             field={(e) => e?.u_from?.code ?? e.code}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
           <Column
-            header="Status Satuan"
+            header={tr[localStorage.getItem("language")].sts}
             style={{ minWidth: "8rem" }}
             body={(e) =>
               load ? (
@@ -643,7 +643,15 @@ const DataSatuan = ({
     return (
       <>
         <Dialog
-          header={isEdit ? "Edit Satuan" : "Tambah Satuan"}
+          header={
+            isEdit
+              ? `${tr[localStorage.getItem("language")].edit} ${
+                  tr[localStorage.getItem("language")].sat
+                }`
+              : `${tr[localStorage.getItem("language")].tambh} ${
+                  tr[localStorage.getItem("language")].sat
+                }`
+          }
           visible={showInput}
           style={{ width: "50vw" }}
           footer={renderFooter()}
@@ -655,40 +663,42 @@ const DataSatuan = ({
           <div className="row mr-0 ml-0">
             <div className="col-6">
               <PrimeInput
-                label={"Kode Satuan"}
+                label={tr[localStorage.getItem("language")].kd_sat}
                 value={currentItem !== null ? currentItem.code : ""}
                 onChange={(e) => {
                   setCurrentItem({ ...currentItem, code: e.target.value });
                   setError({ ...error, code: false });
                 }}
-                placeholder="Masukan Kode Satuan"
+                placeholder={tr[localStorage.getItem("language")].masuk}
                 error={error.code}
               />
             </div>
 
             <div className="col-6">
               <PrimeInput
-                label={"Nama Satuan"}
+                label={tr[localStorage.getItem("language")].nm_sat}
                 value={currentItem !== null ? currentItem.name : ""}
                 onChange={(e) => {
                   setCurrentItem({ ...currentItem, name: e.target.value });
                   setError({ ...error, code: false });
                 }}
-                placeholder="Masukan Nama Satuan"
+                placeholder={tr[localStorage.getItem("language")].masuk}
                 error={error.name}
               />
             </div>
           </div>
 
           <div className="col-12">
-            <label className="text-label">Keterangan</label>
+            <label className="text-label">
+              {tr[localStorage.getItem("language")].ket}
+            </label>
             <div className="p-inputgroup">
               <InputTextarea
                 value={currentItem !== null ? currentItem.desc : ""}
                 onChange={(e) => {
                   setCurrentItem({ ...currentItem, desc: e.target.value });
                 }}
-                placeholder="Masukan Keterangan"
+                placeholder={tr[localStorage.getItem("language")].masuk}
               />
             </div>
           </div>
@@ -703,7 +713,7 @@ const DataSatuan = ({
               }}
             />
             <label className="mr-3 mt-1" htmlFor="email">
-              {"Aktif"}
+              {tr[localStorage.getItem("language")].aktif}
             </label>
           </div>
           <div className="d-flex col-12 align-items-center">
@@ -729,30 +739,36 @@ const DataSatuan = ({
               }}
             />
             <label className="mr-3 mt-1" htmlFor="email">
-              {"Satuan Dasar"}
+              {tr[localStorage.getItem("language")].sat_dasar}
             </label>
           </div>
 
           {currentItem && currentItem.type == "k" && (
             <>
               <h4 className="mt-4 ml-3 mr-3">
-                <b>Konversi Satuan</b>
+                <b>{tr[localStorage.getItem("language")].konver}</b>
               </h4>
               <Divider className="mb-2 ml-3 mr-3"></Divider>
 
               <div className="row ml-0 mr-0 mb-0">
                 <div className="col-3">
-                  <label className="text-label">Nilai/Kuantitas</label>
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].qty}
+                  </label>
                 </div>
 
                 <div className="col-4">
-                  <label className="text-label">Satuan Besar</label>
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].sat_besar}
+                  </label>
                 </div>
 
                 <div className="ml-1"> </div>
 
                 <div className="col-4">
-                  <label className="text-label">Satuan Kecil</label>
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].sat_kecil}
+                  </label>
                 </div>
 
                 <div className="d-flex">
@@ -775,13 +791,16 @@ const DataSatuan = ({
                             newKonv[i].qty = false;
                             setError({ ...error, konv: newKonv });
                           }}
-                          placeholder="Masukan Nilai"
+                          placeholder={
+                            tr[localStorage.getItem("language")].masuk
+                          }
                           showButtons
                         />
                       </div>
                       {error.konv[i].qty && (
                         <small id="name-error" className="p-error block">
-                          <i class="bx bxs-error-circle ml-1"></i> Kuantitas Tidak Sesuai
+                          <i class="bx bxs-error-circle ml-1"></i> Kuantitas
+                          Tidak Sesuai
                         </small>
                       )}
                     </div>
@@ -798,7 +817,7 @@ const DataSatuan = ({
                           newKonv[i].s_big = false;
                           setError({ ...error, konv: newKonv });
                         }}
-                        placeholder="Pilih Satuan"
+                        placeholder={tr[localStorage.getItem("language")].pilih}
                         optionLabel="name"
                         filter
                         filterBy="name"
@@ -819,7 +838,7 @@ const DataSatuan = ({
                           newKonv[i].s_small = false;
                           setError({ ...error, konv: newKonv });
                         }}
-                        placeholder="Pilih Satuan"
+                        placeholder={tr[localStorage.getItem("language")].pilih}
                         optionLabel="name"
                         filter
                         filterBy="name"
@@ -881,7 +900,9 @@ const DataSatuan = ({
         </Dialog>
 
         <Dialog
-          header={"Hapus Data"}
+          header={`${tr[localStorage.getItem("language")].hapus} ${
+            tr[localStorage.getItem("language")].sat
+          }`}
           visible={showDelete}
           style={{ width: "30vw" }}
           footer={renderFooterDel("displayDel")}
@@ -896,7 +917,7 @@ const DataSatuan = ({
               className="pi pi-exclamation-triangle mr-3 align-middle"
               style={{ fontSize: "2rem" }}
             />
-            <span>Apakah anda yakin ingin menghapus data ?</span>
+            <span>{tr[localStorage.getItem("language")].pesan_hapus}</span>
           </div>
         </Dialog>
       </>
@@ -907,7 +928,9 @@ const DataSatuan = ({
     return (
       <>
         <Dialog
-          header={"Data Satuan"}
+          header={`${tr[localStorage.getItem("language")].data} ${
+            tr[localStorage.getItem("language")].sat
+          }`}
           visible={show}
           footer={() => <div></div>}
           style={{ width: "60vw" }}

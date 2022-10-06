@@ -300,8 +300,8 @@ const DataAkun = ({
           getKategori(true);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data berhasil diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -311,8 +311,8 @@ const DataAkun = ({
         setUpdate(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: "Gagal memperbarui data",
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].pesan_gagal,
           sticky: true,
           // life: 3000,
         });
@@ -349,8 +349,8 @@ const DataAkun = ({
           getKategori(true);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data berhasil diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -390,8 +390,8 @@ const DataAkun = ({
           getKategori(true);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data berhasil diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
         }, 500);
@@ -405,8 +405,8 @@ const DataAkun = ({
         onInput(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Akun`,
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].del_gagal,
           sticky: true,
           // life: 3000,
         });
@@ -513,7 +513,7 @@ const DataAkun = ({
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => {
             setShowDelete(false);
             setUpdate(false);
@@ -522,7 +522,7 @@ const DataAkun = ({
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Hapus"
+          label={tr[localStorage.getItem("language")].hapus}
           icon="pi pi-trash"
           onClick={() => {
             if (
@@ -673,7 +673,10 @@ const DataAkun = ({
       const dropdownOptions = [
         { label: 20, value: 20 },
         { label: 50, value: 50 },
-        { label: "Semua", value: options.totalRecords },
+        {
+          label: tr[localStorage.getItem("language")].hal,
+          value: options.totalRecords,
+        },
       ];
 
       return (
@@ -682,7 +685,7 @@ const DataAkun = ({
             className="mx-1"
             style={{ color: "var(--text-color)", userSelect: "none" }}
           >
-            Data per halaman:{" "}
+            {tr[localStorage.getItem("language")].page}{" "}
           </span>
           <Dropdown
             value={options.value}
@@ -702,7 +705,8 @@ const DataAkun = ({
             textAlign: "center",
           }}
         >
-          {options.first} - {options.last} dari {options.totalRecords}
+          {options.first} - {options.last}{" "}
+          {tr[localStorage.getItem("language")].dari} {options.totalRecords}
         </span>
       );
     },
@@ -1025,7 +1029,11 @@ const DataAkun = ({
       <>
         <Toast ref={toast} />
         <Dialog
-          header={isEdit ? tr[localStorage.getItem("language")].edit_acc : tr[localStorage.getItem("language")].tambh_acc}
+          header={
+            isEdit
+              ? tr[localStorage.getItem("language")].edit_acc
+              : tr[localStorage.getItem("language")].tambh_acc
+          }
           visible={showInput}
           style={{ width: "50vw" }}
           footer={renderFooter}
@@ -1257,7 +1265,9 @@ const DataAkun = ({
                 </div>
 
                 <div className="col-12 mb-2">
-                  <label className="text-label">{tr[localStorage.getItem("language")].sld_awal}</label>
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].sld_awal}
+                  </label>
                   <div className="p-inputgroup">
                     <InputNumber
                       value={
@@ -1286,7 +1296,9 @@ const DataAkun = ({
         </Dialog>
 
         <Dialog
-          header={"Hapus Data"}
+          header={`${tr[localStorage.getItem("language")].hapus} ${
+            tr[localStorage.getItem("language")].akun
+          }`}
           visible={showDelete}
           style={{ width: "30vw" }}
           footer={renderFooterDel}
@@ -1301,7 +1313,7 @@ const DataAkun = ({
               className="pi pi-exclamation-triangle mr-3 align-middle"
               style={{ fontSize: "2rem" }}
             />
-            <span>Apakah anda yakin ingin menghapus data ?</span>
+            <span>{tr[localStorage.getItem("language")].pesan_hapus}</span>
           </div>
         </Dialog>
       </>

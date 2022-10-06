@@ -340,7 +340,7 @@ const DataSupplier = ({
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
+            summary: tr[localStorage.getItem("language")].berhsl,
             detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
@@ -351,7 +351,7 @@ const DataSupplier = ({
         setUpdate(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
+          summary: tr[localStorage.getItem("language")].gagal,
           detail: tr[localStorage.getItem("language")].pesan_gagal,
           life: 3000,
         });
@@ -395,7 +395,7 @@ const DataSupplier = ({
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
+            summary: tr[localStorage.getItem("language")].berhsl,
             detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
@@ -408,7 +408,7 @@ const DataSupplier = ({
           setUpdate(false);
           toast.current.show({
             severity: "error",
-            summary: "Gagal",
+            summary: tr[localStorage.getItem("language")].gagal,
             detail: `Kode ${currentItem.supplier.sup_code} Sudah Digunakan`,
             life: 3000,
           });
@@ -418,7 +418,7 @@ const DataSupplier = ({
           setUpdate(false);
           toast.current.show({
             severity: "error",
-            summary: "Gagal",
+            summary: tr[localStorage.getItem("language")].gagal,
             detail: tr[localStorage.getItem("language")].pesan_gagal,
             life: 3000,
           });
@@ -446,7 +446,7 @@ const DataSupplier = ({
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
+            summary: tr[localStorage.getItem("language")].berhsl,
             detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
@@ -460,7 +460,7 @@ const DataSupplier = ({
         onInput(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
+          summary: tr[localStorage.getItem("language")].gagal,
           detail: tr[localStorage.getItem("language")].del_gagal,
           life: 3000,
         });
@@ -651,7 +651,10 @@ const DataSupplier = ({
       const dropdownOptions = [
         { label: 20, value: 20 },
         { label: 50, value: 50 },
-        { label: tr[localStorage.getItem("language")].hal, value: options.totalRecords },
+        {
+          label: tr[localStorage.getItem("language")].hal,
+          value: options.totalRecords,
+        },
       ];
 
       return (
@@ -680,7 +683,8 @@ const DataSupplier = ({
             textAlign: "center",
           }}
         >
-          {options.first} - {options.last} {tr[localStorage.getItem("language")].dari} {options.totalRecords}
+          {options.first} - {options.last}{" "}
+          {tr[localStorage.getItem("language")].dari} {options.totalRecords}
         </span>
       );
     },
@@ -1435,7 +1439,9 @@ const DataSupplier = ({
         </Dialog>
 
         <Dialog
-          header={`${tr[localStorage.getItem("language")].data} ${tr[localStorage.getItem("language")].hapus}` }
+          header={`${tr[localStorage.getItem("language")].hapus} ${
+            tr[localStorage.getItem("language")].supplier
+          }`}
           visible={showDelete}
           style={{ width: "30vw" }}
           footer={renderFooterDel()}

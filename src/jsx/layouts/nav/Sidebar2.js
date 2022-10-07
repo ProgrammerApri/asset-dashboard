@@ -93,7 +93,7 @@ const SideMenu = () => {
             );
           });
         // console.log(key);
-        if (menu[key].length) {
+        if (menu[key]?.length) {
           out.push(
             <div className="sidebar-menu">
               <div

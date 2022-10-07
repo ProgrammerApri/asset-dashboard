@@ -83,6 +83,12 @@ const endpoints = {
     data: {},
   },
 
+  getAccKodeSubUmum: {
+    endpoint: "/v1/api/account/su/",
+    method: "GET",
+    data: {},
+  },
+
   accountUmum: {
     endpoint: "/v1/api/account/umum",
     method: "GET",

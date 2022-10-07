@@ -223,6 +223,30 @@ const DataAkun = ({
     } catch (error) {}
   };
 
+  const getAccKodeSubUmum = async (data) => {
+    const config = {
+      ...endpoints.getAccKodeSubUmum,
+      endpoint: endpoints.getAccKodeSubUmum.endpoint + data.account.acc_code,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const res = response.data;
+        setCurrentItem({
+          ...currentItem,
+          account: {
+            ...currentItem.account,
+            acc_code: res,
+            umm_code: data.account.acc_code,
+          },
+        });
+      }
+    } catch (error) {}
+  };
+
   const getKodeUmum = async (id, data) => {
     const config = {
       ...endpoints.getAccKodeUm,
@@ -1204,7 +1228,11 @@ const DataAkun = ({
                       options={umum}
                       onChange={(e) => {
                         if (e.value) {
-                          getAccKodeDet(e.value);
+                          if (currentItem.account.dou_type === "U") {
+                            getAccKodeSubUmum(e.value);
+                          } else {
+                            getAccKodeDet(e.value);
+                          }
                         } else {
                           getKodeUmum(currentItem.account.kat_code);
                         }

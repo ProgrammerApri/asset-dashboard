@@ -97,6 +97,7 @@ const DataAkun = ({
 
   useEffect(() => {
     getKategori();
+    
     initFilters1();
   }, []);
 
@@ -218,6 +219,32 @@ const DataAkun = ({
             ...currentItem.account,
             acc_code: res,
             umm_code: data.account.acc_code,
+            level: data.account.level+1
+          },
+        });
+      }
+    } catch (error) {}
+  };
+
+  const getAccKodeSubUmum = async (data) => {
+    const config = {
+      ...endpoints.getAccKodeSubUmum,
+      endpoint: endpoints.getAccKodeSubUmum.endpoint + data.account.acc_code,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const res = response.data;
+        setCurrentItem({
+          ...currentItem,
+          account: {
+            ...currentItem.account,
+            acc_code: res,
+            umm_code: data.account.acc_code,
+            level: data.account.level+1
           },
         });
       }
@@ -242,7 +269,8 @@ const DataAkun = ({
               ...currentItem.account,
               acc_code: res,
               umm_code: null,
-              dou_type: data,
+              level: 1
+              // dou_type: data,
             },
           });
         } else {
@@ -252,6 +280,7 @@ const DataAkun = ({
               ...currentItem.account,
               acc_code: res,
               umm_code: null,
+              level: 1
             },
           });
         }
@@ -623,6 +652,7 @@ const DataAkun = ({
                   label={tr[localStorage.getItem("language")].tambh}
                   icon={<i class="bx bx-plus px-2"></i>}
                   onClick={() => {
+                    getAccountUmum();
                     setShowInput(true);
                     setEdit(false);
                     setLoading(false);
@@ -1193,6 +1223,45 @@ const DataAkun = ({
 
           {/* {currentItem !== null && currentItem.account.dou_type !== "" ? (
             currentItem.account.dou_type === "D" &&
+            currentItem.account.kat_code !== 0 ? (
+              <>
+                <div className="col-12 mb-2">
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].acc_umum}
+                  </label>
+                  <div className="p-inputgroup">
+                    <Dropdown
+                      value={
+                        umum !== null && currentItem.account.umm_code !== null
+                          ? valueUmum(currentItem.account.umm_code)
+                          : null
+                      }
+                      options={umum}
+                      onChange={(e) => {
+                        if (e.value) {
+                          if (currentItem.account.dou_type === "U") {
+                            getAccKodeSubUmum(e.value);
+                          } else {
+                            getAccKodeDet(e.value);
+                          }
+                        } else {
+                          getKodeUmum(currentItem.account.kat_code);
+                        }
+                      }}
+                      optionLabel="account.acc_name"
+                      valueTemplate={selectedou_typemumTemplate}
+                      itemTemplate={umumTemplate}
+                      filter
+                      filterBy="account.acc_name"
+                      placeholder={tr[localStorage.getItem("language")].pilih}
+                      showClear
+                      // disabled={isEdit ? currentItem.account.umm_code !== null : false}
+                    />
+                  </div>
+                </div>
+              </>
+            ) : null
+          ) : null}
             currentItem.account.kat_code !== 0 ? ( */}
           {/* <> */}
           <div className="col-12 mb-2">
@@ -1202,14 +1271,18 @@ const DataAkun = ({
             <div className="p-inputgroup">
               <Dropdown
                 value={
-                  umum !== null && currentItem.account.umm_code !== null
+                  umum && currentItem.account.umm_code
                     ? valueUmum(currentItem.account.umm_code)
                     : null
                 }
                 options={umum}
                 onChange={(e) => {
                   if (e.value) {
-                    getAccKodeDet(e.value);
+                    if (currentItem.account.dou_type === "U") {
+                      getAccKodeSubUmum(e.value);
+                    } else {
+                      getAccKodeDet(e.value);
+                    }
                   } else {
                     getKodeUmum(currentItem.account.kat_code);
                   }

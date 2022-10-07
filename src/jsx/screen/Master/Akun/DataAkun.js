@@ -33,6 +33,7 @@ const def = {
     sld_type: "",
     connect: false,
     sld_awal: 0,
+    level: null,
   },
   kategory: {
     id: 0,
@@ -286,6 +287,7 @@ const DataAkun = ({
         kode_saldo: currentItem.kategory.kode_saldo,
         terhubung: currentItem.account.connect,
         saldo_awal: currentItem.account.sld_awal,
+        level: currentItem.account.level,
       },
     };
     console.log(config.data);
@@ -335,6 +337,7 @@ const DataAkun = ({
         kode_saldo: currentItem.kategory.kode_saldo,
         terhubung: currentItem.account.connect,
         saldo_awal: currentItem.account.sld_awal,
+        level: currentItem.account.level,
       },
     };
     console.log(config.data);
@@ -606,27 +609,29 @@ const DataAkun = ({
                 exportExcel();
               }}
             />
-            {edit && <>
-              <PrimeSingleButton
-                className="mr-3"
-                label="Import"
-                icon={<i className="pi pi-file-excel px-2"></i>}
-                onClick={(e) => {
-                  confirmImport(e);
-                }}
-              />
-              <PrimeSingleButton
-                label={tr[localStorage.getItem("language")].tambh}
-                icon={<i class="bx bx-plus px-2"></i>}
-                onClick={() => {
-                  setShowInput(true);
-                  setEdit(false);
-                  setLoading(false);
-                  setCurrentItem(def);
-                  onInput(true);
-                }}
-              />
-            </>}
+            {edit && (
+              <>
+                <PrimeSingleButton
+                  className="mr-3"
+                  label="Import"
+                  icon={<i className="pi pi-file-excel px-2"></i>}
+                  onClick={(e) => {
+                    confirmImport(e);
+                  }}
+                />
+                <PrimeSingleButton
+                  label={tr[localStorage.getItem("language")].tambh}
+                  icon={<i class="bx bx-plus px-2"></i>}
+                  onClick={() => {
+                    setShowInput(true);
+                    setEdit(false);
+                    setLoading(false);
+                    setCurrentItem(def);
+                    onInput(true);
+                  }}
+                />
+              </>
+            )}
           </Row>
         </div>
         <div className="col-12" ref={progressBar} style={{ display: "none" }}>
@@ -1186,43 +1191,43 @@ const DataAkun = ({
             </div>
           </div>
 
-          {currentItem !== null && currentItem.account.dou_type !== "" ? (
+          {/* {currentItem !== null && currentItem.account.dou_type !== "" ? (
             currentItem.account.dou_type === "D" &&
-            currentItem.account.kat_code !== 0 ? (
-              <>
-                <div className="col-12 mb-2">
-                  <label className="text-label">
-                    {tr[localStorage.getItem("language")].acc_umum}
-                  </label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={
-                        umum !== null && currentItem.account.umm_code !== null
-                          ? valueUmum(currentItem.account.umm_code)
-                          : null
-                      }
-                      options={umum}
-                      onChange={(e) => {
-                        if (e.value) {
-                          getAccKodeDet(e.value);
-                        } else {
-                          getKodeUmum(currentItem.account.kat_code);
-                        }
-                      }}
-                      optionLabel="account.acc_name"
-                      valueTemplate={selectedou_typemumTemplate}
-                      itemTemplate={umumTemplate}
-                      filter
-                      filterBy="account.acc_name"
-                      placeholder={tr[localStorage.getItem("language")].pilih}
-                      showClear
-                      // disabled={isEdit ? currentItem.account.umm_code !== null : false}
-                    />
-                  </div>
-                </div>
-              </>
-            ) : null
-          ) : null}
+            currentItem.account.kat_code !== 0 ? ( */}
+          {/* <> */}
+          <div className="col-12 mb-2">
+            <label className="text-label">
+              {tr[localStorage.getItem("language")].acc_umum}
+            </label>
+            <div className="p-inputgroup">
+              <Dropdown
+                value={
+                  umum !== null && currentItem.account.umm_code !== null
+                    ? valueUmum(currentItem.account.umm_code)
+                    : null
+                }
+                options={umum}
+                onChange={(e) => {
+                  if (e.value) {
+                    getAccKodeDet(e.value);
+                  } else {
+                    getKodeUmum(currentItem.account.kat_code);
+                  }
+                }}
+                optionLabel="account.acc_name"
+                valueTemplate={selectedou_typemumTemplate}
+                itemTemplate={umumTemplate}
+                filter
+                filterBy="account.acc_name"
+                placeholder={tr[localStorage.getItem("language")].pilih}
+                showClear
+                // disabled={isEdit ? currentItem.account.umm_code !== null : false}
+              />
+            </div>
+          </div>
+          {/* </> */}
+          {/* ) : null
+          ) : null} */}
 
           <div className="col-12 mb-2">
             <label className="text-label">
@@ -1253,56 +1258,52 @@ const DataAkun = ({
             </div>
           </div>
 
-          {currentItem !== null && currentItem.account.dou_type !== "" ? (
+          {/* {currentItem !== null && currentItem.account.dou_type !== "" ? (
             currentItem.account.dou_type === "D" &&
             currentItem.account.kat_code !== 0 ? (
-              <>
-                <div className="col-12 mb-2">
-                  <Checkbox
-                    className="mb-2"
-                    inputId="binary"
-                    checked={currentItem ? currentItem.account.connect : false}
-                    onChange={(e) =>
-                      setCurrentItem({
-                        ...currentItem,
-                        account: { ...currentItem.account, connect: e.checked },
-                      })
-                    }
-                  />
-                  <label className="ml-3" htmlFor="binary">
-                    {tr[localStorage.getItem("language")].sub_acc}
-                  </label>
-                </div>
+              <> */}
+          <div className="col-12 mb-2">
+            <Checkbox
+              className="mb-2"
+              inputId="binary"
+              checked={currentItem ? currentItem.account.connect : false}
+              onChange={(e) =>
+                setCurrentItem({
+                  ...currentItem,
+                  account: { ...currentItem.account, connect: e.checked },
+                })
+              }
+            />
+            <label className="ml-3" htmlFor="binary">
+              {tr[localStorage.getItem("language")].sub_acc}
+            </label>
+          </div>
 
-                <div className="col-12 mb-2">
-                  <label className="text-label">
-                    {tr[localStorage.getItem("language")].sld_awal}
-                  </label>
-                  <div className="p-inputgroup">
-                    <InputNumber
-                      value={
-                        currentItem !== null ? currentItem.account.sld_awal : ""
-                      }
-                      onChange={(e) => {
-                        console.log(e);
-                        setCurrentItem({
-                          ...currentItem,
-                          account: {
-                            ...currentItem.account,
-                            sld_awal: e.value,
-                          },
-                        });
-                      }}
-                      placeholder={tr[localStorage.getItem("language")].masuk}
-                      disabled={
-                        currentItem ? currentItem.account.connect : false
-                      }
-                    />
-                  </div>
-                </div>
-              </>
+          <div className="col-12 mb-2">
+            <label className="text-label">
+              {tr[localStorage.getItem("language")].sld_awal}
+            </label>
+            <div className="p-inputgroup">
+              <InputNumber
+                value={currentItem !== null ? currentItem.account.sld_awal : ""}
+                onChange={(e) => {
+                  console.log(e);
+                  setCurrentItem({
+                    ...currentItem,
+                    account: {
+                      ...currentItem.account,
+                      sld_awal: e.value,
+                    },
+                  });
+                }}
+                placeholder={tr[localStorage.getItem("language")].masuk}
+                disabled={currentItem ? currentItem.account.connect : false}
+              />
+            </div>
+          </div>
+          {/* </>
             ) : null
-          ) : null}
+          ) : null} */}
         </Dialog>
 
         <Dialog

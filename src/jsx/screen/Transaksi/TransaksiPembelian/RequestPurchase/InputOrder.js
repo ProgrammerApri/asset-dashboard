@@ -27,6 +27,7 @@ import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
+import { tr } from "src/data/tr";
 
 const defError = {
   code: false,
@@ -471,7 +472,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
         <Row className="mb-4">
           <div className="col-4">
             <PrimeInput
-              label={"Kode Referensi"}
+              label={tr[localStorage.getItem("language")].kd_req}
               value={rp.req_code}
               onChange={(e) => {
                 updateRp({ ...rp, req_code: e.target.value });
@@ -487,14 +488,14 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                 //       'keypress', true, true, window, false, false, false, false, 9, 0);
                 // }
               }}
-              placeholder="Masukan Kode Referensi"
+              placeholder={tr[localStorage.getItem("language")].masuk}
               error={error?.code}
             />
           </div>
 
           <div className="col-2">
             <PrimeCalendar
-              label={"Tanggal"}
+              label={tr[localStorage.getItem("language")].tgl}
               value={new Date(`${rp.req_date}Z`)}
               onChange={(e) => {
                 updateRp({ ...rp, req_date: e.value });
@@ -502,7 +503,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                 newError.date = false;
                 setError(newError);
               }}
-              placeholder="Pilih Tanggal"
+              placeholder={tr[localStorage.getItem("language")].pilih_tgl}
               error={error?.date}
               showIcon
             />
@@ -511,7 +512,9 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
           <div className="col-6"></div>
 
           <div className="col-4">
-            <label className="text-label">Departemen</label>
+            <label className="text-label">
+              {tr[localStorage.getItem("language")].dep}
+            </label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
               value={rp.req_dep !== null ? dept(rp.req_dep) : null}
@@ -522,12 +525,14 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
               detail
               onDetail={() => setShowDepartemen(true)}
               label={"[ccost_name] ([ccost_code])"}
-              placeholder="Pilih Departemen"
+              placeholder={tr[localStorage.getItem("language")].pilih}
             />
           </div>
 
           <div className="col-8">
-            <label className="text-label">Keterangan</label>
+            <label className="text-label">
+              {tr[localStorage.getItem("language")].ket}
+            </label>
             <div className="p-inputgroup">
               <InputText
                 value={`${rp?.req_ket ?? ""}`}
@@ -538,14 +543,16 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                   });
                   updateRp({ ...rp, req_ket: e.target.value });
                 }}
-                placeholder="Masukan Keterangan"
+                placeholder={tr[localStorage.getItem("language")].masuk}
               />
             </div>
           </div>
         </Row>
 
         <CustomAccordion
-          tittle={"Permintaan Produk"}
+          tittle={`${tr[localStorage.getItem("language")].req} ${
+            tr[localStorage.getItem("language")].prod
+          }`}
           defaultActive={true}
           active={accor.produk}
           onClick={() => {
@@ -559,15 +566,15 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
             <Row>
               <div className="row col-12 mr-0 ml-0">
                 <div className="col-4">
-                  <label className="text-label">Produk</label>
+                  <label className="text-label">{tr[localStorage.getItem("language")].prod}</label>
                 </div>
 
                 <div className="col-3">
-                  <label className="text-label">Jumlah</label>
+                  <label className="text-label">{tr[localStorage.getItem("language")].req}</label>
                 </div>
 
                 <div className="col-4">
-                  <label className="text-label">Satuan</label>
+                  <label className="text-label">{tr[localStorage.getItem("language")].sat}</label>
                 </div>
 
                 <div className="col-12">
@@ -611,7 +618,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                           setError(newError);
                         }}
                         label={"[name] ([code])"}
-                        placeholder="Pilih Produk"
+                        placeholder={tr[localStorage.getItem("language")].pilih}
                         errorMessage="Produk Belum Dipilih"
                         error={error?.prod[i]?.id}
                       />
@@ -630,7 +637,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                           newError.prod[i].jum = false;
                           setError(newError);
                         }}
-                        placeholder="Masukan Jumlah"
+                        placeholder="0"
                         type="number"
                         error={error?.prod[i]?.jum}
                       />
@@ -651,7 +658,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                           updateRp({ ...rp, rprod: temp });
                         }}
                         label={"[name]"}
-                        placeholder="Pilih Satuan"
+                        placeholder={tr[localStorage.getItem("language")].pilih}
                       />
                     </div>
 
@@ -711,7 +718,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
         />
 
         <CustomAccordion
-          tittle={"Permintaan Jasa"}
+          tittle={`${tr[localStorage.getItem("language")].req} ${tr[localStorage.getItem("language")].jasa}`}
           defaultActive={false}
           active={accor.jasa}
           onClick={() => {
@@ -725,15 +732,15 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
             <Row>
               <div className="row col-12 mr-0 ml-0 mb-0">
                 <div className="col-4">
-                  <label className="text-label">Kode Jasa</label>
+                  <label className="text-label">{tr[localStorage.getItem("language")].kd_jasa}</label>
                 </div>
 
                 <div className="col-3">
-                  <label className="text-label">Jumlah</label>
+                  <label className="text-label">{tr[localStorage.getItem("language")].req}</label>
                 </div>
 
                 <div className="col-4">
-                  <label className="text-label">Satuan</label>
+                  <label className="text-label">{tr[localStorage.getItem("language")].sat}</label>
                 </div>
 
                 <div className="col-12">
@@ -763,7 +770,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                           setError(newError);
                         }}
                         label={"[jasa.name] ([jasa.code])"}
-                        placeholder="Pilih Jasa"
+                        placeholder={tr[localStorage.getItem("language")].pilih}
                         errorMessage="Jasa Belum Dipilih"
                         error={error?.jasa[i]?.id}
                       />
@@ -780,7 +787,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                           newError.jasa[i].jum = false;
                           setError(newError);
                         }}
-                        placeholder="Masukan Jumlah"
+                        placeholder="0"
                         type="number"
                         error={error?.jasa[i]?.jum}
                       />
@@ -802,7 +809,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                           setShowSatuan(true);
                         }}
                         label={"[name]"}
-                        placeholder="Pilih Satuan"
+                        placeholder={tr[localStorage.getItem("language")].pilih}
                       />
                     </div>
 
@@ -859,7 +866,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
 
         <div className="row mb-0">
           <div className="d-flex col-12 align-items-center mt-4">
-            <label className="ml-0 mt-1">{"Referensi Tambahan"}</label>
+            <label className="ml-0 mt-1">{tr[localStorage.getItem("language")].ref_tambh}</label>
             <InputSwitch
               className="ml-4"
               checked={rp && rp.refrence}
@@ -870,7 +877,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
           </div>
 
           <div className="col-6">
-            <label className="text-label">Kode Supplier</label>
+            <label className="text-label">{tr[localStorage.getItem("language")].kd_pem}</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
               value={rp.ref_sup !== null ? supp(rp.ref_sup) : null}
@@ -882,7 +889,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
               detail
               onDetail={() => setShowSupplier(true)}
               label={"[supplier.sup_name]"}
-              placeholder="Pilih Supplier"
+              placeholder={tr[localStorage.getItem("language")].pilih}
               disabled={rp && !rp.refrence}
               errorMessage="Supplier Belum Dipilih"
               error={error?.sup}
@@ -890,12 +897,12 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
           </div>
 
           <div className="col-6">
-            <label className="text-label">Keterangan</label>
+            <label className="text-label">{tr[localStorage.getItem("language")].ket}</label>
             <div className="p-inputgroup">
               <InputText
                 value={rp.ref_ket}
                 onChange={(e) => updateRp({ ...rp, ref_ket: e.target.value })}
-                placeholder="Masukan Keterangan"
+                placeholder={tr[localStorage.getItem("language")].masuk}
                 disabled={rp && !rp.refrence}
               />
             </div>
@@ -910,12 +917,12 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
       <div className="mt-5 flex justify-content-end">
         <div>
           <PButton
-            label="Batal"
+            label={tr[localStorage.getItem("language")].batal}
             onClick={onCancel}
             className="p-button-text btn-primary"
           />
           <PButton
-            label="Simpan"
+            label={tr[localStorage.getItem("language")].simpan}
             icon="pi pi-check"
             onClick={() => onSubmit()}
             autoFocus

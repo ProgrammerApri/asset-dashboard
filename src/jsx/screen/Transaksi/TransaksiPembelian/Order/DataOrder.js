@@ -16,6 +16,7 @@ import { SET_CURRENT_ODR, SET_EDIT_ODR, SET_ODR } from "src/redux/actions";
 import { Divider } from "@material-ui/core";
 import ReactToPrint from "react-to-print";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import { tr } from "src/data/tr";
 
 const data = {
   id: null,
@@ -103,8 +104,8 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
           getOrder(true);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Dihapus",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
         }, 500);
@@ -116,8 +117,8 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
         setDisplayDel(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Data`,
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].del_gagal,
           life: 3000,
         });
       }, 500);
@@ -308,11 +309,11 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
           <InputText
             value={globalFilterValue1}
             onChange={onGlobalFilterChange1}
-            placeholder="Cari disini"
+            placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
         <PrimeSingleButton
-          label="Tambah"
+          label={tr[localStorage.getItem("language")].tambh}
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
@@ -368,7 +369,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => setDisplayData(false)}
           className="p-button-text btn-primary"
         />
@@ -395,7 +396,10 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
       const dropdownOptions = [
         { label: 20, value: 20 },
         { label: 50, value: 50 },
-        { label: "Semua", value: options.totalRecords },
+        {
+          label: tr[localStorage.getItem("language")].hal,
+          value: options.totalRecords,
+        },
       ];
 
       return (
@@ -404,7 +408,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
             className="mx-1"
             style={{ color: "var(--text-color)", userSelect: "none" }}
           >
-            Data per halaman:{" "}
+            {tr[localStorage.getItem("language")].page}{" "}
           </span>
           <Dropdown
             value={options.value}
@@ -424,7 +428,8 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
             textAlign: "center",
           }}
         >
-          {options.first} - {options.last} dari {options.totalRecords}
+          {options.first} - {options.last}{" "}
+          {tr[localStorage.getItem("language")].dari} {options.totalRecords}
         </span>
       );
     },
@@ -492,7 +497,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
                 header={renderHeader}
                 filters={filters1}
                 globalFilterFields={["ord_code"]}
-                emptyMessage="Tidak ada data"
+                emptyMessage={tr[localStorage.getItem("language")].empty_data}
                 paginator
                 paginatorTemplate={template2}
                 first={first2}
@@ -501,7 +506,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
                 paginatorClassName="justify-content-end mt-3"
               >
                 <Column
-                  header="Tanggal Pembelian"
+                  header={tr[localStorage.getItem("language")].tgl}
                   style={{
                     minWidth: "8rem",
                   }}
@@ -509,16 +514,14 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="No. Pembelian"
+                  header={tr[localStorage.getItem("language")].kd_pur}
                   field={(e) => e.ord_code}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Nomor PO"
-                  field={(e) =>
-                    e.po_id?.po_code ?? "-"
-                  }
+                  header={tr[localStorage.getItem("language")].kd_ord}
+                  field={(e) => e.po_id?.po_code ?? "-"}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
@@ -546,13 +549,13 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
                   }
                 /> */}
                 <Column
-                  header="Supplier"
+                  header={tr[localStorage.getItem("language")].supplier}
                   field={(e) => e?.sup_id?.sup_name}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Faktur"
+                  header={tr[localStorage.getItem("language")].fak_pur}
                   field={(e) => e.faktur}
                   style={{ minWidth: "8rem" }}
                   body={(e) =>
@@ -876,7 +879,9 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
       </Dialog> */}
 
       <Dialog
-        header={"Hapus Data"}
+        header={`${tr[localStorage.getItem("language")].hapus} ${
+          tr[localStorage.getItem("language")].pur
+        }`}
         visible={displayDel}
         style={{ width: "30vw" }}
         footer={renderFooterDel("displayDel")}
@@ -889,7 +894,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
             className="pi pi-exclamation-triangle mr-3 align-middle"
             style={{ fontSize: "2rem" }}
           />
-          <span>Apakah anda yakin ingin menghapus data ?</span>
+          <span>{tr[localStorage.getItem("language")].pesan_hapus}</span>
         </div>
       </Dialog>
     </>

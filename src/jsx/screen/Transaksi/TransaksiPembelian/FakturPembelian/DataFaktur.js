@@ -18,6 +18,7 @@ import { Divider } from "@material-ui/core";
 import ReactToPrint from "react-to-print";
 import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import { tr } from "src/data/tr";
 
 const data = {
   id: null,
@@ -132,8 +133,8 @@ const DataFaktur = ({ onAdd, onDetail }) => {
           getFK(true);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Dihapus",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
         }, 500);
@@ -145,8 +146,8 @@ const DataFaktur = ({ onAdd, onDetail }) => {
         setDisplayDel(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Data`,
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].del_gagal,
           life: 3000,
         });
       }, 500);
@@ -234,12 +235,12 @@ const DataFaktur = ({ onAdd, onDetail }) => {
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => setDisplayDel(false)}
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Hapus"
+          label={tr[localStorage.getItem("language")].hapus}
           icon="pi pi-trash"
           onClick={() => {
             delFK();
@@ -255,7 +256,7 @@ const DataFaktur = ({ onAdd, onDetail }) => {
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => setDisplayData(false)}
           className="p-button-text btn-primary"
         />
@@ -300,11 +301,11 @@ const DataFaktur = ({ onAdd, onDetail }) => {
           <InputText
             value={globalFilterValue1}
             onChange={onGlobalFilterChange1}
-            placeholder="Cari disini"
+            placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
         <PrimeSingleButton
-          label="Tambah"
+          label={tr[localStorage.getItem("language")].tambh}
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
@@ -333,7 +334,10 @@ const DataFaktur = ({ onAdd, onDetail }) => {
       const dropdownOptions = [
         { label: 20, value: 20 },
         { label: 50, value: 50 },
-        { label: "Semua", value: options.totalRecords },
+        {
+          label: tr[localStorage.getItem("language")].hal,
+          value: options.totalRecords,
+        },
       ];
 
       return (
@@ -342,7 +346,7 @@ const DataFaktur = ({ onAdd, onDetail }) => {
             className="mx-1"
             style={{ color: "var(--text-color)", userSelect: "none" }}
           >
-            Data per halaman:{" "}
+            {tr[localStorage.getItem("language")].page}{" "}
           </span>
           <Dropdown
             value={options.value}
@@ -362,7 +366,8 @@ const DataFaktur = ({ onAdd, onDetail }) => {
             textAlign: "center",
           }}
         >
-          {options.first} - {options.last} dari {options.totalRecords}
+          {options.first} - {options.last}{" "}
+          {tr[localStorage.getItem("language")].dari} {options.totalRecords}
         </span>
       );
     },
@@ -434,7 +439,7 @@ const DataFaktur = ({ onAdd, onDetail }) => {
                   "ord_id.ord_code",
                   "formatDate(fk_date)",
                 ]}
-                emptyMessage="Tidak ada data"
+                emptyMessage={tr[localStorage.getItem("language")].empty_data}
                 paginator
                 paginatorTemplate={template2}
                 first={first2}
@@ -443,7 +448,7 @@ const DataFaktur = ({ onAdd, onDetail }) => {
                 paginatorClassName="justify-content-end mt-3"
               >
                 <Column
-                  header="Tanggal"
+                  header={tr[localStorage.getItem("language")].tgl}
                   style={{
                     minWidth: "8rem",
                   }}
@@ -451,13 +456,13 @@ const DataFaktur = ({ onAdd, onDetail }) => {
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Nomor Faktur"
+                  header={tr[localStorage.getItem("language")].kd_fk}
                   field={(e) => e.fk_code}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Nomor Pembelian"
+                  header={tr[localStorage.getItem("language")].kd_pur}
                   field={(e) => e.ord_id.ord_code}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
@@ -1013,7 +1018,9 @@ const DataFaktur = ({ onAdd, onDetail }) => {
       </Dialog> */}
 
       <Dialog
-        header={"Hapus Data"}
+        header={`${tr[localStorage.getItem("language")].hapus} ${
+          tr[localStorage.getItem("language")].fak_pur
+        }`}
         visible={displayDel}
         style={{ width: "30vw" }}
         footer={renderFooterDel("displayDel")}
@@ -1026,7 +1033,7 @@ const DataFaktur = ({ onAdd, onDetail }) => {
             className="pi pi-exclamation-triangle mr-3 align-middle"
             style={{ fontSize: "2rem" }}
           />
-          <span>Apakah anda yakin ingin menghapus data ?</span>
+          <span>{tr[localStorage.getItem("language")].pesan_hapus}</span>
         </div>
       </Dialog>
     </>

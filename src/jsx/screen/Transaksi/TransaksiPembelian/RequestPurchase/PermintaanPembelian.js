@@ -284,11 +284,11 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
           <InputText
             value={globalFilterValue1}
             onChange={onGlobalFilterChange1}
-            placeholder="Cari disini"
+            placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
         <PrimeSingleButton
-          label="Tambah"
+          label={tr[localStorage.getItem("language")].tambh}
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
@@ -342,7 +342,10 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
       const dropdownOptions = [
         { label: 20, value: 20 },
         { label: 50, value: 50 },
-        { label: tr[localStorage.getItem("language")].hal, value: options.totalRecords },
+        {
+          label: tr[localStorage.getItem("language")].hal,
+          value: options.totalRecords,
+        },
       ];
 
       return (
@@ -371,7 +374,8 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
             textAlign: "center",
           }}
         >
-          {options.first} - {options.last} {tr[localStorage.getItem("language")].dari} {options.totalRecords}
+          {options.first} - {options.last}{" "}
+          {tr[localStorage.getItem("language")].dari} {options.totalRecords}
         </span>
       );
     },
@@ -425,7 +429,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
           body={loading && <Skeleton />}
         />
         <Column
-          header="Nomor Permintaan"
+          header={tr[localStorage.getItem("language")].kd_req}
           field={(e) => e.req_code}
           style={{ minWidth: "10rem" }}
           body={loading && <Skeleton />}
@@ -593,7 +597,9 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
       </Dialog>
 
       <Dialog
-        header={"Hapus Data"}
+        header={`${tr[localStorage.getItem("language")].hapus} ${
+          tr[localStorage.getItem("language")].req_pur
+        }`}
         visible={displayDel}
         style={{ width: "30vw" }}
         footer={renderFooterDel("displayDel")}
@@ -606,7 +612,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
             className="pi pi-exclamation-triangle mr-3 align-middle"
             style={{ fontSize: "2rem" }}
           />
-          <span>Apakah anda yakin ingin menghapus data ?</span>
+          <span>{tr[localStorage.getItem("language")].pesan_hapus}</span>
         </div>
       </Dialog>
     </>

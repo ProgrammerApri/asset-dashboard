@@ -4,6 +4,7 @@ import { Toast } from "primereact/toast";
 import ReturBeliList from "./ReturBeliList";
 import ReturBeliInput from "./ReturBeliInput";
 import Detail from "./Detail";
+import { tr } from "src/data/tr";
 
 const ReturBeli = ({trigger}) => {
   const [active, setActive] = useState(0);
@@ -32,8 +33,8 @@ const ReturBeli = ({trigger}) => {
           setActive(0);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);

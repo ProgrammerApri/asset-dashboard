@@ -8,6 +8,7 @@ import { InputText } from "primereact/inputtext";
 import { Skeleton } from "primereact/skeleton";
 import { Dropdown } from "primereact/dropdown";
 import { Dialog } from "primereact/dialog";
+import { tr } from "src/data/tr";
 
 const data = {
   id: 1,
@@ -42,7 +43,7 @@ const DataHistori = ({
           <InputText
             value={globalFilterValue1}
             onChange={onGlobalFilterChange1}
-            placeholder="Cari disini"
+            placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
       </div>
@@ -70,7 +71,7 @@ const DataHistori = ({
       const dropdownOptions = [
         { label: 20, value: 20 },
         { label: 50, value: 50 },
-        { label: "Semua", value: options.totalRecords },
+        { label: tr[localStorage.getItem("language")].hal, value: options.totalRecords },
       ];
 
       return (
@@ -79,7 +80,7 @@ const DataHistori = ({
             className="mx-1"
             style={{ color: "var(--text-color)", userSelect: "none" }}
           >
-            Data per halaman:{" "}
+            {tr[localStorage.getItem("language")].page}{" "}
           </span>
           <Dropdown
             value={options.value}
@@ -99,7 +100,7 @@ const DataHistori = ({
             textAlign: "center",
           }}
         >
-          {options.first} - {options.last} dari {options.totalRecords}
+          {options.first} - {options.last} {tr[localStorage.getItem("language")].dari} {options.totalRecords}
         </span>
       );
     },
@@ -141,7 +142,7 @@ const DataHistori = ({
           header={renderHeader}
           filters={filters1}
           globalFilterFields={["code", "name", "address", "desc"]}
-          emptyMessage="Tidak ada data"
+          emptyMessage={tr[localStorage.getItem("language")].empty_data}
           paginator
           paginatorTemplate={template2}
           first={first2}
@@ -152,7 +153,7 @@ const DataHistori = ({
           onRowSelect={onRowSelect}
         >
           <Column
-            header="Tanggal"
+            header={tr[localStorage.getItem("language")].tgl}
             style={{
               minWidth: "8rem",
             }}
@@ -160,19 +161,19 @@ const DataHistori = ({
             body={load && <Skeleton />}
           />
           <Column
-            header="Nomor PO"
+            header={tr[localStorage.getItem("language")].kd_ord}
             field={(e) => e.name}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
           <Column
-            header="Supplier"
+            header={tr[localStorage.getItem("language")].supplier}
             field={(e) => e.supplier?.sup_name}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
           <Column
-            header="Harga"
+            header={tr[localStorage.getItem("language")].price}
             field={(e) => formatIdr(e?.price !== "" ? e.price : "-")}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
@@ -193,7 +194,7 @@ const DataHistori = ({
     return (
       <>
         <Dialog
-          header={"Histori Harga"}
+          header={tr[localStorage.getItem("language")].histori}
           visible={show}
           footer={() => <div></div>}
           style={{ width: "60vw" }}

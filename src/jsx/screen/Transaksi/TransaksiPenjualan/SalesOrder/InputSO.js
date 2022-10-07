@@ -27,6 +27,7 @@ import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 import { InputNumber } from "primereact/inputnumber";
+import { tr } from "src/data/tr";
 
 const defError = {
   code: false,
@@ -240,8 +241,8 @@ const InputSO = ({ onCancel, onSuccess }) => {
         setUpdate(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: "Gagal Memperbarui Data",
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].pesan_gagal,
           life: 3000,
         });
       }, 500);
@@ -268,7 +269,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
           setUpdate(false);
           toast.current.show({
             severity: "error",
-            summary: "Gagal",
+            summary: tr[localStorage.getItem("language")].gagal,
             detail: `Kode ${so.so_code} Sudah Digunakan`,
             life: 3000,
           });
@@ -278,8 +279,8 @@ const InputSO = ({ onCancel, onSuccess }) => {
           setUpdate(false);
           toast.current.show({
             severity: "error",
-            summary: "Gagal",
-            detail: "Gagal Memperbarui Data",
+            summary: tr[localStorage.getItem("language")].gagal,
+            detail: tr[localStorage.getItem("language")].pesan_gagal,
             life: 3000,
           });
         }, 500);
@@ -642,7 +643,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
         <Row className="mb-4">
           <div className="col-3">
             <PrimeInput
-              label={"Kode Referensi"}
+              label={tr[localStorage.getItem("language")].kd_so}
               value={so.so_code}
               onChange={(e) => {
                 updateSo({ ...so, so_code: e.target.value });
@@ -650,14 +651,14 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 newError.code = false;
                 setError(newError);
               }}
-              placeholder="Masukan Kode Referensi"
+              placeholder={tr[localStorage.getItem("language")].masuk}
               error={error?.code}
             />
           </div>
 
           <div className="col-2">
             <PrimeCalendar
-              label={"Tanggal"}
+              label={tr[localStorage.getItem("language")].tgl}
               value={new Date(`${so.so_date}Z`)}
               onChange={(e) => {
                 updateSo({ ...so, so_date: e.value });
@@ -666,7 +667,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 newError.date = false;
                 setError(newError);
               }}
-              placeholder="Pilih Tanggal"
+              placeholder={tr[localStorage.getItem("language")].pilih_tgl}
               showIcon
               dateFormat="dd-mm-yy"
               error={error?.date}
@@ -675,7 +676,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
           <div className="col-12 mt-3">
             <span className="fs-13">
-              <b>Informasi Pelanggan</b>
+              <b>{tr[localStorage.getItem("language")].customer}</b>
             </span>
             {/* </div>
           <div className="col-12"> */}
@@ -683,7 +684,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-3">
-            <label>Pelanggan</label>
+            <label>{tr[localStorage.getItem("language")].customer}</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
               value={so.pel_id !== null ? checkCus(so.pel_id) : null}
@@ -700,7 +701,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 setError(newError);
               }}
               label={"[cus_name]"}
-              placeholder="Pilih Pelanggan"
+              placeholder={tr[localStorage.getItem("language")].pilih}
               detail
               onDetail={() => setShowCustomer(true)}
               errorMessage="Pelanggan Belum Dipilih"
@@ -709,13 +710,13 @@ const InputSO = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-3">
-            <label>Alamat Pelanggan</label>
+            <label>{tr[localStorage.getItem("language")].alamat}</label>
             <div className="p-inputgroup">
               <InputText
                 value={
                   so.pel_id !== null ? checkCus(so.pel_id)?.cus_address : ""
                 }
-                placeholder="Alamat Pelanggan"
+                placeholder={tr[localStorage.getItem("language")].alamat}
                 disabled
               />
             </div>
@@ -723,16 +724,16 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
           <div className="col-3">
             <PrimeInput
-              label={"No. Telepon"}
+              label={tr[localStorage.getItem("language")].telp}
               isNumber
               value={so.pel_id !== null ? checkCus(so.pel_id)?.cus_telp1 : ""}
-              placeholder="No. Telepon"
+              placeholder={tr[localStorage.getItem("language")].telp}
               disabled
             />
           </div>
 
           <div className="col-3">
-            <label>Ppn</label>
+            <label>{tr[localStorage.getItem("language")].type_pjk}</label>
             <div className="p-inputgroup">
               <InputText
                 value={
@@ -741,7 +742,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                     : null
                 }
                 onChange={(e) => {}}
-                placeholder="Jenis Ppn"
+                placeholder={tr[localStorage.getItem("language")].type_pjk}
                 disabled
               />
             </div>
@@ -749,7 +750,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
           <div className="col-12 mt-3">
             <span className="fs-13">
-              <b>Informasi Pembayaran</b>
+              <b>{tr[localStorage.getItem("language")].bayar}</b>
             </span>
             {/* </div>
           <div className="col-12"> */}
@@ -758,7 +759,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
           <div className="col-3">
             <PrimeCalendar
-              label={"Tanggal Permintaan"}
+              label={tr[localStorage.getItem("language")].tgl_req}
               value={new Date(`${so.req_date}Z`)}
               onChange={(e) => {
                 updateSo({ ...so, req_date: e.value });
@@ -767,7 +768,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 newError.tgl = false;
                 setError(newError);
               }}
-              placeholder="Tanggal Pemintaan"
+              placeholder={tr[localStorage.getItem("language")].pilih_tgl}
               showIcon
               dateFormat="dd-mm-yy"
               error={error?.tgl}
@@ -775,7 +776,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-4">
-            <label>Jangka Pembayaran</label>
+            <label>{tr[localStorage.getItem("language")].syarat}</label>
             <div className="p-inputgroup mt-0"></div>
             <CustomDropdown
               value={so.top !== null ? checkRules(so.top) : null}
@@ -792,7 +793,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 setError(newError);
               }}
               label={"[name] ([day] Hari)"}
-              placeholder="Pilih Jangka Waktu"
+              placeholder={tr[localStorage.getItem("language")].pilih}
               detail
               onDetail={() => setShowRulesPay(true)}
               errorMessage="Waktu Pembayaran Belum Dipilih"
@@ -801,12 +802,12 @@ const InputSO = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-3">
-            <label>Tanggal Jatuh Tempo</label>
+            <label>{tr[localStorage.getItem("language")].due}</label>
             <div className="p-inputgroup mt-0">
               <Calendar
                 value={new Date(`${so?.due_date}Z`)}
                 onChange={(e) => {}}
-                placeholder="Tanggal Jatuh Tempo"
+                placeholder={tr[localStorage.getItem("language")].due}
                 disabled
                 dateFormat="dd-mm-yy"
               />
@@ -884,7 +885,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
         </Row>
 
         <CustomAccordion
-          tittle={"Pesanan Produk"}
+          tittle={`${tr[localStorage.getItem("language")].ord} ${
+            tr[localStorage.getItem("language")].prod
+          }`}
           defaultActive={true}
           active={accor.produk}
           onClick={() => {
@@ -913,7 +916,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 emptyMessage={() => <div></div>}
               >
                 <Column
-                  header="Produk"
+                  header={tr[localStorage.getItem("language")].prod}
                   className="align-text-top"
                   field={""}
                   body={(e) => (
@@ -942,7 +945,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         newError.prod[e.index].id = false;
                         setError(newError);
                       }}
-                      placeholder="Pilih Produk"
+                      placeholder={tr[localStorage.getItem("language")].pilih}
                       label={"[name]"}
                       detail
                       onDetail={() => {
@@ -956,7 +959,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
-                  header="Lokasi"
+                  header={tr[localStorage.getItem("language")].gudang}
                   className="align-text-top"
                   field={""}
                   body={(e) => (
@@ -964,7 +967,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                       value={e.location && checkLoc(e.location)}
                       onChange={(u) => {
                         let st = 0;
-                        
+
                         sto.forEach((element) => {
                           if (
                             element.loc_id === u.id &&
@@ -985,7 +988,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                       }}
                       option={lokasi}
                       label={"[name]"}
-                      placeholder="Lokasi"
+                      placeholder={tr[localStorage.getItem("language")].pilih}
                       detail
                       onDetail={() => {
                         setCurrentIndex(e.index);
@@ -998,7 +1001,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
-                  header="Stok"
+                  header={tr[localStorage.getItem("language")].stok}
                   className="align-text-top"
                   style={{
                     width: "7rem",
@@ -1016,7 +1019,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
-                  header="Jumlah"
+                  header={tr[localStorage.getItem("language")].qty}
                   className="align-text-top"
                   field={""}
                   body={(e) => (
@@ -1056,7 +1059,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
-                  header="Satuan"
+                  header={tr[localStorage.getItem("language")].sat}
                   className="align-text-top"
                   field={""}
                   body={(e) => (
@@ -1074,13 +1077,13 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         setCurrentIndex(e.index);
                         setShowSatuan(true);
                       }}
-                      placeholder="Pilih Satuan"
+                      placeholder={tr[localStorage.getItem("language")].pilih}
                     />
                   )}
                 />
 
                 <Column
-                  header="Harga Satuan"
+                  header={tr[localStorage.getItem("language")].price}
                   className="align-text-top"
                   field={""}
                   body={(e) => (
@@ -1106,7 +1109,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
-                  header="Diskon"
+                  header={tr[localStorage.getItem("language")].disc}
                   className="align-text-top"
                   field={""}
                   body={(e) => (
@@ -1129,7 +1132,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
-                  header="Harga Nett"
+                  header={tr[localStorage.getItem("language")].net_prc}
                   className="align-text-top"
                   field={""}
                   body={(e) => (
@@ -1150,7 +1153,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
-                  header="Total"
+                  header={tr[localStorage.getItem("language")].total}
                   className="align-text-top"
                   body={(e) => (
                     <label className="text-nowrap">
@@ -1220,7 +1223,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
         />
 
         <CustomAccordion
-          tittle={"Pesanan Jasa"}
+          tittle={`${tr[localStorage.getItem("language")].ord} ${
+            tr[localStorage.getItem("language")].jasa
+          }`}
           defaultActive={false}
           active={accor.jasa}
           onClick={() => {
@@ -1249,7 +1254,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 emptyMessage={() => <div></div>}
               >
                 <Column
-                  header="Supplier"
+                  header={tr[localStorage.getItem("language")].supplier}
                   className="align-text-top"
                   field={""}
                   body={(e) => (
@@ -1262,7 +1267,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         updateSo({ ...so, sjasa: temp });
                       }}
                       label={"[supplier.sup_name]"}
-                      placeholder="Pilih Supplier"
+                      placeholder={tr[localStorage.getItem("language")].pilih}
                       detail
                       onDetail={() => {
                         setCurrentIndex(e.index);
@@ -1273,7 +1278,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
-                  header="Jasa"
+                  header={tr[localStorage.getItem("language")].jasa}
                   className="align-text-top"
                   field={""}
                   body={(e) => (
@@ -1291,7 +1296,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         setError(newError);
                       }}
                       label={"[jasa.name]"}
-                      placeholder="Pilih Jasa"
+                      placeholder={tr[localStorage.getItem("language")].pilih}
                       detail
                       onDetail={() => {
                         setCurrentIndex(e.index);
@@ -1304,7 +1309,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
-                  header="Jumlah"
+                  header={tr[localStorage.getItem("language")].qty}
                   className="align-text-top"
                   field={""}
                   style={{
@@ -1333,7 +1338,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
-                  header="Satuan"
+                  header={tr[localStorage.getItem("language")].sat}
                   className="align-text-top"
                   style={{
                     width: "13rem",
@@ -1350,7 +1355,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         updateSo({ ...so, sjasa: temp });
                       }}
                       label={"[name]"}
-                      placeholder="Pilih Satuan"
+                      placeholder={tr[localStorage.getItem("language")].pilih}
                       detail
                       onDetail={() => {
                         setCurrentIndex(e.index);
@@ -1361,7 +1366,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
-                  header="Harga Satuan"
+                  header={tr[localStorage.getItem("language")].price}
                   className="align-text-top"
                   style={{
                     width: "25rem",
@@ -1390,7 +1395,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
-                  header="Diskon"
+                  header={tr[localStorage.getItem("language")].disc}
                   className="align-text-top"
                   style={{
                     width: "13rem",
@@ -1416,7 +1421,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
-                  header="Total"
+                  header={tr[localStorage.getItem("language")].total}
                   className="align-text-top"
                   body={(e) => (
                     <label className="text-nowrap">
@@ -1487,7 +1492,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
             <div className="row ml-1">
               {so?.sjasa?.length > 0 && so?.sprod?.length > 0 && (
                 <div className="d-flex col-12 align-items-center">
-                  <label className="mt-1">{"Pisah Faktur"}</label>
+                  <label className="mt-1">
+                    {tr[localStorage.getItem("language")].split}
+                  </label>
                   <InputSwitch
                     className="ml-4"
                     checked={so?.split_inv}
@@ -1516,7 +1523,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
           <div className="row justify-content-right col-6">
             <div className="col-6">
               <label className="text-label">
-                {so?.split_inv ? "Sub Total Barang" : "Sub Total"}
+                {so?.split_inv
+                  ? tr[localStorage.getItem("language")].ttl_barang
+                  : tr[localStorage.getItem("language")].sub_ttl}
               </label>
             </div>
 
@@ -1548,7 +1557,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
             <div className="col-6">
               <label className="text-label">
-                {so.split_inv ? "Pajak Atas Barang (11%)" : "Pajak (11%)"}
+                {so.split_inv
+                  ? tr[localStorage.getItem("language")].pjk_barang
+                  : tr[localStorage.getItem("language")].pajak}
               </label>
             </div>
 
@@ -1568,7 +1579,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
             </div>
 
             <div className="col-6 mt-3">
-              <label className="text-black fs-14">Diskon Tambahan</label>
+              <label className="text-black fs-14">
+                {tr[localStorage.getItem("language")].disc_tambh}
+              </label>
             </div>
 
             <div className="col-6">
@@ -1590,7 +1603,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         100
                       : so.total_disc
                   }
-                  placeholder="Diskon"
+                  placeholder={tr[localStorage.getItem("language")].disc_tambh}
                   type="number"
                   min={0}
                   onChange={(e) => {
@@ -1632,7 +1645,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
             <div className="col-6">
               <label className="fs-14">
-                <b>Total Pembayaran</b>
+                <b>{`${tr[localStorage.getItem("language")].total} ${
+                  tr[localStorage.getItem("language")].bayar
+                }`}</b>
               </label>
             </div>
 
@@ -1666,7 +1681,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
               <>
                 {/* <div className="row justify-content-right col-12 mt-4"> */}
                 <div className="col-6 mt-4">
-                  <label className="text-black fs-14">Sub Total Jasa</label>
+                  <label className="text-black fs-14">{tr[localStorage.getItem("language")].ttl_jasa}</label>
                 </div>
 
                 <div className="col-6 mt-4">
@@ -1687,7 +1702,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
                 <div className="col-6">
                   <label className="text-black fs-14">
-                    Pajak Atas Jasa (2%)
+                  {tr[localStorage.getItem("language")].pjk_jasa} (2%)
                   </label>
                 </div>
 
@@ -1698,7 +1713,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 </div>
 
                 <div className="col-6 mt-3">
-                  <label className="text-black fs-14">Diskon Tambahan</label>
+                  <label className="text-black fs-14">{tr[localStorage.getItem("language")].disc_tambh}</label>
                 </div>
 
                 <div className="col-6">
@@ -1714,7 +1729,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                           ? (getSubTotalJasa() * so.jasa_disc) / 100
                           : so.jasa_disc
                       }
-                      placeholder="Diskon"
+                      placeholder={tr[localStorage.getItem("language")].disc_tambh}
                       type="number"
                       min={0}
                       onChange={(e) => {
@@ -1743,7 +1758,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
                 <div className="col-6">
                   <label className="fs-14">
-                    <b>Total Pembayaran</b>
+                    <b>{`${tr[localStorage.getItem("language")].total} ${tr[localStorage.getItem("language")].bayar}`}</b>
                   </label>
                 </div>
 
@@ -1775,12 +1790,12 @@ const InputSO = ({ onCancel, onSuccess }) => {
       <div className="mt-5 flex justify-content-end">
         <div>
           <PButton
-            label="Batal"
+            label={tr[localStorage.getItem("language")].batal}
             onClick={onCancel}
             className="p-button-text btn-primary"
           />
           <PButton
-            label="Simpan"
+            label={tr[localStorage.getItem("language")].simpan}
             icon="pi pi-check"
             onClick={onSubmit}
             autoFocus

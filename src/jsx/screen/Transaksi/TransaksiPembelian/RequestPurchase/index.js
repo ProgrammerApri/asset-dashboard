@@ -3,6 +3,7 @@ import { Button, Card, Col, Row } from "react-bootstrap";
 import PermintaanPembelian from "./PermintaanPembelian";
 import InputOrder from "./InputOrder";
 import { Toast } from "primereact/toast";
+import { tr } from "src/data/tr";
 
 const data = {
   id: null,
@@ -45,8 +46,8 @@ const RequestPurchase = ({trigger}) => {
           setActive(0);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -55,8 +56,8 @@ const RequestPurchase = ({trigger}) => {
         setTimeout(() => {
           toast.current.show({
             severity: "error",
-            summary: "Gagal",
-            detail: "Gagal Memperbarui Data",
+            summary: tr[localStorage.getItem("language")].gagal,
+            detail: tr[localStorage.getItem("language")].pesan_gagal,
             life: 3000,
           });
         }, 500);
@@ -66,7 +67,7 @@ const RequestPurchase = ({trigger}) => {
           setTimeout(() => {
             toast.current.show({
               severity: "error",
-              summary: "Gagal",
+              summary: tr[localStorage.getItem("language")].gagal,
               detail: `Kode ${code} Sudah Digunakan`,
               life: 3000,
             });
@@ -75,8 +76,8 @@ const RequestPurchase = ({trigger}) => {
           setTimeout(() => {
             toast.current.show({
               severity: "error",
-              summary: "Gagal",
-              detail: "Gagal Memperbarui Data",
+              summary: tr[localStorage.getItem("language")].gagal,
+              detail: tr[localStorage.getItem("language")].pesan_gagal,
               life: 3000,
             });
           }, 500);

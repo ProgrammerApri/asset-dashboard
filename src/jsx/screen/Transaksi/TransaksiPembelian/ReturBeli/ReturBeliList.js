@@ -15,6 +15,7 @@ import { formatDate } from "@fullcalendar/core";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { Link } from "react-router-dom";
 import { Dialog } from "primereact/dialog";
+import { tr } from "src/data/tr";
 
 const data = {
   id: null,
@@ -88,8 +89,8 @@ const ReturBeliList = ({ onAdd, onDetail }) => {
           getPR(true);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Dihapus",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
         }, 500);
@@ -101,8 +102,8 @@ const ReturBeliList = ({ onAdd, onDetail }) => {
         setDisplayDel(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Data`,
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].del_gagal,
           life: 3000,
         });
       }, 500);
@@ -117,11 +118,11 @@ const ReturBeliList = ({ onAdd, onDetail }) => {
           <InputText
             value={globalFilterValue1}
             onChange={onGlobalFilterChange1}
-            placeholder="Cari disini"
+            placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
         <PrimeSingleButton
-          label="Tambah"
+          label={tr[localStorage.getItem("language")].tambh}
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
@@ -195,12 +196,12 @@ const ReturBeliList = ({ onAdd, onDetail }) => {
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => setDisplayDel(false)}
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Hapus"
+          label={tr[localStorage.getItem("language")].hapus}
           icon="pi pi-trash"
           onClick={() => {
             delRet();
@@ -218,7 +219,10 @@ const ReturBeliList = ({ onAdd, onDetail }) => {
       const dropdownOptions = [
         { label: 20, value: 20 },
         { label: 50, value: 50 },
-        { label: "Semua", value: options.totalRecords },
+        {
+          label: tr[localStorage.getItem("language")].hal,
+          value: options.totalRecords,
+        },
       ];
 
       return (
@@ -227,7 +231,7 @@ const ReturBeliList = ({ onAdd, onDetail }) => {
             className="mx-1"
             style={{ color: "var(--text-color)", userSelect: "none" }}
           >
-            Data per halaman:{" "}
+            {tr[localStorage.getItem("language")].page}{" "}
           </span>
           <Dropdown
             value={options.value}
@@ -247,7 +251,8 @@ const ReturBeliList = ({ onAdd, onDetail }) => {
             textAlign: "center",
           }}
         >
-          {options.first} - {options.last} dari {options.totalRecords}
+          {options.first} - {options.last}{" "}
+          {tr[localStorage.getItem("language")].dari} {options.totalRecords}
         </span>
       );
     },
@@ -347,7 +352,7 @@ const ReturBeliList = ({ onAdd, onDetail }) => {
                   "formatDate(ret_date)",
                   "fk_id.fk_code",
                 ]}
-                emptyMessage="Tidak ada data"
+                emptyMessage={tr[localStorage.getItem("language")].empty_data}
                 paginator
                 paginatorTemplate={template2}
                 first={first2}
@@ -360,7 +365,7 @@ const ReturBeliList = ({ onAdd, onDetail }) => {
               >
                 <Column expander style={{ width: "3em" }} />
                 <Column
-                  header="Tanggal"
+                  header={tr[localStorage.getItem("language")].tgl}
                   style={{
                     minWidth: "8rem",
                   }}
@@ -368,13 +373,13 @@ const ReturBeliList = ({ onAdd, onDetail }) => {
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Nomor Retur Pembelian"
+                  header={tr[localStorage.getItem("language")].kd_ret}
                   style={{ minWidth: "8rem" }}
                   field={(e) => e.ret_code}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Nomor Faktur"
+                  header={tr[localStorage.getItem("language")].kd_fk}
                   style={{ minWidth: "8rem" }}
                   field={(e) => e.fk_id.fk_code}
                   body={loading && <Skeleton />}
@@ -393,7 +398,9 @@ const ReturBeliList = ({ onAdd, onDetail }) => {
       </Row>
 
       <Dialog
-        header={"Hapus Data"}
+        header={`${tr[localStorage.getItem("language")].hapus} ${
+          tr[localStorage.getItem("language")].ret_pur
+        }`}
         visible={displayDel}
         style={{ width: "30vw" }}
         footer={renderFooterDel("displayDel")}
@@ -406,7 +413,7 @@ const ReturBeliList = ({ onAdd, onDetail }) => {
             className="pi pi-exclamation-triangle mr-3 align-middle"
             style={{ fontSize: "2rem" }}
           />
-          <span>Apakah anda yakin ingin menghapus data ?</span>
+          <span>{tr[localStorage.getItem("language")].pesan_hapus}</span>
         </div>
       </Dialog>
     </>

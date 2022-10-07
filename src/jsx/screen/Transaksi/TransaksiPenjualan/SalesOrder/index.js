@@ -5,6 +5,7 @@ import InputSO from "./InputSO";
 import { Row, Col, Card } from "react-bootstrap";
 import Detail from "./Detail";
 import { set } from "date-fns";
+import { tr } from "src/data/tr";
 
 const SalesOrder = ({ trigger }) => {
   const [active, setActive] = useState(0);
@@ -36,8 +37,8 @@ const SalesOrder = ({ trigger }) => {
           setActive(0);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);

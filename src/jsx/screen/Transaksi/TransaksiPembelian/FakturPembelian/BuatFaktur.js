@@ -19,6 +19,7 @@ import DataOrder from "../Order/DataOrder";
 import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
+import { tr } from "src/data/tr";
 
 const defError = {
   code: false,
@@ -270,8 +271,8 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
           setUpdate(false);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -281,8 +282,8 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
         setUpdate(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: "Gagal Memperbarui Data",
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].pesan_gagal,
           life: 3000,
         });
       }, 500);
@@ -309,7 +310,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
           setUpdate(false);
           toast.current.show({
             severity: "error",
-            summary: "Gagal",
+            summary: tr[localStorage.getItem("language")].gagal,
             detail: `Kode ${inv.fk_code} Sudah Digunakan`,
             life: 3000,
           });
@@ -319,8 +320,8 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
           setUpdate(false);
           toast.current.show({
             severity: "error",
-            summary: "Gagal",
-            detail: "Gagal Memperbarui Data",
+            summary: tr[localStorage.getItem("language")].gagal,
+            detail: tr[localStorage.getItem("language")].pesan_gagal,
             life: 3000,
           });
         }, 500);
@@ -435,6 +436,20 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
     });
   };
 
+  const ppn = (value) => {
+    let nil = 0;
+    pajak?.forEach((elem) => {
+      if (
+        checkSupp(checkOrd(inv.ord_id)?.sup_id?.id).supplier?.sup_ppn ===
+        elem.id
+      ) {
+        nil = elem.nilai;
+      }
+    });
+
+    return nil;
+  };
+
   const getSubTotalBarang = () => {
     let total = 0;
     inv?.product?.forEach((el) => {
@@ -503,7 +518,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
         <Row className="mb-4">
           <div className="col-4">
             <PrimeInput
-              label={"No. Faktur Pembelian"}
+              label={tr[localStorage.getItem("language")].kd_fk}
               value={inv.fk_code}
               onChange={(e) => {
                 updateINV({ ...inv, fk_code: e.target?.value });
@@ -511,21 +526,21 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                 newError.code = false;
                 setError(newError);
               }}
-              placeholder="Masukan No. Faktur"
+              placeholder={tr[localStorage.getItem("language")].masuk}
               error={error?.code}
             />
           </div>
 
           <div className="col-2">
             <PrimeCalendar
-              label={"Tanggal"}
+              label={tr[localStorage.getItem("language")].tgl}
               value={new Date(`${inv.fk_date}Z`)}
               onChange={(e) => {
                 updateINV({ ...inv, fk_date: e.value });
 
                 setError({ ...error, date: false });
               }}
-              placeholder="Pilih Tanggal"
+              placeholder={tr[localStorage.getItem("language")].pilih_tgl}
               showIcon
               dateFormat="dd-mm-yy"
               error={error?.date}
@@ -534,13 +549,15 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
 
           <div className="col-12 mt-2">
             <span className="fs-14">
-              <b>Informasi Pembelian</b>
+              <b>{tr[localStorage.getItem("language")].pur}</b>
             </span>
             <Divider className="mt-1"></Divider>
           </div>
 
           <div className="col-4">
-            <label className="text-label">No. Pembelian</label>
+            <label className="text-label">
+              {tr[localStorage.getItem("language")].kd_pur}
+            </label>
             <div className="p-inputgroup"></div>
             <PrimeDropdown
               value={inv.ord_id && checkOrd(inv?.ord_id)}
@@ -560,7 +577,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
               filter
               filterBy="ord_code"
               optionLabel="ord_code"
-              placeholder="No. Pembelian"
+              placeholder={tr[localStorage.getItem("language")].pilih}
               errorMessage="Nomor Pembelian Belum Dipilih"
               error={error?.sale}
             />
@@ -569,7 +586,9 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
           <div className="col-6" />
 
           <div className="col-4">
-            <label className="text-label">Supplier</label>
+            <label className="text-label">
+              {tr[localStorage.getItem("language")].supplier}
+            </label>
             <div className="p-inputgroup">
               <InputText
                 value={
@@ -578,14 +597,16 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                         ?.sup_name
                     : null
                 }
-                placeholder="Nama Supplier"
+                placeholder={tr[localStorage.getItem("language")].nm_pem}
                 disabled
               />
             </div>
           </div>
 
           <div className="col-5">
-            <label className="text-label">Alamat Supplier</label>
+            <label className="text-label">
+              {tr[localStorage.getItem("language")].alamat}
+            </label>
             <div className="p-inputgroup">
               <InputText
                 value={
@@ -594,7 +615,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                         ?.sup_address
                     : ""
                 }
-                placeholder="Alamat Supplier"
+                placeholder={tr[localStorage.getItem("language")].alamat}
                 disabled
               />
             </div>
@@ -602,7 +623,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
 
           <div className="col-3">
             <PrimeInput
-              label={"No. Telepon"}
+              label={tr[localStorage.getItem("language")].telp}
               isNumber
               value={
                 inv.ord_id !== null
@@ -610,13 +631,15 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                       ?.sup_telp1
                   : ""
               }
-              placeholder="No. Telepon"
+              placeholder={tr[localStorage.getItem("language")].telp}
               disabled
             />
           </div>
 
           <div className="col-4">
-            <label className="text-label">Jenis Pajak</label>
+            <label className="text-label">
+              {tr[localStorage.getItem("language")].type_pjk}
+            </label>
             <div className="p-inputgroup">
               <InputText
                 value={
@@ -624,14 +647,16 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                     ? checkPjk(checkOrd(inv.ord_id)?.sup_id?.id).name
                     : null
                 }
-                placeholder="Jenis Pajak"
+                placeholder={tr[localStorage.getItem("language")].type_pjk}
                 disabled
               />
             </div>
           </div>
 
           <div className="col-2">
-            <label className="text-label">Ppn (%)</label>
+            <label className="text-label">
+              {tr[localStorage.getItem("language")].nil}
+            </label>
             <div className="p-inputgroup">
               <InputText
                 value={
@@ -639,7 +664,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                     ? checkPjk(checkOrd(inv.ord_id)?.sup_id?.id).nilai
                     : null
                 }
-                placeholder="Nilai Ppn(%)"
+                placeholder={tr[localStorage.getItem("language")].nil}
                 disabled
               />
             </div>
@@ -647,33 +672,37 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
 
           <div className="col-12 mt-2">
             <span className="fs-14">
-              <b>Informasi Faktur Pajak</b>
+              <b>{tr[localStorage.getItem("language")].fk_pjk}</b>
             </span>
             <Divider className="mt-1"></Divider>
           </div>
 
           <div className="col-4">
-            <label className="text-label">Faktur Pajak</label>
+            <label className="text-label">
+              {tr[localStorage.getItem("language")].fk_pjk}
+            </label>
             <div className="p-inputgroup mt-2">
               <InputText
                 value={inv.fk_tax}
                 onChange={(e) => {
                   updateINV({ ...inv, fk_tax: e.target.value });
                 }}
-                placeholder="Masukan Faktur Pajak"
+                placeholder={tr[localStorage.getItem("language")].masuk}
               />
             </div>
           </div>
 
           <div className="col-8">
-            <label className="text-label">Keterangan</label>
+            <label className="text-label">
+              {tr[localStorage.getItem("language")].ket}
+            </label>
             <div className="p-inputgroup mt-2">
               <InputText
                 value={inv.fk_desc}
                 onChange={(e) => {
                   updateINV({ ...inv, fk_desc: e.target.value });
                 }}
-                placeholder="Masukan Keterangan"
+                placeholder={tr[localStorage.getItem("language")].masuk}
               />
             </div>
           </div>
@@ -681,7 +710,9 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
 
         {inv.product?.length ? (
           <CustomAccordion
-            tittle={"Detail Pembelian Produk"}
+            tittle={`${tr[localStorage.getItem("language")].pur} ${
+              tr[localStorage.getItem("language")].prod
+            }`}
             defaultActive={true}
             active={accor.produk}
             onClick={() => {
@@ -709,13 +740,15 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                   emptyMessage={() => <div></div>}
                 >
                   <Column
-                    header="Barcode"
+                    header={tr[localStorage.getItem("language")].barcode}
                     field={""}
                     body={(e) => (
                       <div className="p-inputgroup">
                         <InputText
                           value={e.prod_id && checkProd(e.prod_id).barcode}
-                          placeholder="Barcode Produk"
+                          placeholder={
+                            tr[localStorage.getItem("language")].barcode
+                          }
                           disabled
                         />
                       </div>
@@ -723,7 +756,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Produk"
+                    header={tr[localStorage.getItem("language")].prod}
                     field={""}
                     body={(e) => (
                       <div className="p-inputgroup">
@@ -734,7 +767,9 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                               checkProd(e.prod_id).code
                             })`
                           }
-                          placeholder="Produk"
+                          placeholder={
+                            tr[localStorage.getItem("language")].prod
+                          }
                           disabled
                         />
                       </div>
@@ -742,13 +777,13 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Satuan"
+                    header={tr[localStorage.getItem("language")].sat}
                     field={""}
                     body={(e) => (
                       <div className="p-inputgroup">
                         <InputText
                           value={e.unit_id && checkUnit(e.unit_id).name}
-                          placeholder="Satuan Produk"
+                          placeholder={tr[localStorage.getItem("language")].sat}
                           disabled
                         />
                       </div>
@@ -756,7 +791,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Jumlah"
+                    header={tr[localStorage.getItem("language")].qty}
                     field={""}
                     body={(e) => (
                       <div className="p-inputgroup">
@@ -772,7 +807,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Harga Satuan"
+                    header={tr[localStorage.getItem("language")].price}
                     field={""}
                     body={(e) => (
                       <div className="p-inputgroup">
@@ -788,13 +823,15 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Lokasi"
+                    header={tr[localStorage.getItem("language")].gudang}
                     field={""}
                     body={(e) => (
                       <div className="p-inputgroup">
                         <InputText
                           value={e.location && checkLoc(e.location).name}
-                          placeholder="Lokasi"
+                          placeholder={
+                            tr[localStorage.getItem("language")].gudang
+                          }
                           disabled
                         />
                       </div>
@@ -802,7 +839,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Diskon"
+                    header={tr[localStorage.getItem("language")].disc}
                     field={""}
                     body={(e) => (
                       <div className="p-inputgroup">
@@ -819,7 +856,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Harga Nett"
+                    header={tr[localStorage.getItem("language")].net_prc}
                     field={""}
                     body={(e) => (
                       <div className="p-inputgroup">
@@ -835,7 +872,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Total"
+                    header={tr[localStorage.getItem("language")].total}
                     // style={{
                     //   minWidth: "12rem",
                     // }}
@@ -862,7 +899,9 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
 
         {inv.jasa?.length ? (
           <CustomAccordion
-            tittle={"Detail Pembelian Jasa"}
+            tittle={`${tr[localStorage.getItem("language")].pur} ${
+              tr[localStorage.getItem("language")].jasa
+            }`}
             defaultActive={false}
             active={accor.jasa}
             onClick={() => {
@@ -890,7 +929,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                   emptyMessage={() => <div></div>}
                 >
                   <Column
-                    header="Supplier"
+                    header={tr[localStorage.getItem("language")].supplier}
                     field={""}
                     body={(e) => (
                       <div className="p-inputgroup">
@@ -901,7 +940,9 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                               checkSupp(e.sup_id).supplier.sup_code
                             })`
                           }
-                          placeholder="Supplier"
+                          placeholder={
+                            tr[localStorage.getItem("language")].supplier
+                          }
                           disabled
                         />
                       </div>
@@ -909,7 +950,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Jasa"
+                    header={tr[localStorage.getItem("language")].jasa}
                     field={""}
                     body={(e) => (
                       <div className="p-inputgroup">
@@ -920,7 +961,9 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                               checkJasa(e.jasa_id).jasa.code
                             })`
                           }
-                          placeholder="Jasa"
+                          placeholder={
+                            tr[localStorage.getItem("language")].jasa
+                          }
                           disabled
                         />
                       </div>
@@ -928,13 +971,13 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Satuan"
+                    header={tr[localStorage.getItem("language")].sat}
                     field={""}
                     body={(e) => (
                       <div className="p-inputgroup">
                         <InputText
                           value={e.unit_id && checkUnit(e.unit_id).name}
-                          placeholder="Satuan"
+                          placeholder={tr[localStorage.getItem("language")].sat}
                           disabled
                         />
                       </div>
@@ -942,7 +985,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Jumlah"
+                    header={tr[localStorage.getItem("language")].qty}
                     field={""}
                     body={(e) => (
                       <div className="p-inputgroup">
@@ -958,7 +1001,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Harga Satuan"
+                    header={tr[localStorage.getItem("language")].price}
                     field={""}
                     body={(e) => (
                       <div className="p-inputgroup">
@@ -975,7 +1018,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Diskon"
+                    header={tr[localStorage.getItem("language")].disc}
                     field={""}
                     body={(e) => (
                       <div className="p-inputgroup">
@@ -992,7 +1035,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Total"
+                    header={tr[localStorage.getItem("language")].total}
                     // style={{
                     //   minWidth: "12rem",
                     // }}
@@ -1035,7 +1078,9 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
             <div className="row justify-content-right col-6">
               <div className="col-6">
                 <label className="text-label">
-                  {inv.split_inv ? "Sub Total Barang" : "Sub Total"}
+                  {inv.split_inv
+                    ? tr[localStorage.getItem("language")].ttl_barang
+                    : tr[localStorage.getItem("language")].sub_ttl}
                 </label>
               </div>
 
@@ -1079,7 +1124,9 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
 
               <div className="col-6">
                 <label className="text-label">
-                  {inv.split_inv ? "Pajak Atas Barang (11%)" : "Pajak (11%)"}
+                  {inv.split_inv
+                    ? tr[localStorage.getItem("language")].pjk_barang
+                    : tr[localStorage.getItem("language")].pajak}
                 </label>
               </div>
 
@@ -1088,13 +1135,14 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                   {inv.split_inv ? (
                     <b>
                       Rp.
-                      {formatIdr((getSubTotalBarang() * 11) / 100)}
+                      {formatIdr((getSubTotalBarang() * ppn()) / 100)}
                     </b>
                   ) : (
                     <b>
                       Rp.{" "}
                       {formatIdr(
-                        ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
+                        ((getSubTotalBarang() + getSubTotalJasa()) * ppn()) /
+                          100
                       )}
                     </b>
                   )}
@@ -1102,7 +1150,9 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
               </div>
 
               <div className="col-6 mt-3">
-                <label className="text-label">Diskon Tambahan</label>
+                <label className="text-label">
+                  {tr[localStorage.getItem("language")].disc_tambh}
+                </label>
               </div>
 
               <div className="col-6">
@@ -1125,7 +1175,9 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                     //       100
                     //     : Do.total_disc
                     // }
-                    placeholder="Diskon"
+                    placeholder={
+                      tr[localStorage.getItem("language")].disc_tambh
+                    }
                     type="number"
                     min={0}
                     disabled
@@ -1169,7 +1221,9 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
 
               <div className="col-6">
                 <label className="text-label fs-14">
-                  <b>Total Pembayaran</b>
+                  <b>{`${tr[localStorage.getItem("language")].total} ${
+                    tr[localStorage.getItem("language")].bayar
+                  }`}</b>
                 </label>
               </div>
 
@@ -1179,7 +1233,8 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                     <b>
                       Rp.{" "}
                       {formatIdr(
-                        getSubTotalBarang() + (getSubTotalBarang() * 11) / 100
+                        getSubTotalBarang() +
+                          (getSubTotalBarang() * ppn()) / 100
                       )}
                     </b>
                   ) : (
@@ -1188,7 +1243,8 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                       {formatIdr(
                         getSubTotalBarang() +
                           getSubTotalJasa() +
-                          ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
+                          ((getSubTotalBarang() + getSubTotalJasa()) * ppn()) /
+                            100
                       )}
                     </b>
                   )}
@@ -1203,7 +1259,9 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                 <>
                   <div className="row justify-content-right col-12 mt-4">
                     <div className="col-6 mt-4">
-                      <label className="text-label">Sub Total Jasa</label>
+                      <label className="text-label">
+                        {tr[localStorage.getItem("language")].ttl_jasa}
+                      </label>
                     </div>
 
                     <div className="col-6 mt-4">
@@ -1229,7 +1287,9 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                     </div>
 
                     <div className="col-6">
-                      <label className="text-label">Pajak Atas Jasa (2%)</label>
+                      <label className="text-label">
+                        {tr[localStorage.getItem("language")].pjk_jasa} (2%)
+                      </label>
                     </div>
 
                     <div className="col-6">
@@ -1242,7 +1302,9 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                     </div>
 
                     <div className="col-6 mt-3">
-                      <label className="text-label">Diskon Tambahan</label>
+                      <label className="text-label">
+                        {tr[localStorage.getItem("language")].disc_tambh}
+                      </label>
                     </div>
 
                     <div className="col-6">
@@ -1259,7 +1321,9 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
                               ? (getSubTotalJasa() * inv.jasa_disc) / 100
                               : inv.jasa_disc
                           }
-                          placeholder="Diskon"
+                          placeholder={
+                            tr[localStorage.getItem("language")].disc_tambh
+                          }
                           type="number"
                           min={0}
                           disabled
@@ -1290,7 +1354,9 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
 
                     <div className="col-6">
                       <label className="text-label">
-                        <b>Total Pembayaran</b>
+                        <b>{`${tr[localStorage.getItem("language")].total} ${
+                          tr[localStorage.getItem("language")].bayar
+                        }`}</b>
                       </label>
                     </div>
 
@@ -1325,12 +1391,12 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
       <div className="mt-5 flex justify-content-end">
         <div>
           <PButton
-            label="Batal"
+            label={tr[localStorage.getItem("language")].batal}
             onClick={onCancel}
             className="p-button-text btn-primary"
           />
           <PButton
-            label="Simpan"
+            label={tr[localStorage.getItem("language")].simpan}
             icon="pi pi-check"
             onClick={onSubmit}
             autoFocus

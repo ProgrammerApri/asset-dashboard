@@ -16,6 +16,7 @@ import { SET_CURRENT_SO, SET_EDIT_SO, SET_SO } from "src/redux/actions";
 import ReactToPrint from "react-to-print";
 import { Divider } from "@material-ui/core";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import { tr } from "src/data/tr";
 
 const data = {
   id: null,
@@ -105,8 +106,8 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
           getSO(true);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Dihapus",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
         }, 500);
@@ -118,8 +119,8 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
         setDisplayDel(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Data`,
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].del_gagal,
           life: 3000,
         });
       }, 500);
@@ -144,8 +145,8 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
           getSO(true);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -155,8 +156,8 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
         setUpdate(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: "Gagal Memperbarui Data",
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].pesan_gagal,
           life: 3000,
         });
       }, 500);
@@ -412,11 +413,11 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
           <InputText
             value={globalFilterValue1}
             onChange={onGlobalFilterChange1}
-            placeholder="Cari disini"
+            placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
         <PrimeSingleButton
-          label="Tambah"
+          label={tr[localStorage.getItem("language")].tambh}
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
@@ -467,7 +468,7 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => setDisplayConfirm(false)}
           className="p-button-text btn-primary"
         />
@@ -549,7 +550,6 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
 
-
   return (
     <>
       <Toast ref={toast} />
@@ -571,7 +571,7 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
                   "so.so_date",
                   "pel_id.cus_name",
                 ]}
-                emptyMessage="Tidak ada data"
+                emptyMessage={tr[localStorage.getItem("language")].empty_data}
                 paginator
                 paginatorTemplate={template2}
                 first={first2}
@@ -580,7 +580,7 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
                 paginatorClassName="justify-content-end mt-3"
               >
                 <Column
-                  header="Tanggal"
+                  header={tr[localStorage.getItem("language")].tgl}
                   style={{
                     minWidth: "10rem",
                   }}
@@ -588,25 +588,25 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Kode Referensi"
+                  header={tr[localStorage.getItem("language")].kd_so}
                   field={(e) => e.so_code}
                   style={{ minWidth: "10rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Pelanggan"
+                  header={tr[localStorage.getItem("language")].customer}
                   field={(e) => e.pel_id.cus_name}
                   style={{ minWidth: "10rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Tanggal Jatuh Tempo"
+                  header={tr[localStorage.getItem("language")].due}
                   field={(e) => formatDate(e.due_date)}
                   style={{ minWidth: "10rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Status"
+                  header={tr[localStorage.getItem("language")].sts}
                   field={(e) => e?.status ?? ""}
                   style={{ minWidth: "8rem" }}
                   body={(e) =>
@@ -642,7 +642,9 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
       </Row>
 
       <Dialog
-        header={"Tutup Pesanan Penjualan"}
+        header={`${tr[localStorage.getItem("language")].close} ${
+          tr[localStorage.getItem("language")].sal_ord
+        }`}
         visible={confirm}
         style={{ width: "30vw" }}
         footer={footerClose("confirm")}
@@ -655,12 +657,14 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
             className="pi pi-exclamation-triangle mr-3 align-middle"
             style={{ fontSize: "2rem" }}
           />
-          <span>Apakah Anda Yakin Ingin Menyelesaikan Pesanan Penjualan ?</span>
+          <span>{tr[localStorage.getItem("language")].pesan_cls}</span>
         </div>
       </Dialog>
 
       <Dialog
-        header={"Hapus Data"}
+        header={`${tr[localStorage.getItem("language")].hapus} ${
+          tr[localStorage.getItem("language")].sal_ord
+        }`}
         visible={displayDel}
         style={{ width: "30vw" }}
         footer={renderFooterDel("displayDel")}
@@ -673,7 +677,7 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
             className="pi pi-exclamation-triangle mr-3 align-middle"
             style={{ fontSize: "2rem" }}
           />
-          <span>Apakah anda yakin ingin menghapus data ?</span>
+          <span>{tr[localStorage.getItem("language")].pesan_hapus}</span>
         </div>
       </Dialog>
     </>

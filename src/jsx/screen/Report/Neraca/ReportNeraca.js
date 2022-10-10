@@ -83,49 +83,12 @@ const Neraca = () => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        let d = data;
-        for (var key in d) {
-          if (key !== "id" && key !== "cp_id" && key !== "user_id") {
-            let val = [];
-            if (d[key]) {
-              d[key].forEach((el) => {
-                if (el) {
-                  val.push(Number(el));
-                }
-              });
-              d[key] = val.length > 0 ? val : null;
-            } else {
-              d[key] = [null];
-            }
-          }
-        }
-
+        
         setCategory({
-          aktiva: [
-            {
-              name: "Current Asset",
-              id: d.cur,
-            },
-            {
-              name: "Fixed Asset",
-              id: d.fixed,
-            },
-            {
-              name: "Depreciation",
-              id: d.depr,
-            },
-          ],
-          pasiva: [
-            {
-              name: "Payable",
-              id: d.ap,
-            },
-            {
-              name: "Capital",
-              id: d.cap,
-            },
-          ],
+          aktiva: data.aktiva.map((v) => ({name: v.name, id: v.category.map(i => Number(i))})),
+          pasiva: data.pasiva.map((v) => ({name: v.name, id: v.category.map(i => Number(i))})),
         });
+        console.log(category);
       } else {
         setCategory(set);
       }

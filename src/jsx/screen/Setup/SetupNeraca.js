@@ -8,6 +8,11 @@ import CustomAccordion from "src/jsx/components/Accordion/Accordion";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Link } from "react-router-dom";
+import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import { tr } from "src/data/tr";
+import { Button as PButton } from "primereact/button";
+import { InputText } from "primereact/inputtext";
+import { Dialog } from "primereact/dialog";
 
 const set = {
   id: 0,
@@ -26,6 +31,14 @@ const SetupNeraca = () => {
   const [setup, setSetup] = useState(set);
   const [available, setAvailable] = useState(false);
   const [kategori, setKategori] = useState(null);
+  const [isEdit, setEdit] = useState(false);
+  const [displayInput, setDisplayInput] = useState(false);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [current, setCurrent] = useState({
+    tittle: null,
+    type: null,
+    accounts: [],
+  });
   const [accor, setAccor] = useState({
     aktiva: true,
     passiva: true,
@@ -101,21 +114,6 @@ const SetupNeraca = () => {
       if (response.status) {
         const { data } = response;
         let d = data;
-        for (var key in d) {
-          if (key !== "id" && key !== "cp_id" && key !== "user_id") {
-            let val = [];
-            if (d[key]) {
-              d[key].forEach((el) => {
-                if (el) {
-                  val.push(Number(el));
-                }
-              });
-              d[key] = val.length > 0 ? val : null;
-            } else {
-              d[key] = [null];
-            }
-          }
-        }
         setSetup(d);
       } else {
         setSetup(set);
@@ -163,35 +161,31 @@ const SetupNeraca = () => {
   };
 
   const addSetup = async (data) => {
-    let d = data;
-    for (var key in d) {
-      if (key !== "id" && key !== "cp_id" && key !== "user_id") {
-        let val = [];
-        d[key].forEach((el) => {
-          if (el) {
-            val.push(Number(el));
-          }
-        });
-        d[key] = val.length > 0 ? val : null;
-      }
-    }
     let config = {
       ...endpoints.addNeraca,
-      data: d,
+      data: data,
     };
     let response = null;
     try {
       response = await request(null, config);
       console.log(response);
       if (response.status) {
+        setDisplayInput(false);
         toast.current.show({
           severity: "info",
           summary: "Berhasil",
           detail: "Data berhasil diperbarui",
           life: 3000,
         });
+        setLoadingSubmit(false);
+        setCurrent({
+          tittle: null,
+          type: null,
+          accounts: [],
+        });
       }
     } catch (error) {
+      setLoadingSubmit(false);
       toast.current.show({
         severity: "error",
         summary: "Gagal",
@@ -204,22 +198,13 @@ const SetupNeraca = () => {
   };
 
   const editSetup = async (data) => {
-    let d = data;
-    for (var key in d) {
-      if (key !== "id" && key !== "cp_id" && key !== "user_id") {
-        let val = [];
-        d[key].forEach((el) => {
-          if (el) {
-            val.push(Number(el));
-          }
-        });
-        d[key] = val.length > 0 ? val : null;
-      }
-    }
     let config = {
       ...endpoints.editNeraca,
       endpoint: endpoints.editNeraca.endpoint + data.id,
-      data: d,
+      data: {
+        tittle: data.name,
+        accounts: data.category.filter((v) => v !== 0),
+      },
     };
     let response = null;
     try {
@@ -246,14 +231,8 @@ const SetupNeraca = () => {
   };
 
   const submitUpdate = (data) => {
-    if (available) {
-      if (data.id) {
-        editSetup(data);
-      } else {
-        addSetup(data);
-      }
-    } else {
-      postCompany(data);
+    if (data.id) {
+      editSetup(data);
     }
   };
 
@@ -366,143 +345,162 @@ const SetupNeraca = () => {
 
   const renderAktiva = () => {
     return (
-      <CustomAccordion
-        tittle={"Aktiva"}
-        active={accor.aktiva}
-        key={1}
-        defaultActive={true}
-        onClick={() => {
-          setAccor({
-            ...accor,
-            aktiva: !accor.aktiva,
-          });
-        }}
-        body={
+      <Card>
+        <Card.Header className="p-3">
+          <div className="ml-2">Aktiva</div>
+          <PrimeSingleButton
+            label={tr[localStorage.getItem("language")].tambh}
+            icon={<i class="bx bx-plus px-2"></i>}
+            onClick={() => {
+              setDisplayInput(true);
+              setCurrent({ ...current, type: 1 });
+            }}
+          />
+        </Card.Header>
+        <Card.Body className="p-3">
           <Row className="mr-0 ml-0">
-            {renderKategoriDropdown(
-              "Current Asset",
-              setup?.cur ?? [null],
-              (e, id) => {
-                let temp = setup.cur;
-                temp[e.index] = id;
-                setSetup({ ...setup, cur: temp });
-                submitUpdate({ ...setup, cur: temp });
-              },
-              true,
-              (e) => {
-                setSetup({ ...setup, cur: [...setup.cur, 0] });
-              },
-              (e) => {
-                let temp = setup.cur;
-                temp.splice(e.index, 1);
-                setSetup({ ...setup, cur: temp });
-                submitUpdate({ ...setup, cur: temp });
-              }
-            )}
-            {renderKategoriDropdown(
-              "Fixed Asset",
-              setup?.fixed ?? [null],
-              (e, id) => {
-                let temp = setup.fixed;
-                temp[e.index] = id;
-                setSetup({ ...setup, fixed: temp });
-                submitUpdate({ ...setup, fixed: temp });
-              },
-              true,
-              (e) => {
-                setSetup({ ...setup, fixed: [...setup.fixed, 0] });
-              },
-              (e) => {
-                let temp = setup.fixed;
-                temp.splice(e.index, 1);
-                setSetup({ ...setup, fixed: temp });
-                submitUpdate({ ...setup, fixed: temp });
-              }
-            )}
-            {renderKategoriDropdown(
-              "Depreciation",
-              setup?.depr ?? [null],
-              (e, id) => {
-                let temp = setup.depr;
-                temp[e.index] = id;
-                setSetup({ ...setup, depr: temp });
-                submitUpdate({ ...setup, depr: temp });
-              },
-              true,
-              (e) => {
-                setSetup({ ...setup, depr: [...setup.depr, 0] });
-              },
-              (e) => {
-                let temp = setup.depr;
-                temp.splice(e.index, 1);
-                setSetup({ ...setup, depr: temp });
-                submitUpdate({ ...setup, depr: temp });
-              }
+            {loading ? (
+              <>
+                <Skeleton width="200px" />
+                <Skeleton className="mt-3" height="45px" />
+                <Skeleton className="mt-3" width="200px" />
+                <Skeleton className="mt-3" height="45px" />
+                <Skeleton className="mt-3" width="200px" />
+                <Skeleton className="mt-3" height="45px" />
+              </>
+            ) : (
+              setup?.aktiva?.map((v, i) => {
+                return (
+                  <>
+                    {renderKategoriDropdown(
+                      v.name,
+                      v.category ?? [null],
+                      (e, id) => {
+                        let temp = setup.aktiva;
+                        temp[i].category[e.index] = id;
+
+                        setSetup({ ...setup, aktiva: temp });
+                        submitUpdate(temp[i]);
+                      },
+                      true,
+                      (e) => {
+                        let temp = setup.aktiva;
+                        temp[i].category.push(0);
+
+                        setSetup({ ...setup, aktiva: temp });
+                      },
+                      (e) => {
+                        let temp = setup.aktiva;
+                        temp[i].category.splice(e.index, 1);
+
+                        setSetup({ ...setup, aktiva: temp });
+                        submitUpdate(temp[i]);
+                      }
+                    )}
+                  </>
+                );
+              })
             )}
           </Row>
-        }
-      />
+        </Card.Body>
+      </Card>
     );
   };
 
   const renderPassiva = () => {
     return (
-      <CustomAccordion
-        tittle={"Pasiva"}
-        active={accor?.passiva ?? [null]}
-        key={1}
-        defaultActive={true}
-        onClick={() => {
-          setAccor({
-            ...accor,
-            passiva: !accor.passiva,
-          });
-        }}
-        body={
+      <Card>
+        <Card.Header className="p-3">
+          <div className="ml-2">Pasiva</div>
+          <PrimeSingleButton
+            label={tr[localStorage.getItem("language")].tambh}
+            icon={<i class="bx bx-plus px-2"></i>}
+            onClick={() => {
+              setDisplayInput(true);
+              setCurrent({ ...current, type: 2 });
+            }}
+          />
+        </Card.Header>
+        <Card.Body className="p-3">
           <Row className="mr-0 ml-0">
-            {renderKategoriDropdown(
-              "Payable",
-              setup?.ap ?? [null],
-              (e, id) => {
-                let temp = setup.ap;
-                temp[e.index] = id;
-                setSetup({ ...setup, ap: temp });
-                submitUpdate({ ...setup, ap: temp });
-              },
-              true,
-              (e) => {
-                setSetup({ ...setup, ap: [...setup.ap, 0] });
-              },
-              (e) => {
-                let temp = setup.ap;
-                temp.splice(e.index, 1);
-                setSetup({ ...setup, ap: temp });
-                submitUpdate({ ...setup, ap: temp });
-              }
-            )}
-            {renderKategoriDropdown(
-              "Capital",
-              setup?.cap ?? [null],
-              (e, id) => {
-                let temp = setup.cap;
-                temp[e.index] = id;
-                setSetup({ ...setup, cap: temp });
-                submitUpdate({ ...setup, cap: temp });
-              },
-              true,
-              (e) => {
-                setSetup({ ...setup, cap: [...setup.cap, 0] });
-              },
-              (e) => {
-                let temp = setup.cap;
-                temp.splice(e.index, 1);
-                setSetup({ ...setup, cap: temp });
-                submitUpdate({ ...setup, cap: temp });
-              }
+            {loading ? (
+              <>
+                <Skeleton width="200px" />
+                <Skeleton className="mt-3" height="45px" />
+                <Skeleton className="mt-3" width="200px" />
+                <Skeleton className="mt-3" height="45px" />
+                <Skeleton className="mt-3" width="200px" />
+                <Skeleton className="mt-3" height="45px" />
+              </>
+            ) : (
+              setup?.pasiva?.map((v, i) => {
+                return (
+                  <>
+                    {renderKategoriDropdown(
+                      v.name,
+                      v.category ?? [null],
+                      (e, id) => {
+                        let temp = setup.pasiva;
+                        temp[i].category[e.index] = id;
+
+                        setSetup({ ...setup, pasiva: temp });
+                        submitUpdate(temp[i]);
+                      },
+                      true,
+                      (e) => {
+                        let temp = setup.pasiva;
+                        temp[i].category.push(0);
+
+                        setSetup({ ...setup, pasiva: temp });
+                      },
+                      (e) => {
+                        let temp = setup.pasiva;
+                        temp[i].category.splice(e.index, 1);
+
+                        setSetup({ ...setup, pasiva: temp });
+                        submitUpdate(temp[i]);
+                      }
+                    )}
+                  </>
+                );
+              })
             )}
           </Row>
-        }
-      />
+        </Card.Body>
+      </Card>
+    );
+  };
+
+  const renderFooter = () => {
+    return (
+      <div>
+        <PButton
+          label="Batal"
+          onClick={() => {
+            setDisplayInput(false);
+            setCurrent({
+              tittle: null,
+              type: null,
+              accounts: [],
+            });
+          }}
+          className="p-button-text btn-primary"
+        />
+        <PButton
+          label="Simpan"
+          icon="pi pi-check"
+          onClick={() => {
+            setLoadingSubmit(true);
+            if (available) {
+              addSetup(current);
+            } else {
+              postCompany(current);
+            }
+          }}
+          autoFocus
+          loading={loadingSubmit}
+        />
+      </div>
     );
   };
 
@@ -514,6 +512,37 @@ const SetupNeraca = () => {
 
         <Col className="col-lg-6 col-sm-12 col-xs-12">{renderPassiva()}</Col>
       </Row>
+
+      <Dialog
+        header={isEdit ? "Edit Sub Neraca" : "Tambah Sub Neraca"}
+        visible={displayInput}
+        style={{ width: "30vw" }}
+        footer={renderFooter()}
+        onHide={() => {
+          setEdit(false);
+          setDisplayInput(false);
+          setCurrent({
+            tittle: null,
+            type: null,
+            accounts: [],
+          });
+        }}
+      >
+        <div className="row mr-0 ml-0">
+          <div className="col-12">
+            <label className="text-label">Judul Sub</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={current.tittle}
+                onChange={(e) => {
+                  setCurrent({ ...current, tittle: e.target.value });
+                }}
+                placeholder="Masukan Judul Sub"
+              />
+            </div>
+          </div>
+        </div>
+      </Dialog>
     </>
   );
 };

@@ -456,7 +456,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
         <Toast ref={toast} />
 
         <Row className="mb-4">
-          <div className="col-4">
+          <div className="col-3">
             <PrimeInput
               label={tr[localStorage.getItem("language")].kd_ret}
               value={pr.ret_code}
@@ -907,7 +907,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
 
               <div className="col-6">
                 <label className="text-label">
-                  {tr[localStorage.getItem("language")].pjk_barang}
+                  {`${tr[localStorage.getItem("language")].pjk_barang} (${pajk()}%)`}
                 </label>
               </div>
 

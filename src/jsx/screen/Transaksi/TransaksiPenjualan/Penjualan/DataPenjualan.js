@@ -16,6 +16,7 @@ import { SET_CURRENT_SL, SET_EDIT_SL, SET_SL } from "src/redux/actions";
 import { Divider } from "@material-ui/core";
 import ReactToPrint from "react-to-print";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import { tr } from "src/data/tr";
 
 const data = {
   id: null,
@@ -106,8 +107,8 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
           getSale(true);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Dihapus",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
         }, 500);
@@ -119,8 +120,8 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
         setDisplayDel(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Data`,
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].del_gagal,
           life: 3000,
         });
       }, 500);
@@ -264,12 +265,12 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => setDisplayDel(false)}
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Hapus"
+          label={tr[localStorage.getItem("language")].hapus}
           icon="pi pi-trash"
           onClick={() => {
             setUpdate(true);
@@ -305,11 +306,11 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
           <InputText
             value={globalFilterValue1}
             onChange={onGlobalFilterChange1}
-            placeholder="Cari disini"
+            placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
         <PrimeSingleButton
-          label="Tambah"
+          label={tr[localStorage.getItem("language")].tambh}
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
@@ -390,7 +391,10 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
       const dropdownOptions = [
         { label: 20, value: 20 },
         { label: 50, value: 50 },
-        { label: "Semua", value: options.totalRecords },
+        {
+          label: tr[localStorage.getItem("language")].hal,
+          value: options.totalRecords,
+        },
       ];
 
       return (
@@ -399,7 +403,7 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
             className="mx-1"
             style={{ color: "var(--text-color)", userSelect: "none" }}
           >
-            Data per halaman:{" "}
+            {tr[localStorage.getItem("language")].page}{" "}
           </span>
           <Dropdown
             value={options.value}
@@ -419,7 +423,8 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
             textAlign: "center",
           }}
         >
-          {options.first} - {options.last} dari {options.totalRecords}
+          {options.first} - {options.last}{" "}
+          {tr[localStorage.getItem("language")].dari} {options.totalRecords}
         </span>
       );
     },
@@ -493,7 +498,7 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
                   "so_id.so_code",
                   "pel_id.cus_name",
                 ]}
-                emptyMessage="Tidak ada data"
+                emptyMessage={tr[localStorage.getItem("language")].empty_data}
                 paginator
                 paginatorTemplate={template2}
                 first={first2}
@@ -502,7 +507,7 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
                 paginatorClassName="justify-content-end mt-3"
               >
                 <Column
-                  header="Tanggal"
+                  header={tr[localStorage.getItem("language")].tgl}
                   style={{
                     minWidth: "10rem",
                   }}
@@ -510,19 +515,19 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="No. Penjualan"
+                  header={tr[localStorage.getItem("language")].kd_sale}
                   field={(e) => e.ord_code}
                   style={{ minWidth: "10rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="No. Pesanan Penjualan"
+                  header={tr[localStorage.getItem("language")].kd_so}
                   field={(e) => e.so_id?.so_code ?? "-"}
                   style={{ minWidth: "10rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Pelanggan"
+                  header={tr[localStorage.getItem("language")].customer}
                   field={(e) => e.pel_id?.cus_name}
                   style={{ minWidth: "10rem" }}
                   body={loading && <Skeleton />}
@@ -540,275 +545,10 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
         </Col>
       </Row>
 
-      {/* <Dialog
-        header={"Detail Pembelian"}
-        visible={displayData}
-        style={{ width: "40vw" }}
-        footer={renderFooter("displayData")}
-        onHide={() => {
-          setDisplayData(false);
-        }}
-      >
-        <Row className="ml-0 pt-0 fs-12">
-          <div className="col-8">
-            <label className="text-label">Tanggal Pembelian :</label>
-            <span className="ml-1">
-              <b>{formatDate(show.ord_date)}</b>
-            </span>
-          </div>
-
-          <div className="col-4">
-            <label className="text-label">Jatuh Tempo :</label>
-            <span className="ml-1">
-              <b>{formatDate(show.due_date)}</b>
-            </span>
-          </div>
-
-          <Card className="col-12">
-            <div className="row">
-              <div className="col-8">
-                <label className="text-label">No. Penjualan :</label>
-                <span className="ml-1">
-                  <b>{show.ord_code}</b>
-                </span>
-              </div>
-
-              <div className="col-4">
-                <label className="text-label">No. Pesanan :</label>
-                <span className="ml-1">
-                  <b>{show.so_id?.so_code}</b>
-                </span>
-              </div>
-            </div>
-
-            <div className="row">
-              <div className="col-8">
-                <label className="text-label"></label>
-              </div>
-              <div className="col-4">
-                <label className="text-label">Pelanggan</label>
-                <div className="">
-                  <span className="ml-0">
-                    <b>{show.pel_id?.cus_name}</b>
-                  </span>
-                  <br />
-                  <span>{show.pel_id?.cus_address}</span>
-                  <br />
-                  <span>{show.pel_id?.cus_telp1}</span>
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          <Row className="ml-1 mt-0">
-            <DataTable
-              className="display w-150 datatable-wrapper fs-12"
-              value={show?.jprod}
-            >
-              <Column
-                header="Produk"
-                field={(e) => `${e.prod_id?.name} (${e.prod_id?.code})`}
-                style={{ minWidth: "8rem" }}
-                // body={loading && <Skeleton />}
-              />
-              <Column
-                header="Jumlah"
-                field={(e) => e.order}
-                style={{ minWidth: "5rem" }}
-                // body={loading && <Skeleton />}
-              />
-              <Column
-                header="Satuan"
-                field={(e) => e.unit_id?.name}
-                style={{ minWidth: "5rem" }}
-                // body={loading && <Skeleton />}
-              />
-              <Column
-                header="Harga Satuan"
-                field={(e) => e.price}
-                style={{ minWidth: "8rem" }}
-                // body={loading && <Skeleton />}
-              />
-              <Column
-                header="Lokasi"
-                field={(e) => e.location?.name}
-                style={{ minWidth: "8rem" }}
-                // body={loading && <Skeleton />}
-              />
-              <Column
-                header="Total"
-                field={(e) => formatIdr(e.total)}
-                style={{ minWidth: "6rem" }}
-                // body={loading && <Skeleton />}
-              />
-            </DataTable>
-          </Row>
-
-          {sale.jjasa?.length ? (
-            <Row className="ml-1 mt-5">
-              <>
-                <DataTable
-                  className="display w-150 datatable-wrapper fs-12"
-                  value={show?.jjasa.map((v, i) => {
-                    return {
-                      ...v,
-                      index: i,
-                      total: v?.total ?? 0,
-                    };
-                  })}
-                >
-                  <Column
-                    header="Supplier"
-                    field={(e) => e.sup_id?.sup_name}
-                    style={{ minWidth: "15rem" }}
-                    // body={loading && <Skeleton />}
-                  />
-                  <Column
-                    header="Jasa"
-                    field={(e) => e.jasa_id?.name}
-                    style={{ minWidth: "15rem" }}
-                    // body={loading && <Skeleton />}
-                  />
-                  <Column
-                    header="Total"
-                    field={(e) => formatIdr(e.total)}
-                    style={{ minWidth: "10rem" }}
-                    // body={loading && <Skeleton />}
-                  />
-                </DataTable>
-              </>
-              0
-            </Row>
-          ) : (
-            <></>
-          )}
-
-          <Row className="ml-0 mr-0 mb-0 mt-4 justify-content-between fs-12">
-            <div></div>
-            <div className="row justify-content-right col-6 mr-4">
-              <div className="col-12 mb-0">
-                <label className="text-label">
-                  <b>Detail Pembayaran</b>
-                </label>
-                <Divider className="ml-12"></Divider>
-              </div>
-
-              <div className="col-5 mt-2">
-                <label className="text-label">
-                  {show.split_inv ? "Sub Total Barang" : "Subtotal"}
-                </label>
-              </div>
-
-              <div className="col-7 mt-2 text-right">
-                <label className="text-label">
-                  {show.split_inv ? (
-                    <b>
-                      Rp.
-                      {formatIdr(getSubTotalBarang())}
-                    </b>
-                  ) : (
-                    <b>
-                      Rp.
-                      {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
-                    </b>
-                  )}
-                </label>
-              </div>
-
-              <div className="col-5">
-                <label className="text-label">
-                  {show.split_inv ? "DPP Barang" : "DPP"}
-                </label>
-              </div>
-
-              <div className="col-7 text-right">
-                <label className="text-label">
-                  {show.split_inv ? (
-                    <b>
-                      Rp.
-                      {formatIdr(getSubTotalBarang())}
-                    </b>
-                  ) : (
-                    <b>
-                      Rp.
-                      {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
-                    </b>
-                  )}
-                </label>
-              </div>
-
-              <div className="col-5">
-                <label className="text-label">
-                  {show.split_inv ? "Pajak Atas Barang (11%)" : "Pajak (11%)"}
-                </label>
-              </div>
-
-              <div className="col-7 text-right">
-                <label className="text-label">
-                  {show.split_inv ? (
-                    <b>
-                      Rp.
-                      {formatIdr((getSubTotalBarang() * 11) / 100)}
-                    </b>
-                  ) : (
-                    <b>
-                      Rp.{" "}
-                      {formatIdr(
-                        ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
-                      )}
-                    </b>
-                  )}
-                </label>
-              </div>
-
-              <div className="col-5 mt-0">
-                <label className="text-label">Diskon(%)</label>
-              </div>
-
-              <div className="col-7 text-right">
-                <label className="text-label">
-                  <b>Rp. {show.total_disc !== null ? show.total_disc : 0}</b>
-                </label>
-              </div>
-
-              <div className="col-12">
-                <Divider className="ml-12"></Divider>
-              </div>
-
-              <div className="col-5">
-                <label className="text-label">
-                  <b>Total</b>
-                </label>
-              </div>
-
-              <div className="col-7 text-right">
-                <label className="text-label fs-13">
-                  {show.split_inv ? (
-                    <b>
-                      Rp.{" "}
-                      {formatIdr(
-                        getSubTotalBarang() + (getSubTotalBarang() * 11) / 100
-                      )}
-                    </b>
-                  ) : (
-                    <b>
-                      Rp.{" "}
-                      {formatIdr(
-                        getSubTotalBarang() +
-                          getSubTotalJasa() +
-                          ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
-                      )}
-                    </b>
-                  )}
-                </label>
-              </div>
-            </div>
-          </Row>
-        </Row>
-      </Dialog> */}
-
       <Dialog
-        header={"Hapus Data"}
+        header={`${tr[localStorage.getItem("language")].hapus} ${
+          tr[localStorage.getItem("language")].sale
+        }`}
         visible={displayDel}
         style={{ width: "30vw" }}
         footer={renderFooterDel("displayDel")}
@@ -821,7 +561,7 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
             className="pi pi-exclamation-triangle mr-3 align-middle"
             style={{ fontSize: "2rem" }}
           />
-          <span>Apakah anda yakin ingin menghapus data ?</span>
+          <span>{tr[localStorage.getItem("language")].pesan_hapus}</span>
         </div>
       </Dialog>
     </>

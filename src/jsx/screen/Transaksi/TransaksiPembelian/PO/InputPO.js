@@ -2087,7 +2087,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
               <div className="col-6">
                 <label className="text-label">
                   {po.split_inv
-                    ? tr[localStorage.getItem("language")].pjk_barang
+                    ? `${tr[localStorage.getItem("language")].pjk_barang} (${pajk()}%)`
                     : tr[localStorage.getItem("language")].pajak}
                 </label>
               </div>

@@ -14,6 +14,7 @@ import { SET_CURRENT_SR, SET_EDIT_SR, SET_SR } from "src/redux/actions";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { Link } from "react-router-dom";
 import { Dialog } from "primereact/dialog";
+import { tr } from "src/data/tr";
 
 const data = {
   id: null,
@@ -86,8 +87,8 @@ const ReturJualList = ({ onAdd, onDetail, onEdit }) => {
           getSR(true);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Dihapus",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
         }, 500);
@@ -99,8 +100,8 @@ const ReturJualList = ({ onAdd, onDetail, onEdit }) => {
         setDisplayDel(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Data`,
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].del_gagal,
           life: 3000,
         });
       }, 500);
@@ -115,11 +116,11 @@ const ReturJualList = ({ onAdd, onDetail, onEdit }) => {
           <InputText
             // value={globalFilterValue1}
             // onChange={onGlobalFilterChange1}
-            placeholder="Cari disini"
+            placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
         <PrimeSingleButton
-          label="Tambah"
+          label={tr[localStorage.getItem("language")].tambh}
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
@@ -236,12 +237,12 @@ const ReturJualList = ({ onAdd, onDetail, onEdit }) => {
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => setDisplayDel(false)}
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Hapus"
+          label={tr[localStorage.getItem("language")].hapus}
           icon="pi pi-trash"
           onClick={() => {
             delRet();
@@ -259,7 +260,10 @@ const ReturJualList = ({ onAdd, onDetail, onEdit }) => {
       const dropdownOptions = [
         { label: 20, value: 20 },
         { label: 50, value: 50 },
-        { label: "Semua", value: options.totalRecords },
+        {
+          label: tr[localStorage.getItem("language")].hal,
+          value: options.totalRecords,
+        },
       ];
 
       return (
@@ -268,7 +272,7 @@ const ReturJualList = ({ onAdd, onDetail, onEdit }) => {
             className="mx-1"
             style={{ color: "var(--text-color)", userSelect: "none" }}
           >
-            Data per halaman:{" "}
+            {tr[localStorage.getItem("language")].page}{" "}
           </span>
           <Dropdown
             value={options.value}
@@ -288,7 +292,8 @@ const ReturJualList = ({ onAdd, onDetail, onEdit }) => {
             textAlign: "center",
           }}
         >
-          {options.first} - {options.last} dari {options.totalRecords}
+          {options.first} - {options.last}{" "}
+          {tr[localStorage.getItem("language")].dari} {options.totalRecords}
         </span>
       );
     },
@@ -328,27 +333,27 @@ const ReturJualList = ({ onAdd, onDetail, onEdit }) => {
       <div className="">
         <DataTable value={data.product} responsiveLayout="scroll">
           <Column
-            header="Produk"
+            header={tr[localStorage.getItem("language")].prod}
             style={{ width: "31rem" }}
             field={(e) => `${e.prod_id.name} - ${e.prod_id.code}`}
           />
           <Column
-            header="Satuan"
+            header={tr[localStorage.getItem("language")].sat}
             style={{ width: "24rem" }}
             field={(e) => e.unit_id.code ?? "-"}
           />
           <Column
-            header="Lokasi"
+            header={tr[localStorage.getItem("language")].gudang}
             style={{ width: "15rem" }}
             field={(e) => e.location.name}
           />
           <Column
-            header="Retur"
+            header={tr[localStorage.getItem("language")].qty}
             style={{ width: "15rem" }}
             field={(e) => e.retur}
           />
           <Column
-            header="Harga Satuan"
+            header={tr[localStorage.getItem("language")].price}
             field={(e) => formatIdr(e.price)}
             // style={{ minWidth: "8rem" }}
             // body={loading && <Skeleton />}
@@ -375,7 +380,7 @@ const ReturJualList = ({ onAdd, onDetail, onEdit }) => {
                 header={renderHeader}
                 filters={null}
                 globalFilterFields={["ret_code", "sale_id.ord_code"]}
-                emptyMessage="Tidak ada data"
+                emptyMessage={tr[localStorage.getItem("language")].empty_data}
                 paginator
                 paginatorTemplate={template2}
                 first={first2}
@@ -388,7 +393,7 @@ const ReturJualList = ({ onAdd, onDetail, onEdit }) => {
               >
                 <Column expander style={{ width: "3em" }} />
                 <Column
-                  header="Tanggal"
+                  header={tr[localStorage.getItem("language")].tgl}
                   style={{
                     minWidth: "8rem",
                   }}
@@ -396,13 +401,13 @@ const ReturJualList = ({ onAdd, onDetail, onEdit }) => {
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Nomor Retur Penjualan"
+                  header={tr[localStorage.getItem("language")].kd_ret}
                   field={(e) => e.ret_code}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Nomor Penjualan"
+                  header={tr[localStorage.getItem("language")].kd_sale}
                   field={(e) => e.sale_id.ord_code}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
@@ -421,7 +426,9 @@ const ReturJualList = ({ onAdd, onDetail, onEdit }) => {
       </Row>
 
       <Dialog
-        header={"Hapus Data"}
+        header={`${tr[localStorage.getItem("language")].hapus} ${
+          tr[localStorage.getItem("language")].ret_sale
+        }`}
         visible={displayDel}
         style={{ width: "30vw" }}
         footer={renderFooterDel("displayDel")}
@@ -434,7 +441,7 @@ const ReturJualList = ({ onAdd, onDetail, onEdit }) => {
             className="pi pi-exclamation-triangle mr-3 align-middle"
             style={{ fontSize: "2rem" }}
           />
-          <span>Apakah anda yakin ingin menghapus data ?</span>
+          <span>{tr[localStorage.getItem("language")].pesan_hapus}</span>
         </div>
       </Dialog>
     </>

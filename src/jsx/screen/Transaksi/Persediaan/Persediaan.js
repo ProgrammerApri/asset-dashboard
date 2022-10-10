@@ -1,6 +1,7 @@
 import { current } from "@reduxjs/toolkit";
 import { TabView, TabPanel } from "primereact/tabview";
 import React, { useState } from "react";
+import { tr } from "src/data/tr";
 import KoreksiStok from "./KoreksiPersediaan";
 import MutasiLokasi from "./MutasiAntarLokasi";
 import PemakaianBahan from "./PemakaianBahan";
@@ -18,7 +19,7 @@ const Persediaan = () => {
         setTrigger((current) => current + 1);
       }}
     >
-      <TabPanel header="Mutasi Antar Lokasi">
+      <TabPanel header={tr[localStorage.getItem("language")].mutasi}>
         <MutasiLokasi trigger={trigger} />
       </TabPanel>
       <TabPanel header="Koreksi Persediaan">

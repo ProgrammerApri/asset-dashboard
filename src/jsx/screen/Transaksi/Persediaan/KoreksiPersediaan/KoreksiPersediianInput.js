@@ -22,6 +22,7 @@ import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
+import { tr } from "src/data/tr";
 
 const defError = {
   code: false,
@@ -263,8 +264,8 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
         setUpdate(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: "Gagal Memperbarui Data",
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].pesan_gagal,
           life: 3000,
         });
       }, 500);
@@ -290,7 +291,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
           setUpdate(false);
           toast.current.show({
             severity: "error",
-            summary: "Gagal",
+            summary: tr[localStorage.getItem("language")].gagal,
             detail: `Kode ${ic.code} Sudah Digunakan`,
             life: 3000,
           });
@@ -300,8 +301,8 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
           setUpdate(false);
           toast.current.show({
             severity: "error",
-            summary: "Gagal",
-            detail: "Gagal Memperbarui Data",
+            summary: tr[localStorage.getItem("language")].gagal,
+            detail: tr[localStorage.getItem("language")].pesan_gagal,
             life: 3000,
           });
         }, 500);
@@ -433,9 +434,9 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
         <Toast ref={toast} />
 
         <Row className="mb-4">
-          <div className="col-4">
+          <div className="col-3">
             <PrimeInput
-              label={"Kode Referensi"}
+              label={tr[localStorage.getItem("language")].kd_kor}
               value={ic.code}
               onChange={(e) => {
                 updateIC({ ...ic, code: e.target.value });
@@ -444,14 +445,14 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                 newError.code = false;
                 setError(newError);
               }}
-              placeholder="Masukan Kode Referensi"
+              placeholder={tr[localStorage.getItem("language")].masuk}
               error={error?.code}
             />
           </div>
 
           <div className="col-2">
             <PrimeCalendar
-              label={"Tanggal"}
+              label={tr[localStorage.getItem("language")].tgl}
               value={new Date(`${ic.date}Z`)}
               onChange={(e) => {
                 updateIC({ ...ic, date: e.value });
@@ -460,17 +461,17 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                 newError.date = false;
                 setError(newError);
               }}
-              placeholder="Pilih Tanggal"
+              placeholder={tr[localStorage.getItem("language")].pilih_tgl}
               showIcon
               dateFormat="dd-mm-yy"
               error={error?.date}
             />
           </div>
 
-          <div className="col-4"></div>
+          <div className="col-5"></div>
 
-          <div className="col-4 mt-2">
-            <label className="text-label">Departemen</label>
+          <div className="col-3 mt-2">
+            <label className="text-label">{tr[localStorage.getItem("language")].dep}</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
               value={ic.dep_id ? dept(ic?.dep_id) : null}
@@ -483,7 +484,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                 // setError(newError);
               }}
               label={"[ccost_name] - [ccost_code]"}
-              placeholder="Pilih Departemen"
+              placeholder={tr[localStorage.getItem("language")].pilih}
               detail
               onDetail={() => setShowDept(true)}
               // errorMessage="Departemen Belum Dipilih"
@@ -491,8 +492,8 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-4 mt-2">
-            <label className="text-label">Project</label>
+          <div className="col-3 mt-2">
+            <label className="text-label">{tr[localStorage.getItem("language")].proj}</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
               value={ic.proj_id ? prj(ic?.proj_id) : null}
@@ -507,7 +508,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                 // setError(newError);
               }}
               label={"[proj_name] - [proj_code]"}
-              placeholder="Pilih Project"
+              placeholder={tr[localStorage.getItem("language")].pilih}
               detail
               onDetail={() => setShowProj(true)}
               // errorMessage="Project Belum Dipilih"
@@ -517,7 +518,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
         </Row>
 
         <CustomAccordion
-          tittle={"Koreksi Produk"}
+          tittle={tr[localStorage.getItem("language")].prod}
           defaultActive={true}
           active={accor.produk}
           onClick={() => {
@@ -543,7 +544,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                 emptyMessage={() => <div></div>}
               >
                 <Column
-                  header="Produk"
+                  header={tr[localStorage.getItem("language")].prod}
                   className="align-text-top"
                   style={{
                     width: "25rem",
@@ -577,7 +578,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                         setError(newError);
                       }}
                       optionLabel="name"
-                      placeholder="Pilih Produk"
+                      placeholder={tr[localStorage.getItem("language")].pilih}
                       filter
                       filterBy="name"
                       errorMessage="Produk Belum Dipilih"
@@ -587,7 +588,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
-                  header="Satuan"
+                  header={tr[localStorage.getItem("language")].sat}
                   className="align-text-top"
                   style={{
                     maxWidth: "10rem",
@@ -603,7 +604,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                       }}
                       options={satuan}
                       optionLabel="name"
-                      placeholder="Pilih Satuan"
+                      placeholder={tr[localStorage.getItem("language")].pilih}
                       filter
                       filterBy="name"
                     />
@@ -611,7 +612,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
-                  header="Lokasi"
+                  header={tr[localStorage.getItem("language")].gudang}
                   className="align-text-top"
                   style={{
                     width: "15rem",
@@ -631,7 +632,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                       }}
                       options={lokasi}
                       optionLabel="name"
-                      placeholder="Pilih Lokasi"
+                      placeholder={tr[localStorage.getItem("language")].pilih}
                       filter
                       filterBy={"name"}
                       errorMessage="Lokasi Belum Dipilih"
@@ -665,7 +666,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
-                  header="Jumlah"
+                  header={tr[localStorage.getItem("language")].qty}
                   className="align-text-top"
                   style={{
                     width: "7rem",
@@ -750,12 +751,12 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
       <div className="mt-5 flex justify-content-end">
         <div>
           <PButton
-            label="Batal"
+            label={tr[localStorage.getItem("language")].batal}
             onClick={onCancel}
             className="p-button-text btn-primary"
           />
           <PButton
-            label="Simpan"
+            label={tr[localStorage.getItem("language")].simpan}
             icon="pi pi-check"
             onClick={() => onSubmit()}
             autoFocus

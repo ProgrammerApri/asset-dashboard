@@ -516,7 +516,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
         <Toast ref={toast} />
 
         <Row className="mb-4">
-          <div className="col-4">
+          <div className="col-3">
             <PrimeInput
               label={tr[localStorage.getItem("language")].kd_fk}
               value={inv.fk_code}
@@ -549,12 +549,14 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
 
           <div className="col-12 mt-2">
             <span className="fs-14">
-              <b>{tr[localStorage.getItem("language")].pur}</b>
+              <b>{`${tr[localStorage.getItem("language")].info} ${
+                tr[localStorage.getItem("language")].pur
+              }`}</b>
             </span>
             <Divider className="mt-1"></Divider>
           </div>
 
-          <div className="col-4">
+          <div className="col-3">
             <label className="text-label">
               {tr[localStorage.getItem("language")].kd_pur}
             </label>
@@ -583,9 +585,9 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-6" />
+          <div className="col-7" />
 
-          <div className="col-4">
+          <div className="col-3">
             <label className="text-label">
               {tr[localStorage.getItem("language")].supplier}
             </label>
@@ -603,7 +605,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-5">
+          <div className="col-3">
             <label className="text-label">
               {tr[localStorage.getItem("language")].alamat}
             </label>
@@ -621,7 +623,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-3">
+          <div className="col-2">
             <PrimeInput
               label={tr[localStorage.getItem("language")].telp}
               isNumber
@@ -636,7 +638,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-4">
+          <div className="col-2">
             <label className="text-label">
               {tr[localStorage.getItem("language")].type_pjk}
             </label>
@@ -677,7 +679,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
             <Divider className="mt-1"></Divider>
           </div>
 
-          <div className="col-4">
+          <div className="col-3">
             <label className="text-label">
               {tr[localStorage.getItem("language")].fk_pjk}
             </label>
@@ -692,7 +694,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-8">
+          <div className="col-5">
             <label className="text-label">
               {tr[localStorage.getItem("language")].ket}
             </label>
@@ -1125,7 +1127,9 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
               <div className="col-6">
                 <label className="text-label">
                   {inv.split_inv
-                    ? tr[localStorage.getItem("language")].pjk_barang
+                    ? `${
+                        tr[localStorage.getItem("language")].pjk_barang
+                      } (${ppn()}%)`
                     : tr[localStorage.getItem("language")].pajak}
                 </label>
               </div>

@@ -14,6 +14,7 @@ import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import { tr } from "src/data/tr";
 
 const data = {
   id: 1,
@@ -92,8 +93,8 @@ const AreaPenjualan = () => {
           getAreaPen(true);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -103,8 +104,8 @@ const AreaPenjualan = () => {
         setUpdate(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: "Gagal Memperbarui Data",
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].pesan_gagal,
           life: 3000,
         });
       }, 500);
@@ -132,8 +133,8 @@ const AreaPenjualan = () => {
           getAreaPen(true);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -145,7 +146,7 @@ const AreaPenjualan = () => {
           setUpdate(false);
           toast.current.show({
             severity: "error",
-            summary: "Gagal",
+            summary: tr[localStorage.getItem("language")].gagal,
             detail: `Kode Area ${currentItem.area_pen_code} Sudah Digunakan`,
             life: 3000,
           });
@@ -155,8 +156,8 @@ const AreaPenjualan = () => {
           setUpdate(false);
           toast.current.show({
             severity: "error",
-            summary: "Gagal",
-            detail: "Gagal Memperbarui Data",
+            summary: tr[localStorage.getItem("language")].gagal,
+            detail: tr[localStorage.getItem("language")].pesan_gagal,
             life: 3000,
           });
         }, 500);
@@ -181,8 +182,8 @@ const AreaPenjualan = () => {
           getAreaPen(true);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
         }, 500);
@@ -194,8 +195,8 @@ const AreaPenjualan = () => {
         setDisplayDel(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Project`,
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].del_gagal,
           life: 3000,
         });
       }, 500);
@@ -255,12 +256,12 @@ const AreaPenjualan = () => {
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => setDisplayData(false)}
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Simpan"
+          label={tr[localStorage.getItem("language")].simpan}
           icon="pi pi-check"
           onClick={() => onSubmit()}
           autoFocus
@@ -274,12 +275,12 @@ const AreaPenjualan = () => {
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => setDisplayDel(false)}
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Hapus"
+          label={tr[localStorage.getItem("language")].hapus}
           icon="pi pi-trash"
           onClick={() => {
             delAreaPen();
@@ -314,11 +315,11 @@ const AreaPenjualan = () => {
           <InputText
             value={globalFilterValue1}
             onChange={onGlobalFilterChange1}
-            placeholder="Cari disini"
+            placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
         <PrimeSingleButton
-          label="Tambah"
+          label={tr[localStorage.getItem("language")].tambh}
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             setEdit(false);
@@ -336,7 +337,10 @@ const AreaPenjualan = () => {
       const dropdownOptions = [
         { label: 20, value: 20 },
         { label: 50, value: 50 },
-        { label: "Semua", value: options.totalRecords },
+        {
+          label: tr[localStorage.getItem("language")].hal,
+          value: options.totalRecords,
+        },
       ];
 
       return (
@@ -345,7 +349,7 @@ const AreaPenjualan = () => {
             className="mx-1"
             style={{ color: "var(--text-color)", userSelect: "none" }}
           >
-            Data per halaman:{" "}
+            {tr[localStorage.getItem("language")].page}{" "}
           </span>
           <Dropdown
             value={options.value}
@@ -365,7 +369,8 @@ const AreaPenjualan = () => {
             textAlign: "center",
           }}
         >
-          {options.first} - {options.last} dari {options.totalRecords}
+          {options.first} - {options.last}{" "}
+          {tr[localStorage.getItem("language")].dari} {options.totalRecords}
         </span>
       );
     },
@@ -397,7 +402,7 @@ const AreaPenjualan = () => {
                   "area_pen_name",
                   "area_pen_ket",
                 ]}
-                emptyMessage="Tidak ada data"
+                emptyMessage={tr[localStorage.getItem("language")].empty_data}
                 paginator
                 paginatorTemplate={template2}
                 first={first2}
@@ -406,7 +411,7 @@ const AreaPenjualan = () => {
                 paginatorClassName="justify-content-end mt-3"
               >
                 <Column
-                  header="Kode"
+                  header={tr[localStorage.getItem("language")].kode}
                   style={{
                     minWidth: "8rem",
                   }}
@@ -414,13 +419,13 @@ const AreaPenjualan = () => {
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Nama"
+                  header={tr[localStorage.getItem("language")].nama}
                   field={(e) => e.area_pen_name}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Keterangan"
+                  header={tr[localStorage.getItem("language")].ket}
                   field={(e) => e.area_pen_ket}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
@@ -439,7 +444,15 @@ const AreaPenjualan = () => {
       </Row>
 
       <Dialog
-        header={isEdit ? "Edit Area Penjualan" : "Tambah Area Penjualan"}
+        header={
+          isEdit
+            ? `${tr[localStorage.getItem("language")].edit} ${
+                tr[localStorage.getItem("language")].area_pen
+              }`
+            : `${tr[localStorage.getItem("language")].tambh} ${
+                tr[localStorage.getItem("language")].area_pen
+              }`
+        }
         visible={displayData}
         style={{ width: "40vw" }}
         footer={renderFooter("displayData")}
@@ -450,7 +463,9 @@ const AreaPenjualan = () => {
       >
         <div className="row mr-0 ml-0">
           <div className="col-6">
-            <label className="text-label">Kode</label>
+            <label className="text-label">
+              {tr[localStorage.getItem("language")].kode}
+            </label>
             <div className="p-inputgroup">
               <InputText
                 value={
@@ -462,13 +477,15 @@ const AreaPenjualan = () => {
                     area_pen_code: e.target.value,
                   })
                 }
-                placeholder="Masukan Kode"
+                placeholder={tr[localStorage.getItem("language")].masuk}
               />
             </div>
           </div>
 
           <div className="col-6">
-            <label className="text-label">Nama</label>
+            <label className="text-label">
+              {tr[localStorage.getItem("language")].nama}
+            </label>
             <div className="p-inputgroup">
               <InputText
                 value={
@@ -480,7 +497,7 @@ const AreaPenjualan = () => {
                     area_pen_name: e.target.value,
                   })
                 }
-                placeholder="Masukan Nama Akun"
+                placeholder={tr[localStorage.getItem("language")].masuk}
               />
             </div>
           </div>
@@ -488,7 +505,9 @@ const AreaPenjualan = () => {
 
         <div className="row mr-0 ml-0">
           <div className="col-12">
-            <label className="text-label">Keterangan</label>
+            <label className="text-label">
+              {tr[localStorage.getItem("language")].ket}
+            </label>
             <div className="p-inputgroup">
               <InputTextarea
                 value={
@@ -500,7 +519,7 @@ const AreaPenjualan = () => {
                     area_pen_ket: e.target.value,
                   })
                 }
-                placeholder="Masukan Keterangan"
+                placeholder={tr[localStorage.getItem("language")].masuk}
               />
             </div>
           </div>
@@ -508,7 +527,9 @@ const AreaPenjualan = () => {
       </Dialog>
 
       <Dialog
-        header={"Hapus Data"}
+        header={`${tr[localStorage.getItem("language")].harus} ${
+          tr[localStorage.getItem("language")].area_pen
+        }`}
         visible={displayDel}
         style={{ width: "30vw" }}
         footer={renderFooterDel("displayDel")}
@@ -521,7 +542,7 @@ const AreaPenjualan = () => {
             className="pi pi-exclamation-triangle mr-3 align-middle"
             style={{ fontSize: "2rem" }}
           />
-          <span>Apakah anda yakin ingin menghapus data ?</span>
+          <span>{tr[localStorage.getItem("language")].pesan_hapus}</span>
         </div>
       </Dialog>
     </>

@@ -20,6 +20,7 @@ import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 import { Dropdown } from "primereact/dropdown";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
+import { tr } from "src/data/tr";
 
 const defError = {
   code: false,
@@ -262,8 +263,8 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
         setUpdate(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: "Gagal Memperbarui Data",
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].pesan_gagal,
           life: 3000,
         });
       }, 500);
@@ -290,7 +291,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
           setUpdate(false);
           toast.current.show({
             severity: "error",
-            summary: "Gagal",
+            summary: tr[localStorage.getItem("language")].gagal,
             detail: `Kode ${sr.ret_code} Sudah Digunakan`,
             life: 3000,
           });
@@ -300,8 +301,8 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
           setUpdate(false);
           toast.current.show({
             severity: "error",
-            summary: "Gagal",
-            detail: "Gagal Memperbarui Data",
+            summary: tr[localStorage.getItem("language")].gagal,
+            detail: tr[localStorage.getItem("language")].pesan_gagal,
             life: 3000,
           });
         }, 500);
@@ -445,6 +446,20 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
     return <span>{props.placeholder}</span>;
   };
 
+  const pjk = (value) => {
+    let nil = 0;
+    ppn?.forEach((elem) => {
+      if (
+        checkCus(checkSale(sr.sale_id)?.so_id?.pel_id)?.customer?.cus_pjk ===
+        elem.id
+      ) {
+        nil = elem.nilai;
+      }
+    });
+
+    return nil;
+  };
+
   const header = () => {
     return (
       <h4 className="mb-5">
@@ -462,7 +477,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
         <Row className="mb-4">
           <div className="col-3">
             <PrimeInput
-              label={"Kode Referensi"}
+              label={tr[localStorage.getItem("language")].kd_ret}
               value={sr.ret_code}
               onChange={(e) => {
                 updateSr({ ...sr, ret_code: e.target.value });
@@ -470,14 +485,14 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                 newError.code = false;
                 setError(newError);
               }}
-              placeholder="Masukan Kode Referensi"
+              placeholder={tr[localStorage.getItem("language")].masuk}
               error={error?.code}
             />
           </div>
 
           <div className="col-2">
             <PrimeCalendar
-              label={"Tanggal"}
+              label={tr[localStorage.getItem("language")].tgl}
               value={new Date(`${sr.ret_date}Z`)}
               onChange={(e) => {
                 updateSr({ ...sr, ret_date: e.value });
@@ -486,7 +501,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                 newError.date = false;
                 setError(newError);
               }}
-              placeholder="Pilih Tanggal"
+              placeholder={tr[localStorage.getItem("language")].pilih_tgl}
               showIcon
               dateFormat="dd-mm-yy"
               error={error?.date}
@@ -495,7 +510,9 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
 
           <div className="col-12 mt-0">
             <span className="fs-14">
-              <b>Informasi Penjualan</b>
+              <b>{`${tr[localStorage.getItem("language")].info} ${
+                tr[localStorage.getItem("language")].sale
+              }`}</b>
             </span>
             {/* </div>
           <div className="col-12"> */}
@@ -504,7 +521,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
 
           <div className="col-3">
             <PrimeDropdown
-              label={"No. Penjualan"}
+              label={tr[localStorage.getItem("language")].kd_sale}
               value={sr.sale_id && checkSale(sr.sale_id)}
               options={sale}
               onChange={(e) => {
@@ -521,7 +538,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                 setError(newError);
               }}
               optionLabel={"[ord_code] - [pel_id.cus_name]"}
-              placeholder="Pilih No. Penjualan"
+              placeholder={tr[localStorage.getItem("language")].pilih}
               filter
               filterBy="ord_code"
               itemTemplate={slTemplate}
@@ -535,7 +552,9 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
           {/* kode suplier otomatis keluar, karena sudah melekat di faktur pembelian  */}
 
           <div className="col-3">
-            <label className="text-label">Pelanggan</label>
+            <label className="text-label">
+              {tr[localStorage.getItem("language")].customer}
+            </label>
             <div className="p-inputgroup">
               <InputText
                 value={
@@ -546,14 +565,16 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                       }`
                     : null
                 }
-                placeholder="Pelanggan"
+                placeholder={tr[localStorage.getItem("language")].customer}
                 disabled
               />
             </div>
           </div>
 
           <div className="col-3">
-            <label className="text-label">Alamat Pelanggan</label>
+            <label className="text-label">
+              {tr[localStorage.getItem("language")].alamat}
+            </label>
             <div className="p-inputgroup mt-2">
               <InputText
                 value={
@@ -562,7 +583,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                         ?.cus_address
                     : ""
                 }
-                placeholder="Alamat Pelanggan"
+                placeholder={tr[localStorage.getItem("language")].alamat}
                 disabled
               />
             </div>
@@ -570,7 +591,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
 
           <div className="col-3">
             <PrimeInput
-              label={"No. Telepon"}
+              label={tr[localStorage.getItem("language")].telp}
               isNumber
               value={
                 sr.sale_id !== null
@@ -578,13 +599,15 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                       ?.cus_telp1
                   : ""
               }
-              placeholder="No. Telepon"
+              placeholder={tr[localStorage.getItem("language")].telp}
               disabled
             />
           </div>
 
           <div className="col-3">
-            <label className="text-label">Ppn</label>
+            <label className="text-label">
+              {tr[localStorage.getItem("language")].type_pjk}
+            </label>
             <div className="p-inputgroup">
               <InputText
                 value={
@@ -595,7 +618,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                       )?.name
                     : null
                 }
-                placeholder="Pilih Jenis Pajak"
+                placeholder={tr[localStorage.getItem("language")].type_pjk}
                 disabled
               />
             </div>
@@ -604,7 +627,9 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
 
         {sr.product?.length ? (
           <CustomAccordion
-            tittle={"Produk Retur"}
+            tittle={`${tr[localStorage.getItem("language")].prod} ${
+              tr[localStorage.getItem("language")].ret_sale
+            }`}
             defaultActive={true}
             active={accor.produk}
             onClick={() => {
@@ -634,7 +659,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                   emptyMessage={() => <div></div>}
                 >
                   <Column
-                    header="Produk"
+                    header={tr[localStorage.getItem("language")].prod}
                     className="align-text-top"
                     style={{
                       width: "20rem",
@@ -662,7 +687,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                         //   temp[e.index].unit_id = u.unit?.id;
                         //   updateSr({ ...sr, product: temp });
                         // }}
-                        placeholder="Pilih Kode Produk"
+                        placeholder={tr[localStorage.getItem("language")].prod}
                         // label={"[name]"}
                         // detail
                         disabled={sr.sale_id !== null}
@@ -671,7 +696,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Satuan"
+                    header={tr[localStorage.getItem("language")].sat}
                     className="align-text-top"
                     style={{
                       width: "8rem",
@@ -687,7 +712,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                         // }}
                         // option={satuan}
                         // label={"[name]"}
-                        placeholder="Pilih Satuan"
+                        placeholder={tr[localStorage.getItem("language")].sat}
                         // detail
                         // onDetail={() => setShowSatuan(true)}
                         disabled={sr.sale_id !== null}
@@ -696,7 +721,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Lokasi"
+                    header={tr[localStorage.getItem("language")].gudang}
                     className="align-text-top"
                     field={""}
                     body={(e) => (
@@ -709,7 +734,9 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                         // }}
                         // option={satuan}
                         // label={"[name]"}
-                        placeholder="Pilih Satuan"
+                        placeholder={
+                          tr[localStorage.getItem("language")].gudang
+                        }
                         // detail
                         // onDetail={() => setShowSatuan(true)}
                         disabled={sr.sale_id !== null}
@@ -718,7 +745,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Retur"
+                    header={tr[localStorage.getItem("language")].qty}
                     className="align-text-top"
                     field={""}
                     body={(e) => (
@@ -746,7 +773,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Harga Satuan"
+                    header={tr[localStorage.getItem("language")].price}
                     className="align-text-top"
                     field={""}
                     body={(e) => (
@@ -770,7 +797,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Diskon"
+                    header={tr[localStorage.getItem("language")].disc}
                     className="align-text-top"
                     field={""}
                     body={(e) => (
@@ -793,7 +820,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Harga Nett"
+                    header={tr[localStorage.getItem("language")].net_prc}
                     className="align-text-top"
                     field={""}
                     body={(e) => (
@@ -815,7 +842,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Total"
+                    header={tr[localStorage.getItem("language")].total}
                     className="align-text-top"
                     field={""}
                     body={(e) => (
@@ -886,7 +913,9 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
 
             <div className="row justify-content-right col-6">
               <div className="col-6">
-                <label className="text-label">Sub Total Barang</label>
+                <label className="text-label">
+                  {tr[localStorage.getItem("language")].ttl_barang}
+                </label>
               </div>
 
               <div className="col-6">
@@ -906,17 +935,23 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
               </div>
 
               <div className="col-6">
-                <label className="text-label">Pajak Atas Barang (11%)</label>
+                <label className="text-label">
+                  {`${
+                    tr[localStorage.getItem("language")].pjk_barang
+                  } (${pjk()}%)`}
+                </label>
               </div>
 
               <div className="col-6">
                 <label className="text-label">
-                  <b>Rp. {formatIdr((getSubTotalBarang() * 11) / 100)}</b>
+                  <b>Rp. {formatIdr((getSubTotalBarang() * pjk()) / 100)}</b>
                 </label>
               </div>
 
               <div className="col-6 mt-3">
-                <label className="text-label">Diskon Tambahan</label>
+                <label className="text-label">
+                  {tr[localStorage.getItem("language")].disc_tambh}
+                </label>
               </div>
 
               <div className="col-6">
@@ -932,7 +967,9 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                         ? (getSubTotalBarang() * sr.prod_disc) / 100
                         : sr.prod_disc
                     }
-                    placeholder="Diskon"
+                    placeholder={
+                      tr[localStorage.getItem("language")].disc_tambh
+                    }
                     type="number"
                     min={0}
                     onChange={(e) => {
@@ -961,7 +998,9 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
 
               <div className="col-6">
                 <label className="text-label">
-                  <b>Total Pembayaran</b>
+                  <b>{`${tr[localStorage.getItem("language")].total} ${
+                    tr[localStorage.getItem("language")].bayar
+                  }`}</b>
                 </label>
               </div>
 
@@ -970,7 +1009,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
                   <b>
                     Rp.{" "}
                     {formatIdr(
-                      getSubTotalBarang() + (getSubTotalBarang() * 11) / 100
+                      getSubTotalBarang() + (getSubTotalBarang() * pjk()) / 100
                     )}
                   </b>
                 </label>
@@ -995,12 +1034,12 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
       <div className="mt-5 flex justify-content-end">
         <div>
           <PButton
-            label="Batal"
+            label={tr[localStorage.getItem("language")].batal}
             onClick={onCancel}
             className="p-button-text btn-primary"
           />
           <PButton
-            label="Simpan"
+            label={tr[localStorage.getItem("language")].simpan}
             icon="pi pi-check"
             onClick={() => onSubmit()}
             autoFocus

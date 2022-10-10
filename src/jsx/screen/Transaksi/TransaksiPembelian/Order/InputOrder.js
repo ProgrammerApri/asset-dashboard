@@ -1738,7 +1738,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             <div className="col-6">
               <label className="text-label">
                 {order.split_inv
-                  ? tr[localStorage.getItem("language")].pjk_barang
+                  ? `${tr[localStorage.getItem("language")].pjk_barang} (${ppn()}%)`
                   : tr[localStorage.getItem("language")].pajak}
               </label>
             </div>

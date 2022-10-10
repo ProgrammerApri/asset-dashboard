@@ -16,6 +16,7 @@ import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleB
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import { Card, Row } from "react-bootstrap";
 import { ProgressBar } from "primereact/progressbar";
+import { tr } from "src/data/tr";
 
 const data = {
   id: null,
@@ -94,8 +95,8 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
           getMemorial(true);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Dihapus",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
         }, 100);
@@ -107,8 +108,8 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
         setDisplayDel(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Data`,
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].del_gagal,
           life: 3000,
         });
       }, 500);
@@ -211,12 +212,12 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => setDisplayDel(false)}
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Hapus"
+          label={tr[localStorage.getItem("language")].hapus}
           icon="pi pi-trash"
           onClick={() => {
             delMM();
@@ -266,7 +267,7 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
             <InputText
               value={globalFilterValue1}
               onChange={onGlobalFilterChange1}
-              placeholder="Cari disini"
+              placeholder={tr[localStorage.getItem("language")].cari}
             />
           </span>
           <Row className="mr-1">
@@ -279,7 +280,7 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
               }}
             />
             <PrimeSingleButton
-              label="Tambah"
+              label={tr[localStorage.getItem("language")].tambh}
               icon={<i class="bx bx-plus px-2"></i>}
               onClick={() => {
                 onAdd();
@@ -457,7 +458,7 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
       const dropdownOptions = [
         { label: 20, value: 20 },
         { label: 50, value: 50 },
-        { label: "Semua", value: options.totalRecords },
+        { label: tr[localStorage.getItem("language")].hal, value: options.totalRecords },
       ];
 
       return (
@@ -466,7 +467,7 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
             className="mx-1"
             style={{ color: "var(--text-color)", userSelect: "none" }}
           >
-            Data per halaman:{" "}
+            {tr[localStorage.getItem("language")].page}{" "}
           </span>
           <Dropdown
             value={options.value}
@@ -486,7 +487,7 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
             textAlign: "center",
           }}
         >
-          {options.first} - {options.last} dari {options.totalRecords}
+          {options.first} - {options.last} {tr[localStorage.getItem("language")].dari} {options.totalRecords}
         </span>
       );
     },
@@ -514,17 +515,17 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
       <div className="">
         <DataTable value={data.memo} responsiveLayout="scroll">
           <Column
-            header="Akun"
+            header={tr[localStorage.getItem("language")].akun}
             style={{ width: "31rem" }}
             field={(e) => `${e.acc_id.acc_name} - ${e.acc_id.acc_code}`}
           />
           <Column
-            header="Departemen"
+            header={tr[localStorage.getItem("language")].dep}
             style={{ width: "24rem" }}
             field={(e) => e.dep_id.ccost_name ?? "-"}
           />
           <Column
-            header="Tipe Saldo"
+            header={tr[localStorage.getItem("language")].sld_memo}
             style={{ width: "15rem" }}
             field={(e) => e.dbcr.toUpperCase()}
           />
@@ -534,7 +535,7 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
             field={(e) => formatIdr(e.amnt !== null ? e.amnt : "-")}
           />
           <Column
-            header="Deskripsi"
+            header={tr[localStorage.getItem("language")].ket}
             field={(e) => (e.desc !== null ? e.desc : "-")}
             // style={{ minWidth: "8rem" }}
             // body={loading && <Skeleton />}
@@ -582,7 +583,7 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
         header={renderHeader}
         filters={filters1}
         globalFilterFields={["code"]}
-        emptyMessage="Tidak ada data"
+        emptyMessage={tr[localStorage.getItem("language")].empty_data}
         paginator
         paginatorTemplate={template2}
         first={first2}
@@ -592,7 +593,7 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
       >
         <Column expander style={{ width: "3em" }} />
         <Column
-          header="Kode Memorial"
+          header={tr[localStorage.getItem("language")].kd_memo}
           style={{
             minWidth: "4rem",
           }}
@@ -600,13 +601,13 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
           body={loading && <Skeleton />}
         />
         <Column
-          header="Tgl Memorial"
+          header={tr[localStorage.getItem("language")].tgl}
           field={(e) => formatDate(e.date)}
           style={{ minWidth: "4rem" }}
           body={loading && <Skeleton />}
         />
         <Column
-          header="Keterangan"
+          header={tr[localStorage.getItem("language")].ket}
           field={(e) => (e.desc !== null ? e.desc : "-")}
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
@@ -622,7 +623,7 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
       </DataTable>
 
       <Dialog
-        header={"Hapus Data"}
+        header={`${tr[localStorage.getItem("language")].hapus} ${tr[localStorage.getItem("language")].memo}`}
         visible={displayDel}
         style={{ width: "30vw" }}
         footer={renderFooterDel("displayDel")}
@@ -635,7 +636,7 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
             className="pi pi-exclamation-triangle mr-3 align-middle"
             style={{ fontSize: "2rem" }}
           />
-          <span>Apakah anda yakin ingin menghapus data ?</span>
+          <span>{tr[localStorage.getItem("language")].pesan_hapus}</span>
         </div>
       </Dialog>
     </>

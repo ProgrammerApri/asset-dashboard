@@ -4,6 +4,7 @@ import { Row, Col, Card } from "react-bootstrap";
 import MutasiAntarList from "./MutasiAntarlokasiList";
 import MutasiAntarInput from "./MutasiAntarlokasiInput";
 import DetailMutasi from "./DetailMutasi";
+import { tr } from "src/data/tr";
 
 const MutasiLokasi = ({ trigger }) => {
   const [active, setActive] = useState(0);
@@ -35,8 +36,8 @@ const MutasiLokasi = ({ trigger }) => {
           setActive(0);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);

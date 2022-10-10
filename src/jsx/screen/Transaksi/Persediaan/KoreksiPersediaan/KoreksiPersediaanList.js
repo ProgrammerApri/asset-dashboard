@@ -18,6 +18,7 @@ import { Divider } from "@material-ui/core";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_IC, SET_EDIT_IC, SET_IC } from "src/redux/actions";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import { tr } from "src/data/tr";
 // import data from "src/jsx/data";
 
 const data = {
@@ -81,11 +82,11 @@ const KoreksiPersediaanList = ({ onAdd, onEdit }) => {
           <InputText
             // value={globalFilterValue1}
             // onChange={onGlobalFilterChange1}
-            placeholder="Cari disini"
+            placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
         <PrimeSingleButton
-          label="Tambah"
+          label={tr[localStorage.getItem("language")].tambh}
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
@@ -192,8 +193,8 @@ const KoreksiPersediaanList = ({ onAdd, onEdit }) => {
           getKorSto(true);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Dihapus",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
         }, 100);
@@ -205,8 +206,8 @@ const KoreksiPersediaanList = ({ onAdd, onEdit }) => {
         setDisplayDel(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Data`,
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].del_gagal,
           life: 3000,
         });
       }, 500);
@@ -217,12 +218,12 @@ const KoreksiPersediaanList = ({ onAdd, onEdit }) => {
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => setDisplayDel(false)}
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Hapus"
+          label={tr[localStorage.getItem("language")].hapus}
           icon="pi pi-trash"
           onClick={() => {
             setLoading(true);
@@ -241,7 +242,10 @@ const KoreksiPersediaanList = ({ onAdd, onEdit }) => {
       const dropdownOptions = [
         { label: 20, value: 20 },
         { label: 50, value: 50 },
-        { label: "Semua", value: options.totalRecords },
+        {
+          label: tr[localStorage.getItem("language")].hal,
+          value: options.totalRecords,
+        },
       ];
 
       return (
@@ -250,7 +254,7 @@ const KoreksiPersediaanList = ({ onAdd, onEdit }) => {
             className="mx-1"
             style={{ color: "var(--text-color)", userSelect: "none" }}
           >
-            Data per halaman:{" "}
+            {tr[localStorage.getItem("language")].page}{" "}
           </span>
           <Dropdown
             value={options.value}
@@ -270,7 +274,8 @@ const KoreksiPersediaanList = ({ onAdd, onEdit }) => {
             textAlign: "center",
           }}
         >
-          {options.first} - {options.last} dari {options.totalRecords}
+          {options.first} - {options.last}{" "}
+          {tr[localStorage.getItem("language")].dari} {options.totalRecords}
         </span>
       );
     },
@@ -298,22 +303,22 @@ const KoreksiPersediaanList = ({ onAdd, onEdit }) => {
       <div className="">
         <DataTable value={data.kprod} responsiveLayout="scroll">
           <Column
-            header="Produk"
+            header={tr[localStorage.getItem("language")].prod}
             style={{ width: "26rem" }}
             field={(e) => `${e.prod_id.name} (${e.prod_id.code})`}
           />
           <Column
-            header="Lokasi"
+            header={tr[localStorage.getItem("language")].gudang}
             style={{ width: "15rem" }}
             field={(e) => e.location.name}
           />
           <Column
-            header="Kuantitas"
+            header={tr[localStorage.getItem("language")].qty}
             style={{ width: "15rem" }}
             field={(e) => e.qty}
           />
           <Column
-            header="Satuan"
+            header={tr[localStorage.getItem("language")].sat}
             style={{ width: "24rem" }}
             field={(e) => e.unit_id.code}
             // style={{ minWidth: "8rem" }}
@@ -322,7 +327,7 @@ const KoreksiPersediaanList = ({ onAdd, onEdit }) => {
           <Column
             header="Debit/Kredit"
             style={{ width: "24rem" }}
-            field={(e) => e.dbcr === "D" ? "Debit" : "Kredit"}
+            field={(e) => (e.dbcr === "D" ? "Debit" : "Kredit")}
             // style={{ minWidth: "8rem" }}
             // body={loading && <Skeleton />}
           />
@@ -346,7 +351,7 @@ const KoreksiPersediaanList = ({ onAdd, onEdit }) => {
             header={renderHeader}
             filters={null}
             globalFilterFields={["ref"]}
-            emptyMessage="Tidak ada data"
+            emptyMessage={tr[localStorage.getItem("language")].empty_data}
             paginator
             paginatorTemplate={template2}
             first={first2}
@@ -359,7 +364,7 @@ const KoreksiPersediaanList = ({ onAdd, onEdit }) => {
           >
             <Column expander style={{ width: "3em" }} />
             <Column
-              header="Tanggal"
+              header={tr[localStorage.getItem("language")].tgl}
               style={{
                 minWidth: "8rem",
               }}
@@ -367,7 +372,7 @@ const KoreksiPersediaanList = ({ onAdd, onEdit }) => {
               body={loading && <Skeleton />}
             />
             <Column
-              header="Nomor Koreksi Persediaan"
+              header={tr[localStorage.getItem("language")].kd_kor}
               field={(e) => e.code}
               style={{ minWidth: "8rem" }}
               body={loading && <Skeleton />}
@@ -379,13 +384,13 @@ const KoreksiPersediaanList = ({ onAdd, onEdit }) => {
               // body={loading && <Skeleton />}
             /> */}
             <Column
-              header="Departemen"
+              header={tr[localStorage.getItem("language")].dep}
               field={(e) => e.dep_id.ccost_name ?? "-"}
               style={{ minWidth: "8rem" }}
               body={loading && <Skeleton />}
             />
             <Column
-              header="Project"
+              header={tr[localStorage.getItem("language")].proj}
               field={(e) => e.proj_id.proj_name ?? "-"}
               style={{ minWidth: "8rem" }}
               body={loading && <Skeleton />}
@@ -402,7 +407,9 @@ const KoreksiPersediaanList = ({ onAdd, onEdit }) => {
       </Row>
 
       <Dialog
-        header={"Hapus Data"}
+        header={`${tr[localStorage.getItem("language")].hapus} ${
+          tr[localStorage.getItem("language")].kor_sto
+        }`}
         visible={displayDel}
         style={{ width: "30vw" }}
         footer={renderFooterDel("displayDel")}
@@ -415,7 +422,7 @@ const KoreksiPersediaanList = ({ onAdd, onEdit }) => {
             className="pi pi-exclamation-triangle mr-3 align-middle"
             style={{ fontSize: "2rem" }}
           />
-          <span>Apakah anda yakin ingin menghapus data ?</span>
+          <span>{tr[localStorage.getItem("language")].pesan_hapus}</span>
         </div>
       </Dialog>
     </>

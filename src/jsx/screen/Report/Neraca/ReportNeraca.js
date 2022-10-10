@@ -312,6 +312,7 @@ const Neraca = () => {
               acc_code: ek.account.acc_code,
               acc_name: ek.account.acc_name,
               kat_code: ek.kategory.id,
+              level: ek.account.level,
               saldo: saldo,
             });
           }
@@ -333,6 +334,7 @@ const Neraca = () => {
               {
                 ...detail,
                 value: `           ${sub.acc_name}`,
+                level: sub.level,
                 kat_code: sub.kat_code,
               },
               {
@@ -357,6 +359,7 @@ const Neraca = () => {
               {
                 ...detail,
                 value: `           ${sub.acc_name}`,
+                level: sub.level,
                 kat_code: sub.kat_code,
               },
               {
@@ -388,20 +391,6 @@ const Neraca = () => {
         value: totalPasiva > 0 ? `${formatIdr(totalPasiva)}` : 0,
       },
     ]);
-
-    let selisih = totalAktiva - totalPasiva;
-    // if (category) {
-    //   pasiva[pasiva.length - 4][1].value =
-    //     selisih > 0 ? `Rp. ${formatIdr((selisih / 3).toFixed(0))}` : 0;
-    //   pasiva[pasiva.length - 3][1].value =
-    //     selisih > 0 ? `Rp. ${formatIdr(((selisih * 2) / 3).toFixed(0))}` : 0;
-    //   pasiva[pasiva.length - 2][1].value =
-    //     selisih > 0 ? `Rp. ${formatIdr(selisih / 3 + (selisih * 2) / 3)}` : 0;
-    //   pasiva[pasiva.length - 1][1].value =
-    //     selisih > 0
-    //       ? `Rp. ${formatIdr(totalPasiva + selisih / 3 + (selisih * 2) / 3)}`
-    //       : totalPasiva;
-    // }
 
     console.log(pasiva);
 
@@ -522,7 +511,7 @@ const Neraca = () => {
       },
     ];
 
-    console.log(final);
+    console.log(data);
 
     if (excel) {
       return final;
@@ -683,9 +672,9 @@ const Neraca = () => {
                           )}`}
                         >
                           <Row>
-                            <div className={e[0].type == "D" && "mr-4"}></div>
+                            <div className={e[0].type === "D" && `mr-${e[0].level + 3}`}></div>
                             <div
-                              className={e[0].type == "U" && "font-weight-bold"}
+                              className={e[0].type === "U" && "font-weight-bold"}
                             >
                               {e[0].value}
                             </div>

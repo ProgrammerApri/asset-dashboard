@@ -102,7 +102,7 @@ const SetupNeraca = () => {
         const { data } = response;
         let d = data;
         for (var key in d) {
-          if (key !== "id" && key !== "cp_id") {
+          if (key !== "id" && key !== "cp_id" && key !== "user_id") {
             let val = [];
             if (d[key]) {
               d[key].forEach((el) => {
@@ -112,17 +112,18 @@ const SetupNeraca = () => {
               });
               d[key] = val.length > 0 ? val : null;
             } else {
-              d[key] = [null]
+              d[key] = [null];
             }
           }
         }
-        console.log(d);
         setSetup(d);
       } else {
         setSetup(set);
       }
       setLoading(false);
     } catch (error) {
+      console.log("-------------------");
+      console.log(error);
       setLoading(false);
     }
   };
@@ -164,7 +165,7 @@ const SetupNeraca = () => {
   const addSetup = async (data) => {
     let d = data;
     for (var key in d) {
-      if (key !== "id" && key !== "cp_id") {
+      if (key !== "id" && key !== "cp_id" && key !== "user_id") {
         let val = [];
         d[key].forEach((el) => {
           if (el) {
@@ -205,7 +206,7 @@ const SetupNeraca = () => {
   const editSetup = async (data) => {
     let d = data;
     for (var key in d) {
-      if (key !== "id" && key !== "cp_id") {
+      if (key !== "id" && key !== "cp_id" && key !== "user_id") {
         let val = [];
         d[key].forEach((el) => {
           if (el) {
@@ -338,6 +339,7 @@ const SetupNeraca = () => {
                     <Link
                       onClick={() => {
                         onAdd(e);
+                        console.log(setup.id);
                       }}
                       className="btn btn-primary shadow btn-xs sharp"
                     >

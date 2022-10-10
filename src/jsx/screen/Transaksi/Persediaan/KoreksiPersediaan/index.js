@@ -5,6 +5,7 @@ import { Row, Col, Card } from "react-bootstrap";
 // import InputX from "./InputX";
 import KoreksiPersediaanInput from "./KoreksiPersediianInput";
 import KoreksiPersediaanList from "./KoreksiPersediaanList";
+import { tr } from "src/data/tr";
 
 const KoreksiStok = ({ trigger }) => {
   const [active, setActive] = useState(0);
@@ -30,8 +31,8 @@ const KoreksiStok = ({ trigger }) => {
           setActive(0);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);

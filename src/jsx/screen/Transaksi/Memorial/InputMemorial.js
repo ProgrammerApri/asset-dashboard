@@ -18,6 +18,7 @@ import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 import DataAkun from "../../Master/Akun/DataAkun";
 import DataPusatBiaya from "../../MasterLainnya/PusatBiaya/DataPusatBiaya";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
+import { tr } from "src/data/tr";
 
 const defError = {
   code: false,
@@ -162,8 +163,8 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
         setUpdate(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: "Gagal Memperbarui Data",
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].pesan_gagal,
           life: 3000,
         });
       }, 500);
@@ -190,7 +191,7 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
           setUpdate(false);
           toast.current.show({
             severity: "error",
-            summary: "Gagal",
+            summary: tr[localStorage.getItem("language")].gagal,
             detail: `Kode ${memorial.code} Sudah Digunakan`,
             life: 3000,
           });
@@ -200,8 +201,8 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
           setUpdate(false);
           toast.current.show({
             severity: "error",
-            summary: "Gagal",
-            detail: "Gagal Memperbarui Data",
+            summary: tr[localStorage.getItem("language")].gagal,
+            detail: tr[localStorage.getItem("language")].pesan_gagal,
             life: 3000,
           });
         }, 500);
@@ -456,7 +457,7 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
         <Row className="mb-4">
           <div className="col-2 text-black fs-13">
             <PrimeInput
-              label={"Kode Memorial"}
+              label={tr[localStorage.getItem("language")].kd_memo}
               value={memorial.code}
               onChange={(e) => {
                 updateMM({ ...memorial, code: e.target.value });
@@ -464,13 +465,13 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
                 newError.code = false;
                 setError(newError);
               }}
-              placeholder="Masukan Kode Memorial"
+              placeholder={tr[localStorage.getItem("language")].masuk}
               error={error?.code}
             />
           </div>
           <div className="col-2 text-black fs-13">
             <PrimeCalendar
-              label={"Tanggal"}
+              label={tr[localStorage.getItem("language")].tgl}
               value={new Date(`${memorial.date}Z`)}
               onChange={(e) => {
                 updateMM({ ...memorial, date: e.target.value });
@@ -479,7 +480,7 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
                 newError.date = false;
                 setError(newError);
               }}
-              placeholder="Pilih Tanggal"
+              placeholder={tr[localStorage.getItem("language")].pilih_tgl}
               showIcon
               dateFormat="dd-mm-yy"
               error={error?.date}
@@ -488,14 +489,14 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-5 text-black fs-13">
-            <label className="text-label">Keterangan</label>
+            <label className="text-label">{tr[localStorage.getItem("language")].ket}</label>
             <div className="p-inputgroup">
               <InputText
                 value={memorial.desc}
                 onChange={(e) =>
                   updateMM({ ...memorial, desc: e.target.value })
                 }
-                placeholder="Masukan Keterangan"
+                placeholder={tr[localStorage.getItem("language")].masuk}
               />
             </div>
           </div>
@@ -503,7 +504,7 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
 
           <div className="col-12 mt-3 p-component">
             <CustomAccordion
-              tittle={"Akun Memorial"}
+              tittle={tr[localStorage.getItem("language")].acc_memo}
               defaultActive={true}
               active={accor.akun}
               onClick={() => {
@@ -530,7 +531,7 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
                     emptyMessage={() => <div></div>}
                   >
                     <Column
-                      header="Account Memorial	"
+                      header={tr[localStorage.getItem("language")].acc_memo}
                       className="align-text-top"
                       field={""}
                       body={(e) => (
@@ -557,14 +558,14 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
                           valueTemplate={valTemp}
                           filter
                           filterBy={"account.acc_name"}
-                          placeholder="Pilih Akun"
+                          placeholder={tr[localStorage.getItem("language")].pilih}
                           errorMessage="Akun Belum Dipilih"
                           error={error?.akn[e.index]?.id}
                         />
                       )}
                     />
                     <Column
-                      header="Departemen"
+                      header={tr[localStorage.getItem("language")].dep}
                       className="align-text-top"
                       field={""}
                       body={(e) => (
@@ -582,7 +583,7 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
                             setShowDep(true);
                           }}
                           label={"[ccost_name] ([ccost_code])"}
-                          placeholder="Pilih Departemen"
+                          placeholder={tr[localStorage.getItem("language")].pilih}
                         />
                       )}
                     />
@@ -641,7 +642,7 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
                       )}
                     />
                     <Column
-                      header="Deskripsi"
+                      header={tr[localStorage.getItem("language")].ket}
                       className="align-text-top"
                       field={""}
                       body={(e) => (
@@ -652,7 +653,7 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
                             temp[e.index].desc = u.target.value;
                             updateMM({ ...memorial, memo: temp });
                           }}
-                          placeholder="Deskripsi"
+                          placeholder={tr[localStorage.getItem("language")].ket}
                         />
                       )}
                     />
@@ -742,12 +743,12 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
         <div className="row justify-content-right col-6">
           <div className="col-12 mt-0 fs-12 text-right">
             <PButton
-              label="Batal"
+              label={tr[localStorage.getItem("language")].batal}
               onClick={onCancel}
               className="p-button-text btn-primary"
             />
             <PButton
-              label="Simpan"
+              label={tr[localStorage.getItem("language")].simpan}
               icon="pi pi-check"
               onClick={() => onSubmit()}
               autoFocus

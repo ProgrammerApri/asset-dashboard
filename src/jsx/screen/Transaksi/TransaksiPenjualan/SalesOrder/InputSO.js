@@ -592,6 +592,17 @@ const InputSO = ({ onCancel, onSuccess }) => {
     return [year, month, day].join("-");
   };
 
+  const pjk = (value) => {
+    let nil = 0;
+    ppn?.forEach((elem) => {
+      if (checkCus(so.pel_id)?.cus_pjk === elem.id) {
+        nil = elem.nilai;
+      }
+    });
+
+    return nil;
+  };
+
   const updateSo = (e) => {
     dispatch({
       type: SET_CURRENT_SO,
@@ -816,7 +827,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
           <div className="d-flex col-12 align-items-center mt-4">
             <label className="ml-0 mt-1 fs-12">
-              <b>{"Kirim Ke Sub Pelanggan"}</b>
+              <b>{tr[localStorage.getItem("language")].kirim_sub}</b>
             </label>
             <InputSwitch
               className="ml-4"
@@ -830,7 +841,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
           {so && so.sub_addr === true && (
             <>
               <div className="col-4">
-                <label>Sub Pelanggan</label>
+                <label>{tr[localStorage.getItem("language")].pel_sub}</label>
                 <div className="p-inputgroup"></div>
                 <CustomDropdown
                   value={so.sub_id ? checkSubCus(so.sub_id) : null}
@@ -842,7 +853,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                     setError(newError);
                   }}
                   label={"[cus_name]"}
-                  placeholder="Pilih Sub Pelanggan"
+                  placeholder={tr[localStorage.getItem("language")].pilih}
                   detail
                   onDetail={() => setShowSub(true)}
                   disabled={so && !so.sub_addr}
@@ -852,7 +863,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
               </div>
 
               <div className="col-4">
-                <label>Alamat Sub Pelanggan</label>
+                <label>{tr[localStorage.getItem("language")].alamat}</label>
                 <div className="p-inputgroup">
                   <InputText
                     value={
@@ -860,14 +871,14 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         ? checkSubCus(so.sub_id)?.cus_address
                         : ""
                     }
-                    placeholder="Alamat Sub Pelanggan"
+                    placeholder={tr[localStorage.getItem("language")].alamat}
                     disabled
                   />
                 </div>
               </div>
 
               <div className="col-4">
-                <label>Kontak Person</label>
+                <label>{tr[localStorage.getItem("language")].cp}</label>
                 <div className="p-inputgroup">
                   <InputText
                     value={
@@ -875,7 +886,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         ? checkSubCus(so.sub_id)?.cus_telp1
                         : ""
                     }
-                    placeholder="Kontak Person"
+                    placeholder={tr[localStorage.getItem("language")].cp}
                     disabled
                   />
                 </div>
@@ -1558,7 +1569,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
             <div className="col-6">
               <label className="text-label">
                 {so.split_inv
-                  ? tr[localStorage.getItem("language")].pjk_barang
+                  ? `${tr[localStorage.getItem("language")].pjk_barang} (${pjk()}%)`
                   : tr[localStorage.getItem("language")].pajak}
               </label>
             </div>
@@ -1566,12 +1577,12 @@ const InputSO = ({ onCancel, onSuccess }) => {
             <div className="col-6">
               <label className="text-label">
                 {so?.split_inv ? (
-                  <b>Rp. {formatIdr((getSubTotalBarang() * 11) / 100)}</b>
+                  <b>Rp. {formatIdr((getSubTotalBarang() * pjk()) / 100)}</b>
                 ) : (
                   <b>
                     Rp.{" "}
                     {formatIdr(
-                      ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
+                      ((getSubTotalBarang() + getSubTotalJasa()) * pjk()) / 100
                     )}
                   </b>
                 )}
@@ -1657,7 +1668,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   <b>
                     Rp.{" "}
                     {formatIdr(
-                      getSubTotalBarang() + (getSubTotalBarang() * 11) / 100
+                      getSubTotalBarang() + (getSubTotalBarang() * pjk()) / 100
                     )}
                   </b>
                 ) : (
@@ -1666,7 +1677,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                     {formatIdr(
                       getSubTotalBarang() +
                         getSubTotalJasa() +
-                        ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
+                        ((getSubTotalBarang() + getSubTotalJasa()) * pjk()) / 100
                     )}
                   </b>
                 )}

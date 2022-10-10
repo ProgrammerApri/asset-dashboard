@@ -4,6 +4,7 @@ import { Toast } from "primereact/toast";
 import DataPenjualan from "./DataPenjualan";
 import InputPenjualan from "./InputPenjualan";
 import Detail from "./Detail";
+import { tr } from "src/data/tr";
 
 const Penjualan = ({ trigger }) => {
   const [active, setActive] = useState(0);
@@ -34,8 +35,8 @@ const Penjualan = ({ trigger }) => {
           setActive(0);
           toast.current.show({
             severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);

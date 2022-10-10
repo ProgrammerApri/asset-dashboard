@@ -21,6 +21,7 @@ import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
+import { tr } from "src/data/tr";
 
 const defError = {
   code: false,
@@ -265,8 +266,8 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
         setUpdate(false);
         toast.current.show({
           severity: "error",
-          summary: "Gagal",
-          detail: "Gagal Memperbarui Data",
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].pesan_gagal,
           life: 3000,
         });
       }, 500);
@@ -293,7 +294,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
           setUpdate(false);
           toast.current.show({
             severity: "error",
-            summary: "Gagal",
+            summary: tr[localStorage.getItem("language")].gagal,
             detail: `Kode ${lm.mtsi_code} Sudah Digunakan`,
             life: 3000,
           });
@@ -303,8 +304,8 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
           setUpdate(false);
           toast.current.show({
             severity: "error",
-            summary: "Gagal",
-            detail: "Gagal Memperbarui Data",
+            summary: tr[localStorage.getItem("language")].gagal,
+            detail: tr[localStorage.getItem("language")].pesan_gagal,
             life: 3000,
           });
         }, 500);
@@ -429,9 +430,9 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
         <Toast ref={toast} />
 
         <Row className="mb-4 ">
-          <div className="col-3 mr-0 ml-0">
+          <div className="col-2 mr-0 ml-0">
             <PrimeInput
-              label={"Kode Referensi"}
+              label={tr[localStorage.getItem("language")].kd_mut}
               value={lm.mtsi_code}
               onChange={(e) => {
                 updateLM({ ...lm, mtsi_code: e.target.value });
@@ -440,14 +441,14 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                 newError.code = false;
                 setError(newError);
               }}
-              placeholder="Masukan Kode Referensi"
+              placeholder={tr[localStorage.getItem("language")].masuk}
               error={error?.code}
             />
           </div>
 
           <div className="col-2">
             <PrimeCalendar
-              label={"Tanggal"}
+              label={tr[localStorage.getItem("language")].tgl}
               value={new Date(`${lm.mtsi_date}Z`)}
               onChange={(e) => {
                 updateLM({ ...lm, mtsi_date: e.value });
@@ -456,7 +457,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                 newError.date = false;
                 setError(newError);
               }}
-              placeholder="Pilih Tanggal"
+              placeholder={tr[localStorage.getItem("language")].pilih_tgl}
               showIcon
               dateFormat="dd-mm-yy"
               error={error?.date}
@@ -465,7 +466,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
 
           <div className="col-3 mr-0 ml-0">
             <PrimeInput
-              label={"Kode Dokumen"}
+              label={tr[localStorage.getItem("language")].no_doc}
               value={lm.doc}
               onChange={(e) => {
                 updateLM({ ...lm, doc: e.target.value });
@@ -474,14 +475,14 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                 newError.doc = false;
                 setError(newError);
               }}
-              placeholder="Masukan Kode Dokumen"
+              placeholder={tr[localStorage.getItem("language")].masuk}
               error={error?.doc}
             />
           </div>
 
           <div className="col-2">
             <PrimeCalendar
-              label={"Tanggal"}
+              label={tr[localStorage.getItem("language")].tgl_doc}
               value={new Date(`${lm.doc_date}Z`)}
               onChange={(e) => {
                 updateLM({ ...lm, doc_date: e.value });
@@ -490,7 +491,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                 newError.doc_date = false;
                 setError(newError);
               }}
-              placeholder="Pilih Tanggal"
+              placeholder={tr[localStorage.getItem("language")].pilih_tgl}
               showIcon
               dateFormat="dd-mm-yy"
               error={error?.doc_date}
@@ -499,8 +500,8 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
 
           <div className="col-12 mr-0 ml-0"></div>
 
-          <div className="col-3">
-            <label className="text-label">Lokasi Asal</label>
+          <div className="col-2">
+            <label className="text-label">{tr[localStorage.getItem("language")].lok_asal}</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
               value={lm.loc_from ? checkLok(lm?.loc_from) : null}
@@ -525,7 +526,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                 setError(newError);
               }}
               label={"[name] - [code]"}
-              placeholder="Lokasi Asal"
+              placeholder={tr[localStorage.getItem("language")].lok_asal}
               detail
               onDetail={() => setShowLok(true)}
               errorMessage="Lokasi Asal Belum Dipilih"
@@ -533,8 +534,8 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-3">
-            <label className="text-label">Lokasi Tujuan</label>
+          <div className="col-2">
+            <label className="text-label">{tr[localStorage.getItem("language")].lok_tujuan}</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
               value={lm.loc_to ? checkLok(lm?.loc_to) : null}
@@ -550,7 +551,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                 setError(newError);
               }}
               label={"[name] - [code]"}
-              placeholder="Lokasi Tujuan"
+              placeholder={tr[localStorage.getItem("language")].lok_tujuan}
               detail
               onDetail={() => setShowLoks(true)}
               errorMessage="Lokasi Tujuan Belum Dipilih"
@@ -559,7 +560,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
           </div>
           {/* <div className="col-6"></div>  */}
           <div className="col-3">
-            <label className="text-label">Departemen</label>
+            <label className="text-label">{tr[localStorage.getItem("language")].dep}</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
               value={lm.dep_id ? dept(lm?.dep_id) : null}
@@ -568,14 +569,14 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                 updateLM({ ...lm, dep_id: e.id });
               }}
               label={"[ccost_name] - [ccost_code]"}
-              placeholder="Pilih Departemen"
+              placeholder={tr[localStorage.getItem("language")].pilih}
               detail
               onDetail={() => setShowDept(true)}
             />
           </div>
 
           <div className="col-3">
-            <label className="text-label">Project</label>
+            <label className="text-label">{tr[localStorage.getItem("language")].proj}</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
               value={lm.prj_id ? prj(lm?.prj_id) : null}
@@ -587,7 +588,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                 });
               }}
               label={"[proj_name] - [proj_code]"}
-              placeholder="Pilih Project"
+              placeholder={tr[localStorage.getItem("language")].pilih}
               detail
               onDetail={() => setShowProj(true)}
             />
@@ -596,7 +597,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
         </Row>
 
         <CustomAccordion
-          tittle={"Mutasi Produk"}
+          tittle={tr[localStorage.getItem("language")].prod}
           defaultActive={true}
           active={accor.produk}
           onClick={() => {
@@ -621,7 +622,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                 emptyMessage={() => <div></div>}
               >
                 <Column
-                  header="Produk"
+                  header={tr[localStorage.getItem("language")].prod}
                   className="align-text-top"
                   style={{
                     maxWidth: "20rem",
@@ -658,7 +659,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                         setError(newError);
                       }}
                       optionLabel="name"
-                      placeholder="Pilih Produk"
+                      placeholder={tr[localStorage.getItem("language")].pilih}
                       filter
                       filterBy="name"
                       errorMessage="Produk Belum Dipilih"
@@ -667,7 +668,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                   )}
                 />
                 <Column
-                  header="Jumlah Stok"
+                  header={tr[localStorage.getItem("language")].stok}
                   className="align-text-top"
                   style={{
                     width: "10rem",
@@ -684,7 +685,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                   )}
                 />
                 <Column
-                  header="Jumlah Mutasi"
+                  header={tr[localStorage.getItem("language")].qty}
                   className="align-text-top"
                   style={{
                     width: "10rem",
@@ -714,7 +715,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
-                  header="Satuan"
+                  header={tr[localStorage.getItem("language")].sat}
                   className="align-text-top"
                   style={{
                     maxWidth: "15rem",
@@ -730,7 +731,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                       }}
                       options={satuan}
                       optionLabel="name"
-                      placeholder="Pilih Satuan"
+                      placeholder={tr[localStorage.getItem("language")].pilih}
                       filter
                       filterBy="name"
                     />
@@ -798,12 +799,12 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
       <div className="mt-5 flex justify-content-end">
         <div>
           <PButton
-            label="Batal"
+            label={tr[localStorage.getItem("language")].batal}
             onClick={onCancel}
             className="p-button-text btn-primary"
           />
           <PButton
-            label="Simpan"
+            label={tr[localStorage.getItem("language")].simpan}
             icon="pi pi-check"
             onClick={() => onSubmit()}
             autoFocus

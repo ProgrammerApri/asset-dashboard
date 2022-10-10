@@ -85,7 +85,7 @@ const Neraca = () => {
         const { data } = response;
         let d = data;
         for (var key in d) {
-          if (key !== "id" && key !== "cp_id") {
+          if (key !== "id" && key !== "cp_id" && key !== "user_id") {
             let val = [];
             if (d[key]) {
               d[key].forEach((el) => {

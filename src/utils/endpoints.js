@@ -1342,6 +1342,12 @@ delUSER: {
     method: "GET",
     data: {},
   },
+
+  getImage: {
+    endpoint: "/v1/api/upload/",
+    method: "GET",
+    data: {},
+  },
 };
 
 export default endpoints;

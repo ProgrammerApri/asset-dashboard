@@ -14,6 +14,7 @@ import { InputSwitch } from "primereact/inputswitch";
 import { Toast } from "primereact/toast";
 import { Tooltip } from "primereact/tooltip";
 import { SelectButton } from "primereact/selectbutton";
+import { ApiConfig } from "src/data/config";
 
 const lang = [
   { name: "Indonesia", code: "ID" },
@@ -406,7 +407,7 @@ const Perusahaan = () => {
                       <div className="col-12 mb-3">
                         <img
                           className="cp-logo"
-                          src={currentData.cp_logo}
+                          src={ApiConfig.baseUrl +endpoints.getImage.endpoint + currentData.cp_logo}
                           alt=""
                         />
                       </div>

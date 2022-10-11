@@ -205,7 +205,7 @@ const DataAkun = ({
   const getAccKodeDet = async (data) => {
     const config = {
       ...endpoints.getAccKodeDet,
-      endpoint: endpoints.getAccKodeDet.endpoint + data.account.umm_code,
+      endpoint: endpoints.getAccKodeDet.endpoint + data.account.acc_code,
     };
     console.log(config.data);
     let response = null;
@@ -219,9 +219,8 @@ const DataAkun = ({
           account: {
             ...currentItem.account,
             acc_code: res,
-            umm_code: data.account.umm_code,
-            dou_type: data.account.dou_type,
-            level: data.account.level + 1,
+            umm_code: data.account.acc_code,
+            dou_type: "D",
           },
         });
       }
@@ -246,7 +245,6 @@ const DataAkun = ({
             ...currentItem.account,
             acc_code: res,
             umm_code: data.account.acc_code,
-            level: data.account.level + 1,
           },
         });
       }
@@ -272,7 +270,7 @@ const DataAkun = ({
               acc_code: res,
               umm_code: null,
               level: 1,
-              // dou_type: data,
+              dou_type: "U",
             },
           });
         } else {
@@ -1194,13 +1192,7 @@ const DataAkun = ({
                   if (e.value.code === "D") {
                     getAccountUmum();
                     if (currentItem.account.umm_code) {
-                      getAccKodeDet({
-                        ...currentItem,
-                        account: {
-                          ...currentItem.account,
-                          dou_type: e.value.code,
-                        },
-                      });
+                      getAccKodeDet(valueUmum(currentItem.account.umm_code));
                     } else {
                       setCurrentItem({
                         ...currentItem,
@@ -1247,6 +1239,14 @@ const DataAkun = ({
                 options={umum}
                 onChange={(e) => {
                   if (e.value) {
+                    setCurrentItem({
+                      ...currentItem,
+                      account: {
+                        ...currentItem.account,
+                        level: e.value.account.level + 1,
+                      },
+                    });
+                    console.log(e.value.account.level + 1);
                     if (currentItem.account.dou_type === "U") {
                       getAccKodeSubUmum(e.value);
                     } else {

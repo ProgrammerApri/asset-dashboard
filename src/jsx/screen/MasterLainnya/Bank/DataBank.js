@@ -103,7 +103,7 @@ const DataBank = ({
         const { data } = response;
         let filt = [];
         data.forEach((element) => {
-          if (element.account.kat_code === 2 && element.account.connect) {
+          if (element.account.dou_type === "D" && element.account.connect) {
             filt.push(element.account);
           }
         });

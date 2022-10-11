@@ -1348,6 +1348,12 @@ delUSER: {
     method: "GET",
     data: {},
   },
+
+  getUser: {
+    endpoint: "/v1/api/user",
+    method: "GET",
+    data: {},
+  },
 };
 
 export default endpoints;

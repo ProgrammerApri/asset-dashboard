@@ -27,6 +27,7 @@ import MemorialReducer from "./MemorialReducer";
 import IncReducer from "./IncReducer";
 import GIROINReducer from "./GiroIncReducer";
 import ProfileReducer from "./ProfileReducer";
+import UserReducer from "./UserReducer";
 // import PBNReducer from "./PBNReducer";
 
 
@@ -58,7 +59,8 @@ const rootReducer = combineReducers({
   memorial: MemorialReducer,
   inc: IncReducer,
   giro_in: GIROINReducer,
-  profile: ProfileReducer
+  profile: ProfileReducer,
+  user: UserReducer
 });
 
 export default rootReducer;

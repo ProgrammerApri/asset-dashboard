@@ -143,7 +143,6 @@ export default function Menu() {
         const { data } = response;
         data.forEach((el) => {
           filt.push({
-            ...data,
             id: el.id,
             name: el.name,
             route_name: el.route_name,
@@ -155,7 +154,6 @@ export default function Menu() {
           });
           el.submenu.forEach((ek) => {
             filt.push({
-              ...data,
               id: ek.id,
               name: ek.name,
               route_name: ek.route_name,
@@ -167,7 +165,6 @@ export default function Menu() {
             });
             ek.lastmenu.forEach((ej) => {
               filt.push({
-                ...data,
                 id: ej.id,
                 name: ej.name,
                 route_name: ej.route_name,

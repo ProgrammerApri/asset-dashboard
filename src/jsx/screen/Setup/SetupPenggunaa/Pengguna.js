@@ -12,7 +12,12 @@ import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_EXP, SET_EDIT_EXP, SET_EXP } from "src/redux/actions";
+import {
+  SET_CURRENT_EXP,
+  SET_EDIT_EXP,
+  SET_EXP,
+  SET_USER,
+} from "src/redux/actions";
 import { Skeleton } from "primereact/skeleton";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 
@@ -38,7 +43,6 @@ const data = {
 
 const Pengguna = ({ onAdd, onDetail }) => {
   const [loading, setLoading] = useState(true);
-  const [update, setUpdate] = useState(false);
   const [displayDel, setDisplayDel] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
@@ -51,33 +55,29 @@ const Pengguna = ({ onAdd, onDetail }) => {
   const [rows2, setRows2] = useState(20);
   const [displayData, setDisplayDat] = useState(false);
   const dispatch = useDispatch();
-  const exp = useSelector((state) => state.exp.exp);
-  const show = useSelector((state) => state.exp.current);
+  const user = useSelector((state) => state.user.user);
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getEXP();
     initFilters1();
-    getDep();
-    getProj();
+    getUser();
   }, []);
 
-  const getEXP = async (isUpdate = false) => {
+  const getUser = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.expense,
+      ...endpoints.user,
       data: {},
     };
     console.log(config.data);
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
       if (response.status) {
         const { data } = response;
-        console.log(data);
-        dispatch({ type: SET_EXP, payload: data });
+        dispatch({ type: SET_USER, payload: data });
+        setLoading(false);
       }
     } catch (error) {}
     if (isUpdate) {
@@ -89,167 +89,16 @@ const Pengguna = ({ onAdd, onDetail }) => {
     }
   };
 
-  const getProj = async () => {
-    const config = {
-      ...endpoints.project,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setProj(data);
-      }
-    } catch (error) {}
-  };
-
-  const getDep = async () => {
-    const config = {
-      ...endpoints.pusatBiaya,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setDep(data);
-      }
-    } catch (error) {}
-  };
-
-  const delEXP = async (id) => {
-    const config = {
-      ...endpoints.delEXP,
-      endpoint: endpoints.delEXP.endpoint + currentItem.id,
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        setTimeout(() => {
-          setUpdate(false);
-          setDisplayDel(false);
-          getEXP(true);
-          toast.current.show({
-            severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Dihapus",
-            life: 3000,
-          });
-        }, 500);
-      }
-    } catch (error) {
-      console.log(error);
-      setTimeout(() => {
-        setUpdate(false);
-        setDisplayDel(false);
-        toast.current.show({
-          severity: "error",
-          summary: "Gagal",
-          detail: `Tidak Dapat Menghapus Data`,
-          life: 3000,
-        });
-      }, 500);
-    }
-  };
-
-  const checkdep = (value) => {
-    let selected = {};
-    dep?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-    return selected;
-  };
-
-  const checkproj = (value) => {
-    let selected = {};
-    proj?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
   const actionBodyTemplate = (data) => {
     return (
       // <React.Fragment>
       <div className="d-flex">
         <Link
-          onClick={() => {
-            // onDetail();
-            setDisplayDat(data);
-            dispatch({ type: SET_CURRENT_EXP, payload: data });
-          }}
-          className="btn btn-info shadow btn-xs sharp ml-1"
-        >
-          <i className="bx bx-show mt-1"></i>
-        </Link>
-        {/* <Link
-          onClick={() => {
-            onEdit(data);
-            let acq = data.acq;
-            dispatch({
-              type: SET_EDIT_EXP,
-              payload: true,
-            });
-            acq.forEach((el) => {
-              el.fk_id = el.fk_id?.id;
-            });
-            let exp = data.exp;
-            exp.forEach((el) => {
-              el.acc_code = el.acc_code.id;
-            });
-            dispatch({
-              type: SET_CURRENT_EXP,
-              payload: {
-                ...data,
-                kas_acc: data?.kas_acc?.id ?? null,
-                bank_id: data?.bank_id?.id ?? null,
-                acq_sup: data?.acq_sup?.id ?? null,
-                // top: data?.top?.id ?? null,
-                acq:
-                  acq.length > 0
-                    ? acq
-                    : [
-                        {
-                          id: null,
-                          fk_id: null,
-                          value: null,
-                          payment: null,
-                        },
-                      ],
-                exp:
-                  exp.length > 0
-                    ? exp
-                    : [
-                        {
-                          id: null,
-                          acc_code: null,
-                          value: null,
-                          desc: null,
-                        },
-                      ],
-              },
-            });
-          }}
+          onClick={() => {}}
           className="btn btn-primary shadow btn-xs sharp ml-1"
         >
           <i className="fa fa-pencil"></i>
-        </Link> */}
+        </Link>
 
         <Link
           onClick={() => {
@@ -271,15 +120,13 @@ const Pengguna = ({ onAdd, onDetail }) => {
       <div>
         <PButton
           label="Batal"
-          onClick={() => setDisplayDel(false)}
+          // onClick={() => setDisplayDel(false)}
           className="p-button-text btn-primary"
         />
         <PButton
           label="Hapus"
           icon="pi pi-trash"
-          onClick={() => {
-            delEXP();
-          }}
+          onClick={() => {}}
           autoFocus
           loading={loading}
         />
@@ -330,7 +177,6 @@ const Pengguna = ({ onAdd, onDetail }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
-          
           }}
         />
       </div>
@@ -404,14 +250,14 @@ const Pengguna = ({ onAdd, onDetail }) => {
               <Toast ref={toast} />
               <DataTable
                 responsiveLayout="scroll"
-                value={loading ? dummy : exp}
+                value={loading ? dummy : user}
                 className="display w-150 datatable-wrapper"
                 showGridlines
                 dataKey="id"
                 rowHover
                 header={renderHeader}
                 filters={null}
-                globalFilterFields={["exp.exp_code"]}
+                globalFilterFields={["username"]}
                 emptyMessage="Tidak ada data"
                 paginator
                 paginatorTemplate={template2}
@@ -420,327 +266,50 @@ const Pengguna = ({ onAdd, onDetail }) => {
                 onPage={onCustomPage2}
                 paginatorClassName="justify-content-end mt-3"
               >
-                {/* <Column
-                  header="Tanggal"
-                  style={{
-                    minWidth: "8rem",
-                  }}
-                  field={(e) => formatDate(e.exp_date)}
-                  body={loading && <Skeleton />}
-                /> */}
                 <Column
                   header="Username"
-                  field="-"
+                  field="username"
                   style={{ minWidth: "8rem" }}
-                  // body={loading && <Skeleton />}
+                  body={loading && <Skeleton />}
                 />
                 <Column
                   header="Email"
-                  field="-"
+                  field="email"
                   style={{ minWidth: "8rem" }}
-                  // body={loading && <Skeleton />}
+                  body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Perusahaan"
-                  field="-"
-                  style={{ minWidth: "8rem" }}
-                  // body={loading && <Skeleton />}
-                />
-                
-                {/* <Column
-                  header="Tipe"
-                  field={(e) => e?.exp_type ?? ""}
+                  header="Active"
+                  field="active"
                   style={{ minWidth: "8rem" }}
                   body={(e) =>
                     loading ? (
                       <Skeleton />
                     ) : (
                       <div>
-                        {e.exp_type === 1 ? (
-                          <Badge variant="info light">
-                            <i className="bx bxs-circle text-info mr-1"></i>{" "}
-                            Pelunasan
-                          </Badge>
-                        ) : (
-                          <Badge variant="warning light">
-                            <i className="bx bxs-circle text-warning mr-1"></i>{" "}
-                            Pengeluaran Kas/Bank
-                          </Badge>
-                        )}
-                      </div>
-                    )
-                  }
-                />
-                <Column
-                  header="Jenis Pelunasan"
-                  className="align-text-center"
-                  field={(e) => e?.acq_pay ?? ""}
-                  style={{ minWidth: "8rem" }}
-                  body={(e) =>
-                    loading ? (
-                      <Skeleton />
-                    ) : (
-                      <div>
-                        {e.acq_pay === 1 ? (
-                          <Badge variant="info light">
-                            <i className="bx bxs-circle text-info mr-1"></i> Kas
-                          </Badge>
-                        ) : e.acq_pay === 2 ? (
-                          <Badge variant="warning light">
-                            <i className="bx bxs-circle text-warning mr-1"></i>{" "}
-                            Bank
-                          </Badge>
-                        ) : e.acq_pay === 3 ? (
+                        {e.active ? (
                           <Badge variant="success light">
-                            <i className="bx bxs-circle text-success mr-1"></i>{" "}
-                            Giro
-                          </Badge>
-                        ) : (
-                          <span className="center"> - </span>
-                        )}
-                      </div>
-                    )
-                  }
-                />
-                <Column
-                  header="Status"
-                  field={(e) => e?.approve ?? ""}
-                  style={{ minWidth: "8rem" }}
-                  body={(e) =>
-                    loading ? (
-                      <Skeleton />
-                    ) : (
-                      <div>
-                        {e.approve === true ? (
-                          <Badge variant="info light">
-                            <i className="bx bx-check text-info mr-1"></i>{" "}
-                            Disetujui
+                            <i className="bx bx-check text-success mr-1"></i>{" "}
+                            Aktif
                           </Badge>
                         ) : (
                           <Badge variant="danger light">
-                            <i className="bx bx-x text-danger mr-1"></i> Belum
-                            Disetujui
+                            <i className="bx bx-x text-danger mr-1"></i> Tidak Aktif
                           </Badge>
                         )}
                       </div>
                     )
                   }
-                /> */}
+                />
+
                 <Column
                   header="Action"
                   dataType="boolean"
                   bodyClassName="text-center"
                   style={{ minWidth: "2rem" }}
-                  // body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
+                  body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
                 />
               </DataTable>
-              <Dialog
-                header={"Detail Kas/Bank"}
-                visible={displayData}
-                style={{ width: "60vw" }}
-                footer={renderFooter("displayData")}
-                onHide={() => {
-                  setDisplayDat(false);
-                }}
-              >
-                <Row className="ml-0 pt-0 fs-12">
-                  <div className="col-9"></div>
-                  <div className="col-3">
-                    <label className="text-label">Tanggal Pengeluaran :</label>
-                    <span className="ml-1">
-                      <b>{formatDate(show?.exp_date)}</b>
-                    </span>
-                  </div>
-
-                  <Card className="col-12 ml-0 mr-3">
-                    <div className="col-12">
-                      {/* </div> */}
-
-                      {show.exp_type === 1 && (
-                        <>
-                          <label className="text-label">
-                            <b>Informasi Pelunasan</b>
-                          </label>
-
-                          <br></br>
-                          <br></br>
-                          <span className="ml-0 fs-14">
-                            <b>{show?.exp_code}</b>
-                          </span>
-                          <br></br>
-                          <br></br>
-                          <br></br>
-                          <span className="ml-0">
-                            Tipe Pengeluaran : {""}
-                            <b>
-                              {show?.exp_type === 1
-                                ? "Pelunasan"
-                                : show?.exp_type === 2
-                                ? "Pengeluaran Kas/Bank"
-                                : "Biaya Batch"}
-                            </b>
-                          </span>
-
-                          <br></br>
-
-                          <span className="ml-0">
-                            Supplier :{" "}
-                            <b>{`${show?.acq_sup?.sup_code}-${show?.acq_sup?.sup_name}`}</b>
-                          </span>
-
-                          <br></br>
-                          <span className="ml-0">
-                            Akun Pengeluaran :{" "}
-                            <b>{`${show?.exp_acc?.acc_code}-${show?.exp_acc?.acc_name}`}</b>
-                          </span>
-
-                          <br></br>
-                          <span className="ml-0">
-                            Jenis Pelunasan : {""}
-                            <b>
-                              {show?.acq_pay === 1
-                                ? "Kas"
-                                : show?.acq_pay === 2
-                                ? "Bank"
-                                : "Giro"}
-                            </b>
-                          </span>
-                          <br></br>
-                          {show.acq_pay === 1 ? (
-                            <>
-                              <span className="ml-0">
-                                Akun Pengeluaran :{" "}
-                                <b>{`${show?.kas_acc?.acc_code}-${show?.kas_acc?.acc_name}`}</b>
-                              </span>
-                            </>
-                          ) : show.acq_pay === 2 ? (
-                            <>
-                              <span className="ml-0">
-                                Kode Referensi : <b>{show?.bank_ref}</b>
-                              </span>
-
-                              <br></br>
-                              <span className="ml-0">
-                                Kode Bank :{" "}
-                                <b>{`${show?.bank_acc?.BANK_CODE}-${show?.bank_acc?.BANK_NAME}`}</b>
-                              </span>
-                            </>
-                          ) : (
-                            <>
-                              <span className="ml-0">
-                                Nomor Giro : <b>{show?.giro_num}</b>
-                              </span>
-
-                              <br></br>
-                              <span className="ml-0">
-                                Tanggal Cair : <b>{`${formatDate( show?.giro_date)}`}</b>
-                              </span>
-                              <br></br>
-
-                              <span className="ml-0">
-                                Kode Bank :{" "}
-                                <b>{`${show?.bank_id?.BANK_CODE}-${show?.bank_id?.BANK_NAME}`}</b>
-                              </span>
-                            </>
-                          )}
-                        </>
-                      )}
-
-                      {show.exp_type === 2 && (
-                        <>
-                          <label className="text-label">
-                            <b>Informasi Pengeluaran</b>
-                          </label>
-
-                          <br></br>
-                          <br></br>
-                          <span className="ml-0 fs-14">
-                            <b>{show?.exp_code}</b>
-                          </span>
-                          <br></br>
-                          <br></br>
-                          <br></br>
-                          <span className="ml-0">
-                            Tipe Pengeluaran : {""}
-                            <b>
-                              {show?.exp_type === 1
-                                ? "Pelunasan"
-                                : show?.exp_type === 2
-                                ? "Pengeluaran Kas/Bank"
-                                : "Biaya Batch"}
-                            </b>
-                          </span>
-
-                          <br></br>
-
-                          <span className="ml-0">
-                            Akun Pengeluaran :{" "}
-                            <b>{`${show?.exp_acc.acc_code}-${show?.exp_acc.acc_name}`}</b>
-                          </span>
-
-                          <br></br>
-                          <span className="ml-0">
-                            Departement :{" "}
-                            <b>{`${checkdep(show?.exp_dep)?.ccost_name} (${
-                              checkdep(show?.exp_dep)?.ccost_code
-                            })`}</b>
-                          </span>
-
-                          <br></br>
-                          <span className="ml-0">
-                            Project :{" "}
-                            <b>{`${checkproj(show?.exp_prj)?.proj_code} (${
-                              checkproj(show?.exp_prj)?.proj_name
-                            })`}</b>
-                          </span>
-                        </>
-                      )}
-                    </div>
-                  </Card>
-
-                  <Row className="ml-2 mt-0">
-                    {show.exp_type === 2 && (
-                      <Row className="ml-1 mt-0">
-                        <DataTable
-                          value={show.exp}
-                          responsiveLayout="scroll"
-                          className="display w-150 datatable-wrapper fs-12"
-                          showGridlines
-                          dataKey="id"
-                          rowHover
-                        >
-                          <Column
-                            header="Akun"
-                            field={(e) =>
-                              `${e.acc_code?.acc_code}-${e.acc_code?.acc_name}`
-                            }
-                            style={{ minWidth: "20rem" }}
-                            // body={loading && <Skeleton />}
-                          />
-                          <Column
-                            header="Tipe Pengeluaran"
-                            field={(e) => "Debit"}
-                            style={{ minWidth: "11rem" }}
-                            // body={loading && <Skeleton />}
-                          />
-                          <Column
-                            header="Nilai"
-                            field={(e) => e.value}
-                            style={{ minWidth: "10rem" }}
-                            // body={loading && <Skeleton />}
-                          />
-                          <Column
-                            header="Keterangan"
-                            field={(e) => e.desc}
-                            style={{ minWidth: "18rem" }}
-                            // body={loading && <Skeleton />}
-                          />
-                        </DataTable>
-                      </Row>
-                    )}
-                  </Row>
-                </Row>
-              </Dialog>
 
               <Dialog
                 header={"Hapus Data"}

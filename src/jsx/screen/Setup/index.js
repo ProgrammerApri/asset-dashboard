@@ -9,6 +9,7 @@ import SetupPnl from "./SetupPnl";
 import Menu from "./Menu";
 import InputPengguna from "./SetupPenggunaa/InputPengguna";
 import Pengguna from "./SetupPenggunaa/Pengguna";
+import SetupPenggunaa from "./SetupPenggunaa";
 
 const Setup = () => {
   return (
@@ -23,7 +24,7 @@ const Setup = () => {
         <Pembelian/>
       </TabPanel>
       <TabPanel header="Pengguna">
-        <InputPengguna/>
+        <SetupPenggunaa/>
       </TabPanel>
       <TabPanel header="Menu">
         <Menu/>

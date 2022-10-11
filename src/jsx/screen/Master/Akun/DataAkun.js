@@ -97,7 +97,7 @@ const DataAkun = ({
 
   useEffect(() => {
     getKategori();
-    
+
     initFilters1();
   }, []);
 
@@ -193,6 +193,7 @@ const DataAkun = ({
             acc_code: res,
             kat_code: data.kategory.id,
             sld_type: data.kategory.kode_saldo,
+            level: 1,
           },
           kategory: data.kategory,
           klasifikasi: data.klasifikasi,
@@ -204,7 +205,7 @@ const DataAkun = ({
   const getAccKodeDet = async (data) => {
     const config = {
       ...endpoints.getAccKodeDet,
-      endpoint: endpoints.getAccKodeDet.endpoint + data.account.acc_code,
+      endpoint: endpoints.getAccKodeDet.endpoint + data.account.umm_code,
     };
     console.log(config.data);
     let response = null;
@@ -218,8 +219,9 @@ const DataAkun = ({
           account: {
             ...currentItem.account,
             acc_code: res,
-            umm_code: data.account.acc_code,
-            level: data.account.level+1
+            umm_code: data.account.umm_code,
+            dou_type: data.account.dou_type,
+            level: data.account.level + 1,
           },
         });
       }
@@ -244,7 +246,7 @@ const DataAkun = ({
             ...currentItem.account,
             acc_code: res,
             umm_code: data.account.acc_code,
-            level: data.account.level+1
+            level: data.account.level + 1,
           },
         });
       }
@@ -269,7 +271,7 @@ const DataAkun = ({
               ...currentItem.account,
               acc_code: res,
               umm_code: null,
-              level: 1
+              level: 1,
               // dou_type: data,
             },
           });
@@ -280,7 +282,7 @@ const DataAkun = ({
               ...currentItem.account,
               acc_code: res,
               umm_code: null,
-              level: 1
+              level: 1,
             },
           });
         }
@@ -1050,8 +1052,8 @@ const DataAkun = ({
             }
           />
           <Column
-            header={tr[localStorage.getItem("language")].sld_awal}
-            field={(e) => formatIdr(e.account.sld_awal)}
+            header={"Level"}
+            field={(e) => e.account.level}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
@@ -1191,13 +1193,23 @@ const DataAkun = ({
                   console.log(e.value);
                   if (e.value.code === "D") {
                     getAccountUmum();
-                    setCurrentItem({
-                      ...currentItem,
-                      account: {
-                        ...currentItem.account,
-                        dou_type: e.value.code,
-                      },
-                    });
+                    if (currentItem.account.umm_code) {
+                      getAccKodeDet({
+                        ...currentItem,
+                        account: {
+                          ...currentItem.account,
+                          dou_type: e.value.code,
+                        },
+                      });
+                    } else {
+                      setCurrentItem({
+                        ...currentItem,
+                        account: {
+                          ...currentItem.account,
+                          dou_type: e.value.code,
+                        },
+                      });
+                    }
                   } else if (e.value.code === "U") {
                     if (isEdit && currentItem.account.kat_code === firstKat) {
                       setCurrentItem({
@@ -1221,49 +1233,6 @@ const DataAkun = ({
             </div>
           </div>
 
-          {/* {currentItem !== null && currentItem.account.dou_type !== "" ? (
-            currentItem.account.dou_type === "D" &&
-            currentItem.account.kat_code !== 0 ? (
-              <>
-                <div className="col-12 mb-2">
-                  <label className="text-label">
-                    {tr[localStorage.getItem("language")].acc_umum}
-                  </label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={
-                        umum !== null && currentItem.account.umm_code !== null
-                          ? valueUmum(currentItem.account.umm_code)
-                          : null
-                      }
-                      options={umum}
-                      onChange={(e) => {
-                        if (e.value) {
-                          if (currentItem.account.dou_type === "U") {
-                            getAccKodeSubUmum(e.value);
-                          } else {
-                            getAccKodeDet(e.value);
-                          }
-                        } else {
-                          getKodeUmum(currentItem.account.kat_code);
-                        }
-                      }}
-                      optionLabel="account.acc_name"
-                      valueTemplate={selectedou_typemumTemplate}
-                      itemTemplate={umumTemplate}
-                      filter
-                      filterBy="account.acc_name"
-                      placeholder={tr[localStorage.getItem("language")].pilih}
-                      showClear
-                      // disabled={isEdit ? currentItem.account.umm_code !== null : false}
-                    />
-                  </div>
-                </div>
-              </>
-            ) : null
-          ) : null}
-            currentItem.account.kat_code !== 0 ? ( */}
-          {/* <> */}
           <div className="col-12 mb-2">
             <label className="text-label">
               {tr[localStorage.getItem("language")].acc_umum}
@@ -1294,13 +1263,9 @@ const DataAkun = ({
                 filterBy="account.acc_name"
                 placeholder={tr[localStorage.getItem("language")].pilih}
                 showClear
-                // disabled={isEdit ? currentItem.account.umm_code !== null : false}
               />
             </div>
           </div>
-          {/* </> */}
-          {/* ) : null
-          ) : null} */}
 
           <div className="col-12 mb-2">
             <label className="text-label">
@@ -1331,52 +1296,56 @@ const DataAkun = ({
             </div>
           </div>
 
-          {/* {currentItem !== null && currentItem.account.dou_type !== "" ? (
+          {currentItem !== null && currentItem.account.dou_type !== "" ? (
             currentItem.account.dou_type === "D" &&
             currentItem.account.kat_code !== 0 ? (
-              <> */}
-          <div className="col-12 mb-2">
-            <Checkbox
-              className="mb-2"
-              inputId="binary"
-              checked={currentItem ? currentItem.account.connect : false}
-              onChange={(e) =>
-                setCurrentItem({
-                  ...currentItem,
-                  account: { ...currentItem.account, connect: e.checked },
-                })
-              }
-            />
-            <label className="ml-3" htmlFor="binary">
-              {tr[localStorage.getItem("language")].sub_acc}
-            </label>
-          </div>
+              <>
+                <div className="col-12 mb-2">
+                  <Checkbox
+                    className="mb-2"
+                    inputId="binary"
+                    checked={currentItem ? currentItem.account.connect : false}
+                    onChange={(e) =>
+                      setCurrentItem({
+                        ...currentItem,
+                        account: { ...currentItem.account, connect: e.checked },
+                      })
+                    }
+                  />
+                  <label className="ml-3" htmlFor="binary">
+                    {tr[localStorage.getItem("language")].sub_acc}
+                  </label>
+                </div>
 
-          <div className="col-12 mb-2">
-            <label className="text-label">
-              {tr[localStorage.getItem("language")].sld_awal}
-            </label>
-            <div className="p-inputgroup">
-              <InputNumber
-                value={currentItem !== null ? currentItem.account.sld_awal : ""}
-                onChange={(e) => {
-                  console.log(e);
-                  setCurrentItem({
-                    ...currentItem,
-                    account: {
-                      ...currentItem.account,
-                      sld_awal: e.value,
-                    },
-                  });
-                }}
-                placeholder={tr[localStorage.getItem("language")].masuk}
-                disabled={currentItem ? currentItem.account.connect : false}
-              />
-            </div>
-          </div>
-          {/* </>
+                <div className="col-12 mb-2">
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].sld_awal}
+                  </label>
+                  <div className="p-inputgroup">
+                    <InputNumber
+                      value={
+                        currentItem !== null ? currentItem.account.sld_awal : ""
+                      }
+                      onChange={(e) => {
+                        console.log(e);
+                        setCurrentItem({
+                          ...currentItem,
+                          account: {
+                            ...currentItem.account,
+                            sld_awal: e.value,
+                          },
+                        });
+                      }}
+                      placeholder={tr[localStorage.getItem("language")].masuk}
+                      disabled={
+                        currentItem ? currentItem.account.connect : false
+                      }
+                    />
+                  </div>
+                </div>
+              </>
             ) : null
-          ) : null} */}
+          ) : null}
         </Dialog>
 
         <Dialog

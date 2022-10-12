@@ -18,6 +18,7 @@ import { InputText } from "primereact/inputtext";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { Link } from "react-router-dom";
 import { Password } from "primereact/password";
+import { tr } from "src/data/tr";
 
 const def = {
   id: null,
@@ -122,8 +123,50 @@ const InputPengguna = ({ onCancel, onSuccess }) => {
     }
   };
 
+  const addUser = async () => {
+    setLoading(true);
+    const config = {
+      ...endpoints.addUSER,
+      data: {
+        username: current.username,
+        name: null,
+        password: current.password,
+        email: current.email,
+        active: current.active,
+      },
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setTimeout(() => {
+          setLoading(false);
+          toast.current.show({
+            severity: "info",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
+            life: 3000,
+          });
+        }, 500);
+      }
+    } catch (error) {
+      setTimeout(() => {
+        setUpdate(false);
+        toast.current.show({
+          severity: "error",
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].pesan_gagal,
+          life: 3000,
+        });
+      }, 500);
+    }
+  };
+
   const onSubmit = () => {
-    setUpdate(true)
+    setUpdate(true);
+    addUser();
     // if (isValid()) {
     //   if (isEdit) {
     //     setUpdate(true);

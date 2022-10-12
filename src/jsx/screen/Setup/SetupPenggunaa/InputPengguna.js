@@ -18,6 +18,7 @@ import { InputText } from "primereact/inputtext";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { Link } from "react-router-dom";
 import { Password } from "primereact/password";
+import { tr } from "src/data/tr";
 
 const def = {
   id: null,
@@ -32,6 +33,7 @@ const InputPengguna = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
   const [error, setError] = useState(null);
   const toast = useRef(null);
+  const [showDelete, setShowDelete] = useState(false);
   const exp = useSelector((state) => state.exp.current);
   const [loading, setLoading] = useState(true);
   const [menu, setMenu] = useState(null);
@@ -124,6 +126,8 @@ const InputPengguna = ({ onCancel, onSuccess }) => {
 
   const onSubmit = () => {
     setUpdate(true)
+    addUSER(true)
+    // editUSER(true)
     // if (isValid()) {
     //   if (isEdit) {
     //     setUpdate(true);
@@ -131,6 +135,166 @@ const InputPengguna = ({ onCancel, onSuccess }) => {
     //     setUpdate(true);
     //   }
     // }
+  };
+
+  const addUSER = async () => {
+    const config = {
+      ...endpoints.addUSER,
+      data: {
+        username: current.username,
+        email: current.email,
+        password: current.password,
+        name: null,
+        active: current.active,
+        menu: current.menu
+      },
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setTimeout(() => {
+          setLoading(false);
+          toast.current.show({
+            severity: "info",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
+            life: 3000,
+          });
+        }, 500);
+      }
+    } catch (error) {
+      console.log(error);
+      if (error.status === 400) {
+        setTimeout(() => {
+          setUpdate(false);
+          toast.current.show({
+            severity: "error",
+            summary: tr[localStorage.getItem("language")].gagal,
+            detail: tr[localStorage.getItem("language")].pesan_gagal,
+            life: 3000,
+          });
+        }, 500);
+      } else {
+        setTimeout(() => {
+          setUpdate(false);
+          toast.current.show({
+            severity: "error",
+            summary: tr[localStorage.getItem("language")].gagal,
+            detail: tr[localStorage.getItem("language")].pesan_gagal,
+            life: 3000,
+          });
+        }, 500);
+      }
+    }
+  };
+
+  const editUSER = async () => {
+    const config = {
+      ...endpoints.editUSER,
+      endpoint: endpoints.editUSER.endpoint + current.id,
+      data: {
+        username: current.username,
+        email: current.email,
+        password: current.password,
+        name: null,
+        active: current.active,
+      },
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setTimeout(() => {
+          setLoading(false);
+          toast.current.show({
+            severity: "info",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
+            life: 3000,
+          });
+        }, 500);
+      }
+    } catch (error) {
+      setTimeout(() => {
+        setLoading(false);
+        toast.current.show({
+          severity: "error",
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].pesan_gagal,
+          life: 3000,
+        });
+      }, 500);
+    }
+  };
+
+  const delUSER = async (id) => {
+    const config = {
+      ...endpoints.delUSER,
+      endpoint: endpoints.delUSER.endpoint + current.id,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setTimeout(() => {
+          setLoading(false);
+          setShowDelete(false);
+          toast.current.show({
+            severity: "info",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].del_berhasil,
+            life: 3000,
+          });
+        }, 500);
+      }
+    } catch (error) {
+      console.log(error);
+      setTimeout(() => {
+        setLoading(false);
+        setShowDelete(false);
+        // onSuccessInput();
+        // onInput(false);
+        toast.current.show({
+          severity: "error",
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: tr[localStorage.getItem("language")].del_gagal,
+          life: 3000,
+        });
+      }, 500);
+    }
+  };
+
+  const renderFooterDel = (kode) => {
+    return (
+      <div>
+        <PButton
+          label={tr[localStorage.getItem("language")].batal}
+          onClick={() => {
+            setShowDelete(false);
+            setLoading(false);
+            // onInput(false);
+          }}
+          className="p-button-text btn-s btn-primary"
+        />
+        <PButton
+          label={tr[localStorage.getItem("language")].hapus}
+          className="p-button btn-s btn-primary"
+          icon="pi pi-trash"
+          onClick={() => {
+            delUSER();
+          }}
+          autoFocus
+          loading={update}
+        />
+      </div>
+    );
   };
 
   const body = () => {

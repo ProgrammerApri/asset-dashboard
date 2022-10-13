@@ -33,19 +33,21 @@ const SetupNeraca = () => {
   const [kategori, setKategori] = useState(null);
   const [isEdit, setEdit] = useState(false);
   const [displayInput, setDisplayInput] = useState(false);
+  const [displaySetting, setDisplaySetting] = useState(false);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [current, setCurrent] = useState({
     tittle: null,
     type: null,
     accounts: [],
   });
+  const [exept, setExept] = useState(null);
   const [accor, setAccor] = useState({
     aktiva: true,
     passiva: true,
   });
 
   useEffect(() => {
-    // getAccount();
+    getAcc();
     getKategori();
   }, []);
 
@@ -75,6 +77,24 @@ const SetupNeraca = () => {
     }
 
     getCompany();
+  };
+
+  const getAcc = async (isUpdate = false) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.account,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setAccount(data);
+      }
+    } catch (error) {}
   };
 
   const getCompany = async () => {
@@ -247,6 +267,17 @@ const SetupNeraca = () => {
     return selected;
   };
 
+  const checkAcc = (value) => {
+    let selected = {};
+    account?.forEach((element) => {
+      if (value === element.account.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
   const renderKategoriDropdown = (
     label,
     value,
@@ -343,6 +374,38 @@ const SetupNeraca = () => {
     );
   };
 
+  const renderSetting = () => {
+    return (
+      <div className="d-flex">
+        <div className="col-3">
+          <Link
+            onClick={() => {
+              setEdit(true);
+              setDisplayInput(true);
+            }}
+            // style={{width: "3rem"}}
+            className="btn btn-primary shadow btn-xs sharp"
+          >
+            <i className="fa fa-pencil"></i>
+          </Link>
+        </div>
+
+        <div className="col-3">
+          <Link
+            onClick={() => {
+              // setExept({ ...exept, accounts: null });
+              setDisplaySetting(true);
+            }}
+            // style={{width: "3rem"}}
+            className="btn btn-info shadow btn-xs sharp"
+          >
+            <i className="fa fa-edit"></i>
+          </Link>
+        </div>
+      </div>
+    );
+  };
+
   const renderAktiva = () => {
     return (
       <Card>
@@ -372,6 +435,7 @@ const SetupNeraca = () => {
               setup?.aktiva?.map((v, i) => {
                 return (
                   <>
+                    {renderSetting()}
                     {renderKategoriDropdown(
                       v.name,
                       v.category ?? [null],
@@ -491,10 +555,18 @@ const SetupNeraca = () => {
           icon="pi pi-check"
           onClick={() => {
             setLoadingSubmit(true);
-            if (available) {
-              addSetup(current);
+            if (isEdit) {
+              if (available) {
+                editSetup(current);
+              } else {
+                postCompany(current);
+              }
             } else {
-              postCompany(current);
+              if (available) {
+                addSetup(current);
+              } else {
+                postCompany(current);
+              }
             }
           }}
           autoFocus
@@ -542,6 +614,94 @@ const SetupNeraca = () => {
             </div>
           </div>
         </div>
+      </Dialog>
+
+      <Dialog
+        header={"Setting Exeption Neraca"}
+        visible={displaySetting}
+        style={{ width: "30vw" }}
+        footer={renderFooter()}
+        onHide={() => {
+          setEdit(false);
+          setDisplaySetting(false);
+          setExept(false);
+        }}
+      >
+        <Row>
+
+          {/* {exept?.account?.map((v, i) => { */}
+          {/* return ( */}
+          <div className="row col-12 mr-0 ml-0 mt-0">
+            <div className="col-10">
+              <label className="text-label">Akun</label>
+              <div className="p-inputgroup">
+                <Dropdown
+                  value={checkAcc(exept?.accounts)}
+                  options={account}
+                  onChange={(a) => {
+                    setExept({ ...exept, accounts: a.value.account.id });
+                  }}
+                  optionLabel={(option) => (
+                    <div>
+                      {option !== null
+                        ? `${option.account.acc_code}. ${option.account.acc_name}`
+                        : ""}
+                    </div>
+                  )}
+                  filter
+                  filterBy="account.acc_name"
+                  placeholder="Pilih Akun"
+                  itemTemplate={(option) => (
+                    <div>
+                      {option !== null
+                        ? `${option.account.acc_code}. ${option.account.acc_name}`
+                        : ""}
+                    </div>
+                  )}
+                />
+              </div>
+            </div>
+
+            <div className="col-1 d-flex ml-0 mr-0">
+              <div className="mt-4">
+                {exept === exept?.accounts?.length - 1 ? (
+                  <Link
+                    onClick={() => {
+                      setExept({
+                        ...exept,
+                        accounts: [
+                          ...exept.accounts,
+                          {
+                            accounts: null,
+                          },
+                        ],
+                      });
+                    }}
+                    className="btn btn-primary shadow btn-xs sharp ml-1"
+                  >
+                    <i className="fa fa-plus"></i>
+                  </Link>
+                ) : (
+                  <Link
+                    onClick={() => {
+                      let temp = [...exept.accounts];
+                      temp.splice(exept, 1);
+                      setExept({
+                        ...exept,
+                        accounts: temp,
+                      });
+                    }}
+                    className="btn btn-danger shadow btn-xs sharp ml-1"
+                  >
+                    <i className="fa fa-trash"></i>
+                  </Link>
+                )}
+              </div>
+            </div>
+          </div>
+          {/* );
+          })} */}
+        </Row>
       </Dialog>
     </>
   );

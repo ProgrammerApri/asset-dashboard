@@ -21,34 +21,27 @@ import {
 import { Skeleton } from "primereact/skeleton";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 
-const data = {
+const def = {
   id: null,
-  exp_code: null,
-  exp_date: null,
-  exp_type: null,
-  exp_acc: null,
-  exp_dep: null,
-  exp_prj: null,
-  acq_sup: null,
-  acq_pay: null,
-  kas_acc: null,
-  bank_acc: null,
-  bank_id: null,
-  bank_ref: null,
-  giro_num: null,
-  giro_date: null,
-  acq: [],
-  exp: [],
+  username: null,
+  email: null,
+  password: null,
+  active: true,
+  menu: [],
 };
 
-const Pengguna = ({ onAdd, onDetail }) => {
+const Pengguna = ({ onAdd, onDetail, del, onInput = () => {}, }) => {
   const [loading, setLoading] = useState(true);
   const [displayDel, setDisplayDel] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
+  const [showInput, setShowInput] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
+  const [current, setCurrent] = useState(def);
+  // const [edit, setEdit] = useState("");
   const [dep, setDep] = useState(null);
   const [proj, setProj] = useState(null);
-  const [isEdit, setEdit] = useState(false);
+  const [edit, setEdit] = useState(false);
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
   const [first2, setFirst2] = useState(0);
@@ -93,23 +86,32 @@ const Pengguna = ({ onAdd, onDetail }) => {
     return (
       // <React.Fragment>
       <div className="d-flex">
-        <Link
-          onClick={() => {}}
-          className="btn btn-primary shadow btn-xs sharp ml-1"
-        >
-          <i className="fa fa-pencil"></i>
-        </Link>
+        {edit && (
+          <Link
+            onClick={() => {
+              setEdit(true);
+              setCurrent(data);
+              setShowInput(true);
+              onInput(true);
+            }}
+            className="btn btn-primary shadow btn-xs sharp ml-2"
+          >
+            <i className="fa fa-pencil"></i>
+          </Link>
+        )}
 
-        <Link
-          onClick={() => {
-            setEdit(true);
-            setDisplayDel(true);
-            setCurrentItem(data);
-          }}
-          className="btn btn-danger shadow btn-xs sharp ml-1"
-        >
-          <i className="fa fa-trash"></i>
-        </Link>
+        {del && (
+          <Link
+            onClick={() => {
+              setCurrent(data);
+              setShowDelete(true);
+              onInput(true);
+            }}
+            className="btn btn-danger shadow btn-xs sharp ml-2"
+          >
+            <i className="fa fa-trash"></i>
+          </Link>
+        )}
       </div>
       // </React.Fragment>
     );

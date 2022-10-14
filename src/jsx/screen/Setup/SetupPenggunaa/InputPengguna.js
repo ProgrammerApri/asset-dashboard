@@ -29,11 +29,11 @@ const def = {
   menu: [],
 };
 
-const InputPengguna = ({ onCancel, onSuccess }) => {
+const InputPengguna = ({ onCancel, onSuccess, del,   }) => {
   const [update, setUpdate] = useState(false);
   const [error, setError] = useState(null);
-  const toast = useRef(null);
   const [showDelete, setShowDelete] = useState(false);
+  const toast = useRef(null);
   const exp = useSelector((state) => state.exp.current);
   const [loading, setLoading] = useState(true);
   const [menu, setMenu] = useState(null);
@@ -125,15 +125,15 @@ const InputPengguna = ({ onCancel, onSuccess }) => {
   };
 
   const addUser = async () => {
-    setLoading(true);
+    setUpdate(true);
     const config = {
       ...endpoints.addUSER,
       data: {
         username: current.username,
-        name: null,
         password: current.password,
         email: current.email,
         active: current.active,
+        menu: current.menu
       },
     };
     console.log(config.data);
@@ -143,15 +143,12 @@ const InputPengguna = ({ onCancel, onSuccess }) => {
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setLoading(false);
-          toast.current.show({
-            severity: "info",
-            summary: tr[localStorage.getItem("language")].berhsl,
-            detail: tr[localStorage.getItem("language")].pesan_berhasil,
-            life: 3000,
-          });
+          setUpdate(false)
+         
+          onSuccess()
         }, 500);
       }
+
     } catch (error) {
       setTimeout(() => {
         setUpdate(false);
@@ -165,151 +162,59 @@ const InputPengguna = ({ onCancel, onSuccess }) => {
     }
   };
 
-  const onSubmit = () => {
-    setUpdate(true);
-    addUser();
-    // if (isValid()) {
-    //   if (isEdit) {
-    //     setUpdate(true);
-    //   } else {
-    //     setUpdate(true);
-    //   }
-    // }
-  };
-
-  const addUSER = async () => {
-    const config = {
-      ...endpoints.addUSER,
-      data: {
-        username: current.username,
-        email: current.email,
-        password: current.password,
-        name: null,
-        active: current.active,
-        menu: current.menu
-      },
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        setTimeout(() => {
-          setLoading(false);
-          toast.current.show({
-            severity: "info",
-            summary: tr[localStorage.getItem("language")].berhsl,
-            detail: tr[localStorage.getItem("language")].pesan_berhasil,
-            life: 3000,
-          });
-        }, 500);
-      }
-    } catch (error) {
-      console.log(error);
-      if (error.status === 400) {
-        setTimeout(() => {
-          setUpdate(false);
-          toast.current.show({
-            severity: "error",
-            summary: tr[localStorage.getItem("language")].gagal,
-            detail: tr[localStorage.getItem("language")].pesan_gagal,
-            life: 3000,
-          });
-        }, 500);
-      } else {
-        setTimeout(() => {
-          setUpdate(false);
-          toast.current.show({
-            severity: "error",
-            summary: tr[localStorage.getItem("language")].gagal,
-            detail: tr[localStorage.getItem("language")].pesan_gagal,
-            life: 3000,
-          });
-        }, 500);
-      }
-    }
-  };
-
-  const editUSER = async () => {
+  const editUSER = async (data) => {
+    // setLoadingSubmit(true);
+    setUpdate(true)
     const config = {
       ...endpoints.editUSER,
       endpoint: endpoints.editUSER.endpoint + current.id,
       data: {
         username: current.username,
-        email: current.email,
         password: current.password,
-        name: null,
+        email: current.email,
         active: current.active,
+        menu: current.menu
       },
     };
-    console.log(config.data);
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setLoading(false);
+          setUpdate(false)
+          // setLoadingSubmit(false);
+          // setDisplayInput(false);
+          getMenu();
+          // getProfile();
           toast.current.show({
             severity: "info",
-            summary: tr[localStorage.getItem("language")].berhsl,
-            detail: tr[localStorage.getItem("language")].pesan_berhasil,
+            summary: "Berhasil",
+            detail: "Data Berhasil Diperbarui",
             life: 3000,
           });
         }, 500);
       }
     } catch (error) {
       setTimeout(() => {
-        setLoading(false);
+        // setLoadingSubmit(false);
+        setUpdate(false)
         toast.current.show({
           severity: "error",
-          summary: tr[localStorage.getItem("language")].gagal,
-          detail: tr[localStorage.getItem("language")].pesan_gagal,
+          summary: "Gagal",
+          detail: "Gagal Memperbarui Data",
           life: 3000,
         });
       }, 500);
     }
   };
 
-  const delUSER = async (id) => {
-    const config = {
-      ...endpoints.delUSER,
-      endpoint: endpoints.delUSER.endpoint + current.id,
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        setTimeout(() => {
-          setLoading(false);
-          setShowDelete(false);
-          toast.current.show({
-            severity: "info",
-            summary: tr[localStorage.getItem("language")].berhsl,
-            detail: tr[localStorage.getItem("language")].del_berhasil,
-            life: 3000,
-          });
-        }, 500);
-      }
-    } catch (error) {
-      console.log(error);
-      setTimeout(() => {
-        setLoading(false);
-        setShowDelete(false);
-        // onSuccessInput();
-        // onInput(false);
-        toast.current.show({
-          severity: "error",
-          summary: tr[localStorage.getItem("language")].gagal,
-          detail: tr[localStorage.getItem("language")].del_gagal,
-          life: 3000,
-        });
-      }, 500);
-    }
+  const onSubmit = () => {
+    setUpdate(true);
+    addUser();
+    editUSER();
   };
+
+ 
 
   const renderFooterDel = (kode) => {
     return (
@@ -328,7 +233,7 @@ const InputPengguna = ({ onCancel, onSuccess }) => {
           className="p-button btn-s btn-primary"
           icon="pi pi-trash"
           onClick={() => {
-            delUSER();
+            // delUSER();
           }}
           autoFocus
           loading={update}
@@ -371,6 +276,7 @@ const InputPengguna = ({ onCancel, onSuccess }) => {
                 value={current.password}
                 onChange={(e) => {
                   setCurrent({ ...current, password: e.target.value });
+                  console.log(current);
                 }}
                 placeholder="Masukan Password"
                 toggleMask

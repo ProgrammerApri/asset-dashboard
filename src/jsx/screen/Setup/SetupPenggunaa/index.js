@@ -16,17 +16,59 @@ const SetupPenggunaa = ({ trigger }) => {
   }, [trigger]);
 
   const [view, setView] = useState([
-    <Pengguna onAdd={() => setActive(1)} />,
+    <Pengguna
+      onAdd={() => {
+        setActive(1);
+      }}
+      onEdit={(e) => {
+        setActive(1);
+      }}
+    />,
     <InputPengguna
-      onCancel={() => setActive(0)}
-      onSuccess={() => {
+      onCancel={() => {
         setActive(0);
-        toast.current.show({
-          severity: "info",
-          summary: tr[localStorage.getItem("language")].berhsl,
-          detail: tr[localStorage.getItem("language")].pesan_berhasil,
-          life: 3000,
-        });
+      }}
+      onSuccess={() => {
+        setTimeout(()=>{
+          setActive(0);
+          toast.current.show({
+            severity: "info",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
+            life: 3000,
+          });
+        },500);
+      }}
+      onFail={() => {
+        setTimeout(() => {
+          toast.current.show({
+            severity: "error",
+            summary: "Gagal",
+            detail: "Gagal Memperbarui Data",
+            life: 3000,
+          });
+        }, 500);
+      }}
+      onFailAdd={(error, code) => {
+        if (error.status === 400) {
+          setTimeout(() => {
+            toast.current.show({
+              severity: "error",
+              summary: "Gagal",
+              detail: `Kode ${code} Sudah Digunakan`,
+              life: 3000,
+            });
+          }, 500);
+        } else {
+          setTimeout(() => {
+            toast.current.show({
+              severity: "error",
+              summary: "Gagal",
+              detail: "Gagal Memperbarui Data",
+              life: 3000,
+            });
+          }, 500);
+        }
       }}
     />,
   ]);
@@ -34,6 +76,9 @@ const SetupPenggunaa = ({ trigger }) => {
   return (
     <>
       <Toast ref={toast} />
+      <Row>
+        <Col className="pt-0"></Col>
+      </Row>
       {view[active]}
     </>
   );

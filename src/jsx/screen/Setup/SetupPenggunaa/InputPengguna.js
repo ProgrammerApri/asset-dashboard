@@ -4,7 +4,7 @@ import { Row, Col, Card } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_EXP } from "src/redux/actions";
+import { SET_CURRENT_EXP, SET_CURRENT_USER } from "src/redux/actions";
 import { Divider } from "@material-ui/core";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import CustomAccordion from "src/jsx/components/Accordion/Accordion";
@@ -34,7 +34,8 @@ const InputPengguna = ({ onCancel, onSuccess, del,   }) => {
   const [error, setError] = useState(null);
   const [showDelete, setShowDelete] = useState(false);
   const toast = useRef(null);
-  const exp = useSelector((state) => state.exp.current);
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user.current);
   const [loading, setLoading] = useState(true);
   const [menu, setMenu] = useState(null);
   const [current, setCurrent] = useState(def);
@@ -162,6 +163,8 @@ const InputPengguna = ({ onCancel, onSuccess, del,   }) => {
     }
   };
 
+
+  
   const editUSER = async (data) => {
     // setLoadingSubmit(true);
     setUpdate(true)
@@ -241,6 +244,13 @@ const InputPengguna = ({ onCancel, onSuccess, del,   }) => {
       </div>
     );
   };
+  const updateUser = (e) => {
+    dispatch({
+      type: SET_CURRENT_USER,
+      payload: e,
+    });
+  };
+
 
   const body = () => {
     return (
@@ -251,9 +261,9 @@ const InputPengguna = ({ onCancel, onSuccess, del,   }) => {
           <div className="col-3 ">
             <PrimeInput
               label={"Username"}
-              value={current.username}
+              value={user.username}
               onChange={(e) => {
-                setCurrent({ ...current, username: e.target.value });
+                updateUser({ ...user, username: e.target.value });
               }}
               placeholder="Masukan Username"
             />
@@ -261,9 +271,10 @@ const InputPengguna = ({ onCancel, onSuccess, del,   }) => {
           <div className="col-3">
             <PrimeInput
               label={"Email"}
-              value={current.email}
+              value={user.email}
               onChange={(e) => {
-                setCurrent({ ...current, email: e.target.value });
+                updateUser({ ...user, email: e.target.value });
+                
               }}
               placeholder="Masukan Email"
               isEmail
@@ -273,9 +284,9 @@ const InputPengguna = ({ onCancel, onSuccess, del,   }) => {
             <label className="text-label">Password</label>
             <div className="p-inputgroup">
               <Password
-                value={current.password}
+                value={user.password}
                 onChange={(e) => {
-                  setCurrent({ ...current, password: e.target.value });
+                  updateUser({ ...user, password: e.target.value });
                   console.log(current);
                 }}
                 placeholder="Masukan Password"
@@ -288,9 +299,9 @@ const InputPengguna = ({ onCancel, onSuccess, del,   }) => {
             <InputSwitch
               className="mr-3"
               inputId="email"
-              checked={current.active}
+              checked={user.active}
               onChange={(e) => {
-                setCurrent({ ...current, active: e.value });
+                updateUser({ ...user, active: e.value });
               }}
             />
             <label className="mr-3 mt-1" htmlFor="email">

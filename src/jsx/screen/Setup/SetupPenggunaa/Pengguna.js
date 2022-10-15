@@ -12,14 +12,11 @@ import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  SET_CURRENT_EXP,
-  SET_EDIT_EXP,
-  SET_EXP,
-  SET_USER,
-} from "src/redux/actions";
+import { SET_CURRENT_USER, SET_EDIT_USER, SET_USER } from "src/redux/actions";
 import { Skeleton } from "primereact/skeleton";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
+import { InputTextarea } from "primereact/inputtextarea";
 
 const def = {
   id: null,
@@ -29,23 +26,29 @@ const def = {
   active: true,
   menu: [],
 };
+const defError = {
+  username: false,
+  email: false,
+};
 
-const Pengguna = ({ onAdd, onDetail, del, onInput = () => {}, }) => {
+const Pengguna = ({ onAdd, onEdit }) => {
   const [loading, setLoading] = useState(true);
   const [displayDel, setDisplayDel] = useState(false);
-  const [currentItem, setCurrentItem] = useState(null);
+  // const [currentItem, setCurrentItem] = useState(null);
+  const [update, setUpdate] = useState(true);
   const toast = useRef(null);
   const [showInput, setShowInput] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [current, setCurrent] = useState(def);
   // const [edit, setEdit] = useState("");
-  const [dep, setDep] = useState(null);
-  const [proj, setProj] = useState(null);
+  // const [dep, setDep] = useState(null);
+  // const [proj, setProj] = useState(null);
   const [edit, setEdit] = useState(false);
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+  const [error, setError] = useState(defError);
   const [displayData, setDisplayDat] = useState(false);
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.user);
@@ -86,35 +89,126 @@ const Pengguna = ({ onAdd, onDetail, del, onInput = () => {}, }) => {
     return (
       // <React.Fragment>
       <div className="d-flex">
-        {edit && (
-          <Link
-            onClick={() => {
-              setEdit(true);
-              setCurrent(data);
-              setShowInput(true);
-              onInput(true);
-            }}
-            className="btn btn-primary shadow btn-xs sharp ml-2"
-          >
-            <i className="fa fa-pencil"></i>
-          </Link>
-        )}
+        <Link
+          onClick={() => {
+            onEdit(data);
+            dispatch({
+              type: SET_EDIT_USER,
+              payload: true,
+            })
+            dispatch({
+              type: SET_CURRENT_USER,
+              payload: data
+            });
+          }}
+          className={`btn btn-primary shadow btn-xs sharp ml-1`}
+        >
+          <i className="fa fa-pencil"></i>
+        </Link>
 
-        {del && (
-          <Link
-            onClick={() => {
-              setCurrent(data);
-              setShowDelete(true);
-              onInput(true);
-            }}
-            className="btn btn-danger shadow btn-xs sharp ml-2"
-          >
-            <i className="fa fa-trash"></i>
-          </Link>
-        )}
+        <Link
+          onClick={() => {
+            setEdit(true);
+            setDisplayDel(true);
+            setCurrent(data);
+          }}
+          className={`btn btn-danger shadow btn-xs sharp ml-1`}
+        >
+          <i className="fa fa-trash"></i>
+        </Link>
       </div>
       // </React.Fragment>
     );
+  };
+
+  const delUSER = async (id) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.delUSER,
+      endpoint: endpoints.delUSER.endpoint + current.id,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setTimeout(() => {
+          setUpdate(false);
+          setDisplayDel(false);
+          getUser(true);
+          toast.current.show({
+            severity: "info",
+            summary: "Berhasil",
+            detail: "Data Berhasil Dihapus",
+            life: 3000,
+          });
+        }, 100);
+      }
+    } catch (error) {
+      console.log(error);
+      setTimeout(() => {
+        setUpdate(false);
+        setDisplayDel(false);
+        toast.current.show({
+          severity: "error",
+          summary: "Gagal",
+          detail: `Tidak Dapat Menghapus Data`,
+          life: 3000,
+        });
+      }, 500);
+    }
+  };
+  const editUSER = async () => {
+    setLoading(true);
+    const config = {
+      ...endpoints.editUSER,
+      endpoint: endpoints.editUSER.endpoint + current.id,
+      data: {
+        username: current.username,
+        email: current.email,
+        password: current.password,
+        active: current.active,
+        menu: [],
+      },
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setTimeout(() => {
+          // onSuccessInput();
+          setLoading(false);
+          onHideInput();
+          // onInput(false);
+          toast.current.show({
+            severity: "info",
+            summary: "Berhasil",
+            detail: "Data Berhasil Diperbarui",
+            life: 3000,
+          });
+        }, 500);
+      }
+    } catch (error) {
+      setTimeout(() => {
+        setLoading(false);
+        toast.current.show({
+          severity: "error",
+          summary: "Gagal",
+          detail: "Gagal Memperbarui Data",
+          life: 3000,
+        });
+      }, 500);
+    }
+  };
+  const onHideInput = () => {
+    setLoading(false);
+    setCurrent(def);
+    setEdit(false);
+    setShowInput(false);
+    // onInput(false);
   };
 
   const renderFooterDel = () => {
@@ -122,17 +216,107 @@ const Pengguna = ({ onAdd, onDetail, del, onInput = () => {}, }) => {
       <div>
         <PButton
           label="Batal"
-          // onClick={() => setDisplayDel(false)}
+          onClick={() => setDisplayDel(false)}
           className="p-button-text btn-primary"
         />
         <PButton
           label="Hapus"
           icon="pi pi-trash"
-          onClick={() => {}}
+          onClick={() => {
+            delUSER();
+          }}
           autoFocus
           loading={loading}
         />
       </div>
+    );
+  };
+
+  const renderDialog = () => {
+    return (
+      <>
+        <Toast ref={toast} />
+        <Dialog
+          header={edit ? "Edit Pengguna" : "Tambah Pengguna"}
+          visible={showInput}
+          style={{ width: "40vw" }}
+          footer={renderFooter()}
+          onHide={onHideInput}
+        >
+          <div className="row mr-0 ml-0">
+            <div className="col-6">
+              <PrimeInput
+                label={"Kode Jenis Pelanggan"}
+                value={`${current?.jpel_code}`}
+                onChange={(e) => {
+                  setCurrent({
+                    ...current,
+                    jpel_code: e.target.value,
+                  });
+                  let newError = error;
+                  newError.code = false;
+                  setError(newError);
+                }}
+                placeholder="Masukan Kode"
+                error={error?.code}
+              />
+            </div>
+
+            <div className="col-6">
+              <PrimeInput
+                label={"Nama Jenis Pelanggan"}
+                value={`${current?.jpel_name}`}
+                onChange={(e) => {
+                  setCurrent({
+                    ...current,
+                    jpel_name: e.target.value,
+                  });
+                  let newError = error;
+                  newError.name = false;
+                  setError(newError);
+                }}
+                placeholder="Masukan Nama Jenis Pelanggan"
+                error={error?.name}
+              />
+            </div>
+          </div>
+
+          <div className="row mr-0 ml-0">
+            <div className="col-12">
+              <label className="text-label">Keterangan</label>
+              <div className="p-inputgroup">
+                <InputTextarea
+                  value={`${current?.jpel_ket}`}
+                  onChange={(e) =>
+                    setCurrent({ ...current, jpel_ket: e.target.value })
+                  }
+                  placeholder="Masukan Keterangan"
+                />
+              </div>
+            </div>
+          </div>
+        </Dialog>
+
+        <Dialog
+          header={"Hapus Data"}
+          visible={showDelete}
+          style={{ width: "30vw" }}
+          footer={renderFooterDel()}
+          onHide={() => {
+            setLoading(false);
+            setShowDelete(false);
+            // onInput(false);
+          }}
+        >
+          <div className="ml-3 mr-3">
+            <i
+              className="pi pi-exclamation-triangle mr-3 align-middle"
+              style={{ fontSize: "2rem" }}
+            />
+            <span>Apakah anda yakin ingin menghapus data ?</span>
+          </div>
+        </Dialog>
+      </>
     );
   };
 
@@ -179,6 +363,10 @@ const Pengguna = ({ onAdd, onDetail, del, onInput = () => {}, }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
+            setShowInput(true);
+            setEdit(false);
+            setLoading(false);
+            setCurrent(def);
           }}
         />
       </div>
@@ -226,18 +414,6 @@ const Pengguna = ({ onAdd, onDetail, del, onInput = () => {}, }) => {
     },
   };
 
-  const formatDate = (date) => {
-    var d = new Date(`${date}Z`),
-      month = "" + (d.getMonth() + 1),
-      day = "" + d.getDate(),
-      year = d.getFullYear();
-
-    if (month.length < 2) month = "0" + month;
-    if (day.length < 2) day = "0" + day;
-
-    return [day, month, year].join("-");
-  };
-
   const onCustomPage2 = (event) => {
     setFirst2(event.first);
     setRows2(event.rows);
@@ -254,6 +430,7 @@ const Pengguna = ({ onAdd, onDetail, del, onInput = () => {}, }) => {
                 responsiveLayout="scroll"
                 value={loading ? dummy : user}
                 className="display w-150 datatable-wrapper"
+                // rowExpansionTemplate={rowExpansionTemplate}
                 showGridlines
                 dataKey="id"
                 rowHover
@@ -296,7 +473,8 @@ const Pengguna = ({ onAdd, onDetail, del, onInput = () => {}, }) => {
                           </Badge>
                         ) : (
                           <Badge variant="danger light">
-                            <i className="bx bx-x text-danger mr-1"></i> Tidak Aktif
+                            <i className="bx bx-x text-danger mr-1"></i> Tidak
+                            Aktif
                           </Badge>
                         )}
                       </div>

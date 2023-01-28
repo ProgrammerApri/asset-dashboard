@@ -598,10 +598,10 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                         onChange={(e) => {
                           let sat = [];
                           satuan.forEach((element) => {
-                            if (element.id === e.unit.id) {
+                            if (element.id === e.unit?.id) {
                               sat.push(element);
                             } else {
-                              if (element.u_from?.id === e.unit.id) {
+                              if (element.u_from?.id === e.unit?.id) {
                                 sat.push(element);
                               }
                             }

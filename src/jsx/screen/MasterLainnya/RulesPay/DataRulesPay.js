@@ -385,7 +385,7 @@ const DataRulesPay = ({
   const isValid = () => {
     let valid = false;
     let errors = {
-      name: !currentItem.code || currentItem.code === "",
+      name: !currentItem.name || currentItem.name === "",
       day: !currentItem.day || currentItem.day === "",
     };
 
@@ -477,7 +477,8 @@ const DataRulesPay = ({
                 label={tr[localStorage.getItem("language")].wkt_rul}
                 value={currentItem !== null ? `${currentItem.name}` : ""}
                 onChange={(e) => {
-                  setCurrentItem({ ...currentItem, name: e.target.value });
+                  console.log("weeek", e?.target?.value);
+                  setCurrentItem({ ...currentItem, name: e?.target?.value });
                   let newError = error;
                   newError.name = false;
                   setError(newError);

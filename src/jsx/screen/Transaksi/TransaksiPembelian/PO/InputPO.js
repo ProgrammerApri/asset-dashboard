@@ -793,7 +793,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-2">
-            <PrimeCalendar
+          <PrimeCalendar
               label={tr[localStorage.getItem("language")].tgl}
               value={new Date(`${po.po_date}Z`)}
               onChange={(e) => {

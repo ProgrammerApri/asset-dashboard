@@ -22,6 +22,9 @@ const data = {
   id: null,
   ord_code: null,
   ord_date: null,
+  no_doc: null,
+  doc_date: null,
+  invoice: true,
   faktur: true,
   po_id: null,
   dep_id: null,
@@ -32,6 +35,9 @@ const data = {
   prod_disc: null,
   jasa_disc: null,
   total_disc: null,
+  total_b: null,
+  total_bayar: null,
+  same_sup : false,
   dprod: [],
   djasa: [],
 };
@@ -51,6 +57,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
   const dispatch = useDispatch();
   const order = useSelector((state) => state.order.order);
   const show = useSelector((state) => state.order.current);
+  const [expandedRows, setExpandedRows] = useState(null);
   const printPage = useRef(null);
 
   const dummy = Array.from({ length: 10 });
@@ -341,6 +348,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
                     price: null,
                     disc: null,
                     nett_price: null,
+                    total_fc: null,
                     total: null,
                   },
                 ],
@@ -354,6 +362,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
                     order: null,
                     price: null,
                     disc: null,
+                    total_fc: null,
                     total: null,
                   },
                 ],
@@ -453,6 +462,12 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
   };
 
   const formatIdr = (value) => {
+    return `${value?.toFixed(2)}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
+  const formatTh = (value) => {
     return `${value}`
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
@@ -480,6 +495,96 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
     return total;
   };
 
+  const rowExpansionTemplate = (data) => {
+    return (
+      <div className="">
+        <label className="text-label fs-13 text-black">
+          <b>Daftar Produk</b>
+        </label>
+
+        <DataTable value={data?.dprod} responsiveLayout="scroll">
+          <Column
+            header="Produk"
+            field={(e) => `${e.prod_id?.name} (${e.prod_id?.code})`}
+            style={{ minWidth: "19rem" }}
+            // body={loading && <Skeleton />}
+          />
+          <Column
+            header="Gudang"
+            field={(e) => e.location?.name}
+            style={{ minWidth: "9rem" }}
+            // body={loading && <Skeleton />}
+          />
+          <Column
+            header="Jumlah"
+            field={(e) => formatTh(e.order)}
+            style={{ minWidth: "6rem" }}
+            // body={loading && <Skeleton />}
+          />
+          <Column
+            header="Satuan"
+            field={(e) => e.unit_id?.name}
+            style={{ minWidth: "7rem" }}
+            // body={loading && <Skeleton />}
+          />
+          <Column
+            header="Harga Satuan"
+            field={(e) => `Rp. ${formatIdr(e.price)}`}
+            style={{ minWidth: "10rem" }}
+            // body={loading && <Skeleton />}
+          />
+          <Column
+            header="Total"
+            field={(e) => `Rp. ${formatIdr(e.total)}`}
+            style={{ minWidth: "10rem" }}
+            // body={loading && <Skeleton />}
+          />
+        </DataTable>
+
+        {data?.djasa?.length ? (
+          <>
+            <label className="text-label fs-13 text-black">
+              <b>Daftar Jasa</b>
+            </label>
+
+            <DataTable value={data?.djasa} responsiveLayout="scroll">
+              <Column
+                header="Supplier"
+                field={(e) =>
+                  e.sup_id
+                    ? `${e.sup_id?.supplier?.sup_name} (${e.sup_id?.supplier?.sup_code})`
+                    : "-"
+                }
+                style={{ minWidth: "21rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header=""
+                field={(e) => null}
+                style={{ minWidth: "9rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header="Jasa"
+                field={(e) => e.jasa_id?.name}
+                style={{ minWidth: "27rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header="Total"
+                field={(e) => e.total}
+                style={{ minWidth: "15rem" }}
+                // body={loading && <Skeleton />}
+              />
+            </DataTable>
+          </>
+        ) : (
+          <></>
+        )}
+      </div>
+    );
+  };
+
   return (
     <>
       <Toast ref={toast} />
@@ -504,7 +609,12 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
                 rows={rows2}
                 onPage={onCustomPage2}
                 paginatorClassName="justify-content-end mt-3"
+                expandedRows={expandedRows}
+                onRowToggle={(e) => setExpandedRows(e.data)}
+                rowExpansionTemplate={rowExpansionTemplate}
               >
+                <Column expander style={{ width: "3em" }} />
+
                 <Column
                   header={tr[localStorage.getItem("language")].tgl}
                   style={{
@@ -565,13 +675,62 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
                       <div>
                         {e.faktur === true ? (
                           <Badge variant="info light">
-                            <i className="bx bxs-circle text-info mr-1"></i>{" "}
+                            <i className="bx bxs-plus-circle text-info mr-1 mt-1"></i>{" "}
                             Faktur
                           </Badge>
                         ) : (
                           <Badge variant="warning light">
-                            <i className="bx bxs-circle text-warning mr-1"></i>{" "}
+                            <i className="bx bxs-minus-circle text-warning mr-1 mt-1"></i>{" "}
                             Non Faktur
+                          </Badge>
+                        )}
+                      </div>
+                    )
+                  }
+                />
+                <Column
+                  header={"Invoice Pembelian"}
+                  field={(e) => e.invoice}
+                  style={{ minWidth: "8rem" }}
+                  body={(e) =>
+                    loading ? (
+                      <Skeleton />
+                    ) : (
+                      <div>
+                        {e.invoice === true ? (
+                          <>
+                            {/* <Tooltip target=".link" /> */}
+                            <Link
+                              // className="link"
+                              // data-pr-tooltip="Lihat Invoice"
+                              // data-pr-position="right"
+                              // data-pr-at="right+5 top"
+                              // data-pr-my="left center-2"
+                              onClick={() => {
+                                onDetail();
+                                let dprod = e?.dprod;
+                                let djasa = e?.djasa;
+                                dispatch({
+                                  type: SET_CURRENT_ODR,
+                                  payload: {
+                                    ...e,
+                                    dprod: dprod?.length > 0 ? dprod : null,
+                                    djasa: djasa?.length > 0 ? djasa : null,
+                                  },
+                                });
+                              }}
+                              // className="btn btn-info shadow btn-xs sharp ml-1"
+                            >
+                              <Badge variant="info light">
+                                <i className="bx bxs-plus-circle text-info mr-1 mt-1"></i>{" "}
+                                Invoice
+                              </Badge>
+                            </Link>
+                          </>
+                        ) : (
+                          <Badge variant="warning light">
+                            <i className="bx bxs-minus-circle text-warning mr-1 mt-1"></i>{" "}
+                            Non Invoice
                           </Badge>
                         )}
                       </div>

@@ -1,13 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Button, Card, Col, Row } from "react-bootstrap";
 import { Toast } from "primereact/toast";
-import DataFaktur from "./DataFaktur";
-import BuatFaktur from "./BuatFaktur";
 import Detail from "./Detail";
-import { tr } from "src/data/tr";
-import DetailFaktur from "./DetailFaktur";
+import { tr } from "../../../../../data/tr";
+import DataInvoicePB from "./DataInvoicePB";
+import BuatInvoicePB from "./BuatInvoicePB";
 
-const FakturPembelian = ({trigger}) => {
+const InvoicePembelian = ({trigger}) => {
   const [active, setActive] = useState(0);
   const toast = useRef(null);
   
@@ -18,7 +17,7 @@ const FakturPembelian = ({trigger}) => {
   }, [trigger]);
 
   const [view, setView] = useState([
-    <DataFaktur
+    <DataInvoicePB
       onAdd={() => {
         setActive(1);
       }}
@@ -28,18 +27,15 @@ const FakturPembelian = ({trigger}) => {
       onDetail={() => {
         setActive(2);
       }}
-      onDetailF={() => {
-        setActive(3);
-      }}
     />,
-    <BuatFaktur
+    <BuatInvoicePB
       onCancel={() => setActive(0)}
       onSuccess={() => {
         setTimeout(() => {
           setActive(0);
           toast.current.show({
             severity: "info",
-            summary: tr[localStorage.getItem("language")].berhsl,
+            summary: tr[localStorage.getItem("language")].berhasl,
             detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
@@ -48,7 +44,6 @@ const FakturPembelian = ({trigger}) => {
     />,
 
     <Detail onCancel={() => setActive(0)} />,
-    <DetailFaktur onCancel={() => setActive(0)} />,
   ]);
 
   return (
@@ -59,4 +54,4 @@ const FakturPembelian = ({trigger}) => {
   );
 };
 
-export default FakturPembelian;
+export default InvoicePembelian;

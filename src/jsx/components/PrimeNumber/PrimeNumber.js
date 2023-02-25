@@ -11,10 +11,12 @@ const PrimeNumber = ({
   errorMessage,
   disabled = false,
   min,
+  max,
   maxLength,
   type,
   mode,
   price = false,
+  prc = false,
 }) => {
   return (
     <div>
@@ -30,10 +32,25 @@ const PrimeNumber = ({
               className={error ? "p-invalid" : ""}
               disabled={disabled}
               min={min}
+              max={max}
               maxLength={maxLength}
               mode={mode}
+              minFractionDigits={2}
+              maxFractionDigits={5}
             />
           </>
+        ) : prc ? (
+          <InputNumber
+            value={value}
+            onChange={onChange}
+            placeholder={placeholder}
+            aria-describedby="name-error"
+            className={error ? "p-invalid" : ""}
+            disabled={disabled}
+            min={min}
+            maxLength={maxLength}
+            mode={mode}
+          />
         ) : (
           <InputText
             value={value}
@@ -43,6 +60,7 @@ const PrimeNumber = ({
             className={error ? "p-invalid" : ""}
             disabled={disabled}
             min={min}
+            max={max}
             maxLength={maxLength}
             type={type}
           />

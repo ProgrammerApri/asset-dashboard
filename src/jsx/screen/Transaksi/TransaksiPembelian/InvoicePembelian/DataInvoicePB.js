@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { request, endpoints } from "src/utils";
+import { request } from "src/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Button, Card, Col, Row } from "react-bootstrap";
+import { Badge, Button, Card, Col, Row } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { Dialog } from "primereact/dialog";
@@ -12,36 +12,40 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
-import { Badge } from "primereact/badge";
+import { SET_CURRENT_INV, SET_EDIT_INV, SET_INV } from "src/redux/actions";
 import { Divider } from "@material-ui/core";
 import ReactToPrint from "react-to-print";
 import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { tr } from "../../../../../data/tr";
-import { SET_CURRENT_PB_FK, SET_EDIT_PB_FK, SET_PB_FK } from "src/redux/actions";
+import {
+  SET_CURRENT_INVPJ,
+  SET_EDIT_INVPJ,
+  SET_INVPJ,
+} from "../../../../../redux/actions";
+import endpoints from "../../../../../utils/endpoints";
 
 const data = {
   id: null,
-  fk_code: null,
-  fk_date: null,
-  sup_id: null,
-  fk_tax: null,
-  fk_ppn: null,
-  fk_lunas: null,
-  fk_desc: null,
-  detail: [],
+  inv_code: null,
+  inv_date: null,
+  inv_tax: null,
+  inv_ppn: null,
+  ord_id: null,
+  inv_lunas: null,
+  inv_desc: null,
+  total_bayar: null,
   product: [],
   jasa: [],
 };
 
-const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
+const DataInvoicePB = ({ onAdd, onDetail }) => {
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const [displayData, setDisplayData] = useState(false);
   const [position, setPosition] = useState("center");
   const [displayDel, setDisplayDel] = useState(false);
-  const [fkCode, setFkCode] = useState(null);
   const toast = useRef(null);
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
@@ -51,26 +55,25 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const dispatch = useDispatch();
-  const inv = useSelector((state) => state.fk_pb.fk_pb);
-  const fk = useSelector((state) => state.fk_pb.current_pb_fk);
+  const inv = useSelector((state) => state.inv.inv);
+  const fk = useSelector((state) => state.inv.current);
   const printPage = useRef(null);
   const [supplier, setSupplier] = useState(null);
-  const [expandedRows, setExpandedRows] = useState(null);
   const [doubleClick, setDoubleClick] = useState(false);
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
     getSetup();
-    getFK();
+    getInv();
     getSupplier();
     initFilters1();
   }, []);
 
-  const getFK = async (isUpdate = false) => {
+  const getInv = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.faktur,
+      ...endpoints.invoice_pb,
       data: {},
     };
     console.log(config.data);
@@ -86,7 +89,7 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
             filt.push(element);
           }
         });
-        dispatch({ type: SET_PB_FK, payload: filt });
+        dispatch({ type: SET_INV, payload: filt });
       }
     } catch (error) {}
     if (isUpdate) {
@@ -132,7 +135,7 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
     } catch (error) {}
   };
 
-  const checkSupp = (value) => {
+  const checkSup = (value) => {
     let selected = {};
     supplier?.forEach((element) => {
       if (value === element.supplier.id) {
@@ -143,10 +146,10 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
     return selected;
   };
 
-  const delFK = async (id) => {
+  const delInvPb = async (id) => {
     const config = {
-      ...endpoints.delFK,
-      endpoint: endpoints.delFK.endpoint + currentItem.id,
+      ...endpoints.delInvPb,
+      endpoint: endpoints.delInvPb.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -157,7 +160,7 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayDel(false);
-          getFK(true);
+          getInv(true);
           toast.current.show({
             severity: "info",
             summary: tr[localStorage.getItem("language")].berhasl,
@@ -188,12 +191,20 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
         <Link
           onClick={() => {
             onDetail();
-            let detail = data.detail;
+            let product = data.product;
+            let jasa = data.jasa;
             dispatch({
-              type: SET_CURRENT_PB_FK,
+              type: SET_CURRENT_INV,
               payload: {
                 ...data,
-                detail: detail?.length > 0 ? detail : null,
+                product:
+                  product.length > 0
+                    ? product
+                    : null,
+                jasa:
+                  jasa.length > 0
+                    ? jasa
+                    : null,
               },
             });
           }}
@@ -209,39 +220,10 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
             setCurrentItem(data);
           }}
           className={`btn ${
-            data.post === false ? "" : "disabled"
+            !data.faktur ? "" : "disabled"
           } btn-danger shadow btn-xs sharp ml-1 mt-1`}
         >
           <i className="fa fa-trash"></i>
-        </Link>
-      </div>
-      // </React.Fragment>
-    );
-  };
-
-  const FkBodyTemplate = (data) => {
-    return (
-      // <React.Fragment>
-      <div className="d-flex">
-        <Link
-          onClick={() => {
-            onDetailF();
-            let product = data.ord_id.product;
-            let jasa = data.ord_id.jasa;
-            dispatch({
-              type: SET_CURRENT_PB_FK,
-              payload: {
-                ...data,
-                product: product?.length > 0 ? product : null,
-                jasa: jasa?.length > 0 ? jasa : null,
-              },
-            });
-            console.log("===========dt");
-            console.log(data.ord_id.product);
-          }}
-          className="btn btn-info shadow btn-xs sharp ml-1 mt-1"
-        >
-          <i className="bx bx-show mt-1"></i>
         </Link>
       </div>
       // </React.Fragment>
@@ -269,7 +251,7 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
           icon="pi pi-trash"
           onClick={() => {
             setUpdate(true);
-            delFK();
+            delInvPb();
           }}
           autoFocus
           loading={update}
@@ -336,37 +318,20 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
           onClick={() => {
             onAdd();
             dispatch({
-              type: SET_EDIT_PB_FK,
+              type: SET_EDIT_INV,
               payload: false,
             });
             dispatch({
-              type: SET_CURRENT_PB_FK,
+              type: SET_CURRENT_INV,
               payload: {
                 ...data,
                 // fk_code: fkCode,
-                detail: [
-                  {
-                    id: 0,
-                    fk_id: 0,
-                    inv_id: null,
-                    sale_id: null,
-                    inv_date: null,
-                    total_pay: null,
-                  },
-                ],
-                det: [
-                  {
-                    id: 0,
-                    fk_id: 0,
-                    inv_id: null,
-                    inv_date: null,
-                    total_pay: null,
-                  },
-                ],
+                product: [],
+                jasa: [],
               },
             });
           }}
-          // disabled={setup?.cutoff == null}
+          disabled={setup?.cutoff === null && setup?.year_co === null}
         />
       </div>
     );
@@ -462,67 +427,6 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
     return total;
   };
 
-  const rowExpansionTemplate = (data) => {
-    return (
-      <div className="">
-        <DataTable value={data?.detail} responsiveLayout="scroll">
-          <Column
-            header={"Kode Invoice"}
-            style={{ width: "20rem" }}
-            field={(e) => `${e.inv_id?.inv_code}`}
-          />
-          <Column
-            header="Kode Pembelian"
-            style={{ width: "20rem" }}
-            field={(e) => e.ord_id?.ord_code}
-          />
-          <Column
-            header="Tanggal Transaksi"
-            style={{ width: "20rem" }}
-            field={(e) => formatDate(e.inv_date)}
-          />
-          <Column
-            header={"Total Tagihan"}
-            style={{ width: "20rem" }}
-            field={(e) => `Rp. ${formatIdr(e.total_pay)}`}
-          />
-          <Column
-            header="Action"
-            field={
-              FkBodyTemplate
-              // (e) => (
-              // <div className="d-flex">
-              //   <Link
-              //     onClick={() => {
-              //       onDetailF();
-              //       let product = data.detail.map((v) => v.ord_id).map((p) => p.product);
-              //       let jasa = data.detail.map((v) => v.ord_id).map((p) => p.jasa);
-              //       dispatch({
-              //         type: SET_CURRENT_PB_FK,
-              //         payload: {
-              //           ...data,
-              //           product: product?.length > 0 ? product : null,
-              //           jasa: jasa?.length > 0 ? jasa : null,
-              //         },
-              //       });
-              //       console.log("===========dt");
-              //       console.log(data.detail.map((v) => v.ord_id).map((p) => p.product));
-              //     }}
-              //     className="btn btn-info shadow btn-xs sharp ml-1 mt-1"
-              //   >
-              //     <i className="bx bx-show mt-1"></i>
-              //   </Link>
-              // </div>
-              // )
-            }
-            style={{ minWidth: "6rem" }}
-            body={loading && <Skeleton />}
-          />
-        </DataTable>
-      </div>
-    );
-  };
-
   return (
     <>
       <Toast ref={toast} />
@@ -534,15 +438,15 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
                 responsiveLayout="scroll"
                 value={loading ? dummy : inv}
                 className="display w-150 datatable-wrapper"
-                // showGridlines
+                showGridlines
                 dataKey="id"
                 rowHover
                 header={renderHeader}
                 filters={filters1}
                 globalFilterFields={[
-                  "fk_code",
+                  "inv_code",
                   "ord_id.ord_code",
-                  "formatDate(fk_date)",
+                  "inv_date",
                 ]}
                 emptyMessage={tr[localStorage.getItem("language")].empty_data}
                 paginator
@@ -551,31 +455,50 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
                 rows={rows2}
                 onPage={onCustomPage2}
                 paginatorClassName="justify-content-end mt-3"
-                expandedRows={expandedRows}
-                onRowToggle={(e) => setExpandedRows(e.data)}
-                rowExpansionTemplate={rowExpansionTemplate}
               >
-                <Column expander style={{ width: "3em" }} />
-
                 <Column
                   header={tr[localStorage.getItem("language")].tgl}
                   style={{
                     minWidth: "8rem",
                   }}
-                  field={(e) => formatDate(e.fk_date)}
+                  field={(e) => formatDate(e.inv_date)}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header={tr[localStorage.getItem("language")].kd_fk}
-                  field={(e) => e.fk_code}
+                  header={"Kode Invoice"}
+                  field={(e) => e.inv_code}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header={tr[localStorage.getItem("language")].supplier}
-                  field={(e) => `${e.sup_id?.sup_name} - ${e.sup_id?.sup_code}`}
+                  header={tr[localStorage.getItem("language")].kd_pur}
+                  field={(e) => e.ord_id?.ord_code}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
+                />
+                 <Column
+                  header={tr[localStorage.getItem("language")].fak_pur}
+                  field={(e) => e.faktur}
+                  style={{ minWidth: "8rem" }}
+                  body={(e) =>
+                    loading ? (
+                      <Skeleton />
+                    ) : (
+                      <div>
+                        {e.faktur === true ? (
+                          <Badge variant="info light">
+                            <i className="bx bx-check text-info mr-1 mt-1"></i>{" "}
+                            Faktur
+                          </Badge>
+                        ) : (
+                          <Badge variant="danger light">
+                            <i className="bx bx-x text-danger mr-1 mt-1"></i>{" "}
+                            Faktur
+                          </Badge>
+                        )}
+                      </div>
+                    )
+                  }
                 />
                 <Column
                   header="Action"
@@ -610,4 +533,4 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
   );
 };
 
-export default DataFaktur;
+export default DataInvoicePB;

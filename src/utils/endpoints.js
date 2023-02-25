@@ -457,7 +457,6 @@ const endpoints = {
     method: "PUT",
     data: {},
   },
-  
 
   editCustomer: {
     endpoint: "/v1/api/customer/",
@@ -782,21 +781,46 @@ const endpoints = {
     data: {},
   },
 
+  /// Invoice Pembelian
+  invoice_pb: {
+    endpoint: "/v1/api/invoice-pb",
+    method: "GET",
+    data: {},
+  },
+
+  editInvPb: {
+    endpoint: "/v1/api/invoice-pb/",
+    method: "PUT",
+    data: {},
+  },
+
+  addInvPb: {
+    endpoint: "/v1/api/invoice-pb",
+    method: "POST",
+    data: {},
+  },
+
+  delInvPb: {
+    endpoint: "/v1/api/invoice-pb/",
+    method: "DELETE",
+    data: {},
+  },
+
   /// Faktur
   faktur: {
-    endpoint: "/v1/api/faktur",
+    endpoint: "/v1/api/faktur-pb",
     method: "GET",
     data: {},
   },
 
   editFK: {
-    endpoint: "/v1/api/faktur/",
+    endpoint: "/v1/api/faktur-pb/",
     method: "PUT",
     data: {},
   },
 
   addFK: {
-    endpoint: "/v1/api/faktur",
+    endpoint: "/v1/api/faktur-pb",
     method: "POST",
     data: {},
   },
@@ -808,7 +832,7 @@ const endpoints = {
   },
 
   delFK: {
-    endpoint: "/v1/api/faktur/",
+    endpoint: "/v1/api/faktur-pb/",
     method: "DELETE",
     data: {},
   },
@@ -888,7 +912,6 @@ const endpoints = {
     data: {},
   },
 
-
   /// Income
   income: {
     endpoint: "/v1/api/income",
@@ -914,28 +937,27 @@ const endpoints = {
     data: {},
   },
 
-//User
-user: {
-  endpoint: "/v1/api/user",
-  method: "GET",
-  data: {},
-},
-addUSER: {
-  endpoint: "/v1/api/user",
-  method: "POST",
-  data: {},
-},
-editUSER: {
-  endpoint: "/v1/api/user/",
-  method: "PUT",
-  data: {},
-},
-delUSER: {
-  endpoint: "/v1/api/user/",
-  method: "DELETE",
-  data: {},
-},
-
+  //User
+  user: {
+    endpoint: "/v1/api/user",
+    method: "GET",
+    data: {},
+  },
+  addUSER: {
+    endpoint: "/v1/api/user",
+    method: "POST",
+    data: {},
+  },
+  editUSER: {
+    endpoint: "/v1/api/user/",
+    method: "PUT",
+    data: {},
+  },
+  delUSER: {
+    endpoint: "/v1/api/user/",
+    method: "DELETE",
+    data: {},
+  },
 
   /// Retur-Jual
   retur_sale: {
@@ -1161,7 +1183,6 @@ delUSER: {
     data: {},
   },
 
-
   /// Formula
   formula: {
     endpoint: "/v1/api/formula",
@@ -1300,7 +1321,7 @@ delUSER: {
     data: {},
   },
 
-  // 
+  //
   sto_loc: {
     endpoint: "/v1/api/sto/",
     method: "GET",

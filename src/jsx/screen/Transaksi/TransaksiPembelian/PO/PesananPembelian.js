@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_PO, SET_EDIT_PO } from "src/redux/actions";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { tr } from "src/data/tr";
+import { Tooltip } from "primereact/tooltip";
 
 const data = {
   id: null,
@@ -29,6 +30,7 @@ const data = {
   prod_disc: null,
   jasa_disc: null,
   total_disc: null,
+  total_bayar: null,
   rprod: [],
   rjasa: [],
   psup: [],
@@ -182,7 +184,12 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
     return (
       // <React.Fragment>
       <div className="d-flex">
+        <Tooltip target={".btn"}/>
         <Link
+          data-pr-tooltip="Lihat Detail PO"
+          data-pr-position="right"
+          data-pr-at="right+5 top"
+          data-pr-my="left center-2"
           onClick={() => {
             onDetail();
             let pprod = data.pprod;
@@ -235,6 +242,10 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
         </Link>
 
         <Link
+          data-pr-tooltip="Edit PO"
+          data-pr-position="right"
+          data-pr-at="right+5 top"
+          data-pr-my="left center-2"
           onClick={() => {
             onEdit();
             dispatch({
@@ -318,6 +329,10 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
         </Link>
 
         <Link
+          data-pr-tooltip="Close PO"
+          data-pr-position="right"
+          data-pr-at="right+5 top"
+          data-pr-my="left center-2"
           onClick={() => {
             setDisplayConfirm(true);
             dispatch({
@@ -381,10 +396,14 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
             data.status !== 2 ? "" : "disabled"
           } btn-warning shadow btn-xs sharp ml-1`}
         >
-          <i className="bx bx-task-x mt-1"></i>
+          <i className="bx bx-x mt-1"></i>
         </Link>
 
         <Link
+          data-pr-tooltip="Hapus PO"
+          data-pr-position="right"
+          data-pr-at="right+5 top"
+          data-pr-my="left center-2"
           onClick={() => {
             setEdit(true);
             setDisplayDel(true);

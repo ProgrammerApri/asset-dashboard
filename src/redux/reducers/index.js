@@ -60,7 +60,10 @@ const rootReducer = combineReducers({
   inc: IncReducer,
   giro_in: GIROINReducer,
   profile: ProfileReducer,
-  user: UserReducer
+  user: UserReducer,
+  fk_pj: INVReducer,
+  inv_pj: INVReducer,
+  fk_pb: INVReducer,
 });
 
 export default rootReducer;

@@ -35,7 +35,7 @@ const data = {
   type_acc: null,
   exp_dep: null,
   exp_prj: null,
-  dp_type: 1,
+  dp_type: null,
   dp_sup: null,
   dp_kas: null,
   dp_bnk: null,
@@ -350,15 +350,7 @@ const KasBankOutList = ({ onAdd, onDetail }) => {
                 type_acc: null,
                 exp_type: 1,
                 acq_pay: 1,
-                acq: [
-                  // {
-                  //   id: null,
-                  //   exp_id: null,
-                  //   fk_id: null,
-                  //   value: null,
-                  //   payment: null,
-                  // },
-                ],
+                acq: [],
                 exp: [
                   {
                     id: null,
@@ -370,6 +362,7 @@ const KasBankOutList = ({ onAdd, onDetail }) => {
                     desc: null,
                   },
                 ],
+                det_dp: [],
               },
             });
           }}
@@ -484,15 +477,20 @@ const KasBankOutList = ({ onAdd, onDetail }) => {
                       <Skeleton />
                     ) : (
                       <div>
-                        {e.exp_type === 1 ? (
+                        {e.type_trx === 1 ? (
                           <Badge variant="info light">
                             <i className="bx bxs-circle text-info mr-1"></i>{" "}
                             Pelunasan
                           </Badge>
-                        ) : (
+                        ) : e.type_trx == 2 ? (
                           <Badge variant="warning light">
                             <i className="bx bxs-circle text-warning mr-1"></i>{" "}
-                            Pengeluaran Kas/Bank
+                            Pengeluaran
+                          </Badge>
+                        ) : (
+                          <Badge variant="success light">
+                            <i className="bx bxs-circle text-success mr-1"></i>{" "}
+                            Uang Muka
                           </Badge>
                         )}
                       </div>

@@ -20,20 +20,28 @@ const data = {
   id: null,
   exp_code: null,
   exp_date: null,
-  exp_type: null,
-  exp_acc: null,
-  exp_dep: null,
-  exp_prj: null,
+  type_trx: null,
   acq_sup: null,
   acq_pay: null,
-  kas_acc: null,
-  bank_acc: null,
-  bank_id: null,
+  acq_kas: null,
   bank_ref: null,
+  bank_acc: null,
   giro_num: null,
   giro_date: null,
+  bank_id: null,
+  exp_type: null,
+  kas_acc: null,
+  exp_bnk: null,
+  type_acc: null,
+  exp_dep: null,
+  exp_prj: null,
+  dp_type: 1,
+  dp_sup: null,
+  dp_kas: null,
+  dp_bnk: null,
   acq: [],
   exp: [],
+  det_dp: [],
 };
 
 const KasBankOutList = ({ onAdd, onDetail }) => {
@@ -338,6 +346,8 @@ const KasBankOutList = ({ onAdd, onDetail }) => {
               type: SET_CURRENT_EXP,
               payload: {
                 ...data,
+                type_trx: 1,
+                type_acc: null,
                 exp_type: 1,
                 acq_pay: 1,
                 acq: [
@@ -353,7 +363,10 @@ const KasBankOutList = ({ onAdd, onDetail }) => {
                   {
                     id: null,
                     acc_code: null,
+                    acc_bnk: null,
+                    bnk_code: null,
                     value: null,
+                    fc: null,
                     desc: null,
                   },
                 ],
@@ -648,7 +661,8 @@ const KasBankOutList = ({ onAdd, onDetail }) => {
 
                               <br></br>
                               <span className="ml-0">
-                                Tanggal Cair : <b>{`${formatDate( show?.giro_date)}`}</b>
+                                Tanggal Cair :{" "}
+                                <b>{`${formatDate(show?.giro_date)}`}</b>
                               </span>
                               <br></br>
 
@@ -690,7 +704,7 @@ const KasBankOutList = ({ onAdd, onDetail }) => {
 
                           <span className="ml-0">
                             Akun Pengeluaran :{" "}
-                            <b>{`${show?.exp_acc.acc_code}-${show?.exp_acc.acc_name}`}</b>
+                            {/* <b>{`${show?.exp_acc.acc_code}-${show?.exp_acc.acc_name}`}</b> */}
                           </span>
 
                           <br></br>

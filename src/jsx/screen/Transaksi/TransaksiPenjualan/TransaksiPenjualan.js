@@ -2,6 +2,8 @@ import { current } from "@reduxjs/toolkit";
 import { TabView, TabPanel } from "primereact/tabview";
 import React, { useState } from "react";
 import { tr } from "src/data/tr";
+import FakturPenjualan from "./FakturPenjualan";
+import InvoicePenjualan from "./InvoicePenjualan";
 import Penjualan from "./Penjualan";
 import ReturPenjualan from "./ReturPenjualan";
 import SalesOrder from "./SalesOrder";
@@ -22,6 +24,12 @@ const TransaksiPenjualan = () => {
       </TabPanel>
       <TabPanel header={tr[localStorage.getItem("language")].sale}>
         <Penjualan trigger={trigger}/>
+      </TabPanel>
+      <TabPanel header={"Invoice Penjualan"}>
+        <InvoicePenjualan trigger={trigger}/>
+      </TabPanel>
+      <TabPanel header={"Faktur Penjualan"}>
+        <FakturPenjualan trigger={trigger}/>
       </TabPanel>
       <TabPanel header={tr[localStorage.getItem("language")].ret_sal}>
         <ReturPenjualan trigger={trigger}/>

@@ -634,27 +634,27 @@ const DataGroupProduk = ({
         acc_1: currentItem.groupPro.wip
           ? false
           : !currentItem.groupPro?.acc_sto,
-        acc_2: currentItem.groupPro.wip
-          ? false
-          : !currentItem.groupPro?.acc_send,
-        acc_3: currentItem.groupPro.wip
-          ? false
-          : !currentItem.groupPro?.acc_terima,
-        acc_4: currentItem.groupPro.wip
-          ? false
-          : !currentItem.groupPro?.hrg_pokok,
-        acc_5: currentItem.groupPro.wip
-          ? false
-          : !currentItem.groupPro?.acc_penj,
-        acc_6: currentItem.groupPro.wip
-          ? false
-          : !currentItem.groupPro?.potongan,
-        acc_7: currentItem.groupPro.wip
-          ? false
-          : !currentItem.groupPro?.pengembalian,
-        acc_8: currentItem.groupPro.wip
-          ? false
-          : !currentItem.groupPro?.selisih,
+        // acc_2: currentItem.groupPro.wip
+        //   ? false
+        //   : !currentItem.groupPro?.acc_send,
+        // acc_3: currentItem.groupPro.wip
+        //   ? false
+        //   : !currentItem.groupPro?.acc_terima,
+        // acc_4: currentItem.groupPro.wip
+        //   ? false
+        //   : !currentItem.groupPro?.hrg_pokok,
+        // acc_5: currentItem.groupPro.wip
+        //   ? false
+        //   : !currentItem.groupPro?.acc_penj,
+        // acc_6: currentItem.groupPro.wip
+        //   ? false
+        //   : !currentItem.groupPro?.potongan,
+        // acc_7: currentItem.groupPro.wip
+        //   ? false
+        //   : !currentItem.groupPro?.pengembalian,
+        // acc_8: currentItem.groupPro.wip
+        //   ? false
+        //   : !currentItem.groupPro?.selisih,
         acc_9: !currentItem.groupPro.wip
           ? false
           : !currentItem.groupPro?.acc_wip,
@@ -947,8 +947,8 @@ const DataGroupProduk = ({
                     filterBy="account.acc_name"
                     placeholder={tr[localStorage.getItem("language")].pilih}
                     showClear
-                    errorMessage="Akun Pengiriman Belum Dipilih"
-                    error={error[1]?.acc_2}
+                    // errorMessage="Akun Pengiriman Belum Dipilih"
+                    // error={error[1]?.acc_2}
                     disabled={currentItem.groupPro.wip === true}
                   />
                 </div>
@@ -985,8 +985,8 @@ const DataGroupProduk = ({
                     filterBy="account.acc_name"
                     placeholder={tr[localStorage.getItem("language")].pilih}
                     showClear
-                    errorMessage="Akun Penerimaan Belum Dipilih"
-                    error={error[1]?.acc_3}
+                    // errorMessage="Akun Penerimaan Belum Dipilih"
+                    // error={error[1]?.acc_3}
                     disabled={currentItem.groupPro.wip === true}
                   />
                 </div>
@@ -1065,8 +1065,8 @@ const DataGroupProduk = ({
                     filterBy="account.acc_name"
                     placeholder={tr[localStorage.getItem("language")].pilih}
                     showClear
-                    errorMessage="Akun HPP Belum Dipilih"
-                    error={error[1]?.acc_4}
+                    // errorMessage="Akun HPP Belum Dipilih"
+                    // error={error[1]?.acc_4}
                     disabled={currentItem.groupPro.wip === true}
                   />
                 </div>
@@ -1101,8 +1101,8 @@ const DataGroupProduk = ({
                     filterBy="account.acc_name"
                     placeholder={tr[localStorage.getItem("language")].pilih}
                     showClear
-                    errorMessage="Akun Penjualan Belum Dipilih"
-                    error={error[1]?.acc_5}
+                    // errorMessage="Akun Penjualan Belum Dipilih"
+                    // error={error[1]?.acc_5}
                     disabled={currentItem.groupPro.wip === true}
                   />
                 </div>
@@ -1139,8 +1139,8 @@ const DataGroupProduk = ({
                     filterBy="account.acc_name"
                     placeholder={tr[localStorage.getItem("language")].pilih}
                     showClear
-                    errorMessage="Akun Potongan Penjualan Belum Dipilih"
-                    error={error[1]?.acc_6}
+                    // errorMessage="Akun Potongan Penjualan Belum Dipilih"
+                    // error={error[1]?.acc_6}
                     disabled={currentItem.groupPro.wip === true}
                   />
                 </div>
@@ -1175,8 +1175,8 @@ const DataGroupProduk = ({
                     filterBy="account.acc_name"
                     placeholder={tr[localStorage.getItem("language")].pilih}
                     showClear
-                    errorMessage="Akun Pengembalian Belum Dipilih"
-                    error={error[1]?.acc_7}
+                    // errorMessage="Akun Pengembalian Belum Dipilih"
+                    // error={error[1]?.acc_7}
                     disabled={currentItem.groupPro.wip === true}
                   />
                 </div>
@@ -1213,8 +1213,8 @@ const DataGroupProduk = ({
                     filterBy="account.acc_name"
                     placeholder={tr[localStorage.getItem("language")].pilih}
                     showClear
-                    errorMessage="Akun Selisih Harga Belum Dipilih"
-                    error={error[1]?.acc_8}
+                    // errorMessage="Akun Selisih Harga Belum Dipilih"
+                    // error={error[1]?.acc_8}
                     disabled={currentItem.groupPro.wip === true}
                   />
                 </div>

@@ -119,7 +119,7 @@ export const tr = {
         dep : "Departemen",
         kd_dep : "Kode Departemen",
         nm_dep : "Nama Departemen",
-        salesmn : "Penjual",
+        salesmn : "Salesman",
         kd_slsm : "Kode Penjual",
         nm_slsm : "Nama Penjual",
         proj : "Projek",

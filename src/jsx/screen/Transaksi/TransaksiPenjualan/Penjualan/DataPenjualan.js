@@ -3,7 +3,7 @@ import { request, endpoints } from "src/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Button, Row, Card, Col } from "react-bootstrap";
+import { Button, Row, Card, Col, Badge } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { Dialog } from "primereact/dialog";
@@ -22,6 +22,8 @@ const data = {
   id: null,
   ord_code: null,
   ord_date: null,
+  no_doc: null,
+  doc_date: null,
   so_id: null,
   invoice: null,
   pel_id: null,
@@ -29,6 +31,7 @@ const data = {
   sub_addr: null,
   sub_id: null,
   slsm_id: null,
+  surat_jalan: 1,
   req_date: null,
   top: null,
   due_date: false,
@@ -36,6 +39,8 @@ const data = {
   prod_disc: null,
   jasa_disc: null,
   total_disc: null,
+  total_b: null,
+  total_bayar: null,
   jprod: [],
   jjasa: [],
 };
@@ -56,6 +61,7 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
   const sale = useSelector((state) => state.sl.sl);
   const show = useSelector((state) => state.sl.current);
   const printPage = useRef(null);
+  const [expandedRows, setExpandedRows] = useState(null);
 
   const dummy = Array.from({ length: 10 });
 
@@ -138,40 +144,12 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
             let jprod = data.jprod;
             let jjasa = data.jjasa;
 
-            if (!jprod.length) {
-              jprod.push({
-                id: 0,
-                prod_id: null,
-                unit_id: null,
-                location: null,
-                order: null,
-                price: null,
-                disc: null,
-                nett_price: null,
-                total: null,
-              });
-            }
-
-            if (!jjasa.length) {
-              jjasa.push({
-                id: 0,
-                sup_id: null,
-                jasa_id: null,
-                unit_id: null,
-                order: null,
-                price: null,
-                disc: null,
-                nett_price: null,
-                total: null,
-              });
-            }
-
             dispatch({
               type: SET_CURRENT_SL,
               payload: {
                 ...data,
-                jprod: jprod,
-                jjasa: jjasa,
+                jprod: jprod.length > 0 ? jprod : null,
+                jjasa: jjasa.length > 0 ? jjasa : null,
               },
             });
           }}
@@ -210,6 +188,7 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
                 price: null,
                 disc: null,
                 nett_price: null,
+                total_fc: null,
                 total: null,
               });
             }
@@ -224,6 +203,7 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
                 price: null,
                 disc: null,
                 nett_price: null,
+                total_fc: null,
                 total: null,
               });
             }
@@ -232,7 +212,7 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
               type: SET_CURRENT_SL,
               payload: {
                 ...data,
-                so_id: data?.so_id?.id,
+                // so_id: data?.so_id?.id,
                 pel_id: data?.pel_id?.id ?? null,
                 slsm_id: data?.slsm_id?.id ?? null,
                 top: data?.top?.id,
@@ -322,6 +302,7 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
               type: SET_CURRENT_SL,
               payload: {
                 ...data,
+                surat_jalan: 1,
                 jprod: [
                   {
                     id: 0,
@@ -336,6 +317,7 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
                     price: null,
                     disc: null,
                     nett_price: null,
+                    total_fc: null,
                     total: null,
                   },
                 ],
@@ -349,6 +331,7 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
                     order: null,
                     price: null,
                     disc: null,
+                    total_fc: null,
                     total: null,
                   },
                 ],
@@ -447,8 +430,14 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
     return [day, month, year].join("-");
   };
 
-  const formatIdr = (value) => {
+  const formatTh = (value) => {
     return `${value}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
+  const formatIdr = (value) => {
+    return `${value?.toFixed(2)}`
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
@@ -473,6 +462,96 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
     });
 
     return total;
+  };
+
+  const rowExpansionTemplate = (data) => {
+    return (
+      <div className="">
+        <label className="text-label fs-13 text-black">
+          <b>Daftar Produk</b>
+        </label>
+
+        <DataTable value={data?.jprod} responsiveLayout="scroll">
+          <Column
+            header="Produk"
+            field={(e) => `${e.prod_id?.name} (${e.prod_id?.code})`}
+            style={{ minWidth: "19rem" }}
+            // body={loading && <Skeleton />}
+          />
+          <Column
+            header="Gudang"
+            field={(e) => e.location?.name}
+            style={{ minWidth: "9rem" }}
+            // body={loading && <Skeleton />}
+          />
+          <Column
+            header="Jumlah"
+            field={(e) => formatTh(e.order)}
+            style={{ minWidth: "6rem" }}
+            // body={loading && <Skeleton />}
+          />
+          <Column
+            header="Satuan"
+            field={(e) => e.unit_id?.name}
+            style={{ minWidth: "7rem" }}
+            // body={loading && <Skeleton />}
+          />
+          <Column
+            header="Harga Satuan"
+            field={(e) => `Rp. ${formatIdr(e.price)}`}
+            style={{ minWidth: "10rem" }}
+            // body={loading && <Skeleton />}
+          />
+          <Column
+            header="Total"
+            field={(e) => `Rp. ${formatIdr(e.total)}`}
+            style={{ minWidth: "10rem" }}
+            // body={loading && <Skeleton />}
+          />
+        </DataTable>
+
+        {data?.jjasa?.length ? (
+          <>
+            <label className="text-label fs-13 text-black">
+              <b>Daftar Jasa</b>
+            </label>
+
+            <DataTable value={data?.jjasa} responsiveLayout="scroll">
+              <Column
+                header="Supplier"
+                field={(e) =>
+                  e.sup_id
+                    ? `${e.sup_id?.supplier?.sup_name} (${e.sup_id?.supplier?.sup_code})`
+                    : "-"
+                }
+                style={{ minWidth: "21rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header=""
+                field={(e) => null}
+                style={{ minWidth: "9rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header="Jasa"
+                field={(e) => e.jasa_id?.name}
+                style={{ minWidth: "27rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header="Total"
+                field={(e) => e.total}
+                style={{ minWidth: "15rem" }}
+                // body={loading && <Skeleton />}
+              />
+            </DataTable>
+          </>
+        ) : (
+          <></>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -505,7 +584,12 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
                 rows={rows2}
                 onPage={onCustomPage2}
                 paginatorClassName="justify-content-end mt-3"
+                expandedRows={expandedRows}
+                onRowToggle={(e) => setExpandedRows(e.data)}
+                rowExpansionTemplate={rowExpansionTemplate}
               >
+                <Column expander style={{ width: "3em" }} />
+
                 <Column
                   header={tr[localStorage.getItem("language")].tgl}
                   style={{
@@ -531,6 +615,32 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
                   field={(e) => e.pel_id?.cus_name}
                   style={{ minWidth: "10rem" }}
                   body={loading && <Skeleton />}
+                />
+                <Column
+                  header={"Dokumen"}
+                  field={(e) => e.surat_jalan}
+                  style={{ minWidth: "8rem" }}
+                  body={(e) =>
+                    loading ? (
+                      <Skeleton />
+                    ) : (
+                      <div>
+                        {e.surat_jalan === 1 ? (
+                          <>
+                            <Badge variant="info light">
+                              <i className="bx bxs-plus-circle text-info mr-1 mt-1"></i>{" "}
+                              Invoice
+                            </Badge>
+                          </>
+                        ) : (
+                          <Badge variant="success light">
+                            <i className="bx bxs-plus-circle text-success mr-1 mt-1"></i>{" "}
+                            Invoice + Faktur
+                          </Badge>
+                        )}
+                      </div>
+                    )
+                  }
                 />
                 <Column
                   header="Action"

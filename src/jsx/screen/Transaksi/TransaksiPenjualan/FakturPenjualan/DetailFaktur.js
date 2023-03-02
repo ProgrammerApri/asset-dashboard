@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { request } from "src/utils";
+import { request, endpoints } from "src/utils";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
@@ -11,20 +11,20 @@ import { Divider } from "@material-ui/core";
 import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 import ReactToPrint from "react-to-print";
 import Wrapper from "src/jsx/components/CustomeWrapper/Wrapper";
-import endpoints from "../../../../../utils/endpoints";
 
-const Detail = ({ onCancel }) => {
-  const show = useSelector((state) => state.fk_pb.current_pb_fk);
-  const inv = useSelector((state) => state.fk_pb.fk_pb);
+const DetailFaktur = ({ onCancel }) => {
+  const show = useSelector((state) => state.fk_pj.current_fk);
+  const inv = useSelector((state) => state.fk_pj.fk_pj);
   const dispatch = useDispatch();
   const printPage = useRef(null);
   const [comp, setComp] = useState(null);
   const [order, setOrder] = useState(null);
   const [city, setCity] = useState(null);
+  const [customer, setCustomer] = useState(null);
   const [supplier, setSupplier] = useState(null);
   const [ppn, setPpn] = useState(null);
   const [jas, setJas] = useState(null);
-  const [apCard, setApCard] = useState(null);
+  const [arCard, setArCard] = useState(null);
   const [prod, setProd] = useState(null);
   const [unit, setUnit] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -37,6 +37,7 @@ const Detail = ({ onCancel }) => {
       behavior: "smooth",
     });
     getORD();
+    getCustomer();
     getSupplier();
     getProduct();
     getJasa();
@@ -44,7 +45,7 @@ const Detail = ({ onCancel }) => {
     getComp();
     getCity();
     getPpn();
-    getAp();
+    getAr();
   }, []);
 
   const getORD = async () => {
@@ -64,6 +65,21 @@ const Detail = ({ onCancel }) => {
       console.log("------");
       console.log(error);
     }
+  };
+
+  const getCustomer = async () => {
+    const config = {
+      ...endpoints.customer,
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setCustomer(data);
+      }
+    } catch (error) {}
   };
 
   const getSupplier = async () => {
@@ -190,20 +206,17 @@ const Detail = ({ onCancel }) => {
     } catch (error) {}
   };
 
-  const getAp = async () => {
+  const getAr = async () => {
     const config = {
-      ...endpoints.apcard,
-      data: {},
+      ...endpoints.arcard,
     };
-    console.log(config.data);
     let response = null;
     try {
       response = await request(null, config);
       console.log(response);
       if (response.status) {
         const { data } = response;
-        console.log(data);
-        setApCard(data);
+        setArCard(data);
       }
     } catch (error) {}
   };
@@ -212,6 +225,17 @@ const Detail = ({ onCancel }) => {
     let selected = {};
     jas?.forEach((element) => {
       if (value === element.jasa.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const cus = (value) => {
+    let selected = {};
+    customer?.forEach((element) => {
+      if (value === element.customer.id) {
         selected = element;
       }
     });
@@ -241,6 +265,12 @@ const Detail = ({ onCancel }) => {
   };
 
   const renderHeader = () => {
+    let fk_code = null;
+    inv?.forEach((element) => {
+      if (element.id === show?.fk_id) {
+        fk_code = element.fk_code;
+      }
+    });
     return (
       <Row>
         <Col>
@@ -262,10 +292,10 @@ const Detail = ({ onCancel }) => {
               </div>
 
               <div className="">
-                <label className="text-label">No. Faktur Pembelian</label>
+                <label className="text-label">No. Faktur Penjualan</label>
                 <br></br>
                 <span className="ml-0 fs-14">
-                  <b>{show?.fk_code}</b>
+                  <b>{fk_code}</b>
                 </span>
               </div>
 
@@ -278,10 +308,12 @@ const Detail = ({ onCancel }) => {
               </div> */}
 
               <div className="">
-                <label className="text-label">Supplier</label>
+                <label className="text-label">Customer</label>
                 <br></br>
                 <span className="ml-0 fs-14">
-                  <b>{`${show?.sup_id?.sup_name} (${show?.sup_id?.sup_code})`}</b>
+                  <b>{`${cus(show?.sale_id?.pel_id)?.customer?.cus_name} (${
+                    cus(show?.sale_id?.pel_id)?.customer?.cus_code
+                  })`}</b>
                 </span>
               </div>
 
@@ -341,6 +373,12 @@ const Detail = ({ onCancel }) => {
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
 
+  const formatTh = (value) => {
+    return `${value}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
   const getSubTotalBarang = () => {
     let total = 0;
     show?.product?.forEach((el) => {
@@ -354,17 +392,24 @@ const Detail = ({ onCancel }) => {
     return total;
   };
 
-  const getDp = () => {
+  const getSubTotalJasa = () => {
+    let total = 0;
+    show?.jasa?.forEach((el) => {
+      total += el.total - (el.total * el.disc) / 100;
+    });
+
+    return total;
+  };
+
+  const getUangMuka = () => {
     let dp = 0;
-    show?.detail?.forEach((el) => {
-      apCard?.forEach((element) => {
-        if (
-          el.ord_id?.po_id === element?.po_id?.id &&
-          element?.trx_type === "DP"
-        ) {
-          dp += element.trx_amnh;
-        }
-      });
+    arCard?.forEach((element) => {
+      if (
+        show?.sale_id?.so_id === element.so_id?.id &&
+        element.trx_type === "DP"
+      ) {
+        dp += element.trx_amnh;
+      }
     });
 
     return dp;
@@ -373,25 +418,22 @@ const Detail = ({ onCancel }) => {
   const pajk = (value) => {
     let nil = 0;
     ppn?.forEach((elem) => {
-      if (show?.sup_id?.sup_ppn === elem.id) {
+      if (cus(show?.sale_id?.pel_id)?.customer?.cus_pjk === elem.id) {
         nil = elem.nilai;
       }
     });
     return nil;
   };
 
-  const getSubTotal = () => {
-    let total = 0;
-    let totals = 0;
-    show?.detail?.forEach((el) => {
-      total += el.total;
-    });
-    totals = (total * pajk()) / 100;
-
-    return total;
-  };
-
   const body = () => {
+    let fk_date = null;
+    let fk_code = null;
+    inv?.forEach((element) => {
+      if (element.id === show?.fk_id) {
+        fk_date = element.fk_date;
+        fk_code = element.fk_code;
+      }
+    });
     return (
       <>
         <Row className="ml-0 pt-0 justify-content-center" ref={printPage}>
@@ -440,7 +482,7 @@ const Detail = ({ onCancel }) => {
                   <div className="row justify-content-left col-6">
                     <div className="col-12 mt-0 fs-14 text-left">
                       <label className="text-label">
-                        <b>Faktur Pembelian</b>
+                        <b>Faktur Pajak Penjualan</b>
                       </label>
                     </div>
                   </div>
@@ -449,7 +491,7 @@ const Detail = ({ onCancel }) => {
                     <div className="col-12 mt-0 fs-12 text-right">
                       <label className="text-label">Tanggal Faktur : </label>
                       <span className="ml-1">
-                        <b>{formatDate(show?.fk_date)}</b>
+                        <b>{formatDate(fk_date)}</b>
                       </span>
                     </div>
                   </div>
@@ -459,125 +501,196 @@ const Detail = ({ onCancel }) => {
                   <div className="row col-12">
                     <div className="col-6 fs-12 ml-0">
                       <label className="text-label">
-                        <b>Informasi Faktur</b>
+                        <b>Informasi Penjualan</b>
                       </label>
                     </div>
 
                     <div className="col-6 fs-12 ml-0 text-right">
                       <label className="text-label">
-                        <b>Informasi Supplier</b>
+                        <b>Informasi Pembeli</b>
                       </label>
                     </div>
 
                     <div className="col-6 fs-12 ml-0">
-                      <span className="ml-0 fs-13">
-                        No. Faktur : <b>{show?.fk_code}</b>
+                      <span className="ml-0 fs-12">
+                        Kode Faktur: <b>{fk_code}</b>
                       </span>
                       <br></br>
-                      {/* <span className="ml-0">
-                        No. Pembelian : <b>{show?.ord_id?.ord_code}</b>
+                      <br></br>
+                      <span className="ml-0">
+                        No. Penjualan : <b>{show?.sale_id?.ord_code}</b>
                       </span>
+                      <br></br>
                       <br></br>
                       <span className="ml-0">
                         Jatuh Tempo :{" "}
-                        <b>{formatDate(show?.ord_id?.due_date)}</b>
-                      </span> */}
+                        <b>{formatDate(show?.sale_id?.due_date)}</b>
+                      </span>
                     </div>
 
                     <div className="col-6 fs-12 ml-0 text-right">
                       <span className="ml-0 fs-14">
-                        <b>{show?.sup_id?.sup_name}</b>
+                        <b>{cus(show?.sale_id?.pel_id)?.customer?.cus_name}</b>
                       </span>
                       <br></br>
                       <span className="ml-0">
-                        Cp : <b>{show.sup_id?.sup_cp}</b>
-                      </span>
-                      <br></br>
-                      <span className="ml-0">{show.sup_id?.sup_address}</span>
-                      <br></br>
-                      <span className="ml-0">
-                        {kota(show.sup_id?.sup_kota)?.city_name},
-                        {show.sup_id?.sup_kpos}
+                        Cp :{" "}
+                        <b>{cus(show?.sale_id?.pel_id)?.customer?.cus_cp}</b>
                       </span>
                       <br></br>
                       <span className="ml-0">
-                        (+62)
-                        {show.sup_id?.sup_telp1}
+                        {cus(show?.sale_id?.pel_id)?.customer?.cus_address}
+                      </span>
+                      <br></br>
+                      <span className="ml-0">
+                        {
+                          kota(cus(show?.sale_id?.pel_id)?.customer?.cus_kota)
+                            ?.city_name
+                        }
+                        ,{cus(show?.sale_id?.pel_id)?.customer?.cus_kpos}
+                      </span>
+                      <br></br>
+                      <span className="ml-0">
+                        {cus(show?.sale_id?.pel_id)?.customer?.cus_telp1}
                       </span>
                     </div>
                   </div>
                 </Card>
 
-                <Row className="ml-0 mt-0 mr-1">
-                  <div className="col-12 ml-0 mr-0">
-                    <label className="text-label fs-13 text-black">
-                      <b>Daftar Invoice</b>
-                    </label>
-                    <DataTable
-                      value={show?.detail?.map((v, i) => {
-                        return {
-                          ...v,
-                          index: i,
-                        };
-                      })}
-                      responsiveLayout="none"
-                      className="display w-150 datatable-wrapper fs-12"
-                      // showGridlines
-                      dataKey="id"
-                      rowHover
-                    >
-                      <Column
-                        header="Kode Invoice"
-                        field={(e) => e.inv_id?.inv_code}
-                        style={{ minWidth: "16rem" }}
-                        // body={loading && <Skeleton />}
-                      />
-                      <Column
-                        header="Kode Penjualan"
-                        field={(e) => e.ord_id?.ord_code}
-                        style={{ minWidth: "14rem" }}
-                        // body={loading && <Skeleton />}
-                      />
-                      <Column
-                        header="Tanggal Transaksi"
-                        field={(e) => formatDate(e?.inv_date)}
-                        style={{ minWidth: "14rem" }}
-                        // body={loading && <Skeleton />}
-                      />
-                      <Column
-                        header="Total Tagihan"
-                        field={(e) => `Rp. ${formatIdr(e?.total_pay)}`}
-                        style={{ minWidth: "14rem" }}
-                        // body={loading && <Skeleton />}
-                      />
-                    </DataTable>
-                  </div>
+                <Row className="ml-1 mt-0">
+                  <label className="text-label fs-13 text-black mb-2">
+                    <b>Daftar Produk</b>
+                  </label>
+                  <DataTable
+                    value={show?.sale_id?.product?.map((v, i) => {
+                      return {
+                        ...v,
+                        index: i,
+                        price: v?.price ?? 0,
+                        total: v?.total ?? 0,
+                      };
+                    })}
+                    responsiveLayout="scroll"
+                    className="display w-150 datatable-wrapper fs-12"
+                    // showGridlines
+                    dataKey="id"
+                    rowHover
+                  >
+                    <Column
+                      header="Produk"
+                      field={(e) => `${e.prod_id?.name} (${e.prod_id?.code})`}
+                      style={{ minWidth: "30rem" }}
+                      // body={loading && <Skeleton />}
+                    />
+                    {/* <Column
+                      header="Lokasi"
+                      field={(e) => e.location?.name}
+                      style={{ minWidth: "9rem" }}
+                      // body={loading && <Skeleton />}
+                    /> */}
+                    <Column
+                      header="Jumlah"
+                      field={(e) => formatTh(e?.order)}
+                      style={{ minWidth: "8rem" }}
+                      // body={loading && <Skeleton />}
+                    />
+                    {/* <Column
+                      header="Satuan"
+                      field={(e) => e?.unit_id?.name}
+                      style={{ minWidth: "9rem" }}
+                      // body={loading && <Skeleton />}
+                    /> */}
+                    <Column
+                      header="Harga Satuan"
+                      field={(e) => `Rp. ${formatIdr(e?.price)}`}
+                      style={{ minWidth: "10rem" }}
+                      // body={loading && <Skeleton />}
+                    />
+                    <Column
+                      header="Total"
+                      field={(e) => `Rp. ${formatIdr(e?.total)}`}
+                      style={{ minWidth: "15rem" }}
+                      // body={loading && <Skeleton />}
+                    />
+                  </DataTable>
                 </Row>
+
+                {show?.pel_id?.jasa?.length ? (
+                  <Row className="ml-1 mt-6">
+                    <label className="text-label fs-13 text-black mb-2">
+                      <b>Daftar Jasa</b>
+                    </label>
+                    <>
+                      <DataTable
+                        value={show?.sale_id?.jasa?.map((v, i) => {
+                          return {
+                            ...v,
+                            index: i,
+                            total: v?.total ?? 0,
+                          };
+                        })}
+                        responsiveLayout="scroll"
+                        className="display w-150 datatable-wrapper fs-12"
+                        // showGridlines
+                        dataKey="id"
+                        rowHover
+                      >
+                        <Column
+                          header="Supplier"
+                          field={(e) => e.sup_id?.sup_name}
+                          style={{ minWidth: "21rem" }}
+                          // body={loading && <Skeleton />}
+                        />
+                        <Column
+                          header="Jasa"
+                          field={(e) => e.jasa_id?.name}
+                          style={{ minWidth: "27rem" }}
+                          // body={loading && <Skeleton />}
+                        />
+                        <Column
+                          header="Total"
+                          field={(e) => e?.total}
+                          style={{ minWidth: "15rem" }}
+                          // body={loading && <Skeleton />}
+                        />
+                      </DataTable>
+                    </>
+                  </Row>
+                ) : (
+                  <></>
+                )}
 
                 <Row className="ml-0 mr-0 mb-0 mt-8 justify-content-between fs-12">
                   <div></div>
                   <div className="row justify-content-right col-6 mr-4">
-                    <div className="col-12 mb-0">
-                      <label className="text-label fs-13">
-                        <b>Detail Tagihan</b>
+                    <div className="col-12 mb-0 fs-13">
+                      <label className="text-label">
+                        <b>Detail Pembayaran</b>
                       </label>
                       <Divider className="ml-12"></Divider>
                     </div>
 
                     <div className="col-5 mt-2 ">
                       <label className="text-label">
-                        {"Harga Jual/Penggantian"}
+                        {show?.split_inv
+                          ? "Sub Total Barang"
+                          : "Harga Jual/Penggantian"}
                       </label>
                     </div>
 
                     <div className="col-7 mt-2  text-right">
                       <label className="text-label">
-                        {
+                        {show?.split_inv ? (
                           <b>
                             Rp.
-                            {formatIdr(getSubTotal())}
+                            {formatIdr(getSubTotalBarang())}
                           </b>
-                        }
+                        ) : (
+                          <b>
+                            Rp.
+                            {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
+                          </b>
+                        )}
                       </label>
                     </div>
 
@@ -589,52 +702,87 @@ const Detail = ({ onCancel }) => {
                       <label className="text-label">
                         <b>
                           Rp.{" "}
-                          {show?.detail.map(
-                            (v) => v.sale_id?.total_disc ?? formatIdr(0)
-                          )}
+                          {
+                            formatIdr(0)
+                            // show?.detail?.map(
+                            //   (v) => v.sale_id?.total_disc ?? formatIdr(0)
+                            // )
+                          }
                         </b>
                       </label>
                     </div>
 
                     <div className="col-5">
-                      <label className="text-label">{"Uang Muka"}</label>
+                      <label className="text-label">
+                        {show?.split_inv ? "DPP Barang" : "Uang Muka"}
+                      </label>
                     </div>
 
                     <div className="col-7 text-right">
                       <label className="text-label">
-                        {
+                        {show?.split_inv ? (
                           <b>
                             Rp.
-                            {formatIdr(getDp())}
+                            {formatIdr(getUangMuka())}
                           </b>
-                        }
+                        ) : (
+                          <b>
+                            Rp.
+                            {formatIdr(getUangMuka())}
+                          </b>
+                        )}
                       </label>
                     </div>
 
                     <div className="col-5">
                       <label className="text-label">
-                        {"Dasar Pengenaan Pajak"}
+                        {show?.split_inv
+                          ? "DPP Barang"
+                          : "Dasar Pengenaan Pajak"}
                       </label>
                     </div>
 
                     <div className="col-7 text-right">
                       <label className="text-label">
-                        {
+                        {show?.split_inv ? (
                           <b>
                             Rp.
-                            {formatIdr(getSubTotal())}
+                            {formatIdr(getSubTotalBarang())}
                           </b>
-                        }
+                        ) : (
+                          <b>
+                            Rp.
+                            {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
+                          </b>
+                        )}
                       </label>
                     </div>
 
                     <div className="col-5">
-                      <label className="text-label">{"Total PPN"}</label>
+                      <label className="text-label">
+                        {show?.split_inv
+                          ? "Pajak Atas Barang"`(${pajk()}%)`
+                          : "Total PPN"}
+                      </label>
                     </div>
 
                     <div className="col-7 text-right">
                       <label className="text-label">
-                        {<b>Rp. {formatIdr((getSubTotal() * pajk()) / 100)}</b>}
+                        {show?.split_inv ? (
+                          <b>
+                            Rp.
+                            {formatIdr((getSubTotalBarang() * pajk()) / 100)}
+                          </b>
+                        ) : (
+                          <b>
+                            Rp.{" "}
+                            {formatIdr(
+                              ((getSubTotalBarang() + getSubTotalJasa()) *
+                                pajk()) /
+                                100
+                            )}
+                          </b>
+                        )}
                       </label>
                     </div>
 
@@ -644,22 +792,34 @@ const Detail = ({ onCancel }) => {
 
                     <div className="col-5">
                       <label className="text-label fs-13">
-                        <b>Total Tagihan</b>
+                        <b>Total</b>
                       </label>
                     </div>
 
                     <div className="col-7 text-right">
                       <label className="text-label fs-13">
-                        {
+                        {show?.split_inv ? (
                           <b>
                             Rp.{" "}
                             {formatIdr(
-                              getSubTotal() +
-                                (getSubTotal() * pajk()) / 100 -
-                                getDp()
+                              getSubTotalBarang() +
+                                (getSubTotalBarang() * pajk()) / 100 -
+                                getUangMuka()
                             )}
                           </b>
-                        }
+                        ) : (
+                          <b>
+                            Rp.{" "}
+                            {formatIdr(
+                              getSubTotalBarang() +
+                                getSubTotalJasa() +
+                                ((getSubTotalBarang() + getSubTotalJasa()) *
+                                  pajk()) /
+                                  100 -
+                                getUangMuka()
+                            )}
+                          </b>
+                        )}
                       </label>
                     </div>
 
@@ -695,4 +855,4 @@ const Detail = ({ onCancel }) => {
   );
 };
 
-export default Detail;
+export default DetailFaktur;

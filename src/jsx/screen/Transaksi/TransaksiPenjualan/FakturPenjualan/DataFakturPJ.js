@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { request, endpoints } from "src/utils";
+import { request } from "src/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -12,21 +12,28 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
+import { SET_CURRENT_INV, SET_EDIT_INV, SET_INV } from "src/redux/actions";
 import { Badge } from "primereact/badge";
 import { Divider } from "@material-ui/core";
 import ReactToPrint from "react-to-print";
 import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { tr } from "../../../../../data/tr";
-import { SET_CURRENT_PB_FK, SET_EDIT_PB_FK, SET_PB_FK } from "src/redux/actions";
+import {
+  SET_CURRENT_FK,
+  SET_EDIT_FK,
+  SET_FK,
+} from "../../../../../redux/actions";
+import endpoints from "../../../../../utils/endpoints";
 
 const data = {
   id: null,
   fk_code: null,
   fk_date: null,
-  sup_id: null,
+  pel_id: null,
   fk_tax: null,
   fk_ppn: null,
+  sale_id: null,
   fk_lunas: null,
   fk_desc: null,
   detail: [],
@@ -34,7 +41,7 @@ const data = {
   jasa: [],
 };
 
-const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
+const DataFakturPJ = ({ onAdd, onDetail, onDetailF }) => {
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
@@ -51,26 +58,25 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const dispatch = useDispatch();
-  const inv = useSelector((state) => state.fk_pb.fk_pb);
-  const fk = useSelector((state) => state.fk_pb.current_pb_fk);
+  const inv = useSelector((state) => state.fk_pj.fk_pj);
+  const fk = useSelector((state) => state.fk_pj.current_fk);
   const printPage = useRef(null);
-  const [supplier, setSupplier] = useState(null);
+  const [customer, setCustomer] = useState(null);
   const [expandedRows, setExpandedRows] = useState(null);
   const [doubleClick, setDoubleClick] = useState(false);
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getSetup();
     getFK();
-    getSupplier();
+    getCustomer();
     initFilters1();
   }, []);
 
   const getFK = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.faktur,
+      ...endpoints.faktur_pj,
       data: {},
     };
     console.log(config.data);
@@ -86,7 +92,8 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
             filt.push(element);
           }
         });
-        dispatch({ type: SET_PB_FK, payload: filt });
+        dispatch({ type: SET_FK, payload: filt });
+        getSetup();
       }
     } catch (error) {}
     if (isUpdate) {
@@ -98,9 +105,9 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
     }
   };
 
-  const getSupplier = async () => {
+  const getCustomer = async () => {
     const config = {
-      ...endpoints.supplier,
+      ...endpoints.customer,
       data: {},
     };
     let response = null;
@@ -109,7 +116,7 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        setSupplier(data);
+        setCustomer(data);
       }
     } catch (error) {}
   };
@@ -132,10 +139,10 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
     } catch (error) {}
   };
 
-  const checkSupp = (value) => {
+  const checkCus = (value) => {
     let selected = {};
-    supplier?.forEach((element) => {
-      if (value === element.supplier.id) {
+    customer?.forEach((element) => {
+      if (value === element.customer.id) {
         selected = element;
       }
     });
@@ -145,8 +152,8 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
 
   const delFK = async (id) => {
     const config = {
-      ...endpoints.delFK,
-      endpoint: endpoints.delFK.endpoint + currentItem.id,
+      ...endpoints.delFkPj,
+      endpoint: endpoints.delFkPj.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -190,10 +197,10 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
             onDetail();
             let detail = data.detail;
             dispatch({
-              type: SET_CURRENT_PB_FK,
+              type: SET_CURRENT_FK,
               payload: {
                 ...data,
-                detail: detail?.length > 0 ? detail : null,
+                detail: detail.length > 0 ? detail : null,
               },
             });
           }}
@@ -226,18 +233,18 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
         <Link
           onClick={() => {
             onDetailF();
-            let product = data.ord_id.product;
-            let jasa = data.ord_id.jasa;
+            let product = data?.sale_id?.product;
+            let jasa = data?.sale_id?.jasa;
             dispatch({
-              type: SET_CURRENT_PB_FK,
+              type: SET_CURRENT_FK,
               payload: {
                 ...data,
-                product: product?.length > 0 ? product : null,
-                jasa: jasa?.length > 0 ? jasa : null,
+                product: product.length > 0 ? product : null,
+                jasa: jasa.length > 0 ? jasa : null,
               },
             });
             console.log("===========dt");
-            console.log(data.ord_id.product);
+            console.log(data); 
           }}
           className="btn btn-info shadow btn-xs sharp ml-1 mt-1"
         >
@@ -336,11 +343,11 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
           onClick={() => {
             onAdd();
             dispatch({
-              type: SET_EDIT_PB_FK,
+              type: SET_EDIT_FK,
               payload: false,
             });
             dispatch({
-              type: SET_CURRENT_PB_FK,
+              type: SET_CURRENT_FK,
               payload: {
                 ...data,
                 // fk_code: fkCode,
@@ -435,7 +442,7 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
   };
 
   const formatIdr = (value) => {
-    return `${value}`
+    return `${value?.toFixed(2)}`
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
@@ -472,9 +479,9 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
             field={(e) => `${e.inv_id?.inv_code}`}
           />
           <Column
-            header="Kode Pembelian"
+            header="Kode Penjualan"
             style={{ width: "20rem" }}
-            field={(e) => e.ord_id?.ord_code}
+            field={(e) => e.sale_id?.ord_code}
           />
           <Column
             header="Tanggal Transaksi"
@@ -490,29 +497,29 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
             header="Action"
             field={
               FkBodyTemplate
-              // (e) => (
-              // <div className="d-flex">
-              //   <Link
-              //     onClick={() => {
-              //       onDetailF();
-              //       let product = data.detail.map((v) => v.ord_id).map((p) => p.product);
-              //       let jasa = data.detail.map((v) => v.ord_id).map((p) => p.jasa);
-              //       dispatch({
-              //         type: SET_CURRENT_PB_FK,
-              //         payload: {
-              //           ...data,
-              //           product: product?.length > 0 ? product : null,
-              //           jasa: jasa?.length > 0 ? jasa : null,
-              //         },
-              //       });
-              //       console.log("===========dt");
-              //       console.log(data.detail.map((v) => v.ord_id).map((p) => p.product));
-              //     }}
-              //     className="btn btn-info shadow btn-xs sharp ml-1 mt-1"
-              //   >
-              //     <i className="bx bx-show mt-1"></i>
-              //   </Link>
-              // </div>
+              //   (e) => (
+              //   <div className="d-flex">
+              //     <Link
+              //       onClick={() => {
+              //         onDetailF();
+              //         let product = data.product;
+              //         let jasa = data.jasa;
+              //         dispatch({
+              //           type: SET_CURRENT_FK,
+              //           payload: {
+              //             ...data,
+              //             product: product?.length > 0 ? product : null,
+              //             jasa: jasa?.length > 0 ? jasa : null,
+              //           },
+              //         });
+              //         console.log("===========dt");
+              //         console.log(data);
+              //       }}
+              //       className="btn btn-info shadow btn-xs sharp ml-1 mt-1"
+              //     >
+              //       <i className="bx bx-show mt-1"></i>
+              //     </Link>
+              //   </div>
               // )
             }
             style={{ minWidth: "6rem" }}
@@ -541,7 +548,7 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
                 filters={filters1}
                 globalFilterFields={[
                   "fk_code",
-                  "ord_id.ord_code",
+                  "sale_id.ord_code",
                   "formatDate(fk_date)",
                 ]}
                 emptyMessage={tr[localStorage.getItem("language")].empty_data}
@@ -572,8 +579,8 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header={tr[localStorage.getItem("language")].supplier}
-                  field={(e) => `${e.sup_id?.sup_name} - ${e.sup_id?.sup_code}`}
+                  header={"Pelanggan"}
+                  field={(e) => `${e.pel_id?.cus_name} - ${e.pel_id?.cus_code}`}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
@@ -610,4 +617,4 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
   );
 };
 
-export default DataFaktur;
+export default DataFakturPJ;

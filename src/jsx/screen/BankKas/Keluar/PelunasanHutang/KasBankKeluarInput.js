@@ -60,15 +60,19 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
   const exp = useSelector((state) => state.exp.current);
   const isEdit = useSelector((state) => state.exp.editExp);
   const dispatch = useDispatch();
-  const [account, setAccount] = useState(null);
   const [accKas, setAccKas] = useState(null);
+  const [acc, setAcc] = useState(null);
+  const [allacc, setAllAcc] = useState(null);
   const [bank, setBank] = useState(null);
   const [supplier, setSupplier] = useState(null);
+  const [allSup, setAllSup] = useState(null);
   const [faktur, setFaktur] = useState(null);
   const [apcard, setAP] = useState(null);
   const [dept, setDept] = useState(null);
   const [proj, setProj] = useState(null);
   const [batch, setBatch] = useState(null);
+  const [po, setPo] = useState(null);
+  const [currency, setCurrency] = useState(null);
   const [showSupplier, setShowSupplier] = useState(false);
   const [showDepartemen, setShowDept] = useState(false);
   const [showProj, setShowProj] = useState(false);
@@ -81,10 +85,11 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
     keluar: false,
   });
 
-  const exp_type = [
+  const type_trx = [
     { typePengeluaran: "Pelunasan", kode: 1 },
-    { typePengeluaran: "Pengeluaran Kas/Bank", kode: 2 },
-    { typePengeluaran: "Biaya Batch", kode: 3 },
+    { typePengeluaran: "Pengeluaran", kode: 2 },
+    { typePengeluaran: "Uang Muka", kode: 3 },
+    { typePengeluaran: "Biaya Batch", kode: 4 },
   ];
 
   const acq_pay = [
@@ -93,8 +98,15 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
     { kode: 3, jenisPengeluaran: "Giro" },
   ];
 
-  const [type, setType] = useState({ kode: 1, typePengeluaran: "Pelunasan" });
-  const [typeB, setTypeB] = useState({ kode: 1, jenisPengeluaran: "Kas" });
+  const exp_type = [
+    { kode: 1, name: "Kas" },
+    { kode: 2, name: "Bank" },
+  ];
+
+  const type_acc = [
+    { kode: 1, name: "Akun" },
+    { kode: 2, name: "Bank" },
+  ];
 
   useEffect(() => {
     window.scrollTo({
@@ -102,13 +114,14 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
       left: 0,
       behavior: "smooth",
     });
-    getAccKas();
     getBank();
     getSupplier();
     getBatch();
     getProj();
     getDept();
     getAccount();
+    getCurrency();
+    getPo();
   }, []);
 
   const isValid = () => {
@@ -308,6 +321,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
       if (response.status) {
         const { data } = response;
         getAPCard(data);
+        setAllSup(data);
       }
     } catch (error) {
       console.log(error);
@@ -319,31 +333,6 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
       ...endpoints.account,
       data: {},
     };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        let filt = [];
-        data?.forEach((element) => {
-          if (
-            element.account.dou_type === "D" &&
-            element.account.connect === false
-          ) {
-            filt.push(element);
-          }
-        });
-        setAccount(filt);
-      }
-    } catch (error) {}
-  };
-
-  const getAccKas = async () => {
-    const config = {
-      ...endpoints.account,
-      data: {},
-    };
     console.log(config.data);
     let response = null;
     try {
@@ -351,14 +340,23 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        let filt = [];
+        let kas = [];
+        let all_d = [];
+        let all = [];
         data.forEach((elem) => {
-          if (elem.account.dou_type === "D" && elem.account.connect === false) {
-            filt.push(elem);
+          if (elem.account.dou_type === "D" && elem.account.kat_code === 1) {
+            kas.push(elem.account);
           }
+
+          if (elem.account.dou_type === "D" && elem.account.connect === false) {
+            all_d.push(elem.account);
+          }
+
+          all.push(elem.account);
         });
-        console.log(data);
-        setAccKas(filt);
+        setAccKas(kas);
+        setAcc(all_d);
+        setAllAcc(all);
       }
     } catch (error) {}
   };
@@ -430,6 +428,38 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
       if (response.status) {
         const { data } = response;
         setDept(data);
+      }
+    } catch (error) {}
+  };
+
+  const getCurrency = async () => {
+    const config = {
+      ...endpoints.currency,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setCurrency(data);
+      }
+    } catch (error) {}
+  };
+
+  const getPo = async () => {
+    const config = {
+      ...endpoints.po,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setPo(data);
       }
     } catch (error) {}
   };
@@ -533,17 +563,6 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
-  const checkAccKas = (value) => {
-    let selected = {};
-    accKas?.forEach((element) => {
-      if (value === element.account.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
   const checkBank = (value) => {
     let selected = {};
     bank?.forEach((element) => {
@@ -555,10 +574,32 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
+  const checkCur = (value) => {
+    let selected = {};
+    currency?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkPo = (value) => {
+    let selected = {};
+    po?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
   const checkAcc = (value) => {
     let selected = {};
-    account?.forEach((element) => {
-      if (value === element.account.id) {
+    allacc?.forEach((element) => {
+      if (value === element.id) {
         selected = element;
       }
     });
@@ -591,9 +632,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
   const glTemplate = (option) => {
     return (
       <div>
-        {option !== null
-          ? `${option.account.acc_name} - ${option.account.acc_code}`
-          : ""}
+        {option !== null ? `${option.acc_name} - ${option.acc_code}` : ""}
       </div>
     );
   };
@@ -602,9 +641,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
     if (option) {
       return (
         <div>
-          {option !== null
-            ? `${option.account.acc_name} - ${option.account.acc_code}`
-            : ""}
+          {option !== null ? `${option.acc_name} - ${option.acc_code}` : ""}
         </div>
       );
     }
@@ -638,13 +675,13 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
 
   const onSubmit = () => {
     // if (isValid()) {
-      if (isEdit) {
-        setUpdate(true);
-        editEXP();
-      } else {
-        setUpdate(true);
-        addEXP();
-      }
+    if (isEdit) {
+      setUpdate(true);
+      editEXP();
+    } else {
+      setUpdate(true);
+      addEXP();
+    }
     // }
   };
 
@@ -665,14 +702,6 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
       type: SET_CURRENT_EXP,
       payload: e,
     });
-  };
-
-  const header = () => {
-    return (
-      <h4 className="mb-5">
-        <b>Pembayaran</b>
-      </h4>
-    );
   };
 
   const body = () => {
@@ -724,25 +753,53 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-12 mb-2">
-            <label className="text-label">Tipe Pengeluaran</label>
+            <label className="text-label">Tipe Transaksi</label>
             <div className="p-inputgroup">
               <SelectButton
                 value={
-                  exp !== null && exp.exp_type !== ""
-                    ? exp.exp_type === 1
+                  exp !== null && exp.type_trx !== ""
+                    ? exp.type_trx === 1
                       ? { kode: 1, typePengeluaran: "Pelunasan" }
-                      : exp.exp_type === 2
-                      ? { kode: 2, typePengeluaran: "Pengeluaran Kas/Bank" }
+                      : exp.type_trx === 2
+                      ? { kode: 2, typePengeluaran: "Pengeluaran" }
+                      : exp.type_trx === 3
+                      ? { kode: 3, typePengeluaran: "Uang Muka" }
                       : { kode: 3, typePengeluaran: "Biaya Batch" }
                     : null
                 }
-                options={exp_type}
+                options={type_trx}
                 onChange={(e) => {
                   console.log(e.value);
                   updateExp({
                     ...exp,
-                    exp_type: e.value.kode,
+                    type_trx: e.value.kode,
                     acq_pay: e.value.kode === 1 ? 1 : null,
+                    exp_type: e.value?.kode === 2 ? 1 : null,
+                    type_acc: e.value?.kode === 2 ? 1 : null,
+                    acq_sup: null,
+                    acq_kas: null,
+                    bank_ref: null,
+                    bank_acc: null,
+                    giro_num: null,
+                    giro_date: null,
+                    bank_id: null,
+                    exp_bnk: null,
+                    kas_acc: null,
+                    exp_dep: null,
+                    exp_proj: null,
+                    dp_sup: null,
+                    dp_kas: null,
+                    dp_bnk: null,
+                    exp: exp?.exp.map((v) => ({
+                      ...v,
+                      acc_code: null,
+                      acc_bnk: null,
+                      bnk_code: null,
+                      value: null,
+                      desc: null,
+                    })),
+                    acq: null,
+                    det_dp: null,
                   });
                 }}
                 optionLabel="typePengeluaran"
@@ -751,9 +808,16 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
           </div>
 
           {/* Type Pembayaran */}
-          {exp !== null && exp.exp_type === 1 ? (
+          {exp !== null && exp.type_trx === 1 ? (
             <>
-              <div className="col-4">
+              <div className="col-12 mt-1">
+                <span className="fs-13">
+                  <b>Informasi Pelunasan</b>
+                </span>
+                <Divider className="mt-1"></Divider>
+              </div>
+
+              <div className="col-3">
                 <PrimeDropdown
                   label={"Supplier"}
                   value={exp.acq_sup && supp(exp.acq_sup)}
@@ -786,7 +850,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
               </div>
 
               <div className="col-8">
-                <label className="text-label">Jenis Pengeluaran</label>
+                <label className="text-label">Pelunasan Melalui</label>
                 <div className="p-inputgroup">
                   <SelectButton
                     value={
@@ -800,7 +864,16 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                     }
                     options={acq_pay}
                     onChange={(e) => {
-                      updateExp({ ...exp, acq_pay: e.value.kode });
+                      updateExp({
+                        ...exp,
+                        acq_pay: e.value.kode,
+                        acq_kas: null,
+                        bank_ref: null,
+                        bank_acc: null,
+                        giro_num: null,
+                        giro_date: null,
+                        bank_id: null,
+                      });
                     }}
                     optionLabel="jenisPengeluaran"
                   />
@@ -810,26 +883,30 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
               {/* kode pembayaran cash  */}
               {exp !== null && exp.acq_pay === 1 ? (
                 <>
-                  <div className="col-4">
+                  <div className="col-3">
                     <PrimeDropdown
-                      label={"Kode Akun"}
-                      value={exp.kas_acc && checkAccKas(exp.kas_acc)}
+                      label={"Akun Kas"}
+                      value={exp.acq_kas && checkAcc(exp.acq_kas)}
                       options={accKas}
                       onChange={(e) => {
-                        updateExp({ ...exp, kas_acc: e.value.account.id });
+                        updateExp({
+                          ...exp,
+                          acq_kas: e.value?.id ?? null,
+                        });
 
                         let newError = error;
-                        newError.acco = false;
+                        newError.acq_kas = false;
                         setError(newError);
                       }}
                       optionLabel="account.acc_name"
-                      placeholder="Pilih Kode Akun"
+                      placeholder="Pilih Akun Kas"
                       filter
-                      filterBy="account.acc_name"
+                      filterBy="acc_name"
                       itemTemplate={glTemplate}
                       valueTemplate={valTemp}
-                      errorMessage="Akun Belum Dipilih"
-                      error={error?.acco}
+                      showClear
+                      errorMessage="Akun Cash Belum Dipilih"
+                      error={error?.acq_kas}
                     />
                   </div>
                 </>
@@ -1104,35 +1181,136 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                 <></>
               )}
             </>
-          ) : exp !== null && exp.exp_type === 2 ? (
+          ) : exp !== null && exp.type_trx === 2 ? (
             // Type Pengeluaran
             <>
-              {" "}
-              <div className="col-3">
-                <PrimeDropdown
-                label={"Kode Akun"}
-                  value={exp.exp_acc && checkAcc(exp.exp_acc)}
-                  options={account}
-                  onChange={(e) => {
-                    updateExp({
-                      ...exp,
-                      exp_acc: e.value.account.id,
-                    });
-
-                    let newError = error;
-                    newError.akn = false;
-                    setError(newError);
-                  }}
-                  optionLabel="account.acc_name"
-                  placeholder="Pilih Kode Akun"
-                  filter
-                  filterBy="account.acc_name"
-                  itemTemplate={glTemplate}
-                  valueTemplate={valTemp}
-                  errorMessage="Akun Belum Dipilih"
-                  error={error?.akn}
-                />
+              <div className="col-12 mt-1">
+                <span className="fs-13">
+                  <b>Informasi Pengeluaran</b>
+                </span>
+                <Divider className="mt-1"></Divider>
               </div>
+
+              <div className="col-12 mb-2">
+                <label className="text-label">Tipe Pengeluaran</label>
+                <div className="p-inputgroup">
+                  <SelectButton
+                    value={
+                      exp !== null && exp.exp_type !== ""
+                        ? exp.exp_type === 1
+                          ? { kode: 1, name: "Kas" }
+                          : { kode: 2, name: "Bank" }
+                        : null
+                    }
+                    options={exp_type}
+                    onChange={(e) => {
+                      updateExp({
+                        ...exp,
+                        exp_type: e.value.kode,
+                        type_acc: e.value.kode === 2 ? 1 : null,
+                        exp_bnk: null,
+                        kas_acc: null,
+                        exp: exp.exp.map((v) => ({
+                          ...v,
+                          acc_code: null,
+                          acc_bnk: null,
+                          bnk_code: null,
+                          value: null,
+                          desc: null,
+                        })),
+                      });
+
+                      let newError = error;
+                      if (e.value.kode === 1) {
+                        newError.exp_bnk = false;
+                        newError.exp.push({
+                          acc_bnk: false,
+                          bnk_code: false,
+                          value: false,
+                        });
+                      } else {
+                        newError.exp_kas = false;
+                      }
+
+                      if (e.value.kode === 2 && exp.type_acc === 1) {
+                        newError.exp.push({
+                          acc_code: false,
+                          bnk_code: false,
+                          value: false,
+                        });
+                      } else if (e.value.kode === 2 && exp.type_acc === 2) {
+                        newError.exp.push({
+                          acc_code: false,
+                          acc_bnk: false,
+                          value: false,
+                        });
+                      }
+                    }}
+                    optionLabel="name"
+                  />
+                </div>
+              </div>
+
+              {exp !== null && exp.exp_type === 1 ? (
+                <>
+                  <div className="col-3">
+                    <PrimeDropdown
+                      label={"Kode Akun"}
+                      value={exp.kas_acc && checkAcc(exp.kas_acc)}
+                      options={accKas}
+                      onChange={(e) => {
+                        updateExp({
+                          ...exp,
+                          kas_acc: e.value?.id ?? null,
+                        });
+
+                        let newError = error;
+                        newError.exp_kas = false;
+                        setError(newError);
+                      }}
+                      optionLabel="account.acc_name"
+                      placeholder="Pilih Kode Akun"
+                      filter
+                      filterBy="acc_name"
+                      itemTemplate={glTemplate}
+                      valueTemplate={valTemp}
+                      errorMessage="Akun Belum Dipilih"
+                      error={error?.exp_kas}
+                      showClear
+                    />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="col-3">
+                    <PrimeDropdown
+                      label={"Kode Bank"}
+                      value={checkBank(exp.exp_bnk)}
+                      options={bank}
+                      onChange={(e) => {
+                        updateExp({
+                          ...exp,
+                          exp_bnk: e.value.bank.id,
+                        });
+
+                        let newError = error;
+                        newError.exp_bnk = false;
+                        setError(newError);
+                      }}
+                      optionLabel="bank.BANK_NAME"
+                      placeholder="Pilih Kode Bank"
+                      filter
+                      filterBy="bank.BANK_NAME"
+                      itemTemplate={bankTemplate}
+                      valueTemplate={valBTemp}
+                      errorMessage="Bank Belum Dipilih"
+                      error={error?.exp_bnk}
+                      // showClear
+                    />
+                  </div>
+                </>
+              )}
+
               <div className="col-3">
                 <label className="text-label">Kode Departemen</label>
                 <div className="p-inputgroup"></div>
@@ -1149,8 +1327,10 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                   placeholder="Pilih Departemen"
                   detail
                   onDetail={() => setShowDept(true)}
+                  showClear
                 />
               </div>
+
               <div className="col-3">
                 <label className="text-label">Kode Project</label>
                 <div className="p-inputgroup"></div>
@@ -1162,23 +1342,49 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                       ...exp,
                       exp_prj: e.id,
                     });
-
-                    let newError = error;
-                    newError.proj = false;
-                    setError(newError);
                   }}
                   label={"[proj_name] - [proj_code]"}
                   placeholder="Pilih Project"
                   detail
                   onDetail={() => setShowProj(true)}
-                  errorMessage="Kode Project Belum Dipilih"
-                  error={error?.proj}
+                  showClear
                 />
               </div>
-              
+
+              <div className="col-7 mt-1" hidden={exp.exp_type === 1}>
+                <label className="text-label"></label>
+                <div className="p-inputgroup">
+                  <SelectButton
+                    value={
+                      exp !== null && exp.type_acc !== ""
+                        ? exp.type_acc === 1
+                          ? { kode: 1, name: "Akun" }
+                          : { kode: 2, name: "Bank" }
+                        : null
+                    }
+                    options={type_acc}
+                    onChange={(e) => {
+                      updateExp({
+                        ...exp,
+                        type_acc: e.value.kode,
+                        exp: exp.exp.map((v) => ({
+                          ...v,
+                          acc_bnk: null,
+                          bnk_code: null,
+                          value: null,
+                          fc: 0,
+                          desc: null,
+                        })),
+                      });
+                    }}
+                    optionLabel="name"
+                  />
+                </div>
+              </div>
+
               <CustomAccordion
                 className="col-12 mt-4"
-                tittle={"Pengeluaran Kas / Bank"}
+                tittle={"Akun Pengeluaran"}
                 defaultActive={true}
                 active={accor.keluar}
                 onClick={() => {
@@ -1204,7 +1410,8 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                       emptyMessage={() => <div></div>}
                     >
                       <Column
-                        header="Kode Akun"
+                        hidden={exp.exp_type === 2}
+                        header={"Kode Akun Pengeluaran"}
                         className="align-text-top"
                         style={{
                           width: "25rem",
@@ -1213,30 +1420,141 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                         body={(e) => (
                           <PrimeDropdown
                             value={e.acc_code && checkAcc(e.acc_code)}
-                            options={account}
+                            options={acc}
                             onChange={(u) => {
-                              console.log(e.value);
                               let temp = [...exp.exp];
-                              temp[e.index].acc_code = u.value.account.id;
+                              if (exp.exp_type === 1) {
+                                temp[e.index].acc_code = u.value?.id ?? null;
+                              }
+
                               updateExp({ ...exp, exp: temp });
 
                               let newError = error;
-                              newError.exp[e.index].acc = false;
+                              newError.exp[e.index].acc_code = false;
+                              // newError.acq.push({ pay: false });
                               setError(newError);
                             }}
-                            optionLabel="account.acc_name"
+                            optionLabel={"account.acc_name"}
                             itemTemplate={glTemplate}
                             valueTemplate={valTemp}
                             filter
-                            filterBy="account.acc_name"
-                            placeholder="Pilih Kode Akun"
+                            filterBy={"acc_name"}
+                            placeholder={"Pilih Kode Akun"}
                             errorMessage="Akun Belum Dipilih"
-                            error={error?.exp[e.index]?.acc}
+                            error={error?.exp[e.index]?.acc_code}
+                            showClear
                           />
                         )}
                       />
 
                       <Column
+                        hidden={exp.exp_type === 1}
+                        header={
+                          exp.type_acc === 1 || exp.exp_type === 1
+                            ? "Kode Akun"
+                            : "Kode Bank"
+                        }
+                        className="align-text-top"
+                        style={{
+                          width: "25rem",
+                        }}
+                        field={""}
+                        body={(e) => (
+                          <PrimeDropdown
+                            value={
+                              exp.type_acc === 1
+                                ? e.acc_bnk && checkAcc(e.acc_bnk)
+                                : e.bnk_code && checkBank(e.bnk_code)
+                            }
+                            options={exp.type_acc === 1 ? acc : bank}
+                            onChange={(u) => {
+                              let temp = [...exp.exp];
+
+                              if (exp.type_acc === 1) {
+                                temp[e.index].acc_bnk = u.value?.id ?? null;
+                              } else {
+                                temp[e.index].bnk_code = u.value.bank.id;
+                                temp[e.index].value = null;
+                                temp[e.index].fc = null;
+                              }
+
+                              updateExp({ ...exp, exp: temp });
+
+                              let newError = error;
+                              if (exp?.type_acc == 1) {
+                                newError.exp[e.index].acc_bnk = false;
+                              } else {
+                                newError.exp[e.index].bnk_code = false;
+                              }
+
+                              setError(newError);
+                            }}
+                            optionLabel={
+                              exp.type_acc === 1 ? "acc_name" : "bank.BANK_NAME"
+                            }
+                            itemTemplate={
+                              exp.type_acc === 1 ? glTemplate : bankTemplate
+                            }
+                            valueTemplate={
+                              exp.type_acc === 1 ? valTemp : valBTemp
+                            }
+                            filter
+                            filterBy={
+                              exp.type_acc === 1
+                                ? "account.acc_name"
+                                : "bank.BANK_NAME"
+                            }
+                            placeholder={
+                              exp.type_acc === 1
+                                ? "Pilih Kode Akun"
+                                : "Pilih Kode Bank"
+                            }
+                            showClear={exp.type_acc === 1}
+                            errorMessage={
+                              exp.type_acc === 1
+                                ? "Akun Belum Dipilih"
+                                : "Bank Belum Dipilih"
+                            }
+                            error={
+                              exp.type_acc === 1
+                                ? error?.exp[e.index]?.acc_bnk
+                                : error?.exp[e.index]?.bnk_code
+                            }
+                          />
+                        )}
+                      />
+
+                      <Column
+                        hidden={exp.type_acc !== 2}
+                        header="Currency"
+                        className="align-text-top"
+                        style={{
+                          width: "8rem",
+                        }}
+                        field={""}
+                        body={(e) => (
+                          <div className="p-inputgroup">
+                            <InputText
+                              value={
+                                e.bnk_code !== null
+                                  ? checkBank(e.bnk_code)?.bank?.CURRENCY !==
+                                    null
+                                    ? checkCur(
+                                        checkBank(e.bnk_code)?.bank?.CURRENCY
+                                      )?.code
+                                    : "IDR"
+                                  : null
+                              }
+                              onChange={(e) => {}}
+                              placeholder="Currency"
+                              disabled
+                            />
+                          </div>
+                        )}
+                      />
+
+                      <Column
+                        hidden={exp.type_acc === 2}
                         header="Tipe Saldo"
                         className="align-text-top"
                         style={{
@@ -1247,8 +1565,11 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                           <div className="p-inputgroup">
                             <InputText
                               value={
-                                e.acc_code &&
-                                checkAcc(e.acc_code)?.account?.sld_type
+                                e.acc_bnk !== null || e.acc_code !== null
+                                  ? exp.exp_type === 1
+                                    ? checkAcc(e.acc_code)?.sld_type
+                                    : checkAcc(e.acc_bnk)?.sld_type
+                                  : ""
                               }
                               onChange={(e) => {}}
                               placeholder="Tipe Saldo"
@@ -1262,25 +1583,72 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                         header="Nilai"
                         className="align-text-top"
                         style={{
-                          maxWidth: "10rem",
+                          minWidth: "7rem",
+                        }}
+                        field={""}
+                        body={(e) =>
+                          exp.type_acc === 2 &&
+                          checkBank(e.bnk_code)?.bank?.CURRENCY !== null ? (
+                            <PrimeNumber
+                              value={e.value && e.value}
+                              onChange={(u) => {
+                                let temp = [...exp.exp];
+                                temp[e.index].value = u.target.value;
+                                temp[e.index].fc =
+                                  temp[e.index].value *
+                                  checkCur(
+                                    checkBank(e.bnk_code)?.bank?.CURRENCY
+                                  )?.rate;
+
+                                updateExp({ ...exp, exp: temp });
+
+                                let newError = error;
+                                newError.exp[e.index].value = false;
+                                newError.exp.push({ value: false });
+                                setError(newError);
+                              }}
+                              placeholder="0"
+                              min={0}
+                              error={error?.exp[e.index]?.value}
+                            />
+                          ) : (
+                            <PrimeNumber
+                              price
+                              value={e.value && e.value}
+                              onChange={(u) => {
+                                let temp = [...exp.exp];
+                                temp[e.index].value = u.value;
+                                temp[e.index].fc = temp[e.index].value;
+                                updateExp({ ...exp, exp: temp });
+
+                                let newError = error;
+                                newError.exp[e.index].value = false;
+                                newError.exp.push({ value: false });
+                                setError(newError);
+                              }}
+                              placeholder="0"
+                              min={0}
+                              error={error?.exp[e.index]?.value}
+                            />
+                          )
+                        }
+                      />
+
+                      <Column
+                        hidden={exp.type_acc !== 2}
+                        header="FC"
+                        className="align-text-top"
+                        style={{
+                          minWidth: "8rem",
                         }}
                         field={""}
                         body={(e) => (
                           <PrimeNumber
                             price
-                            value={e.value && e.value}
-                            onChange={(u) => {
-                              let temp = [...exp.exp];
-                              temp[e.index].value = u.value;
-                              updateExp({ ...exp, exp: temp });
-
-                              let newError = error;
-                              newError.exp[e.index].nil = false;
-                              setError(newError);
-                            }}
+                            value={e.fc && e.fc}
+                            onChange={(e) => {}}
                             placeholder="0"
-                            min={0}
-                            error={error?.exp[e.index]?.nil}
+                            disabled
                           />
                         )}
                       />
@@ -1311,7 +1679,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                             <Link
                               onClick={() => {
                                 let newError = error;
-                                newError.exp.push({ nil: false });
+                                newError.exp.push({ value: false });
                                 setError(newError);
 
                                 updateExp({
@@ -1321,7 +1689,10 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                                     {
                                       id: null,
                                       acc_code: null,
+                                      acc_bnk: null,
+                                      bnk_code: null,
                                       value: null,
+                                      fc: null,
                                       desc: null,
                                     },
                                   ],
@@ -1335,7 +1706,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                             <Link
                               onClick={() => {
                                 let newError = error;
-                                newError.exp.push({ nil: false });
+                                newError.exp.push({ value: false });
                                 setError(newError);
 
                                 let temp = [...exp.exp];
@@ -1357,6 +1728,348 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                 }
               />
             </>
+          ) : exp !== null && exp.type_trx === 3 ? (
+            <>
+              <div className="col-12 p-0">
+                <div className="mt-4 mb-2 ml-3 mr-3 fs-13">
+                  <b>{"Uang Muka Pembelian"}</b>
+                </div>
+                <Divider className="mb-2 ml-3 mr-3"></Divider>
+              </div>
+
+              <div className="col-3">
+                <PrimeDropdown
+                  label={"Supplier"}
+                  value={exp?.dp_sup && supp(exp?.dp_sup)}
+                  options={allSup}
+                  onChange={(e) => {
+                    let filt = [];
+                    po?.forEach((element) => {
+                      if (e.value?.supplier?.id === element?.sup_id?.id) {
+                        filt.push(element);
+                      }
+                    });
+                    updateExp({
+                      ...exp,
+                      dp_sup: e.value?.supplier?.id,
+                      det_dp: filt?.map((v) => {
+                        return {
+                          ...v,
+                          po_id: v?.id,
+                          t_bayar: v?.total_bayar,
+                          desc: null,
+                        };
+                      }),
+                    });
+                  }}
+                  optionLabel="supplier.sup_name"
+                  placeholder="Pilih Supplier"
+                  filter
+                  filterBy="supplier.sup_name"
+                />
+              </div>
+
+              <div className="col-2 mb-2">
+                <label className="text-label">DP Melalui</label>
+                <div className="p-inputgroup">
+                  <SelectButton
+                    value={
+                      exp !== null && exp.dp_type !== ""
+                        ? exp.dp_type === 1
+                          ? { kode: 1, name: "Kas" }
+                          : { kode: 2, name: "Bank" }
+                        : null
+                    }
+                    options={exp_type}
+                    onChange={(e) => {
+                      updateExp({
+                        ...exp,
+                        dp_type: e.value.kode,
+                        // type_acc: e.value.kode === 2 ? 1 : null,
+                        // exp_bnk: null,
+                        // kas_acc: null,
+                        // exp: exp.exp.map((v) => ({
+                        //   ...v,
+                        //   acc_code: null,
+                        //   acc_bnk: null,
+                        //   bnk_code: null,
+                        //   value: null,
+                        //   desc: null,
+                        // })),
+                      });
+
+                      // let newError = error;
+                      // if (e.value.kode === 1) {
+                      //   newError.exp_bnk = false;
+                      //   newError.exp.push({
+                      //     acc_bnk: false,
+                      //     bnk_code: false,
+                      //     value: false,
+                      //   });
+                      // } else {
+                      //   newError.exp_kas = false;
+                      // }
+
+                      // if (e.value.kode === 2 && exp.type_acc === 1) {
+                      //   newError.exp.push({
+                      //     acc_code: false,
+                      //     bnk_code: false,
+                      //     value: false,
+                      //   });
+                      // } else if (e.value.kode === 2 && exp.type_acc === 2) {
+                      //   newError.exp.push({
+                      //     acc_code: false,
+                      //     acc_bnk: false,
+                      //     value: false,
+                      //   });
+                      // }
+                    }}
+                    optionLabel="name"
+                  />
+                </div>
+              </div>
+
+              {exp !== null && exp.dp_type === 1 ? (
+                <>
+                  <div className="col-3">
+                    <PrimeDropdown
+                      label={"Kode Akun"}
+                      value={exp.dp_kas && checkAcc(exp.dp_kas)}
+                      options={accKas}
+                      onChange={(e) => {
+                        updateExp({
+                          ...exp,
+                          dp_kas: e.value?.id ?? null,
+                        });
+
+                        // let newError = error;
+                        // newError.exp_kas = false;
+                        // setError(newError);
+                      }}
+                      optionLabel="account.acc_name"
+                      placeholder="Pilih Kode Akun"
+                      filter
+                      filterBy="acc_name"
+                      itemTemplate={glTemplate}
+                      valueTemplate={valTemp}
+                      // errorMessage="Akun Belum Dipilih"
+                      // error={error?.exp_kas}
+                      showClear
+                    />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="col-3">
+                    <PrimeDropdown
+                      label={"Kode Bank"}
+                      value={checkBank(exp.dp_bnk)}
+                      options={bank}
+                      onChange={(e) => {
+                        updateExp({
+                          ...exp,
+                          dp_bnk: e.value.bank.id,
+                        });
+
+                        // let newError = error;
+                        // newError.exp_bnk = false;
+                        // setError(newError);
+                      }}
+                      optionLabel="bank.BANK_NAME"
+                      placeholder="Pilih Kode Bank"
+                      filter
+                      filterBy="bank.BANK_NAME"
+                      itemTemplate={bankTemplate}
+                      valueTemplate={valBTemp}
+                      // errorMessage="Bank Belum Dipilih"
+                      // error={error?.exp_bnk}
+                    />
+                  </div>
+                </>
+              )}
+
+              {exp?.det_dp?.length ? (
+                <>
+                  <CustomAccordion
+                    className="col-12 mt-4"
+                    tittle={"Daftar Pesanan Pembelian"}
+                    defaultActive={true}
+                    active={accor.bayar}
+                    onClick={() => {
+                      setAccor({
+                        ...accor,
+                        bayar: !accor.bayar,
+                      });
+                    }}
+                    key={1}
+                    body={
+                      <>
+                        <DataTable
+                          responsiveLayout="none"
+                          value={exp?.det_dp?.map((v, i) => {
+                            return {
+                              ...v,
+                              index: i,
+                              // payment: v?.payment ?? 0,
+                            };
+                          })}
+                          className="display w-150 datatable-wrapper header-white no-border"
+                          showGridlines={false}
+                          emptyMessage={() => <div></div>}
+                        >
+                          <Column
+                            header="No. Pesanan Pembelian"
+                            style={{
+                              maxWidth: "10rem",
+                            }}
+                            field={""}
+                            body={(e) => (
+                              <PrimeInput
+                                value={checkPo(e.po_id)?.po_code ?? null}
+                                onChange={(u) => {}}
+                                placeholder="No. Pesanan Pembelian"
+                                disabled
+                              />
+                            )}
+                          />
+
+                          <Column
+                            header="Tanggal Pesanan"
+                            style={{
+                              maxWidth: "10rem",
+                            }}
+                            field={""}
+                            body={(e) => (
+                              <div className="p-inputgroup">
+                                <Calendar
+                                  value={
+                                    new Date(`${checkPo(e.po_id)?.po_date}Z`)
+                                  }
+                                  onChange={(e) => {}}
+                                  placeholder="Tanggal Pesanan"
+                                  dateFormat="dd-mm-yy"
+                                  disabled
+                                />
+                              </div>
+                            )}
+                          />
+
+                          <Column
+                            header="Total Tagihan"
+                            style={{
+                              maxWidth: "10rem",
+                            }}
+                            field={""}
+                            body={(e) => (
+                              <PrimeNumber
+                                price
+                                value={e?.t_bayar}
+                                onChange={(e) => {}}
+                                placeholder="0"
+                                disabled
+                              />
+                            )}
+                          />
+
+                          <Column
+                            header="Nilai Uang Muka"
+                            // className="align-text-top"
+                            style={{
+                              maxWidth: "10rem",
+                            }}
+                            field={""}
+                            body={(e) =>
+                              supp(exp.dp_sup)?.supplier?.sup_curren !==
+                              null ? (
+                                <PrimeNumber
+                                  value={e.value ? e.value : ""}
+                                  onChange={(u) => {
+                                    let temp = [...exp.det_dp];
+                                    temp[e.index].value = Number(
+                                      u.target.value
+                                    );
+                                    temp[e.index].remain =
+                                      e.t_bayar - Number(u.target.value);
+                                    updateExp({ ...exp, det_dp: temp });
+
+                                    // let newError = error;
+                                    // newError.acq[e.index].pay = false;
+                                    // newError.acq?.push({ pay: false });
+                                    // setError(newError);
+                                  }}
+                                  placeholder="0"
+                                  // min={0}
+                                  type="number"
+                                  // error={error?.acq[e.index]?.pay}
+                                />
+                              ) : (
+                                <PrimeNumber
+                                  price
+                                  value={e.value && e.value}
+                                  onChange={(u) => {
+                                    let temp = [...exp.det_dp];
+                                    temp[e.index].value = u.value;
+                                    temp[e.index].remain = e.t_bayar - u.value;
+                                    updateExp({ ...exp, det_dp: temp });
+
+                                    // let newError = error;
+                                    // newError.acq[e.index].pay = false;
+                                    // newError.acq.push({ pay: false });
+                                    // setError(newError);
+                                  }}
+                                  placeholder="0"
+                                  min={0}
+                                  // error={error?.acq[e.index]?.pay}
+                                />
+                              )
+                            }
+                          />
+
+                          <Column
+                            hidden={isEdit}
+                            header="Sisa Tagihan"
+                            style={{
+                              maxWidth: "10rem",
+                            }}
+                            field={""}
+                            body={(e) => (
+                              <PrimeNumber
+                                price
+                                value={e.remain ?? 0}
+                                onChange={(e) => {}}
+                                placeholder="0"
+                                disabled
+                              />
+                            )}
+                          />
+
+                          <Column
+                            header="Deskripsi"
+                            style={{
+                              maxWidth: "20rem",
+                            }}
+                            field={""}
+                            body={(e) => (
+                              <PrimeInput
+                                value={e.desc ?? null}
+                                onChange={(e) => {
+                                  let temp = [...exp.det_dp];
+                                  temp[e.index].desc = e.target.value;
+                                  updateExp({ ...exp, det_dp: temp });
+                                }}
+                                placeholder="Masukan Deskripsi"
+                              />
+                            )}
+                          />
+                        </DataTable>
+                      </>
+                    }
+                  />
+                </>
+              ) : (
+                <></>
+              )}
+            </>
           ) : (
             <>
               <div className="col-3">
@@ -1364,7 +2077,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                 <div className="p-inputgroup"></div>
                 <PrimeDropdown
                   value={exp.exp_acc && checkAcc(exp.exp_acc)}
-                  options={account}
+                  options={acc}
                   onChange={(e) => {
                     updateExp({
                       ...exp,
@@ -1476,22 +2189,24 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                         }}
                         field={""}
                         body={(e) => (
-                          <CustomDropdown
+                          <PrimeDropdown
                             value={e.acc_code && checkAcc(e.acc_code)}
-                            option={account}
+                            option={acc}
                             onChange={(u) => {
                               console.log(e.value);
                               let temp = [...exp.exp];
-                              temp[e.index].acc_code = u.account.id;
+                              temp[e.index].acc_code = u.target.account.id;
                               updateExp({ ...exp, exp: temp });
 
                               let newError = error;
                               newError.exp[e.index].acc = false;
                               setError(newError);
                             }}
-                            label={"[account.acc_name] - [account.acc_code]"}
-                            placeholder="Pilih Kode Akun"
-                            detail
+                            optionLabel={"account.acc_name"}
+                            itemTemplate={glTemplate}
+                            valueTemplate={valTemp}
+                            filter
+                            filterBy={"acc_name"}
                             errorMessage="Akun Belum Dipilih"
                             error={error?.exp[e.index]?.acc}
                           />
@@ -1646,193 +2361,192 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
 
   return (
     <Row>
-    <Col className="pt-0">
-      <Card>
-        <Card.Body>
-      {/* {header()} */}
-      {body()}
-      {footer()}
+      <Col className="pt-0">
+        <Card>
+          <Card.Body>
+            {/* {header()} */}
+            {body()}
+            {footer()}
 
-      <DataSupplier
-        data={supplier}
-        loading={false}
-        popUp={true}
-        show={showSupplier}
-        onHide={() => {
-          setShowSupplier(false);
-        }}
-        onInput={(e) => {
-          setShowSupplier(!e);
-        }}
-        onSuccessInput={(e) => {
-          getSupplier();
-        }}
-        onRowSelect={(e) => {
-          if (doubleClick) {
-            setShowSupplier(false);
-            updateExp({ ...exp, acq_sup: e.data.id });
-          }
+            <DataSupplier
+              data={supplier}
+              loading={false}
+              popUp={true}
+              show={showSupplier}
+              onHide={() => {
+                setShowSupplier(false);
+              }}
+              onInput={(e) => {
+                setShowSupplier(!e);
+              }}
+              onSuccessInput={(e) => {
+                getSupplier();
+              }}
+              onRowSelect={(e) => {
+                if (doubleClick) {
+                  setShowSupplier(false);
+                  updateExp({ ...exp, acq_sup: e.data.id });
+                }
 
-          setDoubleClick(true);
+                setDoubleClick(true);
 
-          setTimeout(() => {
-            setDoubleClick(false);
-          }, 2000);
-        }}
-      />
+                setTimeout(() => {
+                  setDoubleClick(false);
+                }, 2000);
+              }}
+            />
 
-      <DataProject
-        data={proj}
-        loading={false}
-        popUp={true}
-        show={showProj}
-        onHide={() => {
-          setShowProj(false);
-        }}
-        onInput={(e) => {
-          setShowProj(!e);
-        }}
-        onSuccessInput={(e) => {
-          getProj();
-        }}
-        onRowSelect={(e) => {
-          if (doubleClick) {
-            setShowProj(false);
-            updateExp({ ...exp, exp_prj: e.data.id });
-          }
+            <DataProject
+              data={proj}
+              loading={false}
+              popUp={true}
+              show={showProj}
+              onHide={() => {
+                setShowProj(false);
+              }}
+              onInput={(e) => {
+                setShowProj(!e);
+              }}
+              onSuccessInput={(e) => {
+                getProj();
+              }}
+              onRowSelect={(e) => {
+                if (doubleClick) {
+                  setShowProj(false);
+                  updateExp({ ...exp, exp_prj: e.data.id });
+                }
 
-          setDoubleClick(true);
+                setDoubleClick(true);
 
-          setTimeout(() => {
-            setDoubleClick(false);
-          }, 2000);
-        }}
-      />
+                setTimeout(() => {
+                  setDoubleClick(false);
+                }, 2000);
+              }}
+            />
 
-      <DataBank
-        data={bank}
-        loading={false}
-        popUp={true}
-        show={showBank}
-        onHide={() => {
-          setShowBank(false);
-        }}
-        onInput={(e) => {
-          setShowBank(!e);
-        }}
-        onSuccessInput={(e) => {
-          getBank();
-        }}
-        onRowSelect={(e) => {
-          if (doubleClick) {
-            setShowBank(false);
-            updateExp({
-              ...exp,
-              bank_id: e.data.bank.id,
-              bank_acc: e.data.bank.acc_id,
-            });
-          }
+            <DataBank
+              data={bank}
+              loading={false}
+              popUp={true}
+              show={showBank}
+              onHide={() => {
+                setShowBank(false);
+              }}
+              onInput={(e) => {
+                setShowBank(!e);
+              }}
+              onSuccessInput={(e) => {
+                getBank();
+              }}
+              onRowSelect={(e) => {
+                if (doubleClick) {
+                  setShowBank(false);
+                  updateExp({
+                    ...exp,
+                    bank_id: e.data.bank.id,
+                    bank_acc: e.data.bank.acc_id,
+                  });
+                }
 
-          setDoubleClick(true);
+                setDoubleClick(true);
 
-          setTimeout(() => {
-            setDoubleClick(false);
-          }, 2000);
-        }}
-      />
+                setTimeout(() => {
+                  setDoubleClick(false);
+                }, 2000);
+              }}
+            />
 
-      <DataBank
-        data={bank}
-        loading={false}
-        popUp={true}
-        show={showBankG}
-        onHide={() => {
-          setShowBankG(false);
-        }}
-        onInput={(e) => {
-          setShowBankG(!e);
-        }}
-        onSuccessInput={(e) => {
-          getBank();
-        }}
-        onRowSelect={(e) => {
-          if (doubleClick) {
-            setShowBankG(false);
-            updateExp({
-              ...exp,
-              bank_id: e.data.bank.id,
-              bank_acc: e.data.bank.acc_id,
-            });
-          }
+            <DataBank
+              data={bank}
+              loading={false}
+              popUp={true}
+              show={showBankG}
+              onHide={() => {
+                setShowBankG(false);
+              }}
+              onInput={(e) => {
+                setShowBankG(!e);
+              }}
+              onSuccessInput={(e) => {
+                getBank();
+              }}
+              onRowSelect={(e) => {
+                if (doubleClick) {
+                  setShowBankG(false);
+                  updateExp({
+                    ...exp,
+                    bank_id: e.data.bank.id,
+                    bank_acc: e.data.bank.acc_id,
+                  });
+                }
 
-          setDoubleClick(true);
+                setDoubleClick(true);
 
-          setTimeout(() => {
-            setDoubleClick(false);
-          }, 2000);
-        }}
-      />
+                setTimeout(() => {
+                  setDoubleClick(false);
+                }, 2000);
+              }}
+            />
 
-      <DataAkun
-        data={accKas}
-        loading={false}
-        popUp={true}
-        show={showAccKas}
-        onHide={() => {
-          setShowAccKas(false);
-        }}
-        onInput={(e) => {
-          setShowAccKas(!e);
-        }}
-        onSuccessInput={(e) => {
-          getAccKas();
-        }}
-        onRowSelect={(e) => {
-          if (doubleClick) {
-            setShowAccKas(false);
-            updateExp({ ...exp, kas_acc: e.data.account.id });
-          }
+            <DataAkun
+              data={accKas}
+              loading={false}
+              popUp={true}
+              show={showAccKas}
+              onHide={() => {
+                setShowAccKas(false);
+              }}
+              onInput={(e) => {
+                setShowAccKas(!e);
+              }}
+              onSuccessInput={(e) => {
+                getAccount();
+              }}
+              onRowSelect={(e) => {
+                if (doubleClick) {
+                  setShowAccKas(false);
+                  updateExp({ ...exp, kas_acc: e.data.account.id });
+                }
 
-          setDoubleClick(true);
+                setDoubleClick(true);
 
-          setTimeout(() => {
-            setDoubleClick(false);
-          }, 2000);
-        }}
-      />
+                setTimeout(() => {
+                  setDoubleClick(false);
+                }, 2000);
+              }}
+            />
 
-      <DataAkun
-        data={account}
-        loading={false}
-        popUp={true}
-        show={showAcc}
-        onHide={() => {
-          setShowAcc(false);
-        }}
-        onInput={(e) => {
-          setShowAcc(!e);
-        }}
-        onSuccessInput={(e) => {
-          getAccount();
-        }}
-        onRowSelect={(e) => {
-          if (doubleClick) {
-            setShowAcc(false);
-            updateExp({ ...exp, exp_acc: e.data.account.id });
-          }
+            <DataAkun
+              data={allacc}
+              loading={false}
+              popUp={true}
+              show={showAcc}
+              onHide={() => {
+                setShowAcc(false);
+              }}
+              onInput={(e) => {
+                setShowAcc(!e);
+              }}
+              onSuccessInput={(e) => {
+                getAccount();
+              }}
+              onRowSelect={(e) => {
+                if (doubleClick) {
+                  setShowAcc(false);
+                  updateExp({ ...exp, exp_acc: e.data.account.id });
+                }
 
-          setDoubleClick(true);
+                setDoubleClick(true);
 
-          setTimeout(() => {
-            setDoubleClick(false);
-          }, 2000);
-        }}
-      />
-    
-    </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+                setTimeout(() => {
+                  setDoubleClick(false);
+                }, 2000);
+              }}
+            />
+          </Card.Body>
+        </Card>
+      </Col>
+    </Row>
   );
 };
 

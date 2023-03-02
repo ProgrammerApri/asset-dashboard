@@ -79,6 +79,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
   const [supplier, setSupplier] = useState(null);
   const [rulesPay, setRulesPay] = useState(null);
   const [ppn, setPpn] = useState(null);
+  const [currency, setCurr] = useState(null);
   const [customer, setCustomer] = useState(null);
   const [subCus, setSubCus] = useState(null);
   const [sto, setSto] = useState(null);
@@ -100,6 +101,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
     getSatuan();
     getRulesPay();
     getPpn();
+    getCurr();
     getCustomer();
     getSubCus();
     getloct();
@@ -416,6 +418,24 @@ const InputSO = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
+  const getCurr = async () => {
+    const config = {
+      ...endpoints.currency,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setCurr(data);
+      }
+    } catch (error) {}
+  };
+
   const getloct = async () => {
     const config = {
       ...endpoints.lokasi,
@@ -548,6 +568,17 @@ const InputSO = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
+  const checkCur = (value) => {
+    let selected = {};
+    currency?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
   const checkLoc = (value) => {
     let selected = {};
     lokasi?.forEach((element) => {
@@ -601,6 +632,30 @@ const InputSO = ({ onCancel, onSuccess }) => {
     });
 
     return nil;
+  };
+
+  const curConv = () => {
+    let cur = 0;
+    currency?.forEach((elem) => {
+      if (checkCus(so.pel_id)?.cus_curren === elem.id) {
+        cur = elem.rate;
+      }
+    });
+
+    return cur;
+  };
+
+  const curConvSup = () => {
+    let cur_sup = 0;
+    so?.sjasa.forEach((element) => {
+      currency?.forEach((elem) => {
+        if (checkSupp(element.sup_id)?.supplier?.sup_curren === elem.id) {
+          cur_sup = elem.rate;
+        }
+      });
+    });
+
+    return cur_sup;
   };
 
   const updateSo = (e) => {
@@ -733,7 +788,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-3">
+          <div className="col-2">
             <PrimeInput
               label={tr[localStorage.getItem("language")].telp}
               isNumber
@@ -743,7 +798,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-3">
+          <div className="col-2">
             <label>{tr[localStorage.getItem("language")].type_pjk}</label>
             <div className="p-inputgroup">
               <InputText
@@ -754,6 +809,21 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 }
                 onChange={(e) => {}}
                 placeholder={tr[localStorage.getItem("language")].type_pjk}
+                disabled
+              />
+            </div>
+          </div>
+
+          <div className="col-2">
+            <label>{tr[localStorage.getItem("language")].currency}</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={
+                  checkCus(so.pel_id)?.cus_curren !== null
+                    ? checkCur(checkCus(so.pel_id)?.cus_curren).code
+                    : "IDR"
+                }
+                placeholder={tr[localStorage.getItem("language")].currency}
                 disabled
               />
             </div>
@@ -1020,6 +1090,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   field={""}
                   body={(e) => (
                     <PrimeNumber
+                      prc
                       value={e?.stock ?? 0}
                       placeholder="0"
                       type="number"
@@ -1036,12 +1107,21 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   body={(e) => (
                     <div className="p-inputgroup">
                       <PrimeNumber
+                        prc
                         value={e.order && e.order}
                         onChange={(u) => {
                           let temp = [...so.sprod];
-                          temp[e.index].order = u.target.value;
-                          temp[e.index].total =
-                            temp[e.index].order * temp[e.index].price;
+                          temp[e.index].order = Number(u.value);
+                          if (checkCus(so.pel_id)?.cus_curren !== null) {
+                            temp[e.index].total_fc =
+                              temp[e.index].order * temp[e.index].price;
+
+                            temp[e.index].total =
+                              temp[e.index].total_fc * curConv();
+                          } else {
+                            temp[e.index].total =
+                              temp[e.index].order * temp[e.index].price;
+                          }
 
                           if (temp[e.index].order > temp[e.index].stock) {
                             // temp[e.index].order = checkProd(e?.prod_id)?.stock;
@@ -1053,8 +1133,16 @@ const InputSO = ({ onCancel, onSuccess }) => {
                               life: 3000,
                             });
                           }
-
-                          updateSo({ ...so, sprod: temp });
+                          updateSo({
+                            ...so,
+                            sprod: temp,
+                            total_bayar:
+                              getSubTotalBarang() +
+                              getSubTotalJasa() +
+                              ((getSubTotalBarang() + getSubTotalJasa()) *
+                                pjk()) /
+                                100,
+                          });
                           console.log(temp);
                           let newError = error;
                           newError.prod[e.index].jum = false;
@@ -1097,26 +1185,83 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   header={tr[localStorage.getItem("language")].price}
                   className="align-text-top"
                   field={""}
-                  body={(e) => (
-                    <PrimeNumber
-                      price
-                      value={e.price && e.price}
-                      onChange={(u) => {
-                        let temp = [...so.sprod];
-                        temp[e.index].price = u.value;
-                        temp[e.index].total =
-                          temp[e.index].order * temp[e.index].price;
-                        updateSo({ ...so, sprod: temp });
-                        console.log(temp);
-                        let newError = error;
-                        newError.prod[e.index].prc = false;
-                        setError(newError);
-                      }}
-                      placeholder="0"
-                      min={0}
-                      error={error?.prod[e.index]?.prc}
-                    />
-                  )}
+                  body={(e) =>
+                    checkCus(so.pel_id)?.cus_curren !== null ? (
+                      <PrimeNumber
+                        value={e.price && e.price}
+                        onChange={(u) => {
+                          let temp = [...so.sprod];
+                          temp[e.index].price = u.target.value;
+                          if (checkCus(so.pel_id)?.cus_curren !== null) {
+                            temp[e.index].total_fc =
+                              temp[e.index].order * temp[e.index].price;
+
+                            temp[e.index].total =
+                              temp[e.index].total_fc * curConv();
+                          } else {
+                            temp[e.index].total =
+                              temp[e.index].order * temp[e.index].price;
+                          }
+
+                          updateSo({
+                            ...so,
+                            sprod: temp,
+                            total_bayar:
+                              getSubTotalBarang() +
+                              getSubTotalJasa() +
+                              ((getSubTotalBarang() + getSubTotalJasa()) *
+                                pjk()) /
+                                100,
+                          });
+
+                          console.log(temp);
+                          let newError = error;
+                          newError.prod[e.index].prc = false;
+                          setError(newError);
+                        }}
+                        placeholder="0"
+                        min={0}
+                        error={error?.prod[e.index]?.prc}
+                      />
+                    ) : (
+                      <PrimeNumber
+                        price
+                        value={e.price && e.price}
+                        onChange={(u) => {
+                          let temp = [...so.sprod];
+                          temp[e.index].price = u.value;
+                          if (checkCus(so.pel_id)?.cus_curren !== null) {
+                            temp[e.index].total_fc =
+                              temp[e.index].order * temp[e.index].price;
+
+                            temp[e.index].total =
+                              temp[e.index].total_fc * curConv();
+                          } else {
+                            temp[e.index].total =
+                              temp[e.index].order * temp[e.index].price;
+                          }
+
+                          updateSo({
+                            ...so,
+                            sprod: temp,
+                            total_bayar:
+                              getSubTotalBarang() +
+                              getSubTotalJasa() +
+                              ((getSubTotalBarang() + getSubTotalJasa()) *
+                                pjk()) /
+                                100,
+                          });
+
+                          let newError = error;
+                          newError.prod[e.index].prc = false;
+                          setError(newError);
+                        }}
+                        placeholder="0"
+                        min={0}
+                        error={error?.prod[e.index]?.prc}
+                      />
+                    )
+                  }
                 />
 
                 <Column
@@ -1130,7 +1275,16 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         onChange={(u) => {
                           let temp = [...so.sprod];
                           temp[e.index].disc = u.target.value;
-                          updateSo({ ...so, sprod: temp });
+                          updateSo({
+                            ...so,
+                            sprod: temp,
+                            total_bayar:
+                              getSubTotalBarang() +
+                              getSubTotalJasa() +
+                              ((getSubTotalBarang() + getSubTotalJasa()) *
+                                pjk()) /
+                                100,
+                          });
                           console.log(temp);
                         }}
                         placeholder="0"
@@ -1153,11 +1307,43 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         onChange={(u) => {
                           let temp = [...so.sprod];
                           temp[e.index].nett_price = u.value;
-                          updateSo({ ...so, sprod: temp });
+                          updateSo({
+                            ...so,
+                            sprod: temp,
+                            total_bayar:
+                              getSubTotalBarang() +
+                              getSubTotalJasa() +
+                              ((getSubTotalBarang() + getSubTotalJasa()) *
+                                pjk()) /
+                                100,
+                          });
                           console.log(temp);
                         }}
                         placeholder="0"
                         min={0}
+                      />
+                    </div>
+                  )}
+                />
+
+                <Column
+                  header="FC"
+                  className="align-text-top"
+                  style={{
+                    minWidth: "7rem",
+                  }}
+                  field={""}
+                  body={(e) => (
+                    <div className="p-inputgroup">
+                      <InputNumber
+                        value={
+                          e.nett_price && e.nett_price !== 0
+                            ? e.nett_price
+                            : e.total_fc - (e.total_fc * e.disc) / 100
+                        }
+                        onChange={(u) => {}}
+                        placeholder="0"
+                        disabled
                       />
                     </div>
                   )}
@@ -1205,6 +1391,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                                 price: null,
                                 disc: null,
                                 nett_price: null,
+                                total_fc: null,
                                 total: null,
                               },
                             ],
@@ -1320,6 +1507,35 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
+                  header={tr[localStorage.getItem("language")].currency}
+                  className="align-text-top"
+                  style={{
+                    minWidth: "8rem",
+                  }}
+                  field={""}
+                  body={(e) => (
+                    <div className="p-inputgroup">
+                      <InputText
+                        value={
+                          e.sup_id !== null
+                            ? checkSupp(e.sup_id)?.supplier?.sup_curren !== null
+                              ? checkCur(
+                                  checkSupp(e.sup_id)?.supplier?.sup_curren
+                                )?.code
+                              : "IDR"
+                            : ""
+                        }
+                        onChange={(u) => {}}
+                        placeholder={
+                          tr[localStorage.getItem("language")].currency
+                        }
+                        disabled
+                      />
+                    </div>
+                  )}
+                />
+
+                <Column
                   header={tr[localStorage.getItem("language")].qty}
                   className="align-text-top"
                   field={""}
@@ -1328,13 +1544,34 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   }}
                   body={(e) => (
                     <PrimeNumber
-                      value={e.qty && e.qty}
+                      value={e.qty ? e.qty : ""}
                       onChange={(u) => {
                         let temp = [...so.sjasa];
                         temp[e.index].qty = u.target.value;
-                        temp[e.index].total =
-                          temp[e.index].qty * temp[e.index].price;
-                        updateSo({ ...so, sjasa: temp });
+                        if (
+                          checkSupp(e.sup_id)?.supplier?.sup_curren !== null
+                        ) {
+                          temp[e.index].total_fc =
+                            temp[e.index].qty * temp[e.index].price;
+
+                          temp[e.index].total =
+                            temp[e.index].total_fc * curConvSup();
+                        } else {
+                          temp[e.index].total =
+                            temp[e.index].qty * temp[e.index].price;
+                        }
+
+                        updateSo({
+                          ...so,
+                          sjasa: temp,
+                          total_bayar:
+                            getSubTotalBarang() +
+                            getSubTotalJasa() +
+                            ((getSubTotalBarang() + getSubTotalJasa()) *
+                              pjk()) /
+                              100,
+                        });
+
                         console.log(temp);
                         let newError = error;
                         newError.jasa[e.index].jum = false;
@@ -1383,26 +1620,88 @@ const InputSO = ({ onCancel, onSuccess }) => {
                     width: "25rem",
                   }}
                   field={""}
-                  body={(e) => (
-                    <PrimeNumber
-                      price
-                      value={e.price && e.price}
-                      onChange={(u) => {
-                        let temp = [...so.sjasa];
-                        temp[e.index].price = u.value;
-                        temp[e.index].total =
-                          temp[e.index].qty * temp[e.index].price;
-                        updateSo({ ...so, sjasa: temp });
-                        console.log(temp);
-                        let newError = error;
-                        newError.jasa[e.index].prc = false;
-                        setError(newError);
-                      }}
-                      placeholder="0"
-                      min={0}
-                      error={error?.jasa[e.index]?.prc}
-                    />
-                  )}
+                  body={(e) =>
+                    checkSupp(e.sup_id)?.supplier?.sup_curren !== null ? (
+                      <PrimeNumber
+                        value={e.price && e.price}
+                        onChange={(u) => {
+                          let temp = [...so.sjasa];
+                          temp[e.index].price = Number(u.target.value);
+                          if (
+                            checkSupp(e.sup_id)?.supplier?.sup_curren !== null
+                          ) {
+                            temp[e.index].total_fc =
+                              temp[e.index].qty * temp[e.index].price;
+
+                            temp[e.index].total =
+                              temp[e.index].total_fc * curConvSup();
+                          } else {
+                            temp[e.index].total =
+                              temp[e.index].qty * temp[e.index].price;
+                          }
+
+                          updateSo({
+                            ...so,
+                            sjasa: temp,
+                            total_bayar:
+                              getSubTotalBarang() +
+                              getSubTotalJasa() +
+                              ((getSubTotalBarang() + getSubTotalJasa()) *
+                                pjk()) /
+                                100,
+                          });
+
+                          console.log(temp);
+                          let newError = error;
+                          newError.jasa[e.index].prc = false;
+                          setError(newError);
+                        }}
+                        placeholder="0"
+                        min={0}
+                        error={error?.jasa[e.index]?.prc}
+                      />
+                    ) : (
+                      <PrimeNumber
+                        price
+                        value={e.price && e.price}
+                        onChange={(u) => {
+                          let temp = [...so.sjasa];
+                          temp[e.index].price = u.value;
+                          if (
+                            checkSupp(e.sup_id)?.supplier?.sup_curren !== null
+                          ) {
+                            temp[e.index].total_fc =
+                              temp[e.index].qty * temp[e.index].price;
+
+                            temp[e.index].total =
+                              temp[e.index].total_fc * curConvSup();
+                          } else {
+                            temp[e.index].total =
+                              temp[e.index].qty * temp[e.index].price;
+                          }
+
+                          updateSo({
+                            ...so,
+                            sjasa: temp,
+                            total_bayar:
+                              getSubTotalBarang() +
+                              getSubTotalJasa() +
+                              ((getSubTotalBarang() + getSubTotalJasa()) *
+                                pjk()) /
+                                100,
+                          });
+
+                          console.log(temp);
+                          let newError = error;
+                          newError.jasa[e.index].prc = false;
+                          setError(newError);
+                        }}
+                        placeholder="0"
+                        min={0}
+                        error={error?.jasa[e.index]?.prc}
+                      />
+                    )
+                  }
                 />
 
                 <Column
@@ -1419,7 +1718,16 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         onChange={(u) => {
                           let temp = [...so.sjasa];
                           temp[e.index].disc = u.target.value;
-                          updateSo({ ...so, sjasa: temp });
+                          updateSo({
+                            ...so,
+                            sjasa: temp,
+                            total_bayar:
+                              getSubTotalBarang() +
+                              getSubTotalJasa() +
+                              ((getSubTotalBarang() + getSubTotalJasa()) *
+                                pjk()) /
+                                100,
+                          });
                           console.log(temp);
                         }}
                         placeholder="0"
@@ -1427,6 +1735,25 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         min={0}
                       />
                       <span className="p-inputgroup-addon">%</span>
+                    </div>
+                  )}
+                />
+
+                <Column
+                  header="FC"
+                  className="align-text-top"
+                  field={""}
+                  style={{
+                    minWidth: "8rem",
+                  }}
+                  body={(e) => (
+                    <div className="p-inputgroup">
+                      <InputNumber
+                        value={e.total_fc - (e.total_fc * e.disc) / 100}
+                        onChange={(t) => {}}
+                        placeholder="0"
+                        disabled
+                      />
                     </div>
                   )}
                 />
@@ -1470,6 +1797,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                                 qty: null,
                                 price: null,
                                 disc: null,
+                                total_fc: null,
                                 total: null,
                               },
                             ],
@@ -1569,7 +1897,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
             <div className="col-6">
               <label className="text-label">
                 {so.split_inv
-                  ? `${tr[localStorage.getItem("language")].pjk_barang} (${pjk()}%)`
+                  ? `${
+                      tr[localStorage.getItem("language")].pjk_barang
+                    } (${pjk()}%)`
                   : tr[localStorage.getItem("language")].pajak}
               </label>
             </div>
@@ -1677,7 +2007,8 @@ const InputSO = ({ onCancel, onSuccess }) => {
                     {formatIdr(
                       getSubTotalBarang() +
                         getSubTotalJasa() +
-                        ((getSubTotalBarang() + getSubTotalJasa()) * pjk()) / 100
+                        ((getSubTotalBarang() + getSubTotalJasa()) * pjk()) /
+                          100
                     )}
                   </b>
                 )}
@@ -1692,7 +2023,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
               <>
                 {/* <div className="row justify-content-right col-12 mt-4"> */}
                 <div className="col-6 mt-4">
-                  <label className="text-black fs-14">{tr[localStorage.getItem("language")].ttl_jasa}</label>
+                  <label className="text-black fs-14">
+                    {tr[localStorage.getItem("language")].ttl_jasa}
+                  </label>
                 </div>
 
                 <div className="col-6 mt-4">
@@ -1713,7 +2046,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
                 <div className="col-6">
                   <label className="text-black fs-14">
-                  {tr[localStorage.getItem("language")].pjk_jasa} (2%)
+                    {tr[localStorage.getItem("language")].pjk_jasa} (2%)
                   </label>
                 </div>
 
@@ -1724,7 +2057,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 </div>
 
                 <div className="col-6 mt-3">
-                  <label className="text-black fs-14">{tr[localStorage.getItem("language")].disc_tambh}</label>
+                  <label className="text-black fs-14">
+                    {tr[localStorage.getItem("language")].disc_tambh}
+                  </label>
                 </div>
 
                 <div className="col-6">
@@ -1740,7 +2075,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
                           ? (getSubTotalJasa() * so.jasa_disc) / 100
                           : so.jasa_disc
                       }
-                      placeholder={tr[localStorage.getItem("language")].disc_tambh}
+                      placeholder={
+                        tr[localStorage.getItem("language")].disc_tambh
+                      }
                       type="number"
                       min={0}
                       onChange={(e) => {
@@ -1769,7 +2106,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
                 <div className="col-6">
                   <label className="fs-14">
-                    <b>{`${tr[localStorage.getItem("language")].total} ${tr[localStorage.getItem("language")].bayar}`}</b>
+                    <b>{`${tr[localStorage.getItem("language")].total} ${
+                      tr[localStorage.getItem("language")].bayar
+                    }`}</b>
                   </label>
                 </div>
 

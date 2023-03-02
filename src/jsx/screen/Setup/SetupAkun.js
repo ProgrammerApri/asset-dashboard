@@ -22,6 +22,7 @@ const set = {
   sls_unbill: null,
   sls_unbill_recv: null,
   sls_tax: null,
+  sls: null,
   pur_cogs: null,
   pur_discount: null,
   pur_shipping: null,
@@ -36,7 +37,7 @@ const set = {
   sto_hpp_diff: null,
   sto_wip: null,
   fixed_assets: null,
-  costing: null
+  costing: null,
 };
 
 const SetupAkun = () => {
@@ -181,6 +182,7 @@ const SetupAkun = () => {
         sls_unbill: data?.sls_unbill?.id ?? null,
         sls_unbill_recv: data?.sls_unbill_recv?.id ?? null,
         sls_tax: data?.sls_tax?.id ?? null,
+        sls: data?.sls?.id ?? null,
         pur_cogs: data?.pur_cogs?.id ?? null,
         pur_discount: data?.pur_discount?.id ?? null,
         pur_shipping: data?.pur_shipping?.id ?? null,
@@ -241,6 +243,7 @@ const SetupAkun = () => {
         sls_unbill: data?.sls_unbill?.id ?? null,
         sls_unbill_recv: data?.sls_unbill_recv?.id ?? null,
         sls_tax: data?.sls_tax?.id ?? null,
+        sls: data?.sls?.id ?? null,
         pur_cogs: data?.pur_cogs?.id ?? null,
         pur_discount: data?.pur_discount?.id ?? null,
         pur_shipping: data?.pur_shipping?.id ?? null,
@@ -485,6 +488,15 @@ const SetupAkun = () => {
                   (e) => {
                     setSetup({ ...setup, sls_tax: e.value });
                     submitUpdate({ ...setup, sls_tax: e.value });
+                  }
+                )}
+
+                {renderAccountDropdown(
+                  "Penjualan Sementara",
+                  setup && setup.sls,
+                  (e) => {
+                    setSetup({ ...setup, sls: e.value });
+                    submitUpdate({ ...setup, sls: e.value });
                   }
                 )}
               </Row>
@@ -766,24 +778,16 @@ const SetupAkun = () => {
                         { code: 2, name: "Prepectual Costing" },
                       ]}
                       onChange={(e) => {
-                        setSetup({...setup, costing: e.value})
+                        setSetup({ ...setup, costing: e.value });
                       }}
                       optionLabel={(option) => (
-                        <div>
-                          {option !== null
-                            ? `${option.name}`
-                            : ""}
-                        </div>
+                        <div>{option !== null ? `${option.name}` : ""}</div>
                       )}
                       filter
                       filterBy="name"
                       placeholder="Pilih Jenis Costing"
                       itemTemplate={(option) => (
-                        <div>
-                          {option !== null
-                            ? `${option.name}`
-                            : ""}
-                        </div>
+                        <div>{option !== null ? `${option.name}` : ""}</div>
                       )}
                     />
                   </div>

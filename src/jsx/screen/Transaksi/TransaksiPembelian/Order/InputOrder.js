@@ -110,7 +110,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     getSupplier();
     getRulesPay();
     getDept();
-    getProduct(order.ns);
+    getProduct();
     getJasa();
     getSatuan();
     getPjk();
@@ -355,7 +355,9 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
         dispatch({
           type: SET_PRODUCT,
-          payload: data.filter((v) => v.group.stok === !ns),
+          payload: data
+          // .filter((v) => v.group.stok === !ns)
+          ,
         });
         getGrupP();
       }
@@ -1283,7 +1285,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             <></>
           )}
 
-          {order?.po_id !== null ? (
+          {/* {order?.po_id !== null ? (
             <>
               <div className="d-flex col-12 align-items-center mt-4">
                 <label className="ml-0 mt-4">{"Non Stock"}</label>
@@ -1299,7 +1301,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             </>
           ) : (
             <></>
-          )}
+          )} */}
         </Row>
 
         <CustomAccordion

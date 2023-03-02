@@ -24,7 +24,8 @@ const def = {
     BANK_CODE: "",
     BANK_NAME: "",
     BANK_DESC: "",
-    acc_id: 0,
+    CURRENCY: null,
+    acc_id: null,
     user_entry: 0,
     user_edit: null,
     entry_date: "",
@@ -67,6 +68,7 @@ const DataBank = ({
 }) => {
   const [bank, setBank] = useState(null);
   const [account, setAccount] = useState(null);
+  const [currency, setCurrency] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [showInput, setShowInput] = useState(false);
@@ -83,12 +85,11 @@ const DataBank = ({
 
   useEffect(() => {
     getAccount();
+    getCurr();
     initFilters1();
   }, []);
 
   const getAccount = async () => {
-    console.log("-------------------");
-    // console.log(currentItem);
     setLoading(true);
     const config = {
       ...endpoints.account,
@@ -113,6 +114,25 @@ const DataBank = ({
     } catch (error) {}
   };
 
+  const getCurr = async () => {
+    setLoading(true);
+    const config = {
+      ...endpoints.currency,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        
+        setCurrency(data);
+      }
+    } catch (error) {}
+  };
+
   const editBank = async () => {
     const config = {
       ...endpoints.editBank,
@@ -122,6 +142,7 @@ const DataBank = ({
         ACC_ID: currentItem?.account?.id,
         BANK_NAME: currentItem?.bank?.BANK_NAME,
         BANK_DESC: currentItem?.bank?.BANK_DESC,
+        CURRENCY: currentItem?.bank?.CURRENCY,
       },
     };
     console.log(config.data);
@@ -160,10 +181,11 @@ const DataBank = ({
     const config = {
       ...endpoints.addBank,
       data: {
-        BANK_CODE: currentItem.bank.BANK_CODE,
-        ACC_ID: currentItem.account.id,
-        BANK_NAME: currentItem.bank.BANK_NAME,
-        BANK_DESC: currentItem.bank.BANK_DESC,
+        BANK_CODE: currentItem.bank.BANK_CODE  ?? null,
+        ACC_ID: currentItem.account.id  ?? null,
+        BANK_NAME: currentItem.bank.BANK_NAME  ?? null,
+        BANK_DESC: currentItem.bank.BANK_DESC  ?? null,
+        CURRENCY: currentItem.bank.CURRENCY ?? null,
       },
     };
     console.log(config.data);
@@ -256,28 +278,32 @@ const DataBank = ({
     return (
       // <React.Fragment>
       <div className="d-flex">
-        {edit && <Link
-          onClick={() => {
-            setEdit(true);
-            setCurrentItem(data);
-            setShowInput(true);
-            onInput(true);
-          }}
-          className="btn btn-primary shadow btn-xs sharp ml-2"
-        >
-          <i className="fa fa-pencil"></i>
-        </Link>}
+        {edit && (
+          <Link
+            onClick={() => {
+              setEdit(true);
+              setCurrentItem(data);
+              setShowInput(true);
+              onInput(true);
+            }}
+            className="btn btn-primary shadow btn-xs sharp ml-2"
+          >
+            <i className="fa fa-pencil"></i>
+          </Link>
+        )}
 
-        {del && <Link
-          onClick={() => {
-            setCurrentItem(data);
-            setShowDelete(true);
-            onInput(true);
-          }}
-          className="btn btn-danger shadow btn-xs sharp ml-2"
-        >
-          <i className="fa fa-trash"></i>
-        </Link>}
+        {del && (
+          <Link
+            onClick={() => {
+              setCurrentItem(data);
+              setShowDelete(true);
+              onInput(true);
+            }}
+            className="btn btn-danger shadow btn-xs sharp ml-2"
+          >
+            <i className="fa fa-trash"></i>
+          </Link>
+        )}
       </div>
       // </React.Fragment>
     );
@@ -370,17 +396,19 @@ const DataBank = ({
             placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
-        {edit && <PrimeSingleButton
-          label={tr[localStorage.getItem("language")].tambh}
-          icon={<i class="bx bx-plus px-2"></i>}
-          onClick={() => {
-            setShowInput(true);
-            setEdit(false);
-            setLoading(false);
-            setCurrentItem(def);
-            onInput(true);
-          }}
-        />}
+        {edit && (
+          <PrimeSingleButton
+            label={tr[localStorage.getItem("language")].tambh}
+            icon={<i class="bx bx-plus px-2"></i>}
+            onClick={() => {
+              setShowInput(true);
+              setEdit(false);
+              setLoading(false);
+              setCurrentItem(def);
+              onInput(true);
+            }}
+          />
+        )}
       </div>
     );
   };
@@ -455,6 +483,16 @@ const DataBank = ({
     return <span>{props.placeholder}</span>;
   };
 
+  const curr = (value) => {
+    let selected = {};
+    currency?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+    return selected;
+  };
+
   const onHideInput = () => {
     setLoading(false);
     setCurrentItem(def);
@@ -527,18 +565,26 @@ const DataBank = ({
             body={load && <Skeleton />}
           />
           <Column
+            header={tr[localStorage.getItem("language")].currency}
+            field={(e) => curr(e.bank?.CURRENCY)?.code}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
             header={tr[localStorage.getItem("language")].ket}
             field={(e) => (e.bank?.BANK_DESC !== "" ? e.bank?.BANK_DESC : "-")}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
-          {(edit || del) && <Column
-            header="Action"
-            dataType="boolean"
-            bodyClassName="text-center"
-            style={{ minWidth: "2rem" }}
-            body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
-          />}
+          {(edit || del) && (
+            <Column
+              header="Action"
+              dataType="boolean"
+              bodyClassName="text-center"
+              style={{ minWidth: "2rem" }}
+              body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
+            />
+          )}
         </DataTable>
       </>
     );
@@ -571,7 +617,7 @@ const DataBank = ({
               <PrimeInput
                 label={tr[localStorage.getItem("language")].kd_bnk}
                 value={
-                  currentItem !== null ? `${currentItem.bank.BANK_CODE}` : ""
+                  currentItem !== null ? `${currentItem?.bank?.BANK_CODE}` : ""
                 }
                 onChange={(e) => {
                   setCurrentItem({
@@ -591,7 +637,7 @@ const DataBank = ({
               <PrimeInput
                 label={tr[localStorage.getItem("language")].nm_bnk}
                 value={
-                  currentItem !== null ? `${currentItem.bank.BANK_NAME}` : ""
+                  currentItem !== null ? `${currentItem?.bank?.BANK_NAME}` : ""
                 }
                 onChange={(e) => {
                   setCurrentItem({
@@ -609,10 +655,10 @@ const DataBank = ({
           </div>
 
           <div className="row ml-0 mt-0">
-            <div className="col-12">
+            <div className="col-6">
               <PrimeDropdown
                 label={tr[localStorage.getItem("language")].akun}
-                value={currentItem !== null ? currentItem.account : null}
+                value={currentItem !== null ? currentItem?.account : null}
                 options={account && account}
                 onChange={(e) => {
                   console.log(e.value);
@@ -634,6 +680,25 @@ const DataBank = ({
                 error={error?.acc_id}
               />
             </div>
+
+            <div className="col-6">
+              <PrimeDropdown
+                label={tr[localStorage.getItem("language")].currency}
+                value={currentItem !== null ? curr(currentItem?.bank?.CURRENCY) : null}
+                options={currency}
+                onChange={(e) => {
+                  console.log(e.value);
+                  setCurrentItem({
+                    ...currentItem,
+                      bank: { ...currentItem.bank, CURRENCY: e?.value?.id },
+                  });
+                }}
+                optionLabel="code"
+                filter
+                filterBy="code"
+                placeholder={tr[localStorage.getItem("language")].pilih}
+              />
+            </div>
           </div>
 
           <div className="row ml-0 mt-0">
@@ -644,7 +709,7 @@ const DataBank = ({
               <div className="p-inputgroup">
                 <InputTextarea
                   value={
-                    currentItem !== null ? `${currentItem.bank.BANK_DESC}` : ""
+                    currentItem !== null ? `${currentItem?.bank?.BANK_DESC}` : ""
                   }
                   onChange={(e) =>
                     setCurrentItem({

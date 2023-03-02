@@ -14,17 +14,18 @@ import Wrapper from "src/jsx/components/CustomeWrapper/Wrapper";
 import endpoints from "../../../../../utils/endpoints";
 
 const Detail = ({ onCancel }) => {
-  const show = useSelector((state) => state.fk_pb.current_pb_fk);
-  const inv = useSelector((state) => state.fk_pb.fk_pb);
+  const show = useSelector((state) => state.fk_pj.current_fk);
+  const inv = useSelector((state) => state.fk_pj.fk_pj);
   const dispatch = useDispatch();
   const printPage = useRef(null);
   const [comp, setComp] = useState(null);
   const [order, setOrder] = useState(null);
   const [city, setCity] = useState(null);
+  const [customer, setCustomer] = useState(null);
   const [supplier, setSupplier] = useState(null);
   const [ppn, setPpn] = useState(null);
   const [jas, setJas] = useState(null);
-  const [apCard, setApCard] = useState(null);
+  const [arCard, setArCard] = useState(null);
   const [prod, setProd] = useState(null);
   const [unit, setUnit] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -37,6 +38,7 @@ const Detail = ({ onCancel }) => {
       behavior: "smooth",
     });
     getORD();
+    getCustomer();
     getSupplier();
     getProduct();
     getJasa();
@@ -44,7 +46,7 @@ const Detail = ({ onCancel }) => {
     getComp();
     getCity();
     getPpn();
-    getAp();
+    getAr();
   }, []);
 
   const getORD = async () => {
@@ -64,6 +66,21 @@ const Detail = ({ onCancel }) => {
       console.log("------");
       console.log(error);
     }
+  };
+
+  const getCustomer = async () => {
+    const config = {
+      ...endpoints.customer,
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setCustomer(data);
+      }
+    } catch (error) {}
   };
 
   const getSupplier = async () => {
@@ -190,9 +207,9 @@ const Detail = ({ onCancel }) => {
     } catch (error) {}
   };
 
-  const getAp = async () => {
+  const getAr = async () => {
     const config = {
-      ...endpoints.apcard,
+      ...endpoints.arcard,
       data: {},
     };
     console.log(config.data);
@@ -203,7 +220,7 @@ const Detail = ({ onCancel }) => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        setApCard(data);
+        setArCard(data);
       }
     } catch (error) {}
   };
@@ -212,6 +229,17 @@ const Detail = ({ onCancel }) => {
     let selected = {};
     jas?.forEach((element) => {
       if (value === element.jasa.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const cus = (value) => {
+    let selected = {};
+    customer?.forEach((element) => {
+      if (value === element.customer.id) {
         selected = element;
       }
     });
@@ -262,7 +290,7 @@ const Detail = ({ onCancel }) => {
               </div>
 
               <div className="">
-                <label className="text-label">No. Faktur Pembelian</label>
+                <label className="text-label">No. Faktur Penjualan</label>
                 <br></br>
                 <span className="ml-0 fs-14">
                   <b>{show?.fk_code}</b>
@@ -278,10 +306,10 @@ const Detail = ({ onCancel }) => {
               </div> */}
 
               <div className="">
-                <label className="text-label">Supplier</label>
+                <label className="text-label">Customer</label>
                 <br></br>
                 <span className="ml-0 fs-14">
-                  <b>{`${show?.sup_id?.sup_name} (${show?.sup_id?.sup_code})`}</b>
+                  <b>{`${show?.pel_id?.cus_name} (${show?.pel_id?.cus_code})`}</b>
                 </span>
               </div>
 
@@ -357,9 +385,9 @@ const Detail = ({ onCancel }) => {
   const getDp = () => {
     let dp = 0;
     show?.detail?.forEach((el) => {
-      apCard?.forEach((element) => {
+      arCard?.forEach((element) => {
         if (
-          el.ord_id?.po_id === element?.po_id?.id &&
+          el.sale_id?.so_id === element?.so_id?.id &&
           element?.trx_type === "DP"
         ) {
           dp += element.trx_amnh;
@@ -373,7 +401,7 @@ const Detail = ({ onCancel }) => {
   const pajk = (value) => {
     let nil = 0;
     ppn?.forEach((elem) => {
-      if (show?.sup_id?.sup_ppn === elem.id) {
+      if (show?.pel_id?.cus_pjk === elem.id) {
         nil = elem.nilai;
       }
     });
@@ -387,6 +415,9 @@ const Detail = ({ onCancel }) => {
       total += el.total;
     });
     totals = (total * pajk()) / 100;
+
+    console.log("==========total" + total);
+    console.log("==========pjk" + totals);
 
     return total;
   };
@@ -440,7 +471,7 @@ const Detail = ({ onCancel }) => {
                   <div className="row justify-content-left col-6">
                     <div className="col-12 mt-0 fs-14 text-left">
                       <label className="text-label">
-                        <b>Faktur Pembelian</b>
+                        <b>Detail Faktur Penjualan</b>
                       </label>
                     </div>
                   </div>
@@ -465,17 +496,17 @@ const Detail = ({ onCancel }) => {
 
                     <div className="col-6 fs-12 ml-0 text-right">
                       <label className="text-label">
-                        <b>Informasi Supplier</b>
+                        <b>Informasi Pembeli</b>
                       </label>
                     </div>
 
                     <div className="col-6 fs-12 ml-0">
-                      <span className="ml-0 fs-13">
-                        No. Faktur : <b>{show?.fk_code}</b>
+                      <span className="ml-0 fs-12">
+                        Kode Faktur: <b>{show?.fk_code}</b>
                       </span>
                       <br></br>
                       {/* <span className="ml-0">
-                        No. Pembelian : <b>{show?.ord_id?.ord_code}</b>
+                        No. Penjualan : <b>{show?.ord_id?.ord_code}</b>
                       </span>
                       <br></br>
                       <span className="ml-0">
@@ -486,72 +517,70 @@ const Detail = ({ onCancel }) => {
 
                     <div className="col-6 fs-12 ml-0 text-right">
                       <span className="ml-0 fs-14">
-                        <b>{show?.sup_id?.sup_name}</b>
+                        <b>{show?.pel_id?.cus_name}</b>
                       </span>
                       <br></br>
                       <span className="ml-0">
-                        Cp : <b>{show.sup_id?.sup_cp}</b>
+                        Cp : <b>{show?.pel_id?.cus_cp}</b>
                       </span>
                       <br></br>
-                      <span className="ml-0">{show.sup_id?.sup_address}</span>
+                      <span className="ml-0">{show?.pel_id?.cus_address}</span>
                       <br></br>
                       <span className="ml-0">
-                        {kota(show.sup_id?.sup_kota)?.city_name},
-                        {show.sup_id?.sup_kpos}
+                        {kota(show?.pel_id?.cus_kota)?.city_name},
+                        {show?.pel_id?.cus_kpos}
                       </span>
                       <br></br>
                       <span className="ml-0">
                         (+62)
-                        {show.sup_id?.sup_telp1}
+                        {show?.pel_id?.cus_telp1}
                       </span>
                     </div>
                   </div>
                 </Card>
 
-                <Row className="ml-0 mt-0 mr-1">
-                  <div className="col-12 ml-0 mr-0">
-                    <label className="text-label fs-13 text-black">
-                      <b>Daftar Invoice</b>
-                    </label>
-                    <DataTable
-                      value={show?.detail?.map((v, i) => {
-                        return {
-                          ...v,
-                          index: i,
-                        };
-                      })}
-                      responsiveLayout="none"
-                      className="display w-150 datatable-wrapper fs-12"
-                      // showGridlines
-                      dataKey="id"
-                      rowHover
-                    >
-                      <Column
-                        header="Kode Invoice"
-                        field={(e) => e.inv_id?.inv_code}
-                        style={{ minWidth: "16rem" }}
-                        // body={loading && <Skeleton />}
-                      />
-                      <Column
-                        header="Kode Penjualan"
-                        field={(e) => e.ord_id?.ord_code}
-                        style={{ minWidth: "14rem" }}
-                        // body={loading && <Skeleton />}
-                      />
-                      <Column
-                        header="Tanggal Transaksi"
-                        field={(e) => formatDate(e?.inv_date)}
-                        style={{ minWidth: "14rem" }}
-                        // body={loading && <Skeleton />}
-                      />
-                      <Column
-                        header="Total Tagihan"
-                        field={(e) => `Rp. ${formatIdr(e?.total_pay)}`}
-                        style={{ minWidth: "14rem" }}
-                        // body={loading && <Skeleton />}
-                      />
-                    </DataTable>
-                  </div>
+                <Row className="ml-2 mt-0">
+                  <label className="text-label fs-13 text-black mb-2">
+                    <b>Daftar Invoice</b>
+                  </label>
+                  <DataTable
+                    value={show?.detail?.map((v, i) => {
+                      return {
+                        ...v,
+                        index: i,
+                      };
+                    })}
+                    responsiveLayout="none"
+                    className="display w-150 datatable-wrapper fs-12"
+                    // showGridlines
+                    dataKey="id"
+                    rowHover
+                  >
+                    <Column
+                      header="Kode Invoice"
+                      field={(e) => e.inv_id?.inv_code}
+                      style={{ minWidth: "16rem" }}
+                      // body={loading && <Skeleton />}
+                    />
+                    <Column
+                      header="Kode Penjualan"
+                      field={(e) => e.sale_id?.ord_code}
+                      style={{ minWidth: "16rem" }}
+                      // body={loading && <Skeleton />}
+                    />
+                    <Column
+                      header="Tanggal Transaksi"
+                      field={(e) => formatDate(e?.inv_date)}
+                      style={{ minWidth: "16rem" }}
+                      // body={loading && <Skeleton />}
+                    />
+                    <Column
+                      header="Total Pembayaran"
+                      field={(e) => `Rp. ${formatIdr(e?.total_pay)}`}
+                      style={{ minWidth: "14rem" }}
+                      // body={loading && <Skeleton />}
+                    />
+                  </DataTable>
                 </Row>
 
                 <Row className="ml-0 mr-0 mb-0 mt-8 justify-content-between fs-12">
@@ -559,7 +588,7 @@ const Detail = ({ onCancel }) => {
                   <div className="row justify-content-right col-6 mr-4">
                     <div className="col-12 mb-0">
                       <label className="text-label fs-13">
-                        <b>Detail Tagihan</b>
+                        <b>Detail Pembayaran</b>
                       </label>
                       <Divider className="ml-12"></Divider>
                     </div>
@@ -588,10 +617,10 @@ const Detail = ({ onCancel }) => {
                     <div className="col-7 text-right">
                       <label className="text-label">
                         <b>
-                          Rp.{" "}
-                          {show?.detail.map(
+                          Rp. {formatIdr(0)}
+                          {/* {show?.detail.map(
                             (v) => v.sale_id?.total_disc ?? formatIdr(0)
-                          )}
+                          )} */}
                         </b>
                       </label>
                     </div>
@@ -644,7 +673,7 @@ const Detail = ({ onCancel }) => {
 
                     <div className="col-5">
                       <label className="text-label fs-13">
-                        <b>Total Tagihan</b>
+                        <b>Total Pembayaran</b>
                       </label>
                     </div>
 
@@ -654,9 +683,7 @@ const Detail = ({ onCancel }) => {
                           <b>
                             Rp.{" "}
                             {formatIdr(
-                              getSubTotal() +
-                                (getSubTotal() * pajk()) / 100 -
-                                getDp()
+                              getSubTotal() + (getSubTotal() * pajk() / 100) - getDp()
                             )}
                           </b>
                         }

@@ -887,6 +887,56 @@ const endpoints = {
     data: {},
   },
 
+  /// Invoice Penjualan
+  invoice_pj: {
+    endpoint: "/v1/api/invoice-pj",
+    method: "GET",
+    data: {},
+  },
+
+  addInvPj: {
+    endpoint: "/v1/api/invoice-pj",
+    method: "POST",
+    data: {},
+  },
+
+  editInvPj: {
+    endpoint: "/v1/api/invoice-pj/",
+    method: "PUT",
+    data: {},
+  },
+
+  delInvPj: {
+    endpoint: "/v1/api/invoice-pj/",
+    method: "DELETE",
+    data: {},
+  },
+
+  /// Faktur Penjualan
+  faktur_pj: {
+    endpoint: "/v1/api/faktur-pj",
+    method: "GET",
+    data: {},
+  },
+
+  addFkPj: {
+    endpoint: "/v1/api/faktur-pj",
+    method: "POST",
+    data: {},
+  },
+
+  editFkPj: {
+    endpoint: "/v1/api/faktur-pj/",
+    method: "PUT",
+    data: {},
+  },
+
+  delFkPj: {
+    endpoint: "/v1/api/faktur-pj/",
+    method: "DELETE",
+    data: {},
+  },
+
   /// Expense
   expense: {
     endpoint: "/v1/api/expense",

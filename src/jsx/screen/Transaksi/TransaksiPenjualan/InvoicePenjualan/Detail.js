@@ -3,7 +3,7 @@ import { request } from "src/utils";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
-import { Card, Col, Row } from "react-bootstrap";
+import { Badge, Card, Col, Row } from "react-bootstrap";
 import { SET_CURRENT_INV, SET_INV } from "src/redux/actions";
 import { useDispatch, useSelector } from "react-redux";
 import { InputText } from "primereact/inputtext";
@@ -14,17 +14,17 @@ import Wrapper from "src/jsx/components/CustomeWrapper/Wrapper";
 import endpoints from "../../../../../utils/endpoints";
 
 const Detail = ({ onCancel }) => {
-  const show = useSelector((state) => state.fk_pb.current_pb_fk);
-  const inv = useSelector((state) => state.fk_pb.fk_pb);
+  const show = useSelector((state) => state.inv_pj.current_inv);
+  const inv = useSelector((state) => state.inv_pj.inv_pj);
   const dispatch = useDispatch();
   const printPage = useRef(null);
   const [comp, setComp] = useState(null);
   const [order, setOrder] = useState(null);
   const [city, setCity] = useState(null);
-  const [supplier, setSupplier] = useState(null);
+  const [customer, setCustomer] = useState(null);
   const [ppn, setPpn] = useState(null);
+  const [arCard, setAr] = useState(null);
   const [jas, setJas] = useState(null);
-  const [apCard, setApCard] = useState(null);
   const [prod, setProd] = useState(null);
   const [unit, setUnit] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -36,20 +36,19 @@ const Detail = ({ onCancel }) => {
       left: 0,
       behavior: "smooth",
     });
-    getORD();
-    getSupplier();
+    getCus();
     getProduct();
     getJasa();
     getSatuan();
     getComp();
     getCity();
     getPpn();
-    getAp();
+    getAr();
   }, []);
 
-  const getORD = async () => {
+  const getCus = async () => {
     const config = {
-      ...endpoints.order,
+      ...endpoints.customer,
       data: {},
     };
     let response = null;
@@ -58,26 +57,7 @@ const Detail = ({ onCancel }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        setOrder(data);
-      }
-    } catch (error) {
-      console.log("------");
-      console.log(error);
-    }
-  };
-
-  const getSupplier = async () => {
-    const config = {
-      ...endpoints.supplier,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setSupplier(data);
+        setCustomer(data);
       }
     } catch (error) {}
   };
@@ -190,9 +170,9 @@ const Detail = ({ onCancel }) => {
     } catch (error) {}
   };
 
-  const getAp = async () => {
+  const getAr = async () => {
     const config = {
-      ...endpoints.apcard,
+      ...endpoints.arcard,
       data: {},
     };
     console.log(config.data);
@@ -203,7 +183,7 @@ const Detail = ({ onCancel }) => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        setApCard(data);
+        setAr(data);
       }
     } catch (error) {}
   };
@@ -219,10 +199,10 @@ const Detail = ({ onCancel }) => {
     return selected;
   };
 
-  const supp = (value) => {
+  const cuss = (value) => {
     let selected = {};
-    supplier?.forEach((element) => {
-      if (value === element.supplier.id) {
+    customer?.forEach((element) => {
+      if (value === element.customer.id) {
         selected = element;
       }
     });
@@ -262,27 +242,52 @@ const Detail = ({ onCancel }) => {
               </div>
 
               <div className="">
-                <label className="text-label">No. Faktur Pembelian</label>
+                <label className="text-label">No. Invoice Penjualan</label>
                 <br></br>
                 <span className="ml-0 fs-14">
-                  <b>{show?.fk_code}</b>
+                  <b>{show?.inv_code}</b>
                 </span>
               </div>
 
-              {/* <div className="">
-                <label className="text-label">Departemen</label>
+              <div className="">
+                <label className="text-label">Customer</label>
                 <br></br>
                 <span className="ml-0 fs-14">
-                  <b>{`${de(show?.ord_id?.dep_id)?.ccost_name} (${show?.ord_id?.dep_id?.ccost_code})`}</b>
+                  <b>{`${cuss(show?.sale_id?.pel_id)?.customer?.cus_name} (${
+                    cuss(show?.sale_id?.pel_id)?.customer?.cus_code
+                  })`}</b>
                 </span>
-              </div> */}
+              </div>
 
               <div className="">
-                <label className="text-label">Supplier</label>
+                <label className="text-label ml-2">Status Tagihan</label>
                 <br></br>
-                <span className="ml-0 fs-14">
-                  <b>{`${show?.sup_id?.sup_name} (${show?.sup_id?.sup_code})`}</b>
-                </span>
+                {getSubTotalBarang() +
+                  getSubTotalJasa() +
+                  ((getSubTotalBarang() + getSubTotalJasa()) * pajk()) / 100 -
+                  getUangMuka() -
+                  getPelunasan() ===
+                0 ? (
+                  <Badge
+                    variant="primary light"
+                    style={{ width: "7rem", height: "2rem" }}
+                  >
+                    <span className="fs-15 mb-0 mr-3">
+                      <i className="bx bx-check text-primary ml-2 mt-0"></i>{" "}
+                      Lunas
+                    </span>
+                  </Badge>
+                ) : (
+                  <Badge
+                    variant="warning light"
+                    style={{ width: "7rem", height: "2rem" }}
+                  >
+                    <span className="fs-15 mb-0 mr-3">
+                      <i className="bx bxs-circle text-warning ml-2 mt-0"></i>{" "}
+                      Open
+                    </span>
+                  </Badge>
+                )}
               </div>
 
               <div className="">
@@ -301,13 +306,13 @@ const Detail = ({ onCancel }) => {
                     }}
                     content={() => printPage.current}
                   />
-                  {/* <Button
+                  <Button
                     className="p-button-info"
                     label="Kirim"
                     icon="bx bxs-paper-plane"
                     onClick={() => {}}
                     // disabled={show?.apprv === false}
-                  /> */}
+                  />
                   <Button
                     label="Batal"
                     onClick={onCancel}
@@ -335,6 +340,12 @@ const Detail = ({ onCancel }) => {
     return [day, month, year].join("-");
   };
 
+  const formatTh = (value) => {
+    return `${value}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
   const formatIdr = (value) => {
     return `${value?.toFixed(2)}`
       .replace(".", ",")
@@ -354,41 +365,51 @@ const Detail = ({ onCancel }) => {
     return total;
   };
 
-  const getDp = () => {
-    let dp = 0;
-    show?.detail?.forEach((el) => {
-      apCard?.forEach((element) => {
-        if (
-          el.ord_id?.po_id === element?.po_id?.id &&
-          element?.trx_type === "DP"
-        ) {
-          dp += element.trx_amnh;
-        }
-      });
+  const getSubTotalJasa = () => {
+    let total = 0;
+    show?.jasa?.forEach((el) => {
+      total += el.total - (el.total * el.disc) / 100;
     });
 
-    return dp;
+    return total;
   };
 
   const pajk = (value) => {
     let nil = 0;
     ppn?.forEach((elem) => {
-      if (show?.sup_id?.sup_ppn === elem.id) {
+      if (cuss(show?.sale_id?.pel_id)?.customer?.cus_pjk === elem.id) {
         nil = elem.nilai;
       }
     });
     return nil;
   };
 
-  const getSubTotal = () => {
-    let total = 0;
-    let totals = 0;
-    show?.detail?.forEach((el) => {
-      total += el.total;
+  const getUangMuka = () => {
+    let dp = 0;
+    arCard?.forEach((element) => {
+      if (
+        show?.sale_id?.so_id === element.so_id?.id &&
+        element.trx_type === "DP"
+      ) {
+        dp += element.trx_amnh;
+      }
     });
-    totals = (total * pajk()) / 100;
 
-    return total;
+    return dp;
+  };
+
+  const getPelunasan = () => {
+    let bayar = 0;
+    arCard?.forEach((element) => {
+      if (
+        show?.sale_id?.id === element.bkt_id?.id &&
+        element.pay_type === "J4"
+      ) {
+        bayar += element.acq_amnh;
+      }
+    });
+
+    return bayar;
   };
 
   const body = () => {
@@ -440,16 +461,16 @@ const Detail = ({ onCancel }) => {
                   <div className="row justify-content-left col-6">
                     <div className="col-12 mt-0 fs-14 text-left">
                       <label className="text-label">
-                        <b>Faktur Pembelian</b>
+                        <b>Invoice Penjualan</b>
                       </label>
                     </div>
                   </div>
 
                   <div className="row justify-content-right col-6">
                     <div className="col-12 mt-0 fs-12 text-right">
-                      <label className="text-label">Tanggal Faktur : </label>
+                      <label className="text-label">Tanggal Invoice : </label>
                       <span className="ml-1">
-                        <b>{formatDate(show?.fk_date)}</b>
+                        <b>{formatDate(show?.inv_date)}</b>
                       </span>
                     </div>
                   </div>
@@ -458,101 +479,165 @@ const Detail = ({ onCancel }) => {
                 <Card className="col-12 mt-0">
                   <div className="row col-12">
                     <div className="col-6 fs-12 ml-0">
-                      <label className="text-label">
-                        <b>Informasi Faktur</b>
+                      <label className="text-label fs-13">
+                        <b>Informasi Penjualan</b>
                       </label>
                     </div>
 
                     <div className="col-6 fs-12 ml-0 text-right">
-                      <label className="text-label">
-                        <b>Informasi Supplier</b>
+                      <label className="text-label fs-13">
+                        <b>Informasi Pembeli</b>
                       </label>
                     </div>
 
                     <div className="col-6 fs-12 ml-0">
-                      <span className="ml-0 fs-13">
-                        No. Faktur : <b>{show?.fk_code}</b>
+                      <span className="ml-0 fs-14">
+                        <b>{show?.inv_code}</b>
                       </span>
                       <br></br>
-                      {/* <span className="ml-0">
-                        No. Pembelian : <b>{show?.ord_id?.ord_code}</b>
+                      <br></br>
+                      <span className="ml-0">
+                        No. Penjualan : <b>{show?.sale_id?.ord_code}</b>
                       </span>
                       <br></br>
                       <span className="ml-0">
                         Jatuh Tempo :{" "}
-                        <b>{formatDate(show?.ord_id?.due_date)}</b>
-                      </span> */}
+                        <b>{formatDate(show?.sale_id?.due_date)}</b>
+                      </span>
                     </div>
 
                     <div className="col-6 fs-12 ml-0 text-right">
                       <span className="ml-0 fs-14">
-                        <b>{show?.sup_id?.sup_name}</b>
+                        <b>{cuss(show?.sale_id?.pel_id)?.customer?.cus_name}</b>
                       </span>
                       <br></br>
                       <span className="ml-0">
-                        Cp : <b>{show.sup_id?.sup_cp}</b>
-                      </span>
-                      <br></br>
-                      <span className="ml-0">{show.sup_id?.sup_address}</span>
-                      <br></br>
-                      <span className="ml-0">
-                        {kota(show.sup_id?.sup_kota)?.city_name},
-                        {show.sup_id?.sup_kpos}
+                        Cp :{" "}
+                        <b>{cuss(show?.sale_id.pel_id)?.customer?.cus_cp}</b>
                       </span>
                       <br></br>
                       <span className="ml-0">
-                        (+62)
-                        {show.sup_id?.sup_telp1}
+                        {cuss(show?.sale_id.pel_id)?.customer?.cus_address}
+                      </span>
+                      <br></br>
+                      <span className="ml-0">
+                        {
+                          kota(cuss(show?.sale_id.pel_id)?.customer?.cus_kota)
+                            ?.city_name
+                        }
+                        ,{cuss(show?.sale_id.pel_id)?.customer?.cus_kpos}
+                      </span>
+                      <br></br>
+                      <span className="ml-0">
+                        {cuss(show?.sale_id.pel_id)?.customer?.cus_telp1}
                       </span>
                     </div>
                   </div>
                 </Card>
 
-                <Row className="ml-0 mt-0 mr-1">
-                  <div className="col-12 ml-0 mr-0">
-                    <label className="text-label fs-13 text-black">
-                      <b>Daftar Invoice</b>
-                    </label>
-                    <DataTable
-                      value={show?.detail?.map((v, i) => {
-                        return {
-                          ...v,
-                          index: i,
-                        };
-                      })}
-                      responsiveLayout="none"
-                      className="display w-150 datatable-wrapper fs-12"
-                      // showGridlines
-                      dataKey="id"
-                      rowHover
-                    >
-                      <Column
-                        header="Kode Invoice"
-                        field={(e) => e.inv_id?.inv_code}
-                        style={{ minWidth: "16rem" }}
-                        // body={loading && <Skeleton />}
-                      />
-                      <Column
-                        header="Kode Penjualan"
-                        field={(e) => e.ord_id?.ord_code}
-                        style={{ minWidth: "14rem" }}
-                        // body={loading && <Skeleton />}
-                      />
-                      <Column
-                        header="Tanggal Transaksi"
-                        field={(e) => formatDate(e?.inv_date)}
-                        style={{ minWidth: "14rem" }}
-                        // body={loading && <Skeleton />}
-                      />
-                      <Column
-                        header="Total Tagihan"
-                        field={(e) => `Rp. ${formatIdr(e?.total_pay)}`}
-                        style={{ minWidth: "14rem" }}
-                        // body={loading && <Skeleton />}
-                      />
-                    </DataTable>
-                  </div>
+                <Row className="ml-1 mt-0">
+                  <label className="text-label">
+                    <b>Daftar Produk</b>
+                  </label>
+
+                  <DataTable
+                    value={show?.product?.map((v, i) => {
+                      return {
+                        ...v,
+                        index: i,
+                        price: v?.price ?? 0,
+                        total: v?.total ?? 0,
+                      };
+                    })}
+                    responsiveLayout="scroll"
+                    className="display w-150 datatable-wrapper fs-12"
+                    // showGridlines
+                    dataKey="id"
+                    rowHover
+                  >
+                    <Column
+                      header="Produk"
+                      field={(e) => `${e.prod_id?.name} (${e.prod_id?.code})`}
+                      style={{ minWidth: "19rem" }}
+                      // body={loading && <Skeleton />}
+                    />
+                    <Column
+                      header="Lokasi"
+                      field={(e) => e.location?.name}
+                      style={{ minWidth: "7rem" }}
+                      // body={loading && <Skeleton />}
+                    />
+                    <Column
+                      header="Jumlah"
+                      field={(e) => formatTh(e.order)}
+                      style={{ minWidth: "6rem" }}
+                      // body={loading && <Skeleton />}
+                    />
+                    <Column
+                      header="Satuan"
+                      field={(e) => e.unit_id?.name}
+                      style={{ minWidth: "7rem" }}
+                      // body={loading && <Skeleton />}
+                    />
+                    <Column
+                      header="Harga Satuan"
+                      field={(e) => `Rp. ${formatIdr(e.price)}`}
+                      style={{ minWidth: "10rem" }}
+                      // body={loading && <Skeleton />}
+                    />
+                    <Column
+                      header="Total"
+                      field={(e) => `Rp. ${formatIdr(e.total)}`}
+                      style={{ minWidth: "10rem" }}
+                      // body={loading && <Skeleton />}
+                    />
+                  </DataTable>
                 </Row>
+
+                {show?.jasa?.length ? (
+                  <Row className="ml-1 mt-6">
+                    <>
+                      <label className="text-label">
+                        <b>Daftar Jasa</b>
+                      </label>
+                      <DataTable
+                        value={show?.jasa?.map((v, i) => {
+                          return {
+                            ...v,
+                            index: i,
+                            total: v?.total ?? 0,
+                          };
+                        })}
+                        responsiveLayout="scroll"
+                        className="display w-150 datatable-wrapper fs-12"
+                        // showGridlines
+                        dataKey="id"
+                        rowHover
+                      >
+                        <Column
+                          header="Supplier"
+                          field={(e) => e.sup_id?.sup_name}
+                          style={{ minWidth: "21rem" }}
+                          // body={loading && <Skeleton />}
+                        />
+                        <Column
+                          header="Jasa"
+                          field={(e) => e.jasa_id?.name}
+                          style={{ minWidth: "27rem" }}
+                          // body={loading && <Skeleton />}
+                        />
+                        <Column
+                          header="Total"
+                          field={(e) => e.total}
+                          style={{ minWidth: "15rem" }}
+                          // body={loading && <Skeleton />}
+                        />
+                      </DataTable>
+                    </>
+                  </Row>
+                ) : (
+                  <></>
+                )}
 
                 <Row className="ml-0 mr-0 mb-0 mt-8 justify-content-between fs-12">
                   <div></div>
@@ -566,18 +651,75 @@ const Detail = ({ onCancel }) => {
 
                     <div className="col-5 mt-2 ">
                       <label className="text-label">
-                        {"Harga Jual/Penggantian"}
+                        {show?.sale_id?.split_inv
+                          ? "Sub Total Barang"
+                          : "Subtotal"}
                       </label>
                     </div>
 
                     <div className="col-7 mt-2  text-right">
                       <label className="text-label">
-                        {
+                        {show?.sale_id?.split_inv ? (
                           <b>
                             Rp.
-                            {formatIdr(getSubTotal())}
+                            {formatIdr(getSubTotalBarang())}
                           </b>
-                        }
+                        ) : (
+                          <b>
+                            Rp.
+                            {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
+                          </b>
+                        )}
+                      </label>
+                    </div>
+
+                    <div className="col-5">
+                      <label className="text-label">
+                        {show?.sale_id?.split_inv ? "DPP Barang" : "DPP"}
+                      </label>
+                    </div>
+
+                    <div className="col-7 text-right">
+                      <label className="text-label">
+                        {show?.sale_id?.split_inv ? (
+                          <b>
+                            Rp.
+                            {formatIdr(getSubTotalBarang())}
+                          </b>
+                        ) : (
+                          <b>
+                            Rp.
+                            {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
+                          </b>
+                        )}
+                      </label>
+                    </div>
+
+                    <div className="col-5">
+                      <label className="text-label">
+                        {show?.sale_id?.split_inv
+                          ? "Pajak Atas Barang"`(${pajk()}%)`
+                          : "Pajak"}
+                      </label>
+                    </div>
+
+                    <div className="col-7 text-right">
+                      <label className="text-label">
+                        {show?.sale_id?.split_inv ? (
+                          <b>
+                            Rp.
+                            {formatIdr((getSubTotalBarang() * pajk()) / 100)}
+                          </b>
+                        ) : (
+                          <b>
+                            Rp.{" "}
+                            {formatIdr(
+                              ((getSubTotalBarang() + getSubTotalJasa()) *
+                                pajk()) /
+                                100
+                            )}
+                          </b>
+                        )}
                       </label>
                     </div>
 
@@ -589,52 +731,10 @@ const Detail = ({ onCancel }) => {
                       <label className="text-label">
                         <b>
                           Rp.{" "}
-                          {show?.detail.map(
-                            (v) => v.sale_id?.total_disc ?? formatIdr(0)
-                          )}
+                          {show?.sale_id?.total_disc !== null
+                            ? formatIdr(show?.sale_id?.total_disc)
+                            : formatIdr(0)}
                         </b>
-                      </label>
-                    </div>
-
-                    <div className="col-5">
-                      <label className="text-label">{"Uang Muka"}</label>
-                    </div>
-
-                    <div className="col-7 text-right">
-                      <label className="text-label">
-                        {
-                          <b>
-                            Rp.
-                            {formatIdr(getDp())}
-                          </b>
-                        }
-                      </label>
-                    </div>
-
-                    <div className="col-5">
-                      <label className="text-label">
-                        {"Dasar Pengenaan Pajak"}
-                      </label>
-                    </div>
-
-                    <div className="col-7 text-right">
-                      <label className="text-label">
-                        {
-                          <b>
-                            Rp.
-                            {formatIdr(getSubTotal())}
-                          </b>
-                        }
-                      </label>
-                    </div>
-
-                    <div className="col-5">
-                      <label className="text-label">{"Total PPN"}</label>
-                    </div>
-
-                    <div className="col-7 text-right">
-                      <label className="text-label">
-                        {<b>Rp. {formatIdr((getSubTotal() * pajk()) / 100)}</b>}
                       </label>
                     </div>
 
@@ -650,20 +750,107 @@ const Detail = ({ onCancel }) => {
 
                     <div className="col-7 text-right">
                       <label className="text-label fs-13">
-                        {
+                        {show?.sale_id?.split_inv ? (
                           <b>
                             Rp.{" "}
                             {formatIdr(
-                              getSubTotal() +
-                                (getSubTotal() * pajk()) / 100 -
-                                getDp()
+                              getSubTotalBarang() +
+                                (getSubTotalBarang() * pajk()) / 100
                             )}
                           </b>
-                        }
+                        ) : (
+                          <b>
+                            Rp.{" "}
+                            {formatIdr(
+                              getSubTotalBarang() +
+                                getSubTotalJasa() +
+                                ((getSubTotalBarang() + getSubTotalJasa()) *
+                                  pajk()) /
+                                  100
+                            )}
+                          </b>
+                        )}
                       </label>
                     </div>
 
-                    {/* <div className="col-12 text-right mt-8">
+                    <div className="col-5 mt-0">
+                      <label className="text-label">{"Uang Muka"}</label>
+                    </div>
+
+                    <div className="col-7 text-right">
+                      <label className="text-label">
+                        <b>Rp. {formatIdr(getUangMuka())}</b>
+                      </label>
+                    </div>
+
+                    <div className="col-5 mt-0">
+                      <label className="text-label">{"Sudah Dibayar"}</label>
+                    </div>
+
+                    <div className="col-7 text-right">
+                      <label className="text-label">
+                        <b>Rp. {formatIdr(getPelunasan())}</b>
+                      </label>
+                    </div>
+
+                    <div className="col-12">
+                      <Divider className="ml-12"></Divider>
+                    </div>
+
+                    <div className="col-5">
+                      <label className="text-label fs-13">
+                        <b>{"Sisa Tagihan"}</b>
+                      </label>
+                    </div>
+
+                    <div className="col-7 text-right">
+                      <label className="text-label fs-13">
+                        <b>
+                          Rp.{" "}
+                          {formatIdr(
+                            getSubTotalBarang() +
+                              getSubTotalJasa() +
+                              ((getSubTotalBarang() + getSubTotalJasa()) *
+                                pajk()) /
+                                100 -
+                              getUangMuka() -
+                              getPelunasan()
+                          )}
+                        </b>
+                      </label>
+
+                      <br></br>
+                      <br></br>
+                      {getSubTotalBarang() +
+                        getSubTotalJasa() +
+                        ((getSubTotalBarang() + getSubTotalJasa()) * pajk()) /
+                          100 -
+                        getUangMuka() -
+                        getPelunasan() ===
+                      0 ? (
+                        <Badge
+                          variant="primary light"
+                          style={{ width: "7rem", height: "2rem" }}
+                        >
+                          <span className="fs-15 mb-0 mr-3">
+                            <i className="bx bx-check text-primary ml-2 mt-0"></i>{" "}
+                            Lunas
+                          </span>
+                        </Badge>
+                      ) : (
+                        <Badge
+                          variant="warning light"
+                          style={{ width: "7rem", height: "2rem" }}
+                        >
+                          <span className="fs-15 mb-0 mr-3">
+                            <i className="bx bxs-circle text-warning ml-2 mt-0"></i>{" "}
+                            Open
+                          </span>
+                        </Badge>
+                      )}
+                    </div>
+
+                    <div className="col-12 text-right mt-8">
                       <label className="text-label fs-13">
                         <b>Semarang, {formatDate(date)}</b>
                       </label>
@@ -671,7 +858,7 @@ const Detail = ({ onCancel }) => {
                       <label className="text-label fs-13 mr-7 mt-6">
                         {comp?.cp_coper}
                       </label>
-                    </div> */}
+                    </div>
                   </div>
                 </Row>
               </>

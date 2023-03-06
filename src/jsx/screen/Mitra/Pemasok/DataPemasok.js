@@ -23,6 +23,8 @@ import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleB
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 import { tr } from "src/data/tr";
 import { de } from "date-fns/locale";
+import { InputSwitch } from "primereact/inputswitch";
+import { SelectButton } from "primereact/selectbutton";
 
 const def = {
   supplier: {
@@ -32,6 +34,8 @@ const def = {
     sup_jpem: null,
     sup_ppn: null,
     sup_npwp: null,
+    sup_pkp: false,
+    sup_country: 1,
     sup_address: null,
     sup_kota: null,
     sup_kpos: null,
@@ -76,23 +80,22 @@ const defError = [
     jpem: false,
     addrs: false,
     city: false,
-    npwp: false,
+    // npwp: false,
   },
   {
     phone: false,
     cp: false,
   },
   {
-    ppn: false,
+    // ppn: false,
     // ap: false,
     // um: false,
   },
 ];
 
-const pajak = [
-  { name: "Include", code: "I" },
-  { name: "Exclude", code: "E" },
-  { name: "Non PPN", code: "N" },
+const opt = [
+  { name: "Dalam Negeri", code: 1 },
+  { name: "Luar Negeri", code: 2 },
 ];
 
 const DataSupplier = ({
@@ -316,6 +319,8 @@ const DataSupplier = ({
         sup_jpem: currentItem?.jpem?.id ?? null,
         sup_ppn: currentItem?.supplier?.sup_ppn ?? null,
         sup_npwp: currentItem?.supplier?.sup_npwp ?? null,
+        sup_pkp: currentItem?.supplier?.sup_pkp ?? null,
+        sup_country: currentItem?.supplier?.sup_country ?? null,
         sup_address: currentItem?.supplier?.sup_address ?? null,
         sup_kota: currentItem?.supplier?.sup_kota ?? null,
         sup_kpos: currentItem?.supplier?.sup_kpos ?? null,
@@ -371,6 +376,8 @@ const DataSupplier = ({
         sup_jpem: currentItem?.jpem?.id ?? null,
         sup_ppn: currentItem?.supplier?.sup_ppn ?? null,
         sup_npwp: currentItem?.supplier?.sup_npwp ?? null,
+        sup_pkp: currentItem?.supplier?.sup_pkp ?? null,
+        sup_country: currentItem?.supplier?.sup_country ?? null,
         sup_address: currentItem?.supplier?.sup_address ?? null,
         sup_kota: currentItem?.supplier?.sup_kota ?? null,
         sup_kpos: currentItem?.supplier?.sup_kpos ?? null,
@@ -717,7 +724,7 @@ const DataSupplier = ({
   const kota = (value) => {
     let selected = {};
     city?.forEach((element) => {
-      if (element.city_id === `${value}`) {
+      if (element.city_name === `${value}`) {
         selected = element;
       }
     });
@@ -800,9 +807,9 @@ const DataSupplier = ({
           !currentItem.supplier.sup_address ||
           currentItem.supplier.sup_address === "",
         city: !currentItem.supplier.sup_kota,
-        npwp:
-          !currentItem.supplier.sup_npwp ||
-          currentItem.supplier.sup_npwp === "",
+        // npwp:
+        //   !currentItem.supplier.sup_npwp ||
+        //   currentItem.supplier.sup_npwp === "",
       },
       {
         phone:
@@ -811,7 +818,7 @@ const DataSupplier = ({
         cp: !currentItem.supplier.sup_cp || currentItem.supplier.sup_cp === "",
       },
       {
-        ppn: !currentItem.supplier.sup_ppn,
+        // ppn: !currentItem.supplier.sup_ppn,
         // ap: !currentItem.supplier.sup_hutang,
         // um: !currentItem.supplier.sup_uang_muka,
       },
@@ -1033,26 +1040,76 @@ const DataSupplier = ({
                           sup_npwp: e.target.value,
                         },
                       });
-                      let newError = error;
-                      newError[0].npwp = false;
-                      setError(newError);
+                      // let newError = error;
+                      // newError[0].npwp = false;
+                      // setError(newError);
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     type="number"
                     min={0}
                     maxLength={16}
-                    error={error[0]?.npwp}
+                    // error={error[0]?.npwp}
                   />
                 </div>
               </div>
 
+              <div className="d-flex col-12 align-items-center mt-0">
+                <InputSwitch
+                  className="ml-0 mt-1"
+                  checked={
+                    currentItem !== null ? currentItem.supplier.sup_pkp : null
+                  }
+                  onChange={(e) => {
+                    setCurrentItem({
+                      ...currentItem,
+                      supplier: {
+                        ...currentItem.supplier,
+                        sup_pkp: e.value,
+                      },
+                    });
+                  }}
+                  // disabled
+                />
+                <label className="ml-3 mt-2">
+                  <b>{"PKP"}</b>
+                </label>
+              </div>
+
               <div className="col-12 p-0">
-                <div className="mt-4 ml-3 mr-3 fs-16 mb-1">
+                <div className="mt-4 ml-3 mr-3 fs-14 mb-1">
                   <b>{`${tr[localStorage.getItem("language")].supplier} ${
                     tr[localStorage.getItem("language")].alamat
                   }`}</b>
                 </div>
                 <Divider className="mb-2 ml-3 mr-3"></Divider>
+              </div>
+
+              <div className="col-6 mt-2">
+                <div className="text-label">
+                  {/* <label className="text-label"></label> */}
+                  <SelectButton
+                    value={
+                      currentItem?.supplier?.sup_country !== null
+                        ? currentItem?.supplier?.sup_country === 1
+                          ? { name: "Dalam Negeri", code: 1 }
+                          : { name: "Luar Negeri", code: 2 }
+                        : null
+                    }
+                    options={opt}
+                    onChange={(e) => {
+                      setCurrentItem({
+                        ...currentItem,
+                        supplier: {
+                          ...currentItem.supplier,
+                          sup_country: e.value?.code,
+                          sup_kota: null,
+                          sup_kpos: null,
+                        },
+                      });
+                    }}
+                    optionLabel="name"
+                  />
+                </div>
               </div>
 
               <div className="row ml-0 mt-0">
@@ -1084,35 +1141,57 @@ const DataSupplier = ({
 
               <div className="row ml-0 mt-0">
                 <div className="col-6 mt-0">
-                  <PrimeDropdown
-                    label={tr[localStorage.getItem("language")].kota}
-                    value={
-                      currentItem !== null &&
-                      currentItem.supplier.sup_kota !== null
-                        ? kota(currentItem.supplier.sup_kota)
-                        : null
-                    }
-                    options={city}
-                    onChange={(e) => {
-                      console.log(e.value);
-                      setCurrentItem({
-                        ...currentItem,
-                        supplier: {
-                          ...currentItem.supplier,
-                          sup_kota: e.value.city_id,
-                        },
-                      });
-                      let newError = error;
-                      newError[0].city = false;
-                      setError(newError);
-                    }}
-                    optionLabel="city_name"
-                    filter
-                    filterBy="city_name"
-                    placeholder={tr[localStorage.getItem("language")].pilih}
-                    errorMessage="Kota Belum Dipilih"
-                    error={error[0]?.city}
-                  />
+                  {currentItem?.supplier?.sup_country === 1 ? (
+                    <PrimeDropdown
+                      label={tr[localStorage.getItem("language")].kota}
+                      value={
+                        currentItem !== null &&
+                        currentItem.supplier.sup_kota !== null
+                          ? kota(currentItem.supplier.sup_kota)
+                          : null
+                      }
+                      options={city}
+                      onChange={(e) => {
+                        console.log(e.value);
+                        setCurrentItem({
+                          ...currentItem,
+                          supplier: {
+                            ...currentItem.supplier,
+                            sup_kota: e.value.city_name ?? null,
+                            sup_kpos: e.value.postal_code ?? null,
+                          },
+                        });
+                        let newError = error;
+                        newError[0].city = false;
+                        setError(newError);
+                      }}
+                      optionLabel="city_name"
+                      filter
+                      filterBy="city_name"
+                      placeholder={tr[localStorage.getItem("language")].pilih}
+                      errorMessage="Kota Belum Dipilih"
+                      error={error[0]?.city}
+                    />
+                  ) : (
+                    <PrimeInput
+                      label={tr[localStorage.getItem("language")].kota}
+                      value={
+                        currentItem !== null
+                          ? `${currentItem?.supplier?.sup_kota ?? ""}`
+                          : ""
+                      }
+                      onChange={(e) => {
+                        setCurrentItem({
+                          ...currentItem,
+                          supplier: {
+                            ...currentItem.supplier,
+                            sup_kota: e.target.value,
+                          },
+                        });
+                      }}
+                      placeholder={tr[localStorage.getItem("language")].masuk}
+                    />
+                  )}
                 </div>
 
                 <div className="col-6">
@@ -1353,10 +1432,8 @@ const DataSupplier = ({
                   <PrimeDropdown
                     label={"Kode Distribusi AP"}
                     value={
-                      currentItem !== null &&
-                      currentItem.supplier.sup_hutang !== null
-                        ? hut(currentItem.supplier.sup_hutang)
-                        : null
+                      currentItem?.supplier?.sup_hutang &&
+                      hut(currentItem?.supplier?.sup_hutang)
                     }
                     options={accHut}
                     onChange={(e) => {
@@ -1376,7 +1453,7 @@ const DataSupplier = ({
                     valueTemplate={clear}
                     itemTemplate={glTemplate}
                     filter
-                    filterBy="account.acc_name"
+                    filterBy="acc_name"
                     placeholder={tr[localStorage.getItem("language")].pilih}
                     showClear
                     // errorMessage="Kode Distribusi AP Belum Dipilih"
@@ -1388,9 +1465,8 @@ const DataSupplier = ({
                   <PrimeDropdown
                     label={"Uang Muka Pembelian"}
                     value={
-                      currentItem !== null
-                        ? hut(currentItem?.supplier?.sup_uang_muka)
-                        : null
+                      currentItem?.supplier?.sup_uang_muka &&
+                      hut(currentItem?.supplier?.sup_uang_muka)
                     }
                     options={accHut}
                     onChange={(e) => {
@@ -1410,7 +1486,7 @@ const DataSupplier = ({
                     valueTemplate={clear}
                     itemTemplate={glTemplate}
                     filter
-                    filterBy="account.acc_name"
+                    filterBy="acc_name"
                     placeholder={tr[localStorage.getItem("language")].pilih}
                     showClear
                     // errorMessage="Uang Muka Pembelian Belum Dipilih"

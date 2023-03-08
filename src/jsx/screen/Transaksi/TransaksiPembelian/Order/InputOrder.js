@@ -1013,7 +1013,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                     sup_id: e.value?.sup_id?.id ?? null,
                     dep_id: e.value?.preq_id?.req_dep?.id ?? null,
                     split_inv: e.value?.split_inv,
-                    same_sup: e.value?.same_sup,
+                    same_sup: e.value?.same_sup ?? false,
                     dprod: e.value?.pprod.map((v) => {
                       return {
                         ...v,

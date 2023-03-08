@@ -44,7 +44,7 @@ const data = {
   det_dp: [],
 };
 
-const KasBankOutList = ({ onAdd, onDetail }) => {
+const KasBankOutList = ({ onAdd, onEdit }) => {
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayDel, setDisplayDel] = useState(false);
@@ -52,6 +52,9 @@ const KasBankOutList = ({ onAdd, onDetail }) => {
   const toast = useRef(null);
   const [dep, setDep] = useState(null);
   const [proj, setProj] = useState(null);
+  const [supp, setSup] = useState(null);
+  const [acc, setAcc] = useState(null);
+  const [bank, setBank] = useState(null);
   const [isEdit, setEdit] = useState(false);
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
@@ -61,6 +64,7 @@ const KasBankOutList = ({ onAdd, onDetail }) => {
   const dispatch = useDispatch();
   const exp = useSelector((state) => state.exp.exp);
   const show = useSelector((state) => state.exp.current);
+  const [expandedRows, setExpandedRows] = useState(null);
 
   const dummy = Array.from({ length: 10 });
 
@@ -69,6 +73,9 @@ const KasBankOutList = ({ onAdd, onDetail }) => {
     initFilters1();
     getDep();
     getProj();
+    getSupp();
+    getBank();
+    getAcc();
   }, []);
 
   const getEXP = async (isUpdate = false) => {
@@ -133,6 +140,57 @@ const KasBankOutList = ({ onAdd, onDetail }) => {
     } catch (error) {}
   };
 
+  const getSupp = async () => {
+    const config = {
+      ...endpoints.supplier,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setSup(data);
+      }
+    } catch (error) {}
+  };
+
+  const getAcc = async () => {
+    const config = {
+      ...endpoints.account,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setAcc(data);
+      }
+    } catch (error) {}
+  };
+
+  const getBank = async () => {
+    const config = {
+      ...endpoints.bank,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setBank(data);
+      }
+    } catch (error) {}
+  };
+
   const delEXP = async (id) => {
     const config = {
       ...endpoints.delEXP,
@@ -192,6 +250,38 @@ const KasBankOutList = ({ onAdd, onDetail }) => {
     return selected;
   };
 
+  const checkSup = (value) => {
+    let selected = {};
+    supp?.forEach((element) => {
+      if (value === element.supplier.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkAcc = (value) => {
+    let selected = {};
+    acc?.forEach((element) => {
+      if (value === element.account.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkBank = (value) => {
+    let selected = {};
+    bank?.forEach((element) => {
+      if (value === element.bank.id) {
+        selected = element;
+      }
+    });
+    return selected;
+  };
+
   const actionBodyTemplate = (data) => {
     return (
       // <React.Fragment>
@@ -206,29 +296,30 @@ const KasBankOutList = ({ onAdd, onDetail }) => {
         >
           <i className="bx bx-show mt-1"></i>
         </Link>
-        {/* <Link
+
+        <Link
           onClick={() => {
             onEdit(data);
             let acq = data.acq;
+            let det_dp = data.det_dp;
             dispatch({
               type: SET_EDIT_EXP,
               payload: true,
             });
             acq.forEach((el) => {
-              el.fk_id = el.fk_id?.id;
+              el.fk_id = el.fk_id?.id ?? null;
             });
-            let exp = data.exp;
-            exp.forEach((el) => {
-              el.acc_code = el.acc_code.id;
+            det_dp.forEach((el) => {
+              el.po_id = el.po_id?.id ?? null;
             });
             dispatch({
               type: SET_CURRENT_EXP,
               payload: {
                 ...data,
-                kas_acc: data?.kas_acc?.id ?? null,
+                // bank_acc: data?.bank_acc?.id ?? null,
                 bank_id: data?.bank_id?.id ?? null,
-                acq_sup: data?.acq_sup?.id ?? null,
-                // top: data?.top?.id ?? null,
+                acq_sup: data?.acq_sup?.id ? data?.acq_sup : null,
+                exp_prod: data?.exp_prod,
                 acq:
                   acq.length > 0
                     ? acq
@@ -238,17 +329,7 @@ const KasBankOutList = ({ onAdd, onDetail }) => {
                           fk_id: null,
                           value: null,
                           payment: null,
-                        },
-                      ],
-                exp:
-                  exp.length > 0
-                    ? exp
-                    : [
-                        {
-                          id: null,
-                          acc_code: null,
-                          value: null,
-                          desc: null,
+                          sisa: null,
                         },
                       ],
               },
@@ -257,7 +338,7 @@ const KasBankOutList = ({ onAdd, onDetail }) => {
           className="btn btn-primary shadow btn-xs sharp ml-1"
         >
           <i className="fa fa-pencil"></i>
-        </Link> */}
+        </Link>
 
         <Link
           onClick={() => {
@@ -279,17 +360,21 @@ const KasBankOutList = ({ onAdd, onDetail }) => {
       <div>
         <PButton
           label="Batal"
-          onClick={() => setDisplayDel(false)}
+          onClick={() => {
+            setUpdate(false);
+            setDisplayDel(false);
+          }}
           className="p-button-text btn-primary"
         />
         <PButton
           label="Hapus"
           icon="pi pi-trash"
           onClick={() => {
+            setUpdate(true);
             delEXP();
           }}
           autoFocus
-          loading={loading}
+          loading={update}
         />
       </div>
     );
@@ -424,9 +509,142 @@ const KasBankOutList = ({ onAdd, onDetail }) => {
     return [day, month, year].join("-");
   };
 
+  const formatIdr = (value) => {
+    return `${value}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
   const onCustomPage2 = (event) => {
     setFirst2(event.first);
     setRows2(event.rows);
+  };
+
+  const rowExpansionTemplate = (data) => {
+    return (
+      <div className="">
+        <DataTable
+          value={
+            data?.type_trx === 1
+              ? data?.acq
+              : data?.type_trx === 2
+              ? data?.exp
+              : data?.det_dp
+          }
+          responsiveLayout="scroll"
+        >
+          <Column
+            header={
+              data?.type_trx === 1
+                ? "Kode Pembelian"
+                : data?.type_trx === 2
+                ? data.exp_type !== 1
+                  ? "Kode Bank"
+                  : "Kode Akun"
+                : "Kode Pesanan Pembelian"
+            }
+            style={{ width: "20rem" }}
+            field={(e) =>
+              data?.type_trx === 1
+                ? e?.fk_id?.ord_code
+                : data?.type_trx === 2
+                ? data.exp_type === 2 && data.type_acc === 1
+                  ? `${checkAcc(e.acc_bnk)?.account?.acc_name} - ${
+                      checkAcc(e.acc_bnk)?.account?.acc_code
+                    }`
+                  : data.exp_type === 2
+                  ? `${checkBank(e.bnk_code)?.bank?.BANK_NAME} - ${
+                      checkBank(e.bnk_code)?.bank?.BANK_CODE
+                    }`
+                  : `${checkAcc(e.acc_code)?.account?.acc_name} - ${
+                      checkAcc(e.acc_code)?.account?.acc_code
+                    }`
+                : e.po_id?.po_code
+            }
+          />
+          <Column
+            hidden={data?.type_trx == 2}
+            header="Pemasok"
+            style={{ width: "20rem" }}
+            field={(e) =>
+              data?.type_trx === 1
+                ? `${data.acq_sup?.sup_name} (${data.acq_sup?.sup_code})`
+                : `${checkSup(data.dp_sup)?.supplier?.sup_name} (${
+                    checkSup(data.dp_sup)?.supplier?.sup_code
+                  })`
+            }
+          />
+          <Column
+            hidden={data.exp_type === 2 && data.type_acc === 2}
+            header={
+              data?.type_trx === 1
+                ? "Jatuh Tempo"
+                : data?.type_trx === 2
+                ? "Tipe Saldo"
+                : "DP Melalui"
+            }
+            style={{ width: "20rem" }}
+            field={(e) =>
+              data?.type_trx === 1
+                ? formatDate(e.fk_id?.due_date)
+                : data?.type_trx === 2
+                ? data.exp_type === 2 && data.type_acc === 1
+                  ? checkAcc(e.acc_bnk)?.account?.sld_type
+                  : checkAcc(e.acc_code)?.account?.sld_type
+                : data?.dp_type === 1
+                ? `${checkAcc(data.dp_kas)?.account?.acc_name} - ${
+                    checkAcc(data.dp_kas)?.account?.acc_code
+                  }`
+                : `${checkBank(data.dp_bnk)?.bank?.BANK_NAME} - ${
+                    checkBank(data.dp_bnk)?.bank?.BANK_CODE
+                  }`
+            }
+          />
+          <Column
+            hidden={data?.type_trx === 3}
+            header={data?.type_trx !== 2 ? "Nilai Hutang" : "Nominal"}
+            style={{ width: "20rem" }}
+            field={(e) =>
+              data?.type_trx !== 2
+                ? data.acq_sup?.sup_curren !== null
+                  ? e.value
+                  : `Rp. ${formatIdr(e.value)}`
+                : data?.type_acc == 2
+                ? `Rp. ${formatIdr(e.fc)}`
+                : `Rp. ${formatIdr(e.value)}`
+            }
+          />
+          <Column
+            header={data?.type_trx !== 2 ? "Uang Muka" : ""}
+            style={{ width: "20rem" }}
+            field={(e) =>
+              data?.type_trx === 1
+                ? data.acq_sup?.sup_curren !== null
+                  ? e.dp
+                  : `Rp. ${formatIdr(e.dp)}`
+                : data?.type_trx === 3
+                ? checkSup(data.dp_sup)?.supplier?.sup_curren !== null
+                  ? e.value
+                  : `Rp. ${formatIdr(e.value)}`
+                : ""
+            }
+          />
+          <Column
+            header={data?.type_trx === 1 ? "Pembayaran" : "Keterangan"}
+            style={{ width: "20rem" }}
+            field={(e) =>
+              data?.type_trx === 1
+                ? data.acq_sup?.sup_curren !== null
+                  ? e.payment
+                  : `Rp. ${formatIdr(e.payment)}`
+                : data?.type_trx === 2
+                ? e.desc ?? "-"
+                : e.desc ?? "-"
+            }
+          />
+        </DataTable>
+      </div>
+    );
   };
 
   return (
@@ -453,7 +671,12 @@ const KasBankOutList = ({ onAdd, onDetail }) => {
                 rows={rows2}
                 onPage={onCustomPage2}
                 paginatorClassName="justify-content-end mt-3"
+                expandedRows={expandedRows}
+                onRowToggle={(e) => setExpandedRows(e.data)}
+                rowExpansionTemplate={rowExpansionTemplate}
               >
+                <Column expander style={{ width: "3em" }} />
+
                 <Column
                   header="Tanggal"
                   style={{
@@ -469,7 +692,7 @@ const KasBankOutList = ({ onAdd, onDetail }) => {
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Tipe"
+                  header="Tipe Transaksi"
                   field={(e) => e?.exp_type ?? ""}
                   style={{ minWidth: "8rem" }}
                   body={(e) =>
@@ -498,7 +721,7 @@ const KasBankOutList = ({ onAdd, onDetail }) => {
                   }
                 />
                 <Column
-                  header="Jenis Pelunasan"
+                  header="Pelunasan Melalui"
                   className="align-text-center"
                   field={(e) => e?.acq_pay ?? ""}
                   style={{ minWidth: "8rem" }}

@@ -219,6 +219,7 @@ const DataInvoicePB = ({ onAdd, onDetail }) => {
             setDisplayDel(true);
             setCurrentItem(data);
           }}
+          // className="btn btn-danger shadow btn-xs sharp ml-1 mt-1"
           className={`btn ${
             !data.faktur ? "" : "disabled"
           } btn-danger shadow btn-xs sharp ml-1 mt-1`}

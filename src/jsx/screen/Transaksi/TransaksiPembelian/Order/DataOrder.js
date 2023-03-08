@@ -263,7 +263,10 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
             setDisplayDel(true);
             setCurrentItem(data);
           }}
-          className="btn btn-danger shadow btn-xs sharp ml-1"
+          // className="btn btn-danger shadow btn-xs sharp ml-1"
+          className={`btn ${
+            !data.faktur ? "" : "disabled"
+          } btn-danger shadow btn-xs sharp ml-1`}
         >
           <i className="fa fa-trash"></i>
         </Link>

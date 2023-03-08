@@ -397,7 +397,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
   const cus = (value) => {
     let selected = {};
     customer?.forEach((element) => {
-      if (value === element.customer.id) {
+      if (value === element.customer?.id) {
         selected = element;
       }
     });
@@ -419,7 +419,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
   const checkAcc = (value) => {
     let selected = {};
     acc?.forEach((element) => {
-      if (value === element.account.id) {
+      if (value === element?.id) {
         selected = element;
       }
     });
@@ -430,7 +430,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
   const checkAR = (value) => {
     let selected = {};
     arcard?.forEach((element) => {
-      if (value === element.bkt_id.id) {
+      if (value === element?.bkt_id?.id) {
         selected = element;
       }
     });
@@ -585,9 +585,9 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                     ...inc,
                     type_trx: e.value.kode,
                     acq_pay: e.value?.kode === 1 ? 1 : null,
-                    // acc_type: e.value?.kode === 2 ? null : null,
                     inc_type: e.value?.kode === 2 ? 1 : null,
                     acc_type: e.value?.kode === 2 ? 1 : null,
+                    dp_type: e.value?.kode === 3 ? 1 : null,
                     acq_cus: null,
                     acq_kas: null,
                     bank_ref: null,
@@ -599,7 +599,6 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                     inc_kas: null,
                     inc_dep: null,
                     inc_proj: null,
-                    dp_type: null,
                     dp_cus: null,
                     dp_kas: null,
                     dp_bnk: null,
@@ -712,8 +711,8 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                         acq: e.value.ar?.map((v) => {
                           return {
                             id: null,
-                            sale_id: v.bkt_id !== null ? v.bkt_id?.id : null,
-                            // sa_id: v.sa_id?.id ?? null,
+                            sale_id: v?.bkt_id !== null ? v?.bkt_id?.id : null,
+                            sa_id: null,
                             type: v.trx_type,
                             value:
                               v.cus_id?.cus_curren !== null
@@ -1030,14 +1029,29 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                           }}
                           field={""}
                           body={(e) => (
-                            <div className="p-inputgroup">
-                              <InputNumber
-                                value={e.value}
-                                onChange={(e) => {}}
+                            cus(inc.acq_cus)?.customer?.cus_curren !== null ? (
+                              <PrimeNumber
+                                // price
+                                value={e.value ? e.value : null}
+                                onChange={(u) => {
+                                }}
                                 placeholder="0"
+                                type="number"
+                                min={0}
                                 disabled
                               />
-                            </div>
+                            ) : (
+                              <PrimeNumber
+                                price
+                                value={e.value ? e.value : null}
+                                onChange={(u) => {
+                                }}
+                                placeholder="0"
+                                type="number"
+                                min={0}
+                                disabled
+                              />
+                            )
                           )}
                         />
 
@@ -1048,14 +1062,29 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                           }}
                           field={""}
                           body={(e) => (
-                            <div className="p-inputgroup">
-                              <InputNumber
-                                value={e?.dp}
-                                onChange={(e) => {}}
+                            cus(inc.acq_cus)?.customer?.cus_curren !== null ? (
+                              <PrimeNumber
+                                // price
+                                value={e.dp ? e.dp : null}
+                                onChange={(u) => {
+                                }}
                                 placeholder="0"
+                                type="number"
+                                min={0}
                                 disabled
                               />
-                            </div>
+                            ) : (
+                              <PrimeNumber
+                                price
+                                value={e.dp ? e.dp : null}
+                                onChange={(u) => {
+                                }}
+                                placeholder="0"
+                                type="number"
+                                min={0}
+                                disabled
+                              />
+                            )
                           )}
                         />
 
@@ -1067,14 +1096,29 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                           }}
                           field={""}
                           body={(e) => (
-                            <div className="p-inputgroup">
-                              <InputNumber
-                                value={e.sisa ?? 0}
-                                onChange={(e) => {}}
+                            cus(inc.acq_cus)?.customer?.cus_curren !== null ? (
+                              <PrimeNumber
+                                // price
+                                value={e.sisa ? e.sisa : null}
+                                onChange={(u) => {
+                                }}
                                 placeholder="0"
+                                type="number"
+                                min={0}
                                 disabled
                               />
-                            </div>
+                            ) : (
+                              <PrimeNumber
+                                price
+                                value={e.sisa ? e.sisa : null}
+                                onChange={(u) => {
+                                }}
+                                placeholder="0"
+                                type="number"
+                                min={0}
+                                disabled
+                              />
+                            )
                           )}
                         />
 
@@ -1702,11 +1746,11 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                     let filt = [];
                     so?.forEach((element) => {
                       if (!element?.sub_addr) {
-                        if (element?.pel_id?.id === e.value.customer?.id) {
+                        if (element?.pel_id?.id === e.value?.customer?.id) {
                           filt.push(element);
                         }
                       } else {
-                        if (element?.sub_id === e.value.customer?.id) {
+                        if (element?.sub_id === e.value?.customer?.id) {
                           filt.push(element);
                         }
                       }
@@ -1718,21 +1762,24 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
 
                     updateInc({
                       ...inc,
-                      dp_cus: e.value.customer?.id,
-                      det_dp: filt?.map((v) => {
-                        return {
-                          ...v,
-                          so_id: v?.id ?? null,
-                          t_bayar: v?.total_bayar ?? 0,
-                          desc: null,
-                        };
-                      }),
+                      dp_cus: e.value?.customer?.id ?? null,
+                      det_dp: e.value?.customer?.id
+                        ? filt?.map((v) => {
+                            return {
+                              ...v,
+                              so_id: v?.id ?? null,
+                              t_bayar: v?.total_bayar ?? 0,
+                              desc: null,
+                            };
+                          })
+                        : null,
                     });
                   }}
                   optionLabel="customer.cus_name"
                   placeholder="Pilih Pelanggan"
                   filter
                   filterBy="customer.cus_name"
+                  showClear
                   // errorMessage="Pelanggan Belum Dipilih"
                   // error={error?.cus}
                 />
@@ -1932,14 +1979,13 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                           }}
                           field={""}
                           body={(e) => (
-                            <div className="p-inputgroup">
-                              <InputNumber
-                                value={e.t_bayar}
-                                onChange={(e) => {}}
-                                placeholder="0"
-                                disabled
-                              />
-                            </div>
+                            <PrimeNumber
+                              price
+                              value={e.t_bayar}
+                              onChange={(e) => {}}
+                              placeholder="0"
+                              disabled
+                            />
                           )}
                         />
 

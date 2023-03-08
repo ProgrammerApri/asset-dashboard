@@ -674,7 +674,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
   const checkAP = (value) => {
     let selected = {};
     apcard?.forEach((element) => {
-      if (value === element.ord_id.id) {
+      if (value === element?.ord_id?.id) {
         selected = element;
       }
     });
@@ -876,20 +876,21 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                     e?.value?.ap?.forEach((elem) => {
                       apcard.forEach((el) => {
                         if (elem?.po_id && el.po_id) {
-                          if (
-                            elem?.po_id?.id === el?.po_id?.id &&
-                            el.trx_type === "DP"
-                          ) {
-                            if (elem?.sup_id?.sup_curren !== null) {
-                              elem.dp = el.trx_amnv ?? 0;
-                            } else {
-                              elem.dp = el.trx_amnh ?? 0;
+                          if (elem?.po_id?.id === el?.po_id?.id) {
+                            if (el.trx_type === "DP" && el.trx_dbcr === "d") {
+                              if (elem?.sup_id?.sup_curren !== null) {
+                                elem.dp = el.trx_amnv ?? 0;
+                              } else {
+                                elem.dp = el.trx_amnh ?? 0;
+                              }
                             }
                           }
                         } else {
                           elem.dp = 0;
                         }
+                        console.log("=========el", el);
                       });
+                      console.log("=========elem", elem);
                     });
 
                     updateExp({
@@ -898,7 +899,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                       acq: e.value.ap?.map((v) => {
                         return {
                           id: null,
-                          fk_id: v.ord_id?.id ?? null,
+                          fk_id: v?.ord_id?.id ?? null,
                           type: v.trx_type,
                           value:
                             v?.sup_id?.sup_curren !== null
@@ -1196,16 +1197,27 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                             maxWidth: "15rem",
                           }}
                           field={""}
-                          body={(e) => (
-                            <div className="p-inputgroup">
-                              <InputNumber
-                                value={e?.value}
-                                onChange={(e) => {}}
+                          body={(e) =>
+                            supp(exp.acq_sup)?.supplier?.sup_curren !== null ? (
+                              <PrimeNumber
+                                value={e.value ? e.value : ""}
+                                onChange={(u) => {}}
                                 placeholder="0"
+                                // min={0}
+                                type="number"
                                 disabled
                               />
-                            </div>
-                          )}
+                            ) : (
+                              <PrimeNumber
+                                price
+                                value={e.value && e.value}
+                                onChange={(u) => {}}
+                                placeholder="0"
+                                min={0}
+                                disabled
+                              />
+                            )
+                          }
                         />
 
                         <Column
@@ -1214,16 +1226,27 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                             maxWidth: "15rem",
                           }}
                           field={""}
-                          body={(e) => (
-                            <div className="p-inputgroup">
-                              <InputNumber
-                                value={e?.dp}
-                                onChange={(e) => {}}
+                          body={(e) =>
+                            supp(exp.acq_sup)?.supplier?.sup_curren !== null ? (
+                              <PrimeNumber
+                                value={e.dp ? e.dp : ""}
+                                onChange={(u) => {}}
                                 placeholder="0"
+                                // min={0}
+                                type="number"
                                 disabled
                               />
-                            </div>
-                          )}
+                            ) : (
+                              <PrimeNumber
+                                price
+                                value={e.dp && e.dp}
+                                onChange={(u) => {}}
+                                placeholder="0"
+                                min={0}
+                                disabled
+                              />
+                            )
+                          }
                         />
 
                         <Column
@@ -1233,16 +1256,27 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                             maxWidth: "15rem",
                           }}
                           field={""}
-                          body={(e) => (
-                            <div className="p-inputgroup">
-                              <InputNumber
-                                value={e.sisa ?? 0}
-                                onChange={(e) => {}}
+                          body={(e) =>
+                            supp(exp.acq_sup)?.supplier?.sup_curren !== null ? (
+                              <PrimeNumber
+                                value={e.sisa ? e.sisa : ""}
+                                onChange={(u) => {}}
                                 placeholder="0"
+                                // min={0}
+                                type="number"
                                 disabled
                               />
-                            </div>
-                          )}
+                            ) : (
+                              <PrimeNumber
+                                price
+                                value={e.sisa && e.sisa}
+                                onChange={(u) => {}}
+                                placeholder="0"
+                                min={0}
+                                disabled
+                              />
+                            )
+                          }
                         />
 
                         <Column

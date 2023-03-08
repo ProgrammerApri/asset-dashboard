@@ -38,6 +38,7 @@ const set = {
   sto_wip: null,
   fixed_assets: null,
   costing: null,
+  selisih_kurs: null,
 };
 
 const SetupAkun = () => {
@@ -54,6 +55,7 @@ const SetupAkun = () => {
     lainnya: false,
     labarugi: true,
     costing: false,
+    selisih: false,
   });
 
   useEffect(() => {
@@ -199,6 +201,7 @@ const SetupAkun = () => {
         sto_bb: data?.sto_bb?.id ?? null,
         sto_bbp: data?.sto_bbp?.id ?? null,
         fixed_assets: data?.fixed_assets?.id ?? null,
+        selisih_kurs: data?.selisih_kurs?.id ?? null,
       },
     };
     let response = null;
@@ -260,6 +263,7 @@ const SetupAkun = () => {
         sto_bb: data?.sto_bb?.id ?? null,
         sto_bbp: data?.sto_bbp?.id ?? null,
         fixed_assets: data?.fixed_assets?.id ?? null,
+        selisih_kurs: data?.selisih_kurs?.id ?? null,
       },
     };
     let response = null;
@@ -386,6 +390,37 @@ const SetupAkun = () => {
               (e) => {
                 setSetup({ ...setup, fixed_assets: e.value });
                 submitUpdate({ ...setup, fixed_assets: e.value });
+              },
+              true,
+              "d"
+            )}
+          </Row>
+        }
+      />
+    );
+  };
+
+  const renderSelisihKurs = () => {
+    return (
+      <CustomAccordion
+        tittle={"Selisih Currency"}
+        defaultActive={false}
+        active={accor.selisih}
+        onClick={() => {
+          setAccor({
+            ...accor,
+            selisih: !accor.selisih,
+          });
+        }}
+        key={1}
+        body={
+          <Row className="mr-0 ml-0">
+            {renderAccountDropdown(
+              "Selisih Currency",
+              setup && setup.selisih_kurs,
+              (e) => {
+                setSetup({ ...setup, selisih_kurs: e.value });
+                submitUpdate({ ...setup, selisih_kurs: e.value });
               },
               true,
               "d"
@@ -815,6 +850,7 @@ const SetupAkun = () => {
           {renderPembelian()}
           {renderOthers()}
           {renderCosting()}
+          {renderSelisihKurs()}
         </Col>
       </Row>
     </>

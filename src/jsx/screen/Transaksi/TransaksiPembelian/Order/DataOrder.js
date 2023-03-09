@@ -17,6 +17,7 @@ import { Divider } from "@material-ui/core";
 import ReactToPrint from "react-to-print";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { tr } from "src/data/tr";
+import { Tooltip } from "primereact/tooltip";
 
 const data = {
   id: null,
@@ -136,7 +137,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
     return (
       // <React.Fragment>
       <div className="d-flex">
-        <Link
+        {/* <Link
           onClick={() => {
             onDetail();
             let dprod = data.dprod;
@@ -184,7 +185,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
           className="btn btn-info shadow btn-xs sharp ml-1"
         >
           <i className="bx bx-show mt-1"></i>
-        </Link>
+        </Link> */}
 
         <Link
           onClick={() => {
@@ -702,13 +703,13 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
                       <div>
                         {e.invoice === true ? (
                           <>
-                            {/* <Tooltip target=".link" /> */}
+                            <Tooltip target=".link" />
                             <Link
-                              // className="link"
-                              // data-pr-tooltip="Lihat Invoice"
-                              // data-pr-position="right"
-                              // data-pr-at="right+5 top"
-                              // data-pr-my="left center-2"
+                              className="link"
+                              data-pr-tooltip="Lihat Invoice"
+                              data-pr-position="right"
+                              data-pr-at="right+5 top"
+                              data-pr-my="left center-2"
                               onClick={() => {
                                 onDetail();
                                 let dprod = e?.dprod;

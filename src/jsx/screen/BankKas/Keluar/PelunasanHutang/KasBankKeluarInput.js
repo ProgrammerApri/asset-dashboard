@@ -72,6 +72,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
   const [proj, setProj] = useState(null);
   const [batch, setBatch] = useState(null);
   const [po, setPo] = useState(null);
+  const [sisa, setSisa] = useState(null);
   const [currency, setCurrency] = useState(null);
   const [showSupplier, setShowSupplier] = useState(false);
   const [showDepartemen, setShowDept] = useState(false);
@@ -121,6 +122,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
     getDept();
     getAccount();
     getCurrency();
+    getSisa();
     getPo();
   }, []);
 
@@ -315,9 +317,11 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
         spl.forEach((element) => {
           element.ap = [];
           data.forEach((el) => {
-            if (el.trx_type === "LP" && el.pay_type === "P1") {
+            if (el.trx_dbcr === "k" && el.pay_type === "P1") {
               if (element.supplier.id === el.sup_id.id) {
-                element.ap.push(el);
+                if (!el.lunas) {
+                  element.ap.push(el);
+                }
               }
             }
           });
@@ -497,6 +501,22 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
       if (response.status) {
         const { data } = response;
         setCurrency(data);
+      }
+    } catch (error) {}
+  };
+
+  const getSisa = async () => {
+    const config = {
+      ...endpoints.exp_sisa,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setSisa(data);
       }
     } catch (error) {}
   };
@@ -874,23 +894,32 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                   options={supplier}
                   onChange={(e) => {
                     e?.value?.ap?.forEach((elem) => {
-                      apcard.forEach((el) => {
-                        if (elem?.po_id && el.po_id) {
-                          if (elem?.po_id?.id === el?.po_id?.id) {
-                            if (el.trx_type === "DP" && el.trx_dbcr === "d") {
-                              if (elem?.sup_id?.sup_curren !== null) {
-                                elem.dp = el.trx_amnv ?? 0;
-                              } else {
-                                elem.dp = el.trx_amnh ?? 0;
-                              }
+                      elem.sisa = elem.trx_amnh;
+                      elem.sisa_fc = elem.trx_amnv;
+                      sisa?.forEach((element) => {
+                        if (
+                          element.id === elem.ord_id?.id ||
+                          element.id === elem.sa_id?.id
+                        ) {
+                          elem.sisa_fc = element.sisa;
+                          elem.sisa = element.sisa;
+                        }
+                      });
+
+                      apcard?.forEach((el) => {
+                        if (elem?.po_id?.id === el?.po_id?.id) {
+                          if (el.trx_type === "DP" && el.trx_dbcr === "d") {
+                            if (e.value.supplier?.sup_curren !== null) {
+                              elem.dp = el.trx_amnv !== null ? el.trx_amnv : 0;
+                            } else {
+                              elem.dp = el.trx_amnh !== null ? el.trx_amnh : 0;
                             }
                           }
-                        } else {
+                        }
+                        if (elem?.po_id === null && el.po_id === null) {
                           elem.dp = 0;
                         }
-                        console.log("=========el", el);
                       });
-                      console.log("=========elem", elem);
                     });
 
                     updateExp({
@@ -907,10 +936,18 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                               : v.trx_amnh,
                           payment: null,
                           sisa:
-                            v?.sup_id?.sup_curren !== null
-                              ? v.trx_amnv - v.dp
-                              : v.trx_amnh - v.dp,
+                            v.sup_id?.sup_curren !== null
+                              ? v.dp > 0
+                                ? v.sisa_fc - v?.dp
+                                : v.sisa_fc
+                              : v.dp > 0
+                              ? v.sisa - v.dp
+                              : v.sisa,
                           dp: v.dp ?? 0,
+                          uang_masuk:
+                            v.sup_id?.sup_curren !== null
+                              ? v.trx_amnv - v.sisa_fc
+                              : v.trx_amnh - v.sisa,
                         };
                       }),
                     });
@@ -1192,7 +1229,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                         />
 
                         <Column
-                          header="Total Pembayaran"
+                          header="Nilai Tagihan"
                           style={{
                             maxWidth: "15rem",
                           }}
@@ -1250,8 +1287,37 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
                         />
 
                         <Column
+                          header="Telah Dibayar"
+                          style={{
+                            maxWidth: "15rem",
+                          }}
+                          field={""}
+                          body={(e) =>
+                            supp(exp.acq_sup)?.supplier?.sup_curren !== null ? (
+                              <PrimeNumber
+                                value={e.uang_masuk ? e.uang_masuk : ""}
+                                onChange={(u) => {}}
+                                placeholder="0"
+                                // min={0}
+                                type="number"
+                                disabled
+                              />
+                            ) : (
+                              <PrimeNumber
+                                price
+                                value={e.uang_masuk && e.uang_masuk}
+                                onChange={(u) => {}}
+                                placeholder="0"
+                                min={0}
+                                disabled
+                              />
+                            )
+                          }
+                        />
+
+                        <Column
                           hidden={isEdit}
-                          header="Sisa Pembayaran"
+                          header="Sisa Tagihan"
                           style={{
                             maxWidth: "15rem",
                           }}

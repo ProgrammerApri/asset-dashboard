@@ -962,6 +962,12 @@ const endpoints = {
     data: {},
   },
 
+  exp_sisa: {
+    endpoint: "/v1/api/sisa-exp",
+    method: "GET",
+    data: {},
+  },
+
   /// Income
   income: {
     endpoint: "/v1/api/income",
@@ -984,6 +990,12 @@ const endpoints = {
   delINC: {
     endpoint: "/v1/api/income/",
     method: "DELETE",
+    data: {},
+  },
+
+  inc_sisa: {
+    endpoint: "/v1/api/sisa-inc",
+    method: "GET",
     data: {},
   },
 

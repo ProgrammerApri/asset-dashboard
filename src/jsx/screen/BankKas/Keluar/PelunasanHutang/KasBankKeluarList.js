@@ -286,7 +286,7 @@ const KasBankOutList = ({ onAdd, onEdit }) => {
     return (
       // <React.Fragment>
       <div className="d-flex">
-        <Link
+        {/* <Link
           onClick={() => {
             // onDetail();
             setDisplayDat(data);
@@ -295,7 +295,7 @@ const KasBankOutList = ({ onAdd, onEdit }) => {
           className="btn btn-info shadow btn-xs sharp ml-1"
         >
           <i className="bx bx-show mt-1"></i>
-        </Link>
+        </Link> */}
 
         <Link
           onClick={() => {
@@ -523,126 +523,186 @@ const KasBankOutList = ({ onAdd, onEdit }) => {
   const rowExpansionTemplate = (data) => {
     return (
       <div className="">
-        <DataTable
-          value={
-            data?.type_trx === 1
-              ? data?.acq
-              : data?.type_trx === 2
-              ? data?.exp
-              : data?.det_dp
-          }
-          responsiveLayout="scroll"
-        >
-          <Column
-            header={
+        <>
+          {/* {data?.type_trx === 2 ? (
+            <DataTable
+              value={data?.type_trx === 2 ? data : null}
+              responsiveLayout="scroll"
+            >
+              <Column
+                header={data?.exp_type === 1 ? "Kode Akun" : "Kode Bank"}
+                style={{ width: "20rem" }}
+                field={(e) =>
+                  e?.exp_type === 1
+                    ? `${checkAcc(e?.kas_acc)?.account?.acc_name} - ${
+                        checkAcc(e?.kas_acc)?.account?.acc_code
+                      }`
+                    : `${checkBank(e?.exp_bnk)?.bank?.BANK_NAME} - ${
+                        checkBank(e?.exp_bnk)?.bank?.BANK_CODE
+                      }`
+                }
+              />
+              <Column
+                header={data?.exp_type === 1 ? "Tipe Saldo" : ""}
+                style={{ width: "20rem" }}
+                field={(e) =>
+                  e?.exp_type === 1
+                    ? checkAcc(e?.kas_acc)?.account?.sld_type
+                    : ""
+                }
+              />
+              <Column
+                header="Nominal Pengeluaran"
+                style={{ width: "20rem" }}
+                field={(e) => `Rp. ${formatIdr()}`}
+              />
+              <Column header="" style={{ width: "20rem" }} field={(e) => {}} />
+              <Column
+                // hidden={data.exp_type === 2 && data.type_acc === 2}
+                header="Department"
+                style={{ width: "20rem" }}
+                field={(e) =>
+                  e.exp_dep
+                    ? `${e?.exp_dep?.ccost_name} - ${e?.exp_dep?.ccost_code}`
+                    : "-"
+                }
+              />
+              <Column
+                // hidden={data?.type_trx === 3}
+                header="Project"
+                style={{ width: "20rem" }}
+                field={(e) =>
+                  e.exp_prj
+                    ? `${e?.exp_prj?.proj_name} - ${e?.exp_prj?.proj_code}`
+                    : "-"
+                }
+              />
+            </DataTable>
+          ) : (
+            <></>
+          )} */}
+
+          <DataTable
+            value={
               data?.type_trx === 1
-                ? "Kode Pembelian"
+                ? data?.acq
                 : data?.type_trx === 2
-                ? data.exp_type !== 1
-                  ? "Kode Bank"
-                  : "Kode Akun"
-                : "Kode Pesanan Pembelian"
+                ? data?.exp
+                : data?.det_dp
             }
-            style={{ width: "20rem" }}
-            field={(e) =>
-              data?.type_trx === 1
-                ? e?.fk_id?.ord_code
-                : data?.type_trx === 2
-                ? data.exp_type === 2 && data.type_acc === 1
-                  ? `${checkAcc(e.acc_bnk)?.account?.acc_name} - ${
-                      checkAcc(e.acc_bnk)?.account?.acc_code
+            responsiveLayout="scroll"
+          >
+            <Column
+              header={
+                data?.type_trx === 1
+                  ? "Kode Pembelian"
+                  : data?.type_trx === 2
+                  ? data.exp_type !== 1 && data?.type_acc !== 1
+                    ? "Kode Bank"
+                    : "Kode Akun"
+                  : "Kode Pesanan Pembelian"
+              }
+              style={{ width: "20rem" }}
+              field={(e) =>
+                data?.type_trx === 1
+                  ? e?.fk_id?.ord_code
+                  : data?.type_trx === 2
+                  ? data.exp_type === 2 && data.type_acc === 1
+                    ? `${checkAcc(e.acc_bnk)?.account?.acc_name} - ${
+                        checkAcc(e.acc_bnk)?.account?.acc_code
+                      }`
+                    : data.exp_type === 2
+                    ? `${checkBank(e.bnk_code)?.bank?.BANK_NAME} - ${
+                        checkBank(e.bnk_code)?.bank?.BANK_CODE
+                      }`
+                    : `${checkAcc(e.acc_code)?.account?.acc_name} - ${
+                        checkAcc(e.acc_code)?.account?.acc_code
+                      }`
+                  : e.po_id?.po_code
+              }
+            />
+            <Column
+              hidden={data?.type_trx == 2}
+              header="Pemasok"
+              style={{ width: "20rem" }}
+              field={(e) =>
+                data?.type_trx === 1
+                  ? `${data.acq_sup?.sup_name} (${data.acq_sup?.sup_code})`
+                  : `${checkSup(data.dp_sup)?.supplier?.sup_name} (${
+                      checkSup(data.dp_sup)?.supplier?.sup_code
+                    })`
+              }
+            />
+            <Column
+              hidden={data.exp_type === 2 && data.type_acc === 2}
+              header={
+                data?.type_trx === 1
+                  ? "Jatuh Tempo"
+                  : data?.type_trx === 2
+                  ? "Tipe Saldo"
+                  : "DP Melalui"
+              }
+              style={{ width: "20rem" }}
+              field={(e) =>
+                data?.type_trx === 1
+                  ? formatDate(e.fk_id?.due_date)
+                  : data?.type_trx === 2
+                  ? data.exp_type === 2 && data.type_acc === 1
+                    ? checkAcc(e.acc_bnk)?.account?.sld_type
+                    : checkAcc(e.acc_code)?.account?.sld_type
+                  : data?.dp_type === 1
+                  ? `${checkAcc(data.dp_kas)?.account?.acc_name} - ${
+                      checkAcc(data.dp_kas)?.account?.acc_code
                     }`
-                  : data.exp_type === 2
-                  ? `${checkBank(e.bnk_code)?.bank?.BANK_NAME} - ${
-                      checkBank(e.bnk_code)?.bank?.BANK_CODE
+                  : `${checkBank(data.dp_bnk)?.bank?.BANK_NAME} - ${
+                      checkBank(data.dp_bnk)?.bank?.BANK_CODE
                     }`
-                  : `${checkAcc(e.acc_code)?.account?.acc_name} - ${
-                      checkAcc(e.acc_code)?.account?.acc_code
-                    }`
-                : e.po_id?.po_code
-            }
-          />
-          <Column
-            hidden={data?.type_trx == 2}
-            header="Pemasok"
-            style={{ width: "20rem" }}
-            field={(e) =>
-              data?.type_trx === 1
-                ? `${data.acq_sup?.sup_name} (${data.acq_sup?.sup_code})`
-                : `${checkSup(data.dp_sup)?.supplier?.sup_name} (${
-                    checkSup(data.dp_sup)?.supplier?.sup_code
-                  })`
-            }
-          />
-          <Column
-            hidden={data.exp_type === 2 && data.type_acc === 2}
-            header={
-              data?.type_trx === 1
-                ? "Jatuh Tempo"
-                : data?.type_trx === 2
-                ? "Tipe Saldo"
-                : "DP Melalui"
-            }
-            style={{ width: "20rem" }}
-            field={(e) =>
-              data?.type_trx === 1
-                ? formatDate(e.fk_id?.due_date)
-                : data?.type_trx === 2
-                ? data.exp_type === 2 && data.type_acc === 1
-                  ? checkAcc(e.acc_bnk)?.account?.sld_type
-                  : checkAcc(e.acc_code)?.account?.sld_type
-                : data?.dp_type === 1
-                ? `${checkAcc(data.dp_kas)?.account?.acc_name} - ${
-                    checkAcc(data.dp_kas)?.account?.acc_code
-                  }`
-                : `${checkBank(data.dp_bnk)?.bank?.BANK_NAME} - ${
-                    checkBank(data.dp_bnk)?.bank?.BANK_CODE
-                  }`
-            }
-          />
-          <Column
-            hidden={data?.type_trx === 3}
-            header={data?.type_trx !== 2 ? "Nilai Hutang" : "Nominal"}
-            style={{ width: "20rem" }}
-            field={(e) =>
-              data?.type_trx !== 2
-                ? data.acq_sup?.sup_curren !== null
-                  ? e.value
+              }
+            />
+            <Column
+              hidden={data?.type_trx === 3}
+              header={data?.type_trx !== 2 ? "Nilai Hutang" : "Nominal"}
+              style={{ width: "20rem" }}
+              field={(e) =>
+                data?.type_trx !== 2
+                  ? data.acq_sup?.sup_curren !== null
+                    ? e.value
+                    : `Rp. ${formatIdr(e.value)}`
+                  : data?.type_acc == 2
+                  ? `Rp. ${formatIdr(e.fc)}`
                   : `Rp. ${formatIdr(e.value)}`
-                : data?.type_acc == 2
-                ? `Rp. ${formatIdr(e.fc)}`
-                : `Rp. ${formatIdr(e.value)}`
-            }
-          />
-          <Column
-            header={data?.type_trx !== 2 ? "Uang Muka" : ""}
-            style={{ width: "20rem" }}
-            field={(e) =>
-              data?.type_trx === 1
-                ? data.acq_sup?.sup_curren !== null
-                  ? e.dp
-                  : `Rp. ${formatIdr(e.dp)}`
-                : data?.type_trx === 3
-                ? checkSup(data.dp_sup)?.supplier?.sup_curren !== null
-                  ? e.value
-                  : `Rp. ${formatIdr(e.value)}`
-                : ""
-            }
-          />
-          <Column
-            header={data?.type_trx === 1 ? "Pembayaran" : "Keterangan"}
-            style={{ width: "20rem" }}
-            field={(e) =>
-              data?.type_trx === 1
-                ? data.acq_sup?.sup_curren !== null
-                  ? e.payment
-                  : `Rp. ${formatIdr(e.payment)}`
-                : data?.type_trx === 2
-                ? e.desc ?? "-"
-                : e.desc ?? "-"
-            }
-          />
-        </DataTable>
+              }
+            />
+            <Column
+              header={data?.type_trx !== 2 ? "Uang Muka" : ""}
+              style={{ width: "20rem" }}
+              field={(e) =>
+                data?.type_trx === 1
+                  ? data.acq_sup?.sup_curren !== null
+                    ? e.dp
+                    : `Rp. ${formatIdr(e.dp)}`
+                  : data?.type_trx === 3
+                  ? checkSup(data.dp_sup)?.supplier?.sup_curren !== null
+                    ? e.value
+                    : `Rp. ${formatIdr(e.value)}`
+                  : ""
+              }
+            />
+            <Column
+              header={data?.type_trx === 1 ? "Pembayaran" : "Keterangan"}
+              style={{ width: "20rem" }}
+              field={(e) =>
+                data?.type_trx === 1
+                  ? data.acq_sup?.sup_curren !== null
+                    ? e.payment
+                    : `Rp. ${formatIdr(e.payment)}`
+                  : data?.type_trx === 2
+                  ? e.desc ?? "-"
+                  : e.desc ?? "-"
+              }
+            />
+          </DataTable>
+        </>
       </div>
     );
   };

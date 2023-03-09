@@ -120,6 +120,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
     getDept();
     getProj();
     getAcc();
+    getSisa();
     getSo();
     getCur();
   }, []);
@@ -140,22 +141,14 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
         plg.forEach((element) => {
           element.ar = [];
           data.forEach((el) => {
-            if (el.trx_type === "JL" && el.pay_type === "P1") {
+            if (el.trx_dbcr === "D" && el.pay_type === "P1") {
               if (element.customer.id === el.cus_id.id) {
-                element.ar.push(el);
+                if (!el.lunas) {
+                  element.ar.push(el);
+                }
               }
             }
           });
-
-          // element.ar.forEach((el) => {
-          //   data.forEach((ek) => {
-          //     if (el.trx_code === ek.id) {
-          //       el.trx_amnh = ek?.trx_amnh ?? 0;
-          //       el.acq_amnh += ek?.acq_amnh ?? 0;
-          //     }
-          //   });
-          //   sisa = el?.trx_amnh ?? 0 - el?.acq_amnh ?? 0;
-          // });
 
           if (element.ar.length > 0) {
             pel.push(element);
@@ -163,7 +156,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
         });
         setAR(data);
         setCustomer(pel);
-        setSisa(sisa);
+        // setSisa(sisa);
       }
     } catch (error) {}
   };
@@ -260,6 +253,22 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
       if (response.status) {
         const { data } = response;
         setProj(data);
+      }
+    } catch (error) {}
+  };
+
+  const getSisa = async () => {
+    const config = {
+      ...endpoints.inc_sisa,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setSisa(data);
       }
     } catch (error) {}
   };
@@ -670,18 +679,17 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                     onChange={(e) => {
                       let dp = 0;
                       e?.value?.ar?.forEach((elem) => {
-                        // elem.sisa = elem.trx_amnh;
-                        // elem.sisa_fc = elem.trx_amnv;
-                        // sisa?.forEach((element) => {
-                        //   if (
-                        //     element.id === elem?.bkt_id?.id ||
-                        //     (element.id === elem?.sa_id?.id &&
-                        //       element.trx_type === elem.trx_type)
-                        //   ) {
-                        //     elem.sisa_fc = element.sisa_fc;
-                        //     elem.sisa = element.sisa;
-                        //   }
-                        // });
+                        elem.sisa = elem.trx_amnh;
+                        elem.sisa_fc = elem.trx_amnv;
+                        sisa?.forEach((element) => {
+                          if (
+                            element?.id === elem?.bkt_id?.id ||
+                            element?.id === elem?.sa_id?.id
+                          ) {
+                            elem.sisa_fc = element.sisa_fc;
+                            elem.sisa = element.sisa;
+                          }
+                        });
 
                         arcard?.forEach((el) => {
                           if (elem?.so_id && el?.so_id) {
@@ -698,6 +706,17 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                           } else {
                             elem.dp = 0;
                           }
+
+                          // if (
+                          //   elem?.bkt_id?.id == el.bkt_id?.id &&
+                          //   el.trx_type === "J4"
+                          // ) {
+                          //   if (elem?.cus_id?.cus_curren !== null) {
+                          //     elem.uang_masuk += el.acq_amnv ?? 0;
+                          //   } else {
+                          //     elem.uang_masuk += el.acq_amnh ?? 0;
+                          //   }
+                          // }
                         });
                       });
 
@@ -720,10 +739,18 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                                 : v.trx_amnh,
                             sisa:
                               v.cus_id?.cus_curren !== null
-                                ? v.trx_amnv - v.dp
-                                : v.trx_amnh - v.dp,
+                                ? v.dp > 0
+                                  ? v.sisa_fc - v?.dp
+                                  : v.sisa_fc
+                                : v.dp > 0
+                                ? v.sisa - v.dp
+                                : v.sisa,
                             payment: null,
                             dp: v.dp ?? 0,
+                            uang_masuk:
+                              v.cus_id?.cus_curren !== null
+                                ? v.trx_amnv - v.sisa_fc
+                                : v.trx_amnh - v.sisa,
                           };
                         }),
                       });
@@ -1023,18 +1050,17 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                         />
 
                         <Column
-                          header="Nilai"
+                          header="Nilai Tagihan"
                           style={{
                             maxWidth: "15rem",
                           }}
                           field={""}
-                          body={(e) => (
+                          body={(e) =>
                             cus(inc.acq_cus)?.customer?.cus_curren !== null ? (
                               <PrimeNumber
                                 // price
                                 value={e.value ? e.value : null}
-                                onChange={(u) => {
-                                }}
+                                onChange={(u) => {}}
                                 placeholder="0"
                                 type="number"
                                 min={0}
@@ -1044,15 +1070,14 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                               <PrimeNumber
                                 price
                                 value={e.value ? e.value : null}
-                                onChange={(u) => {
-                                }}
+                                onChange={(u) => {}}
                                 placeholder="0"
                                 type="number"
                                 min={0}
                                 disabled
                               />
                             )
-                          )}
+                          }
                         />
 
                         <Column
@@ -1061,13 +1086,12 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                             maxWidth: "15rem",
                           }}
                           field={""}
-                          body={(e) => (
+                          body={(e) =>
                             cus(inc.acq_cus)?.customer?.cus_curren !== null ? (
                               <PrimeNumber
                                 // price
                                 value={e.dp ? e.dp : null}
-                                onChange={(u) => {
-                                }}
+                                onChange={(u) => {}}
                                 placeholder="0"
                                 type="number"
                                 min={0}
@@ -1077,31 +1101,60 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                               <PrimeNumber
                                 price
                                 value={e.dp ? e.dp : null}
-                                onChange={(u) => {
-                                }}
+                                onChange={(u) => {}}
                                 placeholder="0"
                                 type="number"
                                 min={0}
                                 disabled
                               />
                             )
-                          )}
+                          }
                         />
 
                         <Column
-                          hidden={isEdit}
-                          header="Sisa Pembayaran"
+                          header="Telah Dibayar"
                           style={{
                             maxWidth: "15rem",
                           }}
                           field={""}
-                          body={(e) => (
+                          body={(e) =>
+                            cus(inc.acq_cus)?.customer?.cus_curren !== null ? (
+                              <PrimeNumber
+                                // price
+                                value={e.uang_masuk ? e.uang_masuk : null}
+                                onChange={(u) => {}}
+                                placeholder="0"
+                                type="number"
+                                min={0}
+                                disabled
+                              />
+                            ) : (
+                              <PrimeNumber
+                                price
+                                value={e.uang_masuk ? e.uang_masuk : null}
+                                onChange={(u) => {}}
+                                placeholder="0"
+                                type="number"
+                                min={0}
+                                disabled
+                              />
+                            )
+                          }
+                        />
+
+                        <Column
+                          hidden={isEdit}
+                          header="Sisa Tagihan"
+                          style={{
+                            maxWidth: "15rem",
+                          }}
+                          field={""}
+                          body={(e) =>
                             cus(inc.acq_cus)?.customer?.cus_curren !== null ? (
                               <PrimeNumber
                                 // price
                                 value={e.sisa ? e.sisa : null}
-                                onChange={(u) => {
-                                }}
+                                onChange={(u) => {}}
                                 placeholder="0"
                                 type="number"
                                 min={0}
@@ -1111,15 +1164,14 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                               <PrimeNumber
                                 price
                                 value={e.sisa ? e.sisa : null}
-                                onChange={(u) => {
-                                }}
+                                onChange={(u) => {}}
                                 placeholder="0"
                                 type="number"
                                 min={0}
                                 disabled
                               />
                             )
-                          )}
+                          }
                         />
 
                         <Column

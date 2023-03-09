@@ -17,6 +17,7 @@ import { Divider } from "@material-ui/core";
 import ReactToPrint from "react-to-print";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { tr } from "src/data/tr";
+import { Tooltip } from "primereact/tooltip";
 
 const data = {
   id: null,
@@ -138,7 +139,7 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
     return (
       // <React.Fragment>
       <div className="d-flex">
-        <Link
+        {/* <Link
           onClick={() => {
             onDetail();
             let jprod = data.jprod;
@@ -156,7 +157,7 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
           className="btn btn-info shadow btn-xs sharp ml-1"
         >
           <i className="bx bx-show mt-1"></i>
-        </Link>
+        </Link> */}
 
         <Link
           onClick={() => {
@@ -625,19 +626,43 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
                       <Skeleton />
                     ) : (
                       <div>
-                        {e.surat_jalan === 1 ? (
-                          <>
-                            <Badge variant="info light">
-                              <i className="bx bxs-plus-circle text-info mr-1 mt-1"></i>{" "}
-                              Invoice
+                        <Tooltip target=".link" />
+                        <Link
+                          className="link"
+                          data-pr-tooltip="Lihat Invoice"
+                          data-pr-position="right"
+                          data-pr-at="right+5 top"
+                          data-pr-my="left center-2"
+                          onClick={() => {
+                            onDetail();
+                            let jprod = e?.jprod;
+                            let jjasa = e?.jjasa;
+
+                            dispatch({
+                              type: SET_CURRENT_SL,
+                              payload: {
+                                ...e,
+                                jprod: jprod?.length > 0 ? jprod : null,
+                                jjasa: jjasa?.length > 0 ? jjasa : null,
+                              },
+                            });
+                          }}
+                          // className="btn btn-info shadow btn-xs sharp ml-1"
+                        >
+                          {e.surat_jalan === 1 ? (
+                            <>
+                              <Badge variant="info light">
+                                <i className="bx bxs-plus-circle text-info mr-1 mt-1"></i>{" "}
+                                Invoice
+                              </Badge>
+                            </>
+                          ) : (
+                            <Badge variant="success light">
+                              <i className="bx bxs-plus-circle text-success mr-1 mt-1"></i>{" "}
+                              Invoice + Faktur
                             </Badge>
-                          </>
-                        ) : (
-                          <Badge variant="success light">
-                            <i className="bx bxs-plus-circle text-success mr-1 mt-1"></i>{" "}
-                            Invoice + Faktur
-                          </Badge>
-                        )}
+                          )}
+                        </Link>
                       </div>
                     )
                   }

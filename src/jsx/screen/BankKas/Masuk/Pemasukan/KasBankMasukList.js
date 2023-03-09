@@ -152,6 +152,44 @@ const KasBankInList = ({ onAdd, onEdit }) => {
     } catch (error) {}
   };
 
+  const delINC = async (id) => {
+    const config = {
+      ...endpoints.delINC,
+      endpoint: endpoints.delINC.endpoint + currentItem.id,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setTimeout(() => {
+          setUpdate(false);
+          setDisplayDel(false);
+          getINC(true);
+          toast.current.show({
+            severity: "info",
+            summary: "Berhasil",
+            detail: "Data Berhasil Dihapus",
+            life: 3000,
+          });
+        }, 500);
+      }
+    } catch (error) {
+      console.log(error);
+      setTimeout(() => {
+        setUpdate(false);
+        setDisplayDel(false);
+        toast.current.show({
+          severity: "error",
+          summary: "Gagal",
+          detail: `Tidak Dapat Menghapus Data`,
+          life: 3000,
+        });
+      }, 500);
+    }
+  };
+
   const renderHeader = () => {
     return (
       <div className="flex justify-content-between">
@@ -267,6 +305,28 @@ const KasBankInList = ({ onAdd, onEdit }) => {
         </Link>
       </div>
       // </React.Fragment>
+    );
+  };
+
+  const renderFooterDel = () => {
+    return (
+      <div>
+        <PButton
+          label="Batal"
+          onClick={() => setDisplayDel(false)}
+          className="p-button-text btn-primary"
+        />
+        <PButton
+          label="Hapus"
+          icon="pi pi-trash"
+          onClick={() => {
+            setUpdate(true);
+            delINC();
+          }}
+          autoFocus
+          loading={update}
+        />
+      </div>
     );
   };
 
@@ -511,6 +571,7 @@ const KasBankInList = ({ onAdd, onEdit }) => {
 
   return (
     <>
+    <Toast ref={toast} />
       <Row>
         <Col className="pt-0">
           <DataTable
@@ -616,6 +677,24 @@ const KasBankInList = ({ onAdd, onEdit }) => {
               body={(e) => (loading ? <Skeleton /> : actionBodyTemplate(e))}
             />
           </DataTable>
+    
+          <Dialog
+            header={"Hapus Data"}
+            visible={displayDel}
+            style={{ width: "30vw" }}
+            footer={renderFooterDel("displayDel")}
+            onHide={() => {
+              setDisplayDel(false);
+            }}
+          >
+            <div className="ml-3 mr-3">
+              <i
+                className="pi pi-exclamation-triangle mr-3 align-middle"
+                style={{ fontSize: "2rem" }}
+              />
+              <span>Apakah anda yakin ingin menghapus data ?</span>
+            </div>
+          </Dialog>
         </Col>
       </Row>
     </>

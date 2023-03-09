@@ -18,7 +18,12 @@ import ReactToPrint from "react-to-print";
 import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { tr } from "../../../../../data/tr";
-import { SET_CURRENT_PB_FK, SET_EDIT_PB_FK, SET_PB_FK } from "src/redux/actions";
+import {
+  SET_CURRENT_PB_FK,
+  SET_EDIT_PB_FK,
+  SET_PB_FK,
+} from "src/redux/actions";
+import { Tooltip } from "primereact/tooltip";
 
 const data = {
   id: null,
@@ -185,7 +190,12 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
     return (
       // <React.Fragment>
       <div className="d-flex">
+        <Tooltip target=".btn" />
         <Link
+          data-pr-tooltip="Detail Faktur Pembelian"
+          data-pr-position="right"
+          data-pr-at="right+5 top"
+          data-pr-my="left center-2"
           onClick={() => {
             onDetail();
             let detail = data.detail;
@@ -223,7 +233,12 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
     return (
       // <React.Fragment>
       <div className="d-flex">
+        <Tooltip target=".btn" />
         <Link
+          data-pr-tooltip="Detail Faktur Pajak"
+          data-pr-position="right"
+          data-pr-at="right+5 top"
+          data-pr-my="left center-2"
           onClick={() => {
             onDetailF();
             let product = data.ord_id.product;

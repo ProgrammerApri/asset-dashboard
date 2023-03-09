@@ -19,9 +19,11 @@ const Detail = ({ onCancel }) => {
   const [order, setOrder] = useState(null);
   const [city, setCity] = useState(null);
   const [supplier, setSupplier] = useState(null);
+  const [ppn, setPpn] = useState(null);
   const [jas, setJas] = useState(null);
   const [prod, setProd] = useState(null);
   const [unit, setUnit] = useState(null);
+  const [apCard, setApCard] = useState(null);
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState(new Date());
 
@@ -38,6 +40,8 @@ const Detail = ({ onCancel }) => {
     getSatuan();
     getComp();
     getCity();
+    getPpn();
+    getApCard();
   }, []);
 
   const getORD = async () => {
@@ -165,6 +169,24 @@ const Detail = ({ onCancel }) => {
     } catch (error) {}
   };
 
+  const getPpn = async () => {
+    const config = {
+      ...endpoints.pajak,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setPpn(data);
+      }
+    } catch (error) {}
+  };
+
   const jasa = (value) => {
     let selected = {};
     jas?.forEach((element) => {
@@ -185,6 +207,27 @@ const Detail = ({ onCancel }) => {
     });
 
     return selected;
+  };
+
+  const getApCard = async () => {
+    const config = {
+      ...endpoints.apcard,
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        // let filt = [];
+        // data?.forEach((element) => {
+        //   if (element.trx_type == "DP") {
+        //     filt.push(element);
+        //   }
+        // });
+        setApCard(data);
+      }
+    } catch (error) {}
   };
 
   const kota = (value) => {
@@ -219,7 +262,7 @@ const Detail = ({ onCancel }) => {
               </div>
 
               <div className="">
-                <label className="text-label">No. Pembelian</label>
+                <label className="text-label">No. Invoice</label>
                 <br></br>
                 <span className="ml-0 fs-14">
                   <b>{show?.ord_code}</b>
@@ -230,30 +273,59 @@ const Detail = ({ onCancel }) => {
                 <label className="text-label">Supplier</label>
                 <br></br>
                 <span className="ml-0 fs-14">
-                  <b>{`${show?.sup_id?.sup_name} (${
-                    show?.sup_id?.sup_code
-                  })`}</b>
+                  <b>{`${show?.sup_id?.sup_name} (${show?.sup_id?.sup_code})`}</b>
                 </span>
               </div>
 
               <div className="">
-                <span className="ml-0">
-                  {
-                    <div>
-                      {show?.faktur === true ? (
-                        <Badge variant="info light" className="fs-14">
-                          <i className="bx bxs-plus-circle text-info mr-0 fs-14"></i>{" "}
-                          Faktur
-                        </Badge>
-                      ) : (
-                        <Badge variant="warning light" className="fs-14">
-                          <i className="bx bxs-minus-circle text-warning mr-0 fs-14"></i>{" "}
-                          Non Faktur
-                        </Badge>
-                      )}
-                    </div>
-                  }
-                </span>
+                <label className="text-label ml-2"></label>
+                <br></br>
+                {
+                  <div>
+                    {show?.faktur === true ? (
+                      <Badge variant="info light" className="fs-13">
+                        <i className="bx bxs-plus-circle text-info mr-0 fs-14"></i>{" "}
+                        Faktur
+                      </Badge>
+                    ) : (
+                      <Badge variant="warning light" className="fs-14">
+                        <i className="bx bxs-minus-circle text-warning mr-0 fs-14"></i>{" "}
+                        Non Faktur
+                      </Badge>
+                    )}
+                  </div>
+                }
+              </div>
+
+              <div className="">
+                <label className="text-label ml-3 fs-12">Status Tagihan</label>
+                <br></br>
+                {getSubTotalBarang() +
+                  getSubTotalJasa() +
+                  ((getSubTotalBarang() + getSubTotalJasa()) * pajk()) / 100 -
+                  getUangMuka() -
+                  getPelunasan() ===
+                0 ? (
+                  <Badge
+                    variant="primary light"
+                    style={{ width: "7rem", height: "2rem" }}
+                  >
+                    <span className="fs-14 mb-0 mr-3">
+                      <i className="bx bx-check text-primary ml-2 mt-0"></i>{" "}
+                      Lunas
+                    </span>
+                  </Badge>
+                ) : (
+                  <Badge
+                    variant="warning light"
+                    style={{ width: "7rem", height: "2rem" }}
+                  >
+                    <span className="fs-14 mb-0 mr-3">
+                      <i className="bx bxs-circle text-warning ml-2 mt-0"></i>{" "}
+                      Open
+                    </span>
+                  </Badge>
+                )}
               </div>
 
               <div className="">
@@ -272,13 +344,13 @@ const Detail = ({ onCancel }) => {
                     }}
                     content={() => printPage.current}
                   />
-                  <Button
+                  {/* <Button
                     className="p-button-info"
                     label="Kirim"
                     icon="bx bxs-paper-plane"
                     onClick={() => {}}
                     // disabled={show?.apprv === false}
-                  />
+                  /> */}
                   <Button
                     label="Batal"
                     onClick={onCancel}
@@ -307,6 +379,12 @@ const Detail = ({ onCancel }) => {
   };
 
   const formatIdr = (value) => {
+    return `${value?.toFixed(2)}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
+  const formatTh = (value) => {
     return `${value}`
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
@@ -334,7 +412,37 @@ const Detail = ({ onCancel }) => {
     return total;
   };
 
+  const pajk = (value) => {
+    let nil = 0;
+    ppn?.forEach((elem) => {
+      if (show.sup_id?.sup_ppn === elem.id) {
+        nil = elem.nilai;
+      }
+    });
+    return nil;
+  };
 
+  const getUangMuka = () => {
+    let dp = 0;
+    apCard?.forEach((element) => {
+      if (show?.po_id?.id === element.po_id?.id && element.trx_type === "DP") {
+        dp += element.trx_amnh;
+      }
+    });
+
+    return dp;
+  };
+
+  const getPelunasan = () => {
+    let bayar = 0;
+    apCard?.forEach((element) => {
+      if (show?.id === element.ord_id?.id && element.pay_type === "H4") {
+        bayar += element.acq_amnh;
+      }
+    });
+
+    return bayar;
+  };
 
   const body = () => {
     return (
@@ -385,14 +493,14 @@ const Detail = ({ onCancel }) => {
                   <div className="row justify-content-left col-6">
                     <div className="col-12 mt-0 fs-14 text-left">
                       <label className="text-label">
-                        <b>Kartu Pembelian</b>
+                        <b>Invoice Pembelian</b>
                       </label>
                     </div>
                   </div>
 
                   <div className="row justify-content-right col-6">
                     <div className="col-12 mt-0 fs-12 text-right">
-                      <label className="text-label">Tanggal Pembelian : </label>
+                      <label className="text-label">Tanggal Invoice : </label>
                       <span className="ml-1">
                         <b>{formatDate(show.ord_date)}</b>
                       </span>
@@ -402,26 +510,33 @@ const Detail = ({ onCancel }) => {
 
                 <Card className="col-12 mt-0">
                   <div className="row col-12">
-                    <div className="col-6 fs-12 ml-0">
+                    <div className="col-8 fs-12 ml-0">
                       <label className="text-label">
                         <b>Informasi Pembelian</b>
                       </label>
                     </div>
 
-                    <div className="col-6 fs-12 ml-0 text-right">
+                    <div className="col-4 fs-12 ml-0 text-right">
                       <label className="text-label">
                         <b>Informasi Supplier</b>
                       </label>
                     </div>
 
-                    <div className="col-6 fs-12 ml-0">
+                    <div className="col-8 fs-12 ml-0">
                       <span className="ml-0 fs-14">
                         <b>{show?.ord_code}</b>
                       </span>
                       <br></br>
+                      <br></br>
                       <span className="ml-0">
-                        Nomor PO : <b>{show?.po_id?.po_code}</b>
+                        No. Pembelian : <b>{show?.ord_code ?? "-"}</b>
                       </span>
+                      <br></br>
+                      <br></br>
+                      <span className="ml-0">
+                        Nomor PO : <b>{show?.po_id?.po_code ?? "-"}</b>
+                      </span>
+                      <br></br>
                       <br></br>
                       <span className="ml-0">
                         Jatuh Tempo : <b>{formatDate(show?.due_date)}</b>
@@ -432,12 +547,12 @@ const Detail = ({ onCancel }) => {
                         {
                           <div>
                             {show?.faktur === true ? (
-                              <Badge variant="info light" className="fs-12">
+                              <Badge variant="info light" className="fs-11">
                                 <i className="bx bxs-plus-circle text-info mr-0"></i>{" "}
                                 Faktur
                               </Badge>
                             ) : (
-                              <Badge variant="warning light" className="fs-12">
+                              <Badge variant="warning light" className="fs-11">
                                 <i className="bx bxs-minus-circle text-warning mr-0"></i>{" "}
                                 Non Faktur
                               </Badge>
@@ -447,18 +562,18 @@ const Detail = ({ onCancel }) => {
                       </span>
                     </div>
 
-                    <div className="col-6 fs-12 ml-0 text-right">
+                    <div className="col-4 fs-12 ml-0 text-right">
                       <span className="ml-0 fs-14">
                         <b>{show?.sup_id?.sup_name}</b>
                       </span>
+                      <br></br>
                       <br></br>
                       <span className="ml-0">
                         Cp : <b>{show?.sup_id?.sup_cp}</b>
                       </span>
                       <br></br>
-                      <span className="ml-0">
-                        {show?.sup_id?.sup_address}
-                      </span>
+                      <br></br>
+                      <span className="ml-0">{show?.sup_id?.sup_address}</span>
                       <br></br>
                       <span className="ml-0">
                         {kota(show?.sup_id?.sup_kota)?.city_name},
@@ -467,14 +582,18 @@ const Detail = ({ onCancel }) => {
                       <br></br>
                       <br></br>
                       <span className="ml-0">
-                        (+62)
+                        {/* (+62) */}
                         {show?.sup_id?.sup_telp1}
                       </span>
                     </div>
                   </div>
                 </Card>
 
-                <Row className="ml-1 mt-0">
+                <Row className="ml-1 mt-2">
+                  <label className="text-label fs-13">
+                    <b>Daftar Produk</b>
+                  </label>
+
                   <DataTable
                     value={show.dprod?.map((v, i) => {
                       return {
@@ -486,7 +605,7 @@ const Detail = ({ onCancel }) => {
                     })}
                     responsiveLayout="scroll"
                     className="display w-150 datatable-wrapper fs-12"
-                    showGridlines
+                    // showGridlines
                     dataKey="id"
                     rowHover
                   >
@@ -497,21 +616,21 @@ const Detail = ({ onCancel }) => {
                       // body={loading && <Skeleton />}
                     />
                     <Column
-                      header="Lokasi"
+                      header="Gudang"
                       field={(e) => e.location?.name}
                       style={{ minWidth: "9rem" }}
                       // body={loading && <Skeleton />}
                     />
                     <Column
                       header="Jumlah"
-                      field={(e) => e.order}
+                      field={(e) => formatTh(e.order)}
                       style={{ minWidth: "6rem" }}
                       // body={loading && <Skeleton />}
                     />
                     <Column
                       header="Satuan"
                       field={(e) => e.unit_id?.name}
-                      style={{ minWidth: "9rem" }}
+                      style={{ minWidth: "7rem" }}
                       // body={loading && <Skeleton />}
                     />
                     <Column
@@ -529,9 +648,13 @@ const Detail = ({ onCancel }) => {
                   </DataTable>
                 </Row>
 
-                {order?.djasa?.length ? (
+                {show?.djasa?.length ? (
                   <Row className="ml-1 mt-6">
                     <>
+                      <label className="text-label fs-13">
+                        <b>Daftar Jasa</b>
+                      </label>
+
                       <DataTable
                         value={show.djasa?.map((v, i) => {
                           return {
@@ -542,13 +665,17 @@ const Detail = ({ onCancel }) => {
                         })}
                         responsiveLayout="scroll"
                         className="display w-150 datatable-wrapper fs-12"
-                        showGridlines
+                        // showGridlines
                         dataKey="id"
                         rowHover
                       >
                         <Column
                           header="Supplier"
-                          field={(e) => e.sup_id?.sup_name}
+                          field={(e) =>
+                            e.sup_id
+                              ? `${e.sup_id?.supplier?.sup_name} (${e.sup_id?.supplier?.sup_code})`
+                              : "-"
+                          }
                           style={{ minWidth: "21rem" }}
                           // body={loading && <Skeleton />}
                         />
@@ -575,8 +702,8 @@ const Detail = ({ onCancel }) => {
                   <div></div>
                   <div className="row justify-content-right col-6 mr-4">
                     <div className="col-12 mb-0">
-                      <label className="text-label">
-                        <b>Detail Pembayaran</b>
+                      <label className="text-label fs-13">
+                        <b>Detail Tagihan</b>
                       </label>
                       <Divider className="ml-12"></Divider>
                     </div>
@@ -628,8 +755,8 @@ const Detail = ({ onCancel }) => {
                     <div className="col-5">
                       <label className="text-label">
                         {show.split_inv
-                          ? "Pajak Atas Barang (11%)"
-                          : "Pajak (11%)"}
+                          ? "Pajak Atas Barang"`(${pajk()}%)`
+                          : "Pajak"}
                       </label>
                     </div>
 
@@ -638,13 +765,14 @@ const Detail = ({ onCancel }) => {
                         {show.split_inv ? (
                           <b>
                             Rp.
-                            {formatIdr((getSubTotalBarang() * 11) / 100)}
+                            {formatIdr((getSubTotalBarang() * pajk()) / 100)}
                           </b>
                         ) : (
                           <b>
                             Rp.{" "}
                             {formatIdr(
-                              ((getSubTotalBarang() + getSubTotalJasa()) * 11) /
+                              ((getSubTotalBarang() + getSubTotalJasa()) *
+                                pajk()) /
                                 100
                             )}
                           </b>
@@ -659,7 +787,10 @@ const Detail = ({ onCancel }) => {
                     <div className="col-7 text-right">
                       <label className="text-label">
                         <b>
-                          Rp. {show?.total_disc !== null ? show?.total_disc : 0}
+                          Rp.{" "}
+                          {show?.total_disc !== null
+                            ? formatIdr(show?.total_disc)
+                            : formatIdr(0)}
                         </b>
                       </label>
                     </div>
@@ -669,8 +800,8 @@ const Detail = ({ onCancel }) => {
                     </div>
 
                     <div className="col-5">
-                      <label className="text-label">
-                        <b>Total</b>
+                      <label className="text-label fs-13">
+                        <b>Total Tagihan</b>
                       </label>
                     </div>
 
@@ -681,7 +812,7 @@ const Detail = ({ onCancel }) => {
                             Rp.{" "}
                             {formatIdr(
                               getSubTotalBarang() +
-                                (getSubTotalBarang() * 11) / 100
+                                (getSubTotalBarang() * pajk()) / 100
                             )}
                           </b>
                         ) : (
@@ -691,12 +822,89 @@ const Detail = ({ onCancel }) => {
                               getSubTotalBarang() +
                                 getSubTotalJasa() +
                                 ((getSubTotalBarang() + getSubTotalJasa()) *
-                                  11) /
+                                  pajk()) /
                                   100
                             )}
                           </b>
                         )}
                       </label>
+                    </div>
+
+                    <div className="col-5 mt-0">
+                      <label className="text-label">{"Uang Muka"}</label>
+                    </div>
+
+                    <div className="col-7 text-right">
+                      <label className="text-label">
+                        <b>Rp. {formatIdr(getUangMuka())}</b>
+                      </label>
+                    </div>
+
+                    <div className="col-5 mt-0">
+                      <label className="text-label">{"Sudah Dibayar"}</label>
+                    </div>
+
+                    <div className="col-7 text-right">
+                      <label className="text-label">
+                        <b>Rp. {formatIdr(getPelunasan())}</b>
+                      </label>
+                    </div>
+
+                    <div className="col-12">
+                      <Divider className="ml-12"></Divider>
+                    </div>
+
+                    <div className="col-5">
+                      <label className="text-label fs-13">
+                        <b>{"Sisa Tagihan"}</b>
+                      </label>
+                    </div>
+
+                    <div className="col-7 text-right">
+                      <label className="text-label fs-13">
+                        <b>
+                          Rp.{" "}
+                          {formatIdr(
+                            getSubTotalBarang() +
+                              getSubTotalJasa() +
+                              ((getSubTotalBarang() + getSubTotalJasa()) *
+                                pajk()) /
+                                100 -
+                              getUangMuka() -
+                              getPelunasan()
+                          )}
+                        </b>
+                      </label>
+
+                      <br></br>
+                      <br></br>
+                      {getSubTotalBarang() +
+                        getSubTotalJasa() +
+                        ((getSubTotalBarang() + getSubTotalJasa()) * pajk()) /
+                          100 -
+                        getUangMuka() -
+                        getPelunasan() ===
+                      0 ? (
+                        <Badge
+                          variant="primary light"
+                          style={{ width: "7rem", height: "2rem" }}
+                        >
+                          <span className="fs-15 mb-0 mr-3">
+                            <i className="bx bx-check text-primary ml-2 mt-0"></i>{" "}
+                            Lunas
+                          </span>
+                        </Badge>
+                      ) : (
+                        <Badge
+                          variant="warning light"
+                          style={{ width: "7rem", height: "2rem" }}
+                        >
+                          <span className="fs-15 mb-0 mr-3">
+                            <i className="bx bxs-circle text-warning ml-2 mt-0"></i>{" "}
+                            Open
+                          </span>
+                        </Badge>
+                      )}
                     </div>
 
                     <div className="col-12 text-right mt-8">

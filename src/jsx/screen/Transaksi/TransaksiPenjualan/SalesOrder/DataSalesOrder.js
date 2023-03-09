@@ -17,6 +17,7 @@ import ReactToPrint from "react-to-print";
 import { Divider } from "@material-ui/core";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { tr } from "src/data/tr";
+import { Tooltip } from "primereact/tooltip";
 
 const data = {
   id: null,
@@ -290,7 +291,12 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
           <i className="fa fa-pencil"></i>
         </Link>
 
+        <Tooltip target=".btn" />
         <Link
+          data-pr-tooltip="Close SO"
+          data-pr-position="right"
+          data-pr-at="right+5 top"
+          data-pr-my="left center-2"
           onClick={() => {
             setDisplayConfirm(true);
             let sprod = data.sprod;
@@ -356,7 +362,7 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
             data.status !== 2 ? "" : "disabled"
           } btn-warning shadow btn-xs sharp ml-1`}
         >
-          <i className="bx bx-task-x mt-1"></i>
+          <i className="bx bx-x mt-1"></i>
         </Link>
 
         <Link

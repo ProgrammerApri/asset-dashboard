@@ -19,6 +19,9 @@ const Pemasukan = ({ trigger }) => {
       onAdd={() => {
         setActive(1);
       }}
+      onEdit={() => {
+        setActive(1);
+      }}
     />,
 
     <KasBankInInput

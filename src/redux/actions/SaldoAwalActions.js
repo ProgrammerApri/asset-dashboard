@@ -1,0 +1,17 @@
+export const SET_CURRENT_SA_INV = "sa_inv.SET_CURRENT_SA_INV"
+export const SET_SA_INV = "sa_inv.SET_SA_INV"
+export const RESET_CURRENT_SA_INV = "sa_inv.RESET_CURRENT_SA_INV"
+export const UPDATE_CURRENT_SA_INV = "sa_inv.UPDATE_CURRENT_SA_INV"
+export const SET_EDIT_SA_INV = "sa_inv.SET_EDIT_SA_INV"
+
+export const SET_CURRENT_SA_AP= "sa_ap.SET_CURRENT_SA_AP"
+export const SET_SA_AP = "sa_ap.SET_SA_AP"
+export const RESET_CURRENT_SA_AP = "sa_ap.RESET_CURRENT_SA_AP"
+export const UPDATE_CURRENT_SA_AP = "sa_ap.UPDATE_CURRENT_SA_AP"
+export const SET_EDIT_SA_AP = "sa_ap.SET_EDIT_SA_AP"
+
+export const SET_CURRENT_SA_AR= "sa_ar.SET_CURRENT_SA_AR"
+export const SET_SA_AR = "sa_ar.SET_SA_AR"
+export const RESET_CURRENT_SA_AR = "sa_ar.RESET_CURRENT_SA_AR"
+export const UPDATE_CURRENT_SA_AR = "sa_ar.UPDATE_CURRENT_SA_AR"
+export const SET_EDIT_SA_AR = "sa_ar.SET_EDIT_SA_AR"

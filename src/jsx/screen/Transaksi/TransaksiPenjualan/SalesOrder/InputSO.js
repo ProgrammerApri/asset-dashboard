@@ -63,6 +63,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
   const isEdit = useSelector((state) => state.so.editso);
   const [isRp, setRp] = useState(true);
   const [isRpJasa, setRpJasa] = useState(true);
+  const [comp, setComp] = useState(null);
   const [jasa, setJasa] = useState(null);
   const [showProduk, setShowProduk] = useState(false);
   const [showJasa, setShowJasa] = useState(false);
@@ -95,6 +96,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
       left: 0,
       behavior: "smooth",
     });
+    getComp();
     getJasa();
     getProduk();
     getSupplier();
@@ -300,6 +302,22 @@ const InputSO = ({ onCancel, onSuccess }) => {
         addSO();
       }
     }
+  };
+
+  const getComp = async (id, e) => {
+    const config = {
+      ...endpoints.getCompany,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setComp(data);
+      }
+    } catch (error) {}
   };
 
   const getSto = async (id, e) => {
@@ -702,6 +720,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
   };
 
   const body = () => {
+    let date = new Date(comp?.year_co, comp?.cutoff - 1, 31);
     return (
       <>
         <Toast ref={toast} />
@@ -737,6 +756,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
               showIcon
               dateFormat="dd-mm-yy"
               error={error?.date}
+              minDate={date}
             />
           </div>
 

@@ -10,6 +10,11 @@ const PrimeCalendar = ({
   disabled = false,
   showIcon,
   dateFormat,
+  disabledDates,
+  disabledDays,
+  minDate,
+  maxDate,
+  view,
 }) => {
   return (
     <div>
@@ -22,6 +27,11 @@ const PrimeCalendar = ({
           disabled={disabled}
           showIcon={showIcon}
           dateFormat={dateFormat}
+          disabledDates={disabledDates}
+          disabledDays={disabledDays}
+          minDate={minDate}
+          maxDate={maxDate}
+          view={view}
         />
       </div>
       {error && (

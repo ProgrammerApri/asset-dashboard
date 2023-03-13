@@ -28,6 +28,7 @@ import IncReducer from "./IncReducer";
 import GIROINReducer from "./GiroIncReducer";
 import ProfileReducer from "./ProfileReducer";
 import UserReducer from "./UserReducer";
+import SaldoAwalReducer from "./SaldoAwalReducer";
 // import PBNReducer from "./PBNReducer";
 
 
@@ -64,6 +65,7 @@ const rootReducer = combineReducers({
   fk_pj: INVReducer,
   inv_pj: INVReducer,
   fk_pb: INVReducer,
+  sa: SaldoAwalReducer,
 });
 
 export default rootReducer;

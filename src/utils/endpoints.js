@@ -1437,6 +1437,94 @@ const endpoints = {
     method: "GET",
     data: {},
   },
+
+  // Saldo Awal GL
+  saldo_sa_gl: {
+    endpoint: "/v1/api/saldo-awal-gl",
+    method: "GET",
+    data: {},
+  },
+
+  add_sa_gl: {
+    endpoint: "/v1/api/saldo-awal-gl",
+    method: "POST",
+    data: {},
+  },
+
+  edit_sa_gl: {
+    endpoint: "/v1/api/saldo-awal-gl",
+    method: "PUT",
+    data: {},
+  },
+
+  saldo_sa_gl_sts: {
+    endpoint: "/v1/api/saldo-awal-gl/status",
+    method: "GET",
+    data: {},
+  },
+
+  // Saldo Awal Inv
+  saldo_sa_inv: {
+    endpoint: "/v1/api/saldo-awal-inv",
+    method: "GET",
+    data: {},
+  },
+
+  add_sa_inv: {
+    endpoint: "/v1/api/saldo-awal-inv",
+    method: "POST",
+    data: {},
+  },
+
+  // Saldo Awal AP
+  saldo_sa_ap: {
+    endpoint: "/v1/api/saldo-awal-ap",
+    method: "GET",
+    data: {},
+  },
+
+  addSA_ap: {
+    endpoint: "/v1/api/saldo-awal-ap",
+    method: "POST",
+    data: {},
+  },
+
+  editSA_ap: {
+    endpoint: "/v1/api/saldo-awal-ap/",
+    method: "PUT",
+    data: {},
+  },
+
+  delSA_ap: {
+    endpoint: "/v1/api/saldo-awal-ap/",
+    method: "DELETE",
+    data: {},
+  },
+
+  // Saldo Awal AR
+  saldo_sa_ar: {
+    endpoint: "/v1/api/saldo-awal-ar",
+    method: "GET",
+    data: {},
+  },
+
+  addSA_ar: {
+    endpoint: "/v1/api/saldo-awal-ar",
+    method: "POST",
+    data: {},
+  },
+
+  editSA_ar: {
+    endpoint: "/v1/api/saldo-awal-ar/",
+    method: "PUT",
+    data: {},
+  },
+
+  delSA_ar: {
+    endpoint: "/v1/api/saldo-awal-ar/",
+    method: "DELETE",
+    data: {},
+  },
 };
 
 export default endpoints;

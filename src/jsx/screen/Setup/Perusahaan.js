@@ -15,6 +15,8 @@ import { Toast } from "primereact/toast";
 import { Tooltip } from "primereact/tooltip";
 import { SelectButton } from "primereact/selectbutton";
 import { ApiConfig } from "src/data/config";
+import CustomAccordion from "src/jsx/components/Accordion/Accordion";
+import CustomMonthPicker from "src/jsx/components/CustomMonthPicker/CustomMonthPicker";
 
 const lang = [
   { name: "Indonesia", code: "ID" },
@@ -40,6 +42,8 @@ const data = {
   tiered: false,
   rp: false,
   over_po: false,
+  cutoff: null,
+  year_co: null,
 };
 
 const Perusahaan = () => {
@@ -59,6 +63,7 @@ const Perusahaan = () => {
     main: true,
     other: false,
     approval: false,
+    cutoff: true,
     bhs: false,
   });
 
@@ -603,6 +608,44 @@ const Perusahaan = () => {
                 </Accordion.Collapse>
               </div>
             </Accordion>
+
+            <CustomAccordion
+              tittle={"Cutoff"}
+              defaultActive={true}
+              active={accor.cutoff}
+              onClick={() => {
+                setAccor({
+                  ...accor,
+                  cutoff: !accor.cutoff,
+                });
+              }}
+              key={1}
+              body={
+                <Row className="mr-0 ml-0">
+                  <div className="col-6">
+                    <CustomMonthPicker
+                      dropdown
+                      value={currentData?.cutoff}
+                      onChange={(e) => {
+                        submitUpdate(false, { ...currentData, cutoff: e });
+                        setCurrentData({ ...currentData, cutoff: e });
+                      }}
+                    />
+                  </div>
+
+                  <div className="col-6">
+                    <CustomMonthPicker
+                      dyear
+                      value={currentData?.year_co}
+                      onChange={(e) => {
+                        submitUpdate(false, { ...currentData, year_co: e });
+                        setCurrentData({ ...currentData, year_co: e });
+                      }}
+                    />
+                  </div>
+                </Row>
+              }
+            />
 
             <Accordion className="acordion" defaultActiveKey="0">
               <div className="accordion__item" key={1}>

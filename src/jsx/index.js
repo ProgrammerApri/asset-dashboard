@@ -70,6 +70,7 @@ import { endpoints, request } from "src/utils";
 import { useDispatch } from "react-redux";
 import { SET_CURRENT_PROFILE } from "src/redux/actions";
 import { ProgressBar } from "primereact/progressbar";
+import SaldoAwal from "./screen/SaldoAwal";
 
 const Markup = ({ width }) => {
   const routes = [
@@ -141,6 +142,9 @@ const Markup = ({ width }) => {
     { url: "transaksi", component: TransaksiPembelian },
 
     { url: "produksi", component: Produksi },
+
+    { url: "saldo-awal", component: SaldoAwal },
+    { url: "saldo-awal/:active", component: SaldoAwal },
   ];
 
   const body = document.querySelector("body");

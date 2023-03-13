@@ -44,6 +44,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
   const isEdit = useSelector((state) => state.pr.editPr);
   const dispatch = useDispatch();
   const [isRp, setRp] = useState(true);
+  const [comp, setComp] = useState(null);
   const [supplier, setSupplier] = useState(null);
   const [ppn, setPpn] = useState(null);
   const [fk, setFk] = useState(null);
@@ -63,6 +64,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
       left: 0,
       behavior: "smooth",
     });
+    getComp();
     getSupplier();
     getPpn();
     getFK();
@@ -122,6 +124,22 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
     }
 
     return valid;
+  };
+
+  const getComp = async () => {
+    const config = {
+      ...endpoints.getCompany,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setComp(data);
+      }
+    } catch (error) {}
   };
 
   const getSupplier = async () => {
@@ -450,6 +468,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
   };
 
   const body = () => {
+    let date = new Date(comp?.year_co, comp?.cutoff - 1, 31);
     return (
       <>
         {/* Put content body here */}
@@ -487,6 +506,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
               showIcon
               dateFormat="dd-mm-yy"
               error={error?.date}
+              minDate={date}
             />
           </div>
 

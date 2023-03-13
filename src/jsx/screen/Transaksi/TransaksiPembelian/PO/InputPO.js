@@ -64,6 +64,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
   const dispatch = useDispatch();
   const [isRp, setRp] = useState(true);
   const [isRpJasa, setRpJasa] = useState(true);
+  const [comp, setComp] = useState(null);
   const [pusatBiaya, setPusatBiaya] = useState(null);
   const [supplier, setSupplier] = useState(null);
   const [rulesPay, setRulesPay] = useState(null);
@@ -103,6 +104,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
       left: 0,
       behavior: "smooth",
     });
+    getComp();
     getPusatBiaya();
     getSupplier();
     getRulesPay();
@@ -114,6 +116,22 @@ const InputPO = ({ onCancel, onSuccess }) => {
     getHistori();
     getCur();
   }, []);
+
+  const getComp = async () => {
+    const config = {
+      ...endpoints.getCompany,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setComp(data);
+      }
+    } catch (error) {}
+  };
 
   const getSupplier = async () => {
     const config = {
@@ -804,6 +822,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
   };
 
   const body = () => {
+    let date = new Date(comp?.year_co, comp?.cutoff - 1, 31);
     return (
       <>
         {/* Put content body here */}
@@ -843,6 +862,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
               showIcon
               dateFormat="dd-mm-yy"
               error={error?.date}
+              minDate={date}
             />
           </div>
 

@@ -74,6 +74,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
   const dispatch = useDispatch();
   const [isRp, setRp] = useState(true);
   const [isRjjasa, setRjjasa] = useState(true);
+  const [comp, setComp] = useState(null);
   const [customer, setCustomer] = useState(null);
   const [subCus, setSubCus] = useState(null);
   const [supplier, setSupplier] = useState(null);
@@ -112,6 +113,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
       left: 0,
       behavior: "smooth",
     });
+    getComp();
     getCustomer();
     getSubCus();
     getSupplier();
@@ -277,6 +279,24 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     }
 
     return valid;
+  };
+
+  const getComp = async () => {
+    const config = {
+      ...endpoints.getCompany,
+      data: {},
+    };
+
+    let response = null;
+    try {
+      response = await request(null, config);
+
+      if (response.status) {
+        const { data } = response;
+        
+        setComp(data);
+      }
+    } catch (error) {}
   };
 
   const getCustomer = async () => {
@@ -955,6 +975,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
   };
 
   const body = () => {
+    let date = new Date(comp?.year_co, comp?.cutoff - 1, 31);
     return (
       <>
         {/* Put content body here */}
@@ -1002,6 +1023,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
               showIcon
               dateFormat="dd-mm-yy"
               error={error?.date}
+              minDate={date}
             />
           </div>
 

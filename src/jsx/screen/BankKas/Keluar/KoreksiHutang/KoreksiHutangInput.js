@@ -16,6 +16,7 @@ import DataAkun from "src/jsx/screen/Master/Akun/DataAkun";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
+import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 
 const defError = {
   code: false,
@@ -35,6 +36,8 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
   const isEdit = useSelector((state) => state.kh.editKh);
   const dispatch = useDispatch();
   const [supplier, setSupplier] = useState(null);
+  const [apcard, setApcard] = useState(null);
+  const [curr, setCurrency] = useState(null);
   const [rp, setRequest] = useState(null);
   const [acc, setAcc] = useState(null);
   const [showSupplier, setShowSupplier] = useState(false);
@@ -47,6 +50,7 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
       behavior: "smooth",
     });
     getSupplier();
+    getCur();
     getAcc();
   }, []);
 
@@ -88,8 +92,40 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
       if (response.status) {
         const { data } = response;
         setSupplier(data);
+        getAPCard(data);
       }
     } catch (error) {}
+  };
+
+  const getAPCard = async (spl) => {
+    const config = {
+      ...endpoints.apcard,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        let filt = [];
+        data.forEach((el) => {
+          if (!el.lunas) {
+            filt.push(el);
+          }
+        });
+
+        setApcard(data);
+
+        let grouped = filt?.filter(
+          (el, i) =>
+            i === filt.findIndex((ek) => el?.sup_id?.id === ek?.sup_id?.id)
+        );
+        setSupplier(grouped);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const getAcc = async () => {
@@ -104,6 +140,22 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
       if (response.status) {
         const { data } = response;
         setAcc(data);
+      }
+    } catch (error) {}
+  };
+
+  const getCur = async () => {
+    const config = {
+      ...endpoints.currency,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setCurrency(data);
       }
     } catch (error) {}
   };
@@ -234,7 +286,7 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
   const supp = (value) => {
     let selected = {};
     supplier?.forEach((element) => {
-      if (value === element.supplier?.id) {
+      if (value === element.sup_id?.id) {
         selected = element;
       }
     });
@@ -288,7 +340,7 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
         <Toast ref={toast} />
 
         <Row className="mb-4">
-          <div className="col-4">
+          <div className="col-3">
             <PrimeInput
               label={"No. Referensi Koreksi"}
               value={kh.kh_code}
@@ -321,33 +373,58 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
               error={error?.date}
             />
           </div>
-          <div className="col-6"></div>
-          <div className="col-4 mt-3">
+          <div className="col-2">
+            <label className="text-label">Jatuh Tempo</label>
+            <div className="p-inputgroup">
+              <Calendar
+                value={new Date(`${kh.due_date}Z`)}
+                onChange={(e) => {
+                  updateKH({ ...kh, due_date: e.value });
+                }}
+                placeholder="Tanggal Jatuh Tempo"
+                showIcon
+                dateFormat="dd-mm-yy"
+              />
+            </div>
+          </div>
+          <div className="col-4"></div>
+          <div className="col-3 mt-3">
             <label className="text-label">Pemasok</label>
-            <div className="p-inputgroup"></div>
-            <CustomDropdown
+            <PrimeDropdown
               value={kh.sup_id ? supp(kh.sup_id) : null}
-              option={supplier}
+              options={supplier}
               onChange={(e) => {
+                let t_hutang = 0;
+                apcard?.forEach((element) => {
+                  if (element.sup_id?.id === e.value?.sup_id?.id) {
+                    if (element.trx_dbcr === "k") {
+                      t_hutang += element.trx_amnh;
+                    } else {
+                      t_hutang -= element.trx_amnh;
+                    }
+                  }
+                });
                 updateKH({
                   ...kh,
-                  sup_id: e.supplier?.id,
+                  sup_id: e?.value?.sup_id?.id ?? null,
+                  total_hut: t_hutang,
                 });
 
                 let newError = error;
                 newError.sup = false;
                 setError(newError);
               }}
-              label={"[supplier.sup_name]"}
+              filter
+              filterBy={"sup_id.sup_name"}
+              optionLabel="sup_id.sup_name"
               placeholder="Pilih Pemasok"
-              detail
-              onDetail={() => setShowSupplier(true)}
               errorMessage="Pemasok Belum Dipilih"
               error={error?.sup}
+              showClear
             />
           </div>
-          <div className="col-4 mt-3">
-            <label className="text-label">Type Koreksi</label>
+          <div className="col-2 mt-3">
+            <label className="text-label">Tipe Koreksi</label>
             <div className="p-inputgroup">
               <Dropdown
                 value={kh.type && kh.type}
@@ -359,11 +436,11 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
                   });
                 }}
                 optionLabel="name"
-                placeholder="Pilih Type Koreksi"
+                placeholder="Pilih Tipe Koreksi"
               />
             </div>
           </div>
-          <div className="col-4 mt-3">
+          <div className="col-3 mt-3">
             <label className="text-label">Akun Lawan</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
@@ -387,8 +464,38 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
               error={error?.akn}
             />
           </div>
-          <div className="col-4">
+          <div className="col-4 mt-3">
+            <label className="text-label">Keterangan </label>
+            <div className="p-inputgroup">
+              <InputText
+                value={kh.ket}
+                onChange={(e) => updateKH({ ...kh, ket: e.target.value })}
+                placeholder="Keterangan"
+              />
+            </div>
+          </div>
+          <div className="col-1">
+            <PrimeInput
+              label={"Mata Uang"}
+              value={kh.nilai}
+              placeholder="Mata Uang"
+              disabled
+            />
+          </div>
+          <div className="col-2">
             <PrimeNumber
+              price
+              label={"Nilai Hutang"}
+              value={kh.total_hut}
+              placeholder="0"
+              type="number"
+              min={0}
+              disabled
+            />
+          </div>
+          <div className="col-2">
+            <PrimeNumber
+              price
               label={"Nilai"}
               value={kh.nilai}
               onChange={(e) => {
@@ -403,30 +510,6 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
               min={0}
               error={error?.nil}
             />
-          </div>
-          <div className="col-4">
-            <label className="text-label">Tanggal J/T</label>
-            <div className="p-inputgroup">
-              <Calendar
-                value={new Date(`${kh.due_date}Z`)}
-                onChange={(e) => {
-                  updateKH({ ...kh, due_date: e.value });
-                }}
-                placeholder="Tanggal Jatuh Tempo"
-                showIcon
-                dateFormat="dd-mm-yy"
-              />
-            </div>
-          </div>
-          <div className="col-4">
-            <label className="text-label">Keterangan </label>
-            <div className="p-inputgroup">
-              <InputText
-                value={kh.ket}
-                onChange={(e) => updateKH({ ...kh, ket: e.target.value })}
-                placeholder="Keterangan"
-              />
-            </div>
           </div>
           {/* kode suplier otomatis keluar, karena sudah melekat di faktur pembelian  */}
         </Row>

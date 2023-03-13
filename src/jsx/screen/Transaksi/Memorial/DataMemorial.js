@@ -345,6 +345,10 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
         const cols = data[0];
         data.shift();
 
+        let new_memorial = [];
+        let not_valid = [];
+        let accNotValid = [];
+
         let _importedData = data.map((d) => {
           return cols.reduce((obj, c, i) => {
             obj[c] = d[i];
@@ -354,73 +358,143 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
 
         progressBar.current.style.display = "";
 
-        _importedData = _importedData.filter(
-          (el) => el?.KODE
-        );
+        _importedData = _importedData.filter((el) => el?.KODE);
 
         console.log(_importedData);
-        let grouped = _importedData.filter(
-          (el, i) =>
-            i === _importedData.findIndex((ek) => el?.KODE === ek?.KODE)
-        );
-        console.log(grouped);
 
-        let new_memorial = [];
-        let not_valid = [];
-        let accNotValid = [];
-        grouped?.forEach((el) => {
-          let memo = [];
-          let debit = 0;
-          let credit = 0;
-          let validAccount = 0;
-          let memoLength = 0;
+        let single = Object.keys(_importedData[0]).some((v) => v === "ACC_D");
+
+        if (single) {
           _importedData.forEach((ek) => {
-            if (el.KODE === ek.KODE) {
-              memo.push({
-                acc_id: checkAcc(ek.ACC)?.account?.id,
-                dep_id: null,
-                currency: null,
-                dbcr: ek.DK.toLowerCase(),
-                amnt: ek.NILAI,
-                amnh: 0,
-                desc: null,
-              });
-              validAccount += checkAcc(ek.ACC)?.account?.id ? 1 : 0;
-              if (!checkAcc(ek.ACC)?.account?.id) {
+            let debit = 0;
+            let credit = 0;
+            let validAccount = 0;
+            let memoLength = 0;
+
+            if (ek.KODE) {
+              validAccount += checkAcc(ek.ACC_D)?.account?.id ? 1 : 0;
+              if (!checkAcc(ek.ACC_D)?.account?.id) {
                 accNotValid.push({
-                  acc: ek.ACC,
+                  acc: ek.ACC_D,
                 });
               }
-              memoLength += 1;
-              debit += ek.DK === "D" ? ek.NILAI : 0;
-              credit += ek.DK === "K" ? ek.NILAI : 0;
+
+              validAccount += checkAcc(ek.ACC_K)?.account?.id ? 1 : 0;
+              if (!checkAcc(ek.ACC_K)?.account?.id) {
+                accNotValid.push({
+                  acc: ek.ACC_K,
+                });
+              }
+
+              debit = ek.NILAI_D;
+              credit = ek.NILAI_K;
+
+              if (debit === credit && validAccount == 2) {
+                let date = ek.TGL.split("/");
+                new_memorial.push({
+                  code: ek.KODE,
+                  date: `${date[1]}/${date[0]}/${date[2]}`,
+                  desc: ek.DESKRIPSI,
+                  memo: [
+                    {
+                      acc_id: checkAcc(ek.ACC_D)?.account?.id,
+                      dep_id: null,
+                      currency: null,
+                      dbcr: "d",
+                      amnt: debit,
+                      amnh: 0,
+                      desc: ek.DESKRIPSI,
+                    },
+                    {
+                      acc_id: checkAcc(ek.ACC_K)?.account?.id,
+                      dep_id: null,
+                      currency: null,
+                      dbcr: "k",
+                      amnt: credit,
+                      amnh: 0,
+                      desc: ek.DESKRIPSI,
+                    },
+                  ],
+                });
+              } else {
+                if (debit !== credit) {
+                  not_valid.push({
+                    kode: ek.KODE,
+                    message: "Nominal Belum Balance",
+                  });
+                }
+                if (validAccount !== memoLength) {
+                  accNotValid.forEach((e) => {
+                    not_valid.push({
+                      kode: ek.KODE,
+                      message: `Akun ${e.acc} tidak ditemukan`,
+                    });
+                  });
+                }
+              }
             }
           });
-          if (debit === credit && validAccount === memoLength) {
-            let date = el.TGL.split("/")
-            new_memorial.push({
-              code: el.KODE,
-              date: `${date[1]}/${date[0]}/${date[2]}`,
-              desc: null,
-              memo: memo,
+        } else {
+          let grouped = _importedData.filter(
+            (el, i) =>
+              i === _importedData.findIndex((ek) => el?.KODE === ek?.KODE)
+          );
+          console.log(grouped);
+
+          grouped?.forEach((el) => {
+            let memo = [];
+            let debit = 0;
+            let credit = 0;
+            let validAccount = 0;
+            let memoLength = 0;
+            _importedData.forEach((ek) => {
+              if (el.KODE === ek.KODE) {
+                memo.push({
+                  acc_id: checkAcc(ek.ACC)?.account?.id,
+                  dep_id: null,
+                  currency: null,
+                  dbcr: ek.DK.toLowerCase(),
+                  amnt: ek.NILAI,
+                  amnh: 0,
+                  desc: ek.DESKRIPSI,
+                });
+                validAccount += checkAcc(ek.ACC)?.account?.id ? 1 : 0;
+                if (!checkAcc(ek.ACC)?.account?.id) {
+                  accNotValid.push({
+                    acc: ek.ACC,
+                  });
+                }
+                memoLength += 1;
+                debit += ek.DK === "D" ? ek.NILAI : 0;
+                credit += ek.DK === "K" ? ek.NILAI : 0;
+              }
             });
-          } else {
-            if (debit !== credit) {
-              not_valid.push({
-                kode: el.KODE,
-                message: "Nominal Belum Balance",
+            if (debit === credit && validAccount === memoLength) {
+              let date = el.TGL.split("/");
+              new_memorial.push({
+                code: el.KODE,
+                date: `${date[1]}/${date[0]}/${date[2]}`,
+                desc: null,
+                memo: memo,
               });
-            }
-            if (validAccount !== memoLength) {
-              accNotValid.forEach((e) => {
+            } else {
+              if (debit !== credit) {
                 not_valid.push({
                   kode: el.KODE,
-                  message: `Akun ${e.acc} tidak ditemukan`,
+                  message: "Nominal Belum Balance",
                 });
-              });
+              }
+              if (validAccount !== memoLength) {
+                accNotValid.forEach((e) => {
+                  not_valid.push({
+                    kode: el.KODE,
+                    message: `Akun ${e.acc} tidak ditemukan`,
+                  });
+                });
+              }
             }
-          }
-        });
+          });
+        }
 
         console.log(new_memorial);
 
@@ -433,19 +507,48 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
           });
         });
 
-        addMemoImport(new_memorial, () => {
+        if (new_memorial.length) {
+          addMemoImport(
+            new_memorial,
+            () => {
+              setTimeout(() => {
+                toast.current.show({
+                  severity: "info",
+                  summary: "Berhasil",
+                  detail: "Data berhasil diimport",
+                  life: 3000,
+                });
+                getMemorial(true);
+                // lazyTable.current.refresh()
+                picker.current.value = null;
+                progressBar.current.style.display = "none";
+              }, 1000);
+            },
+            () => {
+              setTimeout(() => {
+                toast.current.show({
+                  severity: "error",
+                  summary: "Gagal",
+                  detail: "Gagal melakukan import",
+                  life: 3000,
+                });
+                picker.current.value = null;
+                progressBar.current.style.display = "none";
+              }, 1000);
+            }
+          );
+        } else {
           setTimeout(() => {
             toast.current.show({
-              severity: "info",
-              summary: "Berhasil",
-              detail: "Data berhasil diimport",
+              severity: "error",
+              summary: "Gagal",
+              detail: "Tidak ada data untuk diimport",
               life: 3000,
             });
-            getMemorial(true);
             picker.current.value = null;
             progressBar.current.style.display = "none";
           }, 1000);
-        });
+        }
       };
 
       reader.readAsArrayBuffer(file);

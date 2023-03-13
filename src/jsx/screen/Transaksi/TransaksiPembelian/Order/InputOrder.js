@@ -282,6 +282,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
+
   const getSupplier = async () => {
     const config = {
       ...endpoints.supplier,

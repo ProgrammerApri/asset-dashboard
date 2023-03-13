@@ -62,6 +62,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
   const product = useSelector((state) => state.product.product);
   const [satuan, setSatuan] = useState(null);
   const [supplier, setSupplier] = useState(null);
+  const [comp, setComp] = useState(null);
   const [doubleClick, setDoubleClick] = useState(false);
   const rp = useSelector((state) => state.rp.current);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -79,12 +80,31 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
       left: 0,
       behavior: "smooth",
     });
+    getComp();
     getPusatBiaya();
     getProduk();
     getJasa();
     getSatuan();
     getSupplier();
   }, []);
+
+  const getComp = async () => {
+    const config = {
+      ...endpoints.getCompany,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setComp(data);
+      }
+    } catch (error) {}
+  };
 
   const getPusatBiaya = async () => {
     const config = {
@@ -465,6 +485,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
   };
 
   const body = () => {
+    let date = new Date(comp?.year_co, comp?.cutoff - 1, 31);
     return (
       <>
         <Toast ref={toast} />
@@ -506,6 +527,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
               placeholder={tr[localStorage.getItem("language")].pilih_tgl}
               error={error?.date}
               showIcon
+              minDate={date}
             />
           </div>
 

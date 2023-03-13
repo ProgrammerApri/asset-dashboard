@@ -26,6 +26,11 @@ const defError = {
   nil: false,
 };
 
+const tipe = [
+  { name: "Nota Debit", code: "ND" },
+  { name: "Nota Kredit", code: "NK" },
+];
+
 const KoreksiAPInput = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
   const [error, setError] = useState(defError);
@@ -57,11 +62,11 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
   const isValid = () => {
     let valid = false;
     let errors = {
-      code: !kh.kh_code || kh.kh_code === "",
-      date: !kh.kh_date || kh.kh_date === "",
+      code: !kh.code || kh.code === "",
+      date: !kh.date || kh.date === "",
       sup: !kh.sup_id,
       akn: !kh.acc_lwn,
-      nil: !kh.nilai || kh.nilai === "",
+      nil: !kh.value || kh.value === "",
     };
 
     setError(errors);
@@ -110,9 +115,11 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
         const { data } = response;
         let filt = [];
         data.forEach((el) => {
-          if (!el.lunas) {
-            filt.push(el);
-          }
+          // if (el.trx_dbcr == "k") {
+            if (!el.lunas) {
+              filt.push(el);
+            }
+          // }
         });
 
         setApcard(data);
@@ -122,6 +129,9 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
             i === filt.findIndex((ek) => el?.sup_id?.id === ek?.sup_id?.id)
         );
         setSupplier(grouped);
+
+        console.log("==============sup");
+        console.log(grouped);
       }
     } catch (error) {
       console.log(error);
@@ -160,56 +170,10 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
-  const getRp = async () => {
-    const config = {
-      ...endpoints.rPurchase,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        let filt = [];
-        data.forEach((elem) => {
-          if (elem.status === 0) {
-            filt.push(elem);
-            elem.rprod.forEach((el) => {
-              el.order = el.order ?? 0;
-              if (el.order === 0 || el.request - el.order !== 0) {
-                el.prod_id = el.prod_id.id;
-                el.unit_id = el.unit_id.id;
-              }
-            });
-            elem.rjasa.forEach((element) => {
-              element.jasa_id = element.jasa_id.id;
-              element.unit_id = element.unit_id.id;
-            });
-            elem.rjasa.push({
-              id: 0,
-              preq_id: elem.id,
-              sup_id: null,
-              jasa_id: null,
-              unit_id: null,
-              qty: null,
-              price: null,
-              disc: null,
-              total: null,
-            });
-          }
-        });
-        console.log(data);
-        setRequest(filt);
-      }
-    } catch (error) {}
-  };
-
   const editKH = async () => {
     const config = {
-      ...endpoints.editKH,
-      endpoint: endpoints.editKH.endpoint + kh.id,
+      ...endpoints.editKorHut,
+      endpoint: endpoints.editKorHut.endpoint + kh.id,
       data: kh,
     };
     console.log(config.data);
@@ -235,7 +199,7 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
 
   const addKH = async () => {
     const config = {
-      ...endpoints.addKH,
+      ...endpoints.addKorHut,
       data: kh,
     };
     console.log(config.data);
@@ -294,6 +258,17 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
+  const cekType = (value) => {
+    let selected = {};
+    tipe?.forEach((element) => {
+      if (value === element.code) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
   const onSubmit = () => {
     if (isValid()) {
       if (isEdit) {
@@ -325,13 +300,6 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
     });
   };
 
-  const header = () => {
-    return (
-      <h4 className="mb-4">
-        <b>Koreksi Hutang</b>
-      </h4>
-    );
-  };
 
   const body = () => {
     return (
@@ -343,9 +311,9 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
           <div className="col-3">
             <PrimeInput
               label={"No. Referensi Koreksi"}
-              value={kh.kh_code}
+              value={kh.code}
               onChange={(e) => {
-                updateKH({ ...kh, kh_code: e.target.value });
+                updateKH({ ...kh, code: e.target.value });
 
                 let newError = error;
                 newError.code = false;
@@ -359,9 +327,9 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
           <div className="col-2">
             <PrimeCalendar
               label={"Tanggal"}
-              value={new Date(`${kh.kh_date}Z`)}
+              value={new Date(`${kh.date}Z`)}
               onChange={(e) => {
-                updateKH({ ...kh, kh_date: e.value });
+                updateKH({ ...kh, date: e.value });
 
                 let newError = error;
                 newError.date = false;
@@ -396,11 +364,19 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
               onChange={(e) => {
                 let t_hutang = 0;
                 apcard?.forEach((element) => {
-                  if (element.sup_id?.id === e.value?.sup_id?.id) {
-                    if (element.trx_dbcr === "k") {
-                      t_hutang += element.trx_amnh;
+                  if (element.sup_id?.id === e.value?.sup_id?.id && !element.lunas) {
+                    if (e.value?.sup_id?.sup_curren !== null) {
+                      if (element.trx_dbcr === "k") {
+                        t_hutang += element.trx_amnv;
+                      } else {
+                        t_hutang -= element.trx_amnv;
+                      }
                     } else {
-                      t_hutang -= element.trx_amnh;
+                      if (element.trx_dbcr === "k") {
+                        t_hutang += element.trx_amnh;
+                      } else {
+                        t_hutang -= element.trx_amnh;
+                      }
                     }
                   }
                 });
@@ -408,6 +384,9 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
                   ...kh,
                   sup_id: e?.value?.sup_id?.id ?? null,
                   total_hut: t_hutang,
+                  hut_fc: e?.value?.sup_id?.sup_curren
+                    ? t_hutang * curr(e?.value?.sup_id?.sup_curren)?.rate
+                    : 0,
                 });
 
                 let newError = error;
@@ -427,12 +406,12 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
             <label className="text-label">Tipe Koreksi</label>
             <div className="p-inputgroup">
               <Dropdown
-                value={kh.type && kh.type}
-                options={rp}
+                value={kh.tipe && cekType(kh.tipe)}
+                options={tipe}
                 onChange={(e) => {
                   updateKH({
                     ...kh,
-                    type: e.value.id,
+                    tipe: e.value?.code,
                   });
                 }}
                 optionLabel="name"
@@ -468,48 +447,104 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
             <label className="text-label">Keterangan </label>
             <div className="p-inputgroup">
               <InputText
-                value={kh.ket}
-                onChange={(e) => updateKH({ ...kh, ket: e.target.value })}
+                value={kh.desc}
+                onChange={(e) => updateKH({ ...kh, desc: e.target.value })}
                 placeholder="Keterangan"
               />
             </div>
           </div>
-          <div className="col-1">
-            <PrimeInput
-              label={"Mata Uang"}
-              value={kh.nilai}
-              placeholder="Mata Uang"
-              disabled
-            />
-          </div>
-          <div className="col-2">
-            <PrimeNumber
-              price
-              label={"Nilai Hutang"}
-              value={kh.total_hut}
-              placeholder="0"
-              type="number"
-              min={0}
-              disabled
-            />
-          </div>
-          <div className="col-2">
-            <PrimeNumber
-              price
-              label={"Nilai"}
-              value={kh.nilai}
-              onChange={(e) => {
-                updateKH({ ...kh, nilai: e.target.value });
 
-                let newError = error;
-                newError.nil = false;
-                setError(newError);
-              }}
+          <div className="col-1 mt-3" hidden={kh?.sup_id == null}>
+            <PrimeInput
+              price
+              label={"Mata Uang"}
+              value={
+                kh.sup_id
+                  ? supp(kh?.sup_id)?.sup_curren
+                    ? curr(supp(kh?.sup_id)?.sup_curren)?.code
+                    : "IDR"
+                  : ""
+              }
               placeholder="0"
               type="number"
               min={0}
-              error={error?.nil}
+              disabled
             />
+          </div>
+
+          <div className="col-2 mt-3" hidden={kh?.sup_id == null}>
+            {supp(kh?.sup_id)?.sup_curren ? (
+              <PrimeNumber
+                label={"Nilai Hutang"}
+                value={kh.total_hut}
+                placeholder="0"
+                type="number"
+                min={0}
+                disabled
+              />
+            ) : (
+              <PrimeNumber
+                price
+                label={"Nilai Hutang"}
+                value={kh.total_hut}
+                placeholder="0"
+                type="number"
+                min={0}
+                disabled
+              />
+            )}
+          </div>
+
+          <div
+            className="col-2 mt-3"
+            hidden={kh?.sup_id == null || supp(kh?.sup_id)?.sup_curren == null}
+          >
+            <PrimeNumber
+              price
+              label={"Foreign Currency"}
+              value={kh.hut_fc}
+              placeholder="0"
+              type="number"
+              min={0}
+              disabled
+            />
+          </div>
+
+          <div className="col-2 mt-3">
+            {supp(kh?.sup_id)?.sup_curren != null ? (
+              <PrimeNumber
+                label={"Nilai Koreksi"}
+                value={kh.value}
+                onChange={(e) => {
+                  updateKH({ ...kh, value: e.target.value });
+
+                  let newError = error;
+                  newError.nil = false;
+                  setError(newError);
+                }}
+                placeholder="0"
+                type="number"
+                min={0}
+                error={error?.nil}
+              />
+            ) : (
+              <PrimeNumber
+                price
+                label={"Nilai Koreksi"}
+                value={kh.value}
+                onChange={(e) => {
+                  updateKH({ ...kh, value: e.value });
+
+                  let newError = error;
+                  newError.nil = false;
+                  setError(newError);
+                }}
+                placeholder="0"
+                type="number"
+                min={0}
+                error={error?.nil}
+              />
+            )}
           </div>
           {/* kode suplier otomatis keluar, karena sudah melekat di faktur pembelian  */}
         </Row>

@@ -10,6 +10,7 @@ import Menu from "./Menu";
 import InputPengguna from "./SetupPenggunaa/InputPengguna";
 import Pengguna from "./SetupPenggunaa/Pengguna";
 import SetupPenggunaa from "./SetupPenggunaa";
+import SetupSaldoAkhir from "./SetupSaldoAkhir";
 
 const Setup = () => {
   return (
@@ -37,6 +38,9 @@ const Setup = () => {
       </TabPanel>
       <TabPanel header="Setup P/L">
         <SetupPnl/>
+      </TabPanel>
+      <TabPanel header="Setup Saldo Akhir">
+        <SetupSaldoAkhir/>
       </TabPanel>
     </TabView>
   );

@@ -71,6 +71,8 @@ import { useDispatch } from "react-redux";
 import { SET_CURRENT_PROFILE } from "src/redux/actions";
 import { ProgressBar } from "primereact/progressbar";
 import SaldoAwal from "./screen/SaldoAwal";
+import Posting from "./screen/Posting/PostingGl";
+import SaldoAkhir from "./screen/Transaksi/SaldoAkhir/SaldoAkhir";
 
 const Markup = ({ width }) => {
   const routes = [
@@ -145,6 +147,12 @@ const Markup = ({ width }) => {
 
     { url: "saldo-awal", component: SaldoAwal },
     { url: "saldo-awal/:active", component: SaldoAwal },
+
+    { url: "saldo-akhir", component: SaldoAkhir },
+    { url: "saldo-akhir/:active", component: SaldoAkhir },
+
+    { url: "posting", component: Posting },
+    { url: "posting/:active", component: Posting },
   ];
 
   const body = document.querySelector("body");

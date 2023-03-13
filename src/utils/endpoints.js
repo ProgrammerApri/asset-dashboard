@@ -1438,6 +1438,31 @@ const endpoints = {
     data: {},
   },
 
+  // Koreksi Hutang
+  korHut: {
+    endpoint: "/v1/api/koreksi-hut",
+    method: "GET",
+    data: {},
+  },
+
+  addKorHut: {
+    endpoint: "/v1/api/koreksi-hut",
+    method: "POST",
+    data: {},
+  },
+
+  editKorHut: {
+    endpoint: "/v1/api/koreksi-hut/",
+    method: "PUT",
+    data: {},
+  },
+
+  delKorHut: {
+    endpoint: "/v1/api/koreksi-hut/",
+    method: "DELETE",
+    data: {},
+  },
+
   // Saldo Awal GL
   saldo_sa_gl: {
     endpoint: "/v1/api/saldo-awal-gl",
@@ -1523,6 +1548,75 @@ const endpoints = {
   delSA_ar: {
     endpoint: "/v1/api/saldo-awal-ar/",
     method: "DELETE",
+    data: {},
+  },
+
+  // Posting
+  posting_ym: {
+    endpoint: "/v1/api/posting/ym",
+    method: "GET",
+    data: {},
+  },
+
+  posting: {
+    endpoint: "/v1/api/posting",
+    method: "GET",
+    data: {},
+  },
+
+  addPost: {
+    endpoint: "/v1/api/posting",
+    method: "POST",
+    data: {},
+  },
+
+  unpost: {
+    endpoint: "/v1/api/saldo-awal-ar/",
+    method: "GET",
+    data: {},
+  },
+
+  transferGl: {
+    endpoint: "/v1/api/posting/transfer",
+    method: "POST",
+    data: {},
+  },
+
+  closing: {
+    endpoint: "/v1/api/closing/",
+    method: "GET",
+    data: {},
+  },
+
+  // Setup Saldo Akhir
+  getSetupSa: {
+    endpoint: "/v1/api/setup/saldo-akhir",
+    method: "GET",
+    data: {},
+  },
+
+  addSetupSa: {
+    endpoint: "/v1/api/setup/saldo-akhir",
+    method: "POST",
+    data: {},
+  },
+
+  editSetupSa: {
+    endpoint: "/v1/api/setup/saldo-akhir/",
+    method: "PUT",
+    data: {},
+  },
+
+  // Saldo Akhir
+  saldoAkhir: {
+    endpoint: "/v1/api/saldo-akhir",
+    method: "GET",
+    data: {},
+  },
+
+  addSaldoAkhir: {
+    endpoint: "/v1/api/saldo-akhir",
+    method: "POST",
     data: {},
   },
 };

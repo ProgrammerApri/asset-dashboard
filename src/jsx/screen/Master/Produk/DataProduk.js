@@ -21,6 +21,10 @@ import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { Divider } from "@material-ui/core";
 import { tr } from "src/data/tr";
+import { ProgressBar } from "primereact/progressbar";
+import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
+import formatIdr from "src/utils/formatIdr";
+import { useDispatch, useSelector } from "react-redux";
 
 const def = {
   id: null,
@@ -41,6 +45,7 @@ const def = {
   lt_stock: null,
   max_order: null,
   image: null,
+  ns: null
 };
 
 const type = [
@@ -79,9 +84,11 @@ const DataProduk = ({
   edit,
   del,
 }) => {
+  const product = useSelector((state) => state.product);
   const [group, setGroup] = useState(null);
   const [unit, setUnit] = useState(null);
   const [suplier, setSupplier] = useState(null);
+  const [histori, setHistori] = useState(null);
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
   const [displayDel, setDisplayDel] = useState(false);
@@ -97,12 +104,23 @@ const DataProduk = ({
   const picker = useRef(null);
   const [file, setFile] = useState(null);
   const [error, setError] = useState(defError);
+  const progressBar = useRef(null);
+  const [progress, setProgress] = useState(0);
+  const [detail, setDetail] = useState(null);
+  const [showDetail, setShowDetail] = useState(false);
+  const [expandedRows, setExpandedRows] = useState(null);
+  const dispatch = useDispatch();
 
   useEffect(() => {
+    if (!popUp) {
+      progressBar.current.style.display = "none";
+    }
+
     initFilters1();
     getGroup();
     getUnit();
     getSupplier();
+    getHistori();
   }, []);
 
   const getGroup = async () => {
@@ -162,6 +180,28 @@ const DataProduk = ({
           sup.push(element.supplier);
         });
         setSupplier(sup);
+      }
+    } catch (error) {}
+  };
+
+  const getHistori = async () => {
+    const config = {
+      ...endpoints.price_history,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        // let his = [];
+        // data.forEach((elem) => {
+        //   if (elem.product.id === t.id) {
+        //     his.push(elem);
+        //   }
+        // });
+        setHistori(data);
       }
     } catch (error) {}
   };
@@ -353,7 +393,17 @@ const DataProduk = ({
     return (
       // <React.Fragment>
       <div className="d-flex">
-        {edit && <Link
+        <Link
+          onClick={() => {
+            setShowDetail(true);
+            setDetail(data);
+          }}
+          className="btn btn-info shadow btn-xs sharp ml-1"
+        >
+          <i className="bx bx-show mt-1"></i>
+        </Link>
+        {/* {edit &&  */}
+        <Link
           onClick={() => {
             console.log(data);
             setEdit(true);
@@ -364,21 +414,22 @@ const DataProduk = ({
           className="btn btn-primary shadow btn-xs sharp ml-1"
         >
           <i className="fa fa-pencil"></i>
-        </Link>}
+        </Link>
+        {/* } */}
 
-        {del && (
-          <Link
-            onClick={() => {
-              setEdit(true);
-              setDisplayDel(true);
-              setCurrentItem(data);
-              onInput(true);
-            }}
-            className="btn btn-danger shadow btn-xs sharp ml-1"
-          >
-            <i className="fa fa-trash"></i>
-          </Link>
-        )}
+        {/* {del && ( */}
+        <Link
+          onClick={() => {
+            setEdit(true);
+            setDisplayDel(true);
+            setCurrentItem(data);
+            onInput(true);
+          }}
+          className="btn btn-danger shadow btn-xs sharp ml-1"
+        >
+          <i className="fa fa-trash"></i>
+        </Link>
+        {/* )} */}
       </div>
       // </React.Fragment>
     );
@@ -508,28 +559,55 @@ const DataProduk = ({
 
   const renderHeader = () => {
     return (
-      <div className="flex justify-content-between">
-        <span className="p-input-icon-left">
-          <i className="pi pi-search" />
-          <InputText
-            value={globalFilterValue1}
-            onChange={onGlobalFilterChange1}
-            placeholder={tr[localStorage.getItem("language")].cari}
-          />
-        </span>
-        {edit && (
-          <PrimeSingleButton
-            label={tr[localStorage.getItem("language")].tambh}
-            icon={<i class="bx bx-plus px-2"></i>}
-            onClick={() => {
-              setEdit(false);
-              setCurrentItem(def);
-              setDisplayData(true);
-              onInput(true);
-            }}
-          />
+      <Row>
+        <div className="flex justify-content-between col-12">
+          <span className="p-input-icon-left">
+            <i className="pi pi-search" />
+            <InputText
+              value={globalFilterValue1}
+              onChange={onGlobalFilterChange1}
+              placeholder={tr[localStorage.getItem("language")].cari}
+            />
+          </span>
+          {/* {edit && ( */}
+          <Row className="mr-1">
+            {popUp ? (
+              <></>
+            ) : (
+              <PrimeSingleButton
+                className="mr-3"
+                label="Import"
+                icon={<i className="pi pi-file-excel px-2"></i>}
+                onClick={(e) => {
+                  confirmImport(e);
+                }}
+              />
+            )}
+            <PrimeSingleButton
+              label={tr[localStorage.getItem("language")].tambh}
+              icon={<i class="bx bx-plus px-2"></i>}
+              onClick={() => {
+                setEdit(false);
+                setCurrentItem(def);
+                setDisplayData(true);
+                onInput(true);
+                // getSetupWip();
+              }}
+            />
+          </Row>
+          {/* )} */}
+        </div>
+        {popUp ? (
+          <></>
+        ) : (
+          <div className="col-12" ref={progressBar}>
+            <ProgressBar
+              mode="indeterminate"
+              style={{ height: "6px" }}
+            ></ProgressBar>
+          </div>
         )}
-      </div>
+      </Row>
     );
   };
 
@@ -599,14 +677,99 @@ const DataProduk = ({
     );
   };
 
-  const getType = (nilai) => {
-    let typ = {};
-    type.forEach((element) => {
-      if (nilai === element.id) {
-        typ = element;
-      }
+  const confirmImport = (event) => {
+    // console.log(event);
+    confirmPopup({
+      target: event.currentTarget,
+      message: "Anda yakin ingin mengimport ?",
+      icon: "pi pi-exclamation-triangle",
+      accept: () => {
+        picker?.current?.click();
+      },
     });
-    return typ;
+  };
+
+  const processExcel = (file) => {
+    import("xlsx").then((xlsx) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const wb = xlsx.read(e.target.result, { type: "array" });
+        const wsname = wb.SheetNames[0];
+        const ws = wb.Sheets[wsname];
+        const data = xlsx.utils.sheet_to_json(ws, { header: 1 });
+
+        // Prepare DataTable
+        const cols = data[0];
+        data.shift();
+
+        let _importedData = data.map((d) => {
+          return cols.reduce((obj, c, i) => {
+            obj[c] = d[i];
+            return obj;
+          }, {});
+        });
+
+        _importedData = _importedData.filter((el) => el?.group_id);
+
+        progressBar.current.style.display = "";
+        let totalData = _importedData.length;
+        let prod = [];
+        let val = progress;
+
+        _importedData.forEach((el) => {
+          prod?.push({
+            code: el.code,
+            name: el.name,
+            group: el.group_id,
+            unit: el.unit_id,
+            type: null,
+            codeb: null,
+            suplier: null,
+            b_price: null,
+            s_price: null,
+            barcode: null,
+            metode: 1,
+            max_stock: null,
+            min_stock: null,
+            re_stock: null,
+            lt_stock: null,
+            max_order: null,
+            ns: false,
+            image: null,
+          });
+        });
+
+        addProdImport(prod, () => {
+          setTimeout(() => {
+            toast.current.show({
+              severity: "info",
+              summary: "Berhasil",
+              detail: "Data berhasil diperbarui",
+              life: 3000,
+            });
+            onSuccessInput(true);
+            picker.current.value = null;
+            progressBar.current.style.display = "none";
+          }, 1000);
+        });
+      };
+
+      reader.readAsArrayBuffer(file);
+    });
+  };
+
+  const addProdImport = async (data, onSuccess) => {
+    const config = {
+      ...endpoints.addProdImport,
+      data: { prod: data },
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      if (response.status) {
+        onSuccess();
+      }
+    } catch ({ error }) {}
   };
 
   const getMetodeHPP = (value) => {
@@ -657,13 +820,126 @@ const DataProduk = ({
     return valid;
   };
 
+  const formatDate = (date) => {
+    var d = new Date(`${date}Z`),
+      month = "" + (d.getMonth() + 1),
+      day = "" + d.getDate(),
+      year = d.getFullYear();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+
+    return [day, month, year].join("-");
+  };
+
+  const renderFooterDetail = () => {
+    return (
+      <div>
+        <PButton
+          label={tr[localStorage.getItem("language")].batal}
+          onClick={() => {
+            setShowDetail(false);
+            onInput(false);
+          }}
+          // className="p-button-text btn-primary"
+        />
+      </div>
+    );
+  };
+
+  const rowExpansionTemplate = (data) => {
+    let grouped = data?.history?.filter(
+      (el, i) =>
+        i ===
+        data?.history?.findIndex((ek) => el?.supplier.id === ek?.supplier.id)
+    );
+
+    grouped?.forEach((el) => {
+      el.hist = [];
+      data?.history?.forEach((ek) => {
+        if (el.supplier.id === ek.supplier.id) {
+          el.hist.push(ek);
+        }
+      });
+    });
+
+    return (
+      <div className="">
+        <DataTable
+          value={grouped}
+          responsiveLayout="scroll"
+          emptyMessage="Tidak ada histori"
+          expandedRows={expandedRows}
+          onRowToggle={(e) => setExpandedRows(e.data)}
+          rowExpansionTemplate={rowDetailExpansion}
+        >
+          <Column expander style={{ width: "1em" }} />
+          <Column
+            header="Supplier"
+            style={{ width: "31rem" }}
+            field={(e) => `${e.supplier.sup_code} - ${e.supplier.sup_name}`}
+          />
+          <Column
+            header="Harga Beli"
+            style={{ width: "10rem" }}
+            field={(e) =>
+              formatIdr(
+                e.hist.filter(
+                  (el) =>
+                    new Date(`${el.order.ord_date}Z`).getTime() ===
+                    new Date(
+                      Math.max(
+                        ...e.hist?.map((o) => new Date(`${o.order.ord_date}Z`))
+                      )
+                    ).getTime()
+                )[0]?.price
+              ) ?? "-"
+            }
+          />
+        </DataTable>
+      </div>
+    );
+  };
+
+  const rowDetailExpansion = (data) => {
+    console.log(data);
+    return (
+      <div className="">
+        <DataTable
+          value={data.hist}
+          responsiveLayout="scroll"
+          emptyMessage="Tidak ada histori"
+        >
+          <Column
+            header="Kode Transaksi"
+            style={{ width: "20rem" }}
+            field={(e) => `${e.order.ord_code}`}
+          />
+          <Column
+            header="Tanggal Transaksi"
+            style={{ width: "20rem" }}
+            field={(e) => formatDate(e.order.ord_date)}
+          />
+          <Column
+            header="Harga Beli"
+            style={{ width: "10rem" }}
+            field={(e) => formatIdr(e.price)}
+          />
+        </DataTable>
+      </div>
+    );
+  };
+
   const renderBody = () => {
     return (
       <>
         <Toast ref={toast} />
         <DataTable
           responsiveLayout="scroll"
-          value={data}
+          value={product.list?.map((v) => ({
+            ...v,
+            history: histori?.filter((el) => v?.id === el.product?.id),
+          }))}
           className="display w-150 datatable-wrapper"
           showGridlines
           dataKey="id"
@@ -722,15 +998,15 @@ const DataProduk = ({
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
-          {(edit || del) && (
-            <Column
-              header="Action"
-              dataType="boolean"
-              bodyClassName="text-center"
-              style={{ minWidth: "2rem" }}
-              body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
-            />
-          )}
+          {/* {(edit || del) && ( */}
+          <Column
+            header="Action"
+            dataType="boolean"
+            bodyClassName="text-center"
+            style={{ minWidth: "2rem" }}
+            body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
+          />
+          {/* )} */}
         </DataTable>
       </>
     );
@@ -805,10 +1081,11 @@ const DataProduk = ({
                     value={currentItem !== null ? currentItem.group : null}
                     options={group}
                     onChange={(e) => {
-                      console.log(e.value);
+                      console.log(e.target?.value?.stok);
                       setCurrentItem({
                         ...currentItem,
-                        group: e.target.value,
+                        group: e.target.value ?? null,
+                        ns: !e.target?.value?.stok,
                       });
                       let newError = error;
                       newError[0].group = false;
@@ -824,30 +1101,32 @@ const DataProduk = ({
                 </div>
 
                 <div className="col-4">
-                  <PrimeDropdown
+                  <PrimeInput
                     label={tr[localStorage.getItem("language")].type_prod}
                     value={
-                      currentItem !== null && currentItem.type !== null
-                        ? getType(currentItem.type)
-                        : null
+                      currentItem !== null && currentItem.ns !== null
+                        ? currentItem.ns === true
+                          ? "Non Stock"
+                          : "Stock"
+                        : ""
                     }
-                    options={type}
-                    onChange={(e) => {
-                      console.log(e.value);
-                      setCurrentItem({
-                        ...currentItem,
-                        type: e.value.id,
-                      });
-                      let newError = error;
-                      newError[0].type = false;
-                      setError(newError);
-                    }}
+                    // onChange={(e) => {
+                    //   console.log(e.value);
+                    //   setCurrentItem({
+                    //     ...currentItem,
+                    //     type: e.value.id,
+                    //   });
+                    //   let newError = error;
+                    //   newError[0].type = false;
+                    //   setError(newError);
+                    // }}
                     optionLabel="name"
                     filter
                     filterBy="name"
                     placeholder={tr[localStorage.getItem("language")].pilih}
-                    errorMessage="Tipe Produk Belum Dipilih"
-                    error={error[0]?.type}
+                    // errorMessage="Tipe Produk Belum Dipilih"
+                    // error={error[0]?.type}
+                    disabled
                   />
                 </div>
 
@@ -1182,6 +1461,19 @@ const DataProduk = ({
             <span>{tr[localStorage.getItem("language")].pesan_hapus}</span>
           </div>
         </Dialog>
+
+        <Dialog
+          header={"History Supplier"}
+          visible={showDetail}
+          style={{ width: "45vw" }}
+          footer={renderFooterDetail()}
+          onHide={() => {
+            setShowDetail(false);
+            onInput(false);
+          }}
+        >
+          {rowExpansionTemplate(detail)}
+        </Dialog>
       </>
     );
   };
@@ -1206,6 +1498,20 @@ const DataProduk = ({
   } else {
     return (
       <>
+        <ConfirmPopup />
+        <input
+          type="file"
+          id="file"
+          ref={picker}
+          accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          style={{ display: "none" }}
+          onChange={(e) => {
+            console.log(e.target.value);
+            // setFile(e.target.files[0]);
+            const file = e.target.files[0];
+            processExcel(file);
+          }}
+        />
         {renderBody()}
         {renderDialog()}
       </>

@@ -144,7 +144,7 @@ const KoreksiAPList = ({ onAdd, onEdit }) => {
                 date: null,
                 sup_id: null,
                 acc_lwn: null,
-                tIpe: null,
+                tipe: null,
                 value: null,
                 due_date: null,
                 desc: null,

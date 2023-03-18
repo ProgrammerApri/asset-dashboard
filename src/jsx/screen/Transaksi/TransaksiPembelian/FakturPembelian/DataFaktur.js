@@ -165,7 +165,7 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
           getFK(true);
           toast.current.show({
             severity: "info",
-            summary: tr[localStorage.getItem("language")].berhasl,
+            summary: tr[localStorage.getItem("language")].berhsl,
             detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
@@ -605,7 +605,7 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
       </Row>
 
       <Dialog
-        header={tr[localStorage.getItem("language")].hapus_data}
+        header={"Hapus Faktur"}
         visible={displayDel}
         style={{ width: "30vw" }}
         footer={renderFooterDel("displayDel")}

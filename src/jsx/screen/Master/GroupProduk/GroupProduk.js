@@ -20,6 +20,7 @@ import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { InputSwitch } from "primereact/inputswitch";
 import { tr } from "src/data/tr";
+import { SelectButton } from "primereact/selectbutton";
 
 const def = {
   groupPro: {
@@ -27,6 +28,7 @@ const def = {
     code: null,
     name: null,
     wip: false,
+    stok: true,
     div_code: null,
     acc_sto: null,
     acc_send: null,
@@ -36,6 +38,7 @@ const def = {
     potongan: null,
     pengembalian: null,
     selisih: null,
+    biaya: null,
   },
 
   divisi: {
@@ -61,7 +64,13 @@ const defError = [
     acc_7: false,
     acc_8: false,
     acc_9: false,
+    biaya: false,
   },
+];
+
+const tipe = [
+  { name: "Stock", code: true },
+  { name: "Non Stock", code: false },
 ];
 
 const DataGroupProduk = ({
@@ -173,6 +182,7 @@ const DataGroupProduk = ({
         code: currentItem?.groupPro?.code ?? null,
         name: currentItem?.groupPro?.name ?? null,
         div_code: currentItem?.divisi?.id ?? null,
+        stok: currentItem?.groupPro?.stok ?? null,
         wip: currentItem?.groupPro?.wip ?? null,
         acc_sto: currentItem?.groupPro?.acc_sto ?? null,
         acc_send: currentItem?.groupPro?.acc_send ?? null,
@@ -183,6 +193,7 @@ const DataGroupProduk = ({
         potongan: currentItem?.groupPro?.potongan ?? null,
         pengembalian: currentItem?.groupPro?.pengembalian ?? null,
         selisih: currentItem?.groupPro?.selisih ?? null,
+        biaya: currentItem?.groupPro?.biaya ?? null,
       },
     };
     console.log(config.data);
@@ -225,6 +236,7 @@ const DataGroupProduk = ({
         code: currentItem?.groupPro?.code ?? null,
         name: currentItem?.groupPro?.name ?? null,
         div_code: currentItem?.divisi?.id ?? null,
+        stok: currentItem?.groupPro?.stok ?? null,
         wip: currentItem?.groupPro?.wip ?? null,
         acc_sto: currentItem?.groupPro?.acc_sto ?? null,
         acc_send: currentItem?.groupPro?.acc_send ?? null,
@@ -235,6 +247,7 @@ const DataGroupProduk = ({
         potongan: currentItem?.groupPro?.potongan ?? null,
         pengembalian: currentItem?.groupPro?.pengembalian ?? null,
         selisih: currentItem?.groupPro?.selisih ?? null,
+        biaya: currentItem?.groupPro?.biaya ?? null,
       },
     };
     console.log(config.data);
@@ -328,30 +341,34 @@ const DataGroupProduk = ({
     return (
       // <React.Fragment>
       <div className="d-flex">
-        {edit && <Link
-          onClick={() => {
-            console.log(data);
-            setEdit(true);
-            onClick("displayData", data);
-            setCurrentItem(data);
-            onInput(true);
-          }}
-          className="btn btn-primary shadow btn-xs sharp ml-1"
-        >
-          <i className="fa fa-pencil"></i>
-        </Link>}
+        {edit && (
+          <Link
+            onClick={() => {
+              console.log(data);
+              setEdit(true);
+              onClick("displayData", data);
+              setCurrentItem(data);
+              onInput(true);
+            }}
+            className="btn btn-primary shadow btn-xs sharp ml-1"
+          >
+            <i className="fa fa-pencil"></i>
+          </Link>
+        )}
 
-        {del && <Link
-          onClick={() => {
-            setEdit(true);
-            setDisplayDel(true);
-            setCurrentItem(data);
-            onInput(true);
-          }}
-          className="btn btn-danger shadow btn-xs sharp ml-1"
-        >
-          <i className="fa fa-trash"></i>
-        </Link>}
+        {del && (
+          <Link
+            onClick={() => {
+              setEdit(true);
+              setDisplayDel(true);
+              setCurrentItem(data);
+              onInput(true);
+            }}
+            className="btn btn-danger shadow btn-xs sharp ml-1"
+          >
+            <i className="fa fa-trash"></i>
+          </Link>
+        )}
       </div>
       // </React.Fragment>
     );
@@ -631,9 +648,9 @@ const DataGroupProduk = ({
         name: !currentItem.groupPro.name || currentItem.groupPro.name === "",
       },
       {
-        acc_1: currentItem.groupPro.wip
-          ? false
-          : !currentItem.groupPro?.acc_sto,
+        // acc_1: currentItem.groupPro.wip
+        //   ? false
+        //   : !currentItem.groupPro?.acc_sto,
         // acc_2: currentItem.groupPro.wip
         //   ? false
         //   : !currentItem.groupPro?.acc_send,
@@ -655,9 +672,13 @@ const DataGroupProduk = ({
         // acc_8: currentItem.groupPro.wip
         //   ? false
         //   : !currentItem.groupPro?.selisih,
-        acc_9: !currentItem.groupPro.wip
-          ? false
-          : !currentItem.groupPro?.acc_wip,
+        // acc_9: !currentItem.groupPro.wip
+        //   ? false
+        //   : !currentItem.groupPro?.acc_wip,
+        biaya:
+          currentItem.groupPro.stok === false
+            ? !currentItem.groupPro?.biaya
+            : false,
       },
     ];
 
@@ -847,6 +868,38 @@ const DataGroupProduk = ({
                     />
                   </div>
                 </div>
+
+                <div className="col-6">
+                  <label className="text-label">{"Tipe Persediaan"}</label>
+                  <div className="p-inputgroup">
+                    <SelectButton
+                      value={
+                        currentItem.groupPro !== null &&
+                        currentItem.groupPro.stok !== ""
+                          ? currentItem.groupPro.stok === true
+                            ? { code: true, name: "Stock" }
+                            : { code: false, name: "Non Stock" }
+                          : null
+                      }
+                      options={tipe}
+                      onChange={(e) => {
+                        setCurrentItem({
+                          ...currentItem,
+                          groupPro: {
+                            ...currentItem.groupPro,
+                            stok: e.value?.code,
+                            wip: false,
+                          },
+                        });
+                      }}
+                      optionLabel="name"
+                      filter
+                      filterBy="name"
+                      // placeholder="Pilih Divisi"
+                    />
+                  </div>
+                </div>
+
                 <div className="row mr-0 ml-0">
                   <div className="col-12">
                     {/*  */}
@@ -866,6 +919,7 @@ const DataGroupProduk = ({
                             },
                           });
                         }}
+                        disabled={currentItem.groupPro.stok === false}
                       />
                       <label className="mr-5 mt-1">{`${
                         tr[localStorage.getItem("language")].g_prod
@@ -880,345 +934,376 @@ const DataGroupProduk = ({
               header="Distribusi GL Kontrol Stock"
               headerTemplate={renderTabHeader}
             >
-              <div className="row mr-0 ml-0">
-                <div className="col-6">
-                  <PrimeDropdown
-                    label={"Akun Persediaan"}
-                    value={
-                      currentItem !== null &&
-                      currentItem.groupPro.acc_sto !== null
-                        ? gl(currentItem.groupPro.acc_sto)
-                        : null
-                    }
-                    options={account}
-                    onChange={(e) => {
-                      console.log(e.value);
-                      setCurrentItem({
-                        ...currentItem,
-                        groupPro: {
-                          ...currentItem.groupPro,
-                          acc_sto: e.value?.account?.id ?? null,
-                        },
-                      });
-                      let newError = error;
-                      newError[1].acc_1 = false;
-                      setError(newError);
-                    }}
-                    optionLabel="account.acc_name"
-                    valueTemplate={clear}
-                    itemTemplate={glTemplate}
-                    filter
-                    filterBy="account.acc_name"
-                    placeholder={tr[localStorage.getItem("language")].pilih}
-                    showClear
-                    errorMessage="Akun Persediaan Belum Dipilih"
-                    error={error[1]?.acc_1}
-                    disabled={currentItem.groupPro.wip === true}
-                  />
-                </div>
+              {currentItem && currentItem?.groupPro?.stok ? (
+                <>
+                  <div className="row mr-0 ml-0">
+                    <div className="col-6">
+                      <PrimeDropdown
+                        label={"Akun Persediaan"}
+                        value={
+                          currentItem.groupPro.acc_sto !== null
+                            ? gl(currentItem.groupPro.acc_sto)
+                            : null
+                        }
+                        options={account}
+                        onChange={(e) => {
+                          console.log(e.value);
+                          setCurrentItem({
+                            ...currentItem,
+                            groupPro: {
+                              ...currentItem.groupPro,
+                              acc_sto: e.value?.account?.id ?? null,
+                            },
+                          });
+                          let newError = error;
+                          newError[1].acc_1 = false;
+                          setError(newError);
+                        }}
+                        optionLabel="account.acc_name"
+                        valueTemplate={clear}
+                        itemTemplate={glTemplate}
+                        filter
+                        filterBy="account.acc_name"
+                        placeholder={tr[localStorage.getItem("language")].pilih}
+                        showClear
+                        errorMessage="Akun Persediaan Belum Dipilih"
+                        error={error[1]?.acc_1}
+                        disabled={currentItem.groupPro.wip === true}
+                      />
+                    </div>
 
-                <div className="col-6">
-                  <PrimeDropdown
-                    label={"Akun Pengiriman Barang"}
-                    value={
-                      currentItem !== null &&
-                      currentItem.groupPro.acc_send !== null
-                        ? gl(currentItem.groupPro.acc_send)
-                        : null
-                    }
-                    options={account}
-                    onChange={(e) => {
-                      console.log(e.value);
-                      setCurrentItem({
-                        ...currentItem,
-                        groupPro: {
-                          ...currentItem.groupPro,
-                          acc_send: e.value?.account?.id ?? null,
-                        },
-                      });
-                      let newError = error;
-                      newError[1].acc_2 = false;
-                      setError(newError);
-                    }}
-                    optionLabel="account.acc_name"
-                    valueTemplate={clear}
-                    itemTemplate={glTemplate}
-                    filter
-                    filterBy="account.acc_name"
-                    placeholder={tr[localStorage.getItem("language")].pilih}
-                    showClear
-                    // errorMessage="Akun Pengiriman Belum Dipilih"
-                    // error={error[1]?.acc_2}
-                    disabled={currentItem.groupPro.wip === true}
-                  />
-                </div>
-              </div>
+                    <div className="col-6">
+                      <PrimeDropdown
+                        label={"Akun Pengiriman Barang"}
+                        value={
+                          currentItem.groupPro.acc_send !== null
+                            ? gl(currentItem.groupPro.acc_send)
+                            : null
+                        }
+                        options={account}
+                        onChange={(e) => {
+                          console.log(e.value);
+                          setCurrentItem({
+                            ...currentItem,
+                            groupPro: {
+                              ...currentItem.groupPro,
+                              acc_send: e.value?.account?.id ?? null,
+                            },
+                          });
+                          let newError = error;
+                          newError[1].acc_2 = false;
+                          setError(newError);
+                        }}
+                        optionLabel="account.acc_name"
+                        valueTemplate={clear}
+                        itemTemplate={glTemplate}
+                        filter
+                        filterBy="account.acc_name"
+                        placeholder={tr[localStorage.getItem("language")].pilih}
+                        showClear
+                        // errorMessage="Akun Pengiriman Belum Dipilih"
+                        // error={error[1]?.acc_2}
+                        disabled={currentItem.groupPro.wip === true}
+                      />
+                    </div>
+                  </div>
 
-              <div className="row mr-0 ml-0">
-                <div className="col-6">
-                  <PrimeDropdown
-                    label={"Akun Penerimaan Barang"}
-                    value={
-                      currentItem !== null &&
-                      currentItem.groupPro.acc_terima !== null
-                        ? gl(currentItem.groupPro.acc_terima)
-                        : null
-                    }
-                    options={account}
-                    onChange={(e) => {
-                      console.log(e.value);
-                      setCurrentItem({
-                        ...currentItem,
-                        groupPro: {
-                          ...currentItem.groupPro,
-                          acc_terima: e.value?.account?.id ?? null,
-                        },
-                      });
-                      let newError = error;
-                      newError[1].acc_3 = false;
-                      setError(newError);
-                    }}
-                    optionLabel="account.acc_name"
-                    valueTemplate={clear}
-                    itemTemplate={glTemplate}
-                    filter
-                    filterBy="account.acc_name"
-                    placeholder={tr[localStorage.getItem("language")].pilih}
-                    showClear
-                    // errorMessage="Akun Penerimaan Belum Dipilih"
-                    // error={error[1]?.acc_3}
-                    disabled={currentItem.groupPro.wip === true}
-                  />
-                </div>
-                <div className="col-6">
-                  <PrimeDropdown
-                    label={"Akun WIP"}
-                    value={
-                      currentItem !== null &&
-                      currentItem.groupPro.acc_wip !== null
-                        ? gl(currentItem.groupPro.acc_wip)
-                        : null
-                    }
-                    options={wip}
-                    onChange={(e) => {
-                      console.log(e.value);
-                      setCurrentItem({
-                        ...currentItem,
-                        groupPro: {
-                          ...currentItem.groupPro,
-                          acc_wip: e.value?.account?.id ?? null,
-                        },
-                      });
-                      let newError = error;
-                      newError[1].acc_9 = false;
-                      setError(newError);
-                    }}
-                    optionLabel="account.acc_name"
-                    valueTemplate={clear}
-                    itemTemplate={glTemplate}
-                    filter
-                    filterBy="account.acc_name"
-                    placeholder={tr[localStorage.getItem("language")].pilih}
-                    showClear
-                    disabled={currentItem && !currentItem.groupPro.wip}
-                    errorMessage="Akun wip harus dipilih"
-                    error={error[1]?.acc_9}
-                  />
-                </div>
-              </div>
+                  <div className="row mr-0 ml-0">
+                    <div className="col-6">
+                      <PrimeDropdown
+                        label={"Akun Penerimaan Barang"}
+                        value={
+                          currentItem.groupPro.acc_terima !== null
+                            ? gl(currentItem.groupPro.acc_terima)
+                            : null
+                        }
+                        options={account}
+                        onChange={(e) => {
+                          console.log(e.value);
+                          setCurrentItem({
+                            ...currentItem,
+                            groupPro: {
+                              ...currentItem.groupPro,
+                              acc_terima: e.value?.account?.id ?? null,
+                            },
+                          });
+                          let newError = error;
+                          newError[1].acc_3 = false;
+                          setError(newError);
+                        }}
+                        optionLabel="account.acc_name"
+                        valueTemplate={clear}
+                        itemTemplate={glTemplate}
+                        filter
+                        filterBy="account.acc_name"
+                        placeholder={tr[localStorage.getItem("language")].pilih}
+                        showClear
+                        // errorMessage="Akun Penerimaan Belum Dipilih"
+                        // error={error[1]?.acc_3}
+                        disabled={currentItem.groupPro.wip === true}
+                      />
+                    </div>
+                    <div className="col-6">
+                      <PrimeDropdown
+                        label={"Akun WIP"}
+                        value={
+                          currentItem.groupPro.acc_wip !== null
+                            ? gl(currentItem.groupPro.acc_wip)
+                            : null
+                        }
+                        options={wip}
+                        onChange={(e) => {
+                          console.log(e.value);
+                          setCurrentItem({
+                            ...currentItem,
+                            groupPro: {
+                              ...currentItem.groupPro,
+                              acc_wip: e.value?.account?.id ?? null,
+                            },
+                          });
+                          let newError = error;
+                          newError[1].acc_9 = false;
+                          setError(newError);
+                        }}
+                        optionLabel="account.acc_name"
+                        valueTemplate={clear}
+                        itemTemplate={glTemplate}
+                        filter
+                        filterBy="account.acc_name"
+                        placeholder={tr[localStorage.getItem("language")].pilih}
+                        showClear
+                        disabled={currentItem && !currentItem.groupPro.wip}
+                        errorMessage="Akun wip harus dipilih"
+                        error={error[1]?.acc_9}
+                      />
+                    </div>
+                  </div>
 
-              <div className="col-12 p-0">
-                <div className="mt-4 ml-3 mr-3 fs-16 mb-2">
-                  <b>Informasi Akun Penjualan</b>
-                </div>
-                <Divider className="mb-2 ml-3 mr-3"></Divider>
-              </div>
+                  <div className="col-12 p-0">
+                    <div className="mt-4 ml-3 mr-3 fs-16 mb-2">
+                      <b>Informasi Akun Penjualan</b>
+                    </div>
+                    <Divider className="mb-2 ml-3 mr-3"></Divider>
+                  </div>
 
-              <div className="row mr-0 ml-0">
-                <div className="col-6">
-                  <PrimeDropdown
-                    label={"Harga Pokok Penjualan"}
-                    value={
-                      currentItem !== null &&
-                      currentItem.groupPro.hrg_pokok !== null
-                        ? gl(currentItem.groupPro.hrg_pokok)
-                        : null
-                    }
-                    options={account}
-                    onChange={(e) => {
-                      console.log(e.value);
-                      setCurrentItem({
-                        ...currentItem,
-                        groupPro: {
-                          ...currentItem.groupPro,
-                          hrg_pokok: e.value?.account?.id ?? null,
-                        },
-                      });
-                      let newError = error;
-                      newError[1].acc_4 = false;
-                      setError(newError);
-                    }}
-                    optionLabel="account.acc_name"
-                    valueTemplate={clear}
-                    itemTemplate={glTemplate}
-                    filter
-                    filterBy="account.acc_name"
-                    placeholder={tr[localStorage.getItem("language")].pilih}
-                    showClear
-                    // errorMessage="Akun HPP Belum Dipilih"
-                    // error={error[1]?.acc_4}
-                    disabled={currentItem.groupPro.wip === true}
-                  />
-                </div>
+                  <div className="row mr-0 ml-0">
+                    <div className="col-6">
+                      <PrimeDropdown
+                        label={"Harga Pokok Penjualan"}
+                        value={
+                          currentItem.groupPro.hrg_pokok !== null
+                            ? gl(currentItem.groupPro.hrg_pokok)
+                            : null
+                        }
+                        options={account}
+                        onChange={(e) => {
+                          console.log(e.value);
+                          setCurrentItem({
+                            ...currentItem,
+                            groupPro: {
+                              ...currentItem.groupPro,
+                              hrg_pokok: e.value?.account?.id ?? null,
+                            },
+                          });
+                          let newError = error;
+                          newError[1].acc_4 = false;
+                          setError(newError);
+                        }}
+                        optionLabel="account.acc_name"
+                        valueTemplate={clear}
+                        itemTemplate={glTemplate}
+                        filter
+                        filterBy="account.acc_name"
+                        placeholder={tr[localStorage.getItem("language")].pilih}
+                        showClear
+                        // errorMessage="Akun HPP Belum Dipilih"
+                        // error={error[1]?.acc_4}
+                        disabled={currentItem.groupPro.wip === true}
+                      />
+                    </div>
 
-                <div className="col-6">
-                  <PrimeDropdown
-                    label={"Penjualan"}
-                    value={
-                      currentItem !== null &&
-                      currentItem.groupPro.acc_penj !== null
-                        ? gl(currentItem.groupPro.acc_penj)
-                        : null
-                    }
-                    options={account}
-                    onChange={(e) => {
-                      console.log(e.account);
-                      setCurrentItem({
-                        ...currentItem,
-                        groupPro: {
-                          ...currentItem.groupPro,
-                          acc_penj: e.value?.account?.id ?? null,
-                        },
-                      });
-                      let newError = error;
-                      newError[1].acc_5 = false;
-                      setError(newError);
-                    }}
-                    optionLabel="account.acc_name"
-                    valueTemplate={clear}
-                    itemTemplate={glTemplate}
-                    filter
-                    filterBy="account.acc_name"
-                    placeholder={tr[localStorage.getItem("language")].pilih}
-                    showClear
-                    // errorMessage="Akun Penjualan Belum Dipilih"
-                    // error={error[1]?.acc_5}
-                    disabled={currentItem.groupPro.wip === true}
-                  />
-                </div>
-              </div>
+                    <div className="col-6">
+                      <PrimeDropdown
+                        label={"Penjualan"}
+                        value={
+                          currentItem.groupPro.acc_penj !== null
+                            ? gl(currentItem.groupPro.acc_penj)
+                            : null
+                        }
+                        options={account}
+                        onChange={(e) => {
+                          console.log(e.account);
+                          setCurrentItem({
+                            ...currentItem,
+                            groupPro: {
+                              ...currentItem.groupPro,
+                              acc_penj: e.value?.account?.id ?? null,
+                            },
+                          });
+                          let newError = error;
+                          newError[1].acc_5 = false;
+                          setError(newError);
+                        }}
+                        optionLabel="account.acc_name"
+                        valueTemplate={clear}
+                        itemTemplate={glTemplate}
+                        filter
+                        filterBy="account.acc_name"
+                        placeholder={tr[localStorage.getItem("language")].pilih}
+                        showClear
+                        // errorMessage="Akun Penjualan Belum Dipilih"
+                        // error={error[1]?.acc_5}
+                        disabled={currentItem.groupPro.wip === true}
+                      />
+                    </div>
+                  </div>
 
-              <div className="row mr-0 ml-0 mt-2">
-                <div className="col-6">
-                  <PrimeDropdown
-                    label={"Potongan Penjualan"}
-                    value={
-                      currentItem !== null &&
-                      currentItem.groupPro.potongan !== null
-                        ? gl(currentItem.groupPro.potongan)
-                        : null
-                    }
-                    options={account}
-                    onChange={(e) => {
-                      console.log(e.value);
-                      setCurrentItem({
-                        ...currentItem,
-                        groupPro: {
-                          ...currentItem.groupPro,
-                          potongan: e.value?.account?.id ?? null,
-                        },
-                      });
-                      let newError = error;
-                      newError[1].acc_6 = false;
-                      setError(newError);
-                    }}
-                    optionLabel="account.acc_name"
-                    valueTemplate={clear}
-                    itemTemplate={glTemplate}
-                    filter
-                    filterBy="account.acc_name"
-                    placeholder={tr[localStorage.getItem("language")].pilih}
-                    showClear
-                    // errorMessage="Akun Potongan Penjualan Belum Dipilih"
-                    // error={error[1]?.acc_6}
-                    disabled={currentItem.groupPro.wip === true}
-                  />
-                </div>
+                  <div className="row mr-0 ml-0 mt-2">
+                    <div className="col-6">
+                      <PrimeDropdown
+                        label={"Potongan Penjualan"}
+                        value={
+                          currentItem.groupPro.potongan !== null
+                            ? gl(currentItem.groupPro.potongan)
+                            : null
+                        }
+                        options={account}
+                        onChange={(e) => {
+                          console.log(e.value);
+                          setCurrentItem({
+                            ...currentItem,
+                            groupPro: {
+                              ...currentItem.groupPro,
+                              potongan: e.value?.account?.id ?? null,
+                            },
+                          });
+                          let newError = error;
+                          newError[1].acc_6 = false;
+                          setError(newError);
+                        }}
+                        optionLabel="account.acc_name"
+                        valueTemplate={clear}
+                        itemTemplate={glTemplate}
+                        filter
+                        filterBy="account.acc_name"
+                        placeholder={tr[localStorage.getItem("language")].pilih}
+                        showClear
+                        // errorMessage="Akun Potongan Penjualan Belum Dipilih"
+                        // error={error[1]?.acc_6}
+                        disabled={currentItem.groupPro.wip === true}
+                      />
+                    </div>
 
-                <div className="col-6">
-                  <PrimeDropdown
-                    label={"Pengembalian Penjualan"}
-                    value={
-                      currentItem !== null &&
-                      currentItem.groupPro.pengembalian !== null
-                        ? gl(currentItem.groupPro.pengembalian)
-                        : null
-                    }
-                    options={account}
-                    onChange={(e) => {
-                      console.log(e.value);
-                      setCurrentItem({
-                        ...currentItem,
-                        groupPro: {
-                          ...currentItem.groupPro,
-                          pengembalian: e.value?.account?.id ?? null,
-                        },
-                      });
-                      let newError = error;
-                      newError[1].acc_7 = false;
-                      setError(newError);
-                    }}
-                    optionLabel="account.acc_name"
-                    valueTemplate={clear}
-                    itemTemplate={glTemplate}
-                    filter
-                    filterBy="account.acc_name"
-                    placeholder={tr[localStorage.getItem("language")].pilih}
-                    showClear
-                    // errorMessage="Akun Pengembalian Belum Dipilih"
-                    // error={error[1]?.acc_7}
-                    disabled={currentItem.groupPro.wip === true}
-                  />
-                </div>
-              </div>
+                    <div className="col-6">
+                      <PrimeDropdown
+                        label={"Pengembalian Penjualan"}
+                        value={
+                          currentItem.groupPro.pengembalian !== null
+                            ? gl(currentItem.groupPro.pengembalian)
+                            : null
+                        }
+                        options={account}
+                        onChange={(e) => {
+                          console.log(e.value);
+                          setCurrentItem({
+                            ...currentItem,
+                            groupPro: {
+                              ...currentItem.groupPro,
+                              pengembalian: e.value?.account?.id ?? null,
+                            },
+                          });
+                          let newError = error;
+                          newError[1].acc_7 = false;
+                          setError(newError);
+                        }}
+                        optionLabel="account.acc_name"
+                        valueTemplate={clear}
+                        itemTemplate={glTemplate}
+                        filter
+                        filterBy="account.acc_name"
+                        placeholder={tr[localStorage.getItem("language")].pilih}
+                        showClear
+                        // errorMessage="Akun Pengembalian Belum Dipilih"
+                        // error={error[1]?.acc_7}
+                        disabled={currentItem.groupPro.wip === true}
+                      />
+                    </div>
+                  </div>
 
-              <div className="row mr-0 ml-0">
-                <div className="col-12">
-                  <PrimeDropdown
-                    label={"Selisih Harga Pokok"}
-                    value={
-                      currentItem !== null &&
-                      currentItem.groupPro.selisih !== null
-                        ? gl(currentItem.groupPro.selisih)
-                        : null
-                    }
-                    options={account}
-                    onChange={(e) => {
-                      console.log(e.value);
-                      setCurrentItem({
-                        ...currentItem,
-                        groupPro: {
-                          ...currentItem.groupPro,
-                          selisih: e.value?.account?.id ?? null,
-                        },
-                      });
-                      let newError = error;
-                      newError[1].acc_8 = false;
-                      setError(newError);
-                    }}
-                    optionLabel="account.acc_name"
-                    valueTemplate={clear}
-                    itemTemplate={glTemplate}
-                    filter
-                    filterBy="account.acc_name"
-                    placeholder={tr[localStorage.getItem("language")].pilih}
-                    showClear
-                    // errorMessage="Akun Selisih Harga Belum Dipilih"
-                    // error={error[1]?.acc_8}
-                    disabled={currentItem.groupPro.wip === true}
-                  />
+                  <div className="row mr-0 ml-0">
+                    <div className="col-12">
+                      <PrimeDropdown
+                        label={"Selisih Harga Pokok"}
+                        value={
+                          currentItem.groupPro.selisih !== null
+                            ? gl(currentItem.groupPro.selisih)
+                            : null
+                        }
+                        options={account}
+                        onChange={(e) => {
+                          console.log(e.value);
+                          setCurrentItem({
+                            ...currentItem,
+                            groupPro: {
+                              ...currentItem.groupPro,
+                              selisih: e.value?.account?.id ?? null,
+                            },
+                          });
+                          let newError = error;
+                          newError[1].acc_8 = false;
+                          setError(newError);
+                        }}
+                        optionLabel="account.acc_name"
+                        valueTemplate={clear}
+                        itemTemplate={glTemplate}
+                        filter
+                        filterBy="account.acc_name"
+                        placeholder={tr[localStorage.getItem("language")].pilih}
+                        showClear
+                        // errorMessage="Akun Selisih Harga Belum Dipilih"
+                        // error={error[1]?.acc_8}
+                        disabled={currentItem.groupPro.wip === true}
+                      />
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="row mr-0 ml-0">
+                  <div className="col-12">
+                    <PrimeDropdown
+                      label={"Akun Biaya"}
+                      value={
+                        currentItem.groupPro.biaya !== null
+                          ? gl(currentItem.groupPro.biaya)
+                          : null
+                      }
+                      options={account}
+                      onChange={(e) => {
+                        setCurrentItem({
+                          ...currentItem,
+                          groupPro: {
+                            ...currentItem.groupPro,
+                            biaya: e.value?.account?.id ?? null,
+                          },
+                        });
+                        let newError = error;
+                        newError[1].biaya = false;
+                        setError(newError);
+                      }}
+                      optionLabel="account.acc_name"
+                      valueTemplate={clear}
+                      itemTemplate={glTemplate}
+                      filter
+                      filterBy="account.acc_name"
+                      placeholder="Pilih Akun Biaya"
+                      showClear
+                      errorMessage="Akun Biaya Belum Dipilih"
+                      error={error[1]?.biaya}
+                      // disabled={currentItem.groupPro.wip === true}
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
             </TabPanel>
           </TabView>
         </Dialog>

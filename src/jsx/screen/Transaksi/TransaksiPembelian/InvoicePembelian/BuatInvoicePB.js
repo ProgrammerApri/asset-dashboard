@@ -292,7 +292,7 @@ const BuatInvoicePB = ({ onCancel, onSuccess }) => {
           setUpdate(false);
           toast.current.show({
             severity: "info",
-            summary: tr[localStorage.getItem("language")].berhasl,
+            summary: tr[localStorage.getItem("language")].berhsl,
             detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });

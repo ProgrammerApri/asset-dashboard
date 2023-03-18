@@ -1463,6 +1463,32 @@ const endpoints = {
     data: {},
   },
 
+
+  // Koreksi Piutang
+  korPiu: {
+    endpoint: "/v1/api/koreksi-piu",
+    method: "GET",
+    data: {},
+  },
+
+  addKorPiu: {
+    endpoint: "/v1/api/koreksi-piu",
+    method: "POST",
+    data: {},
+  },
+
+  editKorPiu: {
+    endpoint: "/v1/api/koreksi-piu/",
+    method: "PUT",
+    data: {},
+  },
+
+  delKorPiu: {
+    endpoint: "/v1/api/koreksi-piu/",
+    method: "DELETE",
+    data: {},
+  },
+
   // Saldo Awal GL
   saldo_sa_gl: {
     endpoint: "/v1/api/saldo-awal-gl",

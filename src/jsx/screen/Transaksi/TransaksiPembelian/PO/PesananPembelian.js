@@ -31,6 +31,8 @@ const data = {
   jasa_disc: null,
   total_disc: null,
   total_bayar: null,
+  ns: false,
+  same_sup: false,
   rprod: [],
   rjasa: [],
   psup: [],

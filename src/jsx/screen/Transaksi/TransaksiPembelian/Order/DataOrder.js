@@ -38,6 +38,7 @@ const data = {
   total_disc: null,
   total_b: null,
   total_bayar: null,
+  ns : false,
   same_sup : false,
   dprod: [],
   djasa: [],
@@ -209,7 +210,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
               type: SET_CURRENT_ODR,
               payload: {
                 ...data,
-                po_id: data?.po_id?.id ?? null,
+                po_id: data?.po_id?.id ? data?.po_id : null,
                 dep_id: data?.dep_id?.id ?? null,
                 sup_id: data?.sup_id?.id ?? null,
                 top: data?.top?.id ?? null,

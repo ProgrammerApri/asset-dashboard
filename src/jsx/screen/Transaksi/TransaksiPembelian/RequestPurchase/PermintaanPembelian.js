@@ -25,6 +25,7 @@ const data = {
   refrence: false,
   ref_sup: null,
   ref_ket: null,
+  ns: false,
   rprod: [],
   rjasa: [],
 };

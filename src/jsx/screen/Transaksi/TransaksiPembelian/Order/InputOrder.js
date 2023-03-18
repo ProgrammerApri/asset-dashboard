@@ -63,7 +63,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
   const [supplier, setSupplier] = useState(null);
   const [rulesPay, setRulesPay] = useState(null);
   const [pajak, setPajak] = useState(null);
-  const product = useSelector((state) => state.product.product);
+  const product = useSelector((state) => state.product.list);
   const [jasa, setJasa] = useState(null);
   const [satuan, setSatuan] = useState(null);
   const [lokasi, setLokasi] = useState(null);
@@ -110,7 +110,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     getSupplier();
     getRulesPay();
     getDept();
-    getProduct();
+    getProduct(order.ns);
     getJasa();
     getSatuan();
     getPjk();
@@ -282,7 +282,6 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
-
   const getSupplier = async () => {
     const config = {
       ...endpoints.supplier,
@@ -356,10 +355,9 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
         dispatch({
           type: SET_PRODUCT,
-          payload: data
-          // .filter((v) => v.group.stok === !ns)
-          ,
+          payload: data.filter((v) => v.group.stok === !ns),
         });
+
         getGrupP();
       }
     } catch (error) {}
@@ -1008,41 +1006,68 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                   updateORD({
                     ...order,
                     po_id: e.value?.id ?? null,
-                    // ns: e.value?.ns ?? false,
+                    ns: e.value?.ns ?? false,
                     top: e.value?.top?.id ?? null,
-                    due_date: result,
+                    due_date: result ?? null,
                     sup_id: e.value?.sup_id?.id ?? null,
                     dep_id: e.value?.preq_id?.req_dep?.id ?? null,
-                    split_inv: e.value?.split_inv,
+                    split_inv: e.value?.split_inv ?? false,
                     same_sup: e.value?.same_sup ?? false,
-                    dprod: e.value?.pprod.map((v) => {
-                      return {
-                        ...v,
-                        req: v.order,
-                        order: null,
-                        // remain: v?.order - v?.order,
-                        total: 0,
-                        total_fc: 0,
-                      };
-                    }),
-                    djasa: e.value?.pjasa.map((v) => {
-                      return {
-                        ...v,
-                        total_fc:
-                          checkSupp(v.sup_id)?.supplier?.sup_curren !== 0
-                            ? v.order * v.price
-                            : 0,
-                      };
-                    }),
+                    dprod: e.value?.id
+                      ? e.value?.pprod.map((v) => {
+                          return {
+                            ...v,
+                            req: v.order,
+                            order: null,
+                            // remain: v?.order - v?.order,
+                            total: 0,
+                            total_fc: 0,
+                          };
+                        })
+                      : [
+                          {
+                            prod_id: null,
+                            unit_id: null,
+                            request: null,
+                            order: null,
+                            remain: null,
+                            price: null,
+                            disc: null,
+                            nett_price: null,
+                            total_fc: 0,
+                            total: null,
+                          },
+                        ],
+                    djasa: e.value?.id
+                      ? e.value?.pjasa.map((v) => {
+                          return {
+                            ...v,
+                            total_fc:
+                              checkSupp(v.sup_id)?.supplier?.sup_curren !== 0
+                                ? v.order * v.price
+                                : 0,
+                          };
+                        })
+                      : [
+                          {
+                            jasa_id: null,
+                            sup_id: null,
+                            unit_id: null,
+                            order: null,
+                            price: null,
+                            disc: null,
+                            total_fc: null,
+                            total: null,
+                          },
+                        ],
                   });
                   getProduct(e.value?.ns);
-
                 }}
                 placeholder={tr[localStorage.getItem("language")].kd_ord}
                 optionLabel="po_code"
                 filter
                 filterBy="po_code"
-                // showClear
+                showClear={order.po_id}
               />
             )}
           </div>
@@ -1286,7 +1311,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             <></>
           )}
 
-          {/* {order?.po_id !== null ? (
+          {order?.po_id !== null ? (
             <>
               <div className="d-flex col-12 align-items-center mt-4">
                 <label className="ml-0 mt-4">{"Non Stock"}</label>
@@ -1302,7 +1327,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             </>
           ) : (
             <></>
-          )} */}
+          )}
         </Row>
 
         <CustomAccordion
@@ -1856,7 +1881,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                             });
                           }}
                           className="btn btn-primary shadow btn-xs sharp"
-                          disabled={order && order.po_id !== null}
+                          hidden={order.po_id !== null}
                         >
                           <i className="fa fa-plus"></i>
                         </Link>
@@ -1904,6 +1929,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                     });
                   }}
                   className="btn btn-primary shadow btn-s sharp ml- mt-3"
+                  hidden={order.po_id}
                 >
                   <span className="align-middle mx-1">
                     <i className="fa fa-plus"></i>{" "}

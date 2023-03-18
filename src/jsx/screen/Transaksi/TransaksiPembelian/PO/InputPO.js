@@ -12,7 +12,7 @@ import { InputSwitch } from "primereact/inputswitch";
 import { RadioButton } from "primereact/radiobutton";
 import CustomAccordion from "src/jsx/components/Accordion/Accordion";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_PO } from "src/redux/actions";
+import { SET_CURRENT_PO, SET_PRODUCT } from "src/redux/actions";
 import DataPusatBiaya from "../../../MasterLainnya/PusatBiaya/DataPusatBiaya";
 import DataSupplier from "../../../Mitra/Pemasok/DataPemasok";
 import DataRulesPay from "src/jsx/screen/MasterLainnya/RulesPay/DataRulesPay";
@@ -81,7 +81,8 @@ const InputPO = ({ onCancel, onSuccess }) => {
   const [showSatuan, setShowSatuan] = useState(false);
   const [showJasa, setShowJasa] = useState(false);
   const [showHistori, setShowHistori] = useState(false);
-  const [product, setProduct] = useState(null);
+  // const [product, setProduct] = useState(null);
+  const product = useSelector((state) => state.product.list);
   const [jasa, setJasa] = useState(null);
   const [satuan, setSatuan] = useState(null);
   const [error, setError] = useState(defError);
@@ -110,7 +111,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
     getRulesPay();
     getPpn();
     getRp();
-    getProduct();
+    getProduct(po.ns);
     getJasa();
     getSatuan();
     getHistori();
@@ -325,7 +326,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
     }
   };
 
-  const getProduct = async () => {
+  const getProduct = async (ns) => {
     const config = {
       ...endpoints.product,
       data: {},
@@ -336,7 +337,11 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
       if (response.status) {
         const { data } = response;
-        setProduct(data);
+        dispatch({
+          type: SET_PRODUCT,
+          payload: data.filter((v) => v.group.stok === !ns),
+        });
+        // setProduct(data);
         console.log("jsdj");
         console.log(data);
       }
@@ -913,6 +918,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   sup_id: e.value.ref_sup?.id ?? null,
                   dep_id: e.value.req_dep?.id ?? null,
                   split_inv: false,
+                  ns: e.value?.ns ?? false,
                   pprod: e.value.rprod ?? null,
                   pjasa: e.value.rjasa ?? null,
                   psup: psup,
@@ -932,6 +938,8 @@ const InputPO = ({ onCancel, onSuccess }) => {
                 newError.prod = ep;
                 newError.jasa.push({ jum: false, prc: false });
                 setError(newError);
+
+                getProduct(e.value?.ns);
               }}
               optionLabel="req_code"
               placeholder={tr[localStorage.getItem("language")].pilih}
@@ -1415,6 +1423,24 @@ const InputPO = ({ onCancel, onSuccess }) => {
               />
             </div>
           </div>
+
+          {po?.preq_id !== null ? (
+            <>
+              <div className="d-flex col-12 align-items-center mt-4">
+                <label className="ml-0 mt-4">{"Non Stock"}</label>
+                <InputSwitch
+                  className="ml-4 mt-4"
+                  checked={po && po.ns}
+                  onChange={(e) => {
+                    updatePo({ ...po, ns: e.target.value });
+                  }}
+                  disabled
+                />
+              </div>
+            </>
+          ) : (
+            <></>
+          )}
         </Row>
 
         {po?.pprod?.length ? (
@@ -1458,60 +1484,63 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     //   width: "12rem",
                     // }}
                     body={(e) => (
-                      <div className="flex">
-                        <div className="col-11 ml-0 p-0">
-                          <CustomDropdown
-                            value={e.prod_id && checkProd(e.prod_id)}
-                            option={product}
-                            onChange={(t) => {
-                              let sat = [];
-                              satuan.forEach((element) => {
-                                if (element.id === t.unit.id) {
-                                  sat.push(element);
-                                } else {
-                                  if (element.u_from?.id === t.unit.id) {
-                                    sat.push(element);
-                                  }
-                                }
-                              });
-                              // setSatuan(sat);
-
-                              let temp = [...po.pprod];
-                              temp[e.index].prod_id = t.id;
-                              temp[e.index].unit_id = t.unit?.id;
-                              updatePo({ ...po, pprod: temp });
-                            }}
-                            placeholder={
-                              tr[localStorage.getItem("language")].pilih
-                            }
-                            label={"[name]"}
-                            detail
-                            onDetail={() => {
-                              setCurrentIndex(e.index);
-                              setShowProd(true);
-                            }}
-                          />
-                        </div>
-                        {/* <div className="col-1 align-items-center p-0"> */}
-                        <Link
-                          onClick={() => {
-                            let his = [];
-                            histori.forEach((elem) => {
-                              if (elem.product.id === e.prod_id) {
-                                his.push(elem);
+                      <CustomDropdown
+                        value={e.prod_id && checkProd(e.prod_id)}
+                        option={product}
+                        onChange={(t) => {
+                          let sat = [];
+                          satuan.forEach((element) => {
+                            if (element.id === t.unit.id) {
+                              sat.push(element);
+                            } else {
+                              if (element.u_from?.id === t.unit.id) {
+                                sat.push(element);
                               }
-                            });
-                            setFiltHis(his);
+                            }
+                          });
+                          // setSatuan(sat);
 
-                            setCurrentIndex(e.index);
-                            setShowHistori(true);
-                          }}
-                          className="sharp mt-1"
-                        >
-                          <i className="bx bx-history fs-18"></i>
-                        </Link>
-                        {/* </div> */}
-                      </div>
+                          let temp = [...po.pprod];
+                          temp[e.index].prod_id = t.id;
+                          temp[e.index].unit_id = t.unit?.id;
+                          updatePo({ ...po, pprod: temp });
+                        }}
+                        placeholder={tr[localStorage.getItem("language")].pilih}
+                        label={"[name]"}
+                        detail
+                        onDetail={() => {
+                          setCurrentIndex(e.index);
+                          setShowProd(true);
+                        }}
+                      />
+                    )}
+                  />
+
+                  <Column
+                    header=""
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "1rem",
+                    }}
+                    body={(e) => (
+                      <Link
+                        onClick={() => {
+                          let his = [];
+                          histori.forEach((elem) => {
+                            if (elem.product.id === e.prod_id) {
+                              his.push(elem);
+                            }
+                          });
+                          setFiltHis(his);
+
+                          setCurrentIndex(e.index);
+                          setShowHistori(true);
+                        }}
+                        className="sharp mt-1"
+                      >
+                        <i className="bx bx-history fs-18"></i>
+                      </Link>
                     )}
                   />
 
@@ -1922,6 +1951,32 @@ const InputPO = ({ onCancel, onSuccess }) => {
               </>
             }
           />
+        ) : (
+          <></>
+        )}
+
+        {po?.pjasa?.length ? (
+          <div className="d-flex col-12 align-items-center mt-6 mb-2">
+            <label className="ml-0 mt-1">{"Supplier Sama Dengan Produk"}</label>
+            <InputSwitch
+              className="ml-4"
+              checked={po.same_sup}
+              onChange={(e) => {
+                updatePo({
+                  ...po,
+                  same_sup: e.target.value,
+                  pjasa: po.pjasa.map((v) => ({
+                    ...v,
+                    sup_id: e.target.value === true ? po.sup_id : null,
+                    price: null,
+                    total_fc: 0,
+                    total: 0,
+                  })),
+                });
+                // console.log("==============" + order.sup_id);
+              }}
+            />
+          </div>
         ) : (
           <></>
         )}

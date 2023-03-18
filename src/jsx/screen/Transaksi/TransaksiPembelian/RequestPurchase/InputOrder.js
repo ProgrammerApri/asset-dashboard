@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { request, endpoints } from "src/utils";
+import { request } from "src/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { Row } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
@@ -20,6 +20,7 @@ import DataSupplier from "../../../Mitra/Pemasok/DataPemasok";
 import { useDispatch, useSelector } from "react-redux";
 import {
   SET_CURRENT_RP,
+  SET_ORIGINAL_PRODUCT,
   SET_PRODUCT,
   UPDATE_CURRENT_RP,
 } from "src/redux/actions";
@@ -27,7 +28,10 @@ import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
-import { tr } from "src/data/tr";
+import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
+import { SelectButton } from "primereact/selectbutton";
+import endpoints from "../../../../../utils/endpoints";
+import { tr } from "../../../../../data/tr";
 
 const defError = {
   code: false,
@@ -47,6 +51,11 @@ const defError = {
   ],
 };
 
+const tipe = [
+  { name: "Stok", code: true },
+  { name: "Non Stok", code: false },
+];
+
 const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
   const enterEvent = useRef();
   const [update, setUpdate] = useState(false);
@@ -55,14 +64,15 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
   const [showDepartemen, setShowDepartemen] = useState(false);
   const [pusatBiaya, setPusatBiaya] = useState(null);
   const [jasa, setJasa] = useState(null);
+  const [produk, setProduk] = useState(null);
+  const [setup, setSetup] = useState(null);
   const [showProduk, setShowProduk] = useState(false);
   const [showJasa, setShowJasa] = useState(false);
   const [showSatuan, setShowSatuan] = useState(false);
   const [showSupplier, setShowSupplier] = useState(false);
-  const product = useSelector((state) => state.product.product);
+  const product = useSelector((state) => state.product.list);
   const [satuan, setSatuan] = useState(null);
   const [supplier, setSupplier] = useState(null);
-  const [comp, setComp] = useState(null);
   const [doubleClick, setDoubleClick] = useState(false);
   const rp = useSelector((state) => state.rp.current);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -80,31 +90,13 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
       left: 0,
       behavior: "smooth",
     });
-    getComp();
     getPusatBiaya();
-    getProduk();
+    getProduk(rp.ns);
     getJasa();
     getSatuan();
     getSupplier();
+    getSetup();
   }, []);
-
-  const getComp = async () => {
-    const config = {
-      ...endpoints.getCompany,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setComp(data);
-      }
-    } catch (error) {}
-  };
 
   const getPusatBiaya = async () => {
     const config = {
@@ -174,7 +166,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
     }
   };
 
-  const getProduk = async () => {
+  const getProduk = async (ns) => {
     const config = {
       ...endpoints.product,
       data: {},
@@ -187,9 +179,12 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
         const { data } = response;
         dispatch({
           type: SET_PRODUCT,
-          payload: data,
+          payload: data.filter((v) => v.group.stok === !ns),
         });
-        console.log(product);
+        dispatch({
+          type: SET_ORIGINAL_PRODUCT,
+          payload: data.filter((v) => v.group.stok === !ns),
+        });
       }
     } catch (error) {}
   };
@@ -242,74 +237,6 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
     } catch (error) {}
   };
 
-  const header = () => {
-    return (
-      <h4 className="mb-4">
-        <b>Buat Permintaan</b>
-      </h4>
-    );
-  };
-
-  const prodTemp = (option) => {
-    return (
-      <div>{option !== null ? `${option.name} (${option.code})` : ""}</div>
-    );
-  };
-
-  const clear = (option, props) => {
-    if (option) {
-      return (
-        <div>{option !== null ? `${option.name} (${option.code})` : ""}</div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const jasTemp = (option) => {
-    return (
-      <div>
-        {option !== null ? `${option.jasa.name} (${option.jasa.code})` : ""}
-      </div>
-    );
-  };
-
-  const valueJasTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null ? `${option.jasa.name} (${option.jasa.code})` : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
-  const suppTemp = (option) => {
-    return (
-      <div>
-        {option !== null
-          ? `${option.supplier.sup_name} (${option.supplier.sup_code})`
-          : ""}
-      </div>
-    );
-  };
-
-  const valueSupTemp = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null
-            ? `${option.supplier.sup_name} (${option.supplier.sup_code})`
-            : ""}
-        </div>
-      );
-    }
-
-    return <span>{props.placeholder}</span>;
-  };
-
   const checkUnit = (value) => {
     let selected = {};
     satuan?.forEach((element) => {
@@ -319,6 +246,22 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
     });
 
     return selected;
+  };
+
+  const getSetup = async () => {
+    const config = {
+      ...endpoints.getCompany,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setSetup(data);
+      }
+    } catch (error) {}
   };
 
   const checkProd = (value) => {
@@ -485,7 +428,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
   };
 
   const body = () => {
-    let date = new Date(comp?.year_co, comp?.cutoff - 1, 31);
+    let date = new Date(setup?.year_co, setup?.cutoff - 1, 31);
     return (
       <>
         <Toast ref={toast} />
@@ -526,8 +469,8 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
               }}
               placeholder={tr[localStorage.getItem("language")].pilih_tgl}
               error={error?.date}
-              showIcon
               minDate={date}
+              showIcon
             />
           </div>
 
@@ -569,12 +512,30 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
               />
             </div>
           </div>
+
+          <div className="d-flex col-12 align-items-center mt-4">
+            <label className="ml-0 mt-1">{"Non Stock"}</label>
+            <InputSwitch
+              className="ml-4"
+              checked={rp.ns}
+              onChange={(e) => {
+                updateRp({
+                  ...rp,
+                  ns: e.target.value,
+                  rprod: rp.rprod.map((v) => ({
+                    ...v,
+                    prod_id: null,
+                    unit_id: null,
+                  })),
+                });
+                getProduk(e.target.value);
+              }}
+            />
+          </div>
         </Row>
 
         <CustomAccordion
-          tittle={`${tr[localStorage.getItem("language")].req} ${
-            tr[localStorage.getItem("language")].prod
-          }`}
+          tittle={tr[localStorage.getItem("language")].prod}
           defaultActive={true}
           active={accor.produk}
           onClick={() => {
@@ -588,15 +549,21 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
             <Row>
               <div className="row col-12 mr-0 ml-0">
                 <div className="col-4">
-                  <label className="text-label">{tr[localStorage.getItem("language")].prod}</label>
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].prod}
+                  </label>
                 </div>
 
                 <div className="col-3">
-                  <label className="text-label">{tr[localStorage.getItem("language")].req}</label>
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].qty}
+                  </label>
                 </div>
 
                 <div className="col-4">
-                  <label className="text-label">{tr[localStorage.getItem("language")].sat}</label>
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].satuan}
+                  </label>
                 </div>
 
                 <div className="col-12">
@@ -620,10 +587,10 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                         onChange={(e) => {
                           let sat = [];
                           satuan.forEach((element) => {
-                            if (element.id === e.unit?.id) {
+                            if (element.id === e.unit.id) {
                               sat.push(element);
                             } else {
-                              if (element.u_from?.id === e.unit?.id) {
+                              if (element.u_from?.id === e.unit.id) {
                                 sat.push(element);
                               }
                             }
@@ -647,12 +614,13 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                     </div>
 
                     <div className="col-3">
-                      <PrimeNumber
+                      <PrimeInput
+                        number
                         value={v.request && v.request}
                         onChange={(e) => {
                           console.log(e);
                           let temp = [...rp.rprod];
-                          temp[i].request = e.target.value;
+                          temp[i].request = e.value;
                           updateRp({ ...rp, rprod: temp });
 
                           let newError = error;
@@ -660,7 +628,8 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                           setError(newError);
                         }}
                         placeholder="0"
-                        type="number"
+                        // type="number"
+                        useGrouping
                         error={error?.prod[i]?.jum}
                       />
                     </div>
@@ -698,6 +667,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                                     prod_id: null,
                                     unit_id: null,
                                     request: null,
+                                    non_stok: i.non_stok,
                                   },
                                 ],
                               });
@@ -740,7 +710,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
         />
 
         <CustomAccordion
-          tittle={`${tr[localStorage.getItem("language")].req} ${tr[localStorage.getItem("language")].jasa}`}
+          tittle={tr[localStorage.getItem("language")].jasa}
           defaultActive={false}
           active={accor.jasa}
           onClick={() => {
@@ -754,15 +724,21 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
             <Row>
               <div className="row col-12 mr-0 ml-0 mb-0">
                 <div className="col-4">
-                  <label className="text-label">{tr[localStorage.getItem("language")].kd_jasa}</label>
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].jasa}
+                  </label>
                 </div>
 
                 <div className="col-3">
-                  <label className="text-label">{tr[localStorage.getItem("language")].req}</label>
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].qty}
+                  </label>
                 </div>
 
                 <div className="col-4">
-                  <label className="text-label">{tr[localStorage.getItem("language")].sat}</label>
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].satuan}
+                  </label>
                 </div>
 
                 <div className="col-12">
@@ -800,7 +776,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
 
                     <div className="col-3">
                       <PrimeNumber
-                        value={v.qty && v.qty}
+                        value={v.request && v.request}
                         onChange={(e) => {
                           let temp = [...rp.rjasa];
                           temp[i].request = e.target.value;
@@ -888,7 +864,9 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
 
         <div className="row mb-0">
           <div className="d-flex col-12 align-items-center mt-4">
-            <label className="ml-0 mt-1">{tr[localStorage.getItem("language")].ref_tambh}</label>
+            <label className="ml-0 mt-1">
+              {tr[localStorage.getItem("language")].ref_tambh}
+            </label>
             <InputSwitch
               className="ml-4"
               checked={rp && rp.refrence}
@@ -899,7 +877,9 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
           </div>
 
           <div className="col-6">
-            <label className="text-label">{tr[localStorage.getItem("language")].kd_pem}</label>
+            <label className="text-label">
+              {tr[localStorage.getItem("language")].supplier}
+            </label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
               value={rp.ref_sup !== null ? supp(rp.ref_sup) : null}
@@ -919,7 +899,9 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
           </div>
 
           <div className="col-6">
-            <label className="text-label">{tr[localStorage.getItem("language")].ket}</label>
+            <label className="text-label">
+              {tr[localStorage.getItem("language")].ket}
+            </label>
             <div className="p-inputgroup">
               <InputText
                 value={rp.ref_ket}
@@ -949,6 +931,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
             onClick={() => onSubmit()}
             autoFocus
             loading={update}
+            disabled={setup?.cutoff === null}
           />
         </div>
       </div>
@@ -1001,7 +984,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
           setShowProduk(!e);
         }}
         onSuccessInput={(e) => {
-          getProduk();
+          getProduk(rp.ns);
         }}
         onRowSelect={(e) => {
           console.log(e);
@@ -1017,7 +1000,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                 }
               }
             });
-            // setSatuan(sat);
+            setSatuan(sat);
 
             let temp = [...rp.rprod];
             temp[currentIndex].prod_id = e.data.id;

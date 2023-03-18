@@ -13,19 +13,37 @@ import { SET_CURRENT_KP } from "src/redux/actions";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import DataAkun from "src/jsx/screen/Master/Akun/DataAkun";
 import DataCustomer from "src/jsx/screen/Mitra/Pelanggan/DataCustomer";
+import { setAutoFreeze } from "@reduxjs/toolkit/node_modules/immer";
+import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
+import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
+import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
+import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
+
+const defError = {
+  code: false,
+  date: false,
+  cus: false,
+  akn: false,
+  nil: false,
+};
+
+const tipe = [
+  { name: "Nota Debit", code: "ND" },
+  { name: "Nota Kredit", code: "NK" },
+];
 
 const KoreksiARInput = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
-  const [currentItem, setCurrentItem] = useState(def);
+  const [error, setError] = useState(defError);
   const toast = useRef(null);
-
   const [doubleClick, setDoubleClick] = useState(false);
   const kp = useSelector((state) => state.kp.current);
   const isEdit = useSelector((state) => state.kp.editKp);
   const dispatch = useDispatch();
+  const [ar, setAr] = useState(null);
   const [customer, setCustomer] = useState(null);
-  const [rp, setRequest] = useState(null);
   const [acc, setAcc] = useState(null);
+  const [currency, setCurrency] = useState(null);
   const [showCustomer, setShowCus] = useState(false);
   const [showAcc, setShowAcc] = useState(false);
 
@@ -35,16 +53,14 @@ const KoreksiARInput = ({ onCancel, onSuccess }) => {
       left: 0,
       behavior: "smooth",
     });
-    getCustomer();
+    getAr();
     getAcc();
+    getCur();
   }, []);
-  const def = {
-    type: null,
-  };
 
-  const getCustomer = async () => {
+  const getAr = async () => {
     const config = {
-      ...endpoints.customer,
+      ...endpoints.arcard,
       data: {},
     };
     let response = null;
@@ -53,7 +69,20 @@ const KoreksiARInput = ({ onCancel, onSuccess }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        setCustomer(data);
+        let filt = [];
+        data?.forEach((element) => {
+          if (!element.lunas && element.trx_dbcr === "D") {
+            filt.push(element);
+          }
+        });
+
+        setAr(data);
+
+        let grouped = filt?.filter(
+          (el, i) =>
+            i === filt?.findIndex((ek) => el.cus_id?.id === ek.cus_id?.id)
+        );
+        setCustomer(grouped);
       }
     } catch (error) {}
   };
@@ -74,20 +103,26 @@ const KoreksiARInput = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
-  const getType = (nilai) => {
-    let typ = {};
-    type.forEach((element) => {
-      if (nilai === element.id) {
-        typ = element;
+  const getCur = async () => {
+    const config = {
+      ...endpoints.currency,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setCurrency(data);
       }
-    });
-    return typ;
+    } catch (error) {}
   };
 
   const editKP = async () => {
     const config = {
-      ...endpoints.editKP,
-      endpoint: endpoints.editKP.endpoint + kp.id,
+      ...endpoints.editKorPiu,
+      endpoint: endpoints.editKorPiu.endpoint + kp.id,
       data: kp,
     };
     console.log(config.data);
@@ -113,7 +148,7 @@ const KoreksiARInput = ({ onCancel, onSuccess }) => {
 
   const addKP = async () => {
     const config = {
-      ...endpoints.addKP,
+      ...endpoints.addKorPiu,
       data: kp,
     };
     console.log(config.data);
@@ -160,15 +195,33 @@ const KoreksiARInput = ({ onCancel, onSuccess }) => {
 
     return selected;
   };
-  const type = [
-    { name: "Nota Debit", id: 1 },
-    { name: "Nota Kredit", id: 2 },
-  ];
 
   const cuss = (value) => {
     let selected = {};
     customer?.forEach((element) => {
       if (value === element.customer?.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const curr = (value) => {
+    let selected = {};
+    currency?.forEach((element) => {
+      if (value === element?.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkTipe = (value) => {
+    let selected = {};
+    tipe?.forEach((element) => {
+      if (value === element?.kode) {
         selected = element;
       }
     });
@@ -205,14 +258,6 @@ const KoreksiARInput = ({ onCancel, onSuccess }) => {
     });
   };
 
-  const header = () => {
-    return (
-      <h4 className="mb-4">
-        <b>Koreksi Hutang</b>
-      </h4>
-    );
-  };
-
   const body = () => {
     return (
       <>
@@ -220,99 +265,41 @@ const KoreksiARInput = ({ onCancel, onSuccess }) => {
         <Toast ref={toast} />
 
         <Row className="mb-4">
-          <div className="col-4">
-            <label className="text-label">Nomer Referensi Koreksi</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={kp.kp_code}
-                onChange={(e) => updateKP({ ...kp, kp_code: e.target.value })}
-                placeholder="Nomer Referensi"
-              />
-            </div>
+          <div className="col-3">
+            <PrimeInput
+              label={"No. Referensi"}
+              value={kp.code}
+              onChange={(e) => {
+                updateKP({ ...kp, code: e.target.value });
+
+                let newError = error;
+                newError.code = false;
+                setError(newError);
+              }}
+              placeholder="Nomer Referensi"
+              error={error?.code}
+            />
           </div>
 
           <div className="col-2">
-            <label className="text-label">Tanggal</label>
-            <div className="p-inputgroup">
-              <Calendar
-                value={new Date(`${kp.kp_date}Z`)}
-                onChange={(e) => {
-                  updateKP({ ...kp, kp_date: e.value });
-                }}
-                placeholder="Tanggal"
-                showIcon
-                dateFormat="dd-mm-yy"
-              />
-            </div>
-          </div>
-          <div className="col-6"></div>
-          <div className="col-4 mt-3">
-            <label className="text-label">Pelanggan</label>
-            <div className="p-inputgroup"></div>
-            <CustomDropdown
-              value={kp.pel_id ? cuss(kp.pel_id) : null}
-              option={customer}
+            <PrimeCalendar
+              label={"Tanggal"}
+              value={new Date(`${kp.date}Z`)}
               onChange={(e) => {
-                updateKP({
-                  ...kp,
-                  pel_id: e.customer?.id,
-                });
+                updateKP({ ...kp, date: e.value });
+
+                let newError = error;
+                newError.date = false;
+                setError(newError);
               }}
-              label={"[customer.cus_name]"}
-              placeholder="Pilih Pelanggan"
-              detail
-              onDetail={() => setShowCus(true)}
+              placeholder="Tanggal"
+              showIcon
+              dateFormat="dd-mm-yy"
+              error={error?.date}
             />
           </div>
-          <div className="col-4 mt-3">
-            <label className="text-label">Type Koreksi</label>
-            <div className="p-inputgroup">
-              <Dropdown
-                value={kp.type !== null ? getType(kp.type) : null}
-                options={type}
-                onChange={(e) => {
-                  updateKP({
-                    ...kp,
-                    type: e.value.id,
-                  });
-                }}
-                optionLabel="name"
-                placeholder="Pilih Type Koreksi"
-              />
-            </div>
-          </div>
-          <div className="col-4 mt-3">
-            <label className="text-label">Akun Lawan</label>
-            <div className="p-inputgroup"></div>
-            <CustomDropdown
-              value={kp.acc_lwn && acco(kp.acc_lwn)}
-              option={acc}
-              onChange={(e) => {
-                updateKP({
-                  ...kp,
-                  acc_lwn: e.account?.id,
-                });
-              }}
-              label={"[account.acc_name] - [account.acc_code]"}
-              placeholder="Akun Lawan"
-              detail
-              onDetail={() => setShowAcc(true)}
-            />
-          </div>
-          <div className="col-4">
-            <label className="text-label">Nilai </label>
-            <div className="p-inputgroup">
-              <InputText
-                value={kp.nilai}
-                onChange={(e) => updateKP({ ...kp, nilai: e.target.value })}
-                placeholder="0"
-                type="number"
-                min={0}
-              />
-            </div>
-          </div>
-          <div className="col-4">
-            <label className="text-label">Tanggal J/T</label>
+          <div className="col-2">
+            <label className="text-label">Jatuh Tempo</label>
             <div className="p-inputgroup">
               <Calendar
                 value={new Date(`${kp.due_date}Z`)}
@@ -325,15 +312,199 @@ const KoreksiARInput = ({ onCancel, onSuccess }) => {
               />
             </div>
           </div>
-          <div className="col-4">
+          <div className="col-4"></div>
+          <div className="col-3 mt-3">
+            <label className="text-label">Pelanggan</label>
+            <PrimeDropdown
+              value={kp.cus_id ? cuss(kp.cus_id) : null}
+              options={customer}
+              onChange={(e) => {
+                let t_piutang = 0;
+                ar?.forEach((element) => {
+                  if (
+                    element.cus_id?.id === e.value?.cus_id?.id &&
+                    !element.lunas
+                  ) {
+                    if (e.value?.cus_id?.cus_curren !== null) {
+                      if (element.trx_dbcr === "D") {
+                        t_piutang += element.trx_amnv;
+                      } else {
+                        t_piutang -= element.trx_amnv;
+                      }
+                    } else {
+                      if (element.trx_dbcr === "D") {
+                        t_piutang += element.trx_amnh;
+                      } else {
+                        t_piutang -= element.trx_amnh;
+                      }
+                    }
+                  }
+                });
+                updateKP({
+                  ...kp,
+                  cus_id: e?.value?.cus_id?.id ?? null,
+                  total_piu: t_piutang,
+                  piu_fc: e?.value?.cus_id?.cus_curren
+                    ? t_piutang * curr(e?.value?.cus_id?.cus_curren)?.rate
+                    : 0,
+                });
+
+                let newError = error;
+                newError.cus = false;
+                setError(newError);
+              }}
+              filter
+              filterBy={"cus_id.cus_name"}
+              optionLabel="cus_id.cus_name"
+              placeholder="Pilih Pelanggan"
+              errorMessage="Pelanggan Belum Dipilih"
+              error={error?.cus}
+              showClear
+            />
+          </div>
+          <div className="col-2 mt-3">
+            <label className="text-label">Tipe Koreksi</label>
+            <div className="p-inputgroup">
+              <Dropdown
+                value={kp.type_kor && checkTipe(kp.type_kor)}
+                options={tipe}
+                onChange={(e) => {
+                  updateKP({
+                    ...kp,
+                    type_kor: e.value?.code,
+                  });
+                }}
+                optionLabel="name"
+                placeholder="Pilih Tipe Koreksi"
+              />
+            </div>
+          </div>
+          <div className="col-3 mt-3">
+            <label className="text-label">Akun Lawan</label>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
+              value={kp.acc_lwn && acco(kp.acc_lwn)}
+              option={acc}
+              onChange={(e) => {
+                updateKP({
+                  ...kp,
+                  acc_lwn: e.account?.id,
+                });
+
+                let newError = error;
+                newError.akn = false;
+                setError(newError);
+              }}
+              label={"[account.acc_name] - [account.acc_code]"}
+              placeholder="Akun Lawan"
+              detail
+              onDetail={() => setShowAcc(true)}
+              errorMessage="Akun Belum Dipilih"
+              error={error?.akn}
+            />
+          </div>
+          <div className="col-4 mt-3">
             <label className="text-label">Keterangan </label>
             <div className="p-inputgroup">
               <InputText
-                value={kp.ket}
-                onChange={(e) => updateKP({ ...kp, ket: e.target.value })}
+                value={kp.desc}
+                onChange={(e) => updateKP({ ...kp, desc: e.target.value })}
                 placeholder="Keterangan"
               />
             </div>
+          </div>
+
+          <div className="col-1 mt-3" hidden={kp?.cus_id == null}>
+            <PrimeInput
+              price
+              label={"Mata Uang"}
+              value={
+                kp.cus_id
+                  ? cuss(kp?.cus_id)?.cus_curren
+                    ? curr(cuss(kp?.cus_id)?.cus_curren)?.code
+                    : "IDR"
+                  : ""
+              }
+              placeholder="0"
+              type="number"
+              min={0}
+              disabled
+            />
+          </div>
+
+          <div className="col-2 mt-3" hidden={kp?.cus_id == null}>
+            {cuss(kp?.cus_id)?.cus_curren ? (
+              <PrimeNumber
+                label={"Nilai Piutang"}
+                value={kp.total_piu}
+                placeholder="0"
+                type="number"
+                min={0}
+                disabled
+              />
+            ) : (
+              <PrimeNumber
+                price
+                label={"Nilai Piutang"}
+                value={kp.total_piu}
+                placeholder="0"
+                type="number"
+                min={0}
+                disabled
+              />
+            )}
+          </div>
+
+          <div
+            className="col-2 mt-3"
+            hidden={kp?.cus_id == null || cuss(kp?.cus_id)?.cus_curren == null}
+          >
+            <PrimeNumber
+              price
+              label={"Foreign Currency"}
+              value={kp.piu_fc}
+              placeholder="0"
+              type="number"
+              min={0}
+              disabled
+            />
+          </div>
+
+          <div className="col-2 mt-3">
+            {cuss(kp?.cus_id)?.cus_curren != null ? (
+              <PrimeNumber
+                label={"Nilai Koreksi"}
+                value={kp.value}
+                onChange={(e) => {
+                  updateKP({ ...kp, value: e.target.value });
+
+                  let newError = error;
+                  newError.nil = false;
+                  setError(newError);
+                }}
+                placeholder="0"
+                type="number"
+                min={0}
+                error={error?.nil}
+              />
+            ) : (
+              <PrimeNumber
+                price
+                label={"Nilai Koreksi"}
+                value={kp.value}
+                onChange={(e) => {
+                  updateKP({ ...kp, value: e.value });
+
+                  let newError = error;
+                  newError.nil = false;
+                  setError(newError);
+                }}
+                placeholder="0"
+                type="number"
+                min={0}
+                error={error?.nil}
+              />
+            )}
           </div>
           {/* kode suplier otomatis keluar, karena sudah melekat di faktur pembelian  */}
         </Row>
@@ -368,34 +539,6 @@ const KoreksiARInput = ({ onCancel, onSuccess }) => {
       {body()}
       {footer()}
 
-      <DataCustomer
-        data={customer}
-        loading={false}
-        popUp={true}
-        show={showCustomer}
-        onHide={() => {
-          setShowCus(false);
-        }}
-        onInput={(e) => {
-          setShowCus(!e);
-        }}
-        onSuccessInput={(e) => {
-          getCustomer();
-        }}
-        onRowSelect={(e) => {
-          if (doubleClick) {
-            setShowCus(false);
-            updateKP({ ...kp, pel_id: e.data.customer.id });
-          }
-
-          setDoubleClick(true);
-
-          setTimeout(() => {
-            setDoubleClick(false);
-          }, 2000);
-        }}
-      />
-
       <DataAkun
         data={acc}
         loading={false}
@@ -413,7 +556,7 @@ const KoreksiARInput = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowAcc(false);
-            updateKP({ ...rp, req_dep: e.data.id });
+            updateKP({ ...kp, acc_lwn: e.data?.account.id });
           }
 
           setDoubleClick(true);

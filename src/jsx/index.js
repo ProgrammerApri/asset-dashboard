@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 // import Login from "./screen/Login";
 
 /// React router dom
@@ -9,6 +9,12 @@ import {
   Redirect,
   HashRouter,
 } from "react-router-dom";
+import { withResizeDetector } from "react-resize-detector";
+import { endpoints, request } from "src/utils";
+import { useDispatch } from "react-redux";
+import { SET_CURRENT_PROFILE } from "src/redux/actions";
+import { ProgressBar } from "primereact/progressbar";
+import { ProgressSpinner } from "primereact/progressspinner";
 
 /// Css
 import "./index.css";
@@ -19,60 +25,84 @@ import Nav from "./layouts/nav";
 import Footer from "./layouts/Footer";
 
 /// Deshboard
-import Home from "./screen/Dashboard/Home";
-
-/// Klasifikasi
-import KlasifikasiAkun from "./screen/Master/KlasifikasiAkun";
-
-import Login from "./Login";
-import { withResizeDetector } from "react-resize-detector";
-import KategoriAkun from "./screen/Master/KategoriAkun";
-import Akun from "./screen/Master/Akun/DataAkun";
-import Project from "./screen/MasterLainnya/Project/DataProject";
-import Bank from "./screen/MasterLainnya/Bank/DataBank";
-import JenisPemasok from "./screen/MasterLainnya/JenisPemasok/DataJenisPemasok";
-import Salesman from "./screen/MasterLainnya/Salesman/DataSalesman";
-import AreaPenjualan from "./screen/Master/AreaPenjualan";
-import SubArea from "./screen/Master/SubArea/SubArea";
-import Currency from "./screen/Master/Currency";
-import Lokasi from "./screen/Master/Lokasi/DataLokasi";
-import RulesPay from "./screen/MasterLainnya/RulesPay/DataRulesPay";
-import Setup from "./screen/Setup";
-import Divisi from "./screen/MasterLainnya/Divisi/Divisi";
-import PPN from "./screen/Master/Pajak/DataPajak";
-import SetupKhusus from "./screen/Master/SetupKhusus";
-import Mitra from "./screen/Mitra/Mitra";
-import TransaksiPembelian from "./screen/Transaksi/TransaksiPembelian/TransaksiPembelian";
-import GroupProduk from "./screen/Master/GroupProduk";
-import Satuan from "./screen/MasterLainnya/Satuan";
-import Master from "./screen/Master";
-import MasterLainnya from "./screen/MasterLainnya";
-import JenisPelanggan from "./screen/Master/JenisPelanggan";
-import Pajak from "./screen/Master/Pajak/DataPajak";
-import Jasa from "./screen/Master/Jasa/DataJasa";
-import PusatBiaya from "./screen/MasterLainnya/PusatBiaya/DataPusatBiaya";
-import Transaksi from "./screen/Transaksi";
-import BankKas from "./screen/BankKas";
-import TransaksiPersediaan from "./screen/TransaksiPersediaan";
-import LaporanPembelian from "./screen/Report/LaporanPembelian";
-import ReportGRA from "./screen/Report/LaporanPembelian/Gra";
-import Produksi from "./screen/Produksi";
-import DataMesin from "./screen/Produksi/Mesin/DataMesin";
-import GroupReport from "./screen/Report";
-import LaporanPenjualan from "./screen/Report/LaporanPenjualan";
-import LaporanProduksi from "./screen/Report/LaporanProduksi";
-import LaporanAr from "./screen/Report/AR";
-import LaporanAp from "./screen/Report/AP";
-import LaporanNeraca from "./screen/Report/Neraca";
-import Persediaan from "./screen/Transaksi/Persediaan/Persediaan";
-import LaporanPersediaan from "./screen/Report/LaporanPersediaan";
-import { endpoints, request } from "src/utils";
-import { useDispatch } from "react-redux";
-import { SET_CURRENT_PROFILE } from "src/redux/actions";
-import { ProgressBar } from "primereact/progressbar";
-import SaldoAwal from "./screen/SaldoAwal";
-import Posting from "./screen/Posting/PostingGl";
-import SaldoAkhir from "./screen/Transaksi/SaldoAkhir/SaldoAkhir";
+const Home = React.lazy(() => import("./screen/Dashboard/Home"));
+const KlasifikasiAkun = React.lazy(() =>
+  import("./screen/Master/KlasifikasiAkun")
+);
+const Login = React.lazy(() => import("./Login"));
+const KategoriAkun = React.lazy(() => import("./screen/Master/KategoriAkun"));
+const Akun = React.lazy(() => import("./screen/Master/Akun/DataAkun"));
+const Project = React.lazy(() =>
+  import("./screen/MasterLainnya/Project/DataProject")
+);
+const Bank = React.lazy(() => import("./screen/MasterLainnya/Bank/DataBank"));
+const JenisPemasok = React.lazy(() =>
+  import("./screen/MasterLainnya/JenisPemasok/DataJenisPemasok")
+);
+const Salesman = React.lazy(() =>
+  import("./screen/MasterLainnya/Salesman/DataSalesman")
+);
+const AreaPenjualan = React.lazy(() => import("./screen/Master/AreaPenjualan"));
+const SubArea = React.lazy(() => import("./screen/Master/SubArea/SubArea"));
+const Currency = React.lazy(() => import("./screen/Master/Currency"));
+const Lokasi = React.lazy(() => import("./screen/Master/Lokasi/DataLokasi"));
+const RulesPay = React.lazy(() =>
+  import("./screen/MasterLainnya/RulesPay/DataRulesPay")
+);
+const Setup = React.lazy(() => import("./screen/Setup"));
+const Divisi = React.lazy(() => import("./screen/MasterLainnya/Divisi/Divisi"));
+const PPN = React.lazy(() => import("./screen/Master/Pajak/DataPajak"));
+const SetupKhusus = React.lazy(() => import("./screen/Master/SetupKhusus"));
+const Mitra = React.lazy(() => import("./screen/Mitra/Mitra"));
+const TransaksiPembelian = React.lazy(() =>
+  import("./screen/Transaksi/TransaksiPembelian/TransaksiPembelian")
+);
+const GroupProduk = React.lazy(() => import("./screen/Master/GroupProduk"));
+const Satuan = React.lazy(() => import("./screen/MasterLainnya/Satuan"));
+const Master = React.lazy(() => import("./screen/Master"));
+const MasterLainnya = React.lazy(() => import("./screen/MasterLainnya"));
+const JenisPelanggan = React.lazy(() =>
+  import("./screen/Master/JenisPelanggan")
+);
+const Pajak = React.lazy(() => import("./screen/Master/Pajak/DataPajak"));
+const Jasa = React.lazy(() => import("./screen/Master/Jasa/DataJasa"));
+const PusatBiaya = React.lazy(() =>
+  import("./screen/MasterLainnya/PusatBiaya/DataPusatBiaya")
+);
+const Transaksi = React.lazy(() => import("./screen/Transaksi"));
+const BankKas = React.lazy(() => import("./screen/BankKas"));
+const TransaksiPersediaan = React.lazy(() =>
+  import("./screen/TransaksiPersediaan")
+);
+const LaporanPembelian = React.lazy(() =>
+  import("./screen/Report/LaporanPembelian")
+);
+const ReportGRA = React.lazy(() =>
+  import("./screen/Report/LaporanPembelian/Gra")
+);
+const Produksi = React.lazy(() => import("./screen/Produksi"));
+const DataMesin = React.lazy(() => import("./screen/Produksi/Mesin/DataMesin"));
+const GroupReport = React.lazy(() => import("./screen/Report"));
+const LaporanPenjualan = React.lazy(() =>
+  import("./screen/Report/LaporanPenjualan")
+);
+const LaporanProduksi = React.lazy(() =>
+  import("./screen/Report/LaporanProduksi")
+);
+const LaporanAr = React.lazy(() => import("./screen/Report/AR"));
+const LaporanAp = React.lazy(() => import("./screen/Report/AP"));
+const LaporanNeraca = React.lazy(() => import("./screen/Report/Neraca"));
+const Persediaan = React.lazy(() =>
+  import("./screen/Transaksi/Persediaan/Persediaan")
+);
+const LaporanPersediaan = React.lazy(() =>
+  import("./screen/Report/LaporanPersediaan")
+);
+const SaldoAwal = React.lazy(() => import("./screen/SaldoAwal"));
+const Posting = React.lazy(() => import("./screen/Posting/PostingGl"));
+const SaldoAkhir = React.lazy(() =>
+  import("./screen/Transaksi/SaldoAkhir/SaldoAkhir")
+);
 
 const Markup = ({ width }) => {
   const routes = [
@@ -182,33 +212,50 @@ const Markup = ({ width }) => {
       if (response.status) {
         const { data } = response;
         dispatch({ type: SET_CURRENT_PROFILE, payload: data });
-        setLoading(false)
+        setLoading(false);
       }
     } catch (error) {
-      setLoading(false)
+      setLoading(false);
     }
-    
   };
 
-  return loading ? <ProgressBar mode="indeterminate" style={{ height: '6px' }}/> : (
+  return loading ? (
+    <ProgressBar mode="indeterminate" style={{ height: "6px" }} />
+  ) : (
     <Router>
       <div id="main-wrapper" className="show">
         <Nav />
 
         <div className="content-body">
           <div className="container-fluid">
-            <HashRouter basename="/">
-              <Switch>
-                {routes.map((data, i) => (
-                  <Route
-                    key={i}
-                    exact
-                    path={`/${data.url}`}
-                    component={data.component}
+            <Suspense
+              fallback={
+                <div
+                  className="flex align-items-center"
+                  style={{ height: "50rem" }}
+                >
+                  <ProgressSpinner
+                    style={{ width: "50px", height: "50px" }}
+                    strokeWidth="8"
+                    fill="var(--surface-ground)"
+                    animationDuration=".5s"
                   />
-                ))}
-              </Switch>
-            </HashRouter>
+                </div>
+              }
+            >
+              <HashRouter basename="/">
+                <Switch>
+                  {routes.map((data, i) => (
+                    <Route
+                      key={i}
+                      exact
+                      path={`/${data.url}`}
+                      component={data.component}
+                    />
+                  ))}
+                </Switch>
+              </HashRouter>
+            </Suspense>
           </div>
         </div>
       </div>

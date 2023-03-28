@@ -31,6 +31,7 @@ import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import endpoints from "../../../../../utils/endpoints";
 import { tr } from "../../../../../data/tr";
+import { InputTextarea } from "primereact/inputtextarea";
 
 const defError = {
   code: false,
@@ -1013,6 +1014,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                     dep_id: e.value?.preq_id?.req_dep?.id ?? null,
                     split_inv: e.value?.split_inv ?? false,
                     same_sup: e.value?.same_sup ?? false,
+                    note: e.value?.note ?? null,
                     dprod: e.value?.id
                       ? e.value?.pprod.map((v) => {
                           return {
@@ -1259,7 +1261,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-2 mt-3">
+          <div className="mt-4 ml-2">
             <label className="text-label"></label>
             <div className="p-inputgroup">
               <SelectButton
@@ -1284,7 +1286,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
           </div>
 
           {!order?.faktur ? (
-            <div className="col-4 mt-3">
+            <div className="mt-4 ml-4">
               <label className="text-label"></label>
               <div className="p-inputgroup">
                 <SelectButton
@@ -2477,8 +2479,18 @@ const InputOrder = ({ onCancel, onSuccess }) => {
         />
 
         <div className="row ml-0 mr-0 mb-0 mt-6 justify-content-between">
-          <div>
-            <div className="row ml-1">
+          <div className="col-6 pl-0">
+          <label className="text-label">Note</label>
+              <div className="p-inputgroup">
+                <InputTextarea
+                  placeholder="Catatan"
+                  value={order.note}
+                  onChange={(e) => {
+                    updateORD({ ...order, note: e.target.value });
+                  }}
+                />
+              </div>
+            <div className="row mt-4">
               {order.djasa?.length > 0 && order.dprod?.length > 0 && (
                 <div className="d-flex col-12 align-items-center">
                   <label className="mt-1">{"Pisah Faktur"}</label>

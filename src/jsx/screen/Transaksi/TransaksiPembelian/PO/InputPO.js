@@ -32,6 +32,7 @@ import DataHistori from "../Histori/DataHistori";
 import { InputNumber } from "primereact/inputnumber";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import { tr } from "src/data/tr";
+import { InputTextarea } from "primereact/inputtextarea";
 
 const defError = {
   code: false,
@@ -452,7 +453,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
     // d.psup = ref_supp;
     const config = {
       ...endpoints.addPO,
-      data: { ...d, psup: ref_supp },
+      data: { ...d, note: d?.note ?? null, psup: ref_supp },
     };
     console.log(config.data);
     let response = null;
@@ -2412,8 +2413,18 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
         {po?.pprod?.length ? (
           <div className="row ml-0 mr-0 mb-0 mt-6 justify-content-between">
-            <div>
-              <div className="row ml-1">
+            <div className="col-6 pl-0">
+              <label className="text-label">Note</label>
+              <div className="p-inputgroup">
+                <InputTextarea
+                  placeholder="Catatan"
+                  value={po.note}
+                  onChange={(e) => {
+                    updatePo({ ...po, note: e.target.value });
+                  }}
+                />
+              </div>
+              <div className="row mt-4">
                 {po.pjasa?.length > 0 && po.pprod?.length > 0 && (
                   <div className="d-flex col-12 align-items-center">
                     <label className="mt-1">

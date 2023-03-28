@@ -450,11 +450,12 @@ const DataJasa = ({
   };
 
   const isValid = () => {
+    console.log(currentItem);
     let valid = false;
     let errors = {
       code: !currentItem.jasa.code || currentItem.jasa.code === "",
       name: !currentItem.jasa.name || currentItem.jasa.name === "",
-      acc1: !currentItem?.account?.id,
+      acc1: !currentItem?.account.account?.id,
     };
 
     setError(errors);

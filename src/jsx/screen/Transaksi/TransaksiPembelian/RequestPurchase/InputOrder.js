@@ -179,14 +179,16 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
         const { data } = response;
         dispatch({
           type: SET_PRODUCT,
-          payload: data.filter((v) => v.group.stok === !ns),
+          payload: data.filter((v) => v?.group?.stock ? v?.group?.stok === !ns : !v?.group?.stock),
         });
         dispatch({
           type: SET_ORIGINAL_PRODUCT,
-          payload: data.filter((v) => v.group.stok === !ns),
+          payload: data.filter((v) => v?.group?.stock ? v?.group?.stok === !ns : !v?.group?.stock),
         });
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const getJasa = async () => {

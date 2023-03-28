@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { request, endpoints } from "src/utils";
+import { endpoints, request } from "src/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -490,6 +490,9 @@ const SaldoAwalGL = () => {
   };
 
   const textEditor = (data) => {
+
+    console.log("================");
+    console.log(data.rowData);
     return (
       <div className="p-inputgroup">
         <PrimeNumber
@@ -499,14 +502,21 @@ const SaldoAwalGL = () => {
             let temp = saldo;
             temp[data.rowIndex].acc_awal = e.value;
             console.log("================");
-            console.log(temp);
+            console.log(data.rowData);
             setSaldo(temp);
           }}
-          disabled={checkAcc(data.rowData?.acc_code)?.account?.connect}
+          disabled={checkAcc(data.rowData?.acc_code)?.connect}
         />
       </div>
     );
   };
+
+
+  console.log("=========post month", month?.month);
+  console.log("=========post year", month?.year);
+  console.log("=========co month", comp?.cutoff);
+  console.log("=========co year", comp?.year_co);
+  console.log("=========trans", trans?.length);
 
   
   return (

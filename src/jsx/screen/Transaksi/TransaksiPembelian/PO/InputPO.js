@@ -340,7 +340,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
         const { data } = response;
         dispatch({
           type: SET_PRODUCT,
-          payload: data.filter((v) => v.group.stok === !ns),
+          payload: data.filter((v) => v?.group?.stock ? v?.group?.stok === !ns : true),
         });
         // setProduct(data);
         console.log("jsdj");

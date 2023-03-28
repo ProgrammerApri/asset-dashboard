@@ -356,7 +356,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
         dispatch({
           type: SET_PRODUCT,
-          payload: data.filter((v) => v.group.stok === !ns),
+          payload: data.filter((v) => v?.group?.stock ? v?.group?.stok === !ns : true),
         });
 
         getGrupP();

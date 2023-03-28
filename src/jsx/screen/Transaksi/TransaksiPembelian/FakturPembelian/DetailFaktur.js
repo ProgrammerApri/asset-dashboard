@@ -11,6 +11,7 @@ import { Divider } from "@material-ui/core";
 import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 import ReactToPrint from "react-to-print";
 import Wrapper from "src/jsx/components/CustomeWrapper/Wrapper";
+import { ApiConfig } from "src/data/config";
 
 const DetailFaktur = ({ onCancel }) => {
   const show = useSelector((state) => state.fk_pb.current_pb_fk);
@@ -254,7 +255,7 @@ const DetailFaktur = ({ onCancel }) => {
                     height: "50px",
                     width: "50px",
                   }}
-                  src={comp?.cp_logo}
+                  src={ApiConfig.baseUrl +endpoints.getImage.endpoint+comp?.cp_logo}
                   alt=""
                 />
                 <br></br>
@@ -431,7 +432,7 @@ const DetailFaktur = ({ onCancel }) => {
                           height: "150px",
                           width: "150px",
                         }}
-                        src={comp?.cp_logo}
+                        src={ApiConfig.baseUrl +endpoints.getImage.endpoint+comp?.cp_logo}
                         alt=""
                       />
                       {/* <br></br> */}

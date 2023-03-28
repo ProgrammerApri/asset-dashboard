@@ -11,6 +11,7 @@ import { Divider } from "@material-ui/core";
 import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 import ReactToPrint from "react-to-print";
 import Wrapper from "src/jsx/components/CustomeWrapper/Wrapper";
+import { ApiConfig } from "src/data/config";
 
 const Detail = ({ onCancel }) => {
   const show = useSelector((state) => state.inv.current);
@@ -248,7 +249,7 @@ const Detail = ({ onCancel }) => {
                     height: "50px",
                     width: "50px",
                   }}
-                  src={comp?.cp_logo}
+                  src={ApiConfig.baseUrl +endpoints.getImage.endpoint+comp?.cp_logo}
                   alt=""
                 />
                 <br></br>
@@ -462,7 +463,7 @@ const Detail = ({ onCancel }) => {
                           height: "150px",
                           width: "150px",
                         }}
-                        src={comp?.cp_logo}
+                        src={ApiConfig.baseUrl +endpoints.getImage.endpoint+comp?.cp_logo}
                         alt=""
                       />
                       {/* <br></br> */}

@@ -724,7 +724,7 @@ const DataSupplier = ({
   };
 
   const checAcc = (value) => {
-    let acc = {};
+    let acc = null;
     account?.forEach((element) => {
       if (value === element.id) {
         acc = element;

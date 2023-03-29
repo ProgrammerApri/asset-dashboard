@@ -650,7 +650,7 @@ const DataGroupProduk = ({
   };
 
   const gl = (value) => {
-    let gl = {};
+    let gl = null;
     account?.forEach((element) => {
       if (value === element.account.id) {
         gl = element;

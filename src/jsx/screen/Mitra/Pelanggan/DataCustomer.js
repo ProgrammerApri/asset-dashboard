@@ -858,13 +858,13 @@ const DataCustomer = ({
   };
 
   const checkAcc = (value) => {
-    let acc = {};
+    let select = null;
     acc?.forEach((element) => {
-      if (value === element.id) {
-        acc = element;
+      if (value === element?.id) {
+        select = element;
       }
     });
-    return acc;
+    return select;
   };
 
   const glTemplate = (option) => {

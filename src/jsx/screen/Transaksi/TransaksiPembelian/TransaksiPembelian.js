@@ -31,9 +31,9 @@ const TransaksiPembelian = () => {
       <TabPanel header={"Invoice Pembelian"}>
         <InvoicePembelian trigger={trigger}/>
       </TabPanel>
-      <TabPanel header={tr[localStorage.getItem("language")].fak_pur}>
+      {/* <TabPanel header={tr[localStorage.getItem("language")].fak_pur}>
         <FakturPembelian trigger={trigger}/>
-      </TabPanel>
+      </TabPanel> */}
       <TabPanel header={tr[localStorage.getItem("language")].ret_pur}>
         <ReturBeli trigger={trigger}/>
       </TabPanel>

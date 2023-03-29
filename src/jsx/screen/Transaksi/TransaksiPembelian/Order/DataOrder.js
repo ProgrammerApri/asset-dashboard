@@ -265,10 +265,10 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
             setDisplayDel(true);
             setCurrentItem(data);
           }}
-          // className="btn btn-danger shadow btn-xs sharp ml-1"
-          className={`btn ${
-            !data.faktur ? "" : "disabled"
-          } btn-danger shadow btn-xs sharp ml-1`}
+          className="btn btn-danger shadow btn-xs sharp ml-1"
+          // className={`btn ${
+          //   !data.faktur ? "" : "disabled"
+          // } btn-danger shadow btn-xs sharp ml-1`}
         >
           <i className="fa fa-trash"></i>
         </Link>
@@ -669,7 +669,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
-                <Column
+                {/* <Column
                   header={tr[localStorage.getItem("language")].fak_pur}
                   field={(e) => e.faktur}
                   style={{ minWidth: "8rem" }}
@@ -692,7 +692,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
                       </div>
                     )
                   }
-                />
+                /> */}
                 <Column
                   header={"Invoice Pembelian"}
                   field={(e) => e.invoice}

@@ -1305,7 +1305,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="mt-4 ml-2">
+          <div className="mt-4 ml-2" hidden>
             <label className="text-label"></label>
             <div className="p-inputgroup">
               <SelectButton
@@ -1329,7 +1329,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          {!order?.faktur ? (
+          {/* {!order?.faktur ? ( */}
             <div className="mt-4 ml-4">
               <label className="text-label"></label>
               <div className="p-inputgroup">
@@ -1347,15 +1347,16 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                     updateORD({
                       ...order,
                       invoice: e.value.sts,
+                      faktur: e.value.sts === false ? false : true,
                     });
                   }}
                   optionLabel="name"
                 />
               </div>
             </div>
-          ) : (
+          {/* ) : (
             <></>
-          )}
+          )} */}
 
           {order?.po_id !== null ? (
             <>

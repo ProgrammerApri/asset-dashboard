@@ -219,10 +219,10 @@ const DataInvoicePB = ({ onAdd, onDetail }) => {
             setDisplayDel(true);
             setCurrentItem(data);
           }}
-          // className="btn btn-danger shadow btn-xs sharp ml-1 mt-1"
-          className={`btn ${
-            !data.faktur ? "" : "disabled"
-          } btn-danger shadow btn-xs sharp ml-1 mt-1`}
+          className="btn btn-danger shadow btn-xs sharp ml-1 mt-1"
+          // className={`btn ${
+          //   !data.faktur ? "" : "disabled"
+          // } btn-danger shadow btn-xs sharp ml-1 mt-1`}
         >
           <i className="fa fa-trash"></i>
         </Link>
@@ -478,6 +478,7 @@ const DataInvoicePB = ({ onAdd, onDetail }) => {
                   body={loading && <Skeleton />}
                 />
                  <Column
+                 hidden
                   header={tr[localStorage.getItem("language")].fak_pur}
                   field={(e) => e.faktur}
                   style={{ minWidth: "8rem" }}

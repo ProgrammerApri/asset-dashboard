@@ -15,6 +15,7 @@ import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import { el } from "date-fns/locale";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { Dropdown } from "primereact/dropdown";
+import { MultiSelect } from "primereact/multiselect";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -25,8 +26,10 @@ const ReportHutangRingkasan = () => {
   const printPage = useRef(null);
   const [filtDate, setFiltDate] = useState(new Date());
   const [supplier, setSupplier] = useState(null);
-  const [selectedSup, setSelected] = useState(null);
+  const [selectedSup, setSelected] = useState([]);
+  const [selectedAcc, setSelectedAcc] = useState([]);
   const [ap, setAp] = useState(null);
+  const [acc, setAcc] = useState(null);
   const [total, setTotal] = useState(null);
   const [cp, setCp] = useState("");
   const chunkSize = 4;
@@ -51,11 +54,11 @@ const ReportHutangRingkasan = () => {
         spl.forEach((element) => {
           element.ap = [];
           data.forEach((el) => {
-            if (el.trx_type === "LP" && el.pay_type === "P1") {
-              if (element.supplier.id === el.sup_id.id) {
-                element.ap.push({ ...el, trx_amnh: 0, acq_amnh: 0 });
-              }
+            // if (el.trx_type === "LP" && el.pay_type === "P1") {
+            if (element.supplier.id === el.sup_id.id) {
+              element.ap.push({ ...el, trx_amnh: 0, acq_amnh: 0 });
             }
+            // }
           });
           element.ap.forEach((el) => {
             data.forEach((ek) => {
@@ -64,7 +67,12 @@ const ReportHutangRingkasan = () => {
                 el.acq_amnh += ek?.acq_amnh ?? 0;
               }
             });
-            total += el?.trx_amnh ?? 0 - el?.acq_amnh ?? 0;
+            //! HUTANG JIKA ADA TRANSAKSI KREDIT (K) MAKA HUTANGNYA BERTAMBAH
+            //! HUTANG JIKA ADA TRANSAKSI DEBIT (D) MAKA HUTANGNYA BEERKURANG
+            total +=
+              el.trx_dbcr === "k"
+                ? el?.trx_amnh
+                : el?.trx_amnh - el?.acq_amnh ?? 0;
           });
           if (element.ap.length > 0) {
             sup.push(element);
@@ -97,10 +105,43 @@ const ReportHutangRingkasan = () => {
         const { data } = response;
         setSupplier(data);
         getAPCard(data);
+        getAcc(data);
       }
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const getAcc = async (sup) => {
+    const config = {
+      ...endpoints.account,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        let filt = [];
+        data?.forEach((elem) => {
+          sup?.forEach((el) => {
+            if (elem.account?.id === el.supplier?.sup_hutang) {
+              filt.push(elem);
+            }
+            // console.log("============");
+            // console.log(element);
+          });
+        });
+
+        let grouped = filt?.filter(
+          (el, i) =>
+            i === filt.findIndex((ek) => el?.account?.id === ek?.account?.id)
+        );
+        setAcc(grouped);
+      }
+    } catch (error) {}
   };
 
   const formatDate = (date) => {
@@ -115,114 +156,347 @@ const ReportHutangRingkasan = () => {
     return [day, month, year].join("-");
   };
 
+  const checkAcc = (value) => {
+    let selected = {};
+    acc?.forEach((element) => {
+      if (value === element?.account.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
   const jsonForExcel = (ap, excel = false) => {
     let data = [];
 
-    if (selectedSup) {
-      ap?.forEach((el) => {
-        if (selectedSup?.sup_id?.id === el.supplier?.id) {
-          let val = [
-            {
-              type: "header",
-              value: {
-                ref: "No.Pemasok/Nama Pemasok",
-                typ: "Type",
-                value: "Nilai Bukti",
-                lns: "Pembayaran",
-                sisa: "Sisa Bayar",
-                SE: "Saldo Efektif",
-              },
-            },
-          ];
-          let amn = 0;
-          let acq = 0;
-          el.ap.forEach((ek) => {
-            let dt = new Date(`${ek.ord_id?.fk_date}Z`);
-            if (dt <= filtDate) {
-              val.push({
+    if (selectedSup?.length && selectedAcc?.length) {
+      let total_nd = 0;
+      let total_nk = 0;
+
+      selectedSup?.forEach((p) => {
+        selectedAcc?.forEach((acc) => {
+          ap?.forEach((el) => {
+            let amn = 0;
+            let acq = 0;
+            if (
+              p?.sup_id?.id === el.supplier?.id &&
+              acc?.account?.id === el?.supplier?.sup_hutang
+            ) {
+              let trx_amnh = 0;
+              let acq_amnh = 0;
+              let sa = 0;
+              let sisa = 0;
+              let sld_efektif = 0;
+              let type = 0;
+
+              el.ap.forEach((ek) => {
+                let dt = new Date(`${ek.ord_date}Z`);
+                if (dt <= filtDate) {
+                  if (p?.sup_id?.id == ek?.sup_id?.id) {
+                    if (ek.trx_dbcr == "k") {
+                      trx_amnh += ek.trx_amnh;
+                    } else {
+                      if (ek.trx_type === "SA") {
+                        acq_amnh += ek.trx_amnh;
+                      } else {
+                        acq_amnh += ek.acq_amnh;
+                      }
+                    }
+
+                    if (ek.trx_dbcr == "d" && ek.trx_type == "DP") {
+                      sa += ek.trx_amnh;
+                    }
+
+                    if (ek.trx_dbcr == "d" && ek.trx_type == "SA") {
+                      sld_efektif += ek.trx_amnh;
+                    }
+
+                    type =
+                      ek?.trx_type === "LP"
+                        ? "Beli"
+                        : ek?.trx_type === "SA"
+                        ? "Saldo Awal"
+                        : "Pelunasan";
+                  }
+                }
+              });
+              sisa = trx_amnh > 0 ? trx_amnh - (acq_amnh + sa) : 0;
+              acq = acq_amnh + sa;
+
+              data.push({
                 type: "item",
                 value: {
-                  ref: ek.ord_id.fk_code,
-                  typ: "",
-                  SE: `Rp. ${formatIdr(ek.acq_amnh)}`,
-                  value: `Rp. ${formatIdr(ek.trx_amnh)}`,
-                  lns: `Rp. ${formatIdr(ek.acq_amnh)}`,
-                  sisa: `Rp. ${formatIdr(ek.trx_amnh - ek.acq_amnh)}`,
+                  ref: `${el.supplier.sup_code} - ${el.supplier.sup_name} `,
+                  sup_id: el.supplier?.id,
+                  SE: `${
+                    checkAcc(el.supplier?.sup_hutang)?.account?.acc_code
+                  } - ${checkAcc(el.supplier?.sup_hutang)?.account?.acc_name}`,
+                  typ: type,
+                  value: `Rp. ${formatIdr(trx_amnh)}`,
+                  lns: `Rp. ${formatIdr(acq)}`,
+                  sisa: `Rp. ${formatIdr(acq >= trx_amnh ? 0 : sisa)}`,
                 },
               });
-              amn += ek.trx_amnh;
-              acq += ek.acq_amnh;
+
+              total_nd += trx_amnh;
+              total_nk += acq_amnh;
             }
           });
-          val.push({
-            type: "footer",
-            value: {
-              ref: `${el.supplier.sup_code} - ${el.supplier.sup_name} `,
-
-              typ: el.trx_type,
-
-              value: `Rp. ${formatIdr(amn)}`,
-              lns: `Rp. ${formatIdr(acq)}`,
-              sisa: `Rp. ${formatIdr(acq)}`,
-              SE: `Rp. ${formatIdr(amn - acq)}`,
-            },
-          });
-          data.push(val);
-        }
+        });
       });
-    } else {
-      ap?.forEach((el) => {
-        let val = [
-          {
-            type: "header",
-            value: {
-              ref: "Nama Pemasok",
-              typ: "Type",
-              value: "Nilai Bukti",
-              lns: "Pembayaran",
-              sisa: "Sisa Bayar",
-              SE: "Saldo Efektif",
-            },
-          },
-        ];
-        let amn = 0;
-        let acq = 0;
-        el.ap.forEach((ek) => {
-          let dt = new Date(`${ek.ord_id?.fk_date}Z`);
-          if (dt <= filtDate) {
-            val.push({
+
+      data.push({
+        type: "footer",
+        value: {
+          ref: "Total Hutang",
+          SE: "",
+          typ: "",
+          value: `Rp. ${formatIdr(total_nd)}`,
+          lns: `Rp. ${formatIdr(total_nk)}`,
+          sisa: `Rp. ${formatIdr(total_nd - total_nk)}`,
+        },
+      });
+    } else if (selectedSup?.length) {
+      let total_nd = 0;
+      let total_nk = 0;
+
+      selectedSup?.forEach((p) => {
+        ap?.forEach((el) => {
+          let amn = 0;
+          let acq = 0;
+          if (p?.sup_id?.id === el.supplier?.id) {
+            let trx_amnh = 0;
+            let acq_amnh = 0;
+            let sa = 0;
+            let sisa = 0;
+            let sld_efektif = 0;
+            let type = 0;
+
+            el.ap.forEach((ek) => {
+              let dt = new Date(`${ek.ord_date}Z`);
+              if (dt <= filtDate) {
+                if (p?.sup_id?.id == ek?.sup_id?.id) {
+                  if (ek.trx_dbcr == "k") {
+                    trx_amnh += ek.trx_amnh;
+                  } else {
+                    if (ek.trx_type === "SA") {
+                      acq_amnh += ek.trx_amnh;
+                    } else {
+                      acq_amnh += ek.acq_amnh;
+                    }
+                  }
+
+                  if (ek.trx_dbcr == "d" && ek.trx_type == "DP") {
+                    sa += ek.trx_amnh;
+                  }
+
+                  if (ek.trx_dbcr == "d" && ek.trx_type == "SA") {
+                    sld_efektif += ek.trx_amnh;
+                  }
+                }
+
+                type =
+                  ek?.trx_type === "LP"
+                    ? "Beli"
+                    : ek?.trx_type === "SA"
+                    ? "Saldo Awal"
+                    : "Pelunasan";
+              }
+            });
+            sisa = trx_amnh > 0 ? trx_amnh - (acq_amnh + sa) : 0;
+            acq = acq_amnh + sa;
+
+            data.push({
               type: "item",
               value: {
                 ref: `${el.supplier.sup_code} - ${el.supplier.sup_name} `,
-
-                typ: `${ek.trx_type}`,
-                value: `Rp. ${formatIdr(ek.trx_amnh)}`,
-                lns: `Rp. ${formatIdr(ek.acq_amnh)}`,
-                sisa: `Rp. ${formatIdr(ek.trx_amnh)}`,
-                SE: `Rp. ${formatIdr(ek.trx_amnh - ek.acq_amnh)}`,
+                sup_id: el.supplier?.id,
+                SE: `${
+                  checkAcc(el.supplier?.sup_hutang)?.account?.acc_code
+                } - ${checkAcc(el.supplier?.sup_hutang)?.account?.acc_name}`,
+                typ: type,
+                value: `Rp. ${formatIdr(trx_amnh)}`,
+                lns: `Rp. ${formatIdr(acq)}`,
+                sisa: `Rp. ${formatIdr(acq >= trx_amnh ? 0 : sisa)}`,
               },
             });
-            amn += ek.trx_amnh;
-            acq += ek.acq_amnh;
+
+            total_nd += trx_amnh;
+            total_nk += acq_amnh;
+          }
+        });
+      });
+
+      data.push({
+        type: "footer",
+        value: {
+          ref: "Total Hutang",
+          SE: "",
+          typ: "",
+          value: `Rp. ${formatIdr(total_nd)}`,
+          lns: `Rp. ${formatIdr(total_nk)}`,
+          sisa: `Rp. ${formatIdr(total_nd - total_nk)}`,
+        },
+      });
+    } else if (selectedAcc?.length) {
+      let total_nd = 0;
+      let total_nk = 0;
+
+      selectedAcc?.forEach((acc) => {
+        ap?.forEach((el) => {
+          let amn = 0;
+          let acq = 0;
+          if (acc?.account?.id === el.supplier?.sup_hutang) {
+            let trx_amnh = 0;
+            let acq_amnh = 0;
+            let sa = 0;
+            let sisa = 0;
+            let sld_efektif = 0;
+            let type = null;
+
+            el.ap.forEach((ek) => {
+              let dt = new Date(`${ek.ord_date}Z`);
+              if (dt <= filtDate) {
+                // if (p?.sup_id?.id == ek?.sup_id?.id) {
+                if (ek.trx_dbcr == "k") {
+                  trx_amnh += ek.trx_amnh;
+                } else {
+                  if (ek.trx_type === "SA") {
+                    acq_amnh += ek.trx_amnh;
+                  } else {
+                    acq_amnh += ek.acq_amnh;
+                  }
+                }
+
+                if (ek.trx_dbcr == "d" && ek.trx_type == "DP") {
+                  sa += ek.trx_amnh;
+                }
+
+                if (ek.trx_dbcr == "d" && ek.trx_type == "SA") {
+                  sld_efektif += ek.trx_amnh;
+                }
+                // }
+
+                type =
+                  ek?.trx_type === "LP"
+                    ? "Beli"
+                    : ek?.trx_type === "SA"
+                    ? "Saldo Awal"
+                    : "Pelunasan";
+              }
+            });
+            sisa = trx_amnh > 0 ? trx_amnh - (acq_amnh + sa) : 0;
+            acq = acq_amnh + sa;
+
+            data.push({
+              type: "item",
+              value: {
+                ref: `${el.supplier.sup_code} - ${el.supplier.sup_name} `,
+                sup_id: el.supplier?.id,
+                SE: `${
+                  checkAcc(el.supplier?.sup_hutang)?.account?.acc_code
+                } - ${checkAcc(el.supplier?.sup_hutang)?.account?.acc_name}`,
+                typ: type,
+                value: `Rp. ${formatIdr(trx_amnh)}`,
+                lns: `Rp. ${formatIdr(acq)}`,
+                sisa: `Rp. ${formatIdr(acq >= trx_amnh ? 0 : sisa)}`,
+              },
+            });
+
+            total_nd += trx_amnh;
+            total_nk += acq_amnh;
+          }
+        });
+      });
+
+      data.push({
+        type: "footer",
+        value: {
+          ref: "Total Hutang",
+          SE: "",
+          typ: "",
+          value: `Rp. ${formatIdr(total_nd)}`,
+          lns: `Rp. ${formatIdr(total_nk)}`,
+          sisa: `Rp. ${formatIdr(total_nd - total_nk)}`,
+        },
+      });
+    } else {
+      let total_nd = 0;
+      let total_nk = 0;
+
+      ap?.forEach((el) => {
+        let amn = 0;
+        let acq = 0;
+        let trx_amnh = 0;
+        let acq_amnh = 0;
+        let sa = 0;
+        let sisa = 0;
+        let sld_efektif = 0;
+        let type = null;
+
+        el.ap.forEach((ek) => {
+          let dt = new Date(`${ek.ord_date}Z`);
+          if (dt <= filtDate) {
+            if (ek.trx_dbcr == "k") {
+              trx_amnh += ek.trx_amnh;
+            } else {
+              if (ek.trx_type === "SA") {
+                acq_amnh += ek.trx_amnh;
+              } else {
+                acq_amnh += ek.acq_amnh;
+              }
+            }
+
+            if (ek.trx_dbcr == "d" && ek.trx_type == "DP") {
+              sa += ek.trx_amnh;
+            }
+
+            if (ek.trx_dbcr == "d" && ek.trx_type == "SA") {
+              sld_efektif += ek.trx_amnh;
+            }
           }
 
-          val.push({
-            type: "footer",
-            value: {
-              ref: `${el.supplier.sup_code} - ${el.supplier.sup_name} `,
+          type =
+            ek?.trx_type === "LP"
+              ? "Beli"
+              : ek?.trx_type === "SA"
+              ? "Saldo Awal"
+              : "Pelunasan";
+        });
+        sisa = trx_amnh > 0 ? trx_amnh - (acq_amnh + sa) : 0;
+        acq = acq_amnh + sa;
 
-              typ: `${ek.trx_type}`,
+        data.push({
+          type: "item",
+          value: {
+            ref: `${el.supplier.sup_code} - ${el.supplier.sup_name} `,
+            sup_id: el.supplier?.id,
+            SE: `${checkAcc(el.supplier?.sup_hutang)?.account?.acc_code} - ${
+              checkAcc(el.supplier?.sup_hutang)?.account?.acc_name
+            }`,
+            typ: type,
 
-              value: `Rp. ${formatIdr(amn)}`,
-              lns: `Rp. ${formatIdr(acq)}`,
-
-              sisa: `Rp. ${formatIdr(amn - acq)}`,
-              SE: `Rp. ${formatIdr(amn - acq)}`,
-            },
-          });
+            value: `Rp. ${formatIdr(trx_amnh)}`,
+            lns: `Rp. ${formatIdr(acq)}`,
+            sisa: `Rp. ${formatIdr(acq >= trx_amnh ? 0 : sisa)}`,
+          },
         });
 
-        data.push(val);
+        total_nd += trx_amnh;
+        total_nk += acq_amnh;
+      });
+
+      data.push({
+        type: "footer",
+        value: {
+          ref: "Total Hutang",
+          SE: "",
+          typ: "",
+          value: `Rp. ${formatIdr(total_nd)}`,
+          lns: `Rp. ${formatIdr(total_nk)}`,
+          sisa: `Rp. ${formatIdr(total_nd - total_nk)}`,
+        },
       });
     }
 
@@ -230,7 +504,7 @@ const ReportHutangRingkasan = () => {
       {
         columns: [
           {
-            title: "Debt Balance Summary",
+            title: "Accounts Payable Summary",
             width: { wch: 30 },
             style: {
               font: { sz: "14", bold: true },
@@ -269,7 +543,7 @@ const ReportHutangRingkasan = () => {
     data.forEach((ek) => {
       item.push([
         {
-          value: `${ek[ek.length - 1].value.ref}`,
+          value: `${ek[ek.length - 1]?.value.ref}`,
           style: {
             font: {
               sz: "14",
@@ -280,15 +554,7 @@ const ReportHutangRingkasan = () => {
         },
 
         {
-          value: `${ek[ek.length - 1].value.typ}`,
-          style: {
-            font: { sz: "14", bold: ek.type === "header" ? true : false },
-            alignment: { horizontal: "center", vertical: "center" },
-          },
-        },
-
-        {
-          value: `${ek[ek.length - 1].value.value}`,
+          value: `${ek[ek.length - 1]?.value.SE}`,
           style: {
             font: {
               sz: "14",
@@ -299,17 +565,18 @@ const ReportHutangRingkasan = () => {
         },
 
         {
-          value: `${ek[ek.length - 1].value.lns}`,
+          value: `${ek[ek.length - 1]?.value.typ}`,
           style: {
             font: {
               sz: "14",
               bold: ek.type === "header" ? true : false,
             },
-            alignment: { horizontal: "right", vertical: "center" },
+            alignment: { horizontal: "left", vertical: "center" },
           },
         },
+
         {
-          value: `${ek[ek.length - 1].value.sisa}`,
+          value: `${ek[ek.length - 1]?.value.value}`,
           style: {
             font: {
               sz: "14",
@@ -320,7 +587,17 @@ const ReportHutangRingkasan = () => {
         },
 
         {
-          value: `${ek[ek.length - 1].value.SE}`,
+          value: `${ek[ek.length - 1]?.value.lns}`,
+          style: {
+            font: {
+              sz: "14",
+              bold: ek.type === "header" ? true : false,
+            },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: `${ek[ek.length - 1]?.value.sisa}`,
           style: {
             font: {
               sz: "14",
@@ -392,11 +669,11 @@ const ReportHutangRingkasan = () => {
           },
         },
         {
-          title: "Type",
-          width: { wch: 8 },
+          title: "Account Distribution",
+          width: { wch: 30 },
           style: {
             font: { sz: "14", bold: true },
-            alignment: { horizontal: "center", vertical: "center" },
+            alignment: { horizontal: "right", vertical: "center" },
             fill: {
               paternType: "solid",
               fgColor: { rgb: "F3F3F3" },
@@ -404,8 +681,20 @@ const ReportHutangRingkasan = () => {
           },
         },
         {
-          title: "Nilai Terbukti",
-          width: { wch: 20 },
+          title: "Transaction Type",
+          width: { wch: 30 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "right", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          title: "Nilai",
+          width: { wch: 30 },
           style: {
             font: { sz: "14", bold: true },
             alignment: { horizontal: "right", vertical: "center" },
@@ -429,19 +718,7 @@ const ReportHutangRingkasan = () => {
         },
         {
           title: "Sisa",
-          width: { wch: 20 },
-          style: {
-            font: { sz: "14", bold: true },
-            alignment: { horizontal: "right", vertical: "center" },
-            fill: {
-              paternType: "solid",
-              fgColor: { rgb: "F3F3F3" },
-            },
-          },
-        },
-        {
-          title: "Saldo Efektif",
-          width: { wch: 20 },
+          width: { wch: 30 },
           style: {
             font: { sz: "14", bold: true },
             alignment: { horizontal: "right", vertical: "center" },
@@ -463,17 +740,27 @@ const ReportHutangRingkasan = () => {
   };
 
   const formatIdr = (value) => {
-    return `${value}`
+    return `${value?.toFixed(2)}`
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
+  const glTemplate = (option) => {
+    return (
+      <div>
+        {option !== null
+          ? `${option.account.acc_code} - ${option.account.acc_name}`
+          : ""}
+      </div>
+    );
   };
 
   const renderHeader = () => {
     return (
       <div className="flex justify-content-between">
-        <div className="col-6 ml-0 mr-0 pl-0 pt-0">
+        <div className="col-10 ml-0 mr-0 pl-0 pt-0">
           <Row className="mt-0">
-            <div className="p-inputgroup col-4">
+            <div className="p-inputgroup col-3">
               <span className="p-inputgroup-addon">
                 <i className="pi pi-calendar" />
               </span>
@@ -488,8 +775,8 @@ const ReportHutangRingkasan = () => {
                 dateFormat="dd-mm-yy"
               />
             </div>
-            <div className="mt-2">
-              <Dropdown
+            <div className="mt-2 mr-3">
+              <MultiSelect
                 value={selectedSup ?? null}
                 options={supplier}
                 onChange={(e) => {
@@ -500,6 +787,27 @@ const ReportHutangRingkasan = () => {
                 filter
                 filterBy="sup_id.sup_name"
                 showClear
+                display="chip"
+                className="w-full md:w-20rem"
+                maxSelectedLabels={3}
+              />
+            </div>
+            <div className="mt-2">
+              <MultiSelect
+                value={selectedAcc ?? null}
+                options={acc}
+                onChange={(e) => {
+                  setSelectedAcc(e.value);
+                }}
+                placeholder="Pilih Account"
+                optionLabel="account.acc_name"
+                itemTemplate={glTemplate}
+                filter
+                filterBy="account.acc_name"
+                showClear
+                display="chip"
+                className="w-full md:w-20rem"
+                maxSelectedLabels={3}
               />
             </div>
           </Row>
@@ -569,16 +877,17 @@ const ReportHutangRingkasan = () => {
         </Col>
       </Row>
 
-      <Row className="m-0 justify-content-center" ref={printPage}>
+      <Row className="m-0 justify-content-center">
         {chunk(jsonForExcel(ap) ?? [], chunkSize)?.map((val, idx) => {
           return (
             <Card className="ml-1 mr-1 mt-2">
               <Card.Body className="p-0 m-0">
                 <CustomeWrapper
-                  tittle={"Debt Balance Summary"}
-                  subTittle={`Debt Balance Summary as ${formatDate(
-                    filtDate
-                  )}`}
+                  horizontal
+                  tittle={"Accounts Payable Summary"}
+                  subTittle={`Accounts Payable Summary as ${
+                    filtDate ? formatDate(filtDate) : "-"
+                  }`}
                   onComplete={(cp) => setCp(cp)}
                   page={idx + 1}
                   body={
@@ -594,39 +903,143 @@ const ReportHutangRingkasan = () => {
                         <Column
                           header="Nama Supplier"
                           style={{ width: "20rem" }}
-                          body={(e) => e[e.length - 1].value.ref}
+                          field={(e) => e?.value?.ref}
+                          body={
+                            (e) => (
+                              // e.type === "item" ? (
+                              //   <Link
+                              //     to={`/laporan/ap/saldo-hutang-rincian/${btoa(
+                              //       `m'${filtDate?.getMonth() + 1}`
+                              //     )}/${btoa(
+                              //       `y'${filtDate?.getFullYear()}`
+                              //     )}/${btoa(
+                              //       btoa(
+                              //         JSON.stringify({
+                              //           sup_id: e.value?.sup_id,
+                              //         })
+                              //       )
+                              //     )}`}
+                              //   >
+                              //     <div
+                              //       className={
+                              //         e.type === "header"
+                              //           ? "font-weight-bold"
+                              //           : e.type === "footer"
+                              //           ? "font-weight-bold"
+                              //           : ""
+                              //       }
+                              //     >
+                              //       {e.value.ref}
+                              //     </div>
+                              //   </Link>
+                              // ) : (
+                              <div
+                                className={
+                                  e.type === "header"
+                                    ? "font-weight-bold"
+                                    : e.type === "footer"
+                                    ? "font-weight-bold"
+                                    : ""
+                                }
+                              >
+                                {e.value.ref}
+                              </div>
+                            )
+                            // )
+                          }
                         />
 
                         <Column
-                          header="Type"
+                          // className="header-right text-r"
+                          header="Account Distribution"
                           style={{ width: "10rem" }}
-                          body={(e) => e[e.length - 1].value.typ}
+                          body={(e) => (
+                            <div
+                              className={
+                                e.type === "header"
+                                  ? "font-weight-bold"
+                                  : e.type === "footer"
+                                  ? "font-weight-bold"
+                                  : "text-left"
+                              }
+                            >
+                              {e.value.SE}
+                            </div>
+                          )}
                         />
 
                         <Column
-                          className="header-right text-right"
-                          header="Nilai Terbukti"
-                          style={{ width: "10rem" }}
-                          body={(e) => e[e.length - 1].value.value}
-                        />
-                        <Column
-                          className="header-right text-right"
-                          header="Pembayaran"
-                          style={{ width: "10rem" }}
-                          body={(e) => e[e.length - 1].value.lns}
-                        />
-                        <Column
-                          className="header-right text-right"
-                          header="Sisa Bayar"
-                          style={{ width: "10rem" }}
-                          body={(e) => e[e.length - 1].value.sisa}
+                          // className="header-right text-r"
+                          header="Trans type"
+                          style={{ width: "8rem" }}
+                          body={(e) => (
+                            <div
+                              className={
+                                e.type === "header"
+                                  ? "font-weight-bold"
+                                  : e.type === "footer"
+                                  ? "font-weight-bold"
+                                  : "text-left"
+                              }
+                            >
+                              {e.value.typ}
+                            </div>
+                          )}
                         />
 
                         <Column
-                          className="header-right text-right"
-                          header="Saldo Efektif"
+                          // className="header-right text-right"
+                          header="Nilai Kredit"
                           style={{ width: "10rem" }}
-                          body={(e) => e[e.length - 1].value.SE}
+                          body={(e) => (
+                            <div
+                              className={
+                                e.type === "header"
+                                  ? "font-weight-bold text-right mr-2"
+                                  : e.type === "footer"
+                                  ? "font-weight-bold text-right mr-2"
+                                  : "text-right mr-2"
+                              }
+                            >
+                              {e.value.value}
+                            </div>
+                          )}
+                        />
+                        <Column
+                          className="header-right text-right"
+                          header="Nilai Debet"
+                          style={{ width: "10rem" }}
+                          body={(e) => (
+                            <div
+                              className={
+                                e.type === "header"
+                                  ? "font-weight-bold text-right mr-2"
+                                  : e.type === "footer"
+                                  ? "font-weight-bold text-right mr-2"
+                                  : "text-right mr-2"
+                              }
+                            >
+                              {e.value.lns}
+                            </div>
+                          )}
+                        />
+                        <Column
+                          className="header-right text-right"
+                          header="Sisa"
+                          style={{ width: "10rem" }}
+                          body={(e) => (
+                            <div
+                              className={
+                                e.type === "header"
+                                  ? "font-weight-bold text-right mr-2"
+                                  : e.type === "footer"
+                                  ? "font-weight-bold text-right mr-2"
+                                  : "text-right mr-2"
+                              }
+                            >
+                              {e.value.sisa}
+                            </div>
+                          )}
                         />
                       </DataTable>
                     </>
@@ -636,6 +1049,154 @@ const ReportHutangRingkasan = () => {
             </Card>
           );
         })}
+      </Row>
+
+      <Row className="m-0 justify-content-center d-none">
+        <Card className="ml-1 mr-1 mt-2">
+          <Card.Body className="p-0 m-0" ref={printPage}>
+            {chunk(jsonForExcel(ap) ?? [], chunkSize)?.map((val, idx) => {
+              return (
+                <Card className="ml-1 mr-1 mt-2">
+                  <Card.Body className="p-0 m-0">
+                    <CustomeWrapper
+                      horizontal
+                      tittle={"Accounts Payable Summary"}
+                      subTittle={`Accounts Payable Summary as ${
+                        filtDate ? formatDate(filtDate) : "-"
+                      }`}
+                      onComplete={(cp) => setCp(cp)}
+                      page={idx + 1}
+                      body={
+                        <>
+                          <DataTable
+                            responsiveLayout="scroll"
+                            value={val}
+                            showGridlines
+                            dataKey="id"
+                            rowHover
+                            emptyMessage="Data Tidak Ditemukan"
+                          >
+                            <Column
+                              header="Nama Supplier"
+                              style={{ width: "20rem" }}
+                              field={(e) => e?.value?.ref}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header"
+                                      ? "font-weight-bold"
+                                      : e.type === "footer"
+                                      ? "font-weight-bold"
+                                      : ""
+                                  }
+                                >
+                                  {e.value.ref}
+                                </div>
+                              )}
+                            />
+
+                            <Column
+                              // className="header-right text-r"
+                              header="Account Distribution"
+                              style={{ width: "10rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header"
+                                      ? "font-weight-bold"
+                                      : e.type === "footer"
+                                      ? "font-weight-bold"
+                                      : "text-left"
+                                  }
+                                >
+                                  {e.value.SE}
+                                </div>
+                              )}
+                            />
+
+                            <Column
+                              // className="header-right text-r"
+                              header="Trans Type"
+                              style={{ width: "10rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header"
+                                      ? "font-weight-bold"
+                                      : e.type === "footer"
+                                      ? "font-weight-bold"
+                                      : "text-left"
+                                  }
+                                >
+                                  {e.value.typ}
+                                </div>
+                              )}
+                            />
+
+                            <Column
+                              className="header-right text-right"
+                              header="Nilai Kredit"
+                              style={{ width: "10rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header"
+                                      ? "font-weight-bold text-right mr-2"
+                                      : e.type === "footer"
+                                      ? "font-weight-bold text-right mr-2"
+                                      : "text-right mr-2"
+                                  }
+                                >
+                                  {e.value.value}
+                                </div>
+                              )}
+                            />
+                            <Column
+                              className="header-right text-right"
+                              header="Nilai Debet"
+                              style={{ width: "10rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header"
+                                      ? "font-weight-bold text-right mr-2"
+                                      : e.type === "footer"
+                                      ? "font-weight-bold text-right mr-2"
+                                      : "text-right mr-2"
+                                  }
+                                >
+                                  {e.value.lns}
+                                </div>
+                              )}
+                            />
+                            <Column
+                              className="header-right text-right"
+                              header="Sisa"
+                              style={{ width: "10rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header"
+                                      ? "font-weight-bold text-right mr-2"
+                                      : e.type === "footer"
+                                      ? "font-weight-bold text-right mr-2"
+                                      : "text-right mr-2"
+                                  }
+                                >
+                                  {e.value.sisa}
+                                </div>
+                              )}
+                            />
+                          </DataTable>
+                        </>
+                      }
+                    />
+                  </Card.Body>
+                </Card>
+              );
+            })}
+          </Card.Body>
+        </Card>
       </Row>
     </>
   );

@@ -89,6 +89,10 @@ const DataGroupProduk = ({
   const [divisi, setDivisi] = useState(null);
   const [setup, setSetup] = useState(null);
   const [account, setAccount] = useState(null);
+  const [accSto, setAccSto] = useState(null);
+  const [accSlsRet, setAccSlsRet] = useState(null);
+  const [accSlsDisc, setAccSlsDisc] = useState(null);
+  const [accSelisih, setAccSelisih] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
@@ -160,6 +164,11 @@ const DataGroupProduk = ({
       if (response.status) {
         const { data } = response;
         let filt = [];
+        let acc_sto = [];
+        let acc_sls_ret = [];
+        let acc_sls_disc = [];
+        let acc_selisih = [];
+
         data.forEach((element) => {
           if (
             element.account.kat_code === setup?.sto_wip?.kat_code &&
@@ -167,9 +176,44 @@ const DataGroupProduk = ({
           ) {
             filt.push(element);
           }
+
+          if (
+            element.account?.umm_code === setup?.sto_general?.acc_code &&
+            element.account?.dou_type === "D"
+          ) {
+            acc_sto.push(element);
+          }
+
+          if (
+            element.account?.umm_code === setup?.sls_retur?.acc_code ||
+            (element.account.kat_code === setup?.sls_ret?.kat_code &&
+              element.account?.dou_type === "D")
+          ) {
+            acc_sls_ret.push(element);
+          }
+
+          if (
+            element.account?.umm_code === setup?.sls_disc?.acc_code ||
+            (element.account.kat_code === setup?.sls_disc?.kat_code &&
+              element.account?.dou_type === "D")
+          ) {
+            acc_sls_disc.push(element);
+          }
+
+          if (
+            element.account?.umm_code === setup?.sto_hpp_diff?.acc_code ||
+            (element.account.kat_code === setup?.sto_hpp_diff?.kat_code &&
+              element.account?.dou_type === "D")
+          ) {
+            acc_selisih.push(element);
+          }
         });
-        setWip(filt);
         setAccount(data);
+        setWip(filt);
+        setAccSto(acc_sto);
+        setAccSlsRet(acc_sls_ret);
+        setAccSlsDisc(acc_sls_disc);
+        setAccSelisih(acc_selisih);
       }
     } catch (error) {}
   };
@@ -519,15 +563,15 @@ const DataGroupProduk = ({
                 groupPro: {
                   ...def.groupPro,
                   wip: false,
-                  acc_sto: setup?.sto?.id,
-                  acc_send: setup?.pur_shipping?.id,
-                  acc_terima: setup?.ap?.id,
-                  // acc_wip: setup?.sto_wip?.id,
-                  hrg_pokok: setup?.pur_cogs?.id,
-                  acc_penj: setup?.sls_rev?.id,
-                  potongan: setup?.sls_disc?.id,
-                  pengembalian: setup?.sls_shipping?.id,
-                  selisih: setup?.sto_hpp_diff?.id,
+                  // acc_sto: setup?.sto?.id,
+                  // acc_send: setup?.pur_shipping?.id,
+                  // acc_terima: setup?.ap?.id,
+                  // // acc_wip: setup?.sto_wip?.id,
+                  // hrg_pokok: setup?.pur_cogs?.id,
+                  // acc_penj: setup?.sls_rev?.id,
+                  // potongan: setup?.sls_disc?.id,
+                  // pengembalian: setup?.sls_shipping?.id,
+                  // selisih: setup?.sto_hpp_diff?.id,
                 },
               });
               setDisplayData(true);
@@ -945,7 +989,7 @@ const DataGroupProduk = ({
                             ? gl(currentItem.groupPro.acc_sto)
                             : null
                         }
-                        options={account}
+                        options={accSto}
                         onChange={(e) => {
                           console.log(e.value);
                           setCurrentItem({
@@ -1167,7 +1211,7 @@ const DataGroupProduk = ({
                             ? gl(currentItem.groupPro.potongan)
                             : null
                         }
-                        options={account}
+                        options={accSlsDisc}
                         onChange={(e) => {
                           console.log(e.value);
                           setCurrentItem({
@@ -1202,7 +1246,7 @@ const DataGroupProduk = ({
                             ? gl(currentItem.groupPro.pengembalian)
                             : null
                         }
-                        options={account}
+                        options={accSlsRet}
                         onChange={(e) => {
                           console.log(e.value);
                           setCurrentItem({
@@ -1239,7 +1283,7 @@ const DataGroupProduk = ({
                             ? gl(currentItem.groupPro.selisih)
                             : null
                         }
-                        options={account}
+                        options={accSelisih}
                         onChange={(e) => {
                           console.log(e.value);
                           setCurrentItem({

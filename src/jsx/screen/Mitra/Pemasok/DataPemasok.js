@@ -114,6 +114,7 @@ const DataSupplier = ({
   const [currency, setCurrency] = useState(null);
   const [city, setCity] = useState(null);
   const [setup, setSetup] = useState(null);
+  const [account, setAccount] = useState(null);
   const [accHut, setAccHut] = useState(null);
   const [accUm, setAccUm] = useState(null);
   const [company, setComp] = useState(null);
@@ -234,17 +235,29 @@ const DataSupplier = ({
       console.log(response);
       if (response.status) {
         const { data } = response;
+        let all_acc = [];
         let filt = [];
-        let all = [];
+        let acc_um = [];
         data.forEach((elem) => {
-          if (elem.account?.id === setup?.ap?.id) {
+          if (
+            elem.account?.umm_code === setup?.ap?.acc_code &&
+            elem.account?.dou_type === "D"
+          ) {
             filt.push(elem.account);
           }
-          all.push(elem.account);
+
+          if (
+            elem.account?.umm_code === setup?.pur_advance?.acc_code &&
+            elem.account?.dou_type === "D"
+          ) {
+            acc_um.push(elem.account);
+          }
+
+          all_acc.push(elem.account);
         });
-        console.log(data);
+        setAccount(all_acc);
         setAccHut(filt);
-        setAccUm(all);
+        setAccUm(acc_um);
       }
     } catch (error) {}
   };
@@ -627,8 +640,8 @@ const DataSupplier = ({
                 ...def,
                 supplier: {
                   ...def.supplier,
-                  sup_hutang: setup?.ap?.id,
-                  sup_uang_muka: setup?.pur_advance?.id,
+                  // sup_hutang: setup?.ap?.id,
+                  // sup_uang_muka: setup?.pur_advance?.id,
                 },
               });
               onInput(true);
@@ -710,14 +723,14 @@ const DataSupplier = ({
     return selected;
   };
 
-  const hut = (value) => {
-    let hut = {};
-    accHut?.forEach((element) => {
+  const checAcc = (value) => {
+    let acc = {};
+    account?.forEach((element) => {
       if (value === element.id) {
-        hut = element;
+        acc = element;
       }
     });
-    return hut;
+    return acc;
   };
 
   const glTemplate = (option) => {
@@ -1411,7 +1424,7 @@ const DataSupplier = ({
                     label={"Kode Distribusi AP"}
                     value={
                       currentItem?.supplier?.sup_hutang &&
-                      hut(currentItem?.supplier?.sup_hutang)
+                      checAcc(currentItem?.supplier?.sup_hutang)
                     }
                     options={accHut}
                     onChange={(e) => {
@@ -1444,9 +1457,9 @@ const DataSupplier = ({
                     label={"Uang Muka Pembelian"}
                     value={
                       currentItem?.supplier?.sup_uang_muka &&
-                      hut(currentItem?.supplier?.sup_uang_muka)
+                      checAcc(currentItem?.supplier?.sup_uang_muka)
                     }
-                    options={accHut}
+                    options={accUm}
                     onChange={(e) => {
                       console.log(e.value);
                       setCurrentItem({

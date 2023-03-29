@@ -124,7 +124,8 @@ const DataCustomer = ({
   const [subArea, setSubArea] = useState(null);
   const [setup, setSetup] = useState(null);
   const [ar, setAr] = useState(null);
-  const [accU, setAcc] = useState(null);
+  const [accUm, setAccUm] = useState(null);
+  const [acc, setAcc] = useState(null);
   const [company, setComp] = useState(null);
   const [currency, setCurrency] = useState(null);
   const [pajak, setPajak] = useState(null);
@@ -282,8 +283,6 @@ const DataCustomer = ({
   };
 
   const getAR = async (setup) => {
-    console.log("setup========");
-          console.log(setup);
     const config = {
       ...endpoints.account,
       data: {},
@@ -295,16 +294,17 @@ const DataCustomer = ({
       console.log(response);
       if (response.status) {
         const { data } = response;
-        let filt = [];
         let all = [];
+        let filt = [];
+        let acc_um = [];
         data?.forEach((element) => {
-          // setup?.forEach((el) => {
-            if (element.account.id === setup?.ar?.id) {
-              // if (element.account.dou_type === "D") {
-              filt.push(element.account);
-              // }
-            }
-          // });
+          if (
+            element.account.umm_code === setup?.ar?.acc_code &&
+            element.account?.dou_type === "D"
+          ) {
+            filt.push(element.account);
+          }
+
           all.push(element.account);
         });
         setAr(filt);
@@ -774,8 +774,8 @@ const DataCustomer = ({
                 ...def,
                 customer: {
                   ...def.customer,
-                  cus_gl: setup?.ar?.id,
-                  cus_uang_muka: setup?.sls_prepaid?.id,
+                  // cus_gl: setup?.ar?.id,
+                  // cus_uang_muka: setup?.sls_prepaid?.id,
                 },
               });
               onInput(true);
@@ -857,24 +857,14 @@ const DataCustomer = ({
     return selected;
   };
 
-  const gl = (value) => {
-    let gl = {};
-    ar?.forEach((element) => {
+  const checkAcc = (value) => {
+    let acc = {};
+    acc?.forEach((element) => {
       if (value === element.id) {
-        gl = element;
+        acc = element;
       }
     });
-    return gl;
-  };
-
-  const um = (value) => {
-    let um = {};
-    ar?.forEach((element) => {
-      if (value === element.id) {
-        um = element;
-      }
-    });
-    return um;
+    return acc;
   };
 
   const glTemplate = (option) => {
@@ -1615,7 +1605,7 @@ const DataCustomer = ({
                     value={
                       currentItem !== null &&
                       currentItem?.customer?.cus_gl !== null
-                        ? gl(currentItem.customer.cus_gl)
+                        ? checkAcc(currentItem.customer.cus_gl)
                         : null
                     }
                     options={ar}
@@ -1649,9 +1639,9 @@ const DataCustomer = ({
                     label={"Kode Distribusi Uang Muka Penjualan"}
                     value={
                       currentItem?.customer?.cus_uang_muka &&
-                      gl(currentItem.customer.cus_uang_muka)
+                      checkAcc(currentItem.customer.cus_uang_muka)
                     }
-                    options={accU}
+                    options={acc}
                     onChange={(e) => {
                       console.log(e.value);
                       setCurrentItem({

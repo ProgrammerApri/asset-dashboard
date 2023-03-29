@@ -356,7 +356,9 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
         dispatch({
           type: SET_PRODUCT,
-          payload: data.filter((v) => v?.group?.stock ? v?.group?.stok === !ns : true),
+          payload: data.filter((v) =>
+            v?.group?.stock ? v?.group?.stok === !ns : true
+          ),
         });
 
         getGrupP();
@@ -754,22 +756,24 @@ const InputOrder = ({ onCancel, onSuccess }) => {
           element.order ||
           element.price
         ) {
-          errors.prod[i] = {
+          errors.prod.splice(i, 1, {
             id: !element.prod_id,
-            lok: !element.location,
+            lok: element.location === null,
             jum:
               !element.order || element.order === "" || element.order === "0",
             prc:
               !element.price || element.price === "" || element.price === "0",
-          };
+          });
         }
       } else {
-        errors.prod[i] = {
+        console.log("LOCATION=====", element.location === null);
+        errors.prod.splice(i, 1, {
           id: !element.prod_id,
-          lok: !element.location,
+          lok: element.location === null,
           jum: !element.order || element.order === "" || element.order === "0",
           prc: !element.price || element.price === "" || element.price === "0",
-        };
+        });
+        console.log("Errors=====", errors.prod);
       }
 
       grupP?.forEach((el) => {
@@ -786,6 +790,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
         }
       });
     });
+
+    console.log("Error=====", errors);
 
     order?.djasa.forEach((element, i) => {
       if (i > 0) {
@@ -808,6 +814,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     });
 
     if (
+      order.dprod[0]?.prod_id !== null &&
       !errors.prod[0].id &&
       !errors.prod[0].lok &&
       !errors.prod[0].jum &&
@@ -820,19 +827,32 @@ const InputOrder = ({ onCancel, onSuccess }) => {
       });
     }
 
-    if (!errors.jasa[0]?.id && !errors.jasa[0]?.jum && !errors.jasa[0]?.prc) {
-      errors.prod?.forEach((e) => {
-        for (var key in e) {
-          e[key] = false;
-        }
-      });
+    if (errors.jasa.length > 0) {
+      if (
+        order.djasa[0]?.jasa_id !== null &&
+        !errors.jasa[0]?.id &&
+        !errors.jasa[0]?.jum &&
+        !errors.jasa[0]?.prc
+      ) {
+        errors.prod?.forEach((e) => {
+          for (var key in e) {
+            e[key] = false;
+          }
+        });
+      }
     }
 
     let validProduct = 0;
     let validJasa = false;
     errors.prod?.forEach((el) => {
+      let totalKey = 0
+      let validKey = 0
       for (var k in el) {
-        validProduct += !el[k] ? 1 : 0;
+        totalKey++
+        validKey += !el[k] ? 1 : 0;
+      }
+      if (totalKey == validKey) {
+        validProduct += 1
       }
     });
     if (!validProduct) {
@@ -872,12 +892,12 @@ const InputOrder = ({ onCancel, onSuccess }) => {
       !errors.date &&
       !errors.sup &&
       // !errors.rul &&
-      (validProduct || validJasa) &&
+      (validProduct === order.dprod.length || validJasa) &&
       acc_err;
 
     setError(errors);
     console.log("======err=======");
-    console.log(errors);
+    console.log(validProduct);
 
     if (!valid) {
       window.scrollTo({
@@ -1017,6 +1037,15 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                     note: e.value?.note ?? null,
                     dprod: e.value?.id
                       ? e.value?.pprod.map((v) => {
+                          let newError = error;
+                          newError.prod = [];
+                          newError.prod.push({
+                            id: false,
+                            lok: false,
+                            jum: false,
+                            prc: false,
+                          });
+                          setError(newError);
                           return {
                             ...v,
                             req: v.order,
@@ -1024,6 +1053,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                             // remain: v?.order - v?.order,
                             total: 0,
                             total_fc: 0,
+                            location: null,
                           };
                         })
                       : [
@@ -1038,6 +1068,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                             nett_price: null,
                             total_fc: 0,
                             total: null,
+                            location: null,
                           },
                         ],
                     djasa: e.value?.id
@@ -1063,7 +1094,20 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                           },
                         ],
                   });
+                  if (!e.value?.id) {
+                    let newError = error;
+                    newError.prod = [
+                      {
+                        id: false,
+                        lok: false,
+                        jum: false,
+                        prc: false,
+                      },
+                    ];
+                    setError(newError);
+                  }
                   getProduct(e.value?.ns);
+                  console.log(error);
                 }}
                 placeholder={tr[localStorage.getItem("language")].kd_ord}
                 optionLabel="po_code"
@@ -1856,8 +1900,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                           onClick={() => {
                             let newError = error;
                             newError.prod.push({
-                              // id: false,
-                              // lok: false,
+                              id: false,
+                              lok: false,
                               jum: false,
                               prc: false,
                             });
@@ -2481,16 +2525,16 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
         <div className="row ml-0 mr-0 mb-0 mt-6 justify-content-between">
           <div className="col-6 pl-0">
-          <label className="text-label">Note</label>
-              <div className="p-inputgroup">
-                <InputTextarea
-                  placeholder="Catatan"
-                  value={order.note}
-                  onChange={(e) => {
-                    updateORD({ ...order, note: e.target.value });
-                  }}
-                />
-              </div>
+            <label className="text-label">Note</label>
+            <div className="p-inputgroup">
+              <InputTextarea
+                placeholder="Catatan"
+                value={order.note}
+                onChange={(e) => {
+                  updateORD({ ...order, note: e.target.value });
+                }}
+              />
+            </div>
             <div className="row mt-4">
               {order.djasa?.length > 0 && order.dprod?.length > 0 && (
                 <div className="d-flex col-12 align-items-center">

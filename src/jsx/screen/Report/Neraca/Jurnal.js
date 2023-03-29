@@ -465,7 +465,7 @@ const ReportJurnal = () => {
                                 className="header-center"
                                 header={(e) =>
                                   e.props.value
-                                    ? e.props?.value[0]?.trx_code
+                                    ? `${e.props?.value[0]?.trx_code} - ${e.props?.value[0]?.trx_date}`
                                     : null
                                 }
                                 style={{ width: "15rem" }}

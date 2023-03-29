@@ -686,8 +686,8 @@ const DataPajak = ({
                   <PrimeDropdown
                     label={tr[localStorage.getItem("language")].acc_pjk_bl}
                     value={
-                      currentItem !== null && currentItem.acc_sls_tax !== null
-                        ? acc(currentItem.acc_sls_tax)
+                      currentItem !== null && currentItem.acc_pur_tax !== null
+                        ? acc(currentItem.acc_pur_tax)
                         : null
                     }
                     options={account}
@@ -695,7 +695,7 @@ const DataPajak = ({
                       console.log(e.value);
                       setCurrentItem({
                         ...currentItem,
-                        acc_sls_tax: e.value?.id,
+                        acc_pur_tax: e.value?.id,
                       });
                       let newError = error;
                       newError.acc1 = false;
@@ -716,8 +716,8 @@ const DataPajak = ({
                   <PrimeDropdown
                     label={tr[localStorage.getItem("language")].acc_pjk_jl}
                     value={
-                      currentItem !== null && currentItem.acc_pur_tax !== null
-                        ? acc(currentItem.acc_pur_tax)
+                      currentItem !== null && currentItem.acc_sls_tax !== null
+                        ? acc(currentItem.acc_sls_tax)
                         : null
                     }
                     options={account}
@@ -725,7 +725,7 @@ const DataPajak = ({
                       console.log(e.value);
                       setCurrentItem({
                         ...currentItem,
-                        acc_pur_tax: e.value?.id,
+                        acc_sls_tax: e.value?.id,
                       });
                       let newError = error;
                       newError.acc2 = false;

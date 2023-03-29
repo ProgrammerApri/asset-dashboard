@@ -1339,7 +1339,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-3 mt-2">
+          <div className="col-3 mt-2" hidden>
             <label className="text-label"></label>
             <div className="p-inputgroup">
               <SelectButton

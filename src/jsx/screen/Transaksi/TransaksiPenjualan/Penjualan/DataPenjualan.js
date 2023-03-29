@@ -32,7 +32,7 @@ const data = {
   sub_addr: null,
   sub_id: null,
   slsm_id: null,
-  surat_jalan: 1,
+  surat_jalan: 2,
   req_date: null,
   top: null,
   due_date: false,
@@ -303,7 +303,7 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
               type: SET_CURRENT_SL,
               payload: {
                 ...data,
-                surat_jalan: 1,
+                surat_jalan: 2,
                 jprod: [
                   {
                     id: 0,

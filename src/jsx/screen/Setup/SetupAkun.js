@@ -635,12 +635,12 @@ const SetupAkun = () => {
             {renderAccountDropdown("Piutang Usaha", setup && setup.ar, (e) => {
               setSetup({ ...setup, ar: e.value });
               submitUpdate({ ...setup, ar: e.value });
-            })}
+            }, false, "d")}
 
             {renderAccountDropdown("Hutang Usaha", setup && setup.ap, (e) => {
               setSetup({ ...setup, ap: e.value });
               submitUpdate({ ...setup, ap: e.value });
-            })}
+            }, false, "d")}
           </Row>
         }
       />

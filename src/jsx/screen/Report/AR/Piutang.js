@@ -15,6 +15,7 @@ import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import { el } from "date-fns/locale";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { Dropdown } from "primereact/dropdown";
+import { MultiSelect } from "primereact/multiselect";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -25,17 +26,19 @@ const ReportPiutang = () => {
   const printPage = useRef(null);
   const [filtDate, setFiltDate] = useState(new Date());
   const [customer, setCustomer] = useState(null);
-  const [selectedCus, setSelected] = useState(null);
+  const [acc, setAcc] = useState(null);
+  const [selectedCus, setSelected] = useState([]);
+  const [selectedAcc, setSelectedAcc] = useState([]);
   const [ar, setAr] = useState(null);
   const [total, setTotal] = useState(null);
   const [cp, setCp] = useState("");
   const chunkSize = 5;
 
   useEffect(() => {
-    getCustomer();
+    getARCard();
   }, []);
 
-  const getARCard = async (plg) => {
+  const getARCard = async (id) => {
     const config = {
       ...endpoints.arcard,
       data: {},
@@ -43,34 +46,31 @@ const ReportPiutang = () => {
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      // console.log(response);
       if (response.status) {
         const { data } = response;
-        let pel = [];
+        let trx_amnh = 0;
+        let acq_amnh = 0;
         let total = 0;
-        plg.forEach((element) => {
-          element.ar = [];
-          data.forEach((el) => {
-            if (el.trx_type === "JL" && el.pay_type === "P1") {
-              if (element.customer.id === el.cus_id.id) {
-                element.ar.push({ ...el, trx_amnh: 0, acq_amnh: 0 });
+        data.forEach((el) => {
+          if (el.lunas == false) {
+            if (el.trx_dbcr === "D") {
+              trx_amnh += el?.trx_amnh ?? 0;
+            } else {
+              if (
+                el.trx_type === "DP" ||
+                (el.trx_type === "SA" && el.trx_dbcr === "K")
+              ) {
+                acq_amnh += el?.trx_amnh ?? 0;
+              } else {
+                acq_amnh += el?.acq_amnh ?? 0;
               }
             }
-          });
-          element.ar.forEach((el) => {
-            data.forEach((ek) => {
-              if (el.id === ek.id) {
-                el.trx_amnh = ek?.trx_amnh ?? 0;
-                el.acq_amnh += ek?.acq_amnh ?? 0;
-              }
-            });
-            total += el?.trx_amnh ?? 0 - el?.acq_amnh ?? 0;
-          });
-          if (element.ar.length > 0) {
-            pel.push(element);
           }
         });
-        setAr(pel);
+        total += trx_amnh - acq_amnh ?? 0;
+
+        setAr(data);
         setTotal(total);
 
         let grouped = data?.filter(
@@ -78,30 +78,53 @@ const ReportPiutang = () => {
             i === data.findIndex((ek) => el?.cus_id?.id === ek?.cus_id?.id)
         );
         setCustomer(grouped);
+        getAcc(data);
+
+        if (id) {
+          grouped?.forEach((elem) => {
+            if (elem?.cus_id?.id === Number(id)) {
+              setSelected([elem]);
+            }
+          });
+        }
       }
     } catch (error) {
       console.log(error);
     }
   };
 
-  const getCustomer = async () => {
+  const getAcc = async (ar) => {
     const config = {
-      ...endpoints.customer,
+      ...endpoints.account,
       data: {},
     };
+    console.log(config.data);
     let response = null;
     try {
       response = await request(null, config);
       console.log(response);
       if (response.status) {
         const { data } = response;
-        setCustomer(data);
-        getARCard(data);
+        let filt = [];
+        data?.forEach((elem) => {
+          ar?.forEach((el) => {
+            if (elem.account?.id === el.cus_id?.cus_gl) {
+              filt.push(elem);
+            }
+          });
+        });
+
+        let grouped = filt?.filter(
+          (el, i) =>
+            i === filt.findIndex((ek) => el?.account?.id === ek?.account?.id)
+        );
+        setAcc(grouped);
+        // console.log("=======");
+        // console.log(filt);
       }
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
+
 
   const formatDate = (date) => {
     var d = new Date(`${date}Z`),
@@ -118,111 +141,212 @@ const ReportPiutang = () => {
   const jsonForExcel = (ar, excel = false) => {
     let data = [];
 
-    if (selectedCus) {
-      ar?.forEach((el) => {
-        if (selectedCus?.cus_id?.id === el.customer?.id) {
-          let val = [
-            {
-              cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
-              type: "header",
-              value: {
-                ref: "Code",
-                date: "Date",
-                jt: "Due Date",
-                value: "Receivable",
-                lns: "Total Paid",
-                sisa: "Remain",
-              },
+    if (selectedCus?.length && selectedAcc?.length) {
+      selectedCus?.forEach((cus) => {
+        selectedAcc?.forEach((sel) => {
+          ar?.forEach((ek) => {
+            if (
+              ek.cus_id?.id === cus?.cus_id?.id &&
+              ek.cus_id?.cus_gl === sel?.account?.id
+            ) {
+              let amn = 0;
+              let acq = 0;
+              let val = [
+                {
+                  cus: `${cus.cus_id?.cus_name} (${cus.cus_id?.cus_code})`,
+                  type: "header",
+                  value: {
+                    ref: "Transaction Code",
+                    date: "Transaction Date",
+                    jt: "Due Date",
+                    value: "Receivable",
+                    lns: "Payment",
+                    // sisa: `${formatIdr(0)}`,
+                  },
+                },
+              ];
+              // el.ar.forEach((ek) => {
+              let filt = new Date(`${ek?.trx_date}Z`);
+              if (filt <= filtDate) {
+                val.push({
+                  cus: `${ek.cus_id?.cus_name} (${ek.cus_id?.cus_code})`,
+                  type: "item",
+                  value: {
+                    ref: ek.trx_code,
+                    date: formatDate(ek.trx_date),
+                    jt: ek.trx_due ? formatDate(ek.trx_due) : "-",
+                    value: `${formatIdr(
+                      ek.trx_dbcr === "D" ? ek.trx_amnh : 0
+                    )}`,
+                    lns: `${formatIdr(
+                      ek.trx_dbcr === "K" && ek.trx_type !== "JL"
+                        ? ek.trx_amnh
+                        : ek.trx_dbcr === "K" && ek.trx_type === "JL"
+                        ? ek.acq_amnh
+                        : 0
+                    )}`,
+                  },
+                });
+
+                amn += ek.trx_dbcr === "D" ? ek.trx_amnh : 0;
+                acq +=
+                  ek.trx_dbcr === "K" && ek.trx_type !== "JL"
+                    ? ek.trx_amnh
+                    : ek.trx_dbcr === "K" && ek.trx_type === "JL"
+                    ? ek.acq_amnh
+                    : 0;
+              }
+              // });
+              val.push({
+                sup: ``,
+                type: "footer",
+                value: {
+                  ref: "Total",
+                  date: "",
+                  jt: "",
+                  value: `${formatIdr(amn)}`,
+                  lns: `${formatIdr(acq)}`,
+                  // sisa: "",
+                },
+              });
+              data.push(val);
+            }
+          });
+        });
+      });
+    } else if (selectedCus?.length) {
+      selectedCus?.forEach((p) => {
+        console.log("p", p);
+        let amn = 0;
+        let acq = 0;
+        let val = [
+          {
+            cus: `${p.cus_id?.cus_name} (${p.cus_id?.cus_code})`,
+            type: "header",
+            value: {
+              ref: "Transaction Code",
+              date: "Transaction Date",
+              jt: "Due Date",
+              value: "Receivable",
+              lns: "Payment",
+              // sisa: `${formatIdr(0)}`,
             },
-          ];
-          let amn = 0;
-          let acq = 0;
-          el.ar.forEach((ek) => {
+          },
+        ];
+        ar?.forEach((ek) => {
+          if (ek.cus_id?.id === p?.cus_id?.id) {
+            // el.ar.forEach((ek) => {
             let filt = new Date(`${ek?.trx_date}Z`);
-            console.log(filt);
             if (filt <= filtDate) {
               val.push({
-                cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
+                cus: `${ek.cus_id?.cus_name} (${ek.cus_id?.cus_code})`,
                 type: "item",
                 value: {
                   ref: ek.trx_code,
                   date: formatDate(ek.trx_date),
                   jt: ek.trx_due ? formatDate(ek.trx_due) : "-",
-                  value: `Rp. ${formatIdr(ek.trx_amnh)}`,
-                  lns: `Rp. ${formatIdr(ek.acq_amnh)}`,
-                  sisa: `Rp. ${formatIdr(ek.trx_amnh - ek.acq_amnh)}`,
+                  value: `${formatIdr(ek.trx_dbcr === "D" ? ek.trx_amnh : 0)}`,
+                  lns: `${formatIdr(
+                    ek.trx_dbcr === "K" && ek.trx_type !== "JL"
+                      ? ek.trx_amnh
+                      : ek.trx_dbcr === "K" && ek.trx_type === "JL"
+                      ? ek.acq_amnh
+                      : 0
+                  )}`,
                 },
               });
-              amn += ek.trx_amnh;
-              acq += ek.acq_amnh;
+
+              amn += ek.trx_dbcr === "D" ? ek.trx_amnh : 0;
+              acq +=
+                ek.trx_dbcr === "K" && ek.trx_type !== "JL"
+                  ? ek.trx_amnh
+                  : ek.trx_dbcr === "K" && ek.trx_type === "JL"
+                  ? ek.acq_amnh
+                  : 0;
             }
-          });
-          val.push({
-            cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
-            type: "footer",
-            value: {
-              ref: "Total",
-              date: "",
-              jt: "",
-              value: `Rp. ${formatIdr(amn)}`,
-              lns: `Rp. ${formatIdr(acq)}`,
-              sisa: `Rp. ${formatIdr(amn - acq)}`,
-            },
-          });
-          data.push(val);
-        }
-      });
-    } else {
-      ar?.forEach((el) => {
-        let val = [
-          {
-            cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
-            type: "header",
-            value: {
-              ref: "Code",
-              date: "Date",
-              jt: "Due Date",
-              value: "Receivable",
-              lns: "Total Paid",
-              sisa: "Remain",
-            },
-          },
-        ];
-        let amn = 0;
-        let acq = 0;
-        el.ar.forEach((ek) => {
-          let filt = new Date(`${ek?.trx_date}Z`);
-          console.log(filt);
-          if (filt <= filtDate) {
-            val.push({
-              cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
-              type: "item",
-              value: {
-                ref: ek.trx_code,
-                date: formatDate(ek.trx_date),
-                jt: ek.trx_due ? formatDate(ek.trx_due) : "-",
-                value: `Rp. ${formatIdr(ek.trx_amnh)}`,
-                lns: `Rp. ${formatIdr(ek.acq_amnh)}`,
-                sisa: `Rp. ${formatIdr(ek.trx_amnh - ek.acq_amnh)}`,
-              },
-            });
-            amn += ek.trx_amnh;
-            acq += ek.acq_amnh;
+            // });
           }
         });
         val.push({
-          cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
+          sup: ``,
           type: "footer",
           value: {
             ref: "Total",
             date: "",
             jt: "",
-            value: `Rp. ${formatIdr(amn)}`,
-            lns: `Rp. ${formatIdr(acq)}`,
-            sisa: `Rp. ${formatIdr(amn - acq)}`,
+            value: `${formatIdr(amn)}`,
+            lns: `${formatIdr(acq)}`,
+            // sisa: "",
           },
         });
         data.push(val);
+        // });
+      });
+    } else if (selectedAcc?.length) {
+      selectedAcc?.forEach((sel) => {
+        ar?.forEach((ek) => {
+          if (ek.cus_id?.cus_gl === sel?.account?.id) {
+            let amn = 0;
+            let acq = 0;
+            let val = [
+              {
+                cus: `${ek.cus_id?.cus_name} (${ek.cus_id?.cus_code})`,
+                type: "header",
+                value: {
+                  ref: "Transaction Code",
+                  date: "Transaction Date",
+                  jt: "Due Date",
+                  value: "Receivable",
+                  lns: "Payment",
+                  // sisa: `${formatIdr(0)}`,
+                },
+              },
+            ];
+            // el.ar.forEach((ek) => {
+            let filt = new Date(`${ek?.trx_date}Z`);
+            if (filt <= filtDate) {
+              val.push({
+                cus: `${ek.cus_id?.cus_name} (${ek.cus_id?.cus_code})`,
+                type: "item",
+                value: {
+                  ref: ek.trx_code,
+                  date: formatDate(ek.trx_date),
+                  jt: ek.trx_due ? formatDate(ek.trx_due) : "-",
+                  value: `${formatIdr(ek.trx_dbcr === "D" ? ek.trx_amnh : 0)}`,
+                  lns: `${formatIdr(
+                    ek.trx_dbcr === "K" && ek.trx_type !== "JL"
+                      ? ek.trx_amnh
+                      : ek.trx_dbcr === "K" && ek.trx_type === "JL"
+                      ? ek.acq_amnh
+                      : 0
+                  )}`,
+                },
+              });
+
+              amn += ek.trx_dbcr === "D" ? ek.trx_amnh : 0;
+              acq +=
+                ek.trx_dbcr === "K" && ek.trx_type !== "JL"
+                  ? ek.trx_amnh
+                  : ek.trx_dbcr === "K" && ek.trx_type === "JL"
+                  ? ek.acq_amnh
+                  : 0;
+            }
+            // });
+            val.push({
+              sup: ``,
+              type: "footer",
+              value: {
+                ref: "Total",
+                date: "",
+                jt: "",
+                value: `${formatIdr(amn)}`,
+                lns: `${formatIdr(acq)}`,
+                // sisa: "",
+              },
+            });
+            data.push(val);
+          }
+        });
       });
     }
 
@@ -230,7 +354,7 @@ const ReportPiutang = () => {
       {
         columns: [
           {
-            title: "Receivable Report",
+            title: "Accounts Receivable Balance Details",
             width: { wch: 30 },
             style: {
               font: { sz: "14", bold: true },
@@ -274,10 +398,10 @@ const ReportPiutang = () => {
     ];
     data.forEach((el) => {
       let item = [];
-      el.forEach((ek) => {
+      data.forEach((ek) => {
         item.push([
           {
-            value: `${ek.value.ref}`,
+            value: `${ek?.value?.ref}`,
             style: {
               font: {
                 sz: "14",
@@ -288,21 +412,21 @@ const ReportPiutang = () => {
             },
           },
           {
-            value: `${ek.value.date}`,
+            value: `${ek?.value?.date}`,
             style: {
               font: { sz: "14", bold: ek.type === "header" ? true : false },
               alignment: { horizontal: "left", vertical: "center" },
             },
           },
           {
-            value: `${ek.value.jt}`,
+            value: `${ek?.value?.jt}`,
             style: {
               font: { sz: "14", bold: ek.type === "header" ? true : false },
               alignment: { horizontal: "left", vertical: "center" },
             },
           },
           {
-            value: `${ek.value.value}`,
+            value: `${ek?.value?.value}`,
             style: {
               font: {
                 sz: "14",
@@ -313,7 +437,7 @@ const ReportPiutang = () => {
             },
           },
           {
-            value: `${ek.value.lns}`,
+            value: `${ek?.value?.lns}`,
             style: {
               font: {
                 sz: "14",
@@ -324,7 +448,7 @@ const ReportPiutang = () => {
             },
           },
           {
-            value: `${ek.value.sisa}`,
+            value: `${ek?.value?.sisa}`,
             style: {
               font: {
                 sz: "14",
@@ -385,7 +509,7 @@ const ReportPiutang = () => {
       final.push({
         columns: [
           {
-            title: `${el[0].cus}`,
+            title: `${el?.cus}`,
             width: { wch: 30 },
             style: {
               font: { sz: "14", bold: false },
@@ -469,17 +593,27 @@ const ReportPiutang = () => {
   };
 
   const formatIdr = (value) => {
-    return `${value}`
+    return `Rp. ${value?.toFixed(2)}`
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
+  const glTemplate = (option) => {
+    return (
+      <div>
+        {option !== null
+          ? `${option.account.acc_name} - ${option.account.acc_code}`
+          : ""}
+      </div>
+    );
   };
 
   const renderHeader = () => {
     return (
       <div className="flex justify-content-between">
-        <div className="col-6 ml-0 mr-0 pl-0 pt-0">
+        <div className="col-10 ml-0 mr-0 pl-0 pt-0">
           <Row className="mt-0">
-            <div className="p-inputgroup col-4">
+            <div className="p-inputgroup col-2">
               <span className="p-inputgroup-addon">
                 <i className="pi pi-calendar" />
               </span>
@@ -496,18 +630,44 @@ const ReportPiutang = () => {
                 dateFormat="dd-mm-yy"
               />
             </div>
-            <div className="col-4">
-              <Dropdown
+
+            <div className="col-3 ">
+              <MultiSelect
                 value={selectedCus ?? null}
                 options={customer}
                 onChange={(e) => {
                   setSelected(e.value);
+                  // console.log("===========");
+                  // console.log(e.value);
                 }}
                 placeholder="Pilih Customer"
                 optionLabel="cus_id.cus_name"
-                filter
-                filterBy="cus_id.cus_name"
                 showClear
+                filterBy="cus_id.cus_name"
+                filter
+                display="chip"
+                className="w-full md:w-22rem"
+                maxSelectedLabels={3}
+              />
+            </div>
+            <div className="col-3 ml-3">
+              <MultiSelect
+                value={selectedAcc ?? null}
+                options={acc}
+                onChange={(e) => {
+                  setSelectedAcc(e.value);
+                  // console.log("===========");
+                  // console.log(e.value);
+                }}
+                placeholder="Pilih Account"
+                optionLabel="account.acc_name"
+                showClear
+                filterBy="account.acc_name"
+                filter
+                itemTemplate={glTemplate}
+                display="chip"
+                className="w-full md:w-22rem"
+                maxSelectedLabels={3}
               />
             </div>
           </Row>
@@ -581,8 +741,10 @@ const ReportPiutang = () => {
             <Card className="ml-1 mr-1 mt-2">
               <Card.Body className="p-0 m-0">
                 <CustomeWrapper
-                  tittle={"Account Receivable Details"}
-                  subTittle={`Account Receivable Details as ${formatDate(filtDate)}`}
+                  tittle={"Balance Receivable Details"}
+                  subTittle={`Balance Receivable Details Report as ${formatDate(
+                    filtDate
+                  )}`}
                   onComplete={(cp) => setCp(cp)}
                   page={idx + 1}
                   body={
@@ -602,7 +764,7 @@ const ReportPiutang = () => {
                               header={(e) =>
                                 e.props.value ? e.props?.value[0]?.cus : null
                               }
-                              style={{ width: "15rem" }}
+                              style={{ minWidth: "10rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -618,7 +780,7 @@ const ReportPiutang = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ width: "10rem" }}
+                              style={{ minWidth: "10rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -632,7 +794,7 @@ const ReportPiutang = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ width: "10rem" }}
+                              style={{ minWidth: "8rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -646,7 +808,7 @@ const ReportPiutang = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ width: "10rem" }}
+                              style={{ minWidth: "10rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -664,25 +826,25 @@ const ReportPiutang = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ width: "10rem" }}
+                              style={{ minWidth: "10rem" }}
                               body={(e) => (
                                 <div
                                   className={
                                     e.type === "header"
-                                      ? "font-weight-bold text-right"
+                                      ? "font-weight-bold text-right mr-2"
                                       : e.type === "footer"
-                                      ? "font-weight-bold text-right"
-                                      : "text-right"
+                                      ? "font-weight-bold text-right mr-2"
+                                      : "text-right mr-2"
                                   }
                                 >
                                   {e.value.lns}
                                 </div>
                               )}
                             />
-                            <Column
+                            {/* <Column
                               className="header-center"
                               header=""
-                              style={{ width: "10rem" }}
+                              style={{ minWidth: "10rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -696,7 +858,7 @@ const ReportPiutang = () => {
                                   {e.value.sisa}
                                 </div>
                               )}
-                            />
+                            /> */}
                           </DataTable>
                         );
                       })}

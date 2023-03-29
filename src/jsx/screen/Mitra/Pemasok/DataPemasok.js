@@ -137,8 +137,8 @@ const DataSupplier = ({
     getCurrency();
     getCity();
     getSetup();
-    getAccHut();
-    getAccUm();
+    // getAccHut();
+    // getAccUm();
     getCompany();
     getPajak();
     initFilters1();
@@ -216,11 +216,12 @@ const DataSupplier = ({
         const { data } = response;
         console.log(data);
         setSetup(data);
+        getAccHut(data);
       }
     } catch (error) {}
   };
 
-  const getAccHut = async () => {
+  const getAccHut = async (setup) => {
     setLoading(true);
     const config = {
       ...endpoints.account,
@@ -234,39 +235,16 @@ const DataSupplier = ({
       if (response.status) {
         const { data } = response;
         let filt = [];
+        let all = [];
         data.forEach((elem) => {
-          // if (elem.account.kat_code === 9) {
-          //   filt.push(elem.account);
-          // }
-          filt.push(elem.account);
+          if (elem.account?.id === setup?.ap?.id) {
+            filt.push(elem.account);
+          }
+          all.push(elem.account);
         });
         console.log(data);
         setAccHut(filt);
-      }
-    } catch (error) {}
-  };
-
-  const getAccUm = async () => {
-    setLoading(true);
-    const config = {
-      ...endpoints.account,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        let filt = [];
-        data.forEach((elem) => {
-          // if (elem.account.kat_code === 5) {
-          //   filt.push(elem.account);
-          // }
-        });
-        console.log(data);
-        setAccUm(data);
+        setAccUm(all);
       }
     } catch (error) {}
   };
@@ -513,17 +491,17 @@ const DataSupplier = ({
   };
 
   const onSubmit = () => {
-    if (isValid()) {
-      if (isEdit) {
-        setUpdate(true);
-        editSupplier();
-        setActive(0);
-      } else {
-        setUpdate(true);
-        addSupplier();
-        setActive(0);
-      }
+    // if (isValid()) {
+    if (isEdit) {
+      setUpdate(true);
+      editSupplier();
+      setActive(0);
+    } else {
+      setUpdate(true);
+      addSupplier();
+      setActive(0);
     }
+    // }
   };
 
   const renderFooter = () => {
@@ -968,7 +946,7 @@ const DataSupplier = ({
                       setError(newError);
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
-                    error={error[0]?.code}
+                    // error={error[0]?.code}
                   />
                 </div>
 
@@ -993,7 +971,7 @@ const DataSupplier = ({
                       setError(newError);
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
-                    error={error[0]?.name}
+                    // error={error[0]?.name}
                   />
                 </div>
               </div>
@@ -1018,8 +996,8 @@ const DataSupplier = ({
                     filter
                     filterBy="jpem_name"
                     placeholder={tr[localStorage.getItem("language")].pilih}
-                    errorMessage="Jenis Pemasok Belum Dipilih"
-                    error={error[0]?.jpem}
+                    // errorMessage="Jenis Pemasok Belum Dipilih"
+                    // error={error[0]?.jpem}
                   />
                 </div>
 
@@ -1134,7 +1112,7 @@ const DataSupplier = ({
                       setError(newError);
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
-                    error={error[0]?.addrs}
+                    // error={error[0]?.addrs}
                   />
                 </div>
               </div>
@@ -1169,8 +1147,8 @@ const DataSupplier = ({
                       filter
                       filterBy="city_name"
                       placeholder={tr[localStorage.getItem("language")].pilih}
-                      errorMessage="Kota Belum Dipilih"
-                      error={error[0]?.city}
+                      // errorMessage="Kota Belum Dipilih"
+                      // error={error[0]?.city}
                     />
                   ) : (
                     <PrimeInput
@@ -1250,7 +1228,7 @@ const DataSupplier = ({
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     isNumber
-                    error={error[1]?.phone}
+                    // error={error[1]?.phone}
                   />
                 </div>
 
@@ -1324,7 +1302,7 @@ const DataSupplier = ({
                       setError(newError);
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
-                    error={error[1]?.cp}
+                    // error={error[1]?.cp}
                   />
                 </div>
               </div>
@@ -1387,8 +1365,8 @@ const DataSupplier = ({
                     filter
                     filterBy="name"
                     placeholder={tr[localStorage.getItem("language")].pilih}
-                    errorMessage="Jenis Pajak Belum Dipilih"
-                    error={error[2]?.ppn}
+                    // errorMessage="Jenis Pajak Belum Dipilih"
+                    // error={error[2]?.ppn}
                   />
                 </div>
               </div>

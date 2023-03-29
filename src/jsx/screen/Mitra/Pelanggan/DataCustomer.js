@@ -26,6 +26,7 @@ import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleB
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 import { tr } from "src/data/tr";
 import { SelectButton } from "primereact/selectbutton";
+import { set } from "date-fns";
 
 const def = {
   customer: {
@@ -145,18 +146,36 @@ const DataCustomer = ({
   const [error, setError] = useState(defError);
 
   useEffect(() => {
+    getComp();
     getCustomer();
     getCity();
     getJpel();
     getSubArea();
     getCurrency();
-    getAR();
+    // getAR();
     getSetup();
-    getComp();
-    getAcc();
     getPajak();
     initFilters1();
   }, []);
+
+  const getComp = async () => {
+    const config = {
+      ...endpoints.getCompany,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setComp(data);
+        // getSetup();
+      }
+    } catch (error) {}
+  };
 
   const getCustomer = async (isUpdate = false) => {
     setLoading(true);
@@ -244,63 +263,7 @@ const DataCustomer = ({
     }
   };
 
-  const getAR = async () => {
-    const config = {
-      ...endpoints.account,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setAr(data);
-        // getSetup(data);
-      }
-    } catch (error) {}
-  };
-
-  const getAcc = async () => {
-    const config = {
-      ...endpoints.account,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-
-        console.log(data);
-        setAcc(data);
-      }
-    } catch (error) {}
-  };
-
-  const getComp = async () => {
-    const config = {
-      ...endpoints.getCompany,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setComp(data);
-      }
-    } catch (error) {}
-  };
-
-  const getSetup = async (account) => {
+  const getSetup = async () => {
     const config = {
       ...endpoints.getSetup,
       data: {},
@@ -312,20 +275,44 @@ const DataCustomer = ({
       console.log(response);
       if (response.status) {
         const { data } = response;
-        // let filt = [];
-        // account.forEach((elem) => {
-        //   elem.st = [];
-        //   data.forEach((element) => {
-        //     if (elem.id === element.ar.id) {
-        //       elem.st.push(element);
-        //     }
-        //   });
-        // });
-        console.log(data);
         setSetup(data);
-        // setAr(filt);
+        getAR(data);
       }
     } catch (error) {}
+  };
+
+  const getAR = async (setup) => {
+    console.log("setup========");
+          console.log(setup);
+    const config = {
+      ...endpoints.account,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        let filt = [];
+        let all = [];
+        data?.forEach((element) => {
+          // setup?.forEach((el) => {
+            if (element.account.id === setup?.ar?.id) {
+              // if (element.account.dou_type === "D") {
+              filt.push(element.account);
+              // }
+            }
+          // });
+          all.push(element.account);
+        });
+        setAr(filt);
+        setAcc(all);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const getSubArea = async (isUpdate = false) => {
@@ -559,7 +546,12 @@ const DataCustomer = ({
               onInput(true);
               setCurrentItem({
                 ...data,
-                customer: { ...data.customer, cus_id: data.customer.id },
+                customer: {
+                  ...data.customer,
+                  cus_id: data.customer.id,
+                  // cus_gl: setup?.ar?.id,
+                  // cus_uang_muka: setup?.sls_prepaid?.id,
+                },
               });
             }}
             className="btn btn-primary shadow btn-xs sharp ml-1"
@@ -868,7 +860,7 @@ const DataCustomer = ({
   const gl = (value) => {
     let gl = {};
     ar?.forEach((element) => {
-      if (value === element.account.id) {
+      if (value === element.id) {
         gl = element;
       }
     });
@@ -888,9 +880,7 @@ const DataCustomer = ({
   const glTemplate = (option) => {
     return (
       <div>
-        {option !== null
-          ? `${option.account.acc_name} - ${option.account.acc_code}`
-          : ""}
+        {option !== null ? `${option.acc_name} - ${option.acc_code}` : ""}
       </div>
     );
   };
@@ -899,9 +889,7 @@ const DataCustomer = ({
     if (option) {
       return (
         <div>
-          {option !== null
-            ? `${option.account.acc_name} - ${option.account.acc_code}`
-            : ""}
+          {option !== null ? `${option.acc_name} - ${option.acc_code}` : ""}
         </div>
       );
     }
@@ -1625,8 +1613,10 @@ const DataCustomer = ({
                   <PrimeDropdown
                     label={tr[localStorage.getItem("language")].code_account}
                     value={
-                      currentItem?.customer?.cus_gl
-                        && gl(currentItem.customer.cus_gl)
+                      currentItem !== null &&
+                      currentItem?.customer?.cus_gl !== null
+                        ? gl(currentItem.customer.cus_gl)
+                        : null
                     }
                     options={ar}
                     onChange={(e) => {
@@ -1658,8 +1648,8 @@ const DataCustomer = ({
                   <PrimeDropdown
                     label={"Kode Distribusi Uang Muka Penjualan"}
                     value={
-                      currentItem?.customer?.cus_uang_muka
-                        && gl(currentItem.customer.cus_uang_muka)
+                      currentItem?.customer?.cus_uang_muka &&
+                      gl(currentItem.customer.cus_uang_muka)
                     }
                     options={accU}
                     onChange={(e) => {

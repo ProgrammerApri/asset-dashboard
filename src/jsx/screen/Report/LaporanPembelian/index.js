@@ -10,6 +10,7 @@ import OutstandingGRA from "./OutstandingGRA";
 import ReportReturBeli from "./ReturPembelian";
 import HistoryPayOrder from "./HistoryPayOrd";
 import PembelianPerProduk from "./PembelianPerProduk";
+import Pnl from "./Pnl";
 
 const LaporanPembelian = (self) => {
   const [active, setActive] = useState(0);
@@ -29,7 +30,7 @@ const LaporanPembelian = (self) => {
       icon: "bx-receipt",
       component: <ReportPO />,
     },
-   
+
     {
       tittle: "Outstanding RP",
       icon: "bx-receipt",
@@ -44,15 +45,17 @@ const LaporanPembelian = (self) => {
       tittle: "Outstanding Pembelian",
       icon: "bx-receipt",
       component: <OutstandingGRA />,
-    },    
+    },
     {
       tittle: "Retur Pembelian",
       icon: "bx-receipt",
       component: <ReportReturBeli />,
     },
-  
-   
-   
+    {
+      tittle: "Laba Rugi",
+      icon: "bx-spreadsheet",
+      component: <Pnl />,
+    },
   ]);
 
   let id =
@@ -73,7 +76,11 @@ const LaporanPembelian = (self) => {
 
     subMenu.forEach((el, i) => {
       menu.push(
-        <Link to={"/laporan/pembelian/" + el.tittle.toLowerCase().replaceAll(" ", "-")}>
+        <Link
+          to={
+            "/laporan/pembelian/" + el.tittle.toLowerCase().replaceAll(" ", "-")
+          }
+        >
           <Button
             className={`sub-menu mr-4 mb-4 ${id == i ? "act" : ""}`}
             role="button"

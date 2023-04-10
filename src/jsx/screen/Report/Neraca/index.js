@@ -9,6 +9,7 @@ import KartuStock from "./KartuStock";
 import Neraca from "./ReportNeraca";
 import KBBRincian from "./KbbRincian";
 import NeracaSaldo from "./NeracaSaldo";
+import ArusKasTidakLangsung from "./ArusKasTidakLangsung";
 
 const LaporanNeraca = (self) => {
   const [active, setActive] = useState(0);
@@ -38,6 +39,11 @@ const LaporanNeraca = (self) => {
       tittle: "Neraca Saldo",
       icon: "bx-spreadsheet",
       component: <NeracaSaldo />,
+    },
+    {
+      tittle: "Arus Kas Tidak Langsung",
+      icon: "bx-spreadsheet",
+      component: <ArusKasTidakLangsung />,
     },
 
     {

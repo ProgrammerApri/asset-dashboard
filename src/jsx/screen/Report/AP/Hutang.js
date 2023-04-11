@@ -687,7 +687,7 @@ const ReportHutang = () => {
   const renderHeader = () => {
     return (
       <div className="flex justify-content-between">
-        <div className="col-8 ml-0 mr-0 pl-0 pt-0">
+        <div className="col-9 ml-0 mr-0 pl-0 pt-0">
           <Row className="mt-0">
             <div className="p-inputgroup col-3">
               <span className="p-inputgroup-addon">
@@ -703,7 +703,7 @@ const ReportHutang = () => {
                 dateFormat="dd-mm-yy"
               />
             </div>
-            <div className="mt-2 mr-3">
+            <div className="mt-2 mr-2">
               <MultiSelect
                 value={selectedSup ?? null}
                 options={supplier}
@@ -716,7 +716,7 @@ const ReportHutang = () => {
                 filterBy="sup_id.sup_name"
                 showClear
                 display="chip"
-                className="w-full md:w-20rem"
+                // className="w-full md:w-20rem"
                 maxSelectedLabels={3}
               />
             </div>
@@ -735,7 +735,7 @@ const ReportHutang = () => {
                 filterBy="account.acc_name"
                 showClear
                 display="chip"
-                className="w-full md:w-20rem"
+                // className="w-full md:w-20rem"
                 maxSelectedLabels={3}
               />
             </div>

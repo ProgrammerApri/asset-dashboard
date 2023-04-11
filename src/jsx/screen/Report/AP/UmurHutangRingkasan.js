@@ -172,7 +172,7 @@ const UmurHutangRingkasan = () => {
                     : "-",
 
                 older: diff > 60 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
-               
+
                 total: `Rp. ${formatIdr(ek.trx_amnh)}`,
               },
             });
@@ -195,7 +195,7 @@ const UmurHutangRingkasan = () => {
               day3: `Rp. ${formatIdr(t_day3)}`,
               day4: `Rp. ${formatIdr(t_day4)}`,
               older: `Rp. ${formatIdr(t_older)}`,
-             
+
               total: `Rp. ${formatIdr(amn)}`,
             },
           });
@@ -264,7 +264,7 @@ const UmurHutangRingkasan = () => {
           t_older += diff > 60 ? ek.trx_amnh : 0;
         });
         val.push({
-          sup: `${el.supplier.sup_code} - ${el.supplier.sup_name}`,
+          sup: `${el.supplier.sup_name} - ${el.supplier.sup_code}`,
           type: "footer",
           value: {
             supp: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
@@ -274,7 +274,7 @@ const UmurHutangRingkasan = () => {
             day3: `Rp. ${formatIdr(t_day3)}`,
             day4: `Rp. ${formatIdr(t_day4)}`,
             older: `Rp. ${formatIdr(t_older)}`,
-           
+
             total: `Rp. ${formatIdr(amn)}`,
           },
         });
@@ -321,294 +321,282 @@ const UmurHutangRingkasan = () => {
       },
     ];
 
-   
-      let item = [];
-      data.forEach((ek) => {
-        item.push([
-          {
-            value: `${ek[ek.length - 1].value.supp}`,
-            style: {
-              font: {
-                sz: "14",
-                bold:
-                  ek.type === "header" || ek.type === "footer" ? true : false,
-              },
-              alignment: { horizontal: "left", vertical: "center" },
-            },
-          },
-          {
-            value: `${ek[ek.length - 1].value.jt}`,
-            style: {
-              font: {
-                sz: "14",
-                bold:
-                  ek.type === "header" || ek.type === "footer" ? true : false,
-              },
-              alignment: { horizontal: "right", vertical: "center" },
-            },
-          },
-          {
-            value: `${ek[ek.length - 1].value.day1}`,
-            style: {
-              font: {
-                sz: "14",
-                bold:
-                  ek.type === "header" || ek.type === "footer" ? true : false,
-              },
-              alignment: { horizontal: "right", vertical: "center" },
-            },
-          },
-          {
-            value: `${ek[ek.length - 1].value.day2}`,
-            style: {
-              font: {
-                sz: "14",
-                bold:
-                  ek.type === "header" || ek.type === "footer" ? true : false,
-              },
-              alignment: { horizontal: "right", vertical: "center" },
-            },
-          },
-          {
-            value: `${ek[ek.length - 1].value.day3}`,
-            style: {
-              font: {
-                sz: "14",
-                bold:
-                  ek.type === "header" || ek.type === "footer" ? true : false,
-              },
-              alignment: { horizontal: "right", vertical: "center" },
-            },
-          },
-          {
-            value: `${ek[ek.length - 1].value.day4}`,
-            style: {
-              font: {
-                sz: "14",
-                bold:
-                  ek.type === "header" || ek.type === "footer" ? true : false,
-              },
-              alignment: { horizontal: "right", vertical: "center" },
-            },
-          },
-          {
-            value: `${ek[ek.length - 1].value.older}`,
-            style: {
-              font: {
-                sz: "14",
-                bold:
-                  ek.type === "header" || ek.type === "footer" ? true : false,
-              },
-              alignment: { horizontal: "right", vertical: "center" },
-            },
-          },
-
-         
-          {
-            value: `${ek[ek.length - 1].value.total}`,
-            style: {
-              font: {
-                sz: "14",
-                bold:
-                  ek.type === "header" || ek.type === "footer" ? true : false,
-              },
-              alignment: { horizontal: "right", vertical: "center" },
-            },
-          },
-        ]);
-      });
-
+    let item = [];
+    data.forEach((ek) => {
       item.push([
         {
-          value: "",
+          value: `${ek[ek.length - 1].value.supp}`,
           style: {
-            font: { sz: "14", bold: false },
+            font: {
+              sz: "14",
+              bold: ek.type === "header" || ek.type === "footer" ? true : false,
+            },
             alignment: { horizontal: "left", vertical: "center" },
           },
         },
         {
-          value: "",
+          value: `${ek[ek.length - 1].value.jt}`,
           style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "left", vertical: "center" },
-          },
-        },
-        {
-          value: "",
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "left", vertical: "center" },
-          },
-        },
-        {
-          value: "",
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "left", vertical: "center" },
-          },
-        },
-        {
-          value: "",
-          style: {
-            font: { sz: "14", bold: false },
+            font: {
+              sz: "14",
+              bold: ek.type === "header" || ek.type === "footer" ? true : false,
+            },
             alignment: { horizontal: "right", vertical: "center" },
           },
         },
         {
-          value: "",
+          value: `${ek[ek.length - 1].value.day1}`,
           style: {
-            font: { sz: "14", bold: false },
+            font: {
+              sz: "14",
+              bold: ek.type === "header" || ek.type === "footer" ? true : false,
+            },
             alignment: { horizontal: "right", vertical: "center" },
           },
         },
         {
-          value: "",
+          value: `${ek[ek.length - 1].value.day2}`,
           style: {
-            font: { sz: "14", bold: false },
+            font: {
+              sz: "14",
+              bold: ek.type === "header" || ek.type === "footer" ? true : false,
+            },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: `${ek[ek.length - 1].value.day3}`,
+          style: {
+            font: {
+              sz: "14",
+              bold: ek.type === "header" || ek.type === "footer" ? true : false,
+            },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: `${ek[ek.length - 1].value.day4}`,
+          style: {
+            font: {
+              sz: "14",
+              bold: ek.type === "header" || ek.type === "footer" ? true : false,
+            },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: `${ek[ek.length - 1].value.older}`,
+          style: {
+            font: {
+              sz: "14",
+              bold: ek.type === "header" || ek.type === "footer" ? true : false,
+            },
             alignment: { horizontal: "right", vertical: "center" },
           },
         },
 
         {
-          value: "",
+          value: `${ek[ek.length - 1].value.total}`,
           style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "right", vertical: "center" },
-          },
-        },
-        {
-          value: "",
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "right", vertical: "center" },
-          },
-        },
-        {
-          value: "",
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "right", vertical: "center" },
-          },
-        },
-        {
-          value: "",
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "right", vertical: "center" },
-          },
-        },
-        {
-          value: "",
-          style: {
-            font: { sz: "14", bold: false },
+            font: {
+              sz: "14",
+              bold: ek.type === "header" || ek.type === "footer" ? true : false,
+            },
             alignment: { horizontal: "right", vertical: "center" },
           },
         },
       ]);
+    });
 
-      final.push({
-        columns: [
-          {
-            title: "Supplier",
-            width: { wch: 30 },
-            style: {
-              font: { sz: "14", bold: true },
-              alignment: { horizontal: "left", vertical: "center" },
-              fill: {
-                paternType: "solid",
-                fgColor: { rgb: "F3F3F3" },
-              },
+    item.push([
+      {
+        value: "",
+        style: {
+          font: { sz: "14", bold: false },
+          alignment: { horizontal: "left", vertical: "center" },
+        },
+      },
+      {
+        value: "",
+        style: {
+          font: { sz: "14", bold: false },
+          alignment: { horizontal: "left", vertical: "center" },
+        },
+      },
+      {
+        value: "",
+        style: {
+          font: { sz: "14", bold: false },
+          alignment: { horizontal: "left", vertical: "center" },
+        },
+      },
+      {
+        value: "",
+        style: {
+          font: { sz: "14", bold: false },
+          alignment: { horizontal: "left", vertical: "center" },
+        },
+      },
+      {
+        value: "",
+        style: {
+          font: { sz: "14", bold: false },
+          alignment: { horizontal: "right", vertical: "center" },
+        },
+      },
+      {
+        value: "",
+        style: {
+          font: { sz: "14", bold: false },
+          alignment: { horizontal: "right", vertical: "center" },
+        },
+      },
+      {
+        value: "",
+        style: {
+          font: { sz: "14", bold: false },
+          alignment: { horizontal: "right", vertical: "center" },
+        },
+      },
+
+      {
+        value: "",
+        style: {
+          font: { sz: "14", bold: false },
+          alignment: { horizontal: "right", vertical: "center" },
+        },
+      },
+      {
+        value: "",
+        style: {
+          font: { sz: "14", bold: false },
+          alignment: { horizontal: "right", vertical: "center" },
+        },
+      },
+      {
+        value: "",
+        style: {
+          font: { sz: "14", bold: false },
+          alignment: { horizontal: "right", vertical: "center" },
+        },
+      },
+      {
+        value: "",
+        style: {
+          font: { sz: "14", bold: false },
+          alignment: { horizontal: "right", vertical: "center" },
+        },
+      },
+      {
+        value: "",
+        style: {
+          font: { sz: "14", bold: false },
+          alignment: { horizontal: "right", vertical: "center" },
+        },
+      },
+    ]);
+
+    final.push({
+      columns: [
+        {
+          title: "Supplier",
+          width: { wch: 30 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "left", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
             },
           },
-          {
-            title: "Before Due",
-            width: { wch: 20 },
-            style: {
-              font: { sz: "14", bold: true },
-              alignment: { horizontal: "right", vertical: "center" },
-              fill: {
-                paternType: "solid",
-                fgColor: { rgb: "F3F3F3" },
-              },
+        },
+        {
+          title: "Before Due",
+          width: { wch: 20 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "right", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
             },
           },
-          {
-            title: "7 Day",
-            width: { wch: 20 },
-            style: {
-              font: { sz: "14", bold: true },
-              alignment: { horizontal: "right", vertical: "center" },
-              fill: {
-                paternType: "solid",
-                fgColor: { rgb: "F3F3F3" },
-              },
+        },
+        {
+          title: "7 Day",
+          width: { wch: 20 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "right", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
             },
           },
-          {
-            title: "14 Day",
-            width: { wch: 20 },
-            style: {
-              font: { sz: "14", bold: true },
-              alignment: { horizontal: "right", vertical: "center" },
-              fill: {
-                paternType: "solid",
-                fgColor: { rgb: "F3F3F3" },
-              },
+        },
+        {
+          title: "14 Day",
+          width: { wch: 20 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "right", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
             },
           },
-          {
-            title: "30 Day",
-            width: { wch: 20 },
-            style: {
-              font: { sz: "14", bold: true },
-              alignment: { horizontal: "right", vertical: "center" },
-              fill: {
-                paternType: "solid",
-                fgColor: { rgb: "F3F3F3" },
-              },
+        },
+        {
+          title: "30 Day",
+          width: { wch: 20 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "right", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
             },
           },
-          {
-            title: "60 Day",
-            width: { wch: 20 },
-            style: {
-              font: { sz: "14", bold: true },
-              alignment: { horizontal: "right", vertical: "center" },
-              fill: {
-                paternType: "solid",
-                fgColor: { rgb: "F3F3F3" },
-              },
+        },
+        {
+          title: "60 Day",
+          width: { wch: 20 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "right", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
             },
           },
-          {
-            title: "Older",
-            width: { wch: 20 },
-            style: {
-              font: { sz: "14", bold: true },
-              alignment: { horizontal: "right", vertical: "center" },
-              fill: {
-                paternType: "solid",
-                fgColor: { rgb: "F3F3F3" },
-              },
+        },
+        {
+          title: "Older",
+          width: { wch: 20 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "right", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
             },
           },
-          {
-            title: "Total",
-            width: { wch: 20 },
-            style: {
-              font: { sz: "14", bold: true },
-              alignment: { horizontal: "right", vertical: "center" },
-              fill: {
-                paternType: "solid",
-                fgColor: { rgb: "F3F3F3" },
-              },
+        },
+        {
+          title: "Total",
+          width: { wch: 20 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "right", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
             },
           },
-          
-        ],
-        data: item,
-      });
-    
+        },
+      ],
+      data: item,
+    });
 
     console.log(data);
 
@@ -628,9 +616,9 @@ const UmurHutangRingkasan = () => {
   const renderHeader = () => {
     return (
       <div className="flex justify-content-between">
-        <div className="col-6 ml-0 mr-0 pl-0 pt-0">
+        <div className="col-9 ml-0 mr-0 pl-0 pt-0">
           <Row className="mt-0">
-            <div className="p-inputgroup col-4">
+            <div className="p-inputgroup col-3">
               <span className="p-inputgroup-addon">
                 <i className="pi pi-calendar" />
               </span>
@@ -645,7 +633,7 @@ const UmurHutangRingkasan = () => {
                 dateFormat="dd-mm-yy"
               />
             </div>
-            <div className="col-4">
+            <div className="col-3">
               <Dropdown
                 value={selectSup ?? null}
                 options={supplier}

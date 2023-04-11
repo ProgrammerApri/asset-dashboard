@@ -679,7 +679,7 @@ const UmurPiutangRingkasan = () => {
       <div className="flex justify-content-between">
         <div className="col-6 ml-0 mr-0 pl-0 pt-0">
           <Row className="mt-0">
-            <div className="p-inputgroup col-4">
+            <div className="p-inputgroup col-3">
               <span className="p-inputgroup-addon">
                 <i className="pi pi-calendar" />
               </span>
@@ -694,7 +694,7 @@ const UmurPiutangRingkasan = () => {
                 dateFormat="dd-mm-yy"
               />
             </div>
-            <div className="col-4">
+            <div className="col-3">
               <Dropdown
                 value={selectCus ?? null}
                 options={customer}

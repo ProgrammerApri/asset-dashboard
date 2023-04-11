@@ -529,7 +529,7 @@ const PembelianPerProduk = () => {
       <div className="flex justify-content-between">
         <div className="col-8 ml-0 mr-0 pl-0">
           <Row className="m-0">
-            <div className="col-3 mr-3 p-0">
+            <div className="col-4 mr-3 p-0">
               <div className="p-inputgroup">
                 <span className="p-inputgroup-addon">
                   <i className="pi pi-calendar" />

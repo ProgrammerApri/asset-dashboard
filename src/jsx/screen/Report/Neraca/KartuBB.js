@@ -290,6 +290,7 @@ const ReportKBB = () => {
       ],
       data: item,
     });
+    console.log("dataaaa", data);
 
     if (excel) {
       return final;
@@ -307,26 +308,27 @@ const ReportKBB = () => {
   const renderHeader = () => {
     return (
       <div className="flex justify-content-between">
-        <div className="col-6 ml-0 mr-0 pl-0 pt-0">
-          <Row className="mt-0">
-            <div className="p-inputgroup col-6">
-              <span className="p-inputgroup-addon">
-                <i className="pi pi-calendar" />
-              </span>
-              <Calendar
-                value={filtDate}
-                id="range"
-                onChange={(e) => {
-                  console.log(e.value);
-                  setFiltDate(e.value);
-                }}
-                // selectionMode="range"
-                placeholder="Pilih Tanggal"
-                readOnlyInput
-                dateFormat="dd-mm-yy"
-              />
-            </div>
-            <div className="col-4">
+        <div className="col-8 ml-0 mr-0 pl-0">
+          <Row className="m-0">
+            <div className="col-3 mr-3 p-0">
+              <div className="p-inputgroup">
+                <span className="p-inputgroup-addon">
+                  <i className="pi pi-calendar" />
+                </span>
+                <Calendar
+                  value={filtDate}
+                  id="range"
+                  onChange={(e) => {
+                    console.log(e.value);
+                    setFiltDate(e.value);
+                  }}
+                  // selectionMode="range"
+                  placeholder="Pilih Tanggal"
+                  readOnlyInput
+                  dateFormat="dd-mm-yy"
+                />
+              </div>
+              {/* <div className="col-4">
               {/* <CustomDropdown
                 value={customer && selectCus}
                 option={customer}
@@ -336,6 +338,7 @@ const ReportKBB = () => {
                 label={"[customer.cus_name] ([customer.cus_code])"}
                 placeholder="Pilih Pelanggan"
               /> */}
+              {/* </div> */}
             </div>
           </Row>
         </div>

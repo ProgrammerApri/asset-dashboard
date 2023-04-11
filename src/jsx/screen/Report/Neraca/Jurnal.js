@@ -368,20 +368,24 @@ const ReportJurnal = () => {
   const renderHeader = () => {
     return (
       <div className="flex justify-content-between mb-3">
-        <div className="col-3 ml-0 mr-0 pl-0">
-          <div className="p-inputgroup">
-            <span className="p-inputgroup-addon">
-              <i className="pi pi-calendar" />
-            </span>
-            <Calendar
-              value={date}
-              id="range"
-              onChange={(e) => setDate(e.value)}
-              selectionMode="range"
-              placeholder="Pilih Tanggal"
-              readOnlyInput
-            />
-          </div>
+        <div className="col-8 ml-0 mr-0 pl-0">
+          <Row className="mt-0">
+            <div className="col-3 mr-3 p-0">
+              <div className="p-inputgroup">
+                <span className="p-inputgroup-addon">
+                  <i className="pi pi-calendar" />
+                </span>
+                <Calendar
+                  value={date}
+                  id="range"
+                  onChange={(e) => setDate(e.value)}
+                  selectionMode="range"
+                  placeholder="Pilih Tanggal"
+                  readOnlyInput
+                />
+              </div>
+            </div>
+          </Row>
         </div>
         <div style={{ height: "1rem" }}></div>
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>

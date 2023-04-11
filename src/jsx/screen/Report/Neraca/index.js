@@ -88,11 +88,7 @@ const LaporanNeraca = (self) => {
       ),
     },
    
-    // {
-    //   tittle: "Kartu Stock",
-    //   icon: "bx-spreadsheet",
-    //   component: <KartuStock />,
-    // },
+ 
   ]);
 
   let id =

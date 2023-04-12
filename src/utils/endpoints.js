@@ -1602,7 +1602,7 @@ const endpoints = {
   },
 
   // Posting
-  posting_ym: {
+  getYear: {
     endpoint: "/v1/api/posting/ym",
     method: "GET",
     data: {},

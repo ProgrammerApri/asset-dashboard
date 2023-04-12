@@ -779,13 +779,13 @@ const InputOrder = ({ onCancel, onSuccess }) => {
       grupP?.forEach((el) => {
         if (checkProd(element?.prod_id)?.group?.id === el?.groupPro?.id) {
           if (el.groupPro.wip) {
-            acc_gprd = el.groupPro.acc_wip;
-            acc_gprd = checkProd(element.prod_id)?.acc_wip;
-            acc_prd = checkProd(element.prod_id)?.acc_wip;
+            acc_prd = el.groupPro.acc_wip;
+            // acc_gprd = checkProd(element.prod_id)?.acc_wip;
+            // acc_prd = checkProd(element.prod_id)?.acc_wip;
           } else {
-            acc_gprd = el.groupPro.acc_sto;
-            acc_gprd = checkProd(element.prod_id)?.acc_sto;
-            acc_prd = checkProd(element.prod_id)?.acc_sto;
+            acc_prd = el.groupPro.acc_sto;
+            // acc_gprd = checkProd(element.prod_id)?.acc_sto;
+            // acc_prd = checkProd(element.prod_id)?.acc_sto;
           }
         }
       });
@@ -845,14 +845,14 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     let validProduct = 0;
     let validJasa = false;
     errors.prod?.forEach((el) => {
-      let totalKey = 0
-      let validKey = 0
+      let totalKey = 0;
+      let validKey = 0;
       for (var k in el) {
-        totalKey++
+        totalKey++;
         validKey += !el[k] ? 1 : 0;
       }
       if (totalKey == validKey) {
-        validProduct += 1
+        validProduct += 1;
       }
     });
     if (!validProduct) {
@@ -863,10 +863,18 @@ const InputOrder = ({ onCancel, onSuccess }) => {
       });
     }
 
-    if (
-      (setup?.gl_detail && acc_prd === null) ||
-      (!setup?.gl_detail && acc_gprd === null)
-    ) {
+    let acc_ap = checkSupp(order?.sup_id)?.supplier?.sup_hutang !== null;
+
+    if (!acc_ap) {
+      toast.current.show({
+        severity: "error",
+        summary: "Tidak Dapat Menyimpan Data",
+        detail: `Akun Gl Supplier Belum Diisi`,
+        life: 6000,
+      });
+    }
+
+    if (acc_prd === null) {
       toast.current.show({
         severity: "error",
         summary: "Tidak Dapat Menyimpan Data",
@@ -883,14 +891,13 @@ const InputOrder = ({ onCancel, onSuccess }) => {
       //   });
     }
 
-    let acc_err =
-      (setup?.gl_detail && acc_prd !== null) ||
-      (!setup?.gl_detail && acc_gprd !== null);
+    let acc_err = acc_prd !== null;
 
     valid =
       !errors.code &&
       !errors.date &&
       !errors.sup &&
+      acc_ap &&
       // !errors.rul &&
       (validProduct === order.dprod.length || validJasa) &&
       acc_err;
@@ -1330,30 +1337,30 @@ const InputOrder = ({ onCancel, onSuccess }) => {
           </div>
 
           {/* {!order?.faktur ? ( */}
-            <div className="mt-4 ml-4">
-              <label className="text-label"></label>
-              <div className="p-inputgroup">
-                <SelectButton
-                  value={
-                    order.invoice !== null && order.invoice !== ""
-                      ? order.invoice === true
-                        ? { name: "Invoice", sts: true }
-                        : { name: "Non Invoice", sts: false }
-                      : null
-                  }
-                  options={invoice}
-                  onChange={(e) => {
-                    console.log(e.value);
-                    updateORD({
-                      ...order,
-                      invoice: e.value.sts,
-                      faktur: e.value.sts === false ? false : true,
-                    });
-                  }}
-                  optionLabel="name"
-                />
-              </div>
+          <div className="mt-4 ml-4">
+            <label className="text-label"></label>
+            <div className="p-inputgroup">
+              <SelectButton
+                value={
+                  order.invoice !== null && order.invoice !== ""
+                    ? order.invoice === true
+                      ? { name: "Invoice", sts: true }
+                      : { name: "Non Invoice", sts: false }
+                    : null
+                }
+                options={invoice}
+                onChange={(e) => {
+                  console.log(e.value);
+                  updateORD({
+                    ...order,
+                    invoice: e.value.sts,
+                    faktur: e.value.sts === false ? false : true,
+                  });
+                }}
+                optionLabel="name"
+              />
             </div>
+          </div>
           {/* ) : (
             <></>
           )} */}

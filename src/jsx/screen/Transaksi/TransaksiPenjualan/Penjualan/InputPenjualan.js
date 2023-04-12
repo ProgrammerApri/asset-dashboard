@@ -148,6 +148,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
 
     let ord = 0;
     let sto = 0;
+    let acc_prd = 0;
 
     sale?.jprod.forEach((element, i) => {
       if (i > 0) {
@@ -238,6 +239,26 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
       });
     }
 
+    //  console.log("=============");
+    //   console.log(sale);
+    let acc = null;
+    if (sale?.sub_addr) {
+      acc = checkCus(sale?.sub_cus)?.customer?.cus_gl
+    }else{
+      acc = checkCus(sale?.pel_id)?.customer?.cus_gl
+    }
+
+    let acc_ar = acc !== null;
+
+    if (!acc_ar) {
+      toast.current.show({
+        severity: "error",
+        summary: "Tidak Dapat Menyimpan Data",
+        detail: `Akun Gl Customer Belum Diisi`,
+        life: 6000,
+      });
+    }
+
     let validProduct = false;
     let validJasa = false;
     errors.prod?.forEach((el) => {
@@ -266,7 +287,8 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
       !errors.rul &&
       // !errors.sls &&
       !errors.sub &&
-      (validProduct || validJasa);
+      (validProduct || validJasa) &&
+      acc_ar;
 
     setError(errors);
 
@@ -293,7 +315,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
 
       if (response.status) {
         const { data } = response;
-        
+
         setComp(data);
       }
     } catch (error) {}
@@ -1585,7 +1607,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
-                hidden={sale.so_id === null}
+                  hidden={sale.so_id === null}
                   header={tr[localStorage.getItem("language")].ord}
                   className="align-text-top"
                   style={{

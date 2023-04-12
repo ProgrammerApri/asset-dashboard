@@ -21,7 +21,7 @@ const data = {
   id: null,
   ret_code: null,
   ret_date: null,
-  fk_id: null,
+  inv_id: null,
   product: [],
 };
 
@@ -161,7 +161,9 @@ const ReturBeliList = ({ onAdd, onDetail }) => {
                 price: null,
                 disc: null,
                 nett_price: null,
-                total: null,
+                totl: null,
+                totl_fc: null,
+                location: null,
               });
             }
 
@@ -350,7 +352,7 @@ const ReturBeliList = ({ onAdd, onDetail }) => {
                 globalFilterFields={[
                   "ret_code",
                   "formatDate(ret_date)",
-                  "fk_id.fk_code",
+                  "inv_id.inv_code",
                 ]}
                 emptyMessage={tr[localStorage.getItem("language")].empty_data}
                 paginator
@@ -381,7 +383,7 @@ const ReturBeliList = ({ onAdd, onDetail }) => {
                 <Column
                   header={tr[localStorage.getItem("language")].kd_fk}
                   style={{ minWidth: "8rem" }}
-                  field={(e) => e.fk_id.fk_code}
+                  field={(e) => e.inv_id.inv_code}
                   body={loading && <Skeleton />}
                 />
                 <Column

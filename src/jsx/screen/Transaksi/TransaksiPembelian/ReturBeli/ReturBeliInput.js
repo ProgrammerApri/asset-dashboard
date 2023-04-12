@@ -47,11 +47,12 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
   const [comp, setComp] = useState(null);
   const [supplier, setSupplier] = useState(null);
   const [ppn, setPpn] = useState(null);
-  const [fk, setFk] = useState(null);
+  const [inv, setInv] = useState(null);
   const [showSupplier, setShowSupplier] = useState(false);
   const [product, setProduct] = useState(null);
   const [satuan, setSatuan] = useState(null);
   const [lokasi, setLoc] = useState(null);
+  const [currency, setCurrency] = useState(null);
   const [error, setError] = useState(defError);
   const [accor, setAccor] = useState({
     produk: true,
@@ -67,10 +68,11 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
     getComp();
     getSupplier();
     getPpn();
-    getFK();
+    getInv();
     getProduct();
     getSatuan();
     getLoc();
+    getCurr();
   }, []);
 
   const isValid = () => {
@@ -78,7 +80,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
     let errors = {
       code: !pr.ret_code || pr.ret_code === "",
       date: !pr.ret_date || pr.ret_date === "",
-      fk: !pr.fk_id,
+      fk: !pr.inv_id,
       prod: [],
     };
 
@@ -176,9 +178,9 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
-  const getFK = async () => {
+  const getInv = async () => {
     const config = {
-      ...endpoints.faktur,
+      ...endpoints.invoice_pb,
       data: {},
     };
     console.log(config.data);
@@ -191,26 +193,28 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
         let filt = [];
         data.forEach((elem) => {
           let prod = [];
-          elem.product.forEach((el) => {
-            el.prod_id = el.prod_id.id;
-            el.unit_id = el.unit_id.id;
-            prod.push({
-              ...el,
-              r_order: el.order,
+          if (elem.ord_id?.faktur && elem.ord_id?.ns === false) {
+            elem.product.forEach((el) => {
+              el.prod_id = el.prod_id.id;
+              el.unit_id = el.unit_id.id;
+              el.location = el.location.id;
+              prod.push(el);
+
+              let temp = [...pr.product];
+              pr.product.forEach((e, i) => {
+                if (el.id === e.prod_id) {
+                  temp[i].order = el.order;
+                  updatePr({ ...pr, product: temp });
+                }
+              });
             });
 
-            let temp = [...pr.product];
-            pr.product.forEach((e, i) => {
-              if (el.id === e.prod_id) {
-                temp[i].order = el.order;
-                updatePr({ ...pr, product: temp });
-              }
-            });
-          });
-          elem.product = prod;
-          filt.push(elem);
+            elem.product = prod;
+            filt.push(elem);
+          }
         });
-        setFk(filt);
+        setInv(filt);
+        console.log(data);
       }
     } catch (error) {}
   };
@@ -259,6 +263,22 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
       if (response.status) {
         const { data } = response;
         setLoc(data);
+      }
+    } catch (error) {}
+  };
+
+  const getCurr = async () => {
+    const config = {
+      ...endpoints.currency,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setCurrency(data);
       }
     } catch (error) {}
   };
@@ -331,7 +351,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
 
   const checkFK = (value) => {
     let selected = {};
-    fk?.forEach((element) => {
+    inv?.forEach((element) => {
       if (value === element.id) {
         selected = element;
       }
@@ -387,6 +407,17 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
   const checkLoc = (value) => {
     let selected = {};
     lokasi?.forEach((element) => {
+      if (value === element?.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkCur = (value) => {
+    let selected = {};
+    currency?.forEach((element) => {
       if (value === element.id) {
         selected = element;
       }
@@ -436,14 +467,27 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
     let nil = 0;
     ppn?.forEach((elem) => {
       if (
-        supp(checkFK(pr.fk_id)?.ord_id.sup_id).supplier.sup_ppn ===
-        elem.id
+        supp(checkFK(pr.inv_id)?.ord_id.sup_id).supplier.sup_ppn === elem.id
       ) {
         nil = elem.nilai;
       }
     });
 
     return nil;
+  };
+
+  const curConv = () => {
+    let cur = 0;
+    currency?.forEach((elem) => {
+      if (
+        supp(checkFK(pr.inv_id)?.ord_id?.sup_id)?.supplier?.sup_curren ===
+        elem.id
+      ) {
+        cur = elem.rate;
+      }
+    });
+
+    return cur;
   };
 
   const formatIdr = (value) => {
@@ -518,28 +562,26 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-3">
-            <label className="text-label">
-              {tr[localStorage.getItem("language")].fak_pur}
-            </label>
+            <label className="text-label">{"Nomor Invoice"}</label>
             <div className="p-inputgroup"></div>
             <PrimeDropdown
-              value={pr.fk_id && checkFK(pr.fk_id)}
-              options={fk}
+              value={pr.inv_id && checkFK(pr.inv_id)}
+              options={inv}
               onChange={(e) => {
                 updatePr({
                   ...pr,
-                  fk_id: e.value.id,
+                  inv_id: e.value.id,
                   product: e.value.product.map((v) => {
-                    return { ...v, location: v.location.id, retur: 0 };
+                    return { ...v, retur: 0 };
                   }),
                 });
                 let newError = error;
                 newError.fk = false;
                 setError(newError);
               }}
-              optionLabel="fk_code"
+              optionLabel="inv_code"
               placeholder={tr[localStorage.getItem("language")].pilih}
-              errorMessage="Nomor Faktur Belum Dipilih"
+              errorMessage="Nomor Invoice Belum Dipilih"
               error={error?.fk}
             />
           </div>
@@ -553,8 +595,9 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
             <div className="p-inputgroup">
               <InputText
                 value={
-                  pr.fk_id !== null
-                    ? supp(checkFK(pr.fk_id)?.ord_id.sup_id)?.supplier?.sup_name
+                  pr.inv_id !== null
+                    ? supp(checkFK(pr.inv_id)?.ord_id?.sup_id)?.supplier
+                        ?.sup_name
                     : null
                 }
                 placeholder={tr[localStorage.getItem("language")].supplier}
@@ -570,8 +613,8 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
             <div className="p-inputgroup">
               <InputText
                 value={
-                  pr.fk_id !== null
-                    ? supp(checkFK(pr.fk_id)?.ord_id.sup_id).supplier
+                  pr.inv_id !== null
+                    ? supp(checkFK(pr.inv_id)?.ord_id.sup_id).supplier
                         .sup_address
                     : ""
                 }
@@ -581,13 +624,13 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          <div className="col-3">
+          <div className="col-2">
             <PrimeInput
               label={tr[localStorage.getItem("language")].telp}
               isNumber
               value={
-                pr.fk_id !== null
-                  ? supp(checkFK(pr.fk_id)?.ord_id.sup_id).supplier.sup_telp1
+                pr.inv_id !== null
+                  ? supp(checkFK(pr.inv_id)?.ord_id.sup_id).supplier.sup_telp1
                   : ""
               }
               placeholder={tr[localStorage.getItem("language")].telp}
@@ -595,20 +638,47 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-3">
+          <div className="col-2">
             <label className="text-label">
-              {tr[localStorage.getItem("language")].type_pjk}
+              {tr[localStorage.getItem("language")].pajak}
             </label>
             <div className="p-inputgroup">
               <InputText
                 value={
-                  pr.fk_id !== null
-                    ? pjk(
-                        supp(checkFK(pr.fk_id)?.ord_id?.sup_id).supplier.sup_ppn
-                      )?.name
+                  pr.inv_id !== null
+                    ? supp(checkFK(pr.inv_id)?.ord_id?.sup_id)?.supplier
+                        ?.sup_ppn
+                      ? pjk(
+                          supp(checkFK(pr.inv_id)?.ord_id?.sup_id)?.supplier
+                            ?.sup_ppn
+                        )?.name
+                      : ""
+                    : ""
+                }
+                placeholder={tr[localStorage.getItem("language")].pajak}
+                disabled
+              />
+            </div>
+          </div>
+
+          <div className="col-2">
+            <label className="text-label">
+              {tr[localStorage.getItem("language")].currency}
+            </label>
+            <div className="p-inputgroup">
+              <InputText
+                value={
+                  pr.inv_id !== null
+                    ? supp(checkFK(pr.inv_id)?.ord_id?.sup_id)?.supplier
+                        ?.sup_curren !== null
+                      ? checkCur(
+                          supp(checkFK(pr.inv_id)?.ord_id?.sup_id)?.supplier
+                            ?.sup_curren
+                        )?.name
+                      : "IDR"
                     : null
                 }
-                placeholder={tr[localStorage.getItem("language")].type_pjk}
+                placeholder={tr[localStorage.getItem("language")].currency}
                 disabled
               />
             </div>
@@ -657,36 +727,17 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                     field={""}
                     body={(e) => (
                       <PrimeInput
-                        value={e.prod_id && checkProd(e.prod_id).name}
-                        // option={product}
-                        // onChange={(u) => {
-                        //   let sat = [];
-                        //   satuan.forEach((element) => {
-                        //     if (element.id === u.unit.id) {
-                        //       sat.push(element);
-                        //     } else {
-                        //       if (element.u_from?.id === u.unit.id) {
-                        //         sat.push(element);
-                        //       }
-                        //     }
-                        //   });
-                        //   // setSatuan(sat);
-
-                        //   let temp = [...pr.product];
-                        //   temp[e.index].prod_id = u.id;
-                        //   temp[e.index].unit_id = u.unit?.id;
-                        //   updatePr({ ...pr, product: temp });
-                        // }}
-                        placeholder={tr[localStorage.getItem("language")].pilih}
-                        // label={"[name]"}
-                        disabled={pr.fk_id !== null}
-                        // onDetail={() => setShowProduk(true)}
+                        value={`${checkProd(e.prod_id)?.name} (${
+                          checkProd(e.prod_id)?.code
+                        })`}
+                        placeholder="Pilih Kode Produk"
+                        disabled={pr.inv_id !== null}
                       />
                     )}
                   />
 
                   <Column
-                    header={tr[localStorage.getItem("language")].sat}
+                    header={tr[localStorage.getItem("language")].satuan}
                     className="align-text-top"
                     style={{
                       width: "8rem",
@@ -694,16 +745,9 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                     field={""}
                     body={(e) => (
                       <PrimeInput
-                        value={e.unit_id && checkUnit(e.unit_id).code}
-                        // onChange={(t) => {
-                        //   let temp = [...pr.product];
-                        //   temp[e.index].unit_id = t.id;
-                        //   updatePr({ ...pr, product: temp });
-                        // }}
-                        // option={satuan}
-                        // label={"[name]"}
-                        placeholder={tr[localStorage.getItem("language")].sat}
-                        disabled={pr.fk_id !== null}
+                        value={e.unit_id && checkUnit(e.unit_id)?.name}
+                        placeholder={tr[localStorage.getItem("language")].pilih}
+                        disabled={pr.inv_id !== null}
                       />
                     )}
                   />
@@ -714,24 +758,37 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                     field={""}
                     body={(e) => (
                       <PrimeInput
-                        value={e.location && checkLoc(e.location)?.name}
-                        // onChange={(t) => {
-                        //   let temp = [...pr.product];
-                        //   temp[e.index].location = t.id;
-                        //   updatePr({ ...pr, product: temp });
-                        // }}
-                        // option={lokasi}
-                        // label={"[name]"}
-                        placeholder={
-                          tr[localStorage.getItem("language")].gudang
-                        }
-                        disabled={pr.fk_id !== null}
+                        value={`${checkLoc(e.location)?.name} (${
+                          checkLoc(e.location)?.code
+                        })`}
+                        placeholder={tr[localStorage.getItem("language")].pilih}
+                        disabled={pr.inv_id !== null}
                       />
                     )}
                   />
 
                   <Column
-                    header={tr[localStorage.getItem("language")].qty}
+                    hidden={isEdit}
+                    header="Jumlah Beli"
+                    className="align-text-top"
+                    style={{
+                      width: "10rem",
+                    }}
+                    field={""}
+                    body={(e) => (
+                      <PrimeNumber
+                        prc
+                        value={e?.order ?? "0"}
+                        placeholder="0"
+                        type="number"
+                        min={0}
+                        disabled
+                      />
+                    )}
+                  />
+
+                  <Column
+                    header="Jumlah Retur"
                     className="align-text-top"
                     style={{
                       width: "8rem",
@@ -740,12 +797,25 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                     body={(e) => (
                       <div className="p-inputgroup">
                         <PrimeNumber
+                          prc
                           value={e.retur && e.retur}
                           onChange={(u) => {
                             let temp = [...pr.product];
-                            temp[e.index].retur = u.target.value;
-                            temp[e.index].totl =
-                              temp[e.index].retur * temp[e.index].price;
+                            temp[e.index].retur = u.value;
+                            if (
+                              checkFK(pr.inv_id)?.ord_id?.sup_id !== null &&
+                              supp(checkFK(pr.inv_id)?.ord_id?.sup_id)?.supplier
+                                ?.sup_curren !== null
+                            ) {
+                              temp[e.index].totl_fc =
+                                temp[e.index].retur * temp[e.index].price;
+
+                              temp[e.index].totl =
+                                temp[e.index].totl_fc * curConv();
+                            } else {
+                              temp[e.index].totl =
+                                temp[e.index].retur * temp[e.index].price;
+                            }
                             updatePr({ ...pr, product: temp });
 
                             let newError = error;
@@ -764,30 +834,75 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header={tr[localStorage.getItem("language")].price}
+                    header="Harga Satuan"
                     className="align-text-top"
                     field={""}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputNumber
+                    body={(e) =>
+                      supp(checkFK(pr.inv_id)?.ord_id?.sup_id)?.supplier
+                        ?.sup_curren !== null ? (
+                        <div className="p-inputgroup">
+                          <InputText
+                            value={e.price && e.price}
+                            onChange={(u) => {
+                              let temp = [...pr.product];
+                              temp[e.index].price = u.target.value;
+                              if (
+                                checkFK(pr.inv_id)?.ord_id?.sup_id !== null &&
+                                supp(checkFK(pr.inv_id)?.ord_id?.sup_id)
+                                  ?.supplier?.sup_curren !== null
+                              ) {
+                                temp[e.index].totl_fc =
+                                  temp[e.index].retur * temp[e.index].price;
+
+                                temp[e.index].totl =
+                                  temp[e.index].totl_fc * curConv();
+                              } else {
+                                temp[e.index].totl =
+                                  temp[e.index].retur * temp[e.index].price;
+                              }
+
+                              updatePr({ ...pr, product: temp });
+                            }}
+                            placeholder="0"
+                            min={0}
+                            type="number"
+                            disabled
+                          />
+                        </div>
+                      ) : (
+                        <PrimeNumber
+                          price
                           value={e.price && e.price}
                           onChange={(u) => {
                             let temp = [...pr.product];
                             temp[e.index].price = u.value;
-                            temp[e.index].totl =
-                              temp[e.index].retur * temp[e.index].price;
+                            if (
+                              checkFK(pr.inv_id)?.ord_id?.sup_id !== null &&
+                              supp(checkFK(pr.inv_id)?.ord_id?.sup_id)?.supplier
+                                ?.sup_curren !== null
+                            ) {
+                              temp[e.index].totl_fc =
+                                temp[e.index].retur * temp[e.index].price;
+
+                              temp[e.index].totl =
+                                temp[e.index].totl_fc * curConv();
+                            } else {
+                              temp[e.index].totl =
+                                temp[e.index].retur * temp[e.index].price;
+                            }
+
                             updatePr({ ...pr, product: temp });
-                            console.log(temp);
                           }}
                           placeholder="0"
                           min={0}
+                          disabled
                         />
-                      </div>
-                    )}
+                      )
+                    }
                   />
 
                   <Column
-                    header={tr[localStorage.getItem("language")].disc}
+                    header="Diskon"
                     className="align-text-top"
                     style={{
                       width: "10rem",
@@ -813,7 +928,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header={tr[localStorage.getItem("language")].net_pcr}
+                    header="Harga Nett"
                     className="align-text-top"
                     field={""}
                     body={(e) => (
@@ -834,7 +949,39 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header={tr[localStorage.getItem("language")].total}
+                    hidden={
+                      supp(checkFK(pr.inv_id)?.ord_id?.sup_id)?.supplier
+                        ?.sup_curren == null
+                    }
+                    header="FC"
+                    className="align-text-top"
+                    // style={{
+                    //   minWidth: "7rem",
+                    // }}
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={
+                            supp(checkFK(pr.inv_id)?.ord_id?.sup_id)?.supplier
+                              ?.sup_curren !== null
+                              ? e.nett_price && e.nett_price !== 0
+                                ? e.nett_price
+                                : e.totl_fc - (e.totl_fc * e.disc) / 100
+                              : null
+                          }
+                          onChange={(u) => {}}
+                          placeholder="0"
+                          type="number"
+                          min={0}
+                          disabled
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header="Total"
                     className="align-text-top"
                     field={""}
                     body={(e) => (
@@ -927,7 +1074,9 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
 
               <div className="col-6">
                 <label className="text-label">
-                  {`${tr[localStorage.getItem("language")].pjk_barang} (${pajk()}%)`}
+                  {`${
+                    tr[localStorage.getItem("language")].pjk_barang
+                  } (${pajk()}%)`}
                 </label>
               </div>
 

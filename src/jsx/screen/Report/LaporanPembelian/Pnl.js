@@ -13,6 +13,10 @@ import ReactToPrint from "react-to-print";
 import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 import { sub } from "date-fns";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import { Link } from "react-router-dom";
+import { Dropdown } from "primereact/dropdown";
+import { ProgressSpinner } from "primereact/progressspinner";
+// import { connectUrl } from "src/data/config";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -21,42 +25,29 @@ const Pnl = () => {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const printPage = useRef(null);
-  const [date, setDate] = useState([new Date(), new Date()]);
-  const [trans, setTrans] = useState(null);
+  const [date, setDate] = useState(new Date());
+  const [project, setProject] = useState(null);
   const [account, setAccount] = useState(null);
+  const [selectedProject, setSelectedProject] = useState(null);
   const [cp, setCp] = useState("");
-  const chunkSize = 4;
+  const chunkSize = 30;
+  const [maxDate, setMaxDate] = useState(new Date().getMonth() + 1);
+  const [maxYear, setMaxYear] = useState(new Date().getFullYear() + 1);
 
   useEffect(() => {
-    var d = new Date();
-    d.setDate(d.getDate() - 7);
-    setDate([d, new Date()]);
-    getAccount();
+    getProject();
+    getReport(
+      formatDate(new Date(date.getFullYear(), date.getMonth(), 1)),
+      formatDate(new Date(date.getFullYear(), date.getMonth() + 1, 0)),
+      0,
+      0
+    );
   }, []);
 
-  const getTrans = async () => {
+  const getProject = async () => {
     const config = {
-      ...endpoints.trans,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setTrans(data);
-        // jsonForExcel(data);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const getAccount = async (isUpdate = false) => {
-    setLoading(true);
-    const config = {
-      ...endpoints.account,
+      ...endpoints.project,
+      // base_url: connectUrl,
       data: {},
     };
     console.log(config.data);
@@ -66,26 +57,49 @@ const Pnl = () => {
       console.log(response);
       if (response.status) {
         const { data } = response;
+
         console.log(data);
-        setAccount(data);
-        getTrans();
-        // jsonForExcel(data);
+        setProject(data);
       }
     } catch (error) {}
-    if (isUpdate) {
-      setLoading(false);
-    } else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 500);
-    }
+  };
+
+  const getReport = async (start, end, project, product) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.reportPnl,
+      endpoint:
+        endpoints.reportPnl.endpoint +
+        `${btoa(start)}/${btoa(end)}/${btoa(project)}/${btoa(product)}`,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+
+        console.log(data);
+        setReport(data);
+      }
+    } catch (error) {}
+
+    setLoading(false);
   };
 
   const formatDate = (date) => {
-    var d = new Date(`${date}Z`),
-      month = "" + (d.getMonth() + 1),
-      day = "" + d.getDate(),
-      year = d.getFullYear();
+    if (typeof date === "string") {
+      var d = new Date(`${date}Z`),
+        month = "" + (d.getMonth() + 1),
+        day = "" + d.getDate(),
+        year = d.getFullYear();
+    } else {
+      var d = new Date(date),
+        month = "" + (d.getMonth() + 1),
+        day = "" + d.getDate(),
+        year = d.getFullYear();
+    }
 
     if (month.length < 2) month = "0" + month;
     if (day.length < 2) day = "0" + day;
@@ -95,51 +109,6 @@ const Pnl = () => {
 
   const jsonForExcel = (acc, excel = false) => {
     let data = [];
-    let new_acc = [];
-    let grouped = acc?.filter(
-      (el, i) =>
-        i ===
-        acc.findIndex(
-          (ek) =>
-            el.klasifikasi.id >= 4 &&
-            el.klasifikasi.id <= 9 &&
-            el?.klasifikasi.id === ek?.klasifikasi.id
-        )
-    );
-
-    grouped?.forEach((el) => {
-      let total = 0;
-      let sub = [];
-      acc.forEach((ek) => {
-        if (ek.account.dou_type === "U") {
-          if (el.klasifikasi.id === ek.klasifikasi.id) {
-            let saldo = 0;
-            trans?.forEach((ej) => {
-              if (ej.acc_id?.acc_code === ek.account?.acc_code) {
-                saldo += ej.trx_amnt;
-              }
-            });
-            sub.push({
-              acc_name: `${ek.account.acc_code}-${ek.account.acc_name}`,
-              type: "item",
-              saldo: `Rp. ${formatIdr(saldo)}`,
-            });
-            total += saldo;
-          }
-        }
-      });
-      sub.push({
-        acc_name: `Sub Total ${el.klasifikasi.klasiname}`,
-        type: "footer",
-        saldo: `Rp. ${formatIdr(total)}`,
-      });
-      data.push({
-        klasifikasi: `${el.klasifikasi.id}-${el.klasifikasi.klasiname}`,
-        sub: sub,
-      });
-    });
-
-    console.log(data);
 
     let final = [
       {
@@ -255,40 +224,97 @@ const Pnl = () => {
       });
     });
 
-    if (excel) {
-      return final;
-    } else {
-      return data;
-    }
+    return final;
   };
 
   const formatIdr = (value) => {
-    return `${value}`
+    if (value < 0) {
+      return `(Rp. ${`${value?.toFixed(2)}`
+        .replace("-", "")
+        .replace(".", ",")
+        .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.")})`;
+    }
+    return `Rp. ${`${value?.toFixed(2)}`
       .replace(".", ",")
-      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.")}`;
   };
 
   const renderHeader = () => {
     return (
       <div className="flex justify-content-between mb-3">
-        <div className="col-8 ml-0 mr-0 pl-0">
-          <Row className="m-0">
-            <div className="col-3 mr-3 p-0">
-              <div className="p-inputgroup">
-                <span className="p-inputgroup-addon">
-                  <i className="pi pi-calendar" />
-            </span>
-            <Calendar
-              value={date}
-              id="range"
-              onChange={(e) => setDate(e.value)}
-              selectionMode="range"
-              placeholder="Pilih Tanggal"
-              readOnlyInput
-            />
+        <div className="row align-items-center">
+          <div className="col-6">
+            <div className="p-inputgroup">
+              <span className="p-inputgroup-addon">
+                <i className="pi pi-calendar" />
+              </span>
+              <Calendar
+                value={date}
+                id="range"
+                onChange={(e) => {
+                  setDate(e.value);
+                  getReport(
+                    formatDate(
+                      new Date(e.value.getFullYear(), e.value.getMonth(), 1)
+                    ),
+                    formatDate(
+                      new Date(e.value.getFullYear(), e.value.getMonth() + 1, 0)
+                    ),
+                    0,
+                    0
+                  );
+                }}
+                // selectionMode="range"
+                placeholder="Pilih Tanggal"
+                view="month"
+                dateFormat="MM-yy"
+                maxDate={new Date(maxYear, maxDate - 1, 1)}
+              />
             </div>
           </div>
-          </Row>
+          <div className={loading ? "col-5" : "col-6"}>
+            <div className="p-inputgroup">
+              <Dropdown
+                value={selectedProject}
+                options={project && project}
+                onChange={(a) => {
+                  setSelectedProject(a.value)
+                  getReport(
+                    formatDate(
+                      new Date(date.getFullYear(), date.getMonth(), 1)
+                    ),
+                    formatDate(
+                      new Date(date.getFullYear(), date.getMonth() + 1, 0)
+                    ),
+                    a?.value?.id ?? 0,
+                    0
+                  );
+                }}
+                optionLabel={(option) => (
+                  <div>
+                    {option !== null ? `${option.proj_code} ${option.proj_name}` : ""}
+                  </div>
+                )}
+                filter
+                filterBy="proj_name"
+                placeholder="Pilih Project"
+                showClear
+                itemTemplate={(option) => (
+                  <div>
+                    {option !== null ? `${option.proj_code} ${option.proj_name}` : ""}
+                  </div>
+                )}
+              />
+            </div>
+          </div>
+          {loading && (
+            <ProgressSpinner
+              style={{ width: "20px", height: "20px" }}
+              strokeWidth="8"
+              fill="transparent"
+              animationDuration=".5s"
+            />
+          )}
         </div>
         <div style={{ height: "1rem" }}></div>
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
@@ -347,65 +373,67 @@ const Pnl = () => {
 
       <>
         <Row className="m-0 justify-content-center" ref={printPage}>
-          {chunk(jsonForExcel(account) ?? [], chunkSize)?.map((val, idx) => {
+          {chunk(report ?? [], chunkSize)?.map((val, idx) => {
             return (
               <Card className="ml-1 mr-1 mt-2">
                 <Card.Body className="p-0">
                   <CustomeWrapper
                     tittle={"Profit/Loss Report"}
-                    subTittle={`Profit/Loss Report as of 25/06/2022`}
+                    subTittle={`Profit/Loss Report as of ${formatDate(date)}`}
                     onComplete={(cp) => setCp(cp)}
                     page={idx + 1}
                     body={
-                      <>
+                      <Row className="px-2">
                         {val.map((v) => {
+                          if (v.type === "header") {
+                            return (
+                              <div
+                                className="col-12 text-left p-component"
+                                style={{
+                                  background: "var(--input-bg)",
+                                  padding: "1rem 1rem",
+                                  color: "var(--text-color",
+                                  fontWeight: "500",
+                                }}
+                              >
+                                {v.label}
+                              </div>
+                            );
+                          }
+                          if (v.type === "body") {
+                            return (
+                              <div
+                                className="col-12 text-left p-component flex justify-content-between"
+                                style={{
+                                  padding: "0.7rem 1rem",
+                                  color: "var(--text-color",
+                                  borderBottom: "1px solid var(--border-color)",
+                                }}
+                              >
+                                <div className="ml-4">{v.label}</div>
+                                <div className="text-right">
+                                  {formatIdr(v.value)}
+                                </div>
+                              </div>
+                            );
+                          }
                           return (
-                            <DataTable
-                              responsiveLayout="scroll"
-                              value={v.sub}
-                              showGridlines
-                              dataKey="id"
-                              rowHover
-                              emptyMessage="Data Tidak Ditemukan"
+                            <div
+                              className="col-12 text-left font-bold p-component flex justify-content-between"
+                              style={{
+                                padding: "0.7rem 1rem",
+                                color: "var(--text-color",
+                                borderBottom: "1px solid var(--border-color)",
+                              }}
                             >
-                              <Column
-                                className="header-center"
-                                header={v.klasifikasi}
-                                style={{ width: "20rem" }}
-                                body={(e) => (
-                                  <div
-                                    className={
-                                      e.type == "footer"
-                                        ? "font-weight-bold"
-                                        : "ml-4"
-                                    }
-                                  >
-                                    {e.acc_name}
-                                  </div>
-                                )}
-                              />
-                              <Column
-                                className="header-center"
-                                header=""
-                                style={{ minWidht: "10rem" }}
-                                body={(e) => (
-                                  <div
-                                    className={
-                                      e.type == "header"
-                                        ? "font-weight-bold text-right"
-                                        : e.type == "footer"
-                                        ? "font-weight-bold text-right"
-                                        : "text-right"
-                                    }
-                                  >
-                                    {e.saldo}
-                                  </div>
-                                )}
-                              />
-                            </DataTable>
+                              <div>{v.label}</div>
+                              <div className="text-right">
+                                {formatIdr(v.value)}
+                              </div>
+                            </div>
                           );
                         })}
-                      </>
+                      </Row>
                     }
                   />
                 </Card.Body>

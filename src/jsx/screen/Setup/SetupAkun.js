@@ -37,6 +37,7 @@ const set = {
   sto_hpp_diff: null,
   sto_wip: null,
   fixed_assets: null,
+  fixed_kas: null,
   costing: null,
   selisih_kurs: null,
 };
@@ -201,6 +202,7 @@ const SetupAkun = () => {
         sto_bb: data?.sto_bb?.id ?? null,
         sto_bbp: data?.sto_bbp?.id ?? null,
         fixed_assets: data?.fixed_assets?.id ?? null,
+        fixed_kas: data?.fixed_kas?.id ?? null,
         selisih_kurs: data?.selisih_kurs?.id ?? null,
       },
     };
@@ -263,6 +265,7 @@ const SetupAkun = () => {
         sto_bb: data?.sto_bb?.id ?? null,
         sto_bbp: data?.sto_bbp?.id ?? null,
         fixed_assets: data?.fixed_assets?.id ?? null,
+        fixed_kas: data?.fixed_kas?.id ?? null,
         selisih_kurs: data?.selisih_kurs?.id ?? null,
       },
     };
@@ -390,6 +393,37 @@ const SetupAkun = () => {
               (e) => {
                 setSetup({ ...setup, fixed_assets: e.value });
                 submitUpdate({ ...setup, fixed_assets: e.value });
+              },
+              true,
+              "d"
+            )}
+          </Row>
+        }
+      />
+    );
+  };
+
+  const renderKas = () => {
+    return (
+      <CustomAccordion
+        tittle={"Kas"}
+        defaultActive={false}
+        active={accor.lainnya}
+        onClick={() => {
+          setAccor({
+            ...accor,
+            lainnya: !accor.lainnya,
+          });
+        }}
+        key={1}
+        body={
+          <Row className="mr-0 ml-0">
+            {renderAccountDropdown(
+              "Kas Tetap",
+              setup && setup.fixed_kas,
+              (e) => {
+                setSetup({ ...setup, fixed_kas: e.value });
+                submitUpdate({ ...setup, fixed_kas: e.value });
               },
               true,
               "d"
@@ -851,6 +885,7 @@ const SetupAkun = () => {
           {renderOthers()}
           {renderCosting()}
           {renderSelisihKurs()}
+          {renderKas()}
         </Col>
       </Row>
     </>

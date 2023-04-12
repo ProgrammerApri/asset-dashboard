@@ -399,6 +399,24 @@ const endpoints = {
     method: "GET",
     data: {},
   },
+  
+  getCflow: {
+    endpoint: "/v1/api/setup/cflow",
+    method: "GET",
+    data: {},
+  },
+
+  addCflow: {
+    endpoint: "/v1/api/setup/cflow",
+    method: "POST",
+    data: {},
+  },
+
+  editCflow: {
+    endpoint: "/v1/api/setup/cflow/",
+    method: "PUT",
+    data: {},
+  },
 
   getSetup: {
     endpoint: "/v1/api/setup/account",
@@ -455,6 +473,13 @@ const endpoints = {
   editPnl: {
     endpoint: "/v1/api/setup/pnl/",
     method: "PUT",
+    data: {},
+  },
+
+  //report setup
+  reportPnl: {
+    endpoint: "/v1/api/report/pnl/",
+    method: "GET",
     data: {},
   },
 
@@ -1462,7 +1487,6 @@ const endpoints = {
     method: "DELETE",
     data: {},
   },
-
 
   // Koreksi Piutang
   korPiu: {

@@ -55,7 +55,7 @@ const NeracaPerbandingan = () => {
   const [loading, setLoading] = useState(true);
   const [month1, setMonth1] = useState(new Date());
   const [month2, setMonth2] = useState(new Date());
-  const [cp, setCp] = useState(null)
+  const [cp, setCp] = useState(null);
   const printPage = useRef(null);
   const toast = useRef(null);
   const dummy = Array.from({ length: 10 });
@@ -171,7 +171,7 @@ const NeracaPerbandingan = () => {
             let saldo = 0;
             trans?.forEach((ej) => {
               let trx_date = new Date(`${ej.trx_date}Z`);
-              if (trx_date.getMonth()+1 === month2.getMonth() + 1) {
+              if (trx_date.getMonth() + 1 === month2.getMonth() + 1) {
                 if (ek.account?.acc_code === ej.acc_id?.umm_code) {
                   saldo += ej.trx_amnt;
                 }
@@ -497,8 +497,9 @@ const NeracaPerbandingan = () => {
   const renderHeader = () => {
     return (
       <div className="flex justify-content-between mb-3">
+      <div className="col-8 ml-0 mr-0 pl-0">
         <Row className="m-0">
-          <div className="col-6 ml-0 mr-0 pl-0">
+          <div className="col-3 mr-3 p-0">
             <div className="p-inputgroup">
               <span className="p-inputgroup-addon">
                 <i className="pi pi-calendar" />
@@ -515,7 +516,7 @@ const NeracaPerbandingan = () => {
               />
             </div>
           </div>
-          <div className="col-6 ml-0 mr-0 pl-0">
+          <div className="col-3 mr-3 p-0">
             <div className="p-inputgroup">
               <span className="p-inputgroup-addon">
                 <i className="pi pi-calendar" />
@@ -533,14 +534,14 @@ const NeracaPerbandingan = () => {
             </div>
           </div>
         </Row>
+        </div>
         <div style={{ height: "1rem" }}></div>
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
             <ExcelFile
-              filename={`balancesheet_comparison_export_${formatDate(new Date()).replaceAll(
-                "/",
-                ""
-              )}`}
+              filename={`balancesheet_comparison_export_${formatDate(
+                new Date()
+              ).replaceAll("/", "")}`}
               element={
                 <PrimeSingleButton
                   label="Excel"
@@ -603,7 +604,9 @@ const NeracaPerbandingan = () => {
           <Card.Body className="p-0">
             <CustomeWrapper
               tittle={"Balance Sheet Comparison"}
-              subTittle={`Balance Sheet Comparison ${formatDate(month2)} and ${formatDate(month1)}`}
+              subTittle={`Balance Sheet Comparison ${formatDate(
+                month2
+              )} and ${formatDate(month1)}`}
               onComplete={(cp) => setCp(cp)}
               page={1}
               body={
@@ -732,9 +735,11 @@ const NeracaPerbandingan = () => {
       <Row className="m-0 justify-content-center d-none">
         <Card className="ml-1 mr-1 mt-2">
           <Card.Body className="p-0" ref={printPage}>
-          <CustomeWrapper
+            <CustomeWrapper
               tittle={"Balance Sheet Comparison"}
-              subTittle={`Balance Sheet Comparison ${formatDate(month2)} and ${formatDate(month1)}`}
+              subTittle={`Balance Sheet Comparison ${formatDate(
+                month2
+              )} and ${formatDate(month1)}`}
               page={1}
               body={
                 <DataTable

@@ -11,6 +11,8 @@ import InputPengguna from "./SetupPenggunaa/InputPengguna";
 import Pengguna from "./SetupPenggunaa/Pengguna";
 import SetupPenggunaa from "./SetupPenggunaa";
 import SetupSaldoAkhir from "./SetupSaldoAkhir";
+import SetupPnl2 from "./SetupPnl2";
+import SetupCashFlow from "./setupCashFlow";
 
 const Setup = () => {
   return (
@@ -36,8 +38,14 @@ const Setup = () => {
       <TabPanel header="Setup Neraca">
         <SetupNeraca/>
       </TabPanel>
-      <TabPanel header="Setup P/L">
+      <TabPanel header="Arus Kas Tidak Langsung ">
+        <SetupCashFlow />
+      </TabPanel>
+      {/* <TabPanel header="Setup P/L">
         <SetupPnl/>
+      </TabPanel> */}
+      <TabPanel header="Setup P/L">
+        <SetupPnl2/>
       </TabPanel>
       <TabPanel header="Setup Saldo Akhir">
         <SetupSaldoAkhir/>

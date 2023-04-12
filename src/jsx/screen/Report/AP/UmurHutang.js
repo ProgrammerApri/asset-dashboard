@@ -494,7 +494,7 @@ const UmurHutang = () => {
       <div className="flex justify-content-between">
         <div className="col-6 ml-0 mr-0 pl-0 pt-0">
           <Row className="mt-0">
-            <div className="p-inputgroup col-6">
+            <div className="p-inputgroup col-4">
               <span className="p-inputgroup-addon">
                 <i className="pi pi-calendar" />
               </span>

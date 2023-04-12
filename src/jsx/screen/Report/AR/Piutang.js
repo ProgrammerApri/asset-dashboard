@@ -613,7 +613,7 @@ const ReportPiutang = () => {
       <div className="flex justify-content-between">
         <div className="col-10 ml-0 mr-0 pl-0 pt-0">
           <Row className="mt-0">
-            <div className="p-inputgroup col-2">
+            <div className="p-inputgroup col-3  ">
               <span className="p-inputgroup-addon">
                 <i className="pi pi-calendar" />
               </span>
@@ -631,7 +631,7 @@ const ReportPiutang = () => {
               />
             </div>
 
-            <div className="col-3 ">
+            <div className="col-2 ">
               <MultiSelect
                 value={selectedCus ?? null}
                 options={customer}
@@ -646,11 +646,11 @@ const ReportPiutang = () => {
                 filterBy="cus_id.cus_name"
                 filter
                 display="chip"
-                className="w-full md:w-22rem"
+                // className="w-full md:w-22rem"
                 maxSelectedLabels={3}
               />
             </div>
-            <div className="col-3 ml-3">
+            <div className="col-3">
               <MultiSelect
                 value={selectedAcc ?? null}
                 options={acc}
@@ -666,7 +666,7 @@ const ReportPiutang = () => {
                 filter
                 itemTemplate={glTemplate}
                 display="chip"
-                className="w-full md:w-22rem"
+                // className="w-full md:w-22rem"
                 maxSelectedLabels={3}
               />
             </div>

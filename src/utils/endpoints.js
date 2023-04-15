@@ -475,6 +475,11 @@ const endpoints = {
     method: "PUT",
     data: {},
   },
+  delPnl: {
+    endpoint: "/v1/api/setup/pnl/",
+    method: "DELETE",
+    data: {},
+  },
 
   //report setup
   reportPnl: {

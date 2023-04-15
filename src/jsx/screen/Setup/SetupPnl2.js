@@ -25,11 +25,14 @@ export default function SetupPnl2() {
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [klasifikasi, setKlasifikasi] = useState(null);
   const [available, setAvailable] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
   const [displayInput, setDisplayInput] = useState(false);
   const [isEdit, setEdit] = useState(false);
+  const [update, setUpdate] = useState(false);
   const pnl = useSelector((state) => state.pnl);
   const dispatch = useDispatch();
   const textArea = useRef(null);
+  const [currentLabel, setCurrentLabel] = useState({});
 
   useEffect(() => {
     getKlasifikasi();
@@ -148,7 +151,10 @@ export default function SetupPnl2() {
   };
 
   const addSetup = async (data) => {
-    console.log("DATA=======",data.klasifikasi?.filter((v) => v !== null));
+    console.log(
+      "DATA=======",
+      data.klasifikasi?.filter((v) => v !== null)
+    );
     let config = {
       ...endpoints.addPnl,
       data: {
@@ -181,10 +187,10 @@ export default function SetupPnl2() {
     getSetup();
     setLoadingSubmit(false);
     setDisplayInput(false);
+    setCurrentLabel({});
   };
 
   const editSetup = async (data) => {
-    console.log("DATA=======",data.klasifikasi?.filter((v) => v !== null));
     let config = {
       ...endpoints.editPnl,
       endpoint: endpoints.editPnl.endpoint + data.id,
@@ -194,6 +200,7 @@ export default function SetupPnl2() {
           data.type === 1 ? data.klasifikasi?.filter((v) => v !== null) : null,
       },
     };
+    console.log("dataaaaaaaaaaa", config.data);
     let response = null;
     try {
       response = await request(null, config);
@@ -220,6 +227,38 @@ export default function SetupPnl2() {
     setDisplayInput(false);
   };
 
+  const delSetup = async (id) => {
+    let config = {
+      ...endpoints.delPnl,
+      endpoint: endpoints.delPnl.endpoint + id,
+    };
+    console.log("hapus", id);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setUpdate(false);
+        setShowDelete(false);
+        toast.current.show({
+          severity: "info",
+          summary: "Berhasil",
+          detail: "Data berhasil diperbarui",
+          life: 3000,
+        });
+      }
+    } catch (error) {
+      setUpdate(false);
+      setShowDelete(false);
+      toast.current.show({
+        severity: "error",
+        summary: "Gagal",
+        detail: "Gagal memperbarui data",
+        life: 3000,
+      });
+    }
+  };
+
   const checkKlasifikasi = (value) => {
     let selected = {};
     klasifikasi?.forEach((element) => {
@@ -244,6 +283,7 @@ export default function SetupPnl2() {
       payload: payload,
     });
   };
+
   const submitUpdate = (data) => {
     if (available) {
       if (data.id) {
@@ -254,6 +294,33 @@ export default function SetupPnl2() {
     } else {
       postCompany(data);
     }
+  };
+
+  const renderFooterDel = (id) => {
+    return (
+      <div>
+        <PButton
+          label="Batal"
+          onClick={() => {
+            setShowDelete(false);
+            setLoading(false);
+            setUpdate(false);
+          }}
+          className="p-button-text btn-primary"
+        />
+        <PButton
+          label="Hapus"
+          icon="pi pi-trash"
+          onClick={() => {
+            setUpdate(true);
+            setShowDelete(true);
+            delSetup(id);
+          }}
+          autoFocus
+          loading={loading}
+        />
+      </div>
+    );
   };
 
   const renderBody = () => {
@@ -267,6 +334,7 @@ export default function SetupPnl2() {
             onClick={() => {
               setDisplayInput(true);
               setCurrent(pnl.default);
+              setEdit(true);
             }}
           />
         </Card.Header>
@@ -295,13 +363,19 @@ export default function SetupPnl2() {
                                 icon="pi pi-pencil"
                                 className="p-button-rounded p-button-text p-button-plain p-button-sm p-0"
                                 aria-label="Edit"
-                                onClick={(ev) => {}}
+                                onClick={(ev) => {
+                                  // setEdit(true)
+                                  setDisplayInput(true);
+                                  setEdit(true);
+                                }}
                               />
                               <PButton
                                 icon="pi pi-trash"
                                 className="p-button-rounded p-button-text p-button-plain p-button-sm p-0"
                                 aria-label="Delete"
-                                onClick={(ev) => {}}
+                                onClick={(ev) => {
+                                  setShowDelete(true);
+                                }}
                               />
                             </div>
                           </div>
@@ -364,6 +438,7 @@ export default function SetupPnl2() {
 
                                         updateSetup(temp);
                                         submitUpdate(temp[i]);
+                                        setShowDelete(pnl.default);
                                       }}
                                       className="btn btn-danger shadow btn-xs sharp"
                                     >
@@ -445,6 +520,7 @@ export default function SetupPnl2() {
         style={{ width: "40vw" }}
         footer={renderFooter()}
         onHide={() => {
+          setEdit(false);
           setDisplayInput(false);
         }}
       >
@@ -453,7 +529,7 @@ export default function SetupPnl2() {
             <label className="text-label">Label</label>
             <div className="p-inputgroup">
               <InputText
-                value={pnl?.current?.name}
+                value={pnl.current?.name}
                 onChange={(e) => {
                   setCurrent({ ...pnl.current, name: e.target.value });
                 }}
@@ -477,6 +553,7 @@ export default function SetupPnl2() {
               optionLabel="name"
             />
           </div>
+
           {pnl?.current?.type === 2 && (
             <>
               <div className="col-6">
@@ -544,6 +621,25 @@ export default function SetupPnl2() {
               </div>
             </>
           )}
+        </div>
+      </Dialog>
+
+      <Dialog
+        header={"Hapus Data"}
+        visible={showDelete}
+        style={{ width: "30vw" }}
+        footer={renderFooterDel}
+        onHide={() => {
+          setLoading(false);
+          setShowDelete(false);
+        }}
+      >
+        <div className="ml-3 mr-3">
+          <i
+            className="pi pi-exclamation-triangle mr-3 align-middle"
+            style={{ fontSize: "2rem" }}
+          />
+          <span>Apakah anda yakin ingin menghapus data ?</span>
         </div>
       </Dialog>
     </>

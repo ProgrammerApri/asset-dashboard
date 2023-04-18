@@ -62,7 +62,7 @@ export default function SetupPnl2() {
     let response = null;
     try {
       response = await request(null, config);
-      console.log(response);
+      console.log("company", response);
       if (response.status) {
         if (
           Object.keys(response.data).length === 0 &&
@@ -334,7 +334,7 @@ export default function SetupPnl2() {
             onClick={() => {
               setDisplayInput(true);
               setCurrent(pnl.default);
-              setEdit(true);
+              setEdit(false);
             }}
           />
         </Card.Header>
@@ -364,9 +364,8 @@ export default function SetupPnl2() {
                                 className="p-button-rounded p-button-text p-button-plain p-button-sm p-0"
                                 aria-label="Edit"
                                 onClick={(ev) => {
-                                  // setEdit(true)
-                                  setDisplayInput(true);
                                   setEdit(true);
+                                  setDisplayInput(true);
                                 }}
                               />
                               <PButton
@@ -488,9 +487,7 @@ export default function SetupPnl2() {
       <div>
         <PButton
           label="Batal"
-          onClick={() => {
-            setDisplayInput(false);
-          }}
+          onClick={() => setDisplayInput(false)}
           className="p-button-text btn-primary"
         />
         <PButton
@@ -518,7 +515,7 @@ export default function SetupPnl2() {
         header={isEdit ? "Edit Label" : "Tambah Label"}
         visible={displayInput}
         style={{ width: "40vw" }}
-        footer={renderFooter()}
+        footer={renderFooter("displayData")}
         onHide={() => {
           setEdit(false);
           setDisplayInput(false);
@@ -529,7 +526,7 @@ export default function SetupPnl2() {
             <label className="text-label">Label</label>
             <div className="p-inputgroup">
               <InputText
-                value={pnl.current?.name}
+                value={console.log(pnl.current?.name ?? "")}
                 onChange={(e) => {
                   setCurrent({ ...pnl.current, name: e.target.value });
                 }}
@@ -560,7 +557,7 @@ export default function SetupPnl2() {
                 <label className="text-label">Rule</label>
                 <div className="p-inputgroup">
                   <InputTextarea
-                    value={pnl?.current?.rule}
+                    value={pnl?.current?.rule ?? ""}
                     ref={textArea}
                     onChange={(e) => {
                       setCurrent({ ...pnl.current, rule: e.target.value });

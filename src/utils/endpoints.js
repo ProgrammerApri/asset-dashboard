@@ -1456,6 +1456,12 @@ const endpoints = {
     data: {},
   },
 
+  getAccess: {
+    endpoint: "/v1/api/akses-menu",
+    method: "GET",
+    data: {},
+  },
+
   getImage: {
     endpoint: "/v1/api/upload/",
     method: "GET",

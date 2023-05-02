@@ -193,17 +193,56 @@ const Markup = ({ width }) => {
     ? body.setAttribute("data-sidebar-style", "mini")
     : body.setAttribute("data-sidebar-style", "overlay");
 
+
+  const [comp, setComp] = useState(null);
+
   useEffect(() => {
-    getProfile();
+    // getProfile();
+    getAccess();
   }, []);
 
   const dispatch = useDispatch();
 
   const [loading, setLoading] = useState(true);
 
-  const getProfile = async () => {
+  // const getProfile = async () => {
+  //   const config = {
+  //     ...endpoints.getProfile,
+  //     data: {},
+  //   };
+  //   let response = null;
+  //   try {
+  //     response = await request(null, config);
+  //     if (response.status) {
+  //       const { data } = response;
+  //       dispatch({ type: SET_CURRENT_PROFILE, payload: data });
+  //       setLoading(false);
+  //     }
+  //   } catch (error) {
+  //     setLoading(false);
+  //   }
+  // };
+
+  const getComp = async () => {
     const config = {
-      ...endpoints.getProfile,
+      ...endpoints.getCompany,
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      if (response.status) {
+        const { data } = response;
+        setComp(data);
+        getAccess();
+      }
+    } catch (error) {
+      setLoading(false);
+    }
+  };
+
+  const getAccess = async () => {
+    const config = {
+      ...endpoints.getAccess,
       data: {},
     };
     let response = null;

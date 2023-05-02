@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { request, endpoints } from "src/utils";
+import { request } from "src/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -24,8 +24,9 @@ import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
-import { tr } from "src/data/tr";
+import { tr } from "../../../../data/tr";
 import { SelectButton } from "primereact/selectbutton";
+import endpoints from "../../../../utils/endpoints";
 import { set } from "date-fns";
 
 const def = {
@@ -36,7 +37,7 @@ const def = {
     cus_jpel: null,
     cus_sub_area: null,
     cus_npwp: null,
-    cus_pkp: false,
+    cus_pkp: null,
     cus_country: 1,
     cus_address: null,
     cus_kota: null,
@@ -82,7 +83,7 @@ const defError = [
   {
     code: false,
     name: false,
-    jpel: false,
+    // jpel: false,
     induk: false,
     addrs: false,
     city: false,
@@ -95,7 +96,7 @@ const defError = [
   },
   {
     // ppn: false,
-    // ar: false,
+    ar: false,
     // um: false,
   },
 ];
@@ -114,8 +115,6 @@ const DataCustomer = ({
   onInput = () => {},
   onRowSelect,
   onSuccessInput,
-  edit,
-  del,
 }) => {
   const [customer, setCustomer] = useState(null);
   const [nonSub, setNonSub] = useState(null);
@@ -123,10 +122,11 @@ const DataCustomer = ({
   const [jpel, setJpel] = useState(null);
   const [subArea, setSubArea] = useState(null);
   const [setup, setSetup] = useState(null);
-  const [ar, setAr] = useState(null);
-  const [accUm, setAccUm] = useState(null);
   const [acc, setAcc] = useState(null);
-  const [company, setComp] = useState(null);
+  const [accAr, setAccAr] = useState(null);
+  const [accUm, setAccUm] = useState(null);
+  const [allAcc, setAllAcc] = useState(null);
+  const [comp, setComp] = useState(null);
   const [currency, setCurrency] = useState(null);
   const [pajak, setPajak] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -147,36 +147,16 @@ const DataCustomer = ({
   const [error, setError] = useState(defError);
 
   useEffect(() => {
-    getComp();
     getCustomer();
+    getSetup();
     getCity();
     getJpel();
     getSubArea();
     getCurrency();
-    // getAR();
-    getSetup();
+    getComp();
     getPajak();
     initFilters1();
   }, []);
-
-  const getComp = async () => {
-    const config = {
-      ...endpoints.getCompany,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setComp(data);
-        // getSetup();
-      }
-    } catch (error) {}
-  };
 
   const getCustomer = async (isUpdate = false) => {
     setLoading(true);
@@ -200,6 +180,69 @@ const DataCustomer = ({
           }
         });
         setNonSub(non);
+      }
+    } catch (error) {}
+  };
+
+  const getSetup = async () => {
+    const config = {
+      ...endpoints.getSetup,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setSetup(data);
+        getAcc(data);
+      }
+    } catch (error) {}
+  };
+
+  const getAcc = async (setup) => {
+    const config = {
+      ...endpoints.account,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        let all_acc = [];
+        let filt = [];
+        let acc_ar = [];
+        let set_acc = null;
+
+        data?.forEach((element) => {
+          if (element.account.dou_type === "D") {
+            filt.push(element.account);
+          }
+
+
+          if (
+            element?.account?.umm_code === setup?.ar?.acc_code &&
+            element?.account?.dou_type === "D"
+          ) {
+            acc_ar.push(element?.account);
+          }
+
+          all_acc.push(element?.account);
+        });
+
+        console.log("setup");
+        console.log(setup?.ar?.acc_code);
+
+        setAcc(data);
+        setAccAr(acc_ar);
+        setAccUm(filt);
+        setAllAcc(all_acc);
       }
     } catch (error) {}
   };
@@ -264,9 +307,9 @@ const DataCustomer = ({
     }
   };
 
-  const getSetup = async () => {
+  const getComp = async () => {
     const config = {
-      ...endpoints.getSetup,
+      ...endpoints.getCompany,
       data: {},
     };
     console.log(config.data);
@@ -276,43 +319,10 @@ const DataCustomer = ({
       console.log(response);
       if (response.status) {
         const { data } = response;
-        setSetup(data);
-        getAR(data);
+        console.log(data);
+        setComp(data);
       }
     } catch (error) {}
-  };
-
-  const getAR = async (setup) => {
-    const config = {
-      ...endpoints.account,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        let all = [];
-        let filt = [];
-        let acc_um = [];
-        data?.forEach((element) => {
-          if (
-            element.account.umm_code === setup?.ar?.acc_code &&
-            element.account?.dou_type === "D"
-          ) {
-            filt.push(element.account);
-          }
-
-          all.push(element.account);
-        });
-        setAr(filt);
-        setAcc(all);
-      }
-    } catch (error) {
-      console.log(error);
-    }
   };
 
   const getSubArea = async (isUpdate = false) => {
@@ -337,7 +347,7 @@ const DataCustomer = ({
     } catch (error) {}
   };
 
-  const getCurrency = async (isUpdate = false) => {
+  const getCurrency = async () => {
     const config = {
       ...endpoints.currency,
       data: {},
@@ -377,13 +387,13 @@ const DataCustomer = ({
         cus_email: currentItem?.customer?.cus_email ?? null,
         cus_fax: currentItem?.customer?.cus_fax ?? null,
         cus_cp: currentItem?.customer?.cus_cp ?? null,
-        cus_curren: currentItem?.currency?.id ?? null,
         cus_ket: currentItem?.customer?.cus_ket ?? null,
         cus_gl: currentItem?.customer?.cus_gl ?? null,
         cus_uang_muka: currentItem?.customer?.cus_uang_muka ?? null,
         cus_limit: currentItem?.customer?.cus_limit ?? null,
         sub_cus: currentItem?.customer?.sub_cus ?? null,
         cus_id: currentItem?.customer?.cus_id ?? null,
+        cus_curren: currentItem?.customer?.cus_curren ?? null,
       },
     };
     console.log(config.data);
@@ -399,7 +409,7 @@ const DataCustomer = ({
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: tr[localStorage.getItem("language")].berhsl,
+            summary: tr[localStorage.getItem("language")].berhasl,
             detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
@@ -439,7 +449,7 @@ const DataCustomer = ({
         cus_email: currentItem?.customer?.cus_email ?? null,
         cus_fax: currentItem?.customer?.cus_fax ?? null,
         cus_cp: currentItem?.customer?.cus_cp ?? null,
-        cus_curren: currentItem?.currency?.id ?? null,
+        cus_curren: currentItem?.customer?.cus_curren ?? null,
         cus_ket: currentItem?.customer?.cus_ket ?? null,
         cus_gl: currentItem?.customer?.cus_gl ?? null,
         cus_uang_muka: currentItem?.customer?.cus_uang_muka ?? null,
@@ -461,7 +471,7 @@ const DataCustomer = ({
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: tr[localStorage.getItem("language")].berhsl,
+            summary: tr[localStorage.getItem("language")].berhasl,
             detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
@@ -474,7 +484,7 @@ const DataCustomer = ({
           setUpdate(false);
           toast.current.show({
             severity: "error",
-            summary: tr[localStorage.getItem("language")].gagal,
+            summary: "Gagal",
             detail: `Kode ${currentItem.customer.cus_code} Sudah Digunakan`,
             life: 3000,
           });
@@ -512,7 +522,7 @@ const DataCustomer = ({
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: tr[localStorage.getItem("language")].berhsl,
+            summary: tr[localStorage.getItem("language")].berhasl,
             detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
@@ -538,40 +548,31 @@ const DataCustomer = ({
     return (
       // <React.Fragment>
       <div className="d-flex">
-        {edit && (
-          <Link
-            onClick={() => {
-              setEdit(true);
-              setShowInput(true);
-              onInput(true);
-              setCurrentItem({
-                ...data,
-                customer: {
-                  ...data.customer,
-                  cus_id: data.customer.id,
-                  // cus_gl: setup?.ar?.id,
-                  // cus_uang_muka: setup?.sls_prepaid?.id,
-                },
-              });
-            }}
-            className="btn btn-primary shadow btn-xs sharp ml-1"
-          >
-            <i className="fa fa-pencil"></i>
-          </Link>
-        )}
+        <Link
+          onClick={() => {
+            setEdit(true);
+            setShowInput(true);
+            onInput(true);
+            setCurrentItem({
+              ...data,
+              customer: { ...data.customer, cus_id: data.customer.id },
+            });
+          }}
+          className="btn btn-primary shadow btn-xs sharp ml-1"
+        >
+          <i className="fa fa-pencil"></i>
+        </Link>
 
-        {del && (
-          <Link
-            onClick={() => {
-              setCurrentItem(data);
-              setShowDelete(true);
-              onInput(true);
-            }}
-            className="btn btn-danger shadow btn-xs sharp ml-1"
-          >
-            <i className="fa fa-trash"></i>
-          </Link>
-        )}
+        <Link
+          onClick={() => {
+            setCurrentItem(data);
+            setShowDelete(true);
+            onInput(true);
+          }}
+          className="btn btn-danger shadow btn-xs sharp ml-1"
+        >
+          <i className="fa fa-trash"></i>
+        </Link>
       </div>
       // </React.Fragment>
     );
@@ -602,30 +603,24 @@ const DataCustomer = ({
         name:
           !currentItem.customer.cus_name ||
           currentItem.customer.cus_name === "",
-        jpel: !currentItem.jpel?.id,
-        induk: currentItem.customer.sub_cus
-          ? !currentItem.customer.cus_id
-          : false,
-        addrs:
-          !currentItem.customer.cus_address ||
-          currentItem.customer.cus_address === "",
-        city: !currentItem.customer.cus_kota,
+        // jpel: !currentItem.jpel?.id,
+        // addrs:
+        //   !currentItem.customer.cus_address ||
+        //   currentItem.customer.cus_address === "",
+        // city: !currentItem.customer.cus_kota,
         // npwp:
         //   !currentItem.customer.cus_npwp ||
         //   currentItem.customer.cus_npwp === "",
       },
       {
-        phone:
-          !currentItem.customer.cus_telp1 ||
-          currentItem.customer.cus_telp1 === "0",
-        email:
-          !currentItem.customer.cus_email ||
-          currentItem.customer.cus_email === "",
-        cp: !currentItem.customer.cus_cp || currentItem.customer.cus_cp === "",
+        // phone:
+        //   !currentItem.customer.cus_telp1 ||
+        //   currentItem.customer.cus_telp1 === "0",
+        // cp: !currentItem.customer.cus_cp || currentItem.customer.cus_cp === "",
       },
       {
-        // ppn: !currentItem.customer.sup_ppn,
-        // ar: !currentItem.customer.cus_gl,
+        // ppn: !currentItem.customer.cus_pjk,
+        ar: !currentItem.customer.cus_gl,
         // um: !currentItem.customer.cus_uang_muka,
       },
     ];
@@ -762,26 +757,25 @@ const DataCustomer = ({
             placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
-        {edit && (
-          <PrimeSingleButton
-            label={tr[localStorage.getItem("language")].tambh}
-            icon={<i class="bx bx-plus px-2"></i>}
-            onClick={() => {
-              setShowInput(true);
-              setEdit(false);
-              setLoading(false);
-              setCurrentItem({
-                ...def,
-                customer: {
-                  ...def.customer,
-                  // cus_gl: setup?.ar?.id,
-                  // cus_uang_muka: setup?.sls_prepaid?.id,
-                },
-              });
-              onInput(true);
-            }}
-          />
-        )}
+        <PrimeSingleButton
+          label={tr[localStorage.getItem("language")].tambh}
+          icon={<i class="bx bx-plus px-2"></i>}
+          onClick={() => {
+            setShowInput(true);
+            setEdit(false);
+            setLoading(false);
+            setCurrentItem(def);
+            //   {
+            //   ...def,
+            //   customer: {
+            //     ...def.customer,
+            //     cus_gl: setup?.ar?.id,
+            //     cus_uang_muka: setup?.sls_prepaid?.id,
+            //   },
+            // }
+            onInput(true);
+          }}
+        />
       </div>
     );
   };
@@ -857,14 +851,14 @@ const DataCustomer = ({
     return selected;
   };
 
-  const checkAcc = (value) => {
-    let select = null;
-    acc?.forEach((element) => {
-      if (value === element?.id) {
-        select = element;
+  const gl = (value) => {
+    let acc = {};
+    allAcc?.forEach((element) => {
+      if (value === element.id) {
+        acc = element;
       }
     });
-    return select;
+    return acc;
   };
 
   const glTemplate = (option) => {
@@ -928,6 +922,28 @@ const DataCustomer = ({
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
 
+  const checkCurrency = (value) => {
+    let selected = {};
+    currency?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkAcc = (value) => {
+    let selected = {};
+    acc?.forEach((element) => {
+      if (value === element?.account?.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
   const renderBody = () => {
     return (
       <DataTable
@@ -946,7 +962,7 @@ const DataCustomer = ({
           "customer.cus_telp1",
           "customer.cus_limit",
         ]}
-        emptyMessage="Tidak ada data"
+        emptyMessage={tr[localStorage.getItem("language")].empty_data}
         paginator
         paginatorTemplate={template2}
         first={first2}
@@ -987,7 +1003,7 @@ const DataCustomer = ({
         <Column
           header={tr[localStorage.getItem("language")].alamat}
           field={(e) => e?.customer?.cus_address}
-          style={{ minWidth: "8rem" }}
+          style={{ minWidth: "8rem", maxWidth: "25rem" }}
           body={load && <Skeleton />}
         />
         <Column
@@ -997,20 +1013,22 @@ const DataCustomer = ({
           body={load && <Skeleton />}
         />
         <Column
-          header={tr[localStorage.getItem("language")].limit}
-          field={(e) => formatIdr(e?.customer?.cus_limit ?? "0")}
+          header={"Akun Distribusi GL"}
+          field={(e) =>
+            `${checkAcc(e?.customer.cus_gl)?.account?.acc_code} - ${
+              checkAcc(e?.customer.cus_gl)?.account?.acc_name
+            }`
+          }
           style={{ minWidth: "8rem" }}
           body={load && <Skeleton />}
         />
-        {(edit || del) && (
-          <Column
-            header="Action"
-            dataType="boolean"
-            bodyClassName="text-center"
-            style={{ minWidth: "2rem" }}
-            body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
-          />
-        )}
+        <Column
+          header="Action"
+          dataType="boolean"
+          bodyClassName="text-center"
+          style={{ minWidth: "2rem" }}
+          body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
+        />
       </DataTable>
     );
   };
@@ -1023,12 +1041,8 @@ const DataCustomer = ({
         <Dialog
           header={
             isEdit
-              ? `${tr[localStorage.getItem("language")].edit} ${
-                  tr[localStorage.getItem("language")].customer
-                }`
-              : `${tr[localStorage.getItem("language")].tambh} ${
-                  tr[localStorage.getItem("language")].customer
-                }`
+              ? tr[localStorage.getItem("language")].edit_data
+              : tr[localStorage.getItem("language")].add_data
           }
           visible={showInput}
           style={{ width: "50vw" }}
@@ -1047,6 +1061,7 @@ const DataCustomer = ({
               <div className="row mr-0 ml-0">
                 <div className="col-6">
                   <PrimeInput
+                    label={tr[localStorage.getItem("language")].kd_pel}
                     value={`${currentItem?.customer?.cus_code ?? ""}`}
                     onChange={(e) => {
                       setCurrentItem({
@@ -1060,7 +1075,6 @@ const DataCustomer = ({
                       newError[0].code = false;
                       setError(newError);
                     }}
-                    label={tr[localStorage.getItem("language")].kd_pel}
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[0]?.code}
                   />
@@ -1068,6 +1082,7 @@ const DataCustomer = ({
 
                 <div className="col-6">
                   <PrimeInput
+                    label={tr[localStorage.getItem("language")].nm_pel}
                     value={`${currentItem?.customer?.cus_name ?? ""}`}
                     onChange={(e) => {
                       setCurrentItem({
@@ -1082,7 +1097,6 @@ const DataCustomer = ({
                       setError(newError);
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
-                    label={tr[localStorage.getItem("language")].nm_pel}
                     error={error[0]?.name}
                   />
                 </div>
@@ -1091,8 +1105,8 @@ const DataCustomer = ({
               <div className="row mr-0 ml-0">
                 <div className="col-6">
                   <PrimeDropdown
-                    label={tr[localStorage.getItem("language")].pel_type}
-                    value={currentItem !== null ? currentItem.jpel : null}
+                    label={"Jenis Pelanggan"}
+                    value={currentItem !== null ? currentItem?.jpel : null}
                     options={jpel}
                     onChange={(e) => {
                       console.log(e.value);
@@ -1100,16 +1114,16 @@ const DataCustomer = ({
                         ...currentItem,
                         jpel: e.value,
                       });
-                      let newError = error;
-                      newError[0].jpel = false;
-                      setError(newError);
+                      // let newError = error;
+                      // newError[0].jpel = false;
+                      // setError(newError);
                     }}
                     optionLabel="jpel_name"
                     filter
                     filterBy="jpel_name"
                     placeholder={tr[localStorage.getItem("language")].pilih}
-                    errorMessage="Jenis pelanggan harus dipilih"
-                    error={error[0]?.jpel}
+                    // errorMessage="Jenis pelanggan harus dipilih"
+                    // error={error[0]?.jpel}
                   />
                 </div>
 
@@ -1139,6 +1153,31 @@ const DataCustomer = ({
 
               <div className="row mr-0 ml-0">
                 <div className="col-6">
+                  <PrimeDropdown
+                    label={tr[localStorage.getItem("language")].currency}
+                    value={
+                      currentItem
+                        ? checkCurrency(currentItem.customer.cus_curren)
+                        : null
+                    }
+                    options={currency}
+                    onChange={(e) => {
+                      console.log(e.value);
+                      setCurrentItem({
+                        ...currentItem,
+                        customer: {
+                          ...currentItem.customer,
+                          cus_curren: e.value.id,
+                        },
+                      });
+                    }}
+                    optionLabel="name"
+                    filter
+                    filterBy="name"
+                    placeholder={tr[localStorage.getItem("language")].pilih}
+                  />
+                </div>
+                <div className="col-4">
                   <PrimeInput
                     label={"NPWP"}
                     value={`${currentItem?.customer?.cus_npwp ?? ""}`}
@@ -1150,13 +1189,13 @@ const DataCustomer = ({
                           cus_npwp: e.target.value,
                         },
                       });
-                      // let newError = error;
-                      // newError[0].npwp = false;
-                      // setError(newError);
+                      let newError = error;
+                      newError[0].npwp = false;
+                      setError(newError);
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     type="number"
-                    // error={error[0]?.npwp}
+                    error={error[0]?.npwp}
                   />
                 </div>
 
@@ -1183,7 +1222,7 @@ const DataCustomer = ({
                 </div>
               </div>
 
-              <div className="d-flex col-12 align-items-center mt-2">
+              <div className="d-flex col-12 align-items-center">
                 <InputSwitch
                   className="mr-3"
                   inputId="email"
@@ -1245,9 +1284,7 @@ const DataCustomer = ({
 
               <div className="col-12 p-0">
                 <div className="mt-4 ml-3 mr-3 fs-14 mb-1">
-                  <b>{`${tr[localStorage.getItem("language")].customer} ${
-                    tr[localStorage.getItem("language")].alamat
-                  }`}</b>
+                  <b>Alamat Pelanggan</b>
                 </div>
                 <Divider className="mb-2 ml-3 mr-3"></Divider>
               </div>
@@ -1395,8 +1432,8 @@ const DataCustomer = ({
               <div className="row mr-0 ml-0">
                 <div className="col-6">
                   <PrimeInput
-                    label={tr[localStorage.getItem("language")].telp}
                     isNumber
+                    label={`${tr[localStorage.getItem("language")].telp} 1`}
                     value={`${currentItem?.customer?.cus_telp1 ?? ""}`}
                     onChange={(e) => {
                       setCurrentItem({
@@ -1418,7 +1455,7 @@ const DataCustomer = ({
                 <div className="col-6">
                   <PrimeInput
                     isNumber
-                    label={tr[localStorage.getItem("language")].telp}
+                    label={`${tr[localStorage.getItem("language")].telp} 2`}
                     value={`${currentItem?.customer?.cus_telp2 ?? ""}`}
                     onChange={(e) =>
                       setCurrentItem({
@@ -1429,7 +1466,7 @@ const DataCustomer = ({
                         },
                       })
                     }
-                    placeholder="0"
+                    placeholder={tr[localStorage.getItem("language")].masuk}
                     mode={"decimal"}
                     useGrouping={false}
                   />
@@ -1486,7 +1523,7 @@ const DataCustomer = ({
               <div className="row mr-0 ml-0">
                 <div className="col-12">
                   <PrimeInput
-                    label={"Contact Person"}
+                    label={tr[localStorage.getItem("language")].cp}
                     value={`${currentItem?.customer?.cus_cp ?? ""}`}
                     onChange={(e) => {
                       setCurrentItem({
@@ -1508,11 +1545,11 @@ const DataCustomer = ({
             </TabPanel>
 
             <TabPanel
-              header="Distribusi AR & Currency"
+              header={tr[localStorage.getItem("language")].limit}
               headerTemplate={renderTabHeader}
             >
               <div className="row mr-0 ml-0">
-                <div className="col-6">
+                {/* <div className="col-6">
                   <label className="text-label">Currency</label>
                   <div className="p-inputgroup">
                     <Dropdown
@@ -1528,7 +1565,7 @@ const DataCustomer = ({
                       optionLabel="code"
                       filter
                       filterBy="name"
-                      placeholder={tr[localStorage.getItem("language")].pilih}
+                      placeholder="Pilih Jenis Currency"
                       disabled={company && !company.multi_currency}
                     />
                   </div>
@@ -1536,13 +1573,12 @@ const DataCustomer = ({
                     *Aktifkan Multi Currency Pada Setup Perusahaan Terlebih
                     Dahulu
                   </small>
-                </div>
-
+                </div> */}
                 <div className="col-6">
                   <PrimeDropdown
-                    label={"PPN"}
+                    label={tr[localStorage.getItem("language")].pajak}
                     value={
-                      currentItem !== null
+                      currentItem && currentItem?.customer?.cus_pjk !== null
                         ? ppn(currentItem?.customer?.cus_pjk)
                         : null
                     }
@@ -1553,20 +1589,42 @@ const DataCustomer = ({
                         ...currentItem,
                         customer: {
                           ...currentItem.customer,
-                          cus_pjk: e.value.id,
+                          cus_pjk: e?.value?.id ?? null,
                         },
                       });
-                      let newError = error;
-                      newError[2].ppn = false;
-                      setError(newError);
+                      // let newError = error;
+                      // newError[2].ppn = false;
+                      // setError(newError);
                     }}
                     optionLabel="name"
                     filter
                     filterBy="name"
                     placeholder={tr[localStorage.getItem("language")].pilih}
-                    error={error[2]?.ppn}
-                    errorMessage="Jenis Pajak belum dipilih"
+                    showClear
+                    // error={error[2]?.ppn}
+                    // errorMessage="Jenis Pajak belum dipilih"
                   />
+                </div>
+
+                <div className="col-6">
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].limit}
+                  </label>
+                  <div className="p-inputgroup">
+                    <InputNumber
+                      value={`${currentItem?.customer?.cus_limit ?? ""}`}
+                      onChange={(e) =>
+                        setCurrentItem({
+                          ...currentItem,
+                          customer: {
+                            ...currentItem.customer,
+                            cus_limit: e.value,
+                          },
+                        })
+                      }
+                      placeholder={tr[localStorage.getItem("language")].masuk}
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -1601,14 +1659,14 @@ const DataCustomer = ({
               <div className="row mr-0 ml-0">
                 <div className="col-6">
                   <PrimeDropdown
-                    label={tr[localStorage.getItem("language")].code_account}
+                    label={"Kode Distribusi AR"}
                     value={
                       currentItem !== null &&
                       currentItem?.customer?.cus_gl !== null
-                        ? checkAcc(currentItem.customer.cus_gl)
+                        ? gl(currentItem.customer.cus_gl)
                         : null
                     }
-                    options={ar}
+                    options={accAr}
                     onChange={(e) => {
                       console.log(e.value);
                       setCurrentItem({
@@ -1618,30 +1676,36 @@ const DataCustomer = ({
                           cus_gl: e.value?.id ?? null,
                         },
                       });
-                      // let newError = error;
-                      // newError[2].gl = false;
-                      // setError(newError);
+                      let newError = error;
+                      newError[2].ar = false;
+                      setError(newError);
                     }}
-                    optionLabel="account.acc_name"
+                    optionLabel="acc_name"
                     valueTemplate={clear}
                     itemTemplate={glTemplate}
                     filter
                     filterBy="acc_name"
-                    placeholder={tr[localStorage.getItem("language")].pilih}
+                    placeholder="Pilih Kode Distribusi AR"
                     showClear
-                    // error={error[2]?.gl}
-                    // errorMessage="Kode Distribusi AR belum dipilih"
+                    error={error[2]?.ar}
+                    errorMessage="Kode Akun belum dipilih"
+                    disabled={localStorage.getItem("product") !== "inv+gl"}
                   />
+                  <small className="text-blue">
+                    *Harap Periksa Setup Akun Apabila Daftar Akun Tidak Muncul
+                  </small>
                 </div>
 
                 <div className="col-6">
                   <PrimeDropdown
                     label={"Kode Distribusi Uang Muka Penjualan"}
                     value={
-                      currentItem?.customer?.cus_uang_muka &&
-                      checkAcc(currentItem.customer.cus_uang_muka)
+                      currentItem !== null &&
+                      currentItem.customer.cus_uang_muka !== null
+                        ? gl(currentItem.customer.cus_uang_muka)
+                        : null
                     }
-                    options={acc}
+                    options={accUm}
                     onChange={(e) => {
                       console.log(e.value);
                       setCurrentItem({
@@ -1655,49 +1719,27 @@ const DataCustomer = ({
                       // newError[2].um = false;
                       // setError(newError);
                     }}
-                    optionLabel="account.acc_name"
+                    optionLabel="acc_name"
                     valueTemplate={clear}
                     itemTemplate={glTemplate}
                     filter
                     filterBy="acc_name"
-                    placeholder={tr[localStorage.getItem("language")].pilih}
+                    placeholder="Pilih Kode Distribusi Uang Muka Penjualan"
                     showClear
                     // error={error[2]?.um}
                     // errorMessage="Kode Uang Muka Penjualan belum dipilih"
+                    disabled={localStorage.getItem("product") !== "inv+gl"}
                   />
                 </div>
               </div>
 
-              <div className="row mr-0 ml-0">
-                <div className="col-12">
-                  <label className="text-label">
-                    {tr[localStorage.getItem("language")].limit}
-                  </label>
-                  <div className="p-inputgroup">
-                    <InputNumber
-                      value={`${currentItem?.customer?.cus_limit ?? ""}`}
-                      onChange={(e) =>
-                        setCurrentItem({
-                          ...currentItem,
-                          customer: {
-                            ...currentItem.customer,
-                            cus_limit: e.value,
-                          },
-                        })
-                      }
-                      placeholder={tr[localStorage.getItem("language")].masuk}
-                    />
-                  </div>
-                </div>
-              </div>
+              <div className="row mr-0 ml-0"></div>
             </TabPanel>
           </TabView>
         </Dialog>
 
         <Dialog
-          header={`${tr[localStorage.getItem("language")].hapus} ${
-            tr[localStorage.getItem("language")].customer
-          }`}
+          header={tr[localStorage.getItem("language")].hapus_data}
           visible={showDelete}
           style={{ width: "30vw" }}
           footer={renderFooterDel}

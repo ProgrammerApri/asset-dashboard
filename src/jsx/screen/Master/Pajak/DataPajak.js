@@ -19,7 +19,7 @@ import { MultiSelect } from "primereact/multiselect";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
-import { tr } from "src/data/tr";
+import { tr } from "../../../../data/tr";
 
 const def = {
   id: null,
@@ -35,8 +35,8 @@ const def = {
 const defError = {
   name: false,
   nilai: false,
-  acc1: false,
-  acc2: false,
+  // acc1: false,
+  // acc2: false,
 };
 
 const type = [
@@ -56,6 +56,7 @@ const DataPajak = ({
 }) => {
   const [pajak, setPajak] = useState(null);
   const [account, setAccount] = useState(null);
+  const [comp, setComp] = useState(null);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const [filters1, setFilters1] = useState(null);
@@ -71,6 +72,7 @@ const DataPajak = ({
   useEffect(() => {
     getPajak();
     getAccount();
+    getComp();
     initFilters1();
   }, []);
 
@@ -125,6 +127,24 @@ const DataPajak = ({
     } catch (error) {}
   };
 
+  const getComp = async () => {
+    setLoading(true);
+    const config = {
+      ...endpoints.getCompany,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setComp(data);
+      }
+    } catch (error) {}
+  };
+
   const editPajak = async () => {
     const config = {
       ...endpoints.editPajak,
@@ -144,7 +164,7 @@ const DataPajak = ({
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: tr[localStorage.getItem("language")].berhsl,
+            summary: tr[localStorage.getItem("language")].berhasl,
             detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
@@ -181,7 +201,7 @@ const DataPajak = ({
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: tr[localStorage.getItem("language")].berhsl,
+            summary: tr[localStorage.getItem("language")].berhasl,
             detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
@@ -220,7 +240,7 @@ const DataPajak = ({
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: tr[localStorage.getItem("language")].berhsl,
+            summary: tr[localStorage.getItem("language")].berhasl,
             detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
@@ -464,13 +484,13 @@ const DataPajak = ({
     let errors = {
       name: !currentItem.name || currentItem.name === "",
       nilai: !currentItem.nilai || currentItem.nilai === "",
-      acc1: !currentItem?.acc_sls_tax,
-      acc2: !currentItem?.acc_pur_tax,
+      // acc1: !currentItem?.acc_sls_tax,
+      // acc2: !currentItem?.acc_pur_tax,
     };
 
     setError(errors);
 
-    valid = !errors.name && !errors.nilai && !errors.acc1 && !errors.acc2;
+    valid = !errors.name && !errors.nilai;
 
     return valid;
   };
@@ -511,7 +531,7 @@ const DataPajak = ({
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
-          <Column
+          {/* <Column
             header={tr[localStorage.getItem("language")].type_pjk}
             field={(e) => e?.type ?? ""}
             style={{ minWidth: "8rem" }}
@@ -523,17 +543,18 @@ const DataPajak = ({
                   {e.type === "T" ? (
                     <Badge variant="success light">
                       <i className="bx bxs-circle text-success mr-1"></i>{" "}
-                      Tunggal
+                      {"tr[localStorage.getItem("language")].tunggal"}
                     </Badge>
                   ) : (
                     <Badge variant="info light">
-                      <i className="bx bxs-circle text-info mr-1"></i> Ganda
+                      <i className="bx bxs-circle text-info mr-1"></i>{" "}
+                      {tr[localStorage.getItem("language")].gabungan}
                     </Badge>
                   )}
                 </div>
               )
             }
-          />
+          /> */}
           <Column
             header={tr[localStorage.getItem("language")].pemotong}
             field={(e) => e?.cutting ?? ""}
@@ -545,25 +566,25 @@ const DataPajak = ({
                 <div>
                   {e.cutting === false ? (
                     <Badge variant="danger light">
-                      <i className="bx bxs-circle text-danger mr-1"></i> Bukan
-                      Pemotongan
+                      <i className="bx bxs-circle text-danger mr-1"></i>{" "}
+                      {"Bukan Pemotongan"}
                     </Badge>
                   ) : (
                     <Badge variant="info light">
                       <i className="bx bxs-circle text-info mr-1"></i>{" "}
-                      Pemotongan
+                      {"Pemotongan"}
                     </Badge>
                   )}
                 </div>
               )
             }
           />
-          <Column
+          {/* <Column
             header={tr[localStorage.getItem("language")].gabungan}
             field={(e) => e?.combined ?? "-"}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
-          />
+          /> */}
           <Column
             header="Action"
             dataType="boolean"
@@ -583,12 +604,8 @@ const DataPajak = ({
         <Dialog
           header={
             isEdit
-              ? `${tr[localStorage.getItem("language")].edit} ${
-                  tr[localStorage.getItem("language")].pajak
-                }`
-              : `${tr[localStorage.getItem("language")].tambh} ${
-                  tr[localStorage.getItem("language")].pajak
-                }`
+              ? "Edit Data"
+              : "Tambah Data"
           }
           visible={showInput}
           style={{ width: "40vw" }}
@@ -598,10 +615,8 @@ const DataPajak = ({
             onInput(false);
           }}
         >
-          <div className="col-12 mb-2">
-            <label className="text-label">
-              {tr[localStorage.getItem("language")].pajak}
-            </label>
+          <div className="col-12 mb-2" hidden>
+            <label className="text-label">{tr[localStorage.getItem("language")].pajak}</label>
             <div className="p-inputgroup">
               <SelectButton
                 value={
@@ -656,7 +671,7 @@ const DataPajak = ({
                       newError.nilai = false;
                       setError(newError);
                     }}
-                    placeholder="Masukan Nilai"
+                    placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error?.nilai}
                   />
 
@@ -671,7 +686,7 @@ const DataPajak = ({
                     {tr[localStorage.getItem("language")].pemotong}
                   </label>
                   <Checkbox
-                    className="mt-0 mb-2 ml-4"
+                    className="mb-1 ml-5"
                     inputId="binary"
                     checked={currentItem ? currentItem.cutting : false}
                     onChange={(e) =>
@@ -681,7 +696,9 @@ const DataPajak = ({
                 </div>
               </div>
 
-              <div className="row ml-0 mt-0">
+              <div
+                className="row ml-0 mt-0"
+              >
                 <div className="col-6">
                   <PrimeDropdown
                     label={tr[localStorage.getItem("language")].acc_pjk_bl}
@@ -695,11 +712,11 @@ const DataPajak = ({
                       console.log(e.value);
                       setCurrentItem({
                         ...currentItem,
-                        acc_pur_tax: e.value?.id,
+                        acc_pur_tax: e.value?.id ?? null,
                       });
-                      let newError = error;
-                      newError.acc1 = false;
-                      setError(newError);
+                      // let newError = error;
+                      // newError.acc1 = false;
+                      // setError(newError);
                     }}
                     optionLabel="account.acc_name"
                     valueTemplate={clear}
@@ -707,8 +724,10 @@ const DataPajak = ({
                     filter
                     filterBy="acc_name"
                     placeholder={tr[localStorage.getItem("language")].pilih}
-                    errorMessage="Akun Pajak Pembelian Belum Dipilih"
-                    error={error?.acc1}
+                    // errorMessage="Akun Pajak Pembelian Belum Dipilih"
+                    // error={error?.acc1}
+                    disabled={localStorage.getItem("product") !== "inv+gl"}
+                    showClear
                   />
                 </div>
 
@@ -725,11 +744,11 @@ const DataPajak = ({
                       console.log(e.value);
                       setCurrentItem({
                         ...currentItem,
-                        acc_sls_tax: e.value?.id,
+                        acc_sls_tax: e.value?.id ?? null,
                       });
-                      let newError = error;
-                      newError.acc2 = false;
-                      setError(newError);
+                      // let newError = error;
+                      // newError.acc2 = false;
+                      // setError(newError);
                     }}
                     optionLabel="account.acc_name"
                     valueTemplate={clear}
@@ -737,8 +756,9 @@ const DataPajak = ({
                     filter
                     filterBy="acc_name"
                     placeholder={tr[localStorage.getItem("language")].pilih}
-                    errorMessage="Akun Pajak Penjualan Belum Dipilih"
-                    error={error?.acc2}
+                    // errorMessage="Akun Pajak Penjualan Belum Dipilih"
+                    // error={error?.acc2}
+                    showClear
                   />
                 </div>
               </div>
@@ -749,9 +769,7 @@ const DataPajak = ({
               {" "}
               <div className="row ml-0 mt-0">
                 <div className="col-6">
-                  <label className="text-label">
-                    {tr[localStorage.getItem("language")].nm_pjk}
-                  </label>
+                  <label className="text-label">{tr[localStorage.getItem("language")].nm_pjk}</label>
                   <div className="p-inputgroup">
                     <InputText
                       value={
@@ -766,14 +784,13 @@ const DataPajak = ({
                 </div>
 
                 <div className="col-6">
-                  <label className="text-label">
-                    {tr[localStorage.getItem("language")].gabungan}
-                  </label>
+                  <label className="text-label">{tr[localStorage.getItem("language")].gabungan}</label>
                   <div className="p-inputgroup">
                     <MultiSelect
                       value={currentItem !== null ? currentItem.pajak : null}
                       options={pajak}
                       onChange={(e) => {
+                        console.log("=====ppn=======");
                         console.log(e.value);
                         setCurrentItem({
                           ...currentItem,
@@ -823,9 +840,7 @@ const DataPajak = ({
         </Dialog>
 
         <Dialog
-          header={`${tr[localStorage.getItem("language")].hapus} ${
-            tr[localStorage.getItem("language")].pajak
-          }`}
+          header={tr[localStorage.getItem("language")].hapus_data}
           visible={showDelete}
           style={{ width: "30vw" }}
           footer={renderFooterDel("displayDel")}
@@ -851,9 +866,7 @@ const DataPajak = ({
     return (
       <>
         <Dialog
-          header={`${tr[localStorage.getItem("language")].data} ${
-            tr[localStorage.getItem("language")].pajak
-          }`}
+          header={"Data Pajak"}
           visible={show}
           footer={() => <div></div>}
           style={{ width: "60vw" }}

@@ -200,6 +200,7 @@ const DataRulesPay = ({
       <div className="d-flex">
         <Link
           onClick={() => {
+            setLoading(false);
             setEdit(true);
             setCurrentItem(data);
             setShowInput(true);
@@ -386,12 +387,12 @@ const DataRulesPay = ({
     let valid = false;
     let errors = {
       name: !currentItem.name || currentItem.name === "",
-      day: !currentItem.day || currentItem.day === "",
+      // day: !currentItem.day || currentItem.day === "",
     };
 
     setError(errors);
 
-    valid = !errors.day && !errors.name;
+    valid = !errors.name;
 
     return valid;
   };
@@ -492,15 +493,15 @@ const DataRulesPay = ({
               <PrimeInput
                 label={tr[localStorage.getItem("language")].day_rul}
                 number
-                value={currentItem !== null ? `${currentItem.day}` : "0"}
+                value={currentItem && currentItem?.day}
                 onChange={(e) => {
                   setCurrentItem({ ...currentItem, day: e.value });
-                  let newError = error;
-                  newError.day = false;
-                  setError(newError);
+                  // let newError = error;
+                  // newError.day = false;
+                  // setError(newError);
                 }}
                 placeholder="Masukan Jumlah Hari"
-                error={error?.day}
+                // error={error?.day}
               />
             </div>
           </div>

@@ -91,7 +91,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
       behavior: "smooth",
     });
     getPusatBiaya();
-    getProduk(rp.ns);
+    getProduk();
     getJasa();
     getSatuan();
     getSupplier();
@@ -179,11 +179,12 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
         const { data } = response;
         dispatch({
           type: SET_PRODUCT,
-          payload: data.filter((v) => v?.group?.stock ? v?.group?.stok === !ns : true),
+          payload: data
+          // .filter((v) => v?.group?.stock ? v?.group?.stok === !ns : true),
         });
         dispatch({
           type: SET_ORIGINAL_PRODUCT,
-          payload: data.filter((v) => v?.group?.stock ? v?.group?.stok === !ns : true),
+          payload: data.filter((v) => v?.group?.stock === !ns),
         });
       }
     } catch (error) {
@@ -515,7 +516,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
             </div>
           </div>
 
-          <div className="d-flex col-12 align-items-center mt-4">
+          {/* <div className="d-flex col-12 align-items-center mt-4" hidden>
             <label className="ml-0 mt-1">{"Non Stock"}</label>
             <InputSwitch
               className="ml-4"
@@ -533,7 +534,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                 getProduk(e.target.value);
               }}
             />
-          </div>
+          </div> */}
         </Row>
 
         <CustomAccordion

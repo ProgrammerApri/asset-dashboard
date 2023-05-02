@@ -1425,7 +1425,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
             </div>
           </div>
 
-          {po?.preq_id !== null ? (
+          {/* {po?.preq_id !== null ? (
             <>
               <div className="d-flex col-12 align-items-center mt-4">
                 <label className="ml-0 mt-4">{"Non Stock"}</label>
@@ -1441,7 +1441,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
             </>
           ) : (
             <></>
-          )}
+          )} */}
         </Row>
 
         {po?.pprod?.length ? (

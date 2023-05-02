@@ -16,7 +16,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { classNames } from "primereact/utils";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
-import { tr } from "src/data/tr";
+import { tr } from "../../../../data/tr";
 
 const def = {
   id: 1,
@@ -75,12 +75,12 @@ const DataProject = ({
       if (response.status) {
         setTimeout(() => {
           onSuccessInput();
-          setLoading(false);
+          setUpdate(false);
           onHideInput();
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: tr[localStorage.getItem("language")].berhsl,
+            summary: tr[localStorage.getItem("language")].berhasl,
             detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
@@ -116,12 +116,12 @@ const DataProject = ({
       if (response.status) {
         setTimeout(() => {
           onSuccessInput();
-          setLoading(false);
+          setUpdate(false);
           onHideInput();
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: tr[localStorage.getItem("language")].berhsl,
+            summary: tr[localStorage.getItem("language")].berhasl,
             detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
@@ -165,13 +165,13 @@ const DataProject = ({
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setLoading(false);
+          setUpdate(false);
           setShowDelete(false);
           onSuccessInput();
           onInput(false);
           toast.current.show({
             severity: "info",
-            summary: tr[localStorage.getItem("language")].berhsl,
+            summary: tr[localStorage.getItem("language")].berhasl,
             detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
@@ -180,13 +180,13 @@ const DataProject = ({
     } catch (error) {
       console.log(error);
       setTimeout(() => {
-        setLoading(false);
+        setUpdate(false);
         setShowDelete(false);
         onInput(false);
         toast.current.show({
           severity: "error",
           summary: tr[localStorage.getItem("language")].gagal,
-          detail: tr[localStorage.getItem("language")].del_gagal,
+          detail: tr[localStorage.getItem("language")].del_hapus,
           life: 3000,
         });
       }, 500);
@@ -199,7 +199,9 @@ const DataProject = ({
       <div className="d-flex">
         <Link
           onClick={() => {
+            setUpdate(false)
             setEdit(true);
+            setUpdate(false)
             setCurrentItem(data);
             setShowInput(true);
             onInput(true);
@@ -227,10 +229,10 @@ const DataProject = ({
   const onSubmit = () => {
     if (isValid()) {
       if (isEdit) {
-        setUpdate(true);
+        setLoading(true);
         editProject();
       } else {
-        setUpdate(true);
+        setLoading(true);
         addProject();
       }
     }
@@ -274,10 +276,11 @@ const DataProject = ({
           label={tr[localStorage.getItem("language")].hapus}
           icon="pi pi-trash"
           onClick={() => {
+            setLoading(true);
             delProject();
           }}
           autoFocus
-          loading={update}
+          loading={loading}
         />
       </div>
     );
@@ -417,12 +420,12 @@ const DataProject = ({
             style={{
               minWidth: "8rem",
             }}
-            field={(e) => e.proj_code}
+            field={(e) => e?.proj_code}
             body={load && <Skeleton />}
           />
           <Column
             header={tr[localStorage.getItem("language")].nm_proj}
-            field={(e) => e.proj_name}
+            field={(e) => e?.proj_name}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
@@ -451,12 +454,8 @@ const DataProject = ({
         <Dialog
           header={
             isEdit
-              ? `${tr[localStorage.getItem("language")].edit} ${
-                  tr[localStorage.getItem("language")].proj
-                }`
-              : `${tr[localStorage.getItem("language")].tambh} ${
-                  tr[localStorage.getItem("language")].proj
-                }`
+              ? "Edit Project"
+              : "Tambah Project"
           }
           visible={showInput}
           style={{ width: "40vw" }}
@@ -506,16 +505,14 @@ const DataProject = ({
 
           <div className="row ml-0 mt-0">
             <div className="col-12">
-              <label className="text-label">
-                {tr[localStorage.getItem("language")].ket}
-              </label>
+              <label className="text-label">{tr[localStorage.getItem("language")].ket}</label>
               <div className="p-inputgroup">
                 <InputTextarea
-                  value={currentItem !== null ? `${currentItem.proj_ket}` : ""}
+                  value={currentItem && currentItem.proj_ket}
                   onChange={(e) =>
                     setCurrentItem({ ...currentItem, proj_ket: e.target.value })
                   }
-                  placeholder={tr[localStorage.getItem("language")].ket}
+                  placeholder={tr[localStorage.getItem("language")].masuk}
                 />
               </div>
             </div>
@@ -523,9 +520,7 @@ const DataProject = ({
         </Dialog>
 
         <Dialog
-          header={`${tr[localStorage.getItem("language")].hapus} ${
-            tr[localStorage.getItem("language")].proj
-          }`}
+          header={"Hapus Data"}
           visible={showDelete}
           style={{ width: "30vw" }}
           footer={renderFooterDel("displayDel")}
@@ -558,9 +553,7 @@ const DataProject = ({
     return (
       <>
         <Dialog
-          header={`${tr[localStorage.getItem("language")].data} ${
-            tr[localStorage.getItem("language")].proj
-          }`}
+          header={"Data Project"}
           visible={show}
           footer={() => <div></div>}
           style={{ width: "60vw" }}

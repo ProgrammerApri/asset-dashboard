@@ -53,6 +53,12 @@ const endpoints = {
     data: {},
   },
 
+  accountFilter: {
+    endpoint: "/v1/api/account/",
+    method: "GET",
+    data: {},
+  },
+
   editAccount: {
     endpoint: "/v1/api/account/",
     method: "PUT",

@@ -21,7 +21,6 @@ import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import { ProgressBar } from "primereact/progressbar";
-import { tr } from "src/data/tr";
 
 const def = {
   account: {
@@ -33,7 +32,6 @@ const def = {
     sld_type: "",
     connect: false,
     sld_awal: 0,
-    level: null,
   },
   kategory: {
     id: 0,
@@ -69,8 +67,13 @@ const DataAkun = ({
   onSuccessImport,
   edit,
   del,
+  dataLength,
+  onPageChange,
+  onFilter,
 }) => {
   const [account, setAccount] = useState(null);
+
+  const [trans, setTrans] = useState(null);
   const [kategori, setKategori] = useState(null);
   const [umum, setUmum] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -97,7 +100,6 @@ const DataAkun = ({
 
   useEffect(() => {
     getKategori();
-
     initFilters1();
   }, []);
 
@@ -116,6 +118,7 @@ const DataAkun = ({
         const { data } = response;
         console.log(data);
         setAccount(data);
+        getTrans();
       }
     } catch (error) {}
     if (isUpdate) {
@@ -125,6 +128,24 @@ const DataAkun = ({
         setLoading(false);
       }, 500);
     }
+  };
+
+  const getTrans = async () => {
+    const config = {
+      ...endpoints.trans,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+
+        setTrans(data);
+      }
+    } catch (error) {}
   };
 
   const valueUmum = (value) => {
@@ -194,6 +215,8 @@ const DataAkun = ({
             kat_code: data.kategory.id,
             sld_type: data.kategory.kode_saldo,
             level: 1,
+            dou_type: "U",
+            umm_code: null
           },
           kategory: data.kategory,
           klasifikasi: data.klasifikasi,
@@ -205,7 +228,7 @@ const DataAkun = ({
   const getAccKodeDet = async (data) => {
     const config = {
       ...endpoints.getAccKodeDet,
-      endpoint: endpoints.getAccKodeDet.endpoint + data.account.acc_code,
+      endpoint: endpoints.getAccKodeDet.endpoint + data,
     };
     console.log(config.data);
     let response = null;
@@ -219,7 +242,7 @@ const DataAkun = ({
           account: {
             ...currentItem.account,
             acc_code: res,
-            umm_code: data.account.acc_code,
+            umm_code: data,
             dou_type: "D",
           },
         });
@@ -333,8 +356,8 @@ const DataAkun = ({
           getKategori(true);
           toast.current.show({
             severity: "info",
-            summary: tr[localStorage.getItem("language")].berhsl,
-            detail: tr[localStorage.getItem("language")].pesan_berhasil,
+            summary: "Berhasil",
+            detail: "Data berhasil diperbarui",
             life: 3000,
           });
         }, 500);
@@ -344,8 +367,8 @@ const DataAkun = ({
         setUpdate(false);
         toast.current.show({
           severity: "error",
-          summary: tr[localStorage.getItem("language")].gagal,
-          detail: tr[localStorage.getItem("language")].pesan_gagal,
+          summary: "Gagal",
+          detail: "Gagal memperbarui data",
           sticky: true,
           // life: 3000,
         });
@@ -378,13 +401,20 @@ const DataAkun = ({
         setTimeout(() => {
           onSuccessInput();
           setUpdate(false);
-          onHideInput();
+          // onHideInput();
+          setLoading(false);
+          setCurrentItem(def);
+          setEdit(false);
+          // setShowInput(false);
+          setEkat(false);
+          setEname(false);
           onInput(false);
           getKategori(true);
+          getAccountUmum();
           toast.current.show({
             severity: "info",
-            summary: tr[localStorage.getItem("language")].berhsl,
-            detail: tr[localStorage.getItem("language")].pesan_berhasil,
+            summary: "Berhasil",
+            detail: "Data berhasil diperbarui",
             life: 3000,
           });
         }, 500);
@@ -424,8 +454,8 @@ const DataAkun = ({
           getKategori(true);
           toast.current.show({
             severity: "info",
-            summary: tr[localStorage.getItem("language")].berhsl,
-            detail: tr[localStorage.getItem("language")].del_berhasil,
+            summary: "Berhasil",
+            detail: "Data berhasil diperbarui",
             life: 3000,
           });
         }, 500);
@@ -439,8 +469,8 @@ const DataAkun = ({
         onInput(false);
         toast.current.show({
           severity: "error",
-          summary: tr[localStorage.getItem("language")].gagal,
-          detail: tr[localStorage.getItem("language")].del_gagal,
+          summary: "Gagal",
+          detail: `Tidak Dapat Menghapus Akun`,
           sticky: true,
           // life: 3000,
         });
@@ -451,33 +481,30 @@ const DataAkun = ({
   const actionBodyTemplate = (data) => {
     return (
       // <React.Fragment>
-      <div className="d-flex">
-        {edit && (
-          <Link
-            onClick={() => {
-              setEdit(true);
-              setCurrentItem(data);
-              setShowInput(true);
-              onInput(true);
-            }}
-            className="btn btn-primary shadow btn-xs sharp ml-2"
-          >
-            <i className="fa fa-pencil"></i>
-          </Link>
-        )}
-
-        {del && (
-          <Link
-            onClick={() => {
-              setCurrentItem(data);
-              setShowDelete(true);
-              onInput(true);
-            }}
-            className="btn btn-danger shadow btn-xs sharp ml-2"
-          >
-            <i className="fa fa-trash"></i>
-          </Link>
-        )}
+      <div className="row">
+        <Link
+          onClick={() => {
+            setEdit(true);
+            setCurrentItem(data);
+            setShowInput(true);
+            onInput(true);
+          }}
+          className="btn btn-primary shadow btn-xs sharp ml-2"
+        >
+          <i className="fa fa-pencil"></i>
+        </Link>
+        <Link
+          onClick={() => {
+            setCurrentItem(data);
+            setShowDelete(true);
+            onInput(true);
+          }}
+          className={`btn ${
+            trans?.length === 0 ? "" : "disabled"
+          } btn-danger shadow btn-xs sharp ml-1`}
+        >
+          <i className="fa fa-trash"></i>
+        </Link>
       </div>
       // </React.Fragment>
     );
@@ -529,7 +556,7 @@ const DataAkun = ({
     return (
       <div>
         <PButton
-          label={tr[localStorage.getItem("language")].batal}
+          label="Batal"
           onClick={() => {
             onHideInput();
             onInput(false);
@@ -537,7 +564,7 @@ const DataAkun = ({
           className="p-button-text btn-primary"
         />
         <PButton
-          label={tr[localStorage.getItem("language")].simpan}
+          label="Simpan"
           icon="pi pi-check"
           onClick={() => onSubmit()}
           autoFocus
@@ -551,7 +578,7 @@ const DataAkun = ({
     return (
       <div>
         <PButton
-          label={tr[localStorage.getItem("language")].batal}
+          label="Batal"
           onClick={() => {
             setShowDelete(false);
             setUpdate(false);
@@ -560,7 +587,7 @@ const DataAkun = ({
           className="p-button-text btn-primary"
         />
         <PButton
-          label={tr[localStorage.getItem("language")].hapus}
+          label="Hapus"
           icon="pi pi-trash"
           onClick={() => {
             if (
@@ -604,6 +631,7 @@ const DataAkun = ({
 
   const onGlobalFilterChange1 = (e) => {
     const value = e.target.value;
+    onFilter(value);
     let _filters1 = { ...filters1 };
     _filters1["global"].value = value;
 
@@ -626,42 +654,39 @@ const DataAkun = ({
             <InputText
               value={globalFilterValue1}
               onChange={onGlobalFilterChange1}
-              placeholder={tr[localStorage.getItem("language")].cari}
+              placeholder="Cari disini"
             />
           </span>
           <Row className="mr-1">
             <PrimeSingleButton
-              className={edit && "mr-3"}
+              className="mr-3"
               label="Export"
               icon={<i className="pi pi-file-excel px-2"></i>}
               onClick={() => {
                 exportExcel();
               }}
             />
-            {edit && (
-              <>
-                <PrimeSingleButton
-                  className="mr-3"
-                  label="Import"
-                  icon={<i className="pi pi-file-excel px-2"></i>}
-                  onClick={(e) => {
-                    confirmImport(e);
-                  }}
-                />
-                <PrimeSingleButton
-                  label={tr[localStorage.getItem("language")].tambh}
-                  icon={<i class="bx bx-plus px-2"></i>}
-                  onClick={() => {
-                    getAccountUmum();
-                    setShowInput(true);
-                    setEdit(false);
-                    setLoading(false);
-                    setCurrentItem(def);
-                    onInput(true);
-                  }}
-                />
-              </>
-            )}
+            <PrimeSingleButton
+              className="mr-3"
+              label="Import"
+              icon={<i className="pi pi-file-excel px-2"></i>}
+              onClick={(e) => {
+                confirmImport(e);
+              }}
+              disabled={trans?.length > 0}
+            />
+            <PrimeSingleButton
+              label="Tambah"
+              icon={<i class="bx bx-plus px-2"></i>}
+              onClick={() => {
+                getAccountUmum();
+                setShowInput(true);
+                setEdit(false);
+                setLoading(false);
+                setCurrentItem(def);
+                onInput(true);
+              }}
+            />
           </Row>
         </div>
         <div className="col-12" ref={progressBar} style={{ display: "none" }}>
@@ -716,10 +741,7 @@ const DataAkun = ({
       const dropdownOptions = [
         { label: 20, value: 20 },
         { label: 50, value: 50 },
-        {
-          label: tr[localStorage.getItem("language")].hal,
-          value: options.totalRecords,
-        },
+        { label: "Semua", value: options.totalRecords },
       ];
 
       return (
@@ -728,7 +750,7 @@ const DataAkun = ({
             className="mx-1"
             style={{ color: "var(--text-color)", userSelect: "none" }}
           >
-            {tr[localStorage.getItem("language")].page}{" "}
+            Data per halaman:{" "}
           </span>
           <Dropdown
             value={options.value}
@@ -748,14 +770,15 @@ const DataAkun = ({
             textAlign: "center",
           }}
         >
-          {options.first} - {options.last}{" "}
-          {tr[localStorage.getItem("language")].dari} {options.totalRecords}
+          {options.first} - {options.last} dari {options.totalRecords}
         </span>
       );
     },
   };
 
   const onCustomPage2 = (event) => {
+    console.log(event);
+    onPageChange(event);
     setFirst2(event.first);
     setRows2(event.rows);
   };
@@ -946,50 +969,52 @@ const DataAkun = ({
           paginatorClassName="justify-content-end mt-3"
           selectionMode="single"
           onRowSelect={onRowSelect}
+          totalRecords={dataLength ?? data?.length}
+          lazy={dataLength}
         >
           <Column
-            header={tr[localStorage.getItem("language")].code_account}
+            header="Kode Akun"
             style={{
               width: "10rem",
               minWidth: "8rem",
             }}
-            field={(e) => e.account.acc_code}
+            field={(e) => e.account?.acc_code}
             body={load && <Skeleton />}
           />
           <Column
-            header={tr[localStorage.getItem("language")].name_account}
-            field={(e) => e.account.acc_name}
+            header="Nama Akun"
+            field={(e) => e.account?.acc_name}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
           <Column
-            header={tr[localStorage.getItem("language")].kateg}
-            field={(e) => e.kategory.name}
+            header="Kategori"
+            field={(e) => e.kategory?.name}
             style={{ minWidth: "6rem" }}
             body={load && <Skeleton />}
           />
           <Column
-            header={tr[localStorage.getItem("language")].acc_umum}
+            header="Akun Umum"
             // field={(e) => e.account.umm_code}
             style={{ minWidth: "8rem" }}
             body={(e) =>
               load ? (
                 <Skeleton />
               ) : (
-                <div>{e.account.umm_code ? e.account.umm_code : "-"}</div>
+                <div>{e.account?.umm_code ? e.account?.umm_code : "-"}</div>
               )
             }
           />
           <Column
-            header={tr[localStorage.getItem("language")].acc_type}
-            field={(e) => e.account.dou_type}
+            header="Jenis Akun"
+            field={(e) => e.account?.dou_type}
             style={{ minWidth: "8rem" }}
             body={(e) =>
               load ? (
                 <Skeleton />
               ) : (
                 <div>
-                  {e.account.dou_type === "D" ? (
+                  {e.account?.dou_type === "D" ? (
                     <Badge variant="success light">
                       <i className="bx bxs-circle text-success mr-1"></i> Detail
                     </Badge>
@@ -1003,15 +1028,15 @@ const DataAkun = ({
             }
           />
           <Column
-            header={tr[localStorage.getItem("language")].sld_normal}
-            field={(e) => e.account.sld_type}
+            header="Saldo Normal"
+            field={(e) => e?.account?.sld_type}
             style={{ minWidth: "8rem" }}
             body={(e) =>
               load ? (
                 <Skeleton />
               ) : (
                 <div>
-                  {e.account.sld_type === "D" ? (
+                  {e.account?.sld_type === "D" ? (
                     <Badge variant="secondary light">
                       <i className="bx bxs-plus-circle text-secondary mr-1"></i>{" "}
                       Debit
@@ -1027,15 +1052,15 @@ const DataAkun = ({
             }
           />
           <Column
-            header={tr[localStorage.getItem("language")].sub_acc}
-            field={(e) => e.account.connect}
+            header="Terhubung Sub Akun"
+            field={(e) => e.account?.connect}
             style={{ maxWidth: "8rem" }}
             body={(e) =>
               load ? (
                 <Skeleton />
               ) : (
                 <div>
-                  {e.account.connect ? (
+                  {e.account?.connect ? (
                     <Badge variant="primary light">
                       <i className="bx bx-check text-primary mr-1"></i>{" "}
                       Terhubung
@@ -1050,20 +1075,12 @@ const DataAkun = ({
             }
           />
           <Column
-            header={"Level"}
-            field={(e) => e.account.level}
-            style={{ minWidth: "8rem" }}
-            body={load && <Skeleton />}
+            header="Action"
+            dataType="boolean"
+            bodyClassName="text-center"
+            style={{ minWidth: "2rem" }}
+            body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
           />
-          {(edit || del) && (
-            <Column
-              header="Action"
-              dataType="boolean"
-              bodyClassName="text-center"
-              style={{ minWidth: "2rem" }}
-              body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
-            />
-          )}
         </DataTable>
       </>
     );
@@ -1074,11 +1091,7 @@ const DataAkun = ({
       <>
         <Toast ref={toast} />
         <Dialog
-          header={
-            isEdit
-              ? tr[localStorage.getItem("language")].edit_acc
-              : tr[localStorage.getItem("language")].tambh_acc
-          }
+          header={isEdit ? "Edit Akun" : "Tambah Akun"}
           visible={showInput}
           style={{ width: "50vw" }}
           footer={renderFooter}
@@ -1090,7 +1103,7 @@ const DataAkun = ({
           <div className="row ml-0 mt-0">
             <div className="col-4">
               <PrimeInput
-                label={tr[localStorage.getItem("language")].code_account}
+                label={"Kode Akun"}
                 value={
                   currentItem !== null ? `${currentItem.account.acc_code}` : ""
                 }
@@ -1103,14 +1116,14 @@ const DataAkun = ({
                     },
                   })
                 }
-                placeholder={tr[localStorage.getItem("language")].masuk}
+                placeholder="Masukan Kode Akun"
                 disabled
               />
             </div>
 
             <div className="col-4">
               <PrimeInput
-                label={tr[localStorage.getItem("language")].name_account}
+                label={"Nama Akun"}
                 value={
                   currentItem !== null ? `${currentItem.account.acc_name}` : ""
                 }
@@ -1124,14 +1137,14 @@ const DataAkun = ({
                   });
                   setEname(false);
                 }}
-                placeholder={tr[localStorage.getItem("language")].masuk}
+                placeholder={"Masukan Nama Akun"}
                 error={eName}
               />
             </div>
 
             <div className="col-4">
               <PrimeDropdown
-                label={tr[localStorage.getItem("language")].kateg}
+                label={"Kategori"}
                 value={
                   currentItem !== null
                     ? {
@@ -1166,7 +1179,7 @@ const DataAkun = ({
                 optionLabel="kategory.name"
                 filter
                 filterBy="kategory.name"
-                placeholder={tr[localStorage.getItem("language")].pilih}
+                placeholder="Pilih Kategori"
                 error={eKat}
                 errorMessage={"Kategori harus dipilih"}
               />
@@ -1174,9 +1187,7 @@ const DataAkun = ({
           </div>
 
           <div className="col-12 mb-2">
-            <label className="text-label">
-              {tr[localStorage.getItem("language")].acc_type}
-            </label>
+            <label className="text-label">Jenis Akun</label>
             <div className="p-inputgroup">
               <SelectButton
                 value={
@@ -1190,15 +1201,16 @@ const DataAkun = ({
                 onChange={(e) => {
                   console.log(e.value);
                   if (e.value.code === "D") {
-                    getAccountUmum();
+                    // getAccountUmum();
                     if (currentItem.account.umm_code) {
-                      getAccKodeDet(valueUmum(currentItem.account.umm_code));
+                      getAccKodeDet(currentItem.account.umm_code);
                     } else {
                       setCurrentItem({
                         ...currentItem,
                         account: {
                           ...currentItem.account,
                           dou_type: e.value.code,
+                          umm_code: null,
                         },
                       });
                     }
@@ -1226,9 +1238,7 @@ const DataAkun = ({
           </div>
 
           <div className="col-12 mb-2">
-            <label className="text-label">
-              {tr[localStorage.getItem("language")].acc_umum}
-            </label>
+            <label className="text-label">Akun Umum</label>
             <div className="p-inputgroup">
               <Dropdown
                 value={
@@ -1250,7 +1260,7 @@ const DataAkun = ({
                     if (currentItem.account.dou_type === "U") {
                       getAccKodeSubUmum(e.value);
                     } else {
-                      getAccKodeDet(e.value);
+                      getAccKodeDet(e.value.account.acc_code);
                     }
                   } else {
                     getKodeUmum(currentItem.account.kat_code);
@@ -1261,16 +1271,14 @@ const DataAkun = ({
                 itemTemplate={umumTemplate}
                 filter
                 filterBy="account.acc_name"
-                placeholder={tr[localStorage.getItem("language")].pilih}
+                placeholder={"Pilih Akun Umum"}
                 showClear
               />
             </div>
           </div>
 
           <div className="col-12 mb-2">
-            <label className="text-label">
-              {tr[localStorage.getItem("language")].sld_normal}
-            </label>
+            <label className="text-label">Saldo Normal</label>
             <div className="p-inputgroup">
               <SelectButton
                 value={
@@ -1313,35 +1321,8 @@ const DataAkun = ({
                     }
                   />
                   <label className="ml-3" htmlFor="binary">
-                    {tr[localStorage.getItem("language")].sub_acc}
+                    {"Akun Terhubung"}
                   </label>
-                </div>
-
-                <div className="col-12 mb-2">
-                  <label className="text-label">
-                    {tr[localStorage.getItem("language")].sld_awal}
-                  </label>
-                  <div className="p-inputgroup">
-                    <InputNumber
-                      value={
-                        currentItem !== null ? currentItem.account.sld_awal : ""
-                      }
-                      onChange={(e) => {
-                        console.log(e);
-                        setCurrentItem({
-                          ...currentItem,
-                          account: {
-                            ...currentItem.account,
-                            sld_awal: e.value,
-                          },
-                        });
-                      }}
-                      placeholder={tr[localStorage.getItem("language")].masuk}
-                      disabled={
-                        currentItem ? currentItem.account.connect : false
-                      }
-                    />
-                  </div>
                 </div>
               </>
             ) : null
@@ -1349,9 +1330,7 @@ const DataAkun = ({
         </Dialog>
 
         <Dialog
-          header={`${tr[localStorage.getItem("language")].hapus} ${
-            tr[localStorage.getItem("language")].akun
-          }`}
+          header={"Hapus Data"}
           visible={showDelete}
           style={{ width: "30vw" }}
           footer={renderFooterDel}
@@ -1366,7 +1345,7 @@ const DataAkun = ({
               className="pi pi-exclamation-triangle mr-3 align-middle"
               style={{ fontSize: "2rem" }}
             />
-            <span>{tr[localStorage.getItem("language")].pesan_hapus}</span>
+            <span>Apakah anda yakin ingin menghapus data ?</span>
           </div>
         </Dialog>
       </>

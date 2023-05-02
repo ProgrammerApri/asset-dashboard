@@ -17,6 +17,7 @@ import { Calendar } from "primereact/calendar";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import { tr } from "src/data/tr";
+import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 
 const data = {
   id: 1,
@@ -408,7 +409,7 @@ const Currency = () => {
   };
 
   const formatIdr = (value) => {
-    return `${value}`
+    return `${value?.toFixed(2)}`
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
@@ -562,10 +563,10 @@ const Currency = () => {
           </div>
 
           <div className="col-6">
-            <PrimeInput
+            <PrimeNumber
+              price
               label={tr[localStorage.getItem("language")].rat_cr}
-              number
-              value={currentItem !== null ? `${currentItem.rate}` : "0"}
+              value={currentItem && currentItem?.rate}
               onChange={(e) => {
                 setCurrentItem({ ...currentItem, rate: e.value });
                 let newError = error;

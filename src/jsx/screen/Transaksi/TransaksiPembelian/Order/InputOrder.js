@@ -1365,7 +1365,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             <></>
           )} */}
 
-          {order?.po_id !== null ? (
+          {/* {order?.po_id !== null ? (
             <>
               <div className="d-flex col-12 align-items-center mt-4">
                 <label className="ml-0 mt-4">{"Non Stock"}</label>
@@ -1381,7 +1381,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             </>
           ) : (
             <></>
-          )}
+          )} */}
         </Row>
 
         <CustomAccordion

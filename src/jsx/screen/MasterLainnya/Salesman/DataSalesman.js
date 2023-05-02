@@ -230,10 +230,10 @@ const DataSalesman = ({
   const onSubmit = () => {
     if (isValid()) {
       if (isEdit) {
-        setLoading(true);
+        setUpdate(true);
         editSalesman();
       } else {
-        setLoading(true);
+        setUpdate(true);
         addSalesman();
       }
     }
@@ -245,6 +245,8 @@ const DataSalesman = ({
         <PButton
           label={tr[localStorage.getItem("language")].batal}
           onClick={() => {
+            setUpdate(false);
+            setError(false);
             onHideInput();
             onInput(false);
           }}
@@ -378,7 +380,8 @@ const DataSalesman = ({
   };
 
   const onHideInput = () => {
-    setLoading(false);
+    setUpdate(false);
+    setError(false);
     setCurrentItem(def);
     setEdit(false);
     setShowInput(false);
@@ -387,8 +390,8 @@ const DataSalesman = ({
   const isValid = () => {
     let valid = false;
     let errors = {
-      code: !currentItem.code || currentItem.code === "",
-      name: !currentItem.name || currentItem.name === "",
+      code: !currentItem.sales_code || currentItem.sales_code === "",
+      name: !currentItem.sales_name || currentItem.sales_name === "",
     };
 
     setError(errors);

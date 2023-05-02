@@ -127,7 +127,7 @@ const DataBank = ({
       console.log(response);
       if (response.status) {
         const { data } = response;
-        
+
         setCurrency(data);
       }
     } catch (error) {}
@@ -181,10 +181,10 @@ const DataBank = ({
     const config = {
       ...endpoints.addBank,
       data: {
-        BANK_CODE: currentItem.bank.BANK_CODE  ?? null,
-        ACC_ID: currentItem.account.id  ?? null,
-        BANK_NAME: currentItem.bank.BANK_NAME  ?? null,
-        BANK_DESC: currentItem.bank.BANK_DESC  ?? null,
+        BANK_CODE: currentItem.bank.BANK_CODE ?? null,
+        ACC_ID: currentItem.account.id ?? null,
+        BANK_NAME: currentItem.bank.BANK_NAME ?? null,
+        BANK_DESC: currentItem.bank.BANK_DESC ?? null,
         CURRENCY: currentItem.bank.CURRENCY ?? null,
       },
     };
@@ -281,6 +281,7 @@ const DataBank = ({
         {edit && (
           <Link
             onClick={() => {
+              setLoading(false);
               setEdit(true);
               setCurrentItem(data);
               setShowInput(true);
@@ -295,6 +296,7 @@ const DataBank = ({
         {del && (
           <Link
             onClick={() => {
+              setLoading(false);
               setCurrentItem(data);
               setShowDelete(true);
               onInput(true);
@@ -338,7 +340,7 @@ const DataBank = ({
           icon="pi pi-check"
           onClick={() => onSubmit()}
           autoFocus
-          loading={update}
+          loading={loading}
         />
       </div>
     );
@@ -684,13 +686,17 @@ const DataBank = ({
             <div className="col-6">
               <PrimeDropdown
                 label={tr[localStorage.getItem("language")].currency}
-                value={currentItem !== null ? curr(currentItem?.bank?.CURRENCY) : null}
+                value={
+                  currentItem !== null
+                    ? curr(currentItem?.bank?.CURRENCY)
+                    : null
+                }
                 options={currency}
                 onChange={(e) => {
                   console.log(e.value);
                   setCurrentItem({
                     ...currentItem,
-                      bank: { ...currentItem.bank, CURRENCY: e?.value?.id },
+                    bank: { ...currentItem.bank, CURRENCY: e?.value?.id },
                   });
                 }}
                 optionLabel="code"
@@ -709,7 +715,9 @@ const DataBank = ({
               <div className="p-inputgroup">
                 <InputTextarea
                   value={
-                    currentItem !== null ? `${currentItem?.bank?.BANK_DESC}` : ""
+                    currentItem !== null
+                      ? `${currentItem?.bank?.BANK_DESC}`
+                      : ""
                   }
                   onChange={(e) =>
                     setCurrentItem({

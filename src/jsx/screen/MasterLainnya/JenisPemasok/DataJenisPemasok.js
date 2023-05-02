@@ -200,6 +200,7 @@ const DataJenisPemasok = ({
       <div className="d-flex">
         <Link
           onClick={() => {
+            setLoading(false);
             setEdit(true);
             setCurrentItem(data);
             setShowInput(true);
@@ -212,6 +213,7 @@ const DataJenisPemasok = ({
 
         <Link
           onClick={() => {
+            setLoading(false);
             setCurrentItem(data);
             setShowDelete(true);
             onInput(true);
@@ -284,6 +286,7 @@ const DataJenisPemasok = ({
           label={tr[localStorage.getItem("language")].hapus}
           icon="pi pi-trash"
           onClick={() => {
+            setLoading(true);
             delJenisPemasok();
           }}
           autoFocus

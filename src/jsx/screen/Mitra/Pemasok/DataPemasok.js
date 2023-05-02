@@ -21,8 +21,7 @@ import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
-import { tr } from "src/data/tr";
-import { de } from "date-fns/locale";
+import { tr } from "../../../../data/tr";
 import { InputSwitch } from "primereact/inputswitch";
 import { SelectButton } from "primereact/selectbutton";
 
@@ -33,8 +32,8 @@ const def = {
     sup_name: null,
     sup_jpem: null,
     sup_ppn: null,
-    sup_npwp: null,
     sup_pkp: false,
+    sup_npwp: null,
     sup_country: 1,
     sup_address: null,
     sup_kota: null,
@@ -77,7 +76,7 @@ const defError = [
   {
     code: false,
     name: false,
-    jpem: false,
+    // jpem: false,
     addrs: false,
     city: false,
     // npwp: false,
@@ -88,7 +87,7 @@ const defError = [
   },
   {
     // ppn: false,
-    // ap: false,
+    ap: false,
     // um: false,
   },
 ];
@@ -107,17 +106,15 @@ const DataSupplier = ({
   onInput = () => {},
   onRowSelect,
   onSuccessInput,
-  edit,
-  del,
 }) => {
   const [jpem, setJpem] = useState(null);
   const [currency, setCurrency] = useState(null);
   const [city, setCity] = useState(null);
   const [setup, setSetup] = useState(null);
-  const [account, setAccount] = useState(null);
   const [accHut, setAccHut] = useState(null);
   const [accUm, setAccUm] = useState(null);
-  const [company, setComp] = useState(null);
+  const [accAll, setAccAll] = useState(null);
+  const [comp, setComp] = useState(null);
   const [pajak, setPajak] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
@@ -139,7 +136,6 @@ const DataSupplier = ({
     getCity();
     getSetup();
     // getAccHut();
-    // getAccUm();
     getCompany();
     getPajak();
     initFilters1();
@@ -235,29 +231,27 @@ const DataSupplier = ({
       console.log(response);
       if (response.status) {
         const { data } = response;
-        let all_acc = [];
         let filt = [];
-        let acc_um = [];
+        let acc_hut = [];
+        let account = [];
+        let set_acc = null;
         data.forEach((elem) => {
           if (
-            elem.account?.umm_code === setup?.ap?.acc_code &&
-            elem.account?.dou_type === "D"
+            elem?.account?.umm_code === setup?.ap?.acc_code &&
+            elem?.account?.dou_type === "D"
           ) {
+            acc_hut.push(elem.account);
+          }
+
+          if (elem.account.dou_type === "D") {
             filt.push(elem.account);
           }
-
-          if (
-            elem.account?.umm_code === setup?.pur_advance?.acc_code &&
-            elem.account?.dou_type === "D"
-          ) {
-            acc_um.push(elem.account);
-          }
-
-          all_acc.push(elem.account);
+          account.push(elem.account);
         });
-        setAccount(all_acc);
-        setAccHut(filt);
-        setAccUm(acc_um);
+        console.log(data);
+        setAccHut(acc_hut);
+        setAccUm(filt);
+        setAccAll(account);
       }
     } catch (error) {}
   };
@@ -275,7 +269,6 @@ const DataSupplier = ({
       console.log(response);
       if (response.status) {
         const { data } = response;
-        console.log(data);
         setComp(data);
       }
     } catch (error) {}
@@ -309,8 +302,8 @@ const DataSupplier = ({
         sup_name: currentItem?.supplier?.sup_name ?? null,
         sup_jpem: currentItem?.jpem?.id ?? null,
         sup_ppn: currentItem?.supplier?.sup_ppn ?? null,
-        sup_npwp: currentItem?.supplier?.sup_npwp ?? null,
         sup_pkp: currentItem?.supplier?.sup_pkp ?? null,
+        sup_npwp: currentItem?.supplier?.sup_npwp ?? null,
         sup_country: currentItem?.supplier?.sup_country ?? null,
         sup_address: currentItem?.supplier?.sup_address ?? null,
         sup_kota: currentItem?.supplier?.sup_kota ?? null,
@@ -319,7 +312,7 @@ const DataSupplier = ({
         sup_telp2: currentItem?.supplier?.sup_telp2 ?? null,
         sup_fax: currentItem?.supplier?.sup_fax ?? null,
         sup_cp: currentItem?.supplier?.sup_cp ?? null,
-        sup_curren: currentItem?.currency?.id ?? null,
+        sup_curren: currentItem?.supplier?.sup_curren ?? null,
         sup_ket: currentItem?.supplier?.sup_ket ?? null,
         sup_hutang: currentItem?.supplier?.sup_hutang ?? null,
         sup_uang_muka: currentItem?.supplier?.sup_uang_muka ?? null,
@@ -366,8 +359,8 @@ const DataSupplier = ({
         sup_name: currentItem?.supplier?.sup_name ?? null,
         sup_jpem: currentItem?.jpem?.id ?? null,
         sup_ppn: currentItem?.supplier?.sup_ppn ?? null,
-        sup_npwp: currentItem?.supplier?.sup_npwp ?? null,
         sup_pkp: currentItem?.supplier?.sup_pkp ?? null,
+        sup_npwp: currentItem?.supplier?.sup_npwp ?? null,
         sup_country: currentItem?.supplier?.sup_country ?? null,
         sup_address: currentItem?.supplier?.sup_address ?? null,
         sup_kota: currentItem?.supplier?.sup_kota ?? null,
@@ -376,7 +369,7 @@ const DataSupplier = ({
         sup_telp2: currentItem?.supplier?.sup_telp2 ?? null,
         sup_fax: currentItem?.supplier?.sup_fax ?? null,
         sup_cp: currentItem?.supplier?.sup_cp ?? null,
-        sup_curren: currentItem?.currency?.id ?? null,
+        sup_curren: currentItem?.supplier?.sup_curren ?? null,
         sup_ket: currentItem?.supplier?.sup_ket ?? null,
         sup_hutang: currentItem?.supplier?.sup_hutang ?? null,
         sup_uang_muka: currentItem?.supplier?.sup_uang_muka ?? null,
@@ -409,7 +402,7 @@ const DataSupplier = ({
           setUpdate(false);
           toast.current.show({
             severity: "error",
-            summary: tr[localStorage.getItem("language")].gagal,
+            summary: "Gagal",
             detail: `Kode ${currentItem.supplier.sup_code} Sudah Digunakan`,
             life: 3000,
           });
@@ -448,7 +441,7 @@ const DataSupplier = ({
           toast.current.show({
             severity: "info",
             summary: tr[localStorage.getItem("language")].berhsl,
-            detail: tr[localStorage.getItem("language")].del_berhasil,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -462,7 +455,7 @@ const DataSupplier = ({
         toast.current.show({
           severity: "error",
           summary: tr[localStorage.getItem("language")].gagal,
-          detail: tr[localStorage.getItem("language")].del_gagal,
+          detail: tr[localStorage.getItem("language")].pesan_gagal,
           life: 3000,
         });
       }, 500);
@@ -473,48 +466,44 @@ const DataSupplier = ({
     return (
       // <React.Fragment>
       <div className="d-flex">
-        {edit && (
-          <Link
-            onClick={() => {
-              setEdit(true);
-              setCurrentItem(data);
-              setShowInput(true);
-              onInput(true);
-            }}
-            className="btn btn-primary shadow btn-xs sharp ml-1"
-          >
-            <i className="fa fa-pencil"></i>
-          </Link>
-        )}
+        <Link
+          onClick={() => {
+            setEdit(true);
+            setCurrentItem(data);
+            setShowInput(true);
+            onInput(true);
+          }}
+          className="btn btn-primary shadow btn-xs sharp ml-1"
+        >
+          <i className="fa fa-pencil"></i>
+        </Link>
 
-        {del && (
-          <Link
-            onClick={() => {
-              setCurrentItem(data);
-              setShowDelete(true);
-            }}
-            className="btn btn-danger shadow btn-xs sharp ml-1"
-          >
-            <i className="fa fa-trash"></i>
-          </Link>
-        )}
+        <Link
+          onClick={() => {
+            setCurrentItem(data);
+            setShowDelete(true);
+          }}
+          className="btn btn-danger shadow btn-xs sharp ml-1"
+        >
+          <i className="fa fa-trash"></i>
+        </Link>
       </div>
       // </React.Fragment>
     );
   };
 
   const onSubmit = () => {
-    // if (isValid()) {
-    if (isEdit) {
-      setUpdate(true);
-      editSupplier();
-      setActive(0);
-    } else {
-      setUpdate(true);
-      addSupplier();
-      setActive(0);
+    if (isValid()) {
+      if (isEdit) {
+        setUpdate(true);
+        editSupplier();
+        setActive(0);
+      } else {
+        setUpdate(true);
+        addSupplier();
+        setActive(0);
+      }
     }
-    // }
   };
 
   const renderFooter = () => {
@@ -558,7 +547,7 @@ const DataSupplier = ({
     return (
       <div className="mt-3">
         <PButton
-          label="Sebelumnya"
+          label={tr[localStorage.getItem("language")].sebelumnya}
           onClick={() => {
             if (active > 0) {
               setActive(active - 1);
@@ -628,26 +617,24 @@ const DataSupplier = ({
             placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
-        {edit && (
-          <PrimeSingleButton
-            label={tr[localStorage.getItem("language")].tambh}
-            icon={<i class="bx bx-plus px-2"></i>}
-            onClick={() => {
-              setShowInput(true);
-              setEdit(false);
-              setLoading(false);
-              setCurrentItem({
-                ...def,
-                supplier: {
-                  ...def.supplier,
-                  // sup_hutang: setup?.ap?.id,
-                  // sup_uang_muka: setup?.pur_advance?.id,
-                },
-              });
-              onInput(true);
-            }}
-          />
-        )}
+        <PrimeSingleButton
+          label={tr[localStorage.getItem("language")].tambh}
+          icon={<i class="bx bx-plus px-2"></i>}
+          onClick={() => {
+            setShowInput(true);
+            setEdit(false);
+            setLoading(false);
+            setCurrentItem({
+              ...def,
+              supplier: {
+                ...def.supplier,
+                // sup_hutang: setup?.ap?.id,
+                // sup_uang_muka: setup?.pur_advance?.id,
+              },
+            });
+            onInput(true);
+          }}
+        />
       </div>
     );
   };
@@ -723,14 +710,14 @@ const DataSupplier = ({
     return selected;
   };
 
-  const checAcc = (value) => {
-    let acc = null;
-    account?.forEach((element) => {
+  const hut = (value) => {
+    let hut = {};
+    accAll?.forEach((element) => {
       if (value === element.id) {
-        acc = element;
+        hut = element;
       }
     });
-    return acc;
+    return hut;
   };
 
   const glTemplate = (option) => {
@@ -776,6 +763,7 @@ const DataSupplier = ({
   };
 
   const onHideInput = () => {
+    setError(defError);
     setLoading(false);
     setCurrentItem(def);
     setEdit(false);
@@ -793,24 +781,27 @@ const DataSupplier = ({
         name:
           !currentItem.supplier.sup_name ||
           currentItem.supplier.sup_name === "",
-        jpem: !currentItem.jpem?.id,
-        addrs:
-          !currentItem.supplier.sup_address ||
-          currentItem.supplier.sup_address === "",
-        city: !currentItem.supplier.sup_kota,
+        // jpem: !currentItem.jpem?.id,
+        // addrs:
+        //   !currentItem.supplier.sup_address ||
+        //   currentItem.supplier.sup_address === "",
+        // city: !currentItem.supplier.sup_kota,
         // npwp:
         //   !currentItem.supplier.sup_npwp ||
         //   currentItem.supplier.sup_npwp === "",
       },
       {
-        phone:
-          !currentItem.supplier.sup_telp1 ||
-          currentItem.supplier.sup_telp1 === "0",
-        cp: !currentItem.supplier.sup_cp || currentItem.supplier.sup_cp === "",
+        // phone:
+        //   !currentItem.supplier.sup_telp1 ||
+        //   currentItem.supplier.sup_telp1 === "0",
+        // cp: !currentItem.supplier.sup_cp || currentItem.supplier.sup_cp === "",
       },
       {
         // ppn: !currentItem.supplier.sup_ppn,
-        // ap: !currentItem.supplier.sup_hutang,
+        ap:
+          localStorage.getItem("product") == "inv+gl"
+            ? !currentItem.supplier.sup_hutang
+            : false,
         // um: !currentItem.supplier.sup_uang_muka,
       },
     ];
@@ -836,6 +827,17 @@ const DataSupplier = ({
     return valid;
   };
 
+  const checkCurrency = (value) => {
+    let selected = {};
+    currency?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
   const renderBody = () => {
     return (
       <DataTable
@@ -854,7 +856,7 @@ const DataSupplier = ({
           "supplier.sup_telp1",
           "supplier.sup_limit",
         ]}
-        emptyMessage="Tidak ada data"
+        emptyMessage={tr[localStorage.getItem("language")].empty_data}
         paginator
         paginatorTemplate={template2}
         first={first2}
@@ -891,20 +893,22 @@ const DataSupplier = ({
           body={load && <Skeleton />}
         />
         <Column
-          header={tr[localStorage.getItem("language")].limit}
-          field={(e) => formatIdr(e.supplier?.sup_limit ?? "0")}
+          header={"Akun Distribusi GL"}
+          field={(e) =>
+            `${hut(e?.supplier?.sup_hutang)?.acc_code} - ${
+              hut(e?.supplier?.sup_hutang)?.acc_name
+            }`
+          }
           style={{ minWidth: "8rem" }}
           body={load && <Skeleton />}
         />
-        {(edit || del) && (
-          <Column
-            header="Action"
-            dataType="boolean"
-            bodyClassName="text-center"
-            style={{ minWidth: "3rem" }}
-            body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
-          />
-        )}
+        <Column
+          header="Action"
+          dataType="boolean"
+          bodyClassName="text-center"
+          style={{ minWidth: "3rem" }}
+          body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
+        />
       </DataTable>
     );
   };
@@ -916,12 +920,8 @@ const DataSupplier = ({
         <Dialog
           header={
             isEdit
-              ? `${tr[localStorage.getItem("language")].edit} ${
-                  tr[localStorage.getItem("language")].supplier
-                }`
-              : `${tr[localStorage.getItem("language")].tambh} ${
-                  tr[localStorage.getItem("language")].supplier
-                }`
+              ? tr[localStorage.getItem("language")].edit_data
+              : tr[localStorage.getItem("language")].add_data
           }
           visible={showInput}
           style={{ width: "50vw" }}
@@ -938,7 +938,7 @@ const DataSupplier = ({
               headerTemplate={renderTabHeader}
             >
               <div className="row ml-0 mt-0">
-                <div className="col-6 mt-0">
+                <div className="col-4 mt-0">
                   <PrimeInput
                     label={tr[localStorage.getItem("language")].kd_pem}
                     value={
@@ -959,11 +959,11 @@ const DataSupplier = ({
                       setError(newError);
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
-                    // error={error[0]?.code}
+                    error={error[0]?.code}
                   />
                 </div>
 
-                <div className="col-6">
+                <div className="col-4">
                   <PrimeInput
                     label={tr[localStorage.getItem("language")].nm_pem}
                     value={
@@ -984,15 +984,15 @@ const DataSupplier = ({
                       setError(newError);
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
-                    // error={error[0]?.name}
+                    error={error[0]?.name}
                   />
                 </div>
               </div>
 
               <div className="row ml-0 mt-0">
-                <div className="col-6 mt-0">
+                <div className="col-4 mt-0">
                   <PrimeDropdown
-                    label={tr[localStorage.getItem("language")].pem_type}
+                    label={"Jenis Pemasok"}
                     value={currentItem !== null ? currentItem.jpem : null}
                     options={jpem}
                     onChange={(e) => {
@@ -1001,9 +1001,9 @@ const DataSupplier = ({
                         ...currentItem,
                         jpem: e.value,
                       });
-                      let newError = error;
-                      newError[0].jpem = false;
-                      setError(newError);
+                      // let newError = error;
+                      // newError[0].jpem = false;
+                      // setError(newError);
                     }}
                     optionLabel="jpem_name"
                     filter
@@ -1014,7 +1014,42 @@ const DataSupplier = ({
                   />
                 </div>
 
-                <div className="col-6">
+                <div className="col-4">
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].kd_cr}
+                  </label>
+                  <div className="p-inputgroup">
+                    <Dropdown
+                      value={
+                        currentItem
+                          ? checkCurrency(currentItem.supplier.sup_curren)
+                          : null
+                      }
+                      options={currency}
+                      onChange={(e) => {
+                        console.log(e.value);
+                        setCurrentItem({
+                          ...currentItem,
+                          supplier: {
+                            ...currentItem.supplier,
+                            sup_curren: e.target.value.id,
+                          },
+                        });
+                      }}
+                      optionLabel="name"
+                      filter
+                      filterBy="name"
+                      placeholder={tr[localStorage.getItem("language")].pilih}
+                      // disabled={company && !company.multi_currency}
+                    />
+                  </div>
+                  {/* <small className="text-blue">
+                    *Aktifkan Multi Currency Pada Setup Perusahaan Terlebih
+                    Dahulu
+                  </small> */}
+                </div>
+
+                <div className="col-4">
                   <PrimeNumber
                     number
                     label={"NPWP"}
@@ -1067,10 +1102,8 @@ const DataSupplier = ({
               </div>
 
               <div className="col-12 p-0">
-                <div className="mt-4 ml-3 mr-3 fs-14 mb-1">
-                  <b>{`${tr[localStorage.getItem("language")].supplier} ${
-                    tr[localStorage.getItem("language")].alamat
-                  }`}</b>
+                <div className="mt-4 ml-3 mr-3 fs-16 mb-1">
+                  <b>Alamat Pemasok</b>
                 </div>
                 <Divider className="mb-2 ml-3 mr-3"></Divider>
               </div>
@@ -1125,7 +1158,7 @@ const DataSupplier = ({
                       setError(newError);
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
-                    // error={error[0]?.addrs}
+                    error={error[0]?.addrs}
                   />
                 </div>
               </div>
@@ -1160,8 +1193,8 @@ const DataSupplier = ({
                       filter
                       filterBy="city_name"
                       placeholder={tr[localStorage.getItem("language")].pilih}
-                      // errorMessage="Kota Belum Dipilih"
-                      // error={error[0]?.city}
+                      errorMessage="Kota Belum Dipilih"
+                      error={error[0]?.city}
                     />
                   ) : (
                     <PrimeInput
@@ -1221,7 +1254,7 @@ const DataSupplier = ({
               <div className="row ml-0 mt-0">
                 <div className="col-6 mt-0">
                   <PrimeInput
-                    label={tr[localStorage.getItem("language")].telp}
+                    label={`${tr[localStorage.getItem("language")].telp} 1`}
                     value={
                       currentItem !== null
                         ? `${currentItem?.supplier?.sup_telp1 ?? ""}`
@@ -1232,7 +1265,7 @@ const DataSupplier = ({
                         ...currentItem,
                         supplier: {
                           ...currentItem.supplier,
-                          sup_telp1: e.value,
+                          sup_telp1: e.target.value,
                         },
                       });
                       let newError = error;
@@ -1240,15 +1273,13 @@ const DataSupplier = ({
                       setError(newError);
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
-                    isNumber
-                    // error={error[1]?.phone}
+                    error={error[1]?.phone}
                   />
                 </div>
 
                 <div className="col-6">
                   <PrimeInput
-                    isNumber
-                    label={tr[localStorage.getItem("language")].telp}
+                    label={`${tr[localStorage.getItem("language")].telp} 2`}
                     value={
                       currentItem !== null
                         ? `${currentItem?.supplier?.sup_telp2 ?? ""}`
@@ -1263,7 +1294,7 @@ const DataSupplier = ({
                         },
                       })
                     }
-                    placeholder="0"
+                    placeholder={tr[localStorage.getItem("language")].masuk}
                     mode={"decimal"}
                     useGrouping={false}
                   />
@@ -1296,7 +1327,7 @@ const DataSupplier = ({
 
                 <div className="col-6">
                   <PrimeInput
-                    label={"Contact Person"}
+                    label={tr[localStorage.getItem("language")].cp}
                     value={
                       currentItem !== null
                         ? `${currentItem?.supplier?.sup_cp ?? ""}`
@@ -1315,48 +1346,22 @@ const DataSupplier = ({
                       setError(newError);
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
-                    // error={error[1]?.cp}
+                    error={error[1]?.cp}
                   />
                 </div>
               </div>
             </TabPanel>
 
             <TabPanel
-              header="Distribusi AP & Currency"
+              header={tr[localStorage.getItem("language")].limit}
               headerTemplate={renderTabHeader}
             >
               <div className="row ml-0 mt-0">
                 <div className="col-6">
-                  <label className="text-label">Currency</label>
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={currentItem !== null ? currentItem.currency : null}
-                      options={currency}
-                      onChange={(e) => {
-                        console.log(e.value);
-                        setCurrentItem({
-                          ...currentItem,
-                          currency: e.value,
-                        });
-                      }}
-                      optionLabel="code"
-                      filter
-                      filterBy="code"
-                      placeholder={tr[localStorage.getItem("language")].pilih}
-                      disabled={company && !company.multi_currency}
-                    />
-                  </div>
-                  <small className="text-blue">
-                    *Aktifkan Multi Currency Pada Setup Perusahaan Terlebih
-                    Dahulu
-                  </small>
-                </div>
-
-                <div className="col-6">
                   <PrimeDropdown
-                    label={"PPN"}
+                    label={tr[localStorage.getItem("language")].pajak}
                     value={
-                      currentItem !== null
+                      currentItem && currentItem?.supplier?.sup_ppn !== null
                         ? ppn(currentItem?.supplier?.sup_ppn)
                         : null
                     }
@@ -1367,7 +1372,7 @@ const DataSupplier = ({
                         ...currentItem,
                         supplier: {
                           ...currentItem.supplier,
-                          sup_ppn: e.value.id,
+                          sup_ppn: e.value.id ?? null,
                         },
                       });
                       let newError = error;
@@ -1378,9 +1383,35 @@ const DataSupplier = ({
                     filter
                     filterBy="name"
                     placeholder={tr[localStorage.getItem("language")].pilih}
-                    // errorMessage="Jenis Pajak Belum Dipilih"
-                    // error={error[2]?.ppn}
+                    errorMessage="Jenis Pajak Belum Dipilih"
+                    error={error[2]?.ppn}
+                    showClear
                   />
+                </div>
+
+                <div className="col-6">
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].limit}
+                  </label>
+                  <div className="p-inputgroup">
+                    <InputNumber
+                      value={
+                        currentItem !== null
+                          ? `${currentItem?.supplier?.sup_limit ?? ""}`
+                          : ""
+                      }
+                      onChange={(e) =>
+                        setCurrentItem({
+                          ...currentItem,
+                          supplier: {
+                            ...currentItem.supplier,
+                            sup_limit: e.value,
+                          },
+                        })
+                      }
+                      placeholder={tr[localStorage.getItem("language")].masuk}
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -1423,8 +1454,9 @@ const DataSupplier = ({
                   <PrimeDropdown
                     label={"Kode Distribusi AP"}
                     value={
-                      currentItem?.supplier?.sup_hutang &&
-                      checAcc(currentItem?.supplier?.sup_hutang)
+                      currentItem && currentItem?.supplier?.sup_hutang !== null
+                        ? hut(currentItem?.supplier?.sup_hutang)
+                        : null
                     }
                     options={accHut}
                     onChange={(e) => {
@@ -1433,31 +1465,35 @@ const DataSupplier = ({
                         ...currentItem,
                         supplier: {
                           ...currentItem.supplier,
-                          sup_hutang: e.value?.id ?? null,
+                          sup_hutang: e?.value?.id ?? null,
                         },
                       });
-                      // let newError = error;
-                      // newError[2].ap = false;
-                      // setError(newError);
+                      let newError = error;
+                      newError[2].ap = false;
+                      setError(newError);
                     }}
                     optionLabel="account.acc_name"
                     valueTemplate={clear}
                     itemTemplate={glTemplate}
                     filter
                     filterBy="acc_name"
-                    placeholder={tr[localStorage.getItem("language")].pilih}
+                    placeholder="Kode Distribusi Hutang"
                     showClear
-                    // errorMessage="Kode Distribusi AP Belum Dipilih"
-                    // error={error[2]?.ap}
+                    errorMessage="Kode Distribusi AP Belum Dipilih"
+                    error={error[2]?.ap}
                   />
+                  <small className="text-blue">
+                    *Harap Periksa Setup Akun Apabila Daftar Akun Tidak Muncul
+                  </small>
                 </div>
 
                 <div className="col-6">
                   <PrimeDropdown
                     label={"Uang Muka Pembelian"}
                     value={
-                      currentItem?.supplier?.sup_uang_muka &&
-                      checAcc(currentItem?.supplier?.sup_uang_muka)
+                      currentItem?.supplier?.sup_uang_muka !== null
+                        ? hut(currentItem?.supplier?.sup_uang_muka)
+                        : null
                     }
                     options={accUm}
                     onChange={(e) => {
@@ -1478,7 +1514,7 @@ const DataSupplier = ({
                     itemTemplate={glTemplate}
                     filter
                     filterBy="acc_name"
-                    placeholder={tr[localStorage.getItem("language")].pilih}
+                    placeholder="Kode Distribusi Uang Muka"
                     showClear
                     // errorMessage="Uang Muka Pembelian Belum Dipilih"
                     // error={error[2]?.um}
@@ -1486,40 +1522,13 @@ const DataSupplier = ({
                 </div>
               </div>
 
-              <div className="row ml-0 mt-0">
-                <div className="col-12">
-                  <label className="text-label">
-                    {tr[localStorage.getItem("language")].limit}
-                  </label>
-                  <div className="p-inputgroup">
-                    <InputNumber
-                      value={
-                        currentItem !== null
-                          ? `${currentItem?.supplier?.sup_limit ?? ""}`
-                          : ""
-                      }
-                      onChange={(e) =>
-                        setCurrentItem({
-                          ...currentItem,
-                          supplier: {
-                            ...currentItem.supplier,
-                            sup_limit: e.value,
-                          },
-                        })
-                      }
-                      placeholder={tr[localStorage.getItem("language")].masuk}
-                    />
-                  </div>
-                </div>
-              </div>
+              <div className="row ml-0 mt-0"></div>
             </TabPanel>
           </TabView>
         </Dialog>
 
         <Dialog
-          header={`${tr[localStorage.getItem("language")].hapus} ${
-            tr[localStorage.getItem("language")].supplier
-          }`}
+          header={tr[localStorage.getItem("language")].hapus_data}
           visible={showDelete}
           style={{ width: "30vw" }}
           footer={renderFooterDel()}

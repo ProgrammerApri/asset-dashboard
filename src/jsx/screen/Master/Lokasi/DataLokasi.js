@@ -83,7 +83,7 @@ const DataLokasi = ({
       if (response.status) {
         setTimeout(() => {
           onSuccessInput();
-          setLoading(false);
+          setUpdate(false);
           onHideInput();
           onInput(false);
           toast.current.show({
@@ -125,7 +125,7 @@ const DataLokasi = ({
       if (response.status) {
         setTimeout(() => {
           onSuccessInput();
-          setLoading(false);
+          setUpdate(false);
           onHideInput();
           onInput(false);
           toast.current.show({
@@ -175,7 +175,7 @@ const DataLokasi = ({
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setUpdate(true);
+          setUpdate(false);
           setShowDelete(false);
           onSuccessInput();
           onInput(false);
@@ -206,21 +206,25 @@ const DataLokasi = ({
     return (
       // <React.Fragment>
       <div className="d-flex">
-        {edit && <Link
-          onClick={() => {
-            setEdit(true);
-            setCurrentItem(data);
-            setShowInput(true);
-            onInput(true);
-          }}
-          className="btn btn-primary shadow btn-xs sharp ml-1"
-        >
-          <i className="fa fa-pencil"></i>
-        </Link>}
+        {edit && (
+          <Link
+            onClick={() => {
+              setUpdate(false);
+              setEdit(true);
+              setCurrentItem(data);
+              setShowInput(true);
+              onInput(true);
+            }}
+            className="btn btn-primary shadow btn-xs sharp ml-1"
+          >
+            <i className="fa fa-pencil"></i>
+          </Link>
+        )}
 
         {del && (
           <Link
             onClick={() => {
+              setUpdate(false);
               setCurrentItem(data);
               setShowDelete(true);
               onInput(true);
@@ -253,6 +257,7 @@ const DataLokasi = ({
         <PButton
           label={tr[localStorage.getItem("language")].batal}
           onClick={() => {
+            setUpdate(false);
             onHideInput();
             onInput(false);
           }}
@@ -263,7 +268,7 @@ const DataLokasi = ({
           icon="pi pi-check"
           onClick={() => onSubmit()}
           autoFocus
-          loading={loading}
+          loading={update}
         />
       </div>
     );
@@ -276,7 +281,7 @@ const DataLokasi = ({
           label={tr[localStorage.getItem("language")].batal}
           onClick={() => {
             setShowDelete(false);
-            setLoading(false);
+            setUpdate(false);
             onInput(false);
           }}
           className="p-button-text btn-primary"
@@ -285,6 +290,7 @@ const DataLokasi = ({
           label={tr[localStorage.getItem("language")].hapus}
           icon="pi pi-trash"
           onClick={() => {
+            setUpdate(true);
             delLokasi();
           }}
           autoFocus
@@ -327,7 +333,7 @@ const DataLokasi = ({
             onClick={() => {
               setShowInput(true);
               setEdit(false);
-              setLoading(false);
+              setUpdate(false);
               setCurrentItem(def);
               onInput(true);
             }}
@@ -563,7 +569,7 @@ const DataLokasi = ({
           style={{ width: "30vw" }}
           footer={renderFooterDel()}
           onHide={() => {
-            setLoading(false);
+            setUpdate(false);
             setShowDelete(false);
             onInput(false);
           }}
@@ -581,7 +587,7 @@ const DataLokasi = ({
   };
 
   const onHideInput = () => {
-    setLoading(false);
+    setUpdate(false);
     setCurrentItem(def);
     setEdit(false);
     setShowInput(false);

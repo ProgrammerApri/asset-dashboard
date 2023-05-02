@@ -57,6 +57,7 @@ const DataJasa = ({
   onSuccessInput,
 }) => {
   const [account, setAccount] = useState(null);
+  const [allAcc, setAllAcc] = useState(null);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const [filters1, setFilters1] = useState(null);
@@ -76,8 +77,6 @@ const DataJasa = ({
   }, []);
 
   const getAccount = async () => {
-    console.log("-------------------");
-    // console.log(currentItem);
     setLoading(true);
     const config = {
       ...endpoints.account,
@@ -90,14 +89,19 @@ const DataJasa = ({
       console.log(response);
       if (response.status) {
         const { data } = response;
-        // let filt = [];
-        // data.forEach((element) => {
-        //   if (element.account.kat_code === 2 && element.account.connect) {
-        //     filt.push(element.account);
-        //   }
-        // });
+        let all = [];
+        let filt = [];
+
+        data.forEach((element) => {
+          if (element.account.dou_type === "D" && !element.account.connect) {
+            filt.push(element.account);
+          }
+
+          all.push(element.account);
+        });
         console.log(data);
-        setAccount(data);
+        setAllAcc(all);
+        setAccount(filt);
       }
     } catch (error) {}
   };
@@ -111,7 +115,7 @@ const DataJasa = ({
         code: currentItem.jasa.code,
         name: currentItem.jasa.name,
         desc: currentItem.jasa.desc,
-        acc_id: currentItem.account.account.id,
+        acc_id: currentItem.account.id,
       },
     };
     console.log(config.data);
@@ -154,7 +158,7 @@ const DataJasa = ({
         code: currentItem.jasa.code,
         name: currentItem.jasa.name,
         desc: currentItem.jasa.desc,
-        acc_id: currentItem.account.account.id,
+        acc_id: currentItem.account.id,
       },
     };
     console.log(config.data);
@@ -289,8 +293,10 @@ const DataJasa = ({
           onClick={() => {
             if (isValid()) {
               if (isEdit) {
+                setLoading(true);
                 editJasa();
               } else {
+                setLoading(true);
                 addJasa();
               }
             }
@@ -357,6 +363,7 @@ const DataJasa = ({
           label={tr[localStorage.getItem("language")].tambh}
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
+            setError(false);
             setShowInput(true);
             setEdit(false);
             setLoading(false);
@@ -421,9 +428,7 @@ const DataJasa = ({
   const glTemplate = (option) => {
     return (
       <div>
-        {option !== null
-          ? `${option.account.acc_name} - ${option.account.acc_code}`
-          : ""}
+        {option !== null ? `${option.acc_name} - ${option.acc_code}` : ""}
       </div>
     );
   };
@@ -432,9 +437,7 @@ const DataJasa = ({
     if (option) {
       return (
         <div>
-          {option !== null
-            ? `${option.account.acc_name} - ${option.account.acc_code}`
-            : ""}
+          {option !== null ? `${option.acc_name} - ${option.acc_code}` : ""}
         </div>
       );
     }
@@ -455,7 +458,7 @@ const DataJasa = ({
     let errors = {
       code: !currentItem.jasa.code || currentItem.jasa.code === "",
       name: !currentItem.jasa.name || currentItem.jasa.name === "",
-      acc1: !currentItem?.account.account?.id,
+      acc1: !currentItem?.account?.id,
     };
 
     setError(errors);
@@ -510,7 +513,7 @@ const DataJasa = ({
           />
           <Column
             header={tr[localStorage.getItem("language")].akun}
-            field={(e) => e.account.acc_name}
+            field={(e) => `${e.account?.acc_code} - ${e.account?.acc_name}`}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
@@ -600,13 +603,17 @@ const DataJasa = ({
             <div className="col-12">
               <PrimeDropdown
                 label={tr[localStorage.getItem("language")].akun}
-                value={currentItem !== null ? currentItem.account : null}
+                value={
+                  currentItem !== null && currentItem.account !== null
+                    ? currentItem.account
+                    : null
+                }
                 options={account}
                 onChange={(e) => {
                   console.log(e.value);
                   setCurrentItem({
                     ...currentItem,
-                    account: e.value,
+                    account: e.value ?? null,
                   });
                   let newError = error;
                   newError.acc1 = false;
@@ -620,7 +627,7 @@ const DataJasa = ({
                 placeholder={tr[localStorage.getItem("language")].pilih}
                 errorMessage="Akun Distribusi Belum Dipilih"
                 error={error?.acc1}
-                // showClear
+                showClear
               />
             </div>
           </div>

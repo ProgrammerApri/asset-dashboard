@@ -1014,6 +1014,9 @@ const DataGroupProduk = ({
                         error={error[1]?.acc_1}
                         disabled={currentItem.groupPro.wip === true}
                       />
+                      <small className="text-blue" hidden={currentItem.groupPro.wip}>
+                        *Harap Periksa Setup Akun Apabila Daftar Akun Tidak Ada
+                      </small>
                     </div>
 
                     <div className="col-6">
@@ -1120,6 +1123,14 @@ const DataGroupProduk = ({
                         errorMessage="Akun wip harus dipilih"
                         error={error[1]?.acc_9}
                       />
+
+                      <small
+                        className="text-blue"
+                        hidden={!currentItem.groupPro.wip}
+                      >
+                        *Harap Periksa Setup Akun WIP Apabila Daftar Akun Tidak
+                        Ada
+                      </small>
                     </div>
                   </div>
 

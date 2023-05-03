@@ -1,15 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Button, Card, Col, Row } from "react-bootstrap";
 import { Toast } from "primereact/toast";
-import ReturBeliList from "./ReturBeliList";
-import ReturBeliInput from "./ReturBeliInput";
+import DataFormula from "./DataFormula";
+import InputFormula from "./InputFormula";
 import Detail from "./Detail";
-import { tr } from "src/data/tr";
 
-const ReturBeli = ({trigger}) => {
+const Formula = ({ trigger }) => {
   const [active, setActive] = useState(0);
   const toast = useRef(null);
-  
+
   useEffect(() => {
     if (trigger !== 0) {
       setActive(0);
@@ -17,7 +16,7 @@ const ReturBeli = ({trigger}) => {
   }, [trigger]);
 
   const [view, setView] = useState([
-    <ReturBeliList
+    <DataFormula
       onAdd={() => {
         setActive(1);
       }}
@@ -28,16 +27,15 @@ const ReturBeli = ({trigger}) => {
         setActive(2);
       }}
     />,
-
-    <ReturBeliInput
+    <InputFormula
       onCancel={() => setActive(0)}
       onSuccess={() => {
         setTimeout(() => {
           setActive(0);
           toast.current.show({
             severity: "info",
-            summary: tr[localStorage.getItem("language")].berhsl,
-            detail: tr[localStorage.getItem("language")].pesan_berhasil,
+            summary: "Berhasil",
+            detail: "Data Berhasil Diperbarui",
             life: 3000,
           });
         }, 500);
@@ -54,4 +52,4 @@ const ReturBeli = ({trigger}) => {
   );
 };
 
-export default ReturBeli;
+export default Formula;

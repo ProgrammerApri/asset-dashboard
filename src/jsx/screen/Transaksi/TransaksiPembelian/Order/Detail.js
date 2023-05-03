@@ -20,6 +20,7 @@ const Detail = ({ onCancel }) => {
   const [order, setOrder] = useState(null);
   const [city, setCity] = useState(null);
   const [supplier, setSupplier] = useState(null);
+  const [currency, setCurrency] = useState(null);
   const [ppn, setPpn] = useState(null);
   const [jas, setJas] = useState(null);
   const [prod, setProd] = useState(null);
@@ -36,6 +37,7 @@ const Detail = ({ onCancel }) => {
     });
     getORD();
     getSupplier();
+    getCur();
     getProduct();
     getJasa();
     getSatuan();
@@ -76,6 +78,22 @@ const Detail = ({ onCancel }) => {
       if (response.status) {
         const { data } = response;
         setSupplier(data);
+      }
+    } catch (error) {}
+  };
+
+  const getCur = async () => {
+    const config = {
+      ...endpoints.currency,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setCurrency(data);
       }
     } catch (error) {}
   };
@@ -253,7 +271,11 @@ const Detail = ({ onCancel }) => {
                     height: "50px",
                     width: "50px",
                   }}
-                  src={ApiConfig.baseUrl +endpoints.getImage.endpoint+comp?.cp_logo}
+                  src={
+                    ApiConfig.baseUrl +
+                    endpoints.getImage.endpoint +
+                    comp?.cp_logo
+                  }
                   alt=""
                 />
                 <br></br>
@@ -423,6 +445,16 @@ const Detail = ({ onCancel }) => {
     return nil;
   };
 
+  const getCurRate = (value) => {
+    let rate = 0;
+    currency?.forEach((elem) => {
+      if (show.sup_id?.sup_curren === elem.id) {
+        rate = elem.rate;
+      }
+    });
+    return rate;
+  };
+
   const getUangMuka = () => {
     let dp = 0;
     apCard?.forEach((element) => {
@@ -463,7 +495,11 @@ const Detail = ({ onCancel }) => {
                           height: "150px",
                           width: "150px",
                         }}
-                        src={ApiConfig.baseUrl +endpoints.getImage.endpoint+comp?.cp_logo}
+                        src={
+                          ApiConfig.baseUrl +
+                          endpoints.getImage.endpoint +
+                          comp?.cp_logo
+                        }
                         alt=""
                       />
                       {/* <br></br> */}
@@ -591,9 +627,11 @@ const Detail = ({ onCancel }) => {
                 </Card>
 
                 <Row className="ml-1 mt-2">
-                  <label className="text-label fs-13">
-                    <b>Daftar Produk</b>
-                  </label>
+                  <div className="col-12">
+                    <label className="text-label fs-13">
+                      <b>Daftar Produk</b>
+                    </label>
+                  </div>
 
                   <DataTable
                     value={show.dprod?.map((v, i) => {
@@ -605,7 +643,7 @@ const Detail = ({ onCancel }) => {
                       };
                     })}
                     responsiveLayout="scroll"
-                    className="display w-150 datatable-wrapper fs-12"
+                    className="display w-150 datatable-wrapper fs-12 ml-2"
                     // showGridlines
                     dataKey="id"
                     rowHover
@@ -613,7 +651,7 @@ const Detail = ({ onCancel }) => {
                     <Column
                       header="Produk"
                       field={(e) => `${e.prod_id?.name} (${e.prod_id?.code})`}
-                      style={{ minWidth: "19rem" }}
+                      style={{ minWidth: "17rem" }}
                       // body={loading && <Skeleton />}
                     />
                     <Column
@@ -630,18 +668,29 @@ const Detail = ({ onCancel }) => {
                     />
                     <Column
                       header="Satuan"
-                      field={(e) => e.unit_id?.name}
-                      style={{ minWidth: "7rem" }}
+                      field={(e) => e.unit_id?.code}
+                      style={{ minWidth: "5rem" }}
                       // body={loading && <Skeleton />}
                     />
                     <Column
+                      hidden={show?.sup_id?.sup_curren === null}
                       header="Harga Satuan"
-                      field={(e) => `Rp. ${formatIdr(e.price)}`}
+                      field={(e) => formatIdr(e.price)}
+                      style={{ minWidth: "6rem" }}
+                      // body={loading && <Skeleton />}
+                    />
+                    <Column
+                      header="Harga Satuan (IDR)"
+                      field={(e) =>
+                        show?.sup_id?.sup_curren
+                          ? `Rp. ${formatIdr(e.price * getCurRate())}`
+                          : `Rp. ${formatIdr(e.price)}`
+                      }
                       style={{ minWidth: "10rem" }}
                       // body={loading && <Skeleton />}
                     />
                     <Column
-                      header="Total"
+                      header="Total (IDR)"
                       field={(e) => `Rp. ${formatIdr(e.total)}`}
                       style={{ minWidth: "10rem" }}
                       // body={loading && <Skeleton />}

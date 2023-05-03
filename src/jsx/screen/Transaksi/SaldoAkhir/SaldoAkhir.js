@@ -12,7 +12,6 @@ import { InputNumber } from "primereact/inputnumber";
 import { Badge } from "react-bootstrap";
 import { el } from "date-fns/locale";
 import { Messages } from "primereact/messages";
-import { connectUrl } from "src/data/config";
 
 const data = {
   account: {

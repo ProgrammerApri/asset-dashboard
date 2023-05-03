@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { request, endpoints } from "src/utils";
+import { request } from "src/utils";
 import { Row, Col, Card } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
@@ -16,13 +16,14 @@ import DataSupplier from "../../../Mitra/Pemasok/DataPemasok";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
-import { el } from "date-fns/locale";
+
 import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 import { InputNumber } from "primereact/inputnumber";
-import { tr } from "src/data/tr";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
+import endpoints from "../../../../../utils/endpoints";
+import { tr } from "../../../../../data/tr";
 
 const defError = {
   code: false,
@@ -37,22 +38,23 @@ const defError = {
 
 const ReturBeliInput = ({ onCancel, onSuccess }) => {
   const [update, setUpdate] = useState(false);
-  const [currentItem, setCurrentItem] = useState(null);
+  const [setup, setSetup] = useState(null);
   const toast = useRef(null);
   const [doubleClick, setDoubleClick] = useState(false);
   const pr = useSelector((state) => state.pr.current);
   const isEdit = useSelector((state) => state.pr.editPr);
   const dispatch = useDispatch();
   const [isRp, setRp] = useState(true);
-  const [comp, setComp] = useState(null);
   const [supplier, setSupplier] = useState(null);
   const [ppn, setPpn] = useState(null);
+  const [currency, setCurrency] = useState(null);
+  const [ap, setAp] = useState(null);
+  const [fk, setFk] = useState(null);
   const [inv, setInv] = useState(null);
   const [showSupplier, setShowSupplier] = useState(false);
   const [product, setProduct] = useState(null);
   const [satuan, setSatuan] = useState(null);
   const [lokasi, setLoc] = useState(null);
-  const [currency, setCurrency] = useState(null);
   const [error, setError] = useState(defError);
   const [accor, setAccor] = useState({
     produk: true,
@@ -65,14 +67,15 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
       left: 0,
       behavior: "smooth",
     });
-    getComp();
     getSupplier();
     getPpn();
+    getAp();
+    getFK();
     getInv();
     getProduct();
     getSatuan();
     getLoc();
-    getCurr();
+    getSetup();
   }, []);
 
   const isValid = () => {
@@ -128,22 +131,6 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
     return valid;
   };
 
-  const getComp = async () => {
-    const config = {
-      ...endpoints.getCompany,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setComp(data);
-      }
-    } catch (error) {}
-  };
-
   const getSupplier = async () => {
     const config = {
       ...endpoints.supplier,
@@ -156,6 +143,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
       if (response.status) {
         const { data } = response;
         setSupplier(data);
+        getCur();
       }
     } catch (error) {}
   };
@@ -178,6 +166,24 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
+  const getAp = async () => {
+    const config = {
+      ...endpoints.apcard,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setAp(data);
+      }
+    } catch (error) {}
+  };
+
   const getInv = async () => {
     const config = {
       ...endpoints.invoice_pb,
@@ -190,31 +196,37 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
+        console.log(data);
         let filt = [];
-        data.forEach((elem) => {
-          let prod = [];
-          if (elem.ord_id?.faktur && elem.ord_id?.ns === false) {
-            elem.product.forEach((el) => {
-              el.prod_id = el.prod_id.id;
-              el.unit_id = el.unit_id.id;
-              el.location = el.location.id;
-              prod.push(el);
-
-              let temp = [...pr.product];
-              pr.product.forEach((e, i) => {
-                if (el.id === e.prod_id) {
-                  temp[i].order = el.order;
-                  updatePr({ ...pr, product: temp });
-                }
-              });
-            });
-
-            elem.product = prod;
-            filt.push(elem);
+        data?.forEach((element) => {
+          if (element.faktur) {
+            filt.push(element);
           }
         });
         setInv(filt);
-        console.log(data);
+      }
+    } catch (error) {}
+  };
+
+  const getFK = async () => {
+    const config = {
+      ...endpoints.faktur,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        let filt = [];
+        data.forEach((elem) => {
+          if (!elem.post && !elem.closing) {
+            filt.push(elem);
+          }
+        });
+        setFk(filt);
       }
     } catch (error) {}
   };
@@ -267,7 +279,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
-  const getCurr = async () => {
+  const getCur = async () => {
     const config = {
       ...endpoints.currency,
       data: {},
@@ -283,11 +295,27 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
+  const getSetup = async () => {
+    const config = {
+      ...endpoints.getCompany,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setSetup(data);
+      }
+    } catch (error) {}
+  };
+
   const editPr = async () => {
     const config = {
       ...endpoints.editPr,
       endpoint: endpoints.editPr.endpoint + pr.id,
-      data: pr,
+      data: { ...pr, inv_id: pr?.inv_id?.id ?? null },
     };
     console.log(config.data);
     let response = null;
@@ -407,7 +435,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
   const checkLoc = (value) => {
     let selected = {};
     lokasi?.forEach((element) => {
-      if (value === element?.id) {
+      if (value === element.id) {
         selected = element;
       }
     });
@@ -463,16 +491,21 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
     return total;
   };
 
+  const formatIdr = (value) => {
+    return `${value?.toFixed(2)}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
   const pajk = (value) => {
     let nil = 0;
     ppn?.forEach((elem) => {
       if (
-        supp(checkFK(pr.inv_id)?.ord_id.sup_id).supplier.sup_ppn === elem.id
+        supp(checkFK(pr.inv_id)?.ord_id?.sup_id)?.supplier?.sup_ppn === elem.id
       ) {
         nil = elem.nilai;
       }
     });
-
     return nil;
   };
 
@@ -488,12 +521,6 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
     });
 
     return cur;
-  };
-
-  const formatIdr = (value) => {
-    return `${value}`
-      .replace(".", ",")
-      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
 
   const updatePr = (e) => {
@@ -512,7 +539,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
   };
 
   const body = () => {
-    let date = new Date(comp?.year_co, comp?.cutoff - 1, 31);
+    let date = new Date(setup?.year_co, setup?.cutoff - 1, 31);
     return (
       <>
         {/* Put content body here */}
@@ -532,6 +559,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
               }}
               placeholder={tr[localStorage.getItem("language")].masuk}
               error={error?.code}
+              disabled={isEdit}
             />
           </div>
 
@@ -556,34 +584,55 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
 
           <div className="col-12 mt-2">
             <span className="fs-14">
-              <b>{tr[localStorage.getItem("language")].ret_pur}</b>
+              <b>Informasi Retur</b>
             </span>
             <Divider className="mt-1"></Divider>
           </div>
 
           <div className="col-3">
-            <label className="text-label">{"Nomor Invoice"}</label>
-            <div className="p-inputgroup"></div>
-            <PrimeDropdown
-              value={pr.inv_id && checkFK(pr.inv_id)}
-              options={inv}
-              onChange={(e) => {
-                updatePr({
-                  ...pr,
-                  inv_id: e.value.id,
-                  product: e.value.product.map((v) => {
-                    return { ...v, retur: 0 };
-                  }),
-                });
-                let newError = error;
-                newError.fk = false;
-                setError(newError);
-              }}
-              optionLabel="inv_code"
-              placeholder={tr[localStorage.getItem("language")].pilih}
-              errorMessage="Nomor Invoice Belum Dipilih"
-              error={error?.fk}
-            />
+            <label className="text-label">{"Kode Invoice"}</label>
+            {isEdit ? (
+              <PrimeInput
+                value={pr.inv_id?.inv_code}
+                placeholder={"Kode Invoice"}
+                disabled
+              />
+            ) : (
+              <PrimeDropdown
+                value={pr.inv_id && checkFK(pr.inv_id)}
+                options={inv}
+                onChange={(e) => {
+
+                  updatePr({
+                    ...pr,
+                    inv_id: e.value?.id ?? null,
+                    product: e.value?.id
+                      ? e.value?.product?.map((v) => {
+                          return {
+                            ...v,
+                            prod_id: v.prod_id?.id ?? null, 
+                            unit_id: v.unit_id?.id ?? null,
+                            location: v.location?.id ?? null,
+                            totl: 0,
+                            totl_fc: 0,
+                            order: v.order,
+                          };
+                        })
+                      : null,
+                  });
+                  let newError = error;
+                  newError.fk = false;
+                  setError(newError);
+                }}
+                optionLabel="inv_code"
+                placeholder={tr[localStorage.getItem("language")].pilih}
+                filter
+                filterBy="inv_code"
+                errorMessage="Nomor Invoice Belum Dipilih"
+                error={error?.fk}
+                showClear
+              />
+            )}
           </div>
           {/* kode suplier otomatis keluar, karena sudah melekat di faktur pembelian  */}
           <div className="col-9" />
@@ -600,7 +649,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                         ?.sup_name
                     : null
                 }
-                placeholder={tr[localStorage.getItem("language")].supplier}
+                placeholder={tr[localStorage.getItem("language")].pilih}
                 disabled
               />
             </div>
@@ -614,8 +663,8 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
               <InputText
                 value={
                   pr.inv_id !== null
-                    ? supp(checkFK(pr.inv_id)?.ord_id.sup_id).supplier
-                        .sup_address
+                    ? supp(checkFK(pr.inv_id)?.ord_id?.sup_id)?.supplier
+                        ?.sup_address
                     : ""
                 }
                 placeholder={tr[localStorage.getItem("language")].alamat}
@@ -627,10 +676,10 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
           <div className="col-2">
             <PrimeInput
               label={tr[localStorage.getItem("language")].telp}
-              isNumber
+              // isNumber
               value={
                 pr.inv_id !== null
-                  ? supp(checkFK(pr.inv_id)?.ord_id.sup_id).supplier.sup_telp1
+                  ? supp(checkFK(pr.inv_id)?.ord_id?.sup_id)?.supplier?.sup_telp1
                   : ""
               }
               placeholder={tr[localStorage.getItem("language")].telp}
@@ -646,8 +695,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
               <InputText
                 value={
                   pr.inv_id !== null
-                    ? supp(checkFK(pr.inv_id)?.ord_id?.sup_id)?.supplier
-                        ?.sup_ppn
+                    ? supp(checkFK(pr.inv_id)?.ord_id?.sup_id)?.supplier?.sup_ppn
                       ? pjk(
                           supp(checkFK(pr.inv_id)?.ord_id?.sup_id)?.supplier
                             ?.sup_ppn
@@ -687,9 +735,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
 
         {pr.product?.length ? (
           <CustomAccordion
-            tittle={`${tr[localStorage.getItem("language")].ret_pur} ${
-              tr[localStorage.getItem("language")].prod
-            }`}
+            tittle={"Produk Retur"}
             defaultActive={true}
             active={accor.produk}
             onClick={() => {
@@ -755,6 +801,9 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                   <Column
                     header={tr[localStorage.getItem("language")].gudang}
                     className="align-text-top"
+                    style={{
+                      minWidth: "15rem",
+                    }}
                     field={""}
                     body={(e) => (
                       <PrimeInput
@@ -1051,9 +1100,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
 
             <div className="row justify-content-right col-6">
               <div className="col-6">
-                <label className="text-label">
-                  {tr[localStorage.getItem("language")].ttl_barang}
-                </label>
+                <label className="text-label">Sub Total Barang</label>
               </div>
 
               <div className="col-6">
@@ -1073,11 +1120,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
               </div>
 
               <div className="col-6">
-                <label className="text-label">
-                  {`${
-                    tr[localStorage.getItem("language")].pjk_barang
-                  } (${pajk()}%)`}
-                </label>
+                <label className="text-label">{`Pajak Atas Barang (${pajk()}%)`}</label>
               </div>
 
               <div className="col-6">
@@ -1087,9 +1130,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
               </div>
 
               <div className="col-6 mt-3">
-                <label className="text-label">
-                  {tr[localStorage.getItem("language")].disc_tambh}
-                </label>
+                <label className="text-label">Diskon Tambahan</label>
               </div>
 
               <div className="col-6">
@@ -1105,9 +1146,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
                         ? (getSubTotalBarang() * pr.prod_disc) / 100
                         : pr.prod_disc
                     }
-                    placeholder={
-                      tr[localStorage.getItem("language")].disc_tambh
-                    }
+                    placeholder="Diskon"
                     type="number"
                     min={0}
                     onChange={(e) => {
@@ -1136,9 +1175,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
 
               <div className="col-6">
                 <label className="text-label fs-14">
-                  <b>{`${tr[localStorage.getItem("language")].total} ${
-                    tr[localStorage.getItem("language")].bayar
-                  }`}</b>
+                  <b>Total Pembayaran</b>
                 </label>
               </div>
 
@@ -1172,16 +1209,17 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
       <div className="mt-5 flex justify-content-end">
         <div>
           <PButton
-            label={tr[localStorage.getItem("language")].batal}
+            label="Batal"
             onClick={onCancel}
             className="p-button-text btn-primary"
           />
           <PButton
-            label={tr[localStorage.getItem("language")].simpan}
+            label="Simpan"
             icon="pi pi-check"
             onClick={() => onSubmit()}
             autoFocus
             loading={update}
+            disabled={setup?.cutoff === null && setup?.year_co === null}
           />
         </div>
       </div>

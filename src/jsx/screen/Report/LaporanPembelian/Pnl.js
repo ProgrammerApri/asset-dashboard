@@ -16,7 +16,6 @@ import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleB
 import { Link } from "react-router-dom";
 import { Dropdown } from "primereact/dropdown";
 import { ProgressSpinner } from "primereact/progressspinner";
-// import { connectUrl } from "src/data/config";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -47,7 +46,6 @@ const Pnl = () => {
   const getProject = async () => {
     const config = {
       ...endpoints.project,
-      // base_url: connectUrl,
       data: {},
     };
     console.log(config.data);

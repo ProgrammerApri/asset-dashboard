@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { request, endpoints } from "src/utils";
+import { request } from "src/utils";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
@@ -10,18 +10,21 @@ import { InputText } from "primereact/inputtext";
 import { Divider } from "@material-ui/core";
 import ReactToPrint from "react-to-print";
 import Wrapper from "src/jsx/components/CustomeWrapper/Wrapper";
+import endpoints from "../../../../utils/endpoints";
 
-const DetailMutasi = ({ onCancel }) => {
-  const show = useSelector((state) => state.lm.current);
+const Detail = ({ onCancel }) => {
+  const show = useSelector((state) => state.pp.current);
   const dispatch = useDispatch();
   const printPage = useRef(null);
   const [comp, setComp] = useState(null);
-  const [order, setOrder] = useState(null);
-  const [city, setCity] = useState(null);
-  const [supplier, setSupplier] = useState(null);
-  const [jas, setJas] = useState(null);
+  const [pp, setPP] = useState(null);
+  const [plan, setPlan] = useState(null);
+  const [lok, setLok] = useState(null);
+  const [dept, setDept] = useState(null);
+  const [mesin, setMesin] = useState(null);
   const [prod, setProd] = useState(null);
   const [unit, setUnit] = useState(null);
+  const [stcard, setStcard] = useState(null);
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState(new Date());
 
@@ -31,18 +34,19 @@ const DetailMutasi = ({ onCancel }) => {
       left: 0,
       behavior: "smooth",
     });
-    getORD();
-    getSupplier();
+    getPproduct();
+    getDept();
     getProduct();
-    getJasa();
+    getMesin();
     getSatuan();
     getComp();
-    getCity();
+    getLok();
+    getPlan();
   }, []);
 
-  const getORD = async () => {
+  const getPproduct = async () => {
     const config = {
-      ...endpoints.order,
+      ...endpoints.perubahan_prod,
       data: {},
     };
     let response = null;
@@ -51,17 +55,15 @@ const DetailMutasi = ({ onCancel }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        setOrder(data);
+        setPP(data);
+        // getSt();
       }
-    } catch (error) {
-      console.log("------");
-      console.log(error);
-    }
+    } catch (error) {}
   };
 
-  const getSupplier = async () => {
+  const getSt = async () => {
     const config = {
-      ...endpoints.supplier,
+      ...endpoints.stcard,
       data: {},
     };
     let response = null;
@@ -70,7 +72,23 @@ const DetailMutasi = ({ onCancel }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        setSupplier(data);
+        setStcard(data);
+      }
+    } catch (error) {}
+  };
+
+  const getDept = async () => {
+    const config = {
+      ...endpoints.pusatBiaya,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setDept(data);
       }
     } catch (error) {}
   };
@@ -93,9 +111,9 @@ const DetailMutasi = ({ onCancel }) => {
     } catch (error) {}
   };
 
-  const getJasa = async () => {
+  const getMesin = async () => {
     const config = {
-      ...endpoints.jasa,
+      ...endpoints.mesin,
       data: {},
     };
     console.log(config.data);
@@ -106,7 +124,7 @@ const DetailMutasi = ({ onCancel }) => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        setJas(data);
+        setMesin(data);
       }
     } catch (error) {}
   };
@@ -147,9 +165,9 @@ const DetailMutasi = ({ onCancel }) => {
     } catch (error) {}
   };
 
-  const getCity = async () => {
+  const getLok = async () => {
     const config = {
-      ...endpoints.city,
+      ...endpoints.lokasi,
       data: {},
     };
     console.log(config.data);
@@ -160,15 +178,33 @@ const DetailMutasi = ({ onCancel }) => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        setCity(data);
+        setLok(data);
       }
     } catch (error) {}
   };
 
-  const jasa = (value) => {
+  const getPlan = async () => {
+    const config = {
+      ...endpoints.planning,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setPlan(data);
+      }
+    } catch (error) {}
+  };
+
+  const checkDept = (value) => {
     let selected = {};
-    jas?.forEach((element) => {
-      if (value === element.jasa.id) {
+    dept?.forEach((element) => {
+      if (value === element.id) {
         selected = element;
       }
     });
@@ -176,26 +212,6 @@ const DetailMutasi = ({ onCancel }) => {
     return selected;
   };
 
-  const supp = (value) => {
-    let selected = {};
-    supplier?.forEach((element) => {
-      if (value === element.supplier.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
-  const kota = (value) => {
-    let selected = {};
-    city?.forEach((element) => {
-      if (element.city_id === `${value}`) {
-        selected = element;
-      }
-    });
-    return selected;
-  };
 
   const renderHeader = () => {
     return (
@@ -218,29 +234,29 @@ const DetailMutasi = ({ onCancel }) => {
                 </span>
               </div>
 
-              <div className="">
-                <label className="text-label">No. Referensi</label>
+              {/* <div className="">
+                <label className="text-label">No. Perubahan</label>
                 <br></br>
                 <span className="ml-0 fs-14">
-                  <b>{show?.mtsi_code}</b>
+                  <b>{show?.pp_code}</b>
                 </span>
-              </div>
+              </div> */}
 
-              <div className="">
-                <label className="text-label">Lokasi Asal</label>
+              {/* <div className="">
+                <label className="text-label">Departemen</label>
                 <br></br>
                 <span className="ml-0 fs-14">
-                  <b>{show?.loc_from?.name}</b>
+                  <b>
+                    {show?.dep_id !== null
+                      ? `${checkDept(show?.dep_id)?.ccost_name} (${
+                          checkDept(show?.dep_id)?.ccost_code
+                        })`
+                      : "-"}
+                  </b>
                 </span>
-              </div>
+              </div> */}
 
-              <div className="">
-                <label className="text-label">Lokasi Tujuan</label>
-                <br></br>
-                <span className="ml-0 fs-14">
-                  <b>{show?.loc_to?.name}</b>
-                </span>
-              </div>
+              {/*  */}
 
               <div className="">
                 <span className="p-buttonset">
@@ -292,33 +308,6 @@ const DetailMutasi = ({ onCancel }) => {
     return [day, month, year].join("-");
   };
 
-  const formatIdr = (value) => {
-    return `${value?.toFixed(2)}`
-      .replace(".", ",")
-      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
-  };
-
-  const getSubTotalBarang = () => {
-    let total = 0;
-    show?.dprod?.forEach((el) => {
-      if (el.nett_price && el.nett_price > 0) {
-        total += parseInt(el.nett_price);
-      } else {
-        total += el.total - (el.total * el.disc) / 100;
-      }
-    });
-
-    return total;
-  };
-
-  const getSubTotalJasa = () => {
-    let total = 0;
-    show?.djasa?.forEach((el) => {
-      total += el.total - (el.total * el.disc) / 100;
-    });
-
-    return total;
-  };
 
   const body = () => {
     return (
@@ -367,18 +356,18 @@ const DetailMutasi = ({ onCancel }) => {
 
                 <Row className="ml-0 mr-0 mb-0 mt-1 justify-content-between fs-12">
                   <div className="row justify-content-left col-6">
-                    <div className="col-12 mt-0 fs-12 text-left">
+                    <div className="col-12 mt-0 fs-14 text-left">
                       <label className="text-label">
-                        <b>Kartu Mutasi Lokasi Produk</b>
+                        <b>Detail Perubahan Produk</b>
                       </label>
                     </div>
                   </div>
 
                   <div className="row justify-content-right col-6">
                     <div className="col-12 mt-0 fs-12 text-right">
-                      <label className="text-label">Tanggal Mutasi : </label>
+                      <label className="text-label">Tanggal Perubahan : </label>
                       <span className="ml-1">
-                        <b>{formatDate(show.mtsi_date)}</b>
+                        <b>{formatDate(show.pp_date)}</b>
                       </span>
                     </div>
                   </div>
@@ -388,124 +377,145 @@ const DetailMutasi = ({ onCancel }) => {
                   <div className="row col-12">
                     <div className="col-6 fs-12 ml-0">
                       <label className="text-label">
-                        <b>Informasi Mutasi</b>
+                        <b>Informasi Perubahan</b>
                       </label>
                     </div>
 
                     <div className="col-6 fs-12 ml-0 text-right">
-                      <label className="text-label">
-                        <b>Informasi Lokasi</b>
-                      </label>
+                      {/* <label className="text-label">
+                        <b>Informasi Produksi</b>
+                      </label> */}
                     </div>
 
                     <div className="col-6 fs-12 ml-0">
-                      <span className="ml-0 fs-14">
-                        <b>{show?.mtsi_code}</b>
-                      </span>
-                      <br></br>
                       <span className="ml-0 fs-12">
-                        Departemen :{" "}
-                        <b>
-                          {show?.dep_id !== null
-                            ? show?.dep_id.ccost_name
-                            : "-"}
-                        </b>
-                      </span>
-                      <br></br>
-                      <span className="ml-0 fs-12">
-                        Project :{" "}
-                        <b>
-                          {show?.prj_id !== null ? show?.prj_id.proj_name : "-"}
-                        </b>
+                        No. Perubahan : <b>{show?.pp_code}</b>
                       </span>
                       <br></br>
                     </div>
 
                     <div className="col-6 fs-12 ml-0 text-right">
-                      <span className="ml-0 fs-12">
-                        Lokasi Asal : <b>{show?.loc_from?.name}</b>
+                      {/* <span className="ml-0">
+                        Lokasi Row Material : <b>{show?.loc_id?.name}</b>
                       </span>
                       <br></br>
                       <br></br>
                       <span className="ml-0">
-                        Lokasi Tujuan : <b>{show?.loc_to?.name}</b>
-                      </span>
-                      <br></br>
-                      <br></br>
-                      <span className="ml-0">
-                        {show.approve ? (
-                          <>
-                            <Badge variant="info light">
-                              <i className="bx bxs-check-circle text-info mr-1 mt-1"></i>{" "}
-                              Approved
-                            </Badge>
-                          </>
-                        ) : (
-                          <Badge variant="danger light">
-                            <i className="bx bxs-x-circle text-danger mr-1 mt-1"></i>{" "}
-                            Not Approved
-                          </Badge>
-                        )}
-                      </span>
-                      <br></br>
+                        Mesin Produksi :{" "}
+                        <b>
+                          {show?.msn_id !== null
+                            ? `${show?.msn_id.msn_name} (${show?.msn_id.msn_code})`
+                            : "-"}
+                        </b>
+                      </span> */}
                     </div>
                   </div>
                 </Card>
 
-                <Row className="ml-1 mt-0">
-                  <DataTable
-                    value={show.mutasi?.map((v, i) => {
-                      return {
-                        ...v,
-                        index: i,
-                        qty: v?.qty ?? 0,
-                      };
-                    })}
-                    responsiveLayout="scroll"
-                    className="display w-150 datatable-wrapper fs-12"
-                    // showGridlines
-                    dataKey="id"
-                    rowHover
-                  >
-                    <Column
-                      header="Produk"
-                      field={(e) => `${e.prod_id?.name} (${e.prod_id?.code})`}
-                      style={{ minWidth: "22rem" }}
-                      // body={loading && <Skeleton />}
-                    />
-                    <Column
-                      header="Kuantitas Dikirim"
-                      field={(e) => formatIdr(e.qty)}
-                      style={{ minWidth: "13rem" }}
-                      // body={loading && <Skeleton />}
-                    />
-                    <Column
-                      header="Satuan"
-                      field={(e) => e.unit_id?.name}
-                      style={{ minWidth: "15rem" }}
-                      // body={loading && <Skeleton />}
-                    />
-                    <Column
-                      header="Kuantitas Diterima"
-                      field={(e) => formatIdr(e.qty_terima)}
-                      style={{ minWidth: "13rem" }}
-                      // body={loading && <Skeleton />}
-                    />
-                  </DataTable>
+                <Row className="ml-1 mt-4">
+                  <div className="col-12 ml-0 mr-0">
+                    <label className="text-label fs-13 text-black">
+                      <b>Produk Asal</b>
+                    </label>
+                  </div>
+
+                  <div className="col-12">
+                    <>
+                      <DataTable
+                        value={show.pasal?.map((v, i) => {
+                          return {
+                            ...v,
+                            index: i,
+                          };
+                        })}
+                        responsiveLayout="scroll"
+                        className="display w-150 datatable-wrapper fs-12"
+                        showGridlines
+                        dataKey="id"
+                        rowHover
+                      >
+                        <Column
+                          header="Produk"
+                          field={(e) =>
+                            `${e.prod_id?.name} (${e.prod_id?.code})`
+                          }
+                          style={{ minWidth: "19rem" }}
+                          // body={loading && <Skeleton />}
+                        />
+                        <Column
+                          header="Jumlah Perubahan"
+                          field={(e) => e.qty}
+                          style={{ minWidth: "6rem" }}
+                          // body={loading && <Skeleton />}
+                        />
+                        <Column
+                          header="Satuan"
+                          field={(e) => e.unit_id?.name}
+                          style={{ minWidth: "9rem" }}
+                          // body={loading && <Skeleton />}
+                        />
+                        <Column
+                          header="Lokasi"
+                          field={(e) => `${e.loc_id?.name} (${e.loc_id?.code})`}
+                          style={{ minWidth: "9rem" }}
+                          // body={loading && <Skeleton />}
+                        />
+                      </DataTable>
+                    </>
+                  </div>
                 </Row>
 
-                <Row className="ml-0 mr-0 mb-0 mt-8 justify-content-between fs-12">
-                  <div></div>
-                  <div className="row justify-content-right col-6 mr-4">
-                    <div className="col-12 text-right mt-8">
-                      <label className="text-label fs-13">
-                        <b>Semarang, {formatDate(date)}</b>
-                      </label>
-                      <br></br>
-                      <label className="text-label fs-13 mr-7 mt-6">
-                        {comp?.cp_coper}
-                      </label>
-                    </div>
+                <Row className="ml-1 mt-4">
+                  <div className="col-12 ml-0 mr-0">
+                    <label className="text-label fs-13 text-black">
+                      <b>Produk Jadi</b>
+                    </label>
+                  </div>
+
+                  <div className="col-12">
+                    <>
+                      <DataTable
+                        value={show.pjadi?.map((v, i) => {
+                          return {
+                            ...v,
+                            index: i,
+                            qty: v?.qty ?? 0,
+                          };
+                        })}
+                        responsiveLayout="scroll"
+                        className="display w-150 datatable-wrapper fs-12"
+                        showGridlines
+                        dataKey="id"
+                        rowHover
+                      >
+                        <Column
+                          header="Produk"
+                          field={(e) =>
+                            `${e.prod_id?.name} (${e.prod_id?.code})`
+                          }
+                          style={{ minWidth: "19rem" }}
+                          // body={loading && <Skeleton />}
+                        />
+                        <Column
+                          header="Jumlah Perubahan"
+                          field={(e) => e.qty}
+                          style={{ minWidth: "6rem" }}
+                          // body={loading && <Skeleton />}
+                        />
+                        <Column
+                          header="Satuan"
+                          field={(e) => e.unit_id?.name}
+                          style={{ minWidth: "9rem" }}
+                          // body={loading && <Skeleton />}
+                        />
+                        <Column
+                          header="Lokasi"
+                          field={(e) => `${e.loc_id?.name} (${e.loc_id?.code})`}
+                          style={{ minWidth: "9rem" }}
+                          // body={loading && <Skeleton />}
+                        />
+                      </DataTable>
+                    </>
                   </div>
                 </Row>
               </>
@@ -529,4 +539,4 @@ const DetailMutasi = ({ onCancel }) => {
   );
 };
 
-export default DetailMutasi;
+export default Detail;

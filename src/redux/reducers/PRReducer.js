@@ -4,7 +4,7 @@ import { SET_CURRENT_PR, SET_PR, SET_EDIT_PR } from "../actions";
 const initialState = {
   pr: [],
   current: {},
-  editdPr: false
+  editPr: false
 };
 
 const PRReducer = (state = initialState, { type, payload }) => {
@@ -22,7 +22,7 @@ const PRReducer = (state = initialState, { type, payload }) => {
       case SET_EDIT_PR:
         return {
           ...state,
-          editdPr: payload,
+          editPr: payload,
         };
 
     default:

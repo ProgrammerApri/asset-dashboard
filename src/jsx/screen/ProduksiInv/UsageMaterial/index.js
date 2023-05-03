@@ -1,15 +1,15 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Button, Card, Col, Row } from "react-bootstrap";
 import { Toast } from "primereact/toast";
-import ReturBeliList from "./ReturBeliList";
-import ReturBeliInput from "./ReturBeliInput";
+// import Detail from "./Detail";
 import Detail from "./Detail";
-import { tr } from "src/data/tr";
+import DataUsageMaterial from "./DataUsageMaterial";
+import InputUsageMaterial from "./InputUsageMaterial";
 
-const ReturBeli = ({trigger}) => {
+const UsageMaterial = ({ trigger }) => {
   const [active, setActive] = useState(0);
   const toast = useRef(null);
-  
+
   useEffect(() => {
     if (trigger !== 0) {
       setActive(0);
@@ -17,7 +17,7 @@ const ReturBeli = ({trigger}) => {
   }, [trigger]);
 
   const [view, setView] = useState([
-    <ReturBeliList
+    <DataUsageMaterial
       onAdd={() => {
         setActive(1);
       }}
@@ -28,16 +28,15 @@ const ReturBeli = ({trigger}) => {
         setActive(2);
       }}
     />,
-
-    <ReturBeliInput
+    <InputUsageMaterial
       onCancel={() => setActive(0)}
       onSuccess={() => {
         setTimeout(() => {
           setActive(0);
           toast.current.show({
             severity: "info",
-            summary: tr[localStorage.getItem("language")].berhsl,
-            detail: tr[localStorage.getItem("language")].pesan_berhasil,
+            summary: "Berhasil",
+            detail: "Data Berhasil Diperbarui",
             life: 3000,
           });
         }, 500);
@@ -54,4 +53,4 @@ const ReturBeli = ({trigger}) => {
   );
 };
 
-export default ReturBeli;
+export default UsageMaterial;

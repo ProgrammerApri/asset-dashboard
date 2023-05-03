@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { request, endpoints } from "src/utils";
+import { request } from "src/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -15,8 +15,14 @@ import { Dropdown } from "primereact/dropdown";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_LM, SET_EDIT_LM, SET_LM } from "src/redux/actions";
-import { formatDate } from "@fullcalendar/core";
-import { tr } from "src/data/tr";
+import { tr } from "../../../../../data/tr";
+import { InputTextarea } from "primereact/inputtextarea";
+import { Calendar } from "primereact/calendar";
+import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
+import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
+import CustomAccordion from "../../../../components/Accordion/Accordion";
+import endpoints from "../../../../../utils/endpoints";
+import { Tooltip } from "primereact/tooltip";
 
 const data = {
   id: null,
@@ -26,14 +32,27 @@ const data = {
   loc_to: null,
   dep_id: null,
   prj_id: null,
-  mutasi: null,
+  doc: null,
+  doc_date: null,
+  approve: false,
+  desc: null,
+  mutasi: [],
 };
 
-const MutasiAntarList = ({ onAdd, onEdit, onDetail }) => {
+const MutasiAntarList = ({ onAdd, onEdit, onDetail, onSuccess, onCancel }) => {
   const mutasi = useSelector((state) => state.lm.lm);
+  const lm = useSelector((state) => state.lm.current);
+  const isEdit = useSelector((state) => state.lm.editLm);
   const [update, setUpdate] = useState(true);
+  const [displayData, setDisplayData] = useState(false);
   const [displayDel, setDisplayDel] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
+  const [setup, setSetup] = useState(null);
+  const [product, setProduct] = useState(null);
+  const [satuan, setSatuan] = useState(null);
+  const [pusatBiaya, setPusatBiaya] = useState(null);
+  const [proj, setProj] = useState(null);
+  const [lokasi, setLokasi] = useState(null);
   const [loading, setLoading] = useState(true);
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
@@ -41,12 +60,20 @@ const MutasiAntarList = ({ onAdd, onEdit, onDetail }) => {
   const [rows2, setRows2] = useState(20);
   const dispatch = useDispatch();
   const toast = useRef(null);
+  const [accor, setAccor] = useState({
+    produk: true,
+  });
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
     initFilters1();
     getMutasi();
+    getProduct();
+    getSatuan();
+    getPusatBiaya();
+    getLokasi();
+    getProj();
   }, []);
 
   const getMutasi = async (isUpdate = false) => {
@@ -62,8 +89,14 @@ const MutasiAntarList = ({ onAdd, onEdit, onDetail }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        console.log(data);
-        dispatch({ type: SET_LM, payload: data });
+        let filt = [];
+        data?.forEach((element) => {
+          if (!element.closing) {
+            filt.push(element);
+          }
+        });
+        dispatch({ type: SET_LM, payload: filt });
+        getSetup();
       }
     } catch (error) {}
     if (isUpdate) {
@@ -71,6 +104,146 @@ const MutasiAntarList = ({ onAdd, onEdit, onDetail }) => {
     } else {
       setTimeout(() => {
         setLoading(false);
+      }, 500);
+    }
+  };
+
+  const getSetup = async (isUpdate = false) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.getCompany,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setSetup(data);
+      }
+    } catch (error) {}
+  };
+
+  const getProduct = async () => {
+    const config = {
+      ...endpoints.product,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+
+      if (response.status) {
+        const { data } = response;
+        setProduct(data);
+      }
+    } catch (error) {}
+  };
+
+  const getSatuan = async () => {
+    const config = {
+      ...endpoints.getSatuan,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setSatuan(data);
+      }
+    } catch (error) {}
+  };
+
+  const getPusatBiaya = async () => {
+    const config = {
+      ...endpoints.pusatBiaya,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setPusatBiaya(data);
+      }
+    } catch (error) {}
+  };
+
+  const getLokasi = async () => {
+    const config = {
+      ...endpoints.lokasi,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+
+        setLokasi(data);
+      }
+    } catch (error) {}
+  };
+
+  const getProj = async () => {
+    const config = {
+      ...endpoints.project,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setProj(data);
+      }
+    } catch (error) {}
+  };
+
+  const confirmLM = async () => {
+    const config = {
+      ...endpoints.editMutasi,
+      endpoint: endpoints.editMutasi.endpoint + lm.id,
+      data: lm,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setTimeout(() => {
+          setUpdate(false);
+          setDisplayData(false);
+          getMutasi(true);
+          toast.current.show({
+            severity: "info",
+            summary: tr[localStorage.getItem("language")].berhasl,
+            detail: tr[localStorage.getItem("language")].del_berhasil,
+            life: 3000,
+          });
+        }, 100);
+      }
+    } catch (error) {
+      setTimeout(() => {
+        setUpdate(false);
+        toast.current.show({
+          severity: "error",
+          summary: "Gagal",
+          detail: "Gagal Memperbarui Data",
+          life: 3000,
+        });
       }, 500);
     }
   };
@@ -93,7 +266,7 @@ const MutasiAntarList = ({ onAdd, onEdit, onDetail }) => {
           getMutasi(true);
           toast.current.show({
             severity: "info",
-            summary: tr[localStorage.getItem("language")].berhsl,
+            summary: tr[localStorage.getItem("language")].berhasl,
             detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
@@ -165,11 +338,13 @@ const MutasiAntarList = ({ onAdd, onEdit, onDetail }) => {
                     prod_id: null,
                     unit_id: null,
                     qty: null,
+                    qty_terima: null,
                   },
                 ],
               },
             });
           }}
+          disabled={setup?.cutoff === null && setup?.year_co === null}
         />
       </div>
     );
@@ -179,25 +354,19 @@ const MutasiAntarList = ({ onAdd, onEdit, onDetail }) => {
     return (
       // <React.Fragment>
       <div className="d-flex">
+        <Tooltip target=".btn" />
         <Link
           onClick={() => {
             onDetail();
             let mutasi = data.mutasi;
+            // mutasi?.forEach((el) => {
+            //   el.prod_id = el.prod_id?.id;
+            // });
             dispatch({
               type: SET_CURRENT_LM,
               payload: {
                 ...data,
-                mutasi:
-                  mutasi.length > 0
-                    ? mutasi
-                    : [
-                        {
-                          id: 0,
-                          prod_id: null,
-                          unit_id: null,
-                          qty: null,
-                        },
-                      ],
+                mutasi: mutasi.length > 0 ? mutasi : null,
               },
             });
           }}
@@ -227,6 +396,7 @@ const MutasiAntarList = ({ onAdd, onEdit, onDetail }) => {
                 loc_to: data?.loc_to?.id ?? null,
                 dep_id: data?.dep_id?.id ?? null,
                 prj_id: data?.prj_id?.id ?? null,
+                approve: false,
                 mutasi:
                   mutasi.length > 0
                     ? mutasi
@@ -236,12 +406,15 @@ const MutasiAntarList = ({ onAdd, onEdit, onDetail }) => {
                           prod_id: null,
                           unit_id: null,
                           qty: null,
+                          qty_terima: null,
                         },
                       ],
               },
             });
           }}
-          className="btn btn-primary shadow btn-xs sharp ml-1"
+          className={`btn ${
+            data.post === false ? "" : "disabled"
+          } btn-primary shadow btn-xs sharp ml-1`}
         >
           <i className="fa fa-pencil"></i>
         </Link>
@@ -252,12 +425,99 @@ const MutasiAntarList = ({ onAdd, onEdit, onDetail }) => {
             setDisplayDel(true);
             setCurrentItem(data);
           }}
-          className="btn btn-danger shadow btn-xs sharp ml-1"
+          className={`btn ${
+            data.post === false ? "" : "disabled"
+          } btn-danger shadow btn-xs sharp ml-1`}
         >
           <i className="fa fa-trash"></i>
         </Link>
+
+        <Link
+          data-pr-tooltip="Approve Penerimaan Mutasi"
+          data-pr-position="right"
+          data-pr-at="right+5 top"
+          data-pr-my="left center-2"
+          onClick={() => {
+            setUpdate(false);
+            let mutasi = data.mutasi;
+            mutasi.forEach((el) => {
+              el.prod_id = el.prod_id?.id;
+              el.unit_id = el.unit_id?.id;
+            });
+            setDisplayData(
+              dispatch({
+                type: SET_EDIT_LM,
+                payload: true,
+              }),
+
+              dispatch({
+                type: SET_CURRENT_LM,
+                payload: {
+                  ...data,
+                  loc_from: data?.loc_from?.id ?? null,
+                  loc_to: data?.loc_to?.id ?? null,
+                  dep_id: data?.dep_id?.id ?? null,
+                  prj_id: data?.prj_id?.id ?? null,
+                  approve: true,
+                  mutasi:
+                    mutasi.length > 0
+                      ? mutasi
+                      : [
+                          {
+                            id: 0,
+                            prod_id: null,
+                            unit_id: null,
+                            qty: null,
+                            qty_terima: null,
+                          },
+                        ],
+                },
+              })
+            );
+          }}
+          className={
+            data?.approve
+              ? `btn ${
+                  data.approve === false ? "" : "disabled"
+                } btn-danger shadow btn-xs sharp ml-1`
+              : `btn btn-primary shadow btn-xs sharp ml-1`
+          }
+        >
+          <i className="fa fa-check"></i>
+        </Link>
       </div>
       // </React.Fragment>
+    );
+  };
+
+  const confirmFooter = () => {
+    return (
+      <div className="mt-5 flex justify-content-end">
+        <div>
+          <PButton
+            label="Batal"
+            onClick={(e) => {
+              setUpdate(false);
+              setDisplayData(false);
+              getMutasi(true);
+            }}
+            className="p-button-text btn-primary"
+          />
+          <PButton
+            label="Simpan"
+            icon="pi pi-check"
+            onClick={() => {
+              if (isEdit) {
+                setUpdate(true);
+                confirmLM();
+              }
+            }}
+            autoFocus
+            loading={update}
+            disabled={setup?.cutoff === null && setup?.year_co === null}
+          />
+        </div>
+      </div>
     );
   };
 
@@ -338,6 +598,68 @@ const MutasiAntarList = ({ onAdd, onEdit, onDetail }) => {
     return [day, month, year].join("-");
   };
 
+  const checkProd = (value) => {
+    let selected = {};
+    product?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkUnit = (value) => {
+    let selected = {};
+    satuan?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const dept = (value) => {
+    let selected = {};
+    pusatBiaya?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const prj = (value) => {
+    let selected = {};
+    proj?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const loc = (value) => {
+    let selected = {};
+    lokasi?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const updateLM = (e) => {
+    dispatch({
+      type: SET_CURRENT_LM,
+      payload: e,
+    });
+  };
+
   return (
     <>
       <Toast ref={toast} />
@@ -390,6 +712,32 @@ const MutasiAntarList = ({ onAdd, onEdit, onDetail }) => {
                   body={loading && <Skeleton />}
                 />
                 <Column
+                  header={"Status Mutasi"}
+                  field={(e) => e.surat_jalan}
+                  style={{ minWidth: "8rem" }}
+                  body={(e) =>
+                    loading ? (
+                      <Skeleton />
+                    ) : (
+                      <div>
+                        {e.approve ? (
+                          <>
+                            <Badge variant="info light">
+                              <i className="bx bxs-check-circle text-info mr-1 mt-1"></i>{" "}
+                              Approved
+                            </Badge>
+                          </>
+                        ) : (
+                          <Badge variant="danger light">
+                            <i className="bx bxs-x-circle text-danger mr-1 mt-1"></i>{" "}
+                            Not Approved
+                          </Badge>
+                        )}
+                      </div>
+                    )
+                  }
+                />
+                <Column
                   header="Action"
                   dataType="boolean"
                   bodyClassName="text-center"
@@ -403,9 +751,261 @@ const MutasiAntarList = ({ onAdd, onEdit, onDetail }) => {
       </Row>
 
       <Dialog
-        header={`${tr[localStorage.getItem("language")].hapus} ${
-          tr[localStorage.getItem("language")].mutasi
-        }`}
+        header={"Approve Penerimaan Produk Mutasi"}
+        visible={displayData}
+        style={{ width: "60vw" }}
+        footer={confirmFooter("displayData")}
+        onHide={() => {
+          setUpdate(false);
+          setDisplayData(false);
+        }}
+      >
+        <div className="row mr-0 ml-0">
+          <div className="col-3">
+            <label className="text-label">Kode Mutasi</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={`${lm?.mtsi_code}`}
+                // onChange={(e) =>
+                //   updateLM({ ...lm, mtsi_code: e.target.value })
+                // }
+                placeholder="Kode Mutasi"
+                disabled
+              />
+            </div>
+          </div>
+
+          <div className="col-3">
+            <label className="text-label">Tanggal Mutasi</label>
+            <div className="p-inputgroup">
+              <Calendar
+                value={new Date(`${lm.mtsi_date}Z`)}
+                // onChange={(e) =>
+                //   setCurrentItem({ ...currentItem, jpel_name: e.target.value })
+                // }
+                placeholder="Tanggal Mutasi"
+                dateFormat="dd-mm-yy"
+                disabled
+              />
+            </div>
+          </div>
+
+          <div className="col-3">
+            <label className="text-label">No. Dokumen</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={lm?.doc ?? "-"}
+                // onChange={(e) =>
+                //   updateLM({ ...lm, mtsi_code: e.target.value })
+                // }
+                placeholder="No. Dokumen"
+                disabled
+              />
+            </div>
+          </div>
+
+          <div className="col-3">
+            <label className="text-label">Tanggal Dokumen</label>
+            <div className="p-inputgroup">
+              <Calendar
+                value={new Date(`${lm.doc_date}Z`)}
+                // onChange={(e) =>
+                //   setCurrentItem({ ...currentItem, jpel_name: e.target.value })
+                // }
+                placeholder="Tanggal Dokumen"
+                dateFormat="dd-mm-yy"
+                disabled
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="row mr-0 ml-0">
+          <div className="col-3">
+            <label className="text-label">Lokasi Asal</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={loc(lm?.loc_from)?.name ?? "-"}
+                // onChange={(e) =>
+                //   updateLM({ ...lm, mtsi_code: e.target.value })
+                // }
+                placeholder="Lokasi Asal"
+                disabled
+              />
+            </div>
+          </div>
+
+          <div className="col-3">
+            <label className="text-label">Lokasi Tujuan</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={loc(lm.loc_to)?.name ?? "-"}
+                // onChange={(e) =>
+                //   setCurrentItem({ ...currentItem, jpel_name: e.target.value })
+                // }
+                placeholder="Lokasi Tujuan"
+                disabled
+              />
+            </div>
+          </div>
+
+          <div className="col-3">
+            <label className="text-label">Departemen</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={dept(lm.dep_id)?.ccost_name ?? "-"}
+                // onChange={(e) =>
+                //   setCurrentItem({ ...currentItem, jpel_name: e.target.value })
+                // }
+                placeholder="Departemen"
+                disabled
+              />
+            </div>
+          </div>
+          <div className="col-3">
+            <label className="text-label">Project</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={prj(lm.prj_id)?.proj_name ?? "-"}
+                // onChange={(e) =>
+                //   setCurrentItem({ ...currentItem, jpel_name: e.target.value })
+                // }
+                placeholder="Project"
+                disabled
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="row mr-0 ml-0 mt-3">
+          <div className="col-12">
+            <CustomAccordion
+              tittle={"Mutasi Produk"}
+              defaultActive={true}
+              active={accor.produk}
+              onClick={() => {
+                setAccor({
+                  ...accor,
+                  produk: !accor.produk,
+                });
+              }}
+              key={1}
+              body={
+                <>
+                  <DataTable
+                    responsiveLayout="none"
+                    value={lm.mutasi?.map((v, i) => {
+                      return {
+                        ...v,
+                        index: i,
+                      };
+                    })}
+                    className="display w-150 datatable-wrapper header-white no-border"
+                    showGridlines={false}
+                    emptyMessage={() => <div></div>}
+                  >
+                    <Column
+                      header="Produk"
+                      className="align-text-top"
+                      style={{
+                        maxWidth: "20rem",
+                      }}
+                      field={""}
+                      body={(e) => (
+                        <PrimeInput
+                          value={
+                            e.prod_id &&
+                            `${checkProd(e.prod_id)?.name} (${
+                              checkProd(e.prod_id)?.code
+                            })`
+                          }
+                          options={product}
+                          onChange={(u) => {}}
+                          optionLabel="name"
+                          placeholder="Pilih Produk"
+                          filter
+                          filterBy="name"
+                          disabled
+                        />
+                      )}
+                    />
+                    <Column
+                      header="Jumlah Mutasi"
+                      className="align-text-top"
+                      style={{
+                        width: "10rem",
+                      }}
+                      field={""}
+                      body={(e) => (
+                        <PrimeNumber
+                          price
+                          value={e.qty ? e.qty : null}
+                          onChange={(a) => {}}
+                          placeholder="0"
+                          type="number"
+                          min={0}
+                          disabled
+                        />
+                      )}
+                    />
+
+                    <Column
+                      header="Satuan"
+                      className="align-text-top"
+                      style={{
+                        maxWidth: "15rem",
+                      }}
+                      field={""}
+                      body={(e) => (
+                        <PrimeInput
+                          value={e.unit_id && checkUnit(e.unit_id)?.name}
+                          onChange={(e) => {}}
+                          placeholder="Satuan"
+                          disabled
+                        />
+                      )}
+                    />
+
+                    <Column
+                      header="Jumlah Terima"
+                      className="align-text-top"
+                      style={{
+                        width: "10rem",
+                      }}
+                      field={""}
+                      body={(e) => (
+                        <PrimeNumber
+                          price
+                          value={e.qty_terima ? e.qty_terima : null}
+                          onChange={(a) => {
+                            let temp = [...lm.mutasi];
+                            temp[e.index].qty_terima = a.value;
+                            if (a.value > temp[e.index].qty) {
+                              temp[e.index].qty_terima = temp[e.index].qty;
+                            }
+                            updateLM({ ...lm, mutasi: temp });
+
+                            // let newError = error;
+                            // newError.mut[e.index].jum = false;
+                            // setError(newError);
+                          }}
+                          placeholder="0"
+                          type="number"
+                          min={0}
+                          // error={error?.mut[e.index]?.jum}
+                        />
+                      )}
+                    />
+                  </DataTable>
+                </>
+              }
+            />
+          </div>
+        </div>
+      </Dialog>
+
+      <Dialog
+        header={tr[localStorage.getItem("language")].hapus_data}
         visible={displayDel}
         style={{ width: "30vw" }}
         footer={renderFooterDel("displayDel")}

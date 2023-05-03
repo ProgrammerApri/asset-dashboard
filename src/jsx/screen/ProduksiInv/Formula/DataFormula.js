@@ -3,61 +3,60 @@ import { request, endpoints } from "src/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
+import { Badge, Button, Card, Row, Col } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
-import { Row, Col, Card } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  SET_CURRENT_PR,
-  SET_CURRENT_RB,
-  SET_EDIT_PR,
-  SET_EDIT_RB,
-  SET_PR,
-} from "src/redux/actions";
-
+import { SET_CURRENT_FM, SET_EDIT_FM, SET_FM } from "src/redux/actions";
+import { Divider } from "@material-ui/core";
+import ReactToPrint from "react-to-print";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
-import { Link } from "react-router-dom";
-import { Dialog } from "primereact/dialog";
-import { tr } from "../../../../../data/tr";
+import { tr } from "../../../../data/tr";
 
 const data = {
   id: null,
-  ret_code: null,
-  ret_date: null,
-  fk_id: null,
-  inv_id: null,
+  fcode: null,
+  fname: null,
+  version: null,
+  rev: null,
+  desc: null,
+  active: null,
   product: [],
+  material: [],
 };
 
-const ReturBeliList = ({ onAdd, onEdit, onDetail }) => {
+const DataFormula = ({ onAdd, onEdit, onDetail }) => {
   const [loading, setLoading] = useState(true);
-  const [update, setUpdate] = useState(false);
-  const [filters1, setFilters1] = useState(null);
-  const [first2, setFirst2] = useState(0);
-  const [rows2, setRows2] = useState(20);
-  const [globalFilterValue1, setGlobalFilterValue1] = useState("");
+  const [update, setUpdate] = useState(true);
   const [displayDel, setDisplayDel] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
-  const [setup, setSetup] = useState(null);
   const toast = useRef(null);
+  const [filters1, setFilters1] = useState(null);
+  const [globalFilterValue1, setGlobalFilterValue1] = useState("");
+  const [first2, setFirst2] = useState(0);
+  const [rows2, setRows2] = useState(20);
   const dispatch = useDispatch();
-  const pr = useSelector((state) => state.pr.pr);
+  const forml = useSelector((state) => state.forml.forml);
+  const show = useSelector((state) => state.forml.current);
+  const printPage = useRef(null);
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getPR();
+    getFormula();
     initFilters1();
   }, []);
 
-  const getPR = async (isUpdate = false) => {
+  const getFormula = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.retur_order,
-      data: {},
+      ...endpoints.formula,
+      data: forml,
     };
     console.log(config.data);
     let response = null;
@@ -67,14 +66,7 @@ const ReturBeliList = ({ onAdd, onEdit, onDetail }) => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        let filt = [];
-        data?.forEach((element) => {
-          if (!element.closing) {
-            filt.push(element);
-          }
-        });
-        dispatch({ type: SET_PR, payload: filt });
-        getSetup();
+        dispatch({ type: SET_FM, payload: data });
       }
     } catch (error) {}
     if (isUpdate) {
@@ -86,28 +78,11 @@ const ReturBeliList = ({ onAdd, onEdit, onDetail }) => {
     }
   };
 
-  const getSetup = async (isUpdate = false) => {
+  const delFM = async (id) => {
     setLoading(true);
     const config = {
-      ...endpoints.getCompany,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setSetup(data);
-      }
-    } catch (error) {}
-  };
-
-  const delRet = async (id) => {
-    const config = {
-      ...endpoints.delPr,
-      endpoint: endpoints.delPr.endpoint + currentItem.id,
+      ...endpoints.delFormula,
+      endpoint: endpoints.delFormula.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -118,11 +93,11 @@ const ReturBeliList = ({ onAdd, onEdit, onDetail }) => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayDel(false);
-          getPR(true);
+          getFormula(true);
           toast.current.show({
             severity: "info",
             summary: tr[localStorage.getItem("language")].berhasl,
-            detail: tr[localStorage.getItem("language")].del_berhasil,
+            detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
         }, 500);
@@ -135,45 +110,11 @@ const ReturBeliList = ({ onAdd, onEdit, onDetail }) => {
         toast.current.show({
           severity: "error",
           summary: tr[localStorage.getItem("language")].gagal,
-          detail: tr[localStorage.getItem("language")].del_gagal,
+          detail: tr[localStorage.getItem("language")].pesan_gagal,
           life: 3000,
         });
       }, 500);
     }
-  };
-
-  const renderHeader = () => {
-    return (
-      <div className="flex justify-content-between">
-        <span className="p-input-icon-left">
-          <i className="pi pi-search" />
-          <InputText
-            value={globalFilterValue1}
-            onChange={onGlobalFilterChange1}
-            placeholder={tr[localStorage.getItem("language")].cari}
-          />
-        </span>
-        <PrimeSingleButton
-          label={tr[localStorage.getItem("language")].tambh}
-          icon={<i class="bx bx-plus px-2"></i>}
-          onClick={() => {
-            onAdd();
-            dispatch({
-              type: SET_EDIT_PR,
-              payload: false,
-            });
-            dispatch({
-              type: SET_CURRENT_PR,
-              payload: {
-                ...data,
-                product: [],
-              },
-            });
-          }}
-          disabled={setup?.cutoff === null && setup?.year_co === null}
-        />
-      </div>
-    );
   };
 
   const actionBodyTemplate = (data) => {
@@ -183,26 +124,15 @@ const ReturBeliList = ({ onAdd, onEdit, onDetail }) => {
         <Link
           onClick={() => {
             onDetail();
+            let material = data.material;
             let product = data.product;
-
-            if (!product.length) {
-              product.push({
-                id: 0,
-                prod_id: null,
-                unit_id: null,
-                retur: null,
-                price: null,
-                disc: null,
-                nett_price: null,
-                total: null,
-              });
-            }
-
             dispatch({
-              type: SET_CURRENT_PR,
+              type: SET_CURRENT_FM,
               payload: {
                 ...data,
-                product: product,
+                material: material.length > 0 ? material : null,
+
+                product: product.length > 0 ? product : null,
               },
             });
           }}
@@ -214,57 +144,65 @@ const ReturBeliList = ({ onAdd, onEdit, onDetail }) => {
         <Link
           onClick={() => {
             onEdit(data);
-            let product = data?.product;
+            let product = data.product;
             dispatch({
-              type: SET_EDIT_PR,
+              type: SET_EDIT_FM,
               payload: true,
             });
-            product?.forEach((el) => {
+            product.forEach((el) => {
               el.prod_id = el.prod_id?.id;
               el.unit_id = el.unit_id?.id;
-              el.location = el.location?.id;
+            });
+            let material = data.material;
+            material.forEach((el) => {
+              el.prod_id = el.prod_id.id;
+              el.unit_id = el.unit_id.id;
             });
             dispatch({
-              type: SET_CURRENT_PR,
+              type: SET_CURRENT_FM,
               payload: {
                 ...data,
-                inv_id: data?.inv_id?.id ? data?.inv_id : null,
                 product:
-                  product?.length > 0
+                  product.length > 0
                     ? product
                     : [
                         {
                           id: 0,
-                          ret_id: null,
+                          form_id: null,
                           prod_id: null,
                           unit_id: null,
-                          location: null,
-                          retur: null,
+                          qty: null,
+                          aloc: null,
+                        },
+                      ],
+                material:
+                  material.length > 0
+                    ? material
+                    : [
+                        {
+                          id: 0,
+                          form_id: null,
+                          prod_id: null,
+                          unit_id: null,
+                          qty: null,
                           price: null,
-                          disc: null,
-                          nett_price: null,
-                          totl: null,
-                          totl_fc: null,
                         },
                       ],
               },
             });
           }}
-          className={`btn ${
-            data.post === false ? "" : "disabled"
-          } btn-primary shadow btn-xs sharp ml-1`}
+          className="btn btn-primary shadow btn-xs sharp ml-1"
         >
           <i className="fa fa-pencil"></i>
         </Link>
 
         <Link
           onClick={() => {
+            // setEdit(true);
             setDisplayDel(true);
             setCurrentItem(data);
           }}
-          className={`btn ${
-            data.post === false ? "" : "disabled"
-          } btn-danger shadow btn-xs sharp ml-1`}
+          className="btn btn-danger shadow btn-xs sharp ml-1"
         >
           <i className="fa fa-trash"></i>
         </Link>
@@ -285,15 +223,108 @@ const ReturBeliList = ({ onAdd, onEdit, onDetail }) => {
           label={tr[localStorage.getItem("language")].hapus}
           icon="pi pi-trash"
           onClick={() => {
-            setUpdate(true);
-            delRet();
+            delFM();
           }}
           autoFocus
-          loading={update}
+          loading={loading}
         />
       </div>
     );
   };
+
+  const onGlobalFilterChange1 = (e) => {
+    const value = e.target.value;
+    let _filters1 = { ...filters1 };
+    _filters1["global"].value = value;
+
+    setFilters1(_filters1);
+    setGlobalFilterValue1(value);
+  };
+
+  const initFilters1 = () => {
+    setFilters1({
+      global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    });
+  };
+
+  const renderHeader = () => {
+    return (
+      <div className="flex justify-content-between">
+        <span className="p-input-icon-left">
+          <i className="pi pi-search" />
+          <InputText
+            value={globalFilterValue1}
+            onChange={onGlobalFilterChange1}
+            placeholder={tr[localStorage.getItem("language")].cari}
+          />
+        </span>
+        <PrimeSingleButton
+          label={tr[localStorage.getItem("language")].tambh}
+          icon={<i class="bx bx-plus px-2"></i>}
+          onClick={() => {
+            onAdd();
+            dispatch({
+              type: SET_EDIT_FM,
+              payload: false,
+            });
+            dispatch({
+              type: SET_CURRENT_FM,
+              payload: {
+                ...data,
+                active: false,
+                version: 1,
+                product: [
+                  {
+                    id: 0,
+                    form_id: 0,
+                    prod_id: null,
+                    unit_id: null,
+                    qty: null,
+                    aloc: 100,
+                  },
+                ],
+                material: [
+                  {
+                    id: 0,
+                    form_id: 0,
+                    prod_id: null,
+                    unit_id: null,
+                    qty: null,
+                    price: null,
+                  },
+                ],
+              },
+            });
+          }}
+        />
+      </div>
+    );
+  };
+
+  // const renderFooter = () => {
+  //   return (
+  //     <div>
+  //       <PButton
+  //         label="Batal"
+  //         onClick={() => setDisplayData(false)}
+  //         className="p-button-text btn-primary"
+  //       />
+  //       <ReactToPrint
+  //         trigger={() => {
+  //           return (
+  //             <PButton variant="primary" onClick={() => {}}>
+  //               Print{" "}
+  //               <span className="btn-icon-right">
+  //                 <i class="bx bxs-printer"></i>
+  //               </span>
+  //             </PButton>
+  //           );
+  //         }}
+  //         content={() => printPage.current}
+  //       />
+  //     </div>
+  //   );
+  // };
 
   const template2 = {
     layout: "RowsPerPageDropdown CurrentPageReport PrevPageLink NextPageLink",
@@ -336,21 +367,6 @@ const ReturBeliList = ({ onAdd, onEdit, onDetail }) => {
     },
   };
 
-  const onGlobalFilterChange1 = (e) => {
-    const value = e.target.value;
-    let _filters1 = { ...filters1 };
-    _filters1["global"].value = value;
-
-    setFilters1(_filters1);
-    setGlobalFilterValue1(value);
-  };
-
-  const initFilters1 = () => {
-    setFilters1({
-      global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    });
-  };
-
   const onCustomPage2 = (event) => {
     setFirst2(event.first);
     setRows2(event.rows);
@@ -368,27 +384,30 @@ const ReturBeliList = ({ onAdd, onEdit, onDetail }) => {
     return [day, month, year].join("-");
   };
 
+  const formatIdr = (value) => {
+    return `${value}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
   return (
     <>
       <Toast ref={toast} />
+
       <Row>
-        <Col>
+        <Col className="pt-0">
           <Card>
             <Card.Body>
               <DataTable
                 responsiveLayout="scroll"
-                value={loading ? dummy : pr}
+                value={loading ? dummy : forml}
                 className="display w-150 datatable-wrapper"
                 showGridlines
                 dataKey="id"
                 rowHover
                 header={renderHeader}
-                filters={null}
-                globalFilterFields={[
-                  "ret_code",
-                  "formatDate(ret_date)",
-                  "fk_id.fk_code",
-                ]}
+                filters={filters1}
+                globalFilterFields={["fcode", "fname", "date_created"]}
                 emptyMessage={tr[localStorage.getItem("language")].empty_data}
                 paginator
                 paginatorTemplate={template2}
@@ -398,25 +417,38 @@ const ReturBeliList = ({ onAdd, onEdit, onDetail }) => {
                 paginatorClassName="justify-content-end mt-3"
               >
                 <Column
-                  header={tr[localStorage.getItem("language")].tgl}
+                  header={tr[localStorage.getItem("language")].tgl_forml}
                   style={{
                     minWidth: "8rem",
                   }}
-                  field={(e) => formatDate(e.ret_date)}
+                  field={(e) => formatDate(e.date_created)}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header={tr[localStorage.getItem("language")].kd_ret}
+                  header={tr[localStorage.getItem("language")].kd_forml}
+                  field={(e) => e.fcode}
                   style={{ minWidth: "8rem" }}
-                  field={(e) => e.ret_code}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header={"Kode Invoice"}
+                  header={tr[localStorage.getItem("language")].nm_forml}
+                  field={(e) => e.fname}
                   style={{ minWidth: "8rem" }}
-                  field={(e) => e.inv_id.inv_code}
                   body={loading && <Skeleton />}
                 />
+                <Column
+                  header={tr[localStorage.getItem("language")].versi_f}
+                  field={(e) => (e?.version ? e.version : "-")}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header={tr[localStorage.getItem("language")].revisi}
+                  field={(e) => (e?.rev ? e.rev : "-")}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+
                 <Column
                   header="Action"
                   dataType="boolean"
@@ -451,4 +483,4 @@ const ReturBeliList = ({ onAdd, onEdit, onDetail }) => {
   );
 };
 
-export default ReturBeliList;
+export default DataFormula;

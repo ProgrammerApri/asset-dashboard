@@ -876,7 +876,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-4">
+          <div className="col-3">
             <label>{tr[localStorage.getItem("language")].syarat}</label>
             <div className="p-inputgroup mt-0"></div>
             <CustomDropdown
@@ -902,7 +902,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-3">
+          <div className="col-2">
             <label>{tr[localStorage.getItem("language")].due}</label>
             <div className="p-inputgroup mt-0">
               <Calendar

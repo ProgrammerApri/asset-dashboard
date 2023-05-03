@@ -23,6 +23,7 @@ import "./chart.css";
 /// Layout
 import Nav from "./layouts/nav";
 import Footer from "./layouts/Footer";
+import ProduksiInv from "./screen/ProduksiInv";
 
 /// Deshboard
 const Home = React.lazy(() => import("./screen/Dashboard/Home"));
@@ -174,6 +175,9 @@ const Markup = ({ width }) => {
     { url: "transaksi", component: TransaksiPembelian },
 
     { url: "produksi", component: Produksi },
+
+    { url: "direct-produksi", component: ProduksiInv },
+    { url: "direct-produksi/:active", component: ProduksiInv },
 
     { url: "saldo-awal", component: SaldoAwal },
     { url: "saldo-awal/:active", component: SaldoAwal },

@@ -29,6 +29,7 @@ const data = {
   faktur: true,
   po_id: null,
   dep_id: null,
+  proj_id: null,
   sup_id: null,
   top: null,
   due_date: null,
@@ -38,8 +39,8 @@ const data = {
   total_disc: null,
   total_b: null,
   total_bayar: null,
-  ns : false,
-  same_sup : false,
+  ns: false,
+  same_sup: false,
   dprod: [],
   djasa: [],
 };
@@ -50,6 +51,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
   const [displayDel, setDisplayDel] = useState(false);
   const [displayData, setDisplayData] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
+  const [currency, setCurrency] = useState(null);
   const toast = useRef(null);
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
@@ -66,6 +68,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
 
   useEffect(() => {
     getOrder();
+    getCur();
     initFilters1();
   }, []);
 
@@ -93,6 +96,22 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
         setLoading(false);
       }, 500);
     }
+  };
+
+  const getCur = async () => {
+    const config = {
+      ...endpoints.currency,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setCurrency(data);
+      }
+    } catch (error) {}
   };
 
   const delODR = async (id) => {
@@ -212,6 +231,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
                 ...data,
                 po_id: data?.po_id?.id ? data?.po_id : null,
                 dep_id: data?.dep_id?.id ?? null,
+                proj_id: data?.proj_id?.id ?? null,
                 sup_id: data?.sup_id?.id ?? null,
                 top: data?.top?.id ?? null,
                 dprod:
@@ -501,6 +521,13 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
   };
 
   const rowExpansionTemplate = (data) => {
+    let rate = 0;
+    currency?.forEach((el) => {
+      if (el?.id === data?.sup_id?.sup_curren) {
+        rate = el?.rate;
+      }
+    });
+
     return (
       <div className="">
         <label className="text-label fs-13 text-black">
@@ -533,13 +560,24 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
             // body={loading && <Skeleton />}
           />
           <Column
+            hidden={data.sup_id?.sup_curren === null}
             header="Harga Satuan"
-            field={(e) => `Rp. ${formatIdr(e.price)}`}
+            field={(e) => (data.sup_id?.sup_curren ? formatIdr(e.price) : null)}
             style={{ minWidth: "10rem" }}
             // body={loading && <Skeleton />}
           />
           <Column
-            header="Total"
+            header="Harga Satuan (IDR)"
+            field={(e) =>
+              data.sup_id?.sup_curren
+                ? `Rp. ${formatIdr(e.price * rate)}`
+                : `Rp. ${formatIdr(e.price)}`
+            }
+            style={{ minWidth: "10rem" }}
+            // body={loading && <Skeleton />}
+          />
+          <Column
+            header="Total (IDR)"
             field={(e) => `Rp. ${formatIdr(e.total)}`}
             style={{ minWidth: "10rem" }}
             // body={loading && <Skeleton />}
@@ -576,8 +614,8 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
                 // body={loading && <Skeleton />}
               />
               <Column
-                header="Total"
-                field={(e) => e.total}
+                header="Total (IDR)"
+                field={(e) => `Rp. ${formatIdr(e.total)}`}
                 style={{ minWidth: "15rem" }}
                 // body={loading && <Skeleton />}
               />

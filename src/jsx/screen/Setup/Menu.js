@@ -489,7 +489,7 @@ export default function Menu() {
                 onChange={(e) => {
                   setCurrent({
                     ...current,
-                    parent_id: e.value?.id,
+                    parent_id: e.value?.id ?? null,
                     category: e.value?.category,
                   });
                 }}

@@ -1,62 +1,66 @@
 import React, { useState, useEffect, useRef } from "react";
-import { request, endpoints } from "src/utils";
+import { request } from "src/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
+import { Badge, Button, Card, Row, Col } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
-import { Row, Col, Card } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  SET_CURRENT_PR,
-  SET_CURRENT_RB,
-  SET_EDIT_PR,
-  SET_EDIT_RB,
-  SET_PR,
-} from "src/redux/actions";
-
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
-import { Link } from "react-router-dom";
-import { Dialog } from "primereact/dialog";
-import { tr } from "../../../../../data/tr";
+import endpoints from "../../../../utils/endpoints";
+import { tr } from "../../../../data/tr";
+import {
+  SET_CURRENT_USAGE,
+  SET_EDIT_USAGE,
+  SET_USAGE,
+} from "../../../../redux/actions";
 
 const data = {
   id: null,
-  ret_code: null,
-  ret_date: null,
-  fk_id: null,
-  inv_id: null,
-  product: [],
+  code: null,
+  date: null,
+  dep_id: null,
+  loc_id: null,
+  material: [],
+  biaya: [],
 };
 
-const ReturBeliList = ({ onAdd, onEdit, onDetail }) => {
+const DataUsageMaterial = ({ onAdd, onEdit, onDetail }) => {
   const [loading, setLoading] = useState(true);
-  const [update, setUpdate] = useState(false);
-  const [filters1, setFilters1] = useState(null);
-  const [first2, setFirst2] = useState(0);
-  const [rows2, setRows2] = useState(20);
-  const [globalFilterValue1, setGlobalFilterValue1] = useState("");
+  const [update, setUpdate] = useState(true);
   const [displayDel, setDisplayDel] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
-  const [setup, setSetup] = useState(null);
   const toast = useRef(null);
+  const [filters1, setFilters1] = useState(null);
+  const [globalFilterValue1, setGlobalFilterValue1] = useState("");
+  const [first2, setFirst2] = useState(0);
+  const [rows2, setRows2] = useState(20);
   const dispatch = useDispatch();
-  const pr = useSelector((state) => state.pr.pr);
+  const usage = useSelector((state) => state.usage.usage);
+  const show = useSelector((state) => state.usage.current);
+  const printPage = useRef(null);
+  const [trans, setTrans] = useState(null);
+  const [sto, setSto] = useState(null);
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getPR();
+    getMaterial();
+    getTrans();
+    getSto();
     initFilters1();
   }, []);
 
-  const getPR = async (isUpdate = false) => {
+  const getMaterial = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.retur_order,
+      ...endpoints.usage_mat,
       data: {},
     };
     console.log(config.data);
@@ -66,15 +70,13 @@ const ReturBeliList = ({ onAdd, onEdit, onDetail }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        console.log(data);
         let filt = [];
-        data?.forEach((element) => {
+        data.forEach((element) => {
           if (!element.closing) {
             filt.push(element);
           }
         });
-        dispatch({ type: SET_PR, payload: filt });
-        getSetup();
+        dispatch({ type: SET_USAGE, payload: filt });
       }
     } catch (error) {}
     if (isUpdate) {
@@ -86,28 +88,50 @@ const ReturBeliList = ({ onAdd, onEdit, onDetail }) => {
     }
   };
 
-  const getSetup = async (isUpdate = false) => {
-    setLoading(true);
+  const getSto = async (id, e) => {
     const config = {
-      ...endpoints.getCompany,
+      ...endpoints.sto,
       data: {},
     };
-    console.log(config.data);
     let response = null;
     try {
       response = await request(null, config);
       console.log(response);
       if (response.status) {
         const { data } = response;
-        setSetup(data);
+        setSto(data);
       }
     } catch (error) {}
   };
 
-  const delRet = async (id) => {
+  const getTrans = async () => {
     const config = {
-      ...endpoints.delPr,
-      endpoint: endpoints.delPr.endpoint + currentItem.id,
+      ...endpoints.trans,
+      // base_url: connectUrl,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        let filt = [];
+        data?.forEach((element) => {
+          if (element.tf_inv) {
+            filt.push(element);
+          }
+        });
+        setTrans(data);
+      }
+    } catch (error) {}
+  };
+
+  const delMat = async (id) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.delUseMat,
+      endpoint: endpoints.delUseMat.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -118,7 +142,7 @@ const ReturBeliList = ({ onAdd, onEdit, onDetail }) => {
         setTimeout(() => {
           setUpdate(false);
           setDisplayDel(false);
-          getPR(true);
+          getMaterial(true);
           toast.current.show({
             severity: "info",
             summary: tr[localStorage.getItem("language")].berhasl,
@@ -142,67 +166,33 @@ const ReturBeliList = ({ onAdd, onEdit, onDetail }) => {
     }
   };
 
-  const renderHeader = () => {
-    return (
-      <div className="flex justify-content-between">
-        <span className="p-input-icon-left">
-          <i className="pi pi-search" />
-          <InputText
-            value={globalFilterValue1}
-            onChange={onGlobalFilterChange1}
-            placeholder={tr[localStorage.getItem("language")].cari}
-          />
-        </span>
-        <PrimeSingleButton
-          label={tr[localStorage.getItem("language")].tambh}
-          icon={<i class="bx bx-plus px-2"></i>}
-          onClick={() => {
-            onAdd();
-            dispatch({
-              type: SET_EDIT_PR,
-              payload: false,
-            });
-            dispatch({
-              type: SET_CURRENT_PR,
-              payload: {
-                ...data,
-                product: [],
-              },
-            });
-          }}
-          disabled={setup?.cutoff === null && setup?.year_co === null}
-        />
-      </div>
-    );
-  };
-
-  const actionBodyTemplate = (data) => {
+  const actionBodyTemplate = (data) => {  
     return (
       // <React.Fragment>
       <div className="d-flex">
         <Link
           onClick={() => {
             onDetail();
-            let product = data.product;
+            let material = data.material;
+            let biaya = data.biaya;
 
-            if (!product.length) {
-              product.push({
-                id: 0,
-                prod_id: null,
-                unit_id: null,
-                retur: null,
-                price: null,
-                disc: null,
-                nett_price: null,
-                total: null,
-              });
-            }
+            material?.forEach((elem) => {
+              elem.prod_id = elem.prod_id ?? null;
+              elem.unit_id = elem.unit_id ?? null;
+            });
+
+            biaya?.forEach((elem) => {
+              elem.acc_id = elem.acc_id ?? null;
+            });
 
             dispatch({
-              type: SET_CURRENT_PR,
+              type: SET_CURRENT_USAGE,
               payload: {
                 ...data,
-                product: product,
+                dep_id: data?.dep_id?.id ?? null,
+                loc_id: data?.loc_id ?? null,
+                material: material?.length > 0 ? material : null,
+                biaya: biaya?.length > 0 ? biaya : null,
               },
             });
           }}
@@ -214,57 +204,74 @@ const ReturBeliList = ({ onAdd, onEdit, onDetail }) => {
         <Link
           onClick={() => {
             onEdit(data);
-            let product = data?.product;
             dispatch({
-              type: SET_EDIT_PR,
+              type: SET_EDIT_USAGE,
               payload: true,
             });
-            product?.forEach((el) => {
-              el.prod_id = el.prod_id?.id;
-              el.unit_id = el.unit_id?.id;
-              el.location = el.location?.id;
+            let material = data.material;
+            let st = 0;
+            sto?.forEach((element) => {
+              material?.forEach((elem) => {
+                if (
+                  element.loc_id === data?.loc_id.id &&
+                  element.id === elem.prod_id.id
+                ) {
+                  st = element.stock;
+                }
+              });
+            });
+            material?.forEach((elem) => {
+              elem.prod_id = elem.prod_id.id;
+              elem.unit_id = elem.unit_id.id;
+              elem.stock = st + elem.qty;
+            });
+
+            let biaya = data.biaya;
+            let nom_d = 0;
+            let dt_um = new Date(`${data?.date}Z`);
+            trans?.forEach((element) => {
+              let dt = new Date(`${element?.trx_date}Z`);
+              biaya?.forEach((el) => {
+                if (
+                  element.acc_id === el.acc_id &&
+                  dt.getMonth() + 1 === dt_um?.getMonth() + 1 &&
+                  dt.getFullYear() === dt_um?.getFullYear()
+                ) {
+                  if (element.trx_dbcr === "D") {
+                    nom_d += element.trx_amnt;
+                  } else {
+                    nom_d -= element.trx_amnt;
+                  }
+                }
+              });
+            });
+            biaya?.forEach((el) => {
+              el.acc_id = el?.acc_id;
+              el.nom = nom_d + el.value;
             });
             dispatch({
-              type: SET_CURRENT_PR,
+              type: SET_CURRENT_USAGE,
               payload: {
                 ...data,
-                inv_id: data?.inv_id?.id ? data?.inv_id : null,
-                product:
-                  product?.length > 0
-                    ? product
-                    : [
-                        {
-                          id: 0,
-                          ret_id: null,
-                          prod_id: null,
-                          unit_id: null,
-                          location: null,
-                          retur: null,
-                          price: null,
-                          disc: null,
-                          nett_price: null,
-                          totl: null,
-                          totl_fc: null,
-                        },
-                      ],
+                loc_id: data?.loc_id?.id ?? null,
+                dep_id: data?.dep_id?.id ?? null,
+                material: material?.length > 0 ? material : null,
+                biaya: biaya?.length > 0 ? biaya : null,
               },
             });
           }}
-          className={`btn ${
-            data.post === false ? "" : "disabled"
-          } btn-primary shadow btn-xs sharp ml-1`}
+          className={`btn btn-primary shadow btn-xs sharp ml-1`}
         >
           <i className="fa fa-pencil"></i>
         </Link>
 
         <Link
           onClick={() => {
+            // setEdit(true);
             setDisplayDel(true);
             setCurrentItem(data);
           }}
-          className={`btn ${
-            data.post === false ? "" : "disabled"
-          } btn-danger shadow btn-xs sharp ml-1`}
+          className="btn btn-danger shadow btn-xs sharp ml-1"
         >
           <i className="fa fa-trash"></i>
         </Link>
@@ -285,11 +292,75 @@ const ReturBeliList = ({ onAdd, onEdit, onDetail }) => {
           label={tr[localStorage.getItem("language")].hapus}
           icon="pi pi-trash"
           onClick={() => {
-            setUpdate(true);
-            delRet();
+            delMat();
           }}
           autoFocus
-          loading={update}
+          loading={loading}
+        />
+      </div>
+    );
+  };
+
+  const onGlobalFilterChange1 = (e) => {
+    const value = e.target.value;
+    let _filters1 = { ...filters1 };
+    _filters1["global"].value = value;
+
+    setFilters1(_filters1);
+    setGlobalFilterValue1(value);
+  };
+
+  const initFilters1 = () => {
+    setFilters1({
+      global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    });
+  };
+
+  const renderHeader = () => {
+    return (
+      <div className="flex justify-content-between">
+        <span className="p-input-icon-left">
+          <i className="pi pi-search" />
+          <InputText
+            value={globalFilterValue1}
+            onChange={onGlobalFilterChange1}
+            placeholder={tr[localStorage.getItem("language")].cari}
+          />
+        </span>
+        <PrimeSingleButton
+          label={tr[localStorage.getItem("language")].tambh}
+          icon={<i class="bx bx-plus px-2"></i>}
+          onClick={() => {
+            onAdd();
+            dispatch({
+              type: SET_EDIT_USAGE,
+              payload: false,
+            });
+            dispatch({
+              type: SET_CURRENT_USAGE,
+              payload: {
+                ...data,
+                material: [
+                  {
+                    id: 0,
+                    um_id: null,
+                    prod_id: null,
+                    unit_id: null,
+                    qty: null,
+                  },
+                ],
+                biaya: [
+                  {
+                    id: 0,
+                    um_id: null,
+                    acc_id: null,
+                    value: null,
+                    desc: null,
+                  },
+                ],
+              },
+            });
+          }}
         />
       </div>
     );
@@ -301,7 +372,10 @@ const ReturBeliList = ({ onAdd, onEdit, onDetail }) => {
       const dropdownOptions = [
         { label: 20, value: 20 },
         { label: 50, value: 50 },
-        { label: tr[localStorage.getItem("language")].hal, value: options.totalRecords },
+        {
+          label: tr[localStorage.getItem("language")].hal,
+          value: options.totalRecords,
+        },
       ];
 
       return (
@@ -330,25 +404,11 @@ const ReturBeliList = ({ onAdd, onEdit, onDetail }) => {
             textAlign: "center",
           }}
         >
-          {options.first} - {options.last} {tr[localStorage.getItem("language")].dari} {options.totalRecords}
+          {options.first} - {options.last}{" "}
+          {tr[localStorage.getItem("language")].dari} {options.totalRecords}
         </span>
       );
     },
-  };
-
-  const onGlobalFilterChange1 = (e) => {
-    const value = e.target.value;
-    let _filters1 = { ...filters1 };
-    _filters1["global"].value = value;
-
-    setFilters1(_filters1);
-    setGlobalFilterValue1(value);
-  };
-
-  const initFilters1 = () => {
-    setFilters1({
-      global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    });
   };
 
   const onCustomPage2 = (event) => {
@@ -368,26 +428,32 @@ const ReturBeliList = ({ onAdd, onEdit, onDetail }) => {
     return [day, month, year].join("-");
   };
 
+  const formatIdr = (value) => {
+    return `${value}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
   return (
     <>
       <Toast ref={toast} />
       <Row>
-        <Col>
+        <Col className="pt-0">
           <Card>
             <Card.Body>
               <DataTable
                 responsiveLayout="scroll"
-                value={loading ? dummy : pr}
+                value={loading ? dummy : usage}
                 className="display w-150 datatable-wrapper"
                 showGridlines
                 dataKey="id"
                 rowHover
                 header={renderHeader}
-                filters={null}
+                filters={filters1}
                 globalFilterFields={[
-                  "ret_code",
-                  "formatDate(ret_date)",
-                  "fk_id.fk_code",
+                  "code",
+                  "dep_id.ccost_name",
+                  "loc_id.name",
                 ]}
                 emptyMessage={tr[localStorage.getItem("language")].empty_data}
                 paginator
@@ -398,23 +464,23 @@ const ReturBeliList = ({ onAdd, onEdit, onDetail }) => {
                 paginatorClassName="justify-content-end mt-3"
               >
                 <Column
-                  header={tr[localStorage.getItem("language")].tgl}
+                  header={"Tanggal Pemakaian"}
+                  field={(e) => formatDate(e.date)}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header={"Kode Pemakaian"}
                   style={{
                     minWidth: "8rem",
                   }}
-                  field={(e) => formatDate(e.ret_date)}
+                  field={(e) => e.code}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header={tr[localStorage.getItem("language")].kd_ret}
+                  header={tr[localStorage.getItem("language")].dep}
+                  field={(e) => e.dep_id?.ccost_name ?? "-"}
                   style={{ minWidth: "8rem" }}
-                  field={(e) => e.ret_code}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header={"Kode Invoice"}
-                  style={{ minWidth: "8rem" }}
-                  field={(e) => e.inv_id.inv_code}
                   body={loading && <Skeleton />}
                 />
                 <Column
@@ -451,4 +517,4 @@ const ReturBeliList = ({ onAdd, onEdit, onDetail }) => {
   );
 };
 
-export default ReturBeliList;
+export default DataUsageMaterial;

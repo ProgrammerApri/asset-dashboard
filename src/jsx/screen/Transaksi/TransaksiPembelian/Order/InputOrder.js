@@ -32,6 +32,7 @@ import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import endpoints from "../../../../../utils/endpoints";
 import { tr } from "../../../../../data/tr";
 import { InputTextarea } from "primereact/inputtextarea";
+import DataProject from "src/jsx/screen/MasterLainnya/Project/DataProject";
 
 const defError = {
   code: false,
@@ -59,6 +60,7 @@ const defError = {
 const InputOrder = ({ onCancel, onSuccess }) => {
   const order = useSelector((state) => state.order.current);
   const [dept, setDept] = useState(null);
+  const [project, setProj] = useState(null);
   const [po, setPO] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [supplier, setSupplier] = useState(null);
@@ -75,6 +77,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
   const [showSupplier, setShowSupplier] = useState(false);
   const [showRulesPay, setShowRulesPay] = useState(false);
   const [showDept, setShowDept] = useState(false);
+  const [showProj, setShowProj] = useState(false);
   const [showProduk, setShowProduk] = useState(false);
   const [showJasa, setShowJasa] = useState(false);
   const [showSatuan, setShowSatuan] = useState(false);
@@ -111,6 +114,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     getSupplier();
     getRulesPay();
     getDept();
+    getProj();
     getProduct(order.ns);
     getJasa();
     getSatuan();
@@ -330,6 +334,25 @@ const InputOrder = ({ onCancel, onSuccess }) => {
       if (response.status) {
         const { data } = response;
         setDept(data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getProj = async () => {
+    const config = {
+      ...endpoints.project,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setProj(data);
       }
     } catch (error) {
       console.log(error);
@@ -565,6 +588,17 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
+  const checkProj = (value) => {
+    let selected = {};
+    project?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
   const checkpjk = (value) => {
     let selected = {};
     pajak?.forEach((element) => {
@@ -778,14 +812,14 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
       grupP?.forEach((el) => {
         if (checkProd(element?.prod_id)?.group?.id === el?.groupPro?.id) {
-          if (el.groupPro.wip) {
-            acc_prd = el.groupPro.acc_wip;
-            // acc_gprd = checkProd(element.prod_id)?.acc_wip;
-            // acc_prd = checkProd(element.prod_id)?.acc_wip;
-          } else {
-            acc_prd = el.groupPro.acc_sto;
-            // acc_gprd = checkProd(element.prod_id)?.acc_sto;
-            // acc_prd = checkProd(element.prod_id)?.acc_sto;
+          if (el.groupPro?.stok) {
+            if (el.groupPro.wip) {
+              acc_prd = el.groupPro.acc_wip;
+            } else {
+              acc_prd = el.groupPro.acc_sto;
+            }
+          } else{
+            acc_prd = el.groupPro?.biaya
           }
         }
       });
@@ -869,7 +903,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
       toast.current.show({
         severity: "error",
         summary: "Tidak Dapat Menyimpan Data",
-        detail: `Akun Gl Supplier Belum Diisi`,
+        detail: `Akun Distribusi Gl Supplier Belum Diisi`,
         life: 6000,
       });
     }
@@ -878,7 +912,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
       toast.current.show({
         severity: "error",
         summary: "Tidak Dapat Menyimpan Data",
-        detail: `Akun Persediaan Produk Belum Diisi`,
+        detail: `Akun Distribusi GL Produk Belum Diisi`,
         life: 6000,
       });
 
@@ -1144,7 +1178,25 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-6 mt-0">
+          <div className="col-3">
+            <label className="text-label">
+              {tr[localStorage.getItem("language")].proj}
+            </label>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
+              value={order.proj_id !== null ? checkProj(order.proj_id) : null}
+              option={project}
+              onChange={(e) => {
+                updateORD({ ...order, proj_id: e.id });
+              }}
+              placeholder={tr[localStorage.getItem("language")].masuk}
+              detail
+              onDetail={() => setShowProj(true)}
+              label={"[proj_code] ([proj_name])"}
+            />
+          </div>
+
+          <div className="col-3 mt-0">
             {/* <span className="fs-14">
               <b>Informasi Supplier</b>
             </span> */}
@@ -1675,10 +1727,11 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                       order.sup_id !== null &&
                       checkSupp(order.sup_id)?.supplier?.sup_curren !== null ? (
                         <PrimeNumber
+                          price
                           value={e.price && e.price}
                           onChange={(u) => {
                             let temp = [...order.dprod];
-                            temp[e.index].price = u.target.value;
+                            temp[e.index].price = u?.value;
                             if (
                               order.sup_id !== null &&
                               checkSupp(order.sup_id)?.supplier?.sup_curren !==
@@ -1690,7 +1743,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                               temp[e.index].total =
                                 temp[e.index].total_fc * curConv();
 
-                              temp[e.index].idr = u.target.value * curConv();
+                              temp[e.index].idr = u?.value * curConv();
                             } else {
                               temp[e.index].total =
                                 temp[e.index].order * temp[e.index].price;
@@ -3011,6 +3064,34 @@ const InputOrder = ({ onCancel, onSuccess }) => {
           if (doubleClick) {
             setShowDept(false);
             updateORD({ ...order, dep_id: e.data.id });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataProject
+        data={project}
+        loading={false}
+        popUp={true}
+        show={showProj}
+        onHide={() => {
+          setShowProj(false);
+        }}
+        onInput={(e) => {
+          setShowProj(!e);
+        }}
+        onSuccessInput={(e) => {
+          getProj();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowProj(false);
+            updateORD({ ...order, proj_id: e.data.id });
           }
 
           setDoubleClick(true);

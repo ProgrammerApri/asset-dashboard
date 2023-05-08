@@ -214,7 +214,7 @@ const DataRulesPay = ({
         <Link
           onClick={() => {
             setCurrentItem(data);
-            setShowInput(true);
+            setShowDelete(true)
             onInput(true);
           }}
           className="btn btn-danger shadow btn-xs sharp ml-1"

@@ -562,7 +562,6 @@ const InputOrder = ({ onCancel, onSuccess }) => {
         selected = element;
       }
     });
-
     return selected;
   };
 
@@ -818,8 +817,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             } else {
               acc_prd = el.groupPro.acc_sto;
             }
-          } else{
-            acc_prd = el.groupPro?.biaya
+          } else {
+            acc_prd = el.groupPro?.biaya;
           }
         }
       });
@@ -1022,7 +1021,6 @@ const InputOrder = ({ onCancel, onSuccess }) => {
               value={new Date(`${order.doc_date}Z`)}
               onChange={(e) => {
                 updateORD({ ...order, doc_date: e.value });
-
                 // let newError = error;
                 // newError.docDate = false;
                 // setError(newError);

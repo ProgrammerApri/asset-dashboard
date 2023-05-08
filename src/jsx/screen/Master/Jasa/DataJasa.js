@@ -616,7 +616,7 @@ const DataJasa = ({
                     account: e.value ?? null,
                   });
                   let newError = error;
-                  newError.acc1 = false;
+                  // newError.acc1 = false;
                   setError(newError);
                 }}
                 optionLabel="acc_name"

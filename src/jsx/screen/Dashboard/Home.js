@@ -13,7 +13,7 @@ import { SET_DASHBOARD_DATA } from "src/redux/actions";
 import CircleProgressWhite from "../../components/CircleProgress/CircleProgressWhite";
 import CustomCardAssets from "src/jsx/components/CustomCardChart/CustomCardAssets";
 import CustomCardBank from "src/jsx/components/CustomCardChart/CustomCardBank";
-import { Messages } from 'primereact/messages';
+import { Messages } from "primereact/messages";
 
 const ApexLine4 = loadable(() =>
   pMinDelay(import("../../components/charts/apexcharts/Line4"), 500)
@@ -335,9 +335,9 @@ const Home = () => {
           compact
         />
         <div className="col-12 pt-0">
-        <Messages ref={msgs1} />
+          <Messages ref={msgs1} />
         </div>
-        
+
         <CustomCardBank
           tittle={"Raw Material"}
           subTittle={"RM-0001"}

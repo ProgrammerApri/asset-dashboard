@@ -1692,7 +1692,7 @@ const DataCustomer = ({
                     disabled={localStorage.getItem("product") !== "inv+gl"}
                   />
                   <small className="text-blue">
-                    *Harap Periksa Setup Akun Apabila Daftar Akun Tidak Muncul
+                    *Harap Periksa Setup Akun AR/AP Apabila Daftar Akun Tidak Muncul
                   </small>
                 </div>
 

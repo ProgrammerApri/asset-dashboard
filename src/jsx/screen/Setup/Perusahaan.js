@@ -207,13 +207,13 @@ const Perusahaan = () => {
       if (data) {
         config = {
           ...endpoints.updateCompany,
-          endpoint: endpoints.updateCompany.endpoint + currentData.id,
+          endpoint: endpoints.updateCompany.endpoint + currentData?.id,
           data: data,
         };
       } else {
         config = {
           ...endpoints.updateCompany,
-          endpoint: endpoints.updateCompany.endpoint + currentData.id,
+          endpoint: endpoints.updateCompany.endpoint + currentData?.id,
           data: {
             ...currentData,
             cp_logo: logo !== "" ? logo : currentData.cp_logo,
@@ -252,7 +252,7 @@ const Perusahaan = () => {
   };
 
   const submitUpdate = async (upload = false, data) => {
-    if (currentData.id === 0) {
+    if (currentData?.id === 0) {
       if (upload) {
         uploadImage();
       } else {

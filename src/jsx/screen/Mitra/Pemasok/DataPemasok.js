@@ -1483,7 +1483,7 @@ const DataSupplier = ({
                     error={error[2]?.ap}
                   />
                   <small className="text-blue">
-                    *Harap Periksa Setup Akun Apabila Daftar Akun Tidak Muncul
+                    *Harap Periksa Setup Akun AR/AP Apabila Daftar Akun Tidak Muncul
                   </small>
                 </div>
 

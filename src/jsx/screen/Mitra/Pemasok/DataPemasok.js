@@ -1290,7 +1290,7 @@ const DataSupplier = ({
                         ...currentItem,
                         supplier: {
                           ...currentItem.supplier,
-                          sup_telp2: e.value,
+                          sup_telp2: e.target.value,
                         },
                       })
                     }

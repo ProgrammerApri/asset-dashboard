@@ -13,21 +13,21 @@ export default function GroupReport() {
     {
       tittle: "AR",
       icon: "bx-archive",
-      total: 4,
+      total: 5,
       to: "ar",
     },
 
     {
       tittle: "Laporan Penjualan",
       icon: "bx-archive",
-      total: 6,
+      total: 5,
       to: "penjualan",
     },
 
     {
       tittle: "AP",
       icon: "bx-archive",
-      total: 4,
+      total: 5,
       to: "ap",
     },
 
@@ -40,7 +40,7 @@ export default function GroupReport() {
     {
       tittle: "Laporan Persediaan",
       icon: "bx-archive",
-      total: 3,
+      total: 4,
       to: "persediaan",
     },
 

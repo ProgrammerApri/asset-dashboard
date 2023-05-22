@@ -326,7 +326,7 @@ const DataLokasi = ({
             placeholder={tr[localStorage.getItem("language")].cari}
           />
         </span>
-        {edit && (
+        {/* {edit && ( */}
           <PrimeSingleButton
             label={tr[localStorage.getItem("language")].tambh}
             icon={<i class="bx bx-plus px-2"></i>}
@@ -338,7 +338,7 @@ const DataLokasi = ({
               onInput(true);
             }}
           />
-        )}
+        {/* )} */}
       </div>
     );
   };

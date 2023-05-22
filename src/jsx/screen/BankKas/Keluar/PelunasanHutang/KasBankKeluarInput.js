@@ -392,7 +392,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
       ...endpoints.account,
       data: {},
     };
-    console.log(config.data);
+    console.log("uuu",config.data);
     let response = null;
     try {
       response = await request(null, config);
@@ -416,6 +416,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
         setAccKas(kas);
         setAcc(all_d);
         setAllAcc(all);
+        console.log("----",data.elem);
       }
     } catch (error) {}
   };

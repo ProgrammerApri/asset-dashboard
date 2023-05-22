@@ -613,6 +613,12 @@ const endpoints = {
     data: {},
   },
 
+  product_code: {
+    endpoint: "/v1/api/product/code",
+    method: "GET",
+    data: {},
+  },
+
   addSatuan: {
     endpoint: "/v1/api/unit",
     method: "POST",

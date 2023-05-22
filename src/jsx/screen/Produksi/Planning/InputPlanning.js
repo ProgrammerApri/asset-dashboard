@@ -471,8 +471,12 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
             <PrimeCalendar
               label={"Tanggal"}
               value={date}
+              onChange={(e) => {
+                updatePL({ ...plan, date_created: e.target.value });
+              }}
               dateFormat="dd-mm-yy"
-              disabled
+              showIcon
+              // disabled
             />
           </div>
           <div className="col-10"></div>

@@ -211,7 +211,7 @@ const DataBank = ({
       console.log(error);
       if (error.status === 400) {
         setTimeout(() => {
-          setUpdate(false);
+          setLoading(false);
           toast.current.show({
             severity: "error",
             summary: tr[localStorage.getItem("language")].gagal,
@@ -221,7 +221,7 @@ const DataBank = ({
         }, 500);
       } else {
         setTimeout(() => {
-          setUpdate(false);
+          setLoading(false);
           toast.current.show({
             severity: "error",
             summary: tr[localStorage.getItem("language")].gagal,

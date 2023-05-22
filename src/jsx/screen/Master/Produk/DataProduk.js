@@ -45,7 +45,7 @@ const def = {
   lt_stock: null,
   max_order: null,
   image: null,
-  ns: null
+  ns: null,
 };
 
 const type = [
@@ -85,6 +85,7 @@ const DataProduk = ({
   del,
 }) => {
   const product = useSelector((state) => state.product);
+  const [prdCode, setPrdCode] = useState(null);
   const [group, setGroup] = useState(null);
   const [unit, setUnit] = useState(null);
   const [suplier, setSupplier] = useState(null);
@@ -117,11 +118,30 @@ const DataProduk = ({
     }
 
     initFilters1();
+    getProductCode();
     getGroup();
     getUnit();
     getSupplier();
     getHistori();
   }, []);
+
+  const getProductCode = async () => {
+    const config = {
+      ...endpoints.product_code,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+
+        setPrdCode(data);
+      }
+    } catch (error) {}
+  };
 
   const getGroup = async () => {
     const config = {
@@ -588,7 +608,7 @@ const DataProduk = ({
               icon={<i class="bx bx-plus px-2"></i>}
               onClick={() => {
                 setEdit(false);
-                setCurrentItem(def);
+                setCurrentItem({ ...def, code: prdCode });
                 setDisplayData(true);
                 onInput(true);
                 // getSetupWip();

@@ -288,7 +288,7 @@ export const tr = {
     barcode: "Barcode",
     stok: "Stock",
     img: "Image",
-    gudang: "Werehouse",
+    gudang: "Warehouse",
     kd_loc: "Location Code",
     nm_loc: "Location Name",
     kd_sat: "Unit Code",

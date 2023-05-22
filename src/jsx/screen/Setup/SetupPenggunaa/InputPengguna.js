@@ -4,19 +4,13 @@ import { Row, Col, Card } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_EXP, SET_CURRENT_USER } from "src/redux/actions";
+import { SET_CURRENT_USER } from "src/redux/actions";
 import { Divider } from "@material-ui/core";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
-import CustomAccordion from "src/jsx/components/Accordion/Accordion";
 import { InputSwitch } from "primereact/inputswitch";
-import { TabPanel } from "primereact/tabview";
-import SetupAkun from "../SetupAkun";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Skeleton } from "primereact/skeleton";
-import { InputText } from "primereact/inputtext";
-import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
-import { Link } from "react-router-dom";
 import { Password } from "primereact/password";
 import { tr } from "src/data/tr";
 
@@ -29,7 +23,7 @@ const def = {
   menu: [],
 };
 
-const InputPengguna = ({ onCancel, onSuccess, del,   }) => {
+const InputPengguna = ({ onCancel, onSuccess, del }) => {
   const [update, setUpdate] = useState(false);
   const [error, setError] = useState(null);
   const [showDelete, setShowDelete] = useState(false);
@@ -102,15 +96,20 @@ const InputPengguna = ({ onCancel, onSuccess, del,   }) => {
           });
         });
 
-        setCurrent({
-          ...current,
-          menu: filt.map((el) => ({
-            menu_id: el.id,
-            view: true,
-            edit: true,
-            delete: true,
-          })),
-        });
+        if (!user.id) {
+          dispatch({
+            type: SET_CURRENT_USER,
+            payload: {
+              ...user,
+              menu: filt.map((el) => ({
+                menu_id: el.id,
+                view: true,
+                edit: true,
+                delete: true,
+              })),
+            }
+          });
+        }
 
         setMenu(filt);
         setLoading(false);
@@ -130,11 +129,14 @@ const InputPengguna = ({ onCancel, onSuccess, del,   }) => {
     const config = {
       ...endpoints.addUSER,
       data: {
-        username: current.username,
-        password: current.password,
-        email: current.email,
-        active: current.active,
-        menu: current.menu
+        username: user.username,
+        password: user.password,
+        email: user.email,
+        active: user.active,
+        company: null,
+        product: null,
+        endpoint_id: null,
+        menu: user.menu,
       },
     };
     console.log(config.data);
@@ -144,12 +146,11 @@ const InputPengguna = ({ onCancel, onSuccess, del,   }) => {
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          setUpdate(false)
-         
-          onSuccess()
+          setUpdate(false);
+
+          onSuccess();
         }, 500);
       }
-
     } catch (error) {
       setTimeout(() => {
         setUpdate(false);
@@ -163,20 +164,17 @@ const InputPengguna = ({ onCancel, onSuccess, del,   }) => {
     }
   };
 
-
-  
-  const editUSER = async (data) => {
-    // setLoadingSubmit(true);
+  const editUSER = async () => {
     setUpdate(true)
     const config = {
       ...endpoints.editUSER,
-      endpoint: endpoints.editUSER.endpoint + current.id,
+      endpoint: endpoints.editUSER.endpoint + user.id,
       data: {
-        username: current.username,
-        password: current.password,
-        email: current.email,
-        active: current.active,
-        menu: current.menu
+        username: user.username,
+        password: user.password,
+        email: user.email,
+        active: user.active,
+        menu: user.menu,
       },
     };
     let response = null;
@@ -184,11 +182,8 @@ const InputPengguna = ({ onCancel, onSuccess, del,   }) => {
       response = await request(null, config);
       if (response.status) {
         setTimeout(() => {
-          setUpdate(false)
-          // setLoadingSubmit(false);
-          // setDisplayInput(false);
+          setUpdate(false);
           getMenu();
-          // getProfile();
           toast.current.show({
             severity: "info",
             summary: "Berhasil",
@@ -199,8 +194,7 @@ const InputPengguna = ({ onCancel, onSuccess, del,   }) => {
       }
     } catch (error) {
       setTimeout(() => {
-        // setLoadingSubmit(false);
-        setUpdate(false)
+        setUpdate(false);
         toast.current.show({
           severity: "error",
           summary: "Gagal",
@@ -213,11 +207,12 @@ const InputPengguna = ({ onCancel, onSuccess, del,   }) => {
 
   const onSubmit = () => {
     setUpdate(true);
-    addUser();
-    editUSER();
+    if (user.id) {
+      editUSER();
+    } else {
+      addUser();
+    }
   };
-
- 
 
   const renderFooterDel = (kode) => {
     return (
@@ -251,7 +246,6 @@ const InputPengguna = ({ onCancel, onSuccess, del,   }) => {
     });
   };
 
-
   const body = () => {
     return (
       <>
@@ -274,7 +268,6 @@ const InputPengguna = ({ onCancel, onSuccess, del,   }) => {
               value={user.email}
               onChange={(e) => {
                 updateUser({ ...user, email: e.target.value });
-                
               }}
               placeholder="Masukan Email"
               isEmail
@@ -318,7 +311,7 @@ const InputPengguna = ({ onCancel, onSuccess, del,   }) => {
 
           <DataTable
             responsiveLayout="scroll"
-            value={loading ? dummy : menu.map((v, i) => ({ ...v, index: i }))}
+            value={loading ? dummy : menu?.map((v, i) => ({ ...v, index: i }))}
             className="col-12 display datatable-wrapper"
             showGridlines
             dataKey="name"
@@ -351,9 +344,9 @@ const InputPengguna = ({ onCancel, onSuccess, del,   }) => {
                 ) : (
                   <InputSwitch
                     className="mr-3"
-                    checked={current.menu[e.index].view}
+                    checked={user?.menu[e.index]?.view}
                     onChange={(v) => {
-                      let temp = current.menu;
+                      let temp = user?.menu;
                       temp[e.index].view = v.value;
                       if (!v.value) {
                         temp[e.index].delete = v.value;
@@ -374,9 +367,9 @@ const InputPengguna = ({ onCancel, onSuccess, del,   }) => {
                 ) : (
                   <InputSwitch
                     className="mr-3"
-                    checked={current.menu[e.index].edit}
+                    checked={user?.menu[e.index]?.edit}
                     onChange={(v) => {
-                      let temp = current.menu;
+                      let temp = user.menu;
                       temp[e.index].edit = v.value;
                       if (v.value) {
                         temp[e.index].view = v.value;
@@ -396,9 +389,9 @@ const InputPengguna = ({ onCancel, onSuccess, del,   }) => {
                 ) : (
                   <InputSwitch
                     className="mr-3"
-                    checked={current.menu[e.index].delete}
+                    checked={user?.menu[e.index]?.delete}
                     onChange={(v) => {
-                      let temp = current.menu;
+                      let temp = user.menu;
                       temp[e.index].delete = v.value;
                       if (v.value) {
                         temp[e.index].view = v.value;

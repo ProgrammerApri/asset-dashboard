@@ -24,9 +24,11 @@ const defError = {
   code: false,
   date: false,
   btc: false,
-  rej: [{
-    qty: false,
-  }]
+  rej: [
+    {
+      qty: false,
+    },
+  ],
 };
 
 const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
@@ -388,10 +390,10 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                 updatePHJ({
                   ...phj,
                   batch_id: e.id,
-                  product: e.plan_id.product.map((v) => {
+                  product: e.plan_id?.product.map((v) => {
                     return { ...v, qty: "" };
                   }),
-                  reject: e.plan_id.product.map((v) => {
+                  reject: e.plan_id?.product.map((v) => {
                     return { ...v, qty: "" };
                   }),
                 });
@@ -491,7 +493,12 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                     field={""}
                     body={(e) => (
                       <PrimeInput
-                        value={e.prod_id && checkProd(e.prod_id)}
+                        value={
+                          e.prod_id &&
+                          `${checkProd(e.prod_id)?.name} (${
+                            checkProd(e.prod_id)?.code
+                          })`
+                        }
                         option={product}
                         onChange={(u) => {
                           // looping satuan
@@ -530,7 +537,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                     field={""}
                     body={(e) => (
                       <PrimeInput
-                        value={e.unit_id && checkUnit(e.unit_id)}
+                        value={e.unit_id && checkUnit(e.unit_id)?.code}
                         onChange={(u) => {
                           let temp = [...phj.product];
                           temp[e.index].unit_id = u.id;
@@ -594,7 +601,9 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                     field={""}
                     body={(e) => (
                       <PrimeInput
-                        value={e.prod_id && checkProd(e.prod_id)}
+                        value={e.prod_id && `${checkProd(e.prod_id)?.name} (${
+                          checkProd(e.prod_id)?.code
+                        })`}
                         option={product}
                         onChange={(u) => {
                           // looping satuan
@@ -634,7 +643,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                     field={""}
                     body={(e) => (
                       <PrimeInput
-                        value={e.unit_id && checkUnit(e.unit_id)}
+                        value={e.unit_id && checkUnit(e.unit_id)?.code}
                         onChange={(u) => {
                           let temp = [...phj.reject];
                           temp[e.index].unit_id = u.id;
@@ -671,8 +680,6 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
                       />
                     )}
                   />
-
-                
                 </DataTable>
               </Card.Body>
             </Card>

@@ -16,6 +16,7 @@ import { Divider } from "@material-ui/core";
 import { TabPanel, TabView } from "primereact/tabview";
 import DataAkun from "../../Master/Akun/DataAkun";
 import { id } from "chartjs-plugin-streaming";
+import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 
 const defError = {
   code: false,
@@ -57,7 +58,6 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
       behavior: "smooth",
     });
     getAcc();
-    getAccount();
     getBatch();
   }, []);
 
@@ -69,25 +69,14 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      
-      if (response.status) {
-        const { data } = response;
-        setAcc(data);
-      }
-    } catch (error) {}
-  };
 
-  const getAccount = async () => {
-    const config = {
-      ...endpoints.account,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      
       if (response.status) {
         const { data } = response;
+        let filt = [];
+        data?.forEach((element) => {
+          filt.push(element.account);
+        });
+        setAcc(filt);
         setAccount(data);
       }
     } catch (error) {}
@@ -101,7 +90,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
     let response = null;
     try {
       response = await request(null, config);
-      
+
       if (response.status) {
         const { data } = response;
         setBatch(data);
@@ -115,11 +104,11 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
       endpoint: endpoints.editPBB.endpoint + pbb.id,
       data: pbb,
     };
-    
+
     let response = null;
     try {
       response = await request(null, config);
-      
+
       if (response.status) {
         onSuccess();
       }
@@ -141,16 +130,15 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
       ...endpoints.addPBB,
       data: pbb,
     };
-    
+
     let response = null;
     try {
       response = await request(null, config);
-      
+
       if (response.status) {
         onSuccess();
       }
     } catch (error) {
-      
       if (error.status === 400) {
         setTimeout(() => {
           setUpdate(false);
@@ -178,9 +166,8 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
   const checkAcc = (value) => {
     let selected = {};
     acc?.forEach((element) => {
-      if (value === element.account.id) {
+      if (value === element?.id) {
         selected = element;
-       
       }
     });
 
@@ -238,7 +225,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
       }
     });
 
-    if (!errors.uph[0]?.id ) {
+    if (!errors.uph[0]?.id) {
       errors.ovh?.forEach((e) => {
         for (var key in e) {
           e[key] = false;
@@ -322,14 +309,26 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
     });
   };
 
-  const header = () => {
+  const glTemplate = (option) => {
     return (
-      <h4 className="mb-5">
-        <b>Pembelian (PO)</b>
-        {/* <b>{isEdit ? "Edit" : "Buat"} Pembelian (PO)</b> */}
-      </h4>
+      <div>
+        {option !== null ? `${option.acc_name} - ${option.acc_code}` : ""}
+      </div>
     );
   };
+
+  const valTemp = (option, props) => {
+    if (option) {
+      return (
+        <div>
+          {option !== null ? `${option.acc_name} - ${option.acc_code}` : ""}
+        </div>
+      );
+    }
+
+    return <span>{props.placeholder}</span>;
+  };
+
 
   const body = () => {
     return (
@@ -423,22 +422,25 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
           <div className="col-3 text-black">
             <label className="text-black">Akun Kredit</label>
             <div className="p-inputgroup"></div>
-            <CustomDropdown
+            <PrimeDropdown
               value={pbb.acc_cred && checkAcc(pbb.acc_cred)}
-              option={account}
+              options={acc}
               onChange={(u) => {
-                updatePBB({ ...pbb, acc_cred: u.account.id });
+                updatePBB({ ...pbb, acc_cred: u.value?.id ?? null });
 
                 let newError = error;
                 newError.id = false;
                 setError(newError);
               }}
-              detail
-              onDetail={() => setShowAcc(true)}
-              label={"[account.acc_name] - [account.acc_code]"}
+              filter
+              filterBy={"acc_name"}
+              optionLabel={"[account.acc_name]"}
+              itemTemplate={glTemplate}
+              valueTemplate={valTemp}
               placeholder="Pilih Akun Kredit"
               errorMessage="Akun Belum Dipilih"
               error={error?.acc}
+              showClear
             />
           </div>
 
@@ -483,27 +485,27 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                     className="col-4 align-text-top"
                     field={""}
                     body={(e) => (
-                      <CustomDropdown
+                      <PrimeDropdown
                         value={e.acc_id && checkAcc(e.acc_id)}
-                        option={acc}
+                        options={acc}
                         onChange={(u) => {
                           let temp = [...pbb.uph];
-                          temp[e.index].acc_id = u.account.id;
+                          temp[e.index].acc_id = u?.value?.id ?? null;
                           updatePBB({ ...pbb, uph: temp });
 
                           let newError = error;
                           newError.uph[e.index].id = false;
                           setError(newError);
                         }}
-                        detail
-                        onDetail={() => {
-                          setCurrentIndex(e.index);
-                          setShowAcc(true);
-                        }}
-                        label={"[account.acc_name] - [account.acc_code]"}
+                        filter
+                        filterBy={"acc_name"}
+                        optionLabel={"[acc_name]"}
+                        itemTemplate={glTemplate}
+                        valueTemplate={valTemp}
                         placeholder="Pilih Akun Upah"
                         errorMessage="Akun Belum Dipilih"
                         error={error?.uph[e.index]?.id}
+                        showClear
                       />
                     )}
                   />
@@ -579,27 +581,27 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
                     className="col-4 align-text-top"
                     field={""}
                     body={(e) => (
-                      <CustomDropdown
+                      <PrimeDropdown
                         value={e.acc_id && checkAcc(e.acc_id)}
-                        option={acc}
+                        options={acc}
                         onChange={(u) => {
                           let temp = [...pbb.ovh];
-                          temp[e.index].acc_id = u.account.id;
+                          temp[e.index].acc_id = u.value?.id ?? null;
                           updatePBB({ ...pbb, ovh: temp });
 
                           let newError = error;
                           newError.ovh[e.index].id = false;
                           setError(newError);
                         }}
-                        detail
-                        onDetail={() => {
-                          setCurrentIndex(e.index);
-                          setShowAcc(true);
-                        }}
-                        label={"[account.acc_name] - [account.acc_code]"}
+                        filter
+                        filterBy={"acc_name"}
+                        optionLabel={"[acc_name]"}
+                        itemTemplate={glTemplate}
+                        valueTemplate={valTemp}
                         placeholder="Pilih Akun Overhead"
                         errorMessage="Akun Belum Dipilih"
                         error={error?.ovh[e.index]?.id}
+                        showClear
                       />
                     )}
                   />

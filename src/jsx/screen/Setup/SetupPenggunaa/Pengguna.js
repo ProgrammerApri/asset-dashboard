@@ -63,7 +63,7 @@ const Pengguna = ({ onAdd, onEdit }) => {
   const getUser = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.user,
+      ...endpoints.getUser,
       data: {},
     };
     console.log(config.data);
@@ -362,6 +362,16 @@ const Pengguna = ({ onAdd, onEdit }) => {
           label="Tambah"
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
+            dispatch({
+              type: SET_EDIT_USER,
+              payload: false,
+            })
+            dispatch({
+              type: SET_CURRENT_USER,
+              payload: {
+                id: null
+              }
+            });
             onAdd();
             setShowInput(true);
             setEdit(false);

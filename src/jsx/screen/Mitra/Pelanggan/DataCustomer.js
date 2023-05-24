@@ -1689,7 +1689,7 @@ const DataCustomer = ({
                     showClear
                     error={error[2]?.ar}
                     errorMessage="Kode Akun belum dipilih"
-                    disabled={localStorage.getItem("product") !== "inv+gl"}
+                    // disabled={localStorage.getItem("product") !== "inv+gl"}
                   />
                   <small className="text-blue">
                     *Harap Periksa Setup Akun AR/AP Apabila Daftar Akun Tidak Muncul
@@ -1728,7 +1728,7 @@ const DataCustomer = ({
                     showClear
                     // error={error[2]?.um}
                     // errorMessage="Kode Uang Muka Penjualan belum dipilih"
-                    disabled={localStorage.getItem("product") !== "inv+gl"}
+                    // disabled={localStorage.getItem("product") !== "inv+gl"}
                   />
                 </div>
               </div>

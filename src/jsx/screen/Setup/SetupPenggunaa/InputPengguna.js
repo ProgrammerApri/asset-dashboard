@@ -23,6 +23,11 @@ const def = {
   password: null,
   active: true,
   menu: [],
+  previlage: {
+    dep_id: null,
+    access_type: 0,
+    approver: false,
+  },
 };
 
 const InputPengguna = ({ onCancel, onSuccess, del }) => {
@@ -35,6 +40,7 @@ const InputPengguna = ({ onCancel, onSuccess, del }) => {
   const [loading, setLoading] = useState(true);
   const [menu, setMenu] = useState(null);
   const [current, setCurrent] = useState(def);
+  const [pusatBiaya, setPusatBiaya] = useState(null);
 
   const dummy = Array.from({ length: 10 });
 
@@ -45,7 +51,26 @@ const InputPengguna = ({ onCancel, onSuccess, del }) => {
       behavior: "smooth",
     });
     getMenu();
+    getPusatBiaya();
   }, []);
+
+  const getPusatBiaya = async () => {
+    const config = {
+      ...endpoints.pusatBiaya,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setPusatBiaya(data);
+      }
+    } catch (error) {}
+  };
 
   const getMenu = async (isUpdate = false) => {
     setLoading(true);
@@ -139,6 +164,7 @@ const InputPengguna = ({ onCancel, onSuccess, del }) => {
         product: null,
         endpoint_id: null,
         menu: user.menu,
+        previlage: user?.previlage ?? null,
       },
     };
     console.log(config.data);
@@ -177,6 +203,7 @@ const InputPengguna = ({ onCancel, onSuccess, del }) => {
         email: user.email,
         active: user.active,
         menu: user.menu,
+        previlage: user.previlage,
       },
     };
     let response = null;
@@ -241,11 +268,23 @@ const InputPengguna = ({ onCancel, onSuccess, del }) => {
       </div>
     );
   };
+
   const updateUser = (e) => {
     dispatch({
       type: SET_CURRENT_USER,
       payload: e,
     });
+  };
+
+  const checkDepartement = (value) => {
+    let selected = null;
+    pusatBiaya?.forEach((element) => {
+      if (element.id === value) {
+        selected = element;
+      }
+    });
+
+    return selected;
   };
 
   const body = () => {
@@ -319,11 +358,25 @@ const InputPengguna = ({ onCancel, onSuccess, del }) => {
           <div className="col-3 ">
             <PrimeDropdown
               label={"Department"}
-              value={null}
-              options={[]}
+              value={
+                user.previlage?.dep_id
+                  ? checkDepartement(user.previlage.dep_id)
+                  : null
+              }
+              options={pusatBiaya}
+              optionLabel={"ccost_name"}
               onChange={(e) => {
-                // updateUser({ ...user, username: e.target.value });
+                console.log(e);
+                updateUser({
+                  ...user,
+                  previlage: {
+                    ...user.previlage,
+                    dep_id: e.value.id,
+                  },
+                });
               }}
+              filter
+              filterBy={"ccost_name"}
               placeholder="Pilih Department"
             />
           </div>
@@ -331,9 +384,28 @@ const InputPengguna = ({ onCancel, onSuccess, del }) => {
             <label className="text-label">Akses Data</label>
             <div className="p-inputgroup">
               <SelectButton
-                value={null}
-                options={[{ code: 1, name: "All Data" }, { code: 2, name: "Department Only" }]}
-                onChange={(e) => {}}
+                value={
+                  user.previlage?.access_type === 1
+                    ? { code: 1, name: "All Data" }
+                    : user.previlage?.access_type === 2
+                    ? { code: 2, name: "Department Only" }
+                    : null
+                }
+                options={[
+                  { code: 1, name: "All Data" },
+                  { code: 2, name: "Department Only" },
+                ]}
+                onChange={(e) => {
+                  if (e.value?.code) {
+                    updateUser({
+                      ...user,
+                      previlage: {
+                        ...user.previlage,
+                        access_type: e.value.code,
+                      },
+                    });
+                  }
+                }}
                 optionLabel="name"
               />
             </div>
@@ -341,9 +413,15 @@ const InputPengguna = ({ onCancel, onSuccess, del }) => {
           <div className="d-flex col-3 align-items-center mt-4">
             <InputSwitch
               className="mr-3"
-              checked={user.approver}
+              checked={user.previlage?.approver}
               onChange={(e) => {
-                updateUser({ ...user, approver: e.value });
+                updateUser({
+                  ...user,
+                  previlage: {
+                    ...user.previlage,
+                    approver: e.value,
+                  },
+                });
               }}
             />
             <label className="mr-3 mt-1">{"Approver"}</label>

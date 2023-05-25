@@ -6,6 +6,8 @@ import { Toast } from "primereact/toast";
 import { Skeleton } from "primereact/skeleton";
 import CustomAccordion from "src/jsx/components/Accordion/Accordion";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
+import { SET_USER } from "src/redux/actions";
+import { useDispatch, useSelector } from "react-redux";
 
 const data = {
   id: 0,
@@ -26,6 +28,15 @@ const data = {
   tiered: false,
   rp: false,
   over_po: false,
+  rp1: null,
+  rp2: null,
+  rp3: null,
+  po1: null,
+  po2: null,
+  po3: null,
+  gra1: null,
+  gra2: null,
+  gra3: null,
 };
 
 const Pembelian = () => {
@@ -35,11 +46,44 @@ const Pembelian = () => {
   const [accor, setAccor] = useState({
     main: true,
     rp: true,
+    po: true,
+    gra: true,
   });
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user.user);
 
   useEffect(() => {
     getCompany();
+    getUser();
   }, []);
+
+  const getUser = async (isUpdate = false) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.getUser,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      if (response.status) {
+        const { data } = response;
+        dispatch({
+          type: SET_USER,
+          payload: data.filter((v) => v.previlage?.approver),
+        });
+        setLoading(false);
+      }
+    } catch (error) {}
+    if (isUpdate) {
+      setLoading(false);
+    } else {
+      setTimeout(() => {
+        setLoading(false);
+      }, 500);
+    }
+  };
 
   const getCompany = async (needLoading = true) => {
     if (needLoading) {
@@ -131,6 +175,17 @@ const Pembelian = () => {
     }
   };
 
+  const checkUser = (value) => {
+    let selected = null;
+    user?.forEach((element) => {
+      if (element.id === value) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
   const renderLoading = (width) => {
     return (
       <div className="d-flex col-12 align-items-center">
@@ -216,7 +271,7 @@ const Pembelian = () => {
     return (
       <CustomAccordion
         tittle={"Approval Request Purchase (RP)"}
-        ArusKas={accor.rp}
+        active={accor.rp}
         key={1}
         defaultActive={true}
         onClick={() => {
@@ -230,34 +285,46 @@ const Pembelian = () => {
             <div className="col-12 ">
               <PrimeDropdown
                 label={"Approval Level 1"}
-                value={null}
-                options={[]}
+                value={currentData?.rp1 ? checkUser(currentData?.rp1) : null}
+                options={user}
+                filter
+                filterBy={"username"}
                 onChange={(e) => {
-                  // updateUser({ ...user, username: e.target.value });
+                  setCurrentData({ ...currentData, rp1: e.value?.id });
                 }}
+                showClear
                 placeholder="Pilih User"
+                optionLabel={"username"}
               />
             </div>
             <div className="col-12 ">
               <PrimeDropdown
                 label={"Approval Level 2"}
-                value={null}
-                options={[]}
+                value={currentData?.rp2 ? checkUser(currentData?.rp2) : null}
+                options={user}
+                filter
+                filterBy={"username"}
                 onChange={(e) => {
-                  // updateUser({ ...user, username: e.target.value });
+                  setCurrentData({ ...currentData, rp2: e.value?.id });
                 }}
+                showClear
                 placeholder="Pilih User"
+                optionLabel={"username"}
               />
             </div>
             <div className="col-12 ">
               <PrimeDropdown
                 label={"Approval Level 3"}
-                value={null}
-                options={[]}
+                value={currentData?.rp3 ? checkUser(currentData?.rp3) : null}
+                options={user}
+                filter
+                filterBy={"username"}
                 onChange={(e) => {
-                  // updateUser({ ...user, username: e.target.value });
+                  setCurrentData({ ...currentData, rp3: e.value?.id });
                 }}
+                showClear
                 placeholder="Pilih User"
+                optionLabel={"username"}
               />
             </div>
           </Row>
@@ -270,13 +337,13 @@ const Pembelian = () => {
     return (
       <CustomAccordion
         tittle={"Approval Purchase Order (PO)"}
-        ArusKas={accor.rp}
+        active={accor.po}
         key={1}
         defaultActive={true}
         onClick={() => {
           setAccor({
             ...accor,
-            rp: !accor.rp,
+            po: !accor.po,
           });
         }}
         body={
@@ -284,34 +351,46 @@ const Pembelian = () => {
             <div className="col-12 ">
               <PrimeDropdown
                 label={"Approval Level 1"}
-                value={null}
-                options={[]}
+                value={currentData?.po1 ? checkUser(currentData?.po1) : null}
+                options={user}
+                filter
+                filterBy={"username"}
                 onChange={(e) => {
-                  // updateUser({ ...user, username: e.target.value });
+                  setCurrentData({ ...currentData, po1: e.value?.id });
                 }}
+                showClear
                 placeholder="Pilih User"
+                optionLabel={"username"}
               />
             </div>
             <div className="col-12 ">
               <PrimeDropdown
                 label={"Approval Level 2"}
-                value={null}
-                options={[]}
+                value={currentData?.po2 ? checkUser(currentData?.po2) : null}
+                options={user}
+                filter
+                filterBy={"username"}
                 onChange={(e) => {
-                  // updateUser({ ...user, username: e.target.value });
+                  setCurrentData({ ...currentData, po2: e.value?.id });
                 }}
+                showClear
                 placeholder="Pilih User"
+                optionLabel={"username"}
               />
             </div>
             <div className="col-12 ">
               <PrimeDropdown
                 label={"Approval Level 3"}
-                value={null}
-                options={[]}
+                value={currentData?.po3 ? checkUser(currentData?.po3) : null}
+                options={user}
+                filter
+                filterBy={"username"}
                 onChange={(e) => {
-                  // updateUser({ ...user, username: e.target.value });
+                  setCurrentData({ ...currentData, po3: e.value?.id });
                 }}
+                showClear
                 placeholder="Pilih User"
+                optionLabel={"username"}
               />
             </div>
           </Row>
@@ -324,13 +403,13 @@ const Pembelian = () => {
     return (
       <CustomAccordion
         tittle={"Approval Pembelian (GRA)"}
-        ArusKas={accor.rp}
+        active={accor.gra}
         key={1}
         defaultActive={true}
         onClick={() => {
           setAccor({
             ...accor,
-            rp: !accor.rp,
+            gra: !accor.gra,
           });
         }}
         body={
@@ -338,34 +417,46 @@ const Pembelian = () => {
             <div className="col-12 ">
               <PrimeDropdown
                 label={"Approval Level 1"}
-                value={null}
-                options={[]}
+                value={currentData?.gra1 ? checkUser(currentData?.gra1) : null}
+                options={user}
+                filter
+                filterBy={"username"}
                 onChange={(e) => {
-                  // updateUser({ ...user, username: e.target.value });
+                  setCurrentData({ ...currentData, gra1: e.value?.id });
                 }}
+                showClear
                 placeholder="Pilih User"
+                optionLabel={"username"}
               />
             </div>
             <div className="col-12 ">
               <PrimeDropdown
                 label={"Approval Level 2"}
-                value={null}
-                options={[]}
+                value={currentData?.gra2 ? checkUser(currentData?.gra2) : null}
+                options={user}
+                filter
+                filterBy={"username"}
                 onChange={(e) => {
-                  // updateUser({ ...user, username: e.target.value });
+                  setCurrentData({ ...currentData, gra2: e.value?.id });
                 }}
+                showClear
                 placeholder="Pilih User"
+                optionLabel={"username"}
               />
             </div>
             <div className="col-12 ">
               <PrimeDropdown
                 label={"Approval Level 3"}
-                value={null}
-                options={[]}
+                value={currentData?.gra3 ? checkUser(currentData?.gra3) : null}
+                options={user}
+                filter
+                filterBy={"username"}
                 onChange={(e) => {
-                  // updateUser({ ...user, username: e.target.value });
+                  setCurrentData({ ...currentData, gra3: e.value?.id });
                 }}
+                showClear
                 placeholder="Pilih User"
+                optionLabel={"username"}
               />
             </div>
           </Row>
@@ -378,10 +469,22 @@ const Pembelian = () => {
     <>
       <Toast ref={toast} />
       <Row>
-        <Col className="col-lg-12 col-sm-12 col-xs-12">{renderSettings()}</Col>
-        <Col className="col-lg-6 col-sm-12 col-xs-12">{renderApprovalRp()}</Col>
-        <Col className="col-lg-6 col-sm-12 col-xs-12">{renderApprovalPo()}</Col>
-        <Col className="col-lg-6 col-sm-12 col-xs-12">{renderApprovalGra()}</Col>
+        <Col className="col-lg-12 col-sm-12 col-xs-12 pb-0">
+          {renderSettings()}
+        </Col>
+        <Col className="col-lg-6 col-sm-12 col-xs-12">
+          <div className="row">
+            <div className="col-12">
+              {renderApprovalRp()}
+              {renderApprovalGra()}
+            </div>
+          </div>
+        </Col>
+        <Col className="col-lg-6 col-sm-12 col-xs-12">
+          <div className="row">
+            <div className="col-12">{renderApprovalPo()}</div>
+          </div>
+        </Col>
       </Row>
     </>
   );

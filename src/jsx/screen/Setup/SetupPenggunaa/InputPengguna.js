@@ -13,6 +13,8 @@ import { Column } from "primereact/column";
 import { Skeleton } from "primereact/skeleton";
 import { Password } from "primereact/password";
 import { tr } from "src/data/tr";
+import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
+import { SelectButton } from "primereact/selectbutton";
 
 const def = {
   id: null,
@@ -107,7 +109,7 @@ const InputPengguna = ({ onCancel, onSuccess, del }) => {
                 edit: true,
                 delete: true,
               })),
-            }
+            },
           });
         }
 
@@ -165,7 +167,7 @@ const InputPengguna = ({ onCancel, onSuccess, del }) => {
   };
 
   const editUSER = async () => {
-    setUpdate(true)
+    setUpdate(true);
     const config = {
       ...endpoints.editUSER,
       endpoint: endpoints.editUSER.endpoint + user.id,
@@ -252,6 +254,12 @@ const InputPengguna = ({ onCancel, onSuccess, del }) => {
         <Toast ref={toast} />
 
         <Row className="mb-12">
+          <div className="col-12 mt-1">
+            <span className="fs-13">
+              <b>General Information</b>
+            </span>
+            <Divider className="mt-1"></Divider>
+          </div>
           <div className="col-3 ">
             <PrimeInput
               label={"Username"}
@@ -301,6 +309,62 @@ const InputPengguna = ({ onCancel, onSuccess, del }) => {
               {"Aktif"}
             </label>
           </div>
+
+          <div className="col-12 mt-1">
+            <span className="fs-13">
+              <b>Hak Otorisasi</b>
+            </span>
+            <Divider className="mt-1"></Divider>
+          </div>
+          <div className="col-3 ">
+            <PrimeDropdown
+              label={"Department"}
+              value={null}
+              options={[]}
+              onChange={(e) => {
+                // updateUser({ ...user, username: e.target.value });
+              }}
+              placeholder="Pilih Department"
+            />
+          </div>
+          <div className="d-flex flex-column px-3 py-2">
+            <label className="text-label">Akses Data</label>
+            <div className="p-inputgroup">
+              <SelectButton
+                value={null}
+                options={[{ code: 1, name: "All Data" }, { code: 2, name: "Department Only" }]}
+                onChange={(e) => {}}
+                optionLabel="name"
+              />
+            </div>
+          </div>
+          <div className="d-flex col-3 align-items-center mt-4">
+            <InputSwitch
+              className="mr-3"
+              checked={user.approver}
+              onChange={(e) => {
+                updateUser({ ...user, approver: e.value });
+              }}
+            />
+            <label className="mr-3 mt-1">{"Approver"}</label>
+          </div>
+
+          {/* <div className="col-12 mt-1">
+            <span className="fs-13">
+              <b>Approver Settings</b>
+            </span>
+            <Divider className="mt-1"></Divider>
+          </div>
+          <div className="col-3 ">
+            <PrimeInput
+              label={"Approver For"}
+              value={null}
+              onChange={(e) => {
+                // updateUser({ ...user, username: e.target.value });
+              }}
+              placeholder="Masukan Username"
+            />
+          </div> */}
 
           <div className="col-12 mt-1">
             <span className="fs-13">

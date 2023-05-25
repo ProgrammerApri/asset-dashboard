@@ -4,6 +4,8 @@ import { InputSwitch } from "primereact/inputswitch";
 import { endpoints, request } from "src/utils";
 import { Toast } from "primereact/toast";
 import { Skeleton } from "primereact/skeleton";
+import CustomAccordion from "src/jsx/components/Accordion/Accordion";
+import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 
 const data = {
   id: 0,
@@ -32,6 +34,7 @@ const Pembelian = () => {
   const [loading, setLoading] = useState(true);
   const [accor, setAccor] = useState({
     main: true,
+    rp: true,
   });
 
   useEffect(() => {
@@ -182,7 +185,7 @@ const Pembelian = () => {
                       }}
                     />
                     <label className="mr-3 mt-1" htmlFor="email">
-                      {"Aktifkan fitur RP (Request Purchase"}
+                      {"Aktifkan fitur RP (Request Purchase)"}
                     </label>
                   </div>
 
@@ -209,11 +212,176 @@ const Pembelian = () => {
     );
   };
 
+  const renderApprovalRp = () => {
+    return (
+      <CustomAccordion
+        tittle={"Approval Request Purchase (RP)"}
+        ArusKas={accor.rp}
+        key={1}
+        defaultActive={true}
+        onClick={() => {
+          setAccor({
+            ...accor,
+            rp: !accor.rp,
+          });
+        }}
+        body={
+          <Row>
+            <div className="col-12 ">
+              <PrimeDropdown
+                label={"Approval Level 1"}
+                value={null}
+                options={[]}
+                onChange={(e) => {
+                  // updateUser({ ...user, username: e.target.value });
+                }}
+                placeholder="Pilih User"
+              />
+            </div>
+            <div className="col-12 ">
+              <PrimeDropdown
+                label={"Approval Level 2"}
+                value={null}
+                options={[]}
+                onChange={(e) => {
+                  // updateUser({ ...user, username: e.target.value });
+                }}
+                placeholder="Pilih User"
+              />
+            </div>
+            <div className="col-12 ">
+              <PrimeDropdown
+                label={"Approval Level 3"}
+                value={null}
+                options={[]}
+                onChange={(e) => {
+                  // updateUser({ ...user, username: e.target.value });
+                }}
+                placeholder="Pilih User"
+              />
+            </div>
+          </Row>
+        }
+      />
+    );
+  };
+
+  const renderApprovalPo = () => {
+    return (
+      <CustomAccordion
+        tittle={"Approval Purchase Order (PO)"}
+        ArusKas={accor.rp}
+        key={1}
+        defaultActive={true}
+        onClick={() => {
+          setAccor({
+            ...accor,
+            rp: !accor.rp,
+          });
+        }}
+        body={
+          <Row>
+            <div className="col-12 ">
+              <PrimeDropdown
+                label={"Approval Level 1"}
+                value={null}
+                options={[]}
+                onChange={(e) => {
+                  // updateUser({ ...user, username: e.target.value });
+                }}
+                placeholder="Pilih User"
+              />
+            </div>
+            <div className="col-12 ">
+              <PrimeDropdown
+                label={"Approval Level 2"}
+                value={null}
+                options={[]}
+                onChange={(e) => {
+                  // updateUser({ ...user, username: e.target.value });
+                }}
+                placeholder="Pilih User"
+              />
+            </div>
+            <div className="col-12 ">
+              <PrimeDropdown
+                label={"Approval Level 3"}
+                value={null}
+                options={[]}
+                onChange={(e) => {
+                  // updateUser({ ...user, username: e.target.value });
+                }}
+                placeholder="Pilih User"
+              />
+            </div>
+          </Row>
+        }
+      />
+    );
+  };
+
+  const renderApprovalGra = () => {
+    return (
+      <CustomAccordion
+        tittle={"Approval Pembelian (GRA)"}
+        ArusKas={accor.rp}
+        key={1}
+        defaultActive={true}
+        onClick={() => {
+          setAccor({
+            ...accor,
+            rp: !accor.rp,
+          });
+        }}
+        body={
+          <Row>
+            <div className="col-12 ">
+              <PrimeDropdown
+                label={"Approval Level 1"}
+                value={null}
+                options={[]}
+                onChange={(e) => {
+                  // updateUser({ ...user, username: e.target.value });
+                }}
+                placeholder="Pilih User"
+              />
+            </div>
+            <div className="col-12 ">
+              <PrimeDropdown
+                label={"Approval Level 2"}
+                value={null}
+                options={[]}
+                onChange={(e) => {
+                  // updateUser({ ...user, username: e.target.value });
+                }}
+                placeholder="Pilih User"
+              />
+            </div>
+            <div className="col-12 ">
+              <PrimeDropdown
+                label={"Approval Level 3"}
+                value={null}
+                options={[]}
+                onChange={(e) => {
+                  // updateUser({ ...user, username: e.target.value });
+                }}
+                placeholder="Pilih User"
+              />
+            </div>
+          </Row>
+        }
+      />
+    );
+  };
+
   return (
     <>
       <Toast ref={toast} />
       <Row>
         <Col className="col-lg-12 col-sm-12 col-xs-12">{renderSettings()}</Col>
+        <Col className="col-lg-6 col-sm-12 col-xs-12">{renderApprovalRp()}</Col>
+        <Col className="col-lg-6 col-sm-12 col-xs-12">{renderApprovalPo()}</Col>
+        <Col className="col-lg-6 col-sm-12 col-xs-12">{renderApprovalGra()}</Col>
       </Row>
     </>
   );

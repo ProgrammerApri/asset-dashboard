@@ -15,6 +15,8 @@ import { Password } from "primereact/password";
 import { tr } from "src/data/tr";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import { SelectButton } from "primereact/selectbutton";
+import { Link } from "react-router-dom/cjs/react-router-dom";
+import { Dropdown } from "primereact/dropdown";
 
 const def = {
   id: null,
@@ -28,7 +30,31 @@ const def = {
     access_type: 0,
     approver: false,
   },
+  approval_settings: [null],
 };
+
+const modules = [
+  {
+    code: "rp",
+    name: "Request Purchase",
+  },
+  {
+    code: "po",
+    name: "Purchase Order",
+  },
+  {
+    code: "invoice",
+    name: "Invoice",
+  },
+  {
+    code: "so",
+    name: "Sales Order",
+  },
+  {
+    code: "sales",
+    name: "Sales",
+  },
+];
 
 const InputPengguna = ({ onCancel, onSuccess, del }) => {
   const [update, setUpdate] = useState(false);
@@ -164,7 +190,12 @@ const InputPengguna = ({ onCancel, onSuccess, del }) => {
         product: null,
         endpoint_id: null,
         menu: user.menu,
-        previlage: user?.previlage ?? null,
+        previlage: user?.previlage
+          ? { ...user.previlage, approver: user.previlage.approver ?? false }
+          : null,
+        approval_settings: user?.approval_settings
+          ? user?.approval_settings?.filter((e) => e !== null)
+          : null,
       },
     };
     console.log(config.data);
@@ -203,7 +234,13 @@ const InputPengguna = ({ onCancel, onSuccess, del }) => {
         email: user.email,
         active: user.active,
         menu: user.menu,
-        previlage: user.previlage,
+        previlage: {
+          ...user.previlage,
+          approver: user.previlage.approver ?? false,
+        },
+        approval_settings: user?.approval_settings
+          ? user?.approval_settings?.filter((e) => e !== null)
+          : null,
       },
     };
     let response = null;
@@ -212,13 +249,14 @@ const InputPengguna = ({ onCancel, onSuccess, del }) => {
       if (response.status) {
         setTimeout(() => {
           setUpdate(false);
-          getMenu();
-          toast.current.show({
-            severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Diperbarui",
-            life: 3000,
-          });
+          // getMenu();
+          // toast.current.show({
+          //   severity: "info",
+          //   summary: "Berhasil",
+          //   detail: "Data Berhasil Diperbarui",
+          //   life: 3000,
+          // });
+          onSuccess();
         }, 500);
       }
     } catch (error) {
@@ -285,6 +323,143 @@ const InputPengguna = ({ onCancel, onSuccess, del }) => {
     });
 
     return selected;
+  };
+
+  const checkModules = (value) => {
+    let selected = null;
+    modules?.forEach((element) => {
+      if (element.code === value) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const renderApprovalAccess = (
+    value,
+    onChangeLevel,
+    onChangeModule,
+    onChangeType,
+    expanded = false,
+    onAdd,
+    onRemove
+  ) => {
+    return (
+      <div className={`${expanded ? "col-12" : "col-6"} mb-2 px-2 py-0`}>
+        {loading ? (
+          <>
+            <Skeleton width="200px" />
+            <Skeleton className="mt-3" height="45px" />
+          </>
+        ) : (
+          <>
+            <DataTable
+              responsiveLayout="scroll"
+              value={value?.map((e, i) => {
+                return { ...e, index: i };
+              })}
+              className="display w-150 datatable-wrapper header-white no-border"
+              showGridlines={false}
+              emptyMessage={() => <div></div>}
+            >
+              <Column
+                header={"Approval Level"}
+                className="align-text-top p-2"
+                field={""}
+                body={(e) => (
+                  <div className="p-inputgroup">
+                    <Dropdown
+                      value={e?.approval_level}
+                      options={[1, 2, 3]}
+                      onChange={(a) => {
+                        onChangeLevel(e, a.value);
+                      }}
+                      placeholder="Pilih Level"
+                    />
+                  </div>
+                )}
+              />
+              <Column
+                header={"Approval Module"}
+                className="align-text-top p-2"
+                field={""}
+                body={(e) => (
+                  <div className="p-inputgroup">
+                    <Dropdown
+                      value={checkModules(e?.approval_module)}
+                      options={modules}
+                      onChange={(a) => {
+                        onChangeModule(e, a.value.code);
+                      }}
+                      optionLabel="name"
+                      placeholder="Pilih Module"
+                    />
+                  </div>
+                )}
+              />
+              <Column
+                header={"Approval Type"}
+                className="align-text-top p-2"
+                field={""}
+                body={(e) => (
+                  <div className="p-inputgroup">
+                    <Dropdown
+                      value={
+                        e?.approval_type === 1
+                          ? { code: 1, name: "All Data" }
+                          : e?.approval_type === 2
+                          ? { code: 2, name: "Department Only" }
+                          : null
+                      }
+                      options={[
+                        { code: 1, name: "All Data" },
+                        { code: 2, name: "Department Only" },
+                      ]}
+                      optionLabel="name"
+                      onChange={(a) => {
+                        onChangeType(e, a.value.code);
+                      }}
+                      placeholder="Pilih Type"
+                    />
+                  </div>
+                )}
+              />
+              <Column
+                header=""
+                className="align-text-top"
+                field={""}
+                style={{
+                  width: "3rem",
+                }}
+                body={(e) =>
+                  e.index === value.length - 1 ? (
+                    <Link
+                      onClick={() => {
+                        onAdd(e);
+                        // console.log(setup.id);
+                      }}
+                      className="btn btn-primary shadow btn-xs sharp"
+                    >
+                      <i className="fa fa-plus"></i>
+                    </Link>
+                  ) : (
+                    <Link
+                      onClick={() => {
+                        onRemove(e);
+                      }}
+                      className="btn btn-danger shadow btn-xs sharp"
+                    >
+                      <i className="fa fa-trash"></i>
+                    </Link>
+                  )
+                }
+              />
+            </DataTable>
+          </>
+        )}
+      </div>
+    );
   };
 
   const body = () => {
@@ -421,28 +596,82 @@ const InputPengguna = ({ onCancel, onSuccess, del }) => {
                     ...user.previlage,
                     approver: e.value,
                   },
+                  approval_settings: !e.value ? null : user.approval_settings,
                 });
               }}
             />
             <label className="mr-3 mt-1">{"Approver"}</label>
           </div>
 
-          {/* <div className="col-12 mt-1">
-            <span className="fs-13">
-              <b>Approver Settings</b>
-            </span>
-            <Divider className="mt-1"></Divider>
-          </div>
-          <div className="col-3 ">
-            <PrimeInput
-              label={"Approver For"}
-              value={null}
-              onChange={(e) => {
-                // updateUser({ ...user, username: e.target.value });
-              }}
-              placeholder="Masukan Username"
-            />
-          </div> */}
+          {user?.previlage?.approver && (
+            <>
+              <div className="col-12 mt-1">
+                <span className="fs-13">
+                  <b>Approver Settings</b>
+                </span>
+                <Divider className="mt-1"></Divider>
+              </div>
+
+              {renderApprovalAccess(
+                user?.approval_settings ?? [null],
+                (e, value) => {
+                  let temp = user?.approval_settings ?? [null];
+                  temp[e.index] = {
+                    ...temp[e.index],
+                    approval_level: value,
+                  };
+
+                  updateUser({
+                    ...user,
+                    approval_settings: temp,
+                  });
+                },
+                (e, value) => {
+                  let temp = user?.approval_settings ?? [null];
+                  temp[e.index] = {
+                    ...temp[e.index],
+                    approval_module: value,
+                  };
+
+                  updateUser({
+                    ...user,
+                    approval_settings: temp,
+                  });
+                },
+                (e, value) => {
+                  let temp = user?.approval_settings ?? [null];
+                  temp[e.index] = {
+                    ...temp[e.index],
+                    approval_type: value,
+                  };
+
+                  updateUser({
+                    ...user,
+                    approval_settings: temp,
+                  });
+                },
+                false,
+                (e) => {
+                  let temp = user?.approval_settings ?? [null];
+                  temp.push(null);
+
+                  updateUser({
+                    ...user,
+                    approval_settings: temp,
+                  });
+                },
+                (e) => {
+                  let temp = user?.approval_settings;
+                  temp.splice(e.index, 1);
+
+                  updateUser({
+                    ...user,
+                    approval_settings: temp,
+                  });
+                }
+              )}
+            </>
+          )}
 
           <div className="col-12 mt-1">
             <span className="fs-13">

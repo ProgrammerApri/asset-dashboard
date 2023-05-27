@@ -405,7 +405,7 @@ const endpoints = {
     method: "GET",
     data: {},
   },
-  
+
   getCflow: {
     endpoint: "/v1/api/setup/cflow",
     method: "GET",
@@ -438,6 +438,25 @@ const endpoints = {
 
   editSetup: {
     endpoint: "/v1/api/setup/account/",
+    method: "PUT",
+    data: {},
+  },
+
+  //setup auto number
+  getSetupautonumber: {
+    endpoint: "/v1/api/setup/autonumber",
+    method: "GET",
+    data: {},
+  },
+
+  addSetupautonumber: {
+    endpoint: "/v1/api/setup/autonumber",
+    method: "POST",
+    data: {},
+  },
+
+  editSetupautonumber: {
+    endpoint: "/v1/api/setup/autonumber/",
     method: "PUT",
     data: {},
   },

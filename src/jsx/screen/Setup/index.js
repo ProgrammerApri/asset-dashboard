@@ -13,6 +13,7 @@ import SetupPenggunaa from "./SetupPenggunaa";
 import SetupSaldoAkhir from "./SetupSaldoAkhir";
 import SetupPnl2 from "./SetupPnl2";
 import SetupCashFlow from "./setupCashFlow";
+import SetupAutoNumber from "./SetupAutoNumber";
 
 const Setup = () => {
   return (
@@ -49,6 +50,9 @@ const Setup = () => {
       </TabPanel>
       <TabPanel header="Setup Saldo Akhir">
         <SetupSaldoAkhir/>
+      </TabPanel>
+      <TabPanel header="Setup Auto Number">
+        <SetupAutoNumber/>
       </TabPanel>
     </TabView>
   );

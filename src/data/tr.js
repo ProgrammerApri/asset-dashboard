@@ -187,10 +187,25 @@ export const tr = {
     acc_memo: "Akun Memorial",
     sld_memo: "Tipe Saldo",
     histori: "Histori Harga",
+
+no_reff: "Code Reff",
+reff_month: "Reff. Bulan",
+reff_year: "Reff. Tahun",
+auto_no:  "Auto Number",
+res_month:  "Reset Bulan",
+update: "Update",
+
   },
   en: {
     berhsl: "Succeed",
     gagal: "Fail",
+
+    no_reff:"Code Reff",
+    reff_month:"Reff Month",
+    reff_year:"Reff Year",
+    auto_no:"Auto Number",
+    res_month:"Reset Month",
+    update: "Update",
     empty_data: "No Data",
     page: "Page",
     dari: "From",

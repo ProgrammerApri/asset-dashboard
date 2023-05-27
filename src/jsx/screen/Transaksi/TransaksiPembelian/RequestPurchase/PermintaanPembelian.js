@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_RP, SET_EDIT, SET_RP } from "src/redux/actions";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { tr } from "src/data/tr";
+import { Tooltip } from "primereact/tooltip";
 
 const data = {
   id: null,
@@ -36,7 +37,9 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
   const [update, setUpdate] = useState(false);
   const [displayDel, setDisplayDel] = useState(false);
   const [displayData, setDisplayDat] = useState(false);
+  const [displayApprove, setDisplayApprove] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
+  const [expandedRows, setExpandedRows] = useState(null);
   const toast = useRef(null);
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
@@ -46,6 +49,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
   const dispatch = useDispatch();
   const rp = useSelector((state) => state.rp.rp);
   const show = useSelector((state) => state.rp.current);
+  const profile = useSelector((state) => state.profile.profile);
 
   const dummy = Array.from({ length: 10 });
 
@@ -80,7 +84,47 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
     }
   };
 
+  const approveRp = async (id) => {
+    setUpdate(true);
+    const config = {
+      ...endpoints.approveRp,
+      endpoint: endpoints.approveRp.endpoint + currentItem.id,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setTimeout(() => {
+          setUpdate(false);
+          setDisplayApprove(false);
+          getPermintaan(true);
+          toast.current.show({
+            severity: "info",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: "Approve Success",
+            life: 3000,
+          });
+        }, 500);
+      }
+    } catch (error) {
+      console.log(error);
+      setTimeout(() => {
+        setUpdate(false);
+        setDisplayApprove(false);
+        toast.current.show({
+          severity: "error",
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: "Failed to approve",
+          life: 3000,
+        });
+      }, 500);
+    }
+  };
+
   const delPermintaan = async (id) => {
+    setUpdate(true);
     const config = {
       ...endpoints.delRp,
       endpoint: endpoints.delRp.endpoint + currentItem.id,
@@ -118,10 +162,27 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
     }
   };
 
+  const canApprove = (level, data) => {
+    if (!data.apprv_1 && level === 1) {
+      return true;
+    }
+
+    if (!data.apprv_2 && level === 2) {
+      return true;
+    }
+
+    if (!data.apprv_3 && level === 3) {
+      return true;
+    }
+
+    return false;
+  };
+
   const actionBodyTemplate = (data) => {
     return (
       // <React.Fragment>
       <div className="d-flex">
+        <Tooltip target={".btn"} />
         <Link
           onClick={() => {
             setDisplayDat(data);
@@ -236,6 +297,31 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
         >
           <i className="fa fa-trash"></i>
         </Link>
+
+        {profile.previlage.approver && (
+          <Link
+            data-pr-tooltip="Approve"
+            data-pr-position="right"
+            data-pr-my="left center-2"
+            onClick={() => {
+              setEdit(true);
+              setDisplayApprove(true);
+              setCurrentItem(data);
+            }}
+            className={`btn ${
+              canApprove(
+                profile.approval_settings.filter(
+                  (v) => v.approval_module === "rp"
+                )[0].approval_level,
+                data
+              )
+                ? ""
+                : "disabled"
+            } btn-info shadow btn-xs sharp ml-1`}
+          >
+            <i className="fa fa-check"></i>
+          </Link>
+        )}
       </div>
       // </React.Fragment>
     );
@@ -254,6 +340,27 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
           icon="pi pi-trash"
           onClick={() => {
             delPermintaan();
+          }}
+          autoFocus
+          loading={update}
+        />
+      </div>
+    );
+  };
+
+  const renderFooterApprove = () => {
+    return (
+      <div>
+        <PButton
+          label={tr[localStorage.getItem("language")].batal}
+          onClick={() => setDisplayApprove(false)}
+          className="p-button-text btn-primary"
+        />
+        <PButton
+          label={"Approve"}
+          icon="pi pi-check"
+          onClick={() => {
+            approveRp();
           }}
           autoFocus
           loading={update}
@@ -297,10 +404,12 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
               type: SET_EDIT,
               payload: false,
             });
+
             dispatch({
               type: SET_CURRENT_RP,
               payload: {
                 ...data,
+                req_dep: profile.previlage?.dep_id ?? null,
                 rprod: [
                   {
                     id: 0,
@@ -399,6 +508,90 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
     return [day, month, year].join("-");
   };
 
+  const rowExpansionTemplate = (data) => {
+    return (
+      <div className="row">
+        {/* <div className="col-8">
+            <label className="text-label">Tanggal Permintaan :</label>
+            <span className="ml-1">
+              <b>{formatDate(data.req_date)}</b>
+            </span>
+          </div>
+
+          <div className="col-4">
+            <label className="text-label">No. Permintaan :</label>
+            <span className="ml-1">
+              <b>{show.req_code}</b>
+            </span>
+          </div>
+
+          <div className="col-8">
+            <label className="text-label">Department :</label>
+            <span className="ml-1">
+              <b>{data.req_dep?.ccost_name}</b>
+            </span>
+          </div>
+
+          <div className="col-4">
+            <label className="text-label">Ref. Supplier :</label>
+            <span className="ml-1">
+              <b>{data.ref_sup?.sup_name}</b>
+            </span>
+          </div> */}
+
+        <div className="col-12">
+          <DataTable value={data?.rprod} responsiveLayout="scroll">
+            <Column
+              header="Produk"
+              field={(e) => e.prod_id?.name}
+              style={{ minWidth: "14rem" }}
+              // body={loading && <Skeleton />}
+            />
+            <Column
+              header="Jumlah"
+              field={(e) => e.request}
+              style={{ minWidth: "12rem" }}
+              // body={loading && <Skeleton />}
+            />
+            <Column
+              header="Satuan"
+              field={(e) => e.unit_id?.name}
+              style={{ minWidth: "12rem" }}
+              // body={loading && <Skeleton />}
+            />
+          </DataTable>
+        </div>
+        {data?.rjasa.length > 0 && (
+          <div className="col-12">
+            <DataTable
+              value={data?.rjasa}
+              responsiveLayout="scroll"
+              className="mt-2"
+            >
+              <Column
+                header="Jasa"
+                field={(e) => e.jasa_id?.name}
+                style={{ minWidth: "13rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header="Jumlah"
+                field={(e) => e.request}
+                style={{ minWidth: "13rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header="Satuan"
+                field={(e) => e.unit_id?.name}
+                style={{ minWidth: "12rem" }}
+              />
+            </DataTable>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <>
       <Toast ref={toast} />
@@ -420,7 +613,11 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
         rows={rows2}
         onPage={onCustomPage2}
         paginatorClassName="justify-content-end mt-3"
+        expandedRows={expandedRows}
+        onRowToggle={(e) => setExpandedRows(e.data)}
+        rowExpansionTemplate={rowExpansionTemplate}
       >
+        <Column expander style={{ width: "3em" }} />
         <Column
           header={tr[localStorage.getItem("language")].tgl}
           style={{
@@ -467,6 +664,42 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
                   // )
                 }
               </div>
+            )
+          }
+        />
+        <Column
+          header={"Approval Status"}
+          field={(e) => e?.approval_status ?? ""}
+          style={{ minWidth: "8rem" }}
+          body={(e) =>
+            loading ? (
+              <Skeleton />
+            ) : (
+              <>
+                <Tooltip target={"a"} />
+                <Link
+                  data-pr-tooltip="View Approval Detail"
+                  data-pr-position="right"
+                  data-pr-my="left center"
+                >
+                  {e?.apprv_status === 1 ? (
+                    <Badge variant="success light">
+                      <i className="bx bxs-circle text-success mr-1"></i>{" "}
+                      {e?.apprv_text ?? "No Status"}
+                    </Badge>
+                  ) : e?.apprv_status === 2 ? (
+                    <Badge variant="success light">
+                      <i className="bx bxs-circle text-warning mr-1"></i>{" "}
+                      {e?.apprv_text ?? "No Status"}
+                    </Badge>
+                  ) : (
+                    <Badge variant="danger light">
+                      <i className="bx bxs-circle text-danger mr-1"></i>{" "}
+                      {e?.apprv_text ?? "No Status"}
+                    </Badge>
+                  )}
+                </Link>
+              </>
             )
           }
         />
@@ -614,6 +847,24 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
             style={{ fontSize: "2rem" }}
           />
           <span>{tr[localStorage.getItem("language")].pesan_hapus}</span>
+        </div>
+      </Dialog>
+
+      <Dialog
+        header={`Approve ${tr[localStorage.getItem("language")].req_pur}`}
+        visible={displayApprove}
+        style={{ width: "30vw" }}
+        footer={renderFooterApprove()}
+        onHide={() => {
+          setDisplayApprove(false);
+        }}
+      >
+        <div className="ml-3 mr-3">
+          <i
+            className="pi pi-exclamation-triangle mr-3 align-middle"
+            style={{ fontSize: "2rem" }}
+          />
+          <span>{tr[localStorage.getItem("language")].pesan_approve}</span>
         </div>
       </Dialog>
     </>

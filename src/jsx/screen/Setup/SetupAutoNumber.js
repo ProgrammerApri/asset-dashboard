@@ -24,31 +24,36 @@ import { SET_CURRENT_RP_AUTO } from "src/redux/actions";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { Button } from "primereact/button";
+import data from "src/jsx/data";
 // import { Checkbox } from "primereact/checkbox";
 
 const set = {
   id: null,
-  cp_id: null,
+  // cp_id: null,
   rp_no_ref: null,
   rp_ref_month: null,
   rp_ref_year: null,
-  rp_depart: null,
+  rp_depart: false,
   rp_reset_month: false,
+
   po_no_ref: null,
   po_ref_month: null,
   po_ref_year: null,
   po_depart: null,
   po_reset_month: false,
+
   gr_no_ref: null,
   gr_ref_month: null,
   gr_ref_year: null,
   gr_depart: null,
   gr_reset_month: false,
+
   pi_no_ref: null,
   pi_ref_month: null,
   pi_ref_year: null,
   pi_depart: null,
   pi_reset_month: false,
+
   pr_no_ref: null,
   pr_ref_month: null,
   pr_ref_year: null,
@@ -60,21 +65,25 @@ const set = {
   so_ref_year: null,
   so_depart: null,
   so_reset_month: false,
+
   sl_no_ref: null,
   sl_ref_month: null,
   sl_ref_year: null,
   sl_depart: null,
   sl_reset_month: false,
+
   ip_no_ref: null,
   ip_ref_month: null,
   ip_ref_year: null,
   ip_depart: null,
   ip_reset_month: false,
+
   fp_no_ref: null,
   fp_ref_month: null,
   fp_ref_year: null,
   fp_depart: null,
   fp_reset_month: false,
+
   rpen_no_ref: null,
   rpen_ref_month: null,
   rpen_ref_year: null,
@@ -185,8 +194,10 @@ const set = {
 
 const SetupAutoNumber = () => {
   const toast = useRef(null);
-  const [currentData, setCurrentData] = useState({ rp_no_ref: null });
+  const [currentData, setCurrentData] = useState(null);
+  const [currentSetup, setCurrentSetup] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [onSubmit, setSubmit] = useState(false);
   const rp_auto = useSelector((state) => state.rp.currentauto);
   const label = { inputProps: { "aria-label": "Checkbox demo" } };
   //pembelian
@@ -225,75 +236,39 @@ const SetupAutoNumber = () => {
   const [depmemorial, setDepmemorial] = useState("");
   //pengeluaran keluar
   const [pengeluarankeluar, setPengeluarankeluar] = useState("");
-  const [pengeluarankeluar1, setPengeluarankeluar1] = useState("");
-  const [pengeluarankeluar2, setPengeluarankeluar2] = useState("");
-  const [pengeluarankeluar3, setPengeluarankeluar3] = useState("");
 
   //pencairan giro keluar
   const [pencairangirokeluar, setPencairangirokeluar] = useState("");
-  const [pencairangirokeluar1, setPencairangirokeluar1] = useState("");
-  const [pencairangirokeluar2, setPencairangirokeluar2] = useState("");
-  const [pencairangirokeluar3, setPencairangirokeluar3] = useState("");
 
   //koreksi hutang
   const [koreksihutang, setKoreksihutang] = useState("");
-  const [koreksihutang1, setKoreksihutang1] = useState("");
-  const [koreksihutang2, setKoreksihutang2] = useState("");
-  const [koreksihutang3, setKoreksihutang3] = useState("");
 
   //pemasukan masuk
   const [pemasukanmasuk, setPemasukanmasuk] = useState("");
-  const [pemasukanmasuk1, setPemasukanmasuk1] = useState("");
-  const [pemasukanmasuk2, setPemasukanmasuk2] = useState("");
-  const [pemasukanmasuk3, setPemasukanmasuk3] = useState("");
 
   //pencairan giro masuk
   const [pencairangiromasuk, setPencairangiromasuk] = useState("");
-  const [pencairangiromasuk1, setPencairangiromasuk1] = useState("");
-  const [pencairangiromasuk2, setPencairangiromasuk2] = useState("");
-  const [pencairangiromasuk3, setPencairangiromasuk3] = useState("");
 
   //koreksi piutang
   const [koreksipiutang, setKoreksipiutang] = useState("");
-  const [koreksipiutang1, setKoreksipiutang1] = useState("");
-  const [koreksipiutang2, setKoreksipiutang2] = useState("");
-  const [koreksipiutang3, setKoreksipiutang3] = useState("");
 
   //mesin
   const [mesin, setMesin] = useState("");
-  const [mesin1, setMesin1] = useState("");
-  const [mesin2, setMesin2] = useState("");
-  const [mesin3, setMesin3] = useState("");
 
   //formula
   const [formula, setFormula] = useState("");
-  const [formula1, setFormula1] = useState("");
-  const [formula2, setFormula2] = useState("");
-  const [formula3, setFormula3] = useState("");
 
   //planning
   const [planning, setPlanning] = useState("");
-  const [planning1, setPlanning1] = useState("");
-  const [planning2, setPlanning2] = useState("");
-  const [planning3, setPlanning3] = useState("");
 
   //batch
   const [batch, setBatch] = useState("");
-  const [batch1, setBatch1] = useState("");
-  const [batch2, setBatch2] = useState("");
-  const [batch3, setBatch3] = useState("");
 
   //penerimaanhasiljadi
   const [penerimaanhasiljadi, setPenerimaanhasiljadi] = useState("");
-  const [penerimaanhasiljadi1, setPenerimaanhasiljadi1] = useState("");
-  const [penerimaanhasiljadi2, setPenerimaanhasiljadi2] = useState("");
-  const [penerimaanhasiljadi3, setPenerimaanhasiljadi3] = useState("");
 
   //pembebanan
   const [pembebanan, setPembebanan] = useState("");
-  const [pembebanan1, setPembebanan1] = useState("");
-  const [pembebanan2, setPembebanan2] = useState("");
-  const [pembebanan3, setPembebanan3] = useState("");
 
   const [middle, setMiddle] = useState(new Date().getMonth() + 1);
   const dispatch = useDispatch();
@@ -377,266 +352,9 @@ const SetupAutoNumber = () => {
     memorial: true,
     resetbulan: false,
   });
-  const valueprefix = `${prefix}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valueprefix1 = `${prefix1}/${romanNumeral}/${year}/${departement1}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valueprefix2 = `${prefix2}/${romanNumeral}/${year}/${departement2}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valueprefix3 = `${prefix3}/${romanNumeral}/${year}/${departement3}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valueprefix4 = `${prefix4}/${romanNumeral}/${year}/${departement4}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuepenju = `${penju}/${romanNumeral}/${year}/${deppenju}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuepenju1 = `${penju1}/${romanNumeral}/${year}/${deppenju1}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuepenju2 = `${penju2}/${romanNumeral}/${year}/${deppenju2}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuepenju3 = `${penju3}/${romanNumeral}/${year}/${deppenju3}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuepenju4 = `${penju4}/${romanNumeral}/${year}/${deppenju4}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuepersediaan = `${persediaan}/${romanNumeral}/${year}/${deppersediaan}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuepersediaan1 = `${persediaan1}/${romanNumeral}/${year}/${deppersediaan1}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuepersediaan2 = `${persediaan2}/${romanNumeral}/${year}/${deppersediaan2}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuepersediaan3 = `${persediaan3}/${romanNumeral}/${year}/${deppersediaan3}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuememorial = `${memorial}/${romanNumeral}/${year}/${depmemorial}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  // const combinedValue15 = `${memorial}/${romanNumeral}/${year}/${depmemorial}/${number.padStart(
-  //   5,
-  //   "0"
-  // )}  `;
-  const valuepengeluaran = `${pengeluarankeluar}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuepengeluaran1 = `${pengeluarankeluar1}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuepengeluaran2 = `${pengeluarankeluar2}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuepengeluaran3 = `${pengeluarankeluar3}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuepencairankeluar = `${pengeluarankeluar}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuepencairankeluar1 = `${pengeluarankeluar1}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuepencairankeluar2 = `${pengeluarankeluar2}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuepencairankeluar3 = `${pengeluarankeluar3}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuekoreksihutang = `${pengeluarankeluar}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuekoreksihutang1 = `${pengeluarankeluar1}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuekoreksihutang2 = `${pengeluarankeluar2}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuekoreksihutang3 = `${pengeluarankeluar3}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuepemasukanmasuk = `${pengeluarankeluar}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuepemasukanmasuk1 = `${pengeluarankeluar1}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuepemasukanmasuk2 = `${pengeluarankeluar2}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuepemasukanmasuk3 = `${pengeluarankeluar3}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-
-  const valuepencairangiromasuk = `${pengeluarankeluar}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuepencairangiromasuk1 = `${pengeluarankeluar1}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuepencairangiromasuk2 = `${pengeluarankeluar2}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuepencairangiromasuk3 = `${pengeluarankeluar3}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuekoreksipiutang = `${pengeluarankeluar}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuekoreksipiutang1 = `${pengeluarankeluar1}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuekoreksipiutang2 = `${pengeluarankeluar2}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuekoreksipiutang3 = `${pengeluarankeluar3}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuemesin = `${pengeluarankeluar}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuemesin1 = `${pengeluarankeluar1}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuemesin2 = `${pengeluarankeluar2}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuemesin3 = `${pengeluarankeluar3}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valueformula = `${pengeluarankeluar}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valueformula1 = `${pengeluarankeluar1}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valueformula2 = `${pengeluarankeluar2}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valueformula3 = `${pengeluarankeluar3}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valueplanning = `${pengeluarankeluar}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valueplanning1 = `${pengeluarankeluar1}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valueplanning2 = `${pengeluarankeluar2}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valueplanning3 = `${pengeluarankeluar3}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuebatch = `${pengeluarankeluar}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuebatch1 = `${pengeluarankeluar1}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuebatch2 = `${pengeluarankeluar2}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuebatch3 = `${pengeluarankeluar3}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuephj = `${pengeluarankeluar}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuephj1 = `${pengeluarankeluar1}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuephj2 = `${pengeluarankeluar2}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuephj3 = `${pengeluarankeluar3}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuepembebanan = `${pengeluarankeluar}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuepembebanan1 = `${pengeluarankeluar1}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuepembebanan2 = `${pengeluarankeluar2}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
-  const valuepembebanan3 = `${pengeluarankeluar3}/${romanNumeral}/${year}/${departement}/${number.padStart(
-    5,
-    "0"
-  )}  `;
 
   useEffect(() => {
-    getCompany();
+    getSetup();
   }, []);
 
   const getCompany = async () => {
@@ -650,7 +368,7 @@ const SetupAutoNumber = () => {
           Object.keys(response.data).length === 0 &&
           response.data.constructor === Object
         ) {
-          setCurrentData(false);
+          setCurrentData(set);
         } else {
           setCurrentData(true);
         }
@@ -675,9 +393,9 @@ const SetupAutoNumber = () => {
       if (response.status) {
         const { data } = response;
 
-        setCurrentData(data);
+        setCurrentSetup(data);
       } else {
-        setCurrentData(set);
+        setCurrentSetup(set);
       }
       setLoading(false);
     } catch (error) {
@@ -689,7 +407,7 @@ const SetupAutoNumber = () => {
     let config = {
       ...endpoints.addSetupautonumber,
       data: rp_auto,
-    };
+      };
     let response = null;
     try {
       response = await request(null, config);
@@ -710,18 +428,7 @@ const SetupAutoNumber = () => {
         life: 3000,
       });
     }
-
-    getSetup(false);
   };
-  const items = [
-    {
-      label: "Upload",
-      icon: "pi pi-upload",
-      command: () => {
-        //router.push('/fileupload');
-      },
-    },
-  ];
 
   const updateRp = (e) => {
     dispatch({
@@ -750,7 +457,7 @@ const SetupAutoNumber = () => {
         <Col className="col-lg-12 col-sm-12 col-xs-12">
           <CustomAccordion
             tittle={"Auto Number Transaksi Purchase"}
-            defaultActive={false}
+            defaultActive={true}
             active={accor.purchase}
             onClick={() => {
               setAccor({
@@ -776,7 +483,7 @@ const SetupAutoNumber = () => {
                         type="text"
                         value={rp_auto?.prefix}
                         onChange={(e) => {
-                          setPrefix(e.target.value);
+                          setCurrentSetup(e.target.value);
                           updateRp({
                             ...rp_auto,
                             rp_no_ref: e.target.value,
@@ -804,7 +511,7 @@ const SetupAutoNumber = () => {
                     <div className="p-inputgroup"></div>
                     <PrimeInput
                       type="text"
-                      value={resbulan ? "SUPERVISOR" : ""}
+                      value={rp_auto.rp_depart ? "SUPERVISOR" : ""}
                       placeholder="Masukkan Disini"
                       disabled
                     />
@@ -813,24 +520,19 @@ const SetupAutoNumber = () => {
                     <label className=" text-label"></label>
                     <div className="p-inputgroup"></div>
                     <InputSwitch
-                      checked={resbulan}
+                      checked={rp_auto.rp_depart}
                       onChange={(e) => {
-                        setResbulan(e.value);
-                        setAccor({ ...accor, resbulan: e.value });
+                        setCurrentData({ ...rp_auto, rp_depart: e.value });
+                        updateRp({ ...rp_auto, rp_depart: e.value });
                       }}
                     />
                   </div>
 
-                  {/* <div className="col-4">
-                    <label className=" text-label"></label>
-                    <div className="p-inputgroup"></div>
-                    <p className="fs-10 text-large">{valueprefix}</p>
-                  </div> */}
                   <div className="col-4 text-right">
                     <label className=" text-label">Reset Nomor</label>
                     <div className="p-inputgroup"></div>
                     <InputSwitch
-                      checked={resbulan1}
+                      checked={rp_auto && rp_auto.rp_reset_month}
                       onChange={(e) => {
                         setResbulan1(e.value);
                         setAccor({ ...accor, resbulan: e.value });
@@ -848,9 +550,6 @@ const SetupAutoNumber = () => {
                       autoFocus
                       loading={loading}
                     />
-                    {/* <label className="mr-3 mt-1" htmlFor="email">
-                      {"Aktifkan fitur RP (Request Purchase)"}
-                    </label> */}
                   </div>
                 </Row>
                 <Row className="mb-4">
@@ -866,7 +565,7 @@ const SetupAutoNumber = () => {
                       {/* <div className="p-inputgroup"></div> */}
                       <PrimeInput
                         type="text"
-                        value={rp_auto?.prefix1}
+                        value={rp_auto?.prefix}
                         onChange={(e) => {
                           setPrefix1(e.target.value);
                           updateRp({
@@ -905,11 +604,7 @@ const SetupAutoNumber = () => {
                     <div className="p-inputgroup"></div>
                     <PrimeInput
                       type="text"
-                      value={resbulan2 ? "IT" : ""}
-                      onChange={(e) => {
-                        setDepartement1(e.target.value);
-                        updateRp({ ...rp_auto, po_depart: e.target.value });
-                      }}
+                      value={rp_auto.po_depart ? "IT" : ""}
                       placeholder="Masukkan Disini"
                       disabled
                     />
@@ -919,10 +614,10 @@ const SetupAutoNumber = () => {
                     <label className=" text-label"></label>
                     <div className="p-inputgroup"></div>
                     <InputSwitch
-                      checked={resbulan2}
+                      checked={rp_auto.po_depart}
                       onChange={(e) => {
-                        setResbulan2(e.value);
-                        setAccor({ ...accor, resbulan: e.value });
+                        setCurrentData({ ...rp_auto, po_depart: e.value });
+                        updateRp({ ...rp_auto, po_depart: e.value });
                       }}
                     />
                   </div>
@@ -936,10 +631,13 @@ const SetupAutoNumber = () => {
                     <label className=" text-label">Reset Nomor</label>
                     <div className="p-inputgroup"></div>
                     <InputSwitch
-                      checked={resbulan3}
+                      checked={rp_auto && rp_auto.po_reset_month}
                       onChange={(e) => {
-                        setResbulan3(e.value);
-                        setAccor({ ...accor, resbulan: e.value });
+                        setCurrentData({
+                          ...rp_auto,
+                          po_reset_month: e.value,
+                        });
+                        updateRp({ ...rp_auto, po_reset_month: e.value });
                       }}
                     />
                   </div>
@@ -1829,7 +1527,7 @@ const SetupAutoNumber = () => {
           />
           <CustomAccordion
             tittle={"Auto Number Inventory"}
-            defaultActive={true}
+            defaultActive={false}
             active={accor.sale}
             onClick={() => {
               setAccor({
@@ -3053,7 +2751,7 @@ const SetupAutoNumber = () => {
           />
           <CustomAccordion
             tittle={"Auto Number Produksi"}
-            defaultActive={true}
+            defaultActive={false}
             active={accor.sale}
             onClick={() => {
               setAccor({

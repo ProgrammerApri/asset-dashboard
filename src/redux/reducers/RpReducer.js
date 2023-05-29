@@ -4,6 +4,7 @@ const initialState = {
   rp: [],
   current: {},
   editRp: false,
+  
   rp_auto: [],
   currentauto: {},
   editRp: false

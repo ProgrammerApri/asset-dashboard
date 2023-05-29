@@ -455,7 +455,7 @@ const endpoints = {
     data: {},
   },
 
-  editSetupautonumber: {
+  updateSetupautonumber: {
     endpoint: "/v1/api/setup/autonumber/",
     method: "PUT",
     data: {},

@@ -613,7 +613,7 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
                 />
                 <Column
                   header={tr[localStorage.getItem("language")].kd_ord}
-                  field={(e) => e.po_code}
+                  field={(e) => e?.po_code ?? "-"}
                   style={{ minWidth: "10rem" }}
                   body={loading && <Skeleton />}
                 />

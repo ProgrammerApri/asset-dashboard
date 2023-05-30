@@ -12,10 +12,11 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_RP, SET_EDIT, SET_RP } from "src/redux/actions";
+import { SET_CURRENT_RP, SET_EDIT, SET_RP, SET_USER } from "src/redux/actions";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { tr } from "src/data/tr";
 import { Tooltip } from "primereact/tooltip";
+import { Timeline } from "primereact/timeline";
 
 const data = {
   id: null,
@@ -40,6 +41,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
   const [displayApprove, setDisplayApprove] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const [expandedRows, setExpandedRows] = useState(null);
+  const [approverCount, setApproverCount] = useState(0);
   const toast = useRef(null);
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
@@ -50,11 +52,12 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
   const rp = useSelector((state) => state.rp.rp);
   const show = useSelector((state) => state.rp.current);
   const profile = useSelector((state) => state.profile.profile);
+  const user = useSelector((state) => state.user.user);
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getPermintaan();
+    getUser();
     initFilters1();
   }, []);
 
@@ -73,6 +76,44 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
         const { data } = response;
         console.log(data);
         dispatch({ type: SET_RP, payload: data });
+      }
+    } catch (error) {}
+    if (isUpdate) {
+      setLoading(false);
+    } else {
+      setTimeout(() => {
+        setLoading(false);
+      }, 500);
+    }
+  };
+
+  const getUser = async (isUpdate = false) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.getUser,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      if (response.status) {
+        const { data } = response;
+        dispatch({
+          type: SET_USER,
+          payload: data.filter((v) => v.previlage?.approver),
+        });
+        setApproverCount(
+          data.filter(
+            (v) =>
+              v.previlage?.approver &&
+              (v.previlage?.dep_id == profile?.previlage?.dep_id ||
+                v.previlage?.access_type == 1) &&
+              v.approval_settings.some((v) => v.approval_module == "rp")
+          ).length
+        );
+        setLoading(false);
+        getPermintaan();
       }
     } catch (error) {}
     if (isUpdate) {
@@ -508,37 +549,208 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
     return [day, month, year].join("-");
   };
 
+  const formatDateTime = (date) => {
+    var d = new Date(`${date}Z`),
+      month = "" + (d.getMonth() + 1),
+      day = "" + d.getDate(),
+      year = "" + d.getFullYear(),
+      hour = "" + d.getHours(),
+      minute = "" + d.getMinutes(),
+      second = "" + d.getSeconds();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+    if (hour.length < 2) hour = "0" + hour;
+    if (minute.length < 2) minute = "0" + minute;
+    if (second.length < 2) second = "0" + second;
+
+    return `${[day, month, year].join("-")} || ${[hour, minute, second].join(
+      ":"
+    )}`;
+  };
+
+  const customizedMarker = (item) => {
+    console.log(item);
+    return (
+      <span
+        className="flex align-items-center justify-content-center z-1 p-1 border-circle"
+        style={{
+          backgroundColor: item.complete ? "#21BF99" : "white",
+          border: "2px solid #21BF99",
+        }}
+      >
+        <i
+          className={"pi pi-check"}
+          style={{ fontSize: "0.4rem", fontWeight: "bold", color: "white" }}
+        ></i>
+      </span>
+    );
+  };
+
+  const checkUser = (value) => {
+    let selected = null;
+    user?.forEach((element) => {
+      if (element.id === value) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const generateValuTimeline = (data) => {
+    let value = [
+      {
+        label: "Request Created",
+        date: data?.created_at ? formatDateTime(data?.created_at) : "-",
+        approved_by: data?.created_by
+          ? `Created By: ${checkUser(data?.created_by)?.username}`
+          : "-",
+        reason: "-",
+        complete: true,
+      },
+    ];
+
+    if (data.apprv_status === 1) {
+      if (data?.apprv_1) {
+        value.push({
+          label: "Approval Level 1",
+          date: data?.apprv1_time ? formatDateTime(data?.apprv1_time) : "-",
+          approved_by: `Approved By: ${
+            data?.apprv_1 ? checkUser(data?.apprv_1)?.username : "-"
+          }`,
+          reason: "-",
+          complete: true,
+        });
+      }
+      if (data?.apprv_2) {
+        value.push({
+          label: "Approval Level 2",
+          date: data?.apprv2_time ? formatDateTime(data?.apprv2_time) : "-",
+          approved_by: `Approved By: ${
+            data?.apprv_2 ? checkUser(data?.apprv_2)?.username : "-"
+          }`,
+          reason: "-",
+          complete: true,
+        });
+      }
+      if (data?.apprv_3) {
+        value.push({
+          label: "Approval Level 3",
+          date: data?.apprv3_time ? formatDateTime(data?.apprv3_time) : "-",
+          approved_by: `Approved By: ${
+            data?.apprv_3 ? checkUser(data?.apprv_3)?.username : "-"
+          }`,
+          reason: "-",
+          complete: true,
+        });
+      }
+    }
+
+    if (data.apprv_status === 0) {
+      const len = Array.from({ length: approverCount });
+      console.log(approverCount);
+      len.forEach((el, i) => {
+        if (data[`apprv_${i + 1}`]) {
+          value.push({
+            label: `Approval Level ${i + 1}`,
+            date: data[`apprv${i + 1}_time`]
+              ? formatDateTime(data[`apprv${i + 1}_time`])
+              : "-",
+            approved_by: `Approved By: ${
+              data[`apprv_${i + 1}`]
+                ? checkUser(data[`apprv_${i + 1}`])?.username
+                : "-"
+            }`,
+            reason: "-",
+            complete: true,
+          });
+        } else {
+          value.push({
+            label: `Approval Level ${i + 1}`,
+            date: "-",
+            approved_by: "-",
+            reason: "-",
+            complete: false,
+          });
+        }
+      });
+    }
+
+    if (data.apprv_status === 3) {
+      if (data?.apprv_1) {
+        value.push({
+          label: "Approval Level 1",
+          date: data?.apprv1_time ? formatDateTime(data?.apprv1_time) : "-",
+          approved_by: `Approved By: ${
+            data?.apprv_1 ? checkUser(data?.apprv_1)?.username : "-"
+          }`,
+          reason: "-",
+          complete: true,
+        });
+      }
+      if (data?.apprv_2) {
+        value.push({
+          label: "Approval Level 2",
+          date: data?.apprv2_time ? formatDateTime(data?.apprv2_time) : "-",
+          approved_by: `Approved By: ${
+            data?.apprv_2 ? checkUser(data?.apprv_2)?.username : "-"
+          }`,
+          reason: "-",
+          complete: true,
+        });
+      }
+      if (data?.apprv_3) {
+        value.push({
+          label: "Approval Level 3",
+          date: data?.apprv3_time ? formatDateTime(data?.apprv3_time) : "-",
+          approved_by: `Approved By: ${
+            data?.apprv_3 ? checkUser(data?.apprv_3)?.username : "-"
+          }`,
+          reason: "-",
+          complete: true,
+        });
+      }
+
+      if (data?.reject) {
+        value.push({
+          label: "Rejected",
+          date: data?.apprv3_time ? formatDateTime(data?.apprv3_time) : "-",
+          approved_by: `Rejected By: ${
+            data?.reject ? checkUser(data?.reject)?.username : "-"
+          }`,
+          reason: data?.reason ?? "-",
+          complete: true,
+        });
+      }
+    }
+
+    return value;
+  };
+
   const rowExpansionTemplate = (data) => {
     return (
       <div className="row">
-        {/* <div className="col-8">
-            <label className="text-label">Tanggal Permintaan :</label>
-            <span className="ml-1">
-              <b>{formatDate(data.req_date)}</b>
-            </span>
-          </div>
+        <div className="col-12">
+          <Timeline
+            value={generateValuTimeline(data)}
+            layout="horizontal"
+            align="top"
+            marker={customizedMarker}
+            content={(item) => (
+              <div className="row" style={{ minWidth: "14rem" }}>
+                <div className="col-12 pt-0 mt-0">
+                  <b>{item.label}</b>
+                </div>
+                <div className="col-12 pt-0 mt-0">{item.date}</div>
 
-          <div className="col-4">
-            <label className="text-label">No. Permintaan :</label>
-            <span className="ml-1">
-              <b>{show.req_code}</b>
-            </span>
-          </div>
+                <div className="col-12 pt-0 mt-0">{item.approved_by}</div>
 
-          <div className="col-8">
-            <label className="text-label">Department :</label>
-            <span className="ml-1">
-              <b>{data.req_dep?.ccost_name}</b>
-            </span>
-          </div>
-
-          <div className="col-4">
-            <label className="text-label">Ref. Supplier :</label>
-            <span className="ml-1">
-              <b>{data.ref_sup?.sup_name}</b>
-            </span>
-          </div> */}
-
+                <div className="col-12 pt-0 mt-0">{item.reason}</div>
+              </div>
+            )}
+          />
+        </div>
         <div className="col-12">
           <DataTable value={data?.rprod} responsiveLayout="scroll">
             <Column
@@ -676,29 +888,22 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
               <Skeleton />
             ) : (
               <>
-                <Tooltip target={"a"} />
-                <Link
-                  data-pr-tooltip="View Approval Detail"
-                  data-pr-position="right"
-                  data-pr-my="left center"
-                >
-                  {e?.apprv_status === 1 ? (
-                    <Badge variant="success light">
-                      <i className="bx bxs-circle text-success mr-1"></i>{" "}
-                      {e?.apprv_text ?? "No Status"}
-                    </Badge>
-                  ) : e?.apprv_status === 2 ? (
-                    <Badge variant="success light">
-                      <i className="bx bxs-circle text-warning mr-1"></i>{" "}
-                      {e?.apprv_text ?? "No Status"}
-                    </Badge>
-                  ) : (
-                    <Badge variant="danger light">
-                      <i className="bx bxs-circle text-danger mr-1"></i>{" "}
-                      {e?.apprv_text ?? "No Status"}
-                    </Badge>
-                  )}
-                </Link>
+                {e?.apprv_status === 0 ? (
+                  <Badge variant="warning light">
+                    <i className="bx bxs-circle text-warning mr-1"></i>{" "}
+                    {e?.apprv_text ?? "No Status"}
+                  </Badge>
+                ) : e?.apprv_status === 1 ? (
+                  <Badge variant="success light">
+                    <i className="bx bxs-circle text-success mr-1"></i>{" "}
+                    {e?.apprv_text ?? "No Status"}
+                  </Badge>
+                ) : (
+                  <Badge variant="danger light">
+                    <i className="bx bxs-circle text-danger mr-1"></i>{" "}
+                    {e?.apprv_text ?? "No Status"}
+                  </Badge>
+                )}
               </>
             )
           }

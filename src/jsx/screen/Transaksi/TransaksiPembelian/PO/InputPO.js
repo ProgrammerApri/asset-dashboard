@@ -1372,7 +1372,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
             </label>
             <div className="p-inputgroup mt-2"></div>
             <CustomDropdown
-              value={po.top !== null ? rulPay(po.top) : null}
+              value={po?.top ? rulPay(po.top) : null}
               option={rulesPay}
               onChange={(e) => {
                 let result = new Date(`${po.po_date}Z`);

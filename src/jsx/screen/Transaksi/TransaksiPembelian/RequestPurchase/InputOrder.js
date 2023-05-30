@@ -136,9 +136,10 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
   };
 
   const addRp = async () => {
+    let now = new Date();
     const config = {
       ...endpoints.addRp,
-      data: rp,
+      data: {...rp, req_date: new Date(rp.req_date?.setHours(now.getHours(), now.getMinutes(), now.getSeconds()))},
     };
     console.log(config.data);
     let response = null;

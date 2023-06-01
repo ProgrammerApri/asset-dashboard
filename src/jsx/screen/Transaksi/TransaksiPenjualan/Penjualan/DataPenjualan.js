@@ -58,6 +58,7 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
   const [isEdit, setEdit] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+  const [currency, setCurrency] = useState(null);
   const dispatch = useDispatch();
   const sale = useSelector((state) => state.sl.sl);
   const show = useSelector((state) => state.sl.current);
@@ -68,6 +69,7 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
 
   useEffect(() => {
     getSale();
+    getCur();
     initFilters1();
   }, []);
 
@@ -95,6 +97,24 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
         setLoading(false);
       }, 500);
     }
+  };
+
+  const getCur = async () => {
+    const config = {
+      ...endpoints.currency,
+      data: {},
+    };
+
+    let response = null;
+    try {
+      response = await request(null, config);
+
+      if (response.status) {
+        const { data } = response;
+
+        setCurrency(data);
+      }
+    } catch (error) {}
   };
 
   const delSale = async (id) => {
@@ -432,7 +452,7 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
   };
 
   const formatTh = (value) => {
-    return `${value}`
+    return `${value?.toFixed(2)}`
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
@@ -466,6 +486,16 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
   };
 
   const rowExpansionTemplate = (data) => {
+    let cur_rate = 0;
+    let cur_code = null;
+
+    currency?.forEach((element) => {
+      if (data?.pel_id?.cus_curren === element.id) {
+        cur_rate = element?.rate;
+        cur_code = element?.code;
+      }
+    });
+
     return (
       <div className="">
         <label className="text-label fs-13 text-black">
@@ -499,12 +529,27 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
           />
           <Column
             header="Harga Satuan"
-            field={(e) => `Rp. ${formatIdr(e.price)}`}
+            field={(e) =>
+              data?.pel_id?.cus_curren
+                ? `${cur_code} ${formatIdr(e.price)}`
+                : `Rp. ${formatIdr(e.price)}`
+            }
+            style={{ minWidth: "8rem" }}
+            // body={loading && <Skeleton />}
+          />
+          <Column
+            hidden={data?.pel_id?.cus_curren == null}
+            header="Harga Satuan (IDR)"
+            field={(e) =>
+              data?.pel_id?.cus_curren
+                ? `Rp. ${formatIdr(e.price * cur_rate)}`
+                : `Rp. ${formatIdr(e.price)}`
+            }
             style={{ minWidth: "10rem" }}
             // body={loading && <Skeleton />}
           />
           <Column
-            header="Total"
+            header="Total (IDR)"
             field={(e) => `Rp. ${formatIdr(e.total)}`}
             style={{ minWidth: "10rem" }}
             // body={loading && <Skeleton />}

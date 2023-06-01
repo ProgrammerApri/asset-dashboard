@@ -243,9 +243,9 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     //   console.log(sale);
     let acc = null;
     if (sale?.sub_addr) {
-      acc = checkCus(sale?.sub_cus)?.customer?.cus_gl
-    }else{
-      acc = checkCus(sale?.pel_id)?.customer?.cus_gl
+      acc = checkCus(sale?.sub_cus)?.customer?.cus_gl;
+    } else {
+      acc = checkCus(sale?.pel_id)?.customer?.cus_gl;
     }
 
     let acc_ar = acc !== null;
@@ -1477,591 +1477,641 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
           }}
           key={1}
           body={
-            <>
-              <DataTable
-                responsiveLayout="none"
-                value={sale?.jprod.map((v, i) => {
-                  return {
-                    ...v,
-                    index: i,
-                    // order: v?.order ?? 0,
-                    // price: v?.price ?? 0,
-                    // disc: v?.disc ?? 0,
-                    // total: v?.total ?? 0,
-                  };
-                })}
-                className="display w-150 datatable-wrapper header-white no-border"
-                showGridlines={false}
-                emptyMessage={() => <div></div>}
-              >
-                <Column
-                  header={tr[localStorage.getItem("language")].prod}
-                  className="align-text-top"
-                  field={""}
-                  style={{
-                    width: "20rem",
-                  }}
-                  body={(e) => (
-                    <CustomDropdown
-                      value={e.prod_id && checkProd(e.prod_id)}
-                      option={product}
-                      onChange={(u) => {
-                        let sat = [];
-                        satuan.forEach((element) => {
-                          if (element.id === u.unit.id) {
-                            sat.push(element);
-                          } else {
-                            if (element.u_from?.id === u.unit.id) {
+            <Row>
+              <div className="col-12">
+                <DataTable
+                  responsiveLayout="none"
+                  value={sale?.jprod.map((v, i) => {
+                    return {
+                      ...v,
+                      index: i,
+                      // order: v?.order ?? 0,
+                      // price: v?.price ?? 0,
+                      // disc: v?.disc ?? 0,
+                      // total: v?.total ?? 0,
+                    };
+                  })}
+                  className="display w-150 datatable-wrapper header-white no-border"
+                  showGridlines={false}
+                  emptyMessage={() => <div></div>}
+                >
+                  <Column
+                    header={tr[localStorage.getItem("language")].prod}
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "20rem",
+                    }}
+                    body={(e) => (
+                      <CustomDropdown
+                        value={e.prod_id && checkProd(e.prod_id)}
+                        option={product}
+                        onChange={(u) => {
+                          let sat = [];
+                          satuan.forEach((element) => {
+                            if (element.id === u.unit.id) {
                               sat.push(element);
+                            } else {
+                              if (element.u_from?.id === u.unit.id) {
+                                sat.push(element);
+                              }
+                            }
+                          });
+                          // setSatuan(sat);
+
+                          let temp = [...sale.jprod];
+                          temp[e.index].prod_id = u.id;
+                          temp[e.index].unit_id = u.unit?.id;
+                          updateSL({ ...sale, jprod: temp });
+
+                          let newError = error;
+                          newError.prod[e.index].id = false;
+                          setError(newError);
+                        }}
+                        placeholder={tr[localStorage.getItem("language")].pilih}
+                        label={"[name]"}
+                        detail
+                        onDetail={() => {
+                          setCurrentIndex(e.index);
+                          setShowProduk(true);
+                        }}
+                        errorMessage="Produk Belum Dipilih"
+                        error={error?.prod[e.index]?.id}
+                        disabled={sale && sale.so_id}
+                      />
+                    )}
+                  />
+
+                  <Column
+                    header={tr[localStorage.getItem("language")].gudang}
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "10rem",
+                    }}
+                    body={(e) => (
+                      <CustomDropdown
+                        value={e.location && checkLoc(e.location)}
+                        onChange={(u) => {
+                          let st = 0;
+
+                          sto?.forEach((element) => {
+                            if (
+                              element.loc_id === u.id &&
+                              element.id === sale?.jprod[e.index].prod_id
+                            ) {
+                              st = element.stock;
+                            }
+                          });
+
+                          let temp = [...sale.jprod];
+                          temp[e.index].location = u.id;
+                          temp[e.index].stock = st;
+                          updateSL({ ...sale, jprod: temp });
+
+                          let newError = error;
+                          newError.prod[e.index].lok = false;
+                          setError(newError);
+                        }}
+                        option={lokasi}
+                        label={"[name]"}
+                        placeholder={tr[localStorage.getItem("language")].pilih}
+                        detail
+                        onDetail={() => {
+                          setCurrentIndex(e.index);
+                          setShowLok(true);
+                        }}
+                        errorMessage="Lokasi Belum Dipilih"
+                        error={error?.prod[e.index]?.lok}
+                        disabled={sale && sale.so_id}
+                      />
+                    )}
+                  />
+
+                  <Column
+                    header={tr[localStorage.getItem("language")].stok}
+                    className="align-text-top"
+                    style={{
+                      minWidth: "7rem",
+                    }}
+                    field={""}
+                    body={(e) => (
+                      <PrimeNumber
+                        prc
+                        value={e?.stock ?? 0}
+                        placeholder="0"
+                        type="number"
+                        min={0}
+                        disabled
+                      />
+                    )}
+                  />
+
+                  <Column
+                    hidden={sale.so_id === null}
+                    header={tr[localStorage.getItem("language")].ord}
+                    className="align-text-top"
+                    style={{
+                      minWidth: "8rem",
+                    }}
+                    field={""}
+                    body={(e) => (
+                      <PrimeNumber
+                        prc
+                        value={e.req && e.req}
+                        onChange={(u) => {
+                          let temp = [...sale.jprod];
+                          temp[e.index].req = u.target.value;
+                        }}
+                        placeholder="0"
+                        type="number"
+                        min={0}
+                        disabled
+                      />
+                    )}
+                  />
+
+                  <Column
+                    header={tr[localStorage.getItem("language")].qty}
+                    className="align-text-top"
+                    style={{
+                      minWidth: "8rem",
+                    }}
+                    field={""}
+                    body={(e) => (
+                      <PrimeNumber
+                        prc
+                        value={e.order && e.order}
+                        onChange={(u) => {
+                          let temp = [...sale.jprod];
+                          if (sale.so_id) {
+                            let val =
+                              u.value > e.r_remain ? e.r_remain : u.value;
+                            let result =
+                              temp[e.index].order - val + temp[e.index].remain;
+                            temp[e.index].order = val;
+
+                            temp[e.index].order = u.value;
+
+                            if (
+                              sale.pel_id &&
+                              checkCus(sale.pel_id)?.customer?.cus_curren !==
+                                null
+                            ) {
+                              temp[e.index].total_fc =
+                                temp[e.index].order * temp[e.index].price;
+
+                              temp[e.index].total =
+                                temp[e.index].total_fc * curConv();
+                            } else {
+                              temp[e.index].total =
+                                temp[e.index].order * temp[e.index].price;
+                            }
+
+                            temp[e.index].remain = result;
+
+                            if (temp[e.index].order > e.req) {
+                              temp[e.index].order = e.req;
+                              temp[e.index].total =
+                                temp[e.index].order * temp[e.index].price;
+                            }
+                          } else {
+                            temp[e.index].order = u.value;
+
+                            if (
+                              sale.pel_id &&
+                              checkCus(sale.pel_id)?.customer?.cus_curren !==
+                                null
+                            ) {
+                              temp[e.index].total_fc =
+                                temp[e.index].order * temp[e.index].price;
+
+                              temp[e.index].total =
+                                temp[e.index].total_fc * curConv();
+                            } else {
+                              temp[e.index].total =
+                                temp[e.index].order * temp[e.index].price;
                             }
                           }
-                        });
-                        // setSatuan(sat);
-
-                        let temp = [...sale.jprod];
-                        temp[e.index].prod_id = u.id;
-                        temp[e.index].unit_id = u.unit?.id;
-                        updateSL({ ...sale, jprod: temp });
-
-                        let newError = error;
-                        newError.prod[e.index].id = false;
-                        setError(newError);
-                      }}
-                      placeholder={tr[localStorage.getItem("language")].pilih}
-                      label={"[name]"}
-                      detail
-                      onDetail={() => {
-                        setCurrentIndex(e.index);
-                        setShowProduk(true);
-                      }}
-                      errorMessage="Produk Belum Dipilih"
-                      error={error?.prod[e.index]?.id}
-                      disabled={sale && sale.so_id}
-                    />
-                  )}
-                />
-
-                <Column
-                  header={tr[localStorage.getItem("language")].gudang}
-                  className="align-text-top"
-                  field={""}
-                  style={{
-                    width: "10rem",
-                  }}
-                  body={(e) => (
-                    <CustomDropdown
-                      value={e.location && checkLoc(e.location)}
-                      onChange={(u) => {
-                        let st = 0;
-
-                        sto?.forEach((element) => {
-                          if (
-                            element.loc_id === u.id &&
-                            element.id === sale?.jprod[e.index].prod_id
-                          ) {
-                            st = element.stock;
-                          }
-                        });
-
-                        let temp = [...sale.jprod];
-                        temp[e.index].location = u.id;
-                        temp[e.index].stock = st;
-                        updateSL({ ...sale, jprod: temp });
-
-                        let newError = error;
-                        newError.prod[e.index].lok = false;
-                        setError(newError);
-                      }}
-                      option={lokasi}
-                      label={"[name]"}
-                      placeholder={tr[localStorage.getItem("language")].pilih}
-                      detail
-                      onDetail={() => {
-                        setCurrentIndex(e.index);
-                        setShowLok(true);
-                      }}
-                      errorMessage="Lokasi Belum Dipilih"
-                      error={error?.prod[e.index]?.lok}
-                      disabled={sale && sale.so_id}
-                    />
-                  )}
-                />
-
-                <Column
-                  header={tr[localStorage.getItem("language")].stok}
-                  className="align-text-top"
-                  style={{
-                    width: "7rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <PrimeNumber
-                      prc
-                      value={e?.stock ?? 0}
-                      placeholder="0"
-                      type="number"
-                      min={0}
-                      disabled
-                    />
-                  )}
-                />
-
-                <Column
-                  hidden={sale.so_id === null}
-                  header={tr[localStorage.getItem("language")].ord}
-                  className="align-text-top"
-                  style={{
-                    width: "8rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <PrimeNumber
-                      prc
-                      value={e.req && e.req}
-                      onChange={(u) => {
-                        let temp = [...sale.jprod];
-                        temp[e.index].req = u.target.value;
-                      }}
-                      placeholder="0"
-                      type="number"
-                      min={0}
-                      disabled
-                    />
-                  )}
-                />
-
-                <Column
-                  header={tr[localStorage.getItem("language")].qty}
-                  className="align-text-top"
-                  style={{
-                    width: "8rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <PrimeNumber
-                      prc
-                      value={e.order && e.order}
-                      onChange={(u) => {
-                        let temp = [...sale.jprod];
-                        if (sale.so_id) {
-                          let val = u.value > e.r_remain ? e.r_remain : u.value;
-                          let result =
-                            temp[e.index].order - val + temp[e.index].remain;
-                          temp[e.index].order = val;
-
-                          temp[e.index].order = u.value;
 
                           if (
-                            sale.pel_id &&
-                            checkCus(sale.pel_id)?.customer?.cus_curren !== null
+                            temp[e.index].order > checkProd(e?.prod_id)?.stock
                           ) {
-                            temp[e.index].total_fc =
-                              temp[e.index].order * temp[e.index].price;
-
-                            temp[e.index].total =
-                              temp[e.index].total_fc * curConv();
-                          } else {
-                            temp[e.index].total =
-                              temp[e.index].order * temp[e.index].price;
+                            temp[e.index].order = checkProd(e?.prod_id)?.stock;
                           }
+                          updateSL({
+                            ...sale,
+                            jprod: temp,
+                            total_b: getSubTotalBarang() + getSubTotalJasa(),
+                            total_bayar:
+                              getSubTotalBarang() +
+                              getSubTotalJasa() +
+                              ((getSubTotalBarang() + getSubTotalJasa()) *
+                                pjk()) /
+                                100,
+                          });
 
-                          temp[e.index].remain = result;
-
-                          if (temp[e.index].order > e.req) {
-                            temp[e.index].order = e.req;
-                            temp[e.index].total =
-                              temp[e.index].order * temp[e.index].price;
-                          }
-                        } else {
-                          temp[e.index].order = u.value;
-
-                          if (
-                            sale.pel_id &&
-                            checkCus(sale.pel_id)?.customer?.cus_curren !== null
-                          ) {
-                            temp[e.index].total_fc =
-                              temp[e.index].order * temp[e.index].price;
-
-                            temp[e.index].total =
-                              temp[e.index].total_fc * curConv();
-                          } else {
-                            temp[e.index].total =
-                              temp[e.index].order * temp[e.index].price;
-                          }
-                        }
-
-                        if (
-                          temp[e.index].order > checkProd(e?.prod_id)?.stock
-                        ) {
-                          temp[e.index].order = checkProd(e?.prod_id)?.stock;
-                        }
-                        updateSL({
-                          ...sale,
-                          jprod: temp,
-                          total_b: getSubTotalBarang() + getSubTotalJasa(),
-                          total_bayar:
-                            getSubTotalBarang() +
-                            getSubTotalJasa() +
-                            ((getSubTotalBarang() + getSubTotalJasa()) *
-                              pjk()) /
-                              100,
-                        });
-
-                        let newError = error;
-                        newError.prod[e.index].jum = false;
-                        setError(newError);
-                      }}
-                      placeholder="0"
-                      type="number"
-                      min={0}
-                      error={error?.prod[e.index]?.jum}
-                      errorMessage={
-                        state
-                          ? tr[localStorage.getItem("language")].info_sto
-                          : null
-                      }
-                      // disabled={sale && sale.so_id}
-                    />
-                  )}
-                />
-
-                <Column
-                  hidden
-                  header={tr[localStorage.getItem("language")].sisa}
-                  className="align-text-top"
-                  field={""}
-                  // style={{
-                  //   minWidth: "7rem",
-                  // }}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={e.remain ? e.remain : ""}
+                          let newError = error;
+                          newError.prod[e.index].jum = false;
+                          setError(newError);
+                        }}
                         placeholder="0"
                         type="number"
-                        disabled
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header={tr[localStorage.getItem("language")].sat}
-                  className="align-text-top"
-                  field={""}
-                  style={{
-                    width: "10rem",
-                  }}
-                  body={(e) => (
-                    <CustomDropdown
-                      value={e.unit_id && checkUnit(e.unit_id)}
-                      onChange={(t) => {
-                        let temp = [...sale.jprod];
-                        temp[e.index].unit_id = t.id;
-                        updateSL({ ...sale, jprod: temp });
-                      }}
-                      option={satuan}
-                      label={"[name]"}
-                      placeholder={tr[localStorage.getItem("language")].pilih}
-                      detail
-                      onDetail={() => {
-                        setCurrentIndex(e.index);
-                        setShowSatuan(true);
-                      }}
-                      disabled={sale && sale.so_id}
-                    />
-                  )}
-                />
-
-                <Column
-                  header={tr[localStorage.getItem("language")].price}
-                  className="align-text-top"
-                  style={{
-                    width: "10rem",
-                  }}
-                  field={""}
-                  body={(e) =>
-                    sale.pel_id &&
-                    checkCus(sale.pel_id)?.customer?.cus_curren !== null ? (
-                      <PrimeNumber
-                        value={e.price && e.price}
-                        onChange={(u) => {
-                          let temp = [...sale.jprod];
-
-                          temp[e.index].price = u.target.value;
-                          if (
-                            sale.pel_id &&
-                            checkCus(sale.pel_id)?.customer?.cus_curren !== null
-                          ) {
-                            temp[e.index].total_fc =
-                              temp[e.index].order * temp[e.index].price;
-
-                            temp[e.index].total =
-                              temp[e.index].total_fc * curConv();
-
-                            temp[e.index].idr = u.target.value * curConv();
-                          } else {
-                            temp[e.index].total =
-                              temp[e.index].order * temp[e.index].price;
-                          }
-
-                          updateSL({
-                            ...sale,
-                            jprod: temp,
-                            total_b: getSubTotalBarang() + getSubTotalJasa(),
-                            total_bayar:
-                              getSubTotalBarang() +
-                              getSubTotalJasa() +
-                              ((getSubTotalBarang() + getSubTotalJasa()) *
-                                pjk()) /
-                                100,
-                          });
-
-                          let newError = error;
-                          newError.prod[e.index].prc = false;
-                          setError(newError);
-                        }}
-                        placeholder="0"
                         min={0}
-                        error={error?.prod[e.index]?.prc}
-                        disabled={sale && sale.so_id}
+                        error={error?.prod[e.index]?.jum}
+                        errorMessage={
+                          state
+                            ? tr[localStorage.getItem("language")].info_sto
+                            : null
+                        }
+                        // disabled={sale && sale.so_id}
                       />
-                    ) : (
-                      <PrimeNumber
-                        price
-                        value={e.price && e.price}
-                        onChange={(u) => {
-                          let temp = [...sale.jprod];
+                    )}
+                  />
 
-                          temp[e.index].price = u.value;
-                          if (
-                            sale.pel_id &&
-                            checkCus(sale.pel_id)?.customer?.cus_curren !== null
-                          ) {
-                            temp[e.index].total_fc =
-                              temp[e.index].order * temp[e.index].price;
+                  <Column
+                    hidden
+                    header={tr[localStorage.getItem("language")].sisa}
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "7rem",
+                    }}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.remain ? e.remain : ""}
+                          placeholder="0"
+                          type="number"
+                          disabled
+                        />
+                      </div>
+                    )}
+                  />
 
-                            temp[e.index].total =
-                              temp[e.index].total_fc * curConv();
-                          } else {
-                            temp[e.index].total =
-                              temp[e.index].order * temp[e.index].price;
-                          }
-
-                          updateSL({
-                            ...sale,
-                            jprod: temp,
-                            total_b: getSubTotalBarang() + getSubTotalJasa(),
-                            total_bayar:
-                              getSubTotalBarang() +
-                              getSubTotalJasa() +
-                              ((getSubTotalBarang() + getSubTotalJasa()) *
-                                pjk()) /
-                                100,
-                          });
-
-                          let newError = error;
-                          newError.prod[e.index].prc = false;
-                          setError(newError);
-                        }}
-                        placeholder="0"
-                        min={0}
-                        error={error?.prod[e.index]?.prc}
-                        disabled={sale && sale.so_id}
-                      />
-                    )
-                  }
-                />
-
-                <Column
-                  header={tr[localStorage.getItem("language")].disc}
-                  className="align-text-top"
-                  field={""}
-                  style={{
-                    width: "10rem",
-                  }}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={e.disc && e.disc}
+                  <Column
+                    header={tr[localStorage.getItem("language")].sat}
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "10rem",
+                    }}
+                    body={(e) => (
+                      <CustomDropdown
+                        value={e.unit_id && checkUnit(e.unit_id)}
                         onChange={(t) => {
                           let temp = [...sale.jprod];
-                          temp[e.index].disc = t.target.value;
-                          // let disc = temp[e.index].total * temp[e.index].disc / 100
-
-                          // temp[e.index].total -= disc;
-                          updateSL({
-                            ...sale,
-                            jprod: temp,
-                            total_b: getSubTotalBarang() + getSubTotalJasa(),
-                            total_bayar:
-                              getSubTotalBarang() +
-                              getSubTotalJasa() +
-                              ((getSubTotalBarang() + getSubTotalJasa()) *
-                                pjk()) /
-                                100,
-                          });
+                          temp[e.index].unit_id = t.id;
+                          updateSL({ ...sale, jprod: temp });
                         }}
-                        placeholder="0"
-                        type="number"
-                        min={0}
+                        option={satuan}
+                        label={"[name]"}
+                        placeholder={tr[localStorage.getItem("language")].pilih}
+                        detail
+                        onDetail={() => {
+                          setCurrentIndex(e.index);
+                          setShowSatuan(true);
+                        }}
                         disabled={sale && sale.so_id}
                       />
-                      <span className="p-inputgroup-addon">%</span>
-                    </div>
-                  )}
-                />
+                    )}
+                  />
 
-                <Column
-                  header={tr[localStorage.getItem("language")].net_prc}
-                  className="align-text-top"
-                  field={""}
-                  style={{
-                    width: "10rem",
+                  <Column
+                    header={tr[localStorage.getItem("language")].price}
+                    className="align-text-top"
+                    style={{
+                      minWidth: "10rem",
+                    }}
+                    field={""}
+                    body={
+                      (e) => (
+                        // sale.pel_id &&
+                        // checkCus(sale.pel_id)?.customer?.cus_curren !== null ? (
+                        //   <PrimeNumber
+                        //     value={e.price && e.price}
+                        //     onChange={(u) => {
+                        //       let temp = [...sale.jprod];
+
+                        //       temp[e.index].price = u.target.value;
+                        //       if (
+                        //         sale.pel_id &&
+                        //         checkCus(sale.pel_id)?.customer?.cus_curren !== null
+                        //       ) {
+                        //         temp[e.index].total_fc =
+                        //           temp[e.index].order * temp[e.index].price;
+
+                        //         temp[e.index].total =
+                        //           temp[e.index].total_fc * curConv();
+
+                        //         temp[e.index].idr = u.target.value * curConv();
+                        //       } else {
+                        //         temp[e.index].total =
+                        //           temp[e.index].order * temp[e.index].price;
+                        //       }
+
+                        //       updateSL({
+                        //         ...sale,
+                        //         jprod: temp,
+                        //         total_b: getSubTotalBarang() + getSubTotalJasa(),
+                        //         total_bayar:
+                        //           getSubTotalBarang() +
+                        //           getSubTotalJasa() +
+                        //           ((getSubTotalBarang() + getSubTotalJasa()) *
+                        //             pjk()) /
+                        //             100,
+                        //       });
+
+                        //       let newError = error;
+                        //       newError.prod[e.index].prc = false;
+                        //       setError(newError);
+                        //     }}
+                        //     placeholder="0"
+                        //     min={0}
+                        //     error={error?.prod[e.index]?.prc}
+                        //     disabled={sale && sale.so_id}
+                        //   />
+                        // ) : (
+                        <PrimeNumber
+                          price
+                          value={e.price && e.price}
+                          onChange={(u) => {
+                            let temp = [...sale.jprod];
+
+                            temp[e.index].price = u.value;
+                            if (
+                              sale.pel_id &&
+                              checkCus(sale.pel_id)?.customer?.cus_curren !==
+                                null
+                            ) {
+                              temp[e.index].total_fc =
+                                temp[e.index].order * temp[e.index].price;
+
+                              temp[e.index].total =
+                                temp[e.index].total_fc * curConv();
+                            } else {
+                              temp[e.index].total =
+                                temp[e.index].order * temp[e.index].price;
+                            }
+
+                            updateSL({
+                              ...sale,
+                              jprod: temp,
+                              total_b: getSubTotalBarang() + getSubTotalJasa(),
+                              total_bayar:
+                                getSubTotalBarang() +
+                                getSubTotalJasa() +
+                                ((getSubTotalBarang() + getSubTotalJasa()) *
+                                  pjk()) /
+                                  100,
+                            });
+
+                            let newError = error;
+                            newError.prod[e.index].prc = false;
+                            setError(newError);
+                          }}
+                          placeholder="0"
+                          min={0}
+                          error={error?.prod[e.index]?.prc}
+                          disabled={sale && sale.so_id}
+                        />
+                      )
+                      // )
+                    }
+                  />
+
+                  <Column
+                    hidden={checkCus(sale.pel_id)?.customer?.cus_curren == null}
+                    header={`${
+                      tr[localStorage.getItem("language")].price
+                    } (IDR)`}
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "10rem",
+                    }}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <PrimeNumber
+                          price
+                          value={e.idr ? e.idr : null}
+                          placeholder="0"
+                          type="number"
+                          disabled
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header={tr[localStorage.getItem("language")].disc}
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "10rem",
+                    }}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.disc && e.disc}
+                          onChange={(t) => {
+                            let temp = [...sale.jprod];
+                            temp[e.index].disc = t.target.value;
+                            // let disc = temp[e.index].total * temp[e.index].disc / 100
+
+                            // temp[e.index].total -= disc;
+                            updateSL({
+                              ...sale,
+                              jprod: temp,
+                              total_b: getSubTotalBarang() + getSubTotalJasa(),
+                              total_bayar:
+                                getSubTotalBarang() +
+                                getSubTotalJasa() +
+                                ((getSubTotalBarang() + getSubTotalJasa()) *
+                                  pjk()) /
+                                  100,
+                            });
+                          }}
+                          placeholder="0"
+                          type="number"
+                          min={0}
+                          disabled={sale && sale.so_id}
+                        />
+                        <span className="p-inputgroup-addon">%</span>
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header={tr[localStorage.getItem("language")].net_prc}
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "10rem",
+                    }}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputNumber
+                          value={e.nett_price && e.nett_price}
+                          onChange={(t) => {
+                            let temp = [...sale.jprod];
+                            temp[e.index].nett_price = t.value;
+                            updateSL({
+                              ...sale,
+                              jprod: temp,
+                              total_b: getSubTotalBarang() + getSubTotalJasa(),
+                              total_bayar:
+                                getSubTotalBarang() +
+                                getSubTotalJasa() +
+                                ((getSubTotalBarang() + getSubTotalJasa()) *
+                                  pjk()) /
+                                  100,
+                            });
+                          }}
+                          placeholder="0"
+                          disabled={sale && sale.so_id}
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    hidden={checkCus(sale.pel_id)?.customer?.cus_curren == null}
+                    header="FC"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "10rem",
+                    }}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputNumber
+                          value={
+                            e.nett_price && e.nett_price !== 0
+                              ? e.nett_price
+                              : e.total_fc - (e.total_fc * e.disc) / 100
+                          }
+                          onChange={(t) => {}}
+                          placeholder="0"
+                          disabled
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header={tr[localStorage.getItem("language")].total}
+                    className="align-text-top"
+                    body={(e) => (
+                      <label className="text-nowrap">
+                        <b>
+                          Rp.{" "}
+                          {formatIdr(
+                            e.nett_price && e.nett_price != 0
+                              ? e.nett_price
+                              : e.total - (e.total * e.disc) / 100
+                          )}
+                        </b>
+                      </label>
+                    )}
+                  />
+
+                  <Column
+                    className="align-text-top"
+                    body={
+                      (e) => (
+                        // e.index === sale.jprod.length - 1 ? (
+                        //   <Link
+                        //     onClick={() => {
+                        //       let newError = error;
+                        //       newError.prod.push({ jum: false, prc: false });
+                        //       setError(newError);
+
+                        //       updateSL({
+                        //         ...sale,
+                        //         jprod: [
+                        //           ...sale.jprod,
+                        //           {
+                        //             id: 0,
+                        //             prod_id: null,
+                        //             unit_id: null,
+                        //             location: null,
+                        //             stock: null,
+                        //             req: null,
+                        //             order: null,
+                        //             remain: null,
+                        //             price: null,
+                        //             disc: null,
+                        //             nett_price: null,
+                        //             total_fc: null,
+                        //             total: null,
+                        //           },
+                        //         ],
+                        //       });
+                        //     }}
+                        //     className="btn btn-primary shadow btn-xs sharp ml-1"
+                        //   >
+                        //     <i className="fa fa-plus"></i>
+                        //   </Link>
+                        // ) : (
+                        <Link
+                          onClick={() => {
+                            let temp = [...sale.jprod];
+                            temp.splice(e.index, 1);
+                            updateSL({
+                              ...sale,
+                              jprod: temp,
+                            });
+                          }}
+                          className="btn btn-danger shadow btn-xs sharp ml-1"
+                        >
+                          <i className="fa fa-trash"></i>
+                        </Link>
+                      )
+                      // )
+                    }
+                  />
+                </DataTable>
+              </div>
+
+              <div className="col-12 d-flex justify-content-end">
+                <Link
+                  onClick={() => {
+                    let newError = error;
+                    newError.prod.push({ jum: false, prc: false });
+                    setError(newError);
+
+                    updateSL({
+                      ...sale,
+                      jprod: [
+                        ...sale.jprod,
+                        {
+                          id: 0,
+                          prod_id: null,
+                          unit_id: null,
+                          location: null,
+                          stock: null,
+                          req: null,
+                          order: null,
+                          remain: null,
+                          price: null,
+                          disc: null,
+                          nett_price: null,
+                          total_fc: null,
+                          total: null,
+                        },
+                      ],
+                    });
                   }}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputNumber
-                        value={e.nett_price && e.nett_price}
-                        onChange={(t) => {
-                          let temp = [...sale.jprod];
-                          temp[e.index].nett_price = t.value;
-                          updateSL({
-                            ...sale,
-                            jprod: temp,
-                            total_b: getSubTotalBarang() + getSubTotalJasa(),
-                            total_bayar:
-                              getSubTotalBarang() +
-                              getSubTotalJasa() +
-                              ((getSubTotalBarang() + getSubTotalJasa()) *
-                                pjk()) /
-                                100,
-                          });
-                        }}
-                        placeholder="0"
-                        disabled={sale && sale.so_id}
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
-                  hidden={checkCus(sale.pel_id)?.customer?.cus_curren == null}
-                  header={`${tr[localStorage.getItem("language")].price} (IDR)`}
-                  className="align-text-top"
-                  field={""}
-                  // style={{
-                  //   minWidth: "7rem",
-                  // }}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <PrimeNumber
-                        price
-                        value={e.idr ? e.idr : null}
-                        placeholder="0"
-                        type="number"
-                        disabled
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
-                  hidden={checkCus(sale.pel_id)?.customer?.cus_curren == null}
-                  header="FC"
-                  className="align-text-top"
-                  field={""}
-                  style={{
-                    minWidth: "10rem",
-                  }}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputNumber
-                        value={
-                          e.nett_price && e.nett_price !== 0
-                            ? e.nett_price
-                            : e.total_fc - (e.total_fc * e.disc) / 100
-                        }
-                        onChange={(t) => {}}
-                        placeholder="0"
-                        disabled
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header={tr[localStorage.getItem("language")].total}
-                  className="align-text-top"
-                  body={(e) => (
-                    <label className="text-nowrap">
-                      <b>
-                        Rp.{" "}
-                        {formatIdr(
-                          e.nett_price && e.nett_price != 0
-                            ? e.nett_price
-                            : e.total - (e.total * e.disc) / 100
-                        )}
-                      </b>
-                    </label>
-                  )}
-                />
-
-                <Column
-                  className="align-text-top"
-                  body={(e) =>
-                    e.index === sale.jprod.length - 1 ? (
-                      <Link
-                        onClick={() => {
-                          let newError = error;
-                          newError.prod.push({ jum: false, prc: false });
-                          setError(newError);
-
-                          updateSL({
-                            ...sale,
-                            jprod: [
-                              ...sale.jprod,
-                              {
-                                id: 0,
-                                prod_id: null,
-                                unit_id: null,
-                                location: null,
-                                stock: null,
-                                req: null,
-                                order: null,
-                                remain: null,
-                                price: null,
-                                disc: null,
-                                nett_price: null,
-                                total_fc: null,
-                                total: null,
-                              },
-                            ],
-                          });
-                        }}
-                        className="btn btn-primary shadow btn-xs sharp ml-1"
-                      >
-                        <i className="fa fa-plus"></i>
-                      </Link>
-                    ) : (
-                      <Link
-                        onClick={() => {
-                          let temp = [...sale.jprod];
-                          temp.splice(e.index, 1);
-                          updateSL({
-                            ...sale,
-                            jprod: temp,
-                          });
-                        }}
-                        className="btn btn-danger shadow btn-xs sharp ml-1"
-                      >
-                        <i className="fa fa-trash"></i>
-                      </Link>
-                    )
-                  }
-                />
-              </DataTable>
-            </>
+                  className="btn btn-primary shadow btn-s sharp ml-1 mt-3"
+                >
+                  <span className="align-middle mx-1">
+                    <i className="fa fa-plus"></i>{" "}
+                    {tr[localStorage.getItem("language")].tambh}
+                  </span>
+                </Link>
+              </div>
+            </Row>
           }
         />
 

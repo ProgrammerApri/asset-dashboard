@@ -190,8 +190,13 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
 
       if (response.status) {
         const { data } = response;
+        let filt = [];
 
-        setBank(data);
+        data?.forEach((element) => {
+          filt.push(element.bank);
+        });
+
+        setBank(filt);
       }
     } catch (error) {}
   };
@@ -309,7 +314,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
     const config = {
       ...endpoints.editINC,
       endpoint: endpoints.editINC.endpoint + inc.id,
-      data: inc,
+      data: { ...inc, acq_cus: inc?.acq_cus?.id ?? null },
     };
 
     let response = null;
@@ -417,7 +422,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
   const checkBank = (value) => {
     let selected = {};
     bank?.forEach((element) => {
-      if (value === element.bank.id) {
+      if (value === element?.id) {
         selected = element;
       }
     });
@@ -504,7 +509,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
     return (
       <div>
         {option !== null
-          ? `${option.bank.BANK_NAME} - ${option.bank.BANK_CODE}`
+          ? `${option.BANK_NAME} - ${option.BANK_CODE}`
           : ""}
       </div>
     );
@@ -515,7 +520,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
       return (
         <div>
           {option !== null
-            ? `${option.bank.BANK_NAME} - ${option.bank.BANK_CODE}`
+            ? `${option.BANK_NAME} - ${option.BANK_CODE}`
             : ""}
         </div>
       );
@@ -851,9 +856,37 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
               ) : inc !== null && inc.acq_pay === 2 ? (
                 <>
                   <div className="col-3">
+                    <label className="text-label">Kode Bank</label>
+                    <PrimeDropdown
+                      value={inc.bank_acc && checkBank(inc.bank_acc)}
+                      options={bank}
+                      onChange={(e) => {
+                        let newError = error;
+                        newError.kd_bnk = false;
+                        setError(newError);
+
+                        updateInc({
+                          ...inc,
+                          bank_acc: e?.value?.id ?? null,
+                          bank_ref: e.value?.BANK_CODE ?? null,
+                        });
+                      }}
+                      optionLabel="BANK_NAME"
+                      placeholder="Pilih Kode Bank"
+                      filter
+                      filterBy={"BANK_NAME"}
+                      itemTemplate={bankTemplate}
+                      valueTemplate={valBTemp}
+                      errorMessage="Bank Belum Dipilih"
+                      error={error?.kd_bnk}
+                      showClear
+                    />
+                  </div>
+
+                  <div className="col-3">
                     <label className="text-label">Kode Referensi Bank</label>
                     <PrimeInput
-                      value={inc.bank_ref}
+                      value={inc?.bank_acc ? inc.bank_ref : ""}
                       onChange={(e) => {
                         let newError = error;
                         newError.ref_bnk = false;
@@ -863,32 +896,6 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                       }}
                       placeholder="Masukan Kode Bank"
                       error={error?.ref_bnk}
-                    />
-                  </div>
-
-                  <div className="col-3">
-                    <label className="text-label">Kode Bank</label>
-                    <div className="p-inputgroup"></div>
-                    <CustomDropdown
-                      value={inc.bank_acc && checkBank(inc.bank_acc)}
-                      option={bank}
-                      onChange={(e) => {
-                        let newError = error;
-                        newError.kd_bnk = false;
-                        setError(newError);
-
-                        updateInc({
-                          ...inc,
-                          bank_acc: e.bank?.id,
-                        });
-                      }}
-                      label={"[bank.BANK_NAME] - [bank.BANK_CODE]"}
-                      placeholder="Pilih Kode Bank"
-                      detail
-                      onDetail={() => setShowBank(true)}
-                      errorMessage="Bank Belum Dipilih"
-                      error={error?.kd_bnk}
-                      showClear
                     />
                   </div>
                 </>
@@ -932,9 +939,9 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                   <div className="col-3">
                     <label className="text-label">Kode Bank</label>
                     <div className="p-inputgroup"></div>
-                    <CustomDropdown
+                    <PrimeDropdown
                       value={inc.giro_bnk && checkBank(inc.giro_bnk)}
-                      option={bank}
+                      options={bank}
                       onChange={(e) => {
                         let newError = error;
                         newError.bnk_gr = false;
@@ -942,15 +949,18 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
 
                         updateInc({
                           ...inc,
-                          giro_bnk: e.bank.id,
+                          giro_bnk: e.value?.id ?? null,
                         });
                       }}
-                      label={"[bank.BANK_NAME] - [bank.BANK_CODE]"}
+                      optionLabel="BANK_NAME"
                       placeholder="Pilih Kode Bank"
-                      onDetail={() => setShowBankG(true)}
-                      detail
+                      filter
+                      filterBy={"BANK_NAME"}
+                      itemTemplate={bankTemplate}
+                      valueTemplate={valBTemp}
                       errorMessage="Bank Belum Dipilih"
                       error={error?.bnk_gr}
+                      showClear
                     />
                   </div>
                 </>
@@ -988,7 +998,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                         <Column
                           header="Kode Transaksi"
                           style={{
-                            maxWidth: "15rem",
+                            minWidth: "15rem",
                           }}
                           field={""}
                           body={(e) => (
@@ -1008,7 +1018,9 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
 
                         <Column
                           header="Tanggal J/T tempo"
-                          field={""}
+                          style={{
+                            minWidth: "10rem",
+                          }}
                           body={(e) => (
                             <div className="p-inputgroup">
                               <Calendar
@@ -1034,7 +1046,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                           hidden={isEdit}
                           header="Type"
                           style={{
-                            width: "10rem",
+                            minWidth: "6rem",
                           }}
                           field={""}
                           body={(e) => (
@@ -1052,179 +1064,107 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                         <Column
                           header="Nilai Tagihan"
                           style={{
-                            maxWidth: "15rem",
+                            minWidth: "10rem",
                           }}
                           field={""}
-                          body={(e) =>
-                            cus(inc.acq_cus)?.customer?.cus_curren !== null ? (
-                              <PrimeNumber
-                                // price
-                                value={e.value ? e.value : null}
-                                onChange={(u) => {}}
-                                placeholder="0"
-                                type="number"
-                                min={0}
-                                disabled
-                              />
-                            ) : (
-                              <PrimeNumber
-                                price
-                                value={e.value ? e.value : null}
-                                onChange={(u) => {}}
-                                placeholder="0"
-                                type="number"
-                                min={0}
-                                disabled
-                              />
-                            )
-                          }
+                          body={(e) => (
+                            <PrimeNumber
+                              price
+                              value={e.value ? e.value : null}
+                              onChange={(u) => {}}
+                              placeholder="0"
+                              type="number"
+                              min={0}
+                              disabled
+                            />
+                          )}
                         />
 
                         <Column
                           header="Uang Muka"
                           style={{
-                            maxWidth: "15rem",
+                            minWidth: "10rem",
                           }}
                           field={""}
-                          body={(e) =>
-                            cus(inc.acq_cus)?.customer?.cus_curren !== null ? (
-                              <PrimeNumber
-                                // price
-                                value={e.dp ? e.dp : null}
-                                onChange={(u) => {}}
-                                placeholder="0"
-                                type="number"
-                                min={0}
-                                disabled
-                              />
-                            ) : (
-                              <PrimeNumber
-                                price
-                                value={e.dp ? e.dp : null}
-                                onChange={(u) => {}}
-                                placeholder="0"
-                                type="number"
-                                min={0}
-                                disabled
-                              />
-                            )
-                          }
+                          body={(e) => (
+                            <PrimeNumber
+                              price
+                              value={e.dp ? e.dp : null}
+                              onChange={(u) => {}}
+                              placeholder="0"
+                              type="number"
+                              min={0}
+                              disabled
+                            />
+                          )}
                         />
 
                         <Column
                           header="Telah Dibayar"
                           style={{
-                            maxWidth: "15rem",
+                            minWidth: "10rem",
                           }}
                           field={""}
-                          body={(e) =>
-                            cus(inc.acq_cus)?.customer?.cus_curren !== null ? (
-                              <PrimeNumber
-                                // price
-                                value={e.uang_masuk ? e.uang_masuk : null}
-                                onChange={(u) => {}}
-                                placeholder="0"
-                                type="number"
-                                min={0}
-                                disabled
-                              />
-                            ) : (
-                              <PrimeNumber
-                                price
-                                value={e.uang_masuk ? e.uang_masuk : null}
-                                onChange={(u) => {}}
-                                placeholder="0"
-                                type="number"
-                                min={0}
-                                disabled
-                              />
-                            )
-                          }
+                          body={(e) => (
+                            <PrimeNumber
+                              price
+                              value={e.uang_masuk ? e.uang_masuk : null}
+                              onChange={(u) => {}}
+                              placeholder="0"
+                              type="number"
+                              min={0}
+                              disabled
+                            />
+                          )}
                         />
 
                         <Column
                           hidden={isEdit}
                           header="Sisa Tagihan"
                           style={{
-                            maxWidth: "15rem",
+                            minWidth: "10rem",
                           }}
                           field={""}
-                          body={(e) =>
-                            cus(inc.acq_cus)?.customer?.cus_curren !== null ? (
-                              <PrimeNumber
-                                // price
-                                value={e.sisa ? e.sisa : null}
-                                onChange={(u) => {}}
-                                placeholder="0"
-                                type="number"
-                                min={0}
-                                disabled
-                              />
-                            ) : (
-                              <PrimeNumber
-                                price
-                                value={e.sisa ? e.sisa : null}
-                                onChange={(u) => {}}
-                                placeholder="0"
-                                type="number"
-                                min={0}
-                                disabled
-                              />
-                            )
-                          }
+                          body={(e) => (
+                            <PrimeNumber
+                              price
+                              value={e.sisa ? e.sisa : null}
+                              onChange={(u) => {}}
+                              placeholder="0"
+                              type="number"
+                              min={0}
+                              disabled
+                            />
+                          )}
                         />
 
                         <Column
                           header="Nilai Pembayaran"
                           style={{
-                            maxWidth: "10rem",
+                            minWidth: "10rem",
                           }}
                           field={""}
-                          body={(e) =>
-                            cus(inc.acq_cus)?.customer?.cus_curren !== null ? (
-                              <PrimeNumber
-                                // price
-                                value={e.payment ? e.payment : null}
-                                onChange={(u) => {
-                                  let temp = [...inc.acq];
-                                  temp[e.index].payment = Number(
-                                    u.target.value
-                                  );
-                                  updateInc({ ...inc, acq: temp });
+                          body={(e) => (
+                            <PrimeNumber
+                              price
+                              value={e.payment ? e.payment : null}
+                              onChange={(u) => {
+                                let temp = [...inc.acq];
+                                temp[e.index].payment = Number(u.value);
+                                updateInc({ ...inc, acq: temp });
 
-                                  let newError = error;
-                                  newError.acq[e.index].pay = false;
-                                  newError.acq?.push({ pay: false });
-                                  setError(newError);
-                                }}
-                                placeholder="0"
-                                type="number"
-                                min={0}
-                                error={error?.acq[e.index]?.pay}
-                                // disabled={e.sisa === 0 || e.sisa === null}
-                              />
-                            ) : (
-                              <PrimeNumber
-                                price
-                                value={e.payment ? e.payment : null}
-                                onChange={(u) => {
-                                  let temp = [...inc.acq];
-                                  temp[e.index].payment = Number(u.value);
-                                  updateInc({ ...inc, acq: temp });
-
-                                  let newError = error;
-                                  newError.acq[e.index].pay = false;
-                                  newError.acq?.push({ pay: false });
-                                  setError(newError);
-                                }}
-                                placeholder="0"
-                                type="number"
-                                min={0}
-                                error={error?.acq[e.index]?.pay}
-                                // disabled={e.sisa === 0 || e.sisa === null}
-                              />
-                            )
-                          }
+                                let newError = error;
+                                newError.acq[e.index].pay = false;
+                                newError.acq?.push({ pay: false });
+                                setError(newError);
+                              }}
+                              placeholder="0"
+                              type="number"
+                              min={0}
+                              error={error?.acq[e.index]?.pay}
+                              // disabled={e.sisa === 0 || e.sisa === null}
+                            />
+                          )}
                         />
 
                         <Column

@@ -30,7 +30,7 @@ import data from "src/jsx/data";
 const set = {
   id: null,
   // cp_id: null,
-  rp_no_ref: null,
+  rp_no_ref: "",
   rp_ref_month: null,
   rp_ref_year: null,
   rp_depart: false,
@@ -354,31 +354,60 @@ const SetupAutoNumber = () => {
   });
 
   useEffect(() => {
-    getSetup();
+    postSetup();
   }, []);
 
-  const getCompany = async () => {
-    const config = endpoints.getCompany;
+  
+  const postSetup = async ( isUpdate = data) => {
+    let config = {};
+    if (isUpdate) {
+      if (data) {
+        config = {
+          ...endpoints.updateSetupautonumber,
+          endpoint: endpoints.updateSetupautonumber.endpoint + currentData?.id,
+          data: data,
+        };
+      } else {
+        config = {
+          ...endpoints.updateSetupautonumber,
+          endpoint: endpoints.updateSetupautonumber.endpoint + currentData?.id,
+          data: {
+            ...currentData,
+            data: data,
+          },
+        };
+      }
+    } else {
+      config = {
+        ...endpoints.addSetupautonumber,
+        data: data,
+      };
+    }
     let response = null;
     try {
       response = await request(null, config);
       console.log(response);
       if (response.status) {
-        if (
-          Object.keys(response.data).length === 0 &&
-          response.data.constructor === Object
-        ) {
-          setCurrentData(set);
-        } else {
-          setCurrentData(true);
-        }
-        setLoading(false);
+        setSubmit(false);
+        // onHide();
+        toast.current.show({
+          severity: "info",
+          summary: "Berhasil",
+          detail: "Data berhasil diperbarui",
+          life: 3000,
+        });
       }
     } catch (error) {
-      setLoading(false);
+      setSubmit(false);
+      toast.current.show({
+        severity: "error",
+        summary: "Gagal",
+        detail: "Gagal memperbarui data",
+        life: 3000,
+      });
     }
-    getSetup();
   };
+
   const getSetup = async (needLoading = true) => {
     setLoading(needLoading);
     const config = {
@@ -402,6 +431,23 @@ const SetupAutoNumber = () => {
       setLoading(false);
     }
   };
+
+  const submitUpdate = async (upload = false, data) => {
+    if (currentData?.id === 0) {
+      if (upload) {
+        postSetup("");
+      } else {
+        postSetup("");
+      }
+    } else {
+      if (upload) {
+        postSetup(true);
+      } else {
+        postSetup("", true, data);
+      }
+    }
+  };
+
 
   const addSetup = async () => {
     let config = {
@@ -437,19 +483,6 @@ const SetupAutoNumber = () => {
     });
   };
 
-  const renderLoading = (width) => {
-    return (
-      <div className="d-flex col-12 align-items-center">
-        <Skeleton
-          className="mr-3"
-          height="30px"
-          width="50px"
-          borderRadius="20px"
-        />
-        <Skeleton className="mr-3" width={width ? width : "250px"} />
-      </div>
-    );
-  };
 
   const renderSettings = () => {
     return (
@@ -481,11 +514,11 @@ const SetupAutoNumber = () => {
                       {/* <div className="p-inputgroup"></div> */}
                       <PrimeInput
                         type="text"
-                        value={rp_auto?.prefix}
+                        value={currentData ? currentData?.rp_no_ref : null}
                         onChange={(e) => {
                           setCurrentSetup(e.target.value);
                           updateRp({
-                            ...rp_auto,
+                            ...currentData,
                             rp_no_ref: e.target.value,
                             rp_ref_month: romanNumeral,
                             rp_ref_year: year,
@@ -545,10 +578,10 @@ const SetupAutoNumber = () => {
                       label={tr[localStorage.getItem("language")].update}
                       icon="pi pi-check"
                       onClick={(e) => {
-                        addSetup();
+                        submitUpdate();
                       }}
                       autoFocus
-                      loading={loading}
+                      loading={onSubmit}
                     />
                   </div>
                 </Row>
@@ -650,7 +683,7 @@ const SetupAutoNumber = () => {
                         addSetup();
                       }}
                       autoFocus
-                      loading={loading}
+                      loading={onSubmit}
                     />
                     {/* <label className="mr-3 mt-1" htmlFor="email">
                       {"Aktifkan fitur RP (Request Purchase)"}

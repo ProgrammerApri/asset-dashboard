@@ -461,6 +461,25 @@ const endpoints = {
     data: {},
   },
 
+  //auto
+  getAutonumber: {
+    endpoint: "/v1/api/autonumber",
+    method: "GET",
+    data: {},
+  },
+
+  addAutonumber: {
+    endpoint: "/v1/api/autonumber",
+    method: "POST",
+    data: {},
+  },
+
+  updateAutonumber: {
+    endpoint: "/v1/api/autonumber/",
+    method: "PUT",
+    data: {},
+  },
+
   // Setup Neraca
 
   getNeraca: {

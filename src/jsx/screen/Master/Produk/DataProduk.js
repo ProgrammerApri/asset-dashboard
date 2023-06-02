@@ -25,16 +25,22 @@ import { ProgressBar } from "primereact/progressbar";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import formatIdr from "src/utils/formatIdr";
 import { useDispatch, useSelector } from "react-redux";
+import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
+import { InputTextarea } from "primereact/inputtextarea";
 
 const def = {
   id: null,
   code: null,
   name: null,
+  brand: null,
   group: null,
   type: null,
   codeb: null,
   unit: null,
-  suplier: null,
+  weight: null,
+  dm_panjang: null,
+  dm_lebar: null,
+  dm_tinggi: null,
   b_price: null,
   s_price: null,
   barcode: null,
@@ -46,6 +52,8 @@ const def = {
   max_order: null,
   image: null,
   ns: null,
+  ket: null,
+  suplier: null,
 };
 
 const type = [
@@ -64,10 +72,10 @@ const defError = [
     name: false,
     group: false,
     type: false,
-    sat: false,
     sup: false,
   },
   {
+    sat: false,
     hpp: false,
   },
 ];
@@ -232,9 +240,9 @@ const DataProduk = ({
       endpoint: endpoints.editProduct.endpoint + currentItem.id,
       data: {
         ...currentItem,
-        group: currentItem?.group?.id ?? null,
-        suplier: currentItem?.suplier?.id ?? null,
-        unit: currentItem?.unit?.id ?? null,
+        // group: currentItem?.group?.id ?? null,
+        // suplier: currentItem?.suplier?.id ?? null,
+        // unit: currentItem?.unit?.id ?? null,
         image: image,
       },
     };
@@ -276,9 +284,9 @@ const DataProduk = ({
       ...endpoints.addProduct,
       data: {
         ...currentItem,
-        group: currentItem?.group?.id ?? null,
-        suplier: currentItem?.suplier?.id ?? null,
-        unit: currentItem?.unit?.id ?? null,
+        // group: currentItem?.group?.id ?? null,
+        // suplier: currentItem?.suplier?.id ?? null,
+        // unit: currentItem?.unit?.id ?? null,
         image: image,
       },
     };
@@ -425,10 +433,32 @@ const DataProduk = ({
         {/* {edit &&  */}
         <Link
           onClick={() => {
+            console.log("data");
             console.log(data);
+            let suplier = data.suplier;
+
+            suplier?.forEach((element) => {
+              element.sup_id = element.sup_id?.id ?? null;
+            });
+
             setEdit(true);
             onClick("displayData", data);
-            setCurrentItem(data);
+            setCurrentItem({
+              ...data,
+              b_price: data?.b_price ?? null,
+              unit: data?.unit?.id ?? null,
+              group: data?.group?.id ?? null,
+              suplier:
+                suplier?.length > 0
+                  ? suplier
+                  : [
+                      {
+                        id: 0,
+                        prod_id: null,
+                        sup_id: null,
+                      },
+                    ],
+            });
             onInput(true);
           }}
           className="btn btn-primary shadow btn-xs sharp ml-1"
@@ -472,7 +502,7 @@ const DataProduk = ({
   };
 
   const renderFooter = () => {
-    if (active !== 1) {
+    if (active !== 2) {
       return (
         <div className="mt-3">
           {active > 0 ? (
@@ -608,7 +638,17 @@ const DataProduk = ({
               icon={<i class="bx bx-plus px-2"></i>}
               onClick={() => {
                 setEdit(false);
-                setCurrentItem({ ...def, code: prdCode });
+                setCurrentItem({
+                  ...def,
+                  // code: prdCode,
+                  suplier: [
+                    {
+                      id: 0,
+                      prod_id: null,
+                      sup_id: null,
+                    },
+                  ],
+                });
                 setDisplayData(true);
                 onInput(true);
                 // getSetupWip();
@@ -804,17 +844,17 @@ const DataProduk = ({
 
   const isValid = () => {
     let valid = false;
-    let active = 1;
+    let active = 2;
     let errors = [
       {
         code: !currentItem.code || currentItem.code === "",
         name: !currentItem.name || currentItem.name === "",
-        group: !currentItem.group?.id,
+        group: !currentItem.group,
         type: !currentItem.type,
-        sat: !currentItem.unit?.id,
         // sup: !currentItem.suplier?.id,
       },
       {
+        sat: !currentItem.unit,
         hpp: !currentItem.metode,
       },
     ];
@@ -948,6 +988,61 @@ const DataProduk = ({
         </DataTable>
       </div>
     );
+  };
+
+  const checkSup = (value) => {
+    let selected = {};
+    suplier?.forEach((element) => {
+      if (value === element?.id) {
+        selected = element;
+        console.log(selected);
+      }
+    });
+
+    return selected;
+  };
+
+  const checkUnit = (value) => {
+    let selected = {};
+    unit?.forEach((element) => {
+      if (value === element?.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkGroup = (value) => {
+    let selected = {};
+    group?.forEach((element) => {
+      if (value === element?.id) {
+        selected = element;
+        console.log(selected);
+      }
+    });
+
+    return selected;
+  };
+
+  const supTemp = (option) => {
+    return (
+      <div>
+        {option !== null ? `${option?.sup_name} (${option?.sup_code})` : ""}
+      </div>
+    );
+  };
+
+  const valSup = (option, props) => {
+    if (option) {
+      return (
+        <div>
+          {option !== null ? `${option?.sup_name} (${option?.sup_code})` : ""}
+        </div>
+      );
+    }
+
+    return <span>{props.placeholder}</span>;
   };
 
   const renderBody = () => {
@@ -1092,20 +1187,35 @@ const DataProduk = ({
                     error={error[0]?.name}
                   />
                 </div>
+
+                <div className="col-4">
+                  <PrimeInput
+                    label={"Brands"}
+                    value={`${currentItem?.brand ?? ""}`}
+                    onChange={(e) => {
+                      setCurrentItem({ ...currentItem, brand: e.target.value });
+                      // let newError = error;
+                      // newError[0].name = false;
+                      // setError(newError);
+                    }}
+                    placeholder={tr[localStorage.getItem("language")].masuk}
+                    // error={error[0]?.name}
+                  />
+                </div>
               </div>
 
               <div className="row mr-0 ml-0">
                 <div className="col-4">
                   <PrimeDropdown
                     label={tr[localStorage.getItem("language")].g_prod}
-                    value={currentItem !== null ? currentItem.group : null}
+                    value={currentItem !== null ? checkGroup(currentItem.group) : null}
                     options={group}
                     onChange={(e) => {
-                      console.log(e.target?.value?.stok);
+                      console.log(e.target?.value);
                       setCurrentItem({
                         ...currentItem,
-                        group: e.target.value ?? null,
-                        ns: !e.target?.value?.stok,
+                        group: e?.target.value?.id ?? null,
+                        ns: !e?.target?.value?.stok,
                       });
                       let newError = error;
                       newError[0].group = false;
@@ -1149,17 +1259,155 @@ const DataProduk = ({
                     disabled
                   />
                 </div>
+              </div>
 
+              <div className="col-12 p-0">
+                <div className="mt-4 ml-3 mr-3 fs-16 mb-1">
+                  <b>{tr[localStorage.getItem("language")].supplier}</b>
+                </div>
+                <Divider className="mb-2 ml-3 mr-3"></Divider>
+              </div>
+
+              <DataTable
+                responsiveLayout="none"
+                value={currentItem?.suplier?.map((v, i) => {
+                  return {
+                    ...v,
+                    index: i,
+                    // order: v?.order ?? 0,
+                  };
+                })}
+                className="display w-150 datatable-wrapper header-white no-border ml-2"
+                showGridlines={false}
+                emptyMessage={() => <div></div>}
+              >
+                <Column
+                  header="Pemasok"
+                  className="align-text-top"
+                  field={""}
+                  style={{
+                    minWidth: "30rem",
+                  }}
+                  body={(e) => (
+                    <PrimeDropdown
+                      value={e.sup_id && checkSup(e?.sup_id)}
+                      options={suplier}
+                      onChange={(a) => {
+                        console.log("temp");
+                        console.log(a.value?.id);
+                        let temp = [...currentItem?.suplier];
+                        temp[e.index].sup_id = a.value?.id ?? null;
+
+                        setCurrentItem({
+                          ...currentItem,
+                          suplier: temp,
+                        });
+                        // let newError = error;
+                        // newError[0].sup = false;
+                        // setError(newError);
+                      }}
+                      optionLabel="sup_name"
+                      filter
+                      filterBy="sup_name"
+                      itemTemplate={supTemp}
+                      valueTemplate={valSup}
+                      placeholder={tr[localStorage.getItem("language")].pilih}
+                      showClear
+                      // errorMessage="Pemasok Belum Dipilih"
+                      // error={error[0]?.sup}
+                    />
+                  )}
+                />
+
+                <Column
+                  header=""
+                  className="align-text-top"
+                  field={""}
+                  body={(e) =>
+                    e.index === currentItem?.suplier.length - 1 ? (
+                      <Link
+                        onClick={() => {
+                          // let newError = error;
+                          // newError.mtrl.push({
+                          //   qty: false,
+                          // });
+                          // setError(newError);
+
+                          setCurrentItem({
+                            ...currentItem,
+                            suplier: [
+                              ...currentItem.suplier,
+                              {
+                                id: 0,
+                                prod_id: null,
+                                sup_id: null,
+                              },
+                            ],
+                          });
+                        }}
+                        className="btn btn-primary shadow btn-xs sharp"
+                      >
+                        <i className="fa fa-plus"></i>
+                      </Link>
+                    ) : (
+                      <Link
+                        onClick={() => {
+                          // let newError = error;
+                          // newError.mtrl.push({
+                          //   qty: false,
+                          // });
+                          // setError(newError);
+
+                          let temp = [...currentItem.suplier];
+                          temp.splice(e.index, 1);
+                          setCurrentItem({ ...currentItem, suplier: temp });
+                        }}
+                        className="btn btn-danger shadow btn-xs sharp"
+                      >
+                        <i className="fa fa-trash"></i>
+                      </Link>
+                    )
+                  }
+                />
+              </DataTable>
+
+              <div className="row mr-0 ml-0">
+                <div className="col-6"></div>
+              </div>
+            </TabPanel>
+
+            <TabPanel
+              header="Informasi Unit Produk"
+              headerTemplate={renderTabHeader}
+            >
+              <div className="row mr-0 ml-0">
+                {" "}
+                <div className="col-4">
+                  <PrimeNumber
+                    price
+                    label={"Berat"}
+                    value={currentItem?.weight ?? null}
+                    onChange={(a) => {
+                      setCurrentItem({
+                        ...currentItem,
+                        weight: a.value ?? null,
+                      });
+                    }}
+                    placeholder="0"
+                    type="number"
+                    min={0}
+                  />
+                </div>
                 <div className="col-4">
                   <PrimeDropdown
                     label={tr[localStorage.getItem("language")].satuan}
-                    value={currentItem !== null ? currentItem.unit : null}
+                    value={currentItem !== null ? checkUnit(currentItem.unit) : null}
                     options={unit}
                     onChange={(e) => {
                       console.log(e.value);
                       setCurrentItem({
                         ...currentItem,
-                        unit: e.target.value,
+                        unit: e?.target.value?.id ?? null,
                       });
                       let newError = error;
                       newError[0].sat = false;
@@ -1170,44 +1418,58 @@ const DataProduk = ({
                     filterBy="name"
                     placeholder={tr[localStorage.getItem("language")].pilih}
                     errorMessage="Satuan Produk Belum Dipilih"
-                    error={error[0]?.sat}
+                    error={error[1]?.sat}
                   />
                 </div>
-              </div>
-
-              <div className="col-12 p-0">
-                <div className="mt-4 ml-3 mr-3 fs-16 mb-1">
-                  <b>{tr[localStorage.getItem("language")].supplier}</b>
+                <div className="col-1">
+                  <label className="text-label">Dimensi</label>
+                  <PrimeNumber
+                    price
+                    value={currentItem?.dm_panjang ?? null}
+                    onChange={(a) => {
+                      setCurrentItem({
+                        ...currentItem,
+                        dm_panjang: a?.value ?? null,
+                      });
+                    }}
+                    placeholder="P"
+                  />
                 </div>
-                <Divider className="mb-2 ml-3 mr-3"></Divider>
+                <span className="mt-5">x</span>
+                <div className="col-1 mt-2">
+                  <label className="text-label"></label>
+                  <PrimeNumber
+                    price
+                    value={currentItem?.dm_lebar ?? null}
+                    onChange={(a) => {
+                      setCurrentItem({
+                        ...currentItem,
+                        dm_lebar: a?.value ?? null,
+                      });
+                    }}
+                    placeholder="L"
+                  />
+                </div>
+                <span className="mt-5">x</span>
+                <div className="col-1 mt-2">
+                  <label className="text-label"></label>
+                  <PrimeNumber
+                    price
+                    value={currentItem?.dm_tinggi ?? null}
+                    onChange={(a) => {
+                      setCurrentItem({
+                        ...currentItem,
+                        dm_tinggi: a?.value ?? null,
+                      });
+                    }}
+                    placeholder="T"
+                  />
+                </div>
               </div>
 
               <div className="row mr-0 ml-0">
-                <div className="col-6">
-                  <PrimeDropdown
-                    label={tr[localStorage.getItem("language")].supplier}
-                    value={currentItem !== null ? currentItem.suplier : null}
-                    options={suplier}
-                    onChange={(e) => {
-                      console.log(e.value);
-                      setCurrentItem({
-                        ...currentItem,
-                        suplier: e.target.value,
-                      });
-                      let newError = error;
-                      newError[0].sup = false;
-                      setError(newError);
-                    }}
-                    optionLabel="sup_name"
-                    filter
-                    filterBy="sup_name"
-                    placeholder={tr[localStorage.getItem("language")].pilih}
-                    errorMessage="Pemasok Belum Dipilih"
-                    error={error[0]?.sup}
-                  />
-                </div>
-
-                <div className="col-6">
+                {" "}
+                <div className="col-4">
                   <label className="text-label">
                     {tr[localStorage.getItem("language")].kd_prev}
                   </label>
@@ -1224,47 +1486,7 @@ const DataProduk = ({
                     />
                   </div>
                 </div>
-              </div>
-
-              <div className="row mr-0 ml-0">
-                <div className="col-6">
-                  <label className="text-label">
-                    {tr[localStorage.getItem("language")].hrg_bl}
-                  </label>
-                  <div className="p-inputgroup">
-                    <InputNumber
-                      value={`${currentItem?.b_price ?? ""}`}
-                      onChange={(e) =>
-                        setCurrentItem({ ...currentItem, b_price: e.value })
-                      }
-                      placeholder={tr[localStorage.getItem("language")].masuk}
-                    />
-                  </div>
-                </div>
-
-                <div className="col-6">
-                  <label className="text-label">
-                    {tr[localStorage.getItem("language")].hrg_jl}
-                  </label>
-                  <div className="p-inputgroup">
-                    <InputNumber
-                      value={`${currentItem?.s_price ?? ""}`}
-                      onChange={(e) =>
-                        setCurrentItem({ ...currentItem, s_price: e.value })
-                      }
-                      placeholder={tr[localStorage.getItem("language")].masuk}
-                    />
-                  </div>
-                </div>
-              </div>
-            </TabPanel>
-
-            <TabPanel
-              header="Informasi Produk Lainnya"
-              headerTemplate={renderTabHeader}
-            >
-              <div className="row mr-0 ml-0">
-                <div className="col-6">
+                <div className="col-4">
                   <label className="text-label">
                     {tr[localStorage.getItem("language")].barcode}
                   </label>
@@ -1281,8 +1503,7 @@ const DataProduk = ({
                     />
                   </div>
                 </div>
-
-                <div className="col-6">
+                <div className="col-4">
                   <PrimeDropdown
                     label={`HPP ${tr[localStorage.getItem("language")].metode}`}
                     value={
@@ -1308,6 +1529,42 @@ const DataProduk = ({
                     errorMessage="Metode HPP Belum Dipilih"
                     error={error[1]?.hpp}
                   />
+                </div>
+              </div>
+            </TabPanel>
+
+            <TabPanel
+              header="Informasi Produk Lainnya"
+              headerTemplate={renderTabHeader}
+            >
+              <div className="row mr-0 ml-0">
+                <div className="col-6">
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].hrg_bl}
+                  </label>
+                  <div className="p-inputgroup">
+                    <InputNumber
+                      value={`${currentItem?.b_price ?? ""}`}
+                      onChange={(e) =>
+                        setCurrentItem({ ...currentItem, b_price: e.value })
+                      }
+                      placeholder={tr[localStorage.getItem("language")].masuk}
+                    />
+                  </div>
+                </div>
+                <div className="col-6">
+                  <label className="text-label">
+                    {tr[localStorage.getItem("language")].hrg_jl}
+                  </label>
+                  <div className="p-inputgroup">
+                    <InputNumber
+                      value={`${currentItem?.s_price ?? ""}`}
+                      onChange={(e) =>
+                        setCurrentItem({ ...currentItem, s_price: e.value })
+                      }
+                      placeholder={tr[localStorage.getItem("language")].masuk}
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -1378,7 +1635,7 @@ const DataProduk = ({
               </div>
 
               <div className="row mr-0 ml-0">
-                <div className="col-12">
+                <div className="col-6">
                   <label className="text-label">
                     {tr[localStorage.getItem("language")].max_ord}
                   </label>
@@ -1390,6 +1647,18 @@ const DataProduk = ({
                       }
                       placeholder="Masukan Maksimal Order"
                       showButtons
+                    />
+                  </div>
+                </div>
+                <div className="col-6">
+                  <label className="text-label">Keterangan</label>
+                  <div className="p-inputgroup">
+                    <InputTextarea
+                      value={`${currentItem?.ket ?? ""}`}
+                      onChange={(e) =>
+                        setCurrentItem({ ...currentItem, ket: e.target.value })
+                      }
+                      placeholder="Masukan Keterangan"
                     />
                   </div>
                 </div>

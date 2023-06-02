@@ -775,7 +775,7 @@ const ReportHutangRingkasan = () => {
                 dateFormat="dd-mm-yy"
               />
             </div>
-            <div className="mt-2 mr-2">
+            <div className="p-inputgroup col-3">
               <MultiSelect
                 value={selectedSup ?? null}
                 options={supplier}
@@ -792,7 +792,7 @@ const ReportHutangRingkasan = () => {
                 maxSelectedLabels={3}
               />
             </div>
-            <div className="mt-2">
+            <div className="p-inputgroup col-3">
               <MultiSelect
                 value={selectedAcc ?? null}
                 options={acc}

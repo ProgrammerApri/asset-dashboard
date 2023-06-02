@@ -2,10 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Button, Col, Row } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import KartuStock from "./KartuStock";
-import KartuStock_ringkasan from "./KartuStock_ringkasan";
+// import KartuStock_ringkasan from "./KartuStock_ringkasan";
 import MutasiStock from "./MutasiStock";
 import PembelianPerProduk from "../LaporanPembelian/PembelianPerProduk";
 import ReportGRA from "../LaporanPembelian/Gra";
+import KartuStockRingkasan from "./KartuStock_ringkasan";
 
 const LaporanPersediaan = (self) => {
   const [active, setActive] = useState(0);
@@ -18,7 +19,7 @@ const LaporanPersediaan = (self) => {
     {
       tittle: "Kartu Stock Ringkasan",
       icon: "bx-spreadsheet",
-      component: <KartuStock_ringkasan />,
+      component: <KartuStockRingkasan />,
     },
     {
       tittle: "Kartu Stock Rincian",

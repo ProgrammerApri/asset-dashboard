@@ -92,7 +92,7 @@ const ReportPO = () => {
               rp: el.preq_id?.req_code,
               sup: el.sup_id !== null ? el.sup_id.sup_name : "-",
               prod: ek.prod_id.name,
-              ord: ek.order,
+              ord: formatIdr(ek.order),
               unit: ek.unit_id.code,
               prc: `Rp. ${formatIdr(ek.price)}`,
               t_prc: `Rp. ${formatIdr(ek.total)}`,
@@ -480,7 +480,7 @@ const ReportPO = () => {
   };
 
   const formatIdr = (value) => {
-    return `${value}`
+    return `${value?.toFixed(2)}`
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
@@ -510,7 +510,8 @@ const ReportPO = () => {
             <Card className="ml-1 mr-1 mt-0">
               <Card.Body className="p-0 m-0">
                 <CustomeWrapper
-                // horizontal
+                  viewOnly
+                  horizontal
                   tittle={"Purchase Order Report"}
                   subTittle={`Purchase Order Report From ${formatDate(
                     filtersDate[0]
@@ -565,7 +566,7 @@ const ReportPO = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{width: "9rem" }}
+                              style={{ width: "9rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -660,12 +661,12 @@ const ReportPO = () => {
                               style={{ width: "6rem" }}
                               body={(e) => (
                                 <div
-                                className={
-                                  e.type == "header"
-                                    ? "font-weight-bold text-right"
-                                    : e.type == "footer"
-                                    ? "font-weight-bold text-right"
-                                    : "text-right"
+                                  className={
+                                    e.type == "header"
+                                      ? "font-weight-bold text-right"
+                                      : e.type == "footer"
+                                      ? "font-weight-bold text-right"
+                                      : "text-right"
                                   }
                                 >
                                   {e.value.st_gra}

@@ -65,59 +65,59 @@ const OutstandingPO = () => {
     po?.forEach((el) => {
       if (el.status !== 1) {
         let tgl_gra = new Date(`${el?.po_date}Z`);
-      if (tgl_gra >= filtersDate[0] && tgl_gra <= filtersDate[1]) {
-        let val = [
-          {
-            ref: `PO Code : ${el.po_code}`,
-            type: "header",
-            value: {
-              date: "Date",
-              rp: "Req Code",
-              sup: "Supplier",
-              prod: "Product Name",
-              ord: "Qty",
-              unit: "Unit",
-              prc: "Price",
-              t_prc: "Total Price",
-              st_gra: "Status",
+        if (tgl_gra >= filtersDate[0] && tgl_gra <= filtersDate[1]) {
+          let val = [
+            {
+              ref: `PO Code : ${el.po_code}`,
+              type: "header",
+              value: {
+                date: "Date",
+                rp: "Req Code",
+                sup: "Supplier",
+                prod: "Product Name",
+                ord: "Qty",
+                unit: "Unit",
+                prc: "Price",
+                t_prc: "Total Price",
+                st_gra: "Status",
+              },
             },
-          },
-        ];
+          ];
 
-        let total = 0;
-        el.pprod?.forEach((ek) => {
-          val.push({
-            type: "item",
-            value: {
-              date: formatDate(el.po_date),
-              rp: el.preq_id?.req_code,
-              sup: el.sup_id !== null ? `${el.sup_id.sup_name}` : "-",
-              prod: `${ek.prod_id.name}`,
-              ord: ek.order,
-              unit: ek.unit_id.code,
-              prc: `Rp. ${formatIdr(ek.price)}`,
-              t_prc: `Rp. ${formatIdr(ek.total)}`,
-              st_gra: ek.status !== 1 ? "Open" : "Close",
-            },
+          let total = 0;
+          el.pprod?.forEach((ek) => {
+            val.push({
+              type: "item",
+              value: {
+                date: formatDate(el.po_date),
+                rp: el.preq_id?.req_code,
+                sup: el.sup_id !== null ? `${el.sup_id.sup_name}` : "-",
+                prod: `${ek.prod_id.name}`,
+                ord: formatIdr(ek.order),
+                unit: ek.unit_id.code,
+                prc: `Rp. ${formatIdr(ek.price)}`,
+                t_prc: `Rp. ${formatIdr(ek.total)}`,
+                st_gra: ek.status !== 1 ? "Open" : "Close",
+              },
+            });
+            // total += ek.total;
           });
-          // total += ek.total;
-        });
 
-        //   val.push({
-        //     // ref: el.kd_gra,
-        //     type: "footer",
-        //     value: {
-        //       date: "Total",
-        //       sup: "",
-        //       prod: "",
-        //       ord: "",
-        //       unit: "",
-        //       prc: "",
-        //       tot: `Rp. ${formatIdr(total)}`,
-        //     },
-        //   });
-        data.push(val);
-      }
+          //   val.push({
+          //     // ref: el.kd_gra,
+          //     type: "footer",
+          //     value: {
+          //       date: "Total",
+          //       sup: "",
+          //       prod: "",
+          //       ord: "",
+          //       unit: "",
+          //       prc: "",
+          //       tot: `Rp. ${formatIdr(total)}`,
+          //     },
+          //   });
+          data.push(val);
+        }
       }
       console.log("========fddfdfdfdfdfdf===");
       console.log(data);
@@ -485,7 +485,7 @@ const OutstandingPO = () => {
   };
 
   const formatIdr = (value) => {
-    return `${value}`
+    return `${value?.toFixed(2)}`
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
@@ -515,6 +515,8 @@ const OutstandingPO = () => {
             <Card className="ml-1 mr-1 mt-0">
               <Card.Body className="p-0 m-0">
                 <CustomeWrapper
+                  viewOnly
+                  horizontal
                   tittle={"Outstanding PO Report"}
                   subTittle={`Outstanding PO Report From ${formatDate(
                     filtersDate[0]
@@ -532,14 +534,14 @@ const OutstandingPO = () => {
                             dataKey="id"
                             rowHover
                             emptyMessage="Tidak Ada Transaksi"
-                            className="mt-0"
+                            className="mt-3"
                           >
                             <Column
                               className="header-center"
                               header={(e) =>
                                 e.props.value ? e.props?.value[0]?.ref : null
                               }
-                              style={{ minWidht: "6rem" }}
+                              style={{ minWidth: "10rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -555,7 +557,7 @@ const OutstandingPO = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{ minWidth: "12rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -569,7 +571,7 @@ const OutstandingPO = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{ minWidth: "15rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -583,7 +585,7 @@ const OutstandingPO = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{ minWidth: "15rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -597,7 +599,7 @@ const OutstandingPO = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{ minWidth: "6rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -611,7 +613,7 @@ const OutstandingPO = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{ minWidth: "3rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -625,7 +627,7 @@ const OutstandingPO = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{ minWidth: "10rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -643,7 +645,7 @@ const OutstandingPO = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{ minWidth: "10rem" }}
                               body={(e) => (
                                 <div
                                   className={
@@ -661,15 +663,15 @@ const OutstandingPO = () => {
                             <Column
                               className="header-center"
                               header=""
-                              style={{ minWidht: "10rem" }}
+                              style={{ minWidth: "6rem" }}
                               body={(e) => (
                                 <div
-                                className={
-                                  e.type == "header"
-                                    ? "font-weight-bold text-right"
-                                    : e.type == "footer"
-                                    ? "font-weight-bold text-right"
-                                    : "text-right"
+                                  className={
+                                    e.type == "header"
+                                      ? "font-weight-bold text-right"
+                                      : e.type == "footer"
+                                      ? "font-weight-bold text-right"
+                                      : "text-right"
                                   }
                                 >
                                   {e.value.st_gra}

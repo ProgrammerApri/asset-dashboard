@@ -125,7 +125,6 @@ const ReportPiutang = () => {
     } catch (error) {}
   };
 
-
   const formatDate = (date) => {
     var d = new Date(`${date}Z`),
       month = "" + (d.getMonth() + 1),
@@ -631,7 +630,7 @@ const ReportPiutang = () => {
               />
             </div>
 
-            <div className="col-2 ">
+            <div className="p-inputgroup col-3 mr-0">
               <MultiSelect
                 value={selectedCus ?? null}
                 options={customer}
@@ -650,7 +649,7 @@ const ReportPiutang = () => {
                 maxSelectedLabels={3}
               />
             </div>
-            <div className="col-3">
+            <div className="p-inputgroup col-3 mr-0">
               <MultiSelect
                 value={selectedAcc ?? null}
                 options={acc}
@@ -741,6 +740,8 @@ const ReportPiutang = () => {
             <Card className="ml-1 mr-1 mt-2">
               <Card.Body className="p-0 m-0">
                 <CustomeWrapper
+                  viewOnly
+                  horizontal
                   tittle={"Balance Receivable Details"}
                   subTittle={`Balance Receivable Details Report as ${formatDate(
                     filtDate
@@ -884,7 +885,9 @@ const ReportPiutang = () => {
           <Card.Body className="p-0">
             <CustomeWrapper
               tittle={"Account Receivable Details"}
-              subTittle={`Account Receivable Details as of ${formatDate(filtDate)}`}
+              subTittle={`Account Receivable Details as of ${formatDate(
+                filtDate
+              )}`}
               onComplete={(cp) => setCp(cp)}
               body={
                 <>

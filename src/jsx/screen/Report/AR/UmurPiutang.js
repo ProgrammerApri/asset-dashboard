@@ -491,7 +491,7 @@ const UmurPiutang = () => {
   };
 
   const formatIdr = (value) => {
-    return `${value}`
+    return `${value?.toFixed(2)}`
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
@@ -589,8 +589,12 @@ const UmurPiutang = () => {
             <Card>
               <Card.Body className="p-0 m-0">
                 <CustomeWrapper
+                  viewOnly
+                  horizontal
                   tittle={"Age of Accounts Receivable Details"}
-                  subTittle={`Age of Accounts Receivable Details as of ${formatDate(date)}`}
+                  subTittle={`Age of Accounts Receivable Details as of ${formatDate(
+                    date
+                  )}`}
                   onComplete={(cp) => setCp(cp)}
                   page={idx + 1}
                   body={
@@ -603,6 +607,7 @@ const UmurPiutang = () => {
                             showGridlines
                             dataKey="id"
                             rowHover
+                            className="mt-3"
                             emptyMessage="Data Tidak Ditemukan"
                           >
                             <Column
@@ -836,7 +841,9 @@ const UmurPiutang = () => {
           <Card.Body className="p-0">
             <CustomeWrapper
               tittle={"Age of Accounts Receivable Details"}
-              subTittle={`Age of Accounts Receivable Details as of ${formatDate(date)}`}
+              subTittle={`Age of Accounts Receivable Details as of ${formatDate(
+                date
+              )}`}
               body={
                 <>
                   {jsonForExcel(ar, false)?.map((v) => {

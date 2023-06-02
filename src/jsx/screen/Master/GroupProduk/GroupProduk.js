@@ -182,6 +182,7 @@ const DataGroupProduk = ({
             element.account?.dou_type === "D"
           ) {
             acc_sto.push(element);
+            console.log("jijiijiiiiii,", acc_sto.push(element));
           }
 
           if (
@@ -991,7 +992,7 @@ const DataGroupProduk = ({
                         }
                         options={accSto}
                         onChange={(e) => {
-                          console.log(e.value);
+                          console.log("akunwe",e.value);
                           setCurrentItem({
                             ...currentItem,
                             groupPro: {
@@ -1014,7 +1015,10 @@ const DataGroupProduk = ({
                         error={error[1]?.acc_1}
                         disabled={currentItem.groupPro.wip === true}
                       />
-                      <small className="text-blue" hidden={currentItem.groupPro.wip}>
+                      <small
+                        className="text-blue"
+                        hidden={currentItem.groupPro.wip}
+                      >
                         *Harap Periksa Setup Akun Apabila Daftar Akun Tidak Ada
                       </small>
                     </div>

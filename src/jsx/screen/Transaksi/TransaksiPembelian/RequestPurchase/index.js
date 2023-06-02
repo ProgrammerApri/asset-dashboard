@@ -14,9 +14,21 @@ const data = {
   refrence: false,
   ref_sup: null,
   ref_ket: null,
+  status: null,
+  apprv_status: null,
+  apprv_text: null,
+  apprv_1: null,
+  apprv_2: null,
+  apprv_3: null,
+  apprv1_time: null,
+  apprv2_time: null,
+  apprv3_time: null,
+  reject: null,
+  reject_time: null,
+  reason: null,
 };
 
-const RequestPurchase = ({trigger}) => {
+const RequestPurchase = ({ trigger }) => {
   const [active, setActive] = useState(0);
   const [current, updateCurrent] = useState(data);
   const toast = useRef(null);

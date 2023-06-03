@@ -365,7 +365,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
           <i className="fa fa-trash"></i>
         </Link>
 
-        {profile.previlage?.approver && (
+        {profile?.previlage?.approver && (
           <Link
             data-pr-tooltip="Approve"
             data-pr-position="right"
@@ -377,7 +377,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
             }}
             className={`btn ${
               canApprove(
-                profile.approval_settings.filter(
+                profile?.approval_settings?.filter(
                   (v) => v.approval_module === "rp"
                 )[0]?.approval_level,
                 data
@@ -389,7 +389,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
             <i className="fa fa-check"></i>
           </Link>
         )}
-        {profile.previlage.approver && (
+        {profile?.previlage?.approver && (
           <Link
             data-pr-tooltip="Reject"
             data-pr-position="right"
@@ -401,7 +401,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
             }}
             className={`btn ${
               canApprove(
-                profile.approval_settings.filter(
+                profile?.approval_settings?.filter(
                   (v) => v.approval_module === "rp"
                 )[0]?.approval_level,
                 data

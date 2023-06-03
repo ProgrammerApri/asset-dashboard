@@ -443,7 +443,7 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
           <i className="fa fa-trash"></i>
         </Link>
 
-        {profile.previlage.approver && (
+        {profile?.previlage?.approver && (
           <Link
             data-pr-tooltip="Approve"
             data-pr-position="right"
@@ -455,7 +455,7 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
             }}
             className={`btn ${
               canApprove(
-                profile.approval_settings.filter(
+                profile?.approval_settings?.filter(
                   (v) => v.approval_module === "po"
                 )[0]?.approval_level,
                 data
@@ -467,7 +467,7 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
             <i className="fa fa-check"></i>
           </Link>
         )}
-        {profile.previlage.approver && (
+        {profile?.previlage?.approver && (
           <Link
             data-pr-tooltip="Reject"
             data-pr-position="right"

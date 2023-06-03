@@ -780,6 +780,12 @@ const endpoints = {
     data: {},
   },
 
+  rejectRp: {
+    endpoint: "/v1/api/reject/rp/",
+    method: "PUT",
+    data: {},
+  },
+
   /// PO
   po: {
     endpoint: "/v1/api/po",

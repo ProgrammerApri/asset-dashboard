@@ -46,6 +46,8 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
   const [isEdit, setEdit] = useState(false);
   const [displayDel, setDisplayDel] = useState(false);
   const [confirm, setDisplayConfirm] = useState(false);
+  const [displayApprove, setDisplayApprove] = useState(false);
+  const [displayReject, setDisplayReject] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
   const [filters1, setFilters1] = useState(null);
@@ -55,6 +57,7 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
   const dispatch = useDispatch();
   const PO = useSelector((state) => state.po.po);
   const closePo = useSelector((state) => state.po.current);
+  const profile = useSelector((state) => state.profile.profile);
 
   const dummy = Array.from({ length: 10 });
 
@@ -182,15 +185,40 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
     }
   };
 
+  const canApprove = (level, data) => {
+    if (!data.apprv_1 && level === 1 && data.apprv_status === 0) {
+      return true;
+    }
+
+    if (
+      data.apprv_1 &&
+      !data.apprv_2 &&
+      level === 2 &&
+      data.apprv_status === 0
+    ) {
+      return true;
+    }
+
+    if (
+      data.apprv_1 &&
+      data.apprv_2 &&
+      !data.apprv_3 &&
+      level === 3 &&
+      data.apprv_status === 0
+    ) {
+      return true;
+    }
+
+    return false;
+  };
+
   const actionBodyTemplate = (data) => {
-    return (
-      // <React.Fragment>
+    return data.id ? (
       <div className="d-flex">
-        <Tooltip target={".btn"}/>
+        <Tooltip target={".btn"} />
         <Link
           data-pr-tooltip="Lihat Detail PO"
           data-pr-position="right"
-          data-pr-at="right+5 top"
           data-pr-my="left center-2"
           onClick={() => {
             onDetail();
@@ -246,7 +274,6 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
         <Link
           data-pr-tooltip="Edit PO"
           data-pr-position="right"
-          data-pr-at="right+5 top"
           data-pr-my="left center-2"
           onClick={() => {
             onEdit();
@@ -333,7 +360,6 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
         <Link
           data-pr-tooltip="Close PO"
           data-pr-position="right"
-          data-pr-at="right+5 top"
           data-pr-my="left center-2"
           onClick={() => {
             setDisplayConfirm(true);
@@ -404,7 +430,6 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
         <Link
           data-pr-tooltip="Hapus PO"
           data-pr-position="right"
-          data-pr-at="right+5 top"
           data-pr-my="left center-2"
           onClick={() => {
             setEdit(true);
@@ -417,8 +442,147 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
         >
           <i className="fa fa-trash"></i>
         </Link>
+
+        {profile.previlage.approver && (
+          <Link
+            data-pr-tooltip="Approve"
+            data-pr-position="right"
+            data-pr-my="left center-2"
+            onClick={() => {
+              setEdit(true);
+              setDisplayApprove(true);
+              setCurrentItem(data);
+            }}
+            className={`btn ${
+              canApprove(
+                profile.approval_settings.filter(
+                  (v) => v.approval_module === "po"
+                )[0]?.approval_level,
+                data
+              )
+                ? ""
+                : "disabled"
+            } btn-info shadow btn-xs sharp ml-1`}
+          >
+            <i className="fa fa-check"></i>
+          </Link>
+        )}
+        {profile.previlage.approver && (
+          <Link
+            data-pr-tooltip="Reject"
+            data-pr-position="right"
+            data-pr-my="left center-2"
+            onClick={() => {
+              setEdit(true);
+              setDisplayReject(true);
+              setCurrentItem(data);
+            }}
+            className={`btn ${
+              canApprove(
+                profile.approval_settings.filter(
+                  (v) => v.approval_module === "po"
+                )[0]?.approval_level,
+                data
+              )
+                ? ""
+                : "disabled"
+            } btn-danger     shadow btn-xs sharp ml-1`}
+          >
+            <i className="fa fa-times"></i>
+          </Link>
+        )}
       </div>
-      // </React.Fragment>
+    ) : (
+      <div className="d-flex">
+        <Tooltip target={".btn"} />
+        <Link
+          data-pr-tooltip="Create PO"
+          data-pr-position="right"
+          data-pr-my="left center-2"
+          onClick={() => {
+            onEdit();
+            dispatch({
+              type: SET_EDIT_PO,
+              payload: false,
+            });
+
+            let pprod = data.pprod;
+            pprod.forEach((el) => {
+              el.prod_id = el.prod_id.id;
+              el.unit_id = el.unit_id.id;
+            });
+            let pjasa = data.pjasa;
+            pjasa.forEach((el) => {
+              el.jasa_id = el.jasa_id.id;
+              el.unit_id = el.unit_id.id;
+            });
+            // let psup = data.psup;
+            // psup.forEach((el) => {
+            //   el.sup_id = el.sup_id.id;
+            //   el.prod_id = el.prod_id.id;
+            // });
+
+            if (!pprod.length) {
+              pprod.push({
+                id: 0,
+                prod_id: null,
+                rprod_id: null,
+                unit_id: null,
+                order: null,
+                price: null,
+                disc: null,
+                nett_price: null,
+                total: null,
+              });
+            }
+
+            if (!pjasa.length) {
+              pjasa.push({
+                id: 0,
+                jasa_id: null,
+                rjasa_id: null,
+                unit_id: null,
+                sup_id: null,
+                order: null,
+                price: null,
+                disc: null,
+                nett_price: null,
+                total: null,
+              });
+            }
+
+            // if (!psup.length) {
+            //   psup.push({
+            //     id: 0,
+            //     sup_id: null,
+            //     prod_id: null,
+            //     price: null,
+            //     image: null,
+            //   });
+            // }
+
+            dispatch({
+              type: SET_CURRENT_PO,
+              payload: {
+                ...data,
+                ref_sup: false,
+                preq_id: data?.preq_id?.id,
+                sup_id: data?.sup_id?.id,
+                top: data?.top?.id,
+                pprod: pprod,
+                pjasa: pjasa,
+                psup: [],
+                // psup: psup,
+              },
+            });
+          }}
+          className={`btn ${
+            data.status === 0 ? "" : "disabled"
+          } btn-primary shadow btn-xs sharp ml-1`}
+        >
+          <i className="fa fa-plus"></i>
+        </Link>
+      </div>
     );
   };
 
@@ -522,7 +686,10 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
       const dropdownOptions = [
         { label: 20, value: 20 },
         { label: 50, value: 50 },
-        { label: tr[localStorage.getItem("language")].hal, value: options.totalRecords },
+        {
+          label: tr[localStorage.getItem("language")].hal,
+          value: options.totalRecords,
+        },
       ];
 
       return (
@@ -551,7 +718,8 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
             textAlign: "center",
           }}
         >
-          {options.first} - {options.last} {tr[localStorage.getItem("language")].dari} {options.totalRecords}
+          {options.first} - {options.last}{" "}
+          {tr[localStorage.getItem("language")].dari} {options.totalRecords}
         </span>
       );
     },
@@ -651,6 +819,41 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
                       </div>
                     )
                   }
+                />
+                <Column
+                  header={"Approval Status"}
+                  field={(e) => e?.approval_status ?? ""}
+                  style={{ minWidth: "8rem" }}
+                  body={(e) =>
+                    loading ? (
+                      <Skeleton />
+                    ) : (
+                      <>
+                        {e?.apprv_status === 0 ? (
+                          <Badge variant="warning light">
+                            <i className="bx bxs-circle text-warning mr-1"></i>{" "}
+                            {e?.apprv_text ?? "No Status"}
+                          </Badge>
+                        ) : e?.apprv_status === 1 ? (
+                          <Badge variant="success light">
+                            <i className="bx bxs-circle text-success mr-1"></i>{" "}
+                            {e?.apprv_text ?? "No Status"}
+                          </Badge>
+                        ) : (
+                          <Badge variant="danger light">
+                            <i className="bx bxs-circle text-danger mr-1"></i>{" "}
+                            {e?.apprv_text ?? "No Status"}
+                          </Badge>
+                        )}
+                      </>
+                    )
+                  }
+                />
+                <Column
+                  header={"GRA Code"}
+                  field={(e) => e.gra_code ?? "-"}
+                  style={{ minWidth: "10rem" }}
+                  body={loading && <Skeleton />}
                 />
                 <Column
                   header="Action"

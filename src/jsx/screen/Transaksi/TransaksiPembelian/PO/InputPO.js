@@ -280,7 +280,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
             elem.rjasa = jasa;
             filt.push(elem);
           } else {
-            if (elem.status !== 2) {
+            if (elem.status !== 2 && elem.apprv_status === 1) {
               let prod = [];
               elem.rprod.forEach((el) => {
                 if (el.remain > 0) {
@@ -439,7 +439,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
       el.disc = el.disc === "" ? 0 : el.disc;
     });
     let ref_supp = [];
-    d.psup.forEach((el) => {
+    d?.psup.forEach((el) => {
       el.prod_id.forEach((ek, i) => {
         ref_supp.push({
           sup_id: el.sup_id,
@@ -969,7 +969,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
           <div className="col-6" />
 
-          {po && po.ref_sup === false && (
+          {po && po?.ref_sup === false && (
             <>
               <div className="col-3">
                 <label className="text-label">

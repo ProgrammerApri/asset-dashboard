@@ -17,6 +17,7 @@ import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleB
 import { tr } from "src/data/tr";
 import { Tooltip } from "primereact/tooltip";
 import { Timeline } from "primereact/timeline";
+import { InputTextarea } from "primereact/inputtextarea";
 
 const data = {
   id: null,
@@ -33,12 +34,13 @@ const data = {
 };
 
 const PermintaanPembelian = ({ onAdd, onEdit }) => {
-  const [permintaan, setPermintaan] = useState(null);
+  const [reject, setReject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayDel, setDisplayDel] = useState(false);
   const [displayData, setDisplayDat] = useState(false);
   const [displayApprove, setDisplayApprove] = useState(false);
+  const [displayReject, setDisplayReject] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const [expandedRows, setExpandedRows] = useState(null);
   const [approverCount, setApproverCount] = useState(0);
@@ -125,6 +127,46 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
     }
   };
 
+  const rejectRp = async (id) => {
+    setUpdate(true);
+    const config = {
+      ...endpoints.rejectRp,
+      endpoint: endpoints.rejectRp.endpoint + currentItem.id,
+      data: { reason: reject ?? null },
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setTimeout(() => {
+          setUpdate(false);
+          setDisplayReject(false);
+          getPermintaan(true);
+          toast.current.show({
+            severity: "info",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: "Approve Success",
+            life: 3000,
+          });
+        }, 500);
+      }
+    } catch (error) {
+      console.log(error);
+      setTimeout(() => {
+        setUpdate(false);
+        setDisplayApprove(false);
+        toast.current.show({
+          severity: "error",
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: "Failed to approve",
+          life: 3000,
+        });
+      }, 500);
+    }
+  };
+
   const delPermintaan = async (id) => {
     setUpdate(true);
     const config = {
@@ -165,15 +207,26 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
   };
 
   const canApprove = (level, data) => {
-    if (!data.apprv_1 && level === 1) {
+    if (!data.apprv_1 && level === 1 && data.apprv_status === 0) {
       return true;
     }
 
-    if (!data.apprv_2 && level === 2) {
+    if (
+      data.apprv_1 &&
+      !data.apprv_2 &&
+      level === 2 &&
+      data.apprv_status === 0
+    ) {
       return true;
     }
 
-    if (!data.apprv_3 && level === 3) {
+    if (
+      data.apprv_1 &&
+      data.apprv_2 &&
+      !data.apprv_3 &&
+      level === 3 &&
+      data.apprv_status === 0
+    ) {
       return true;
     }
 
@@ -281,7 +334,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
             });
           }}
           className={`btn ${
-            data.status !== 2 ? "" : "disabled"
+            data.status !== 2 && data.apprv_status === 0 ? "" : "disabled"
           } btn-primary shadow btn-xs sharp ml-1`}
         >
           <i className="fa fa-pencil"></i>
@@ -294,7 +347,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
             setCurrentItem(data);
           }}
           className={`btn ${
-            data.status !== 2 ? "" : "disabled"
+            data.status !== 2 && data.apprv_status === 0 ? "" : "disabled"
           } btn-danger shadow btn-xs sharp ml-1`}
         >
           <i className="fa fa-trash"></i>
@@ -314,7 +367,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
               canApprove(
                 profile.approval_settings.filter(
                   (v) => v.approval_module === "rp"
-                )[0].approval_level,
+                )[0]?.approval_level,
                 data
               )
                 ? ""
@@ -322,6 +375,30 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
             } btn-info shadow btn-xs sharp ml-1`}
           >
             <i className="fa fa-check"></i>
+          </Link>
+        )}
+        {profile.previlage.approver && (
+          <Link
+            data-pr-tooltip="Reject"
+            data-pr-position="right"
+            data-pr-my="left center-2"
+            onClick={() => {
+              setEdit(true);
+              setDisplayReject(true);
+              setCurrentItem(data);
+            }}
+            className={`btn ${
+              canApprove(
+                profile.approval_settings.filter(
+                  (v) => v.approval_module === "rp"
+                )[0]?.approval_level,
+                data
+              )
+                ? ""
+                : "disabled"
+            } btn-danger     shadow btn-xs sharp ml-1`}
+          >
+            <i className="fa fa-times"></i>
           </Link>
         )}
       </div>
@@ -342,6 +419,27 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
           icon="pi pi-trash"
           onClick={() => {
             delPermintaan();
+          }}
+          autoFocus
+          loading={update}
+        />
+      </div>
+    );
+  };
+
+  const renderFooterReject = () => {
+    return (
+      <div>
+        <PButton
+          label={tr[localStorage.getItem("language")].batal}
+          onClick={() => setDisplayReject(false)}
+          className="p-button-text btn-primary"
+        />
+        <PButton
+          label={"Reject"}
+          icon="pi pi-times"
+          onClick={() => {
+            rejectRp();
           }}
           autoFocus
           loading={update}
@@ -530,18 +628,30 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
     )}`;
   };
 
-  const customizedMarker = (item) => {
-    console.log(item);
+  const customizedMarker = (item, index, data) => {
+    console.log(index);
     return (
       <span
         className="flex align-items-center justify-content-center z-1 p-1 border-circle"
         style={{
-          backgroundColor: item.complete ? "#21BF99" : "white",
-          border: "2px solid #21BF99",
+          backgroundColor:
+            !item.approved
+              ? "red"
+              : item.complete
+              ? "#21BF99"
+              : "white",
+          border:
+          !item.approved
+              ? "2px solid red"
+              : "2px solid #21BF99",
         }}
       >
         <i
-          className={"pi pi-check"}
+          className={
+            !item.approved
+              ? "pi pi-times"
+              : "pi pi-check"
+          }
           style={{ fontSize: "0.4rem", fontWeight: "bold", color: "white" }}
         ></i>
       </span>
@@ -551,27 +661,36 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
   const rowExpansionTemplate = (data) => {
     return (
       <div className="row">
-        <div className="col-12">
+        <div className="col-12 pb-0">
           <Timeline
             value={data.timeline}
             layout="horizontal"
             align="top"
-            marker={customizedMarker}
+            marker={(item, index) => customizedMarker(item, index, data)}
             content={(item) => (
-              <div className="row" style={{ minWidth: "14rem" }}>
-                <div className="col-12 pt-0 mt-0">
+              <div
+                className=""
+                style={{
+                  minWidth: "12rem",
+                  minHeight: "4.5rem",
+                  // maxHeight: "8rem",
+                }}
+              >
+                <div className="pt-0 mt-0">
                   <b>{item.label}</b>
                 </div>
-                <div className="col-12 pt-0 mt-0">{item?.date ? formatDateTime(item?.date) : "-"}</div>
+                <div className="fs-12">
+                  {item?.date ? formatDateTime(item?.date) : "-"}
+                </div>
 
-                <div className="col-12 pt-0 mt-0">{item.approved_by}</div>
+                <div className="fs-12">{item.approved_by}</div>
 
-                <div className="col-12 pt-0 mt-0">{item.reason}</div>
+                <div className="fs-12">{item.reason}</div>
               </div>
             )}
           />
         </div>
-        <div className="col-12">
+        <div className="col-12 pt-0">
           <DataTable value={data?.rprod} responsiveLayout="scroll">
             <Column
               header="Produk"
@@ -634,7 +753,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
         className="display w-150 datatable-wrapper"
         showGridlines
         dataKey="id"
-        rowHover
+        // rowHover
         header={renderHeader}
         filters={filters1}
         globalFilterFields={["req_code", "req_dep.ccost_name"]}
@@ -727,6 +846,12 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
               </>
             )
           }
+        />
+        <Column
+          header={"PO Code"}
+          field={(e) => e.po_code ?? "-"}
+          style={{ minWidth: "10rem" }}
+          body={loading && <Skeleton />}
         />
         <Column
           header="Action"
@@ -890,6 +1015,31 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
             style={{ fontSize: "2rem" }}
           />
           <span>{tr[localStorage.getItem("language")].pesan_approve}</span>
+        </div>
+      </Dialog>
+
+      <Dialog
+        header={`Reject ${tr[localStorage.getItem("language")].req_pur}`}
+        visible={displayReject}
+        style={{ width: "35vw" }}
+        footer={renderFooterReject()}
+        onHide={() => {
+          setDisplayReject(false);
+        }}
+      >
+        <div className="row ml-0 mt-0">
+          <div className="col-12">
+            <label className="text-label">{"Reason"}</label>
+            <div className="p-inputgroup">
+              <InputTextarea
+                value={reject ? `${reject}` : ""}
+                onChange={(e) => {
+                  setReject(e.target.value);
+                }}
+                placeholder={"Reason"}
+              />
+            </div>
+          </div>
         </div>
       </Dialog>
     </>

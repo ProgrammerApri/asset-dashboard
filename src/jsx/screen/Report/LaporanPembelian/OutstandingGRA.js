@@ -137,11 +137,11 @@ const OutstandingGRA = () => {
                     po: el.po_id.po_code !== null ? `${el.po_id.po_code}` : "-",
                     sup: el.sup_id !== null ? `${el.sup_id.sup_name}` : "-",
                     prod: `${ek.prod_id.name} (${ek.prod_id.code})`,
-                    ord: ek.ord_id,
-                    po: el.po_id.po_code ? `${el.po_id.po_code}` : "-",
+                    ord: ek?.ord_id,
+                    po: el.po_id?.po_code ? `${el.po_id?.po_code}` : "-",
                     sup: el.sup_id ? `${el.sup_id.sup_name}` : "-",
                     prod: `${ek.prod_id.name} (${ek.prod_id.code})`,
-                    ord: ek.order,
+                    ord: formatIdr(ek.order),
                     unit: ek.unit_id.name,
                     prc: `Rp. ${formatIdr(ek.price)}`,
                     tot: `Rp. ${formatIdr(ek.total)}`,
@@ -199,13 +199,13 @@ const OutstandingGRA = () => {
                 type: "item",
                 value: {
                   date: formatDate(el.ord_date),
-                  po: el.po_id.po_code !== null ? `-` : "",
+                  po: el.po_id?.po_code !== null ? `-` : "",
                   sup: el.sup_id !== null ? `${el.sup_id.sup_name}` : "-",
 
-                  po: el.po_id.po_code ? el.po_id.po_code : "-",
-                  sup: el.sup_id ? `${el.sup_id.sup_name}` : "-",
+                  po: el.po_id?.po_code ? el.po_id?.po_code : "-",
+                  sup: el.sup_id ? `${el.sup_id?.sup_name}` : "-",
                   prod: `${ek.prod_id.name} (${ek.prod_id.code})`,
-                  ord: ek.order,
+                  ord: formatIdr(ek.order),
                   unit: ek.unit_id.name,
                   prc: `Rp. ${formatIdr(ek.price)}`,
                   tot: `Rp. ${formatIdr(ek.total)}`,
@@ -622,7 +622,7 @@ const OutstandingGRA = () => {
   };
 
   const formatIdr = (value) => {
-    return `${value}`
+    return `${value?.toFixed(2)}`
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { request, endpoints } from "src/utils";
+import { request } from "src/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -8,33 +8,106 @@ import { Button, Card, Col, Row } from "react-bootstrap";
 import { Toast } from "primereact/toast";
 import { Skeleton } from "primereact/skeleton";
 
-import ReactExport from "react-data-export";
+// import ReactExport from "react-data-export";
 import ReactToPrint from "react-to-print";
 import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import { MultiSelect } from "primereact/multiselect";
+import endpoints from "../../../../utils/endpoints";
 
-const ExcelFile = ReactExport.ExcelFile;
-const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
+// const ExcelFile = ReactExport.ExcelFile;
+// const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
-const ReportJurnal = () => {
+const ReportJurnal = ({ trx_code }) => {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [acc, setAcc] = useState(null);
+  const [selectTrn, setSelectTrn] = useState([]);
   const printPage = useRef(null);
   const [date, setDate] = useState([new Date(), new Date()]);
   const [trans, setTrans] = useState(null);
+  const [filtTrn, setFiltTrn] = useState(null);
   const [cp, setCp] = useState("");
-  const chunkSize = 3;
+  const page = [];
+  const chunkSize = 2;
 
   useEffect(() => {
     var d = new Date();
-    d.setDate(d.getDate() - 7);
+    d.setDate(d.getDate() - 30);
     setDate([d, new Date()]);
-    getTrans();
+    getTrans(formatDate(d), formatDate(new Date()), trx_code ? trx_code : 0);
+    getAcc();
   }, []);
 
-  const getTrans = async () => {
+  const getTrans = async (startDate, endDate, trx_code = 0) => {
+    console.log(trx_code);
+    setLoading(true);
     const config = {
-      ...endpoints.trans,
+      ...endpoints.reportJurnal,
+      endpoint:
+        endpoints.reportJurnal.endpoint +
+        `${btoa(startDate)}/${btoa(endDate)}/${btoa(trx_code)}`,
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setLoading(false);
+        const { data } = response;
+        let trx_date = [];
+        data.forEach((el) => {
+          el.trx.forEach((ek) => {
+            trx_date.push(new Date(ek.trx_date + "Z"));
+          });
+        });
+        if (trx_code !== 0) {
+          setDate([
+            new Date(Math.min(...trx_date)),
+            new Date(Math.max(...trx_date)),
+          ]);
+        }
+
+        let groupTrn = data?.filter(
+          (el, i) => i === data.findIndex((ek) => el?.trx_code === ek?.trx_code)
+        );
+
+        setTrans(data);
+        setFiltTrn(groupTrn);
+      }
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+    }
+  };
+
+  // const getTrans = async () => {
+  //   const config = {
+  //     ...endpoints.trans,
+  //     data: {},
+  //   };
+  //   let response = null;
+  //   try {
+  //     response = await request(null, config);
+  //     console.log(response);
+  //     if (response.status) {
+  //       const { data } = response;
+  //       let groupTrn = data?.filter(
+  //         (el, i) => i === data.findIndex((ek) => el?.trx_code === ek?.trx_code)
+  //       );
+
+  //       setTrans(data);
+  //       setFiltTrn(groupTrn);
+  //       // jsonForExcel(data);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+
+  const getAcc = async () => {
+    const config = {
+      ...endpoints.account,
       data: {},
     };
     let response = null;
@@ -43,12 +116,22 @@ const ReportJurnal = () => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        setTrans(data);
-        // jsonForExcel(data);
+        setAcc(data);
       }
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const checkAcc = (value) => {
+    let selected = {};
+    acc?.forEach((element) => {
+      if (value === element.account.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
   };
 
   const formatDate = (date) => {
@@ -63,75 +146,163 @@ const ReportJurnal = () => {
     return [day, month, year].join("/");
   };
 
-  const jsonForExcel = (trans, excel = false) => {
+  const jsonForExcel = (new_trans, excel = false) => {
     let data = [];
-    let grouped = trans?.filter(
-      (el, i) => i === trans.findIndex((ek) => el?.trx_code === ek?.trx_code)
-    );
-    let new_trans = [];
-    grouped?.forEach((el) => {
-      let trx_date = new Date(`${el?.trx_date}Z`);
-      if (trx_date >= date[0] && trx_date <= date[1]) {
-        let trx = [];
-        trans?.forEach((ek) => {
-          if (el.trx_code === ek.trx_code) {
-            trx.push(ek);
+    // let grouped = trans?.filter(
+    //   (el, i) => i === trans.findIndex((ek) => el?.trx_code === ek?.trx_code)
+    // );
+    // let new_trans = [];
+
+    // if (trx_code) {
+    //   grouped?.forEach((el) => {
+    //     if (el.trx_code === trx_code) {
+    //       let trx = [];
+    //       trans?.forEach((ek) => {
+    //         if (el.trx_code === ek.trx_code) {
+    //           trx.push(ek);
+    //         }
+    //       });
+    //       new_trans.push({
+    //         trx_code: el.trx_code,
+    //         trx_date: formatDate(el.trx_date),
+    //         trx: trx,
+    //       });
+    //     }
+    //   });
+    // } else {
+    //   console.log("grouped", grouped);
+    //   grouped?.forEach((el) => {
+    //     let trx_date = new Date(`${el?.trx_date}Z`);
+    //     trx_date?.setHours(0, 0, 0, 0);
+    //     date[0]?.setHours(0, 0, 0, 0);
+    //     date[1]?.setHours(0, 0, 0, 0);
+    //     if (trx_date >= date[0] && trx_date <= date[1]) {
+    //       let trx = [];
+    //       trans?.forEach((ek) => {
+    //         if (el.trx_code === ek.trx_code) {
+    //           trx.push(ek);
+    //         }
+    //       });
+    //       new_trans.push({
+    //         trx_code: el.trx_code,
+    //         trx_date: formatDate(el.trx_date),
+    //         trx: trx,
+    //       });
+    //     }
+    //   });
+    // }
+
+    console.log("new_trans", new_trans);
+
+    if (selectTrn?.length) {
+      selectTrn?.forEach((sel) => {
+        new_trans?.forEach((el) => {
+          if (sel?.trx_code == el.trx_code) {
+            let val = [
+              {
+                trx_code: `No. Transaksi : ${el.trx_code}`,
+                trx_date: `${el.trx_date}`,
+                type: "header",
+                value: {
+                  acc: "Account",
+                  trx_date: "Tanggal",
+                  debit: "Mutasi Debit",
+                  kredit: "Mutasi Kredit",
+                  desc: "Deskripsi",
+                },
+              },
+            ];
+            let k = 0;
+            let d = 0;
+            el.trx.forEach((ek) => {
+              val.push({
+                trx_code: `${el.trx_code}`,
+                trx_date: `${el.trx_date}`,
+                type: "item",
+                value: {
+                  acc: `${checkAcc(ek?.acc_id)?.account?.acc_code}-${
+                    checkAcc(ek?.acc_id)?.account?.acc_name
+                  }`,
+                  trx_date: `${formatDate(ek.trx_date)}`,
+                  debit:
+                    ek.trx_dbcr === "D" ? `Rp. ${formatIdr(ek.trx_amnt)}` : "-",
+                  kredit:
+                    ek.trx_dbcr === "K" ? `Rp. ${formatIdr(ek.trx_amnt)}` : "-",
+                  desc: ek.trx_desc,
+                },
+              });
+              k += ek.trx_dbcr === "K" ? ek.trx_amnt : 0;
+              d += ek.trx_dbcr === "D" ? ek.trx_amnt : 0;
+            });
+            val.push({
+              trx_code: `${el.trx_code}`,
+              trx_date: `${el.trx_date}`,
+              type: "footer",
+              value: {
+                acc: "Total",
+                trx_date: "",
+                debit: `Rp. ${formatIdr(d)}`,
+                kredit: `Rp. ${formatIdr(k)}`,
+                desc: "",
+              },
+            });
+            data.push(val);
           }
         });
-        new_trans.push({
-          trx_code: el.trx_code,
-          trx_date: formatDate(el.trx_date),
-          trx: trx,
-        });
-      }
-    });
-
-    console.log(new_trans);
-
-    new_trans.forEach((el) => {
-      let val = [
-        {
-          trx_code: `${el.trx_code}`,
-          trx_date: `${el.trx_date}`,
-          type: "header",
-          value: {
-            acc: "Account",
-            debit: "Mutasi Debit",
-            kredit: "Mutasi Kredit",
-            desc: "Deskripsi",
+      });
+    } else {
+      new_trans?.forEach((el) => {
+        let val = [
+          {
+            trx_code: `No. Transaksi : ${el.trx_code}`,
+            trx_date: `${el.trx_date}`,
+            type: "header",
+            value: {
+              acc: "Account",
+              trx_date: "Tanggal",
+              debit: "Mutasi Debit",
+              kredit: "Mutasi Kredit",
+              desc: "Deskripsi",
+            },
           },
-        },
-      ];
-      let k = 0;
-      let d = 0;
-      el.trx.forEach((ek) => {
+        ];
+        let k = 0;
+        let d = 0;
+        el.trx.forEach((ek) => {
+          val.push({
+            trx_code: `${el.trx_code}`,
+            trx_date: `${el.trx_date}`,
+            type: "item",
+            value: {
+              acc: `${checkAcc(ek?.acc_id)?.account?.acc_code}-${
+                checkAcc(ek?.acc_id)?.account?.acc_name
+              }`,
+              trx_date: `${formatDate(ek.trx_date)}`,
+              debit:
+                ek.trx_dbcr === "D" ? `Rp. ${formatIdr(ek.trx_amnt)}` : "-",
+              kredit:
+                ek.trx_dbcr === "K" ? `Rp. ${formatIdr(ek.trx_amnt)}` : "-",
+              desc: ek.trx_desc,
+            },
+          });
+          k += ek.trx_dbcr === "K" ? ek.trx_amnt : 0;
+          d += ek.trx_dbcr === "D" ? ek.trx_amnt : 0;
+        });
         val.push({
           trx_code: `${el.trx_code}`,
           trx_date: `${el.trx_date}`,
-          type: "item",
+          type: "footer",
           value: {
-            acc: `${ek?.acc_id?.acc_code}-${ek?.acc_id?.acc_name}`,
-            debit: ek.trx_dbcr === "D" ? `Rp. ${formatIdr(ek.trx_amnt)}` : 0,
-            kredit: ek.trx_dbcr === "K" ? `Rp. ${formatIdr(ek.trx_amnt)}` : 0,
-            desc: ek.trx_desc,
+            acc: "Total",
+            trx_date: "",
+            debit: `Rp. ${formatIdr(d)}`,
+            kredit: `Rp. ${formatIdr(k)}`,
+            desc: "",
           },
         });
-        k += ek.trx_dbcr === "K" ? ek.trx_amnt : 0;
-        d += ek.trx_dbcr === "D" ? ek.trx_amnt : 0;
+        data.push(val);
       });
-      val.push({
-        trx_code: `${el.trx_code}`,
-        trx_date: `${el.trx_date}`,
-        type: "footer",
-        value: {
-          acc: "Total",
-          debit: `Rp. ${formatIdr(d)}`,
-          kredit: `Rp. ${formatIdr(k)}`,
-          desc: "",
-        },
-      });
-      data.push(val);
-    });
+    }
 
     let final = [
       {
@@ -224,6 +395,16 @@ const ReportJurnal = () => {
         item.push([
           {
             value: `${ek.value.acc}`,
+            style: {
+              font: {
+                sz: "14",
+                bold: ek.type === "header" || ek.type === "footer",
+              },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            value: ek.value.trx_date,
             style: {
               font: {
                 sz: "14",
@@ -352,15 +533,26 @@ const ReportJurnal = () => {
       });
     });
 
+    console.log("data", data);
+
     if (excel) {
       return final;
     } else {
+      // let page = [];
+      let total_row = 0;
+      data.forEach((el) => {
+        el.forEach((element) => {
+          page.push(element);
+        });
+      });
+
+      console.log("PAGE");
       return data;
     }
   };
 
   const formatIdr = (value) => {
-    return `${value}`
+    return `${value?.toFixed(2)}`
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
@@ -368,29 +560,50 @@ const ReportJurnal = () => {
   const renderHeader = () => {
     return (
       <div className="flex justify-content-between mb-3">
-        <div className="col-8 ml-0 mr-0 pl-0">
-          <Row className="mt-0">
-            <div className="col-3 mr-3 p-0">
-              <div className="p-inputgroup">
-                <span className="p-inputgroup-addon">
-                  <i className="pi pi-calendar" />
-                </span>
-                <Calendar
-                  value={date}
-                  id="range"
-                  onChange={(e) => setDate(e.value)}
-                  selectionMode="range"
-                  placeholder="Pilih Tanggal"
-                  readOnlyInput
-                />
-              </div>
+        <div className="col-10 ml-0 mr-0 pl-0">
+          <Row>
+            <div className="p-inputgroup col-3">
+              <span className="p-inputgroup-addon">
+                <i className="pi pi-calendar" />
+              </span>
+              <Calendar
+                value={date}
+                id="range"
+                onChange={(e) => {
+                  if (e.value[1]) {
+                    getTrans(formatDate(e.value[0]), formatDate(e.value[1]));
+                  }
+                  setDate(e.value);
+                }}
+                selectionMode="range"
+                placeholder="Pilih Tanggal"
+                readOnlyInput
+              />
+            </div>
+
+            <div className="p-inputgroup col-3">
+              <MultiSelect
+                value={selectTrn ?? null}
+                options={filtTrn}
+                onChange={(e) => {
+                  setSelectTrn(e.value);
+                }}
+                placeholder="Pilih Kode Transaksi"
+                optionLabel="trx_code"
+                showClear
+                filterBy="trx_code"
+                filter
+                display="chip"
+                // className="w-full md:w-15rem"
+                maxSelectedLabels={3}
+              />
             </div>
           </Row>
         </div>
         <div style={{ height: "1rem" }}></div>
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
-            <ExcelFile
+            {/* <ExcelFile
               filename={`journal_report_export_${new Date().getTime()}`}
               element={
                 <PrimeSingleButton
@@ -403,7 +616,7 @@ const ReportJurnal = () => {
                 dataSet={trans ? jsonForExcel(trans, true) : null}
                 name="Journal Report"
               />
-            </ExcelFile>
+            </ExcelFile> */}
           </div>
           <ReactToPrint
             trigger={() => {
@@ -451,7 +664,7 @@ const ReportJurnal = () => {
                     subTittle={`Transaction Journal for Period ${formatDate(
                       date[0]
                     )} to ${formatDate(date[1])}`}
-                    onComplete={(cp) => setCp(cp)}
+                    onComplete={(cp) => cp !== "" && setCp(cp)}
                     page={idx + 1}
                     body={
                       <>
@@ -469,7 +682,7 @@ const ReportJurnal = () => {
                                 className="header-center"
                                 header={(e) =>
                                   e.props.value
-                                    ? `${e.props?.value[0]?.trx_code} - ${e.props?.value[0]?.trx_date}`
+                                    ? e.props?.value[0]?.trx_code
                                     : null
                                 }
                                 style={{ width: "15rem" }}
@@ -477,8 +690,8 @@ const ReportJurnal = () => {
                                   <div
                                     className={
                                       e.type == "header" || e.type == "footer"
-                                        ? "font-weight-bold ml-2"
-                                        : "ml-2"
+                                        ? "font-weight-bold"
+                                        : ""
                                     }
                                   >
                                     {e.value.acc}
@@ -488,7 +701,23 @@ const ReportJurnal = () => {
                               <Column
                                 className="header-center"
                                 header=""
-                                style={{ width: "8rem" }}
+                                style={{ width: "5rem" }}
+                                body={(e) => (
+                                  <div
+                                    className={
+                                      e.type == "header" || e.type == "footer"
+                                        ? "font-weight-bold"
+                                        : ""
+                                    }
+                                  >
+                                    {e.value.trx_date}
+                                  </div>
+                                )}
+                              />
+                              <Column
+                                className="header-center"
+                                header=""
+                                style={{ width: "10rem" }}
                                 body={(e) => (
                                   <div
                                     className={
@@ -506,15 +735,15 @@ const ReportJurnal = () => {
                               <Column
                                 className="header-center"
                                 header=""
-                                style={{ width: "8rem" }}
+                                style={{ width: "10rem" }}
                                 body={(e) => (
                                   <div
                                     className={
                                       e.type == "header"
-                                        ? "font-weight-bold text-right m-3"
+                                        ? "font-weight-bold text-right mr-4"
                                         : e.type == "footer"
-                                        ? "font-weight-bold text-right"
-                                        : "text-right m-3"
+                                        ? "font-weight-bold text-right mr-4"
+                                        : "text-right mr-4"
                                     }
                                   >
                                     {e.value.kredit}
@@ -524,13 +753,15 @@ const ReportJurnal = () => {
                               <Column
                                 className="header-center"
                                 header=""
-                                style={{ width: "25rem" }}
+                                style={{ width: "15rem" }}
                                 body={(e) => (
                                   <div
                                     className={
-                                      e.type === "header" || e.type === "footer"
-                                        ? "font-weight-bold ml-5"
-                                        : "ml-5"
+                                      e.type == "header"
+                                        ? "ml-3 font-weight-bold text-left"
+                                        : e.type == "footer"
+                                        ? "font-weight-bold text-left"
+                                        : "text-left ml-3"
                                     }
                                   >
                                     {e.value.desc}

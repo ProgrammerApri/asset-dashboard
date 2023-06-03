@@ -363,72 +363,73 @@ const ReportHutang = () => {
           data.push(val);
         });
       });
-    } else {
-      ap?.forEach((ek) => {
-        let amn = 0;
-        let acq = 0;
-        let val = [
-          {
-            sup: `${ek?.sup_id?.sup_name} (${ek?.sup_id?.sup_code})`,
-            type: "header",
-            value: {
-              ref: "Transaction Code",
-              date: "Transaction Date",
-              jt: "Due Date",
-              value: "Payable",
-              lns: "Payment",
-              // sisa: `${formatIdr(0)}`,
-            },
-          },
-        ];
+    } 
+    // else {
+    //   ap?.forEach((ek) => {
+    //     let amn = 0;
+    //     let acq = 0;
+    //     let val = [
+    //       {
+    //         sup: `${ek?.sup_id?.sup_name} (${ek?.sup_id?.sup_code})`,
+    //         type: "header",
+    //         value: {
+    //           ref: "Transaction Code",
+    //           date: "Transaction Date",
+    //           jt: "Due Date",
+    //           value: "Payable",
+    //           lns: "Payment",
+    //           // sisa: `${formatIdr(0)}`,
+    //         },
+    //       },
+    //     ];
 
-        let dt = new Date(`${ek.ord_date}Z`);
-        if (dt <= filtDate) {
-          val.push({
-            sup: `${ek?.sup_id?.sup_name} (${ek?.sup_id?.sup_code})`,
-            type: "item",
-            value: {
-              ref: ek.trx_code,
-              date:
-                ek.trx_type === "LP" && ek.trx_dbcr === "d"
-                  ? formatDate(ek.acq_date)
-                  : formatDate(ek.ord_date),
-              jt: ek.ord_due ? formatDate(ek.ord_due) : "-",
-              value: `${formatIdr(ek.trx_dbcr === "k" ? ek.trx_amnh : 0)}`,
-              lns: `${formatIdr(
-                ek.trx_dbcr === "d" && ek.trx_type === "LP"
-                  ? ek.acq_amnh
-                  : ek.trx_dbcr === "d" && ek.trx_type != "LP"
-                  ? ek.trx_amnh
-                  : 0
-              )}`,
-              // sisa: `${formatIdr(0)}`,
-            },
-          });
-          amn += ek.trx_dbcr === "k" ? ek.trx_amnh : 0;
-          acq +=
-            ek.trx_dbcr === "d" && ek.trx_type === "LP"
-              ? ek.acq_amnh
-              : ek.trx_dbcr === "d" && ek.trx_type !== "LP"
-              ? ek.trx_amnh
-              : 0;
-        }
+    //     let dt = new Date(`${ek.ord_date}Z`);
+    //     if (dt <= filtDate) {
+    //       val.push({
+    //         sup: `${ek?.sup_id?.sup_name} (${ek?.sup_id?.sup_code})`,
+    //         type: "item",
+    //         value: {
+    //           ref: ek.trx_code,
+    //           date:
+    //             ek.trx_type === "LP" && ek.trx_dbcr === "d"
+    //               ? formatDate(ek.acq_date)
+    //               : formatDate(ek.ord_date),
+    //           jt: ek.ord_due ? formatDate(ek.ord_due) : "-",
+    //           value: `${formatIdr(ek.trx_dbcr === "k" ? ek.trx_amnh : 0)}`,
+    //           lns: `${formatIdr(
+    //             ek.trx_dbcr === "d" && ek.trx_type === "LP"
+    //               ? ek.acq_amnh
+    //               : ek.trx_dbcr === "d" && ek.trx_type != "LP"
+    //               ? ek.trx_amnh
+    //               : 0
+    //           )}`,
+    //           // sisa: `${formatIdr(0)}`,
+    //         },
+    //       });
+    //       amn += ek.trx_dbcr === "k" ? ek.trx_amnh : 0;
+    //       acq +=
+    //         ek.trx_dbcr === "d" && ek.trx_type === "LP"
+    //           ? ek.acq_amnh
+    //           : ek.trx_dbcr === "d" && ek.trx_type !== "LP"
+    //           ? ek.trx_amnh
+    //           : 0;
+    //     }
 
-        val.push({
-          sup: ``,
-          type: "footer",
-          value: {
-            ref: "Total",
-            date: "",
-            jt: "",
-            value: `${formatIdr(amn)}`,
-            lns: `${formatIdr(acq)}`,
-            // sisa: "",
-          },
-        });
-        data.push(val);
-      });
-    }
+    //     val.push({
+    //       sup: ``,
+    //       type: "footer",
+    //       value: {
+    //         ref: "Total",
+    //         date: "",
+    //         jt: "",
+    //         value: `${formatIdr(amn)}`,
+    //         lns: `${formatIdr(acq)}`,
+    //         // sisa: "",
+    //       },
+    //     });
+    //     data.push(val);
+    //   });
+    // }
 
     console.log("=====tes");
     console.log(data);
@@ -703,7 +704,7 @@ const ReportHutang = () => {
                 dateFormat="dd-mm-yy"
               />
             </div>
-            <div className="mt-2 mr-2">
+            <div className="p-inputgroup col-3">
               <MultiSelect
                 value={selectedSup ?? null}
                 options={supplier}
@@ -720,7 +721,7 @@ const ReportHutang = () => {
                 maxSelectedLabels={3}
               />
             </div>
-            <div className="mt-2">
+            <div className="p-inputgroup col-3">
               <MultiSelect
                 value={selectedAcc ?? null}
                 options={acc}

@@ -90,7 +90,7 @@ const ReportRP = () => {
                   ? `${el.ref_sup.sup_name} (${el.ref_sup.sup_name})`
                   : "-",
               prod: `${ek.prod_id.name} (${ek.prod_id.code})`,
-              ord: ek.request,
+              ord: formatIdr(ek.request),
               unit: ek.unit_id.code,
               st_po: ek.status === 1 ? "Open" : "Close",
             },
@@ -411,7 +411,7 @@ const ReportRP = () => {
   };
 
   const formatIdr = (value) => {
-    return `${value}`
+    return `${value?.toFixed(2)}`
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };

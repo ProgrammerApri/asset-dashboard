@@ -90,7 +90,7 @@ const OutstandingRP = () => {
                 date: formatDate(el.req_date),
                 sup: el.ref_sup !== null ?`${el.ref_sup.sup_name} (${el.ref_sup.sup_name})` : "-",
                 prod: `${ek.prod_id.name} (${ek.prod_id.code})`,
-                ord: ek.request,
+                ord: formatIdr(ek.request),
                 unit: ek.unit_id.code,
                 st_po: ek.status !== 1 ? "Open" : "Close",
               },
@@ -413,7 +413,7 @@ const OutstandingRP = () => {
   };
 
   const formatIdr = (value) => {
-    return `${value}`
+    return `${value?.toFixed(2)}`
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };

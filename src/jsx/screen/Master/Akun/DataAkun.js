@@ -109,7 +109,7 @@ const DataAkun = ({
       ...endpoints.account,
       data: {},
     };
-    console.log(config.data);
+    console.log("jjjjjjjjjj",config.data);
     let response = null;
     try {
       response = await request(null, config);
@@ -165,19 +165,24 @@ const DataAkun = ({
       ...endpoints.kategori,
       data: {},
     };
-    console.log(config.data);
-    let response = null;
+    let response = null
+    console.log("kategori", config.data);
     try {
-      response = await request(null, config);
+      const response = await request(null, config);
       console.log(response);
       if (response.status) {
         const { data } = response;
         console.log(data);
         setKategori(data);
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
     getAccount();
   };
+  
 
   const getAccountUmum = async () => {
     const config = {

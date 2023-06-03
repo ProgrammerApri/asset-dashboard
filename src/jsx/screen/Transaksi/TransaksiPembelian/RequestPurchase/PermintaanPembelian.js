@@ -29,6 +29,18 @@ const data = {
   ref_sup: null,
   ref_ket: null,
   ns: false,
+  status: null,
+  apprv_status: null,
+  apprv_text: null,
+  apprv_1: null,
+  apprv_2: null,
+  apprv_3: null,
+  apprv1_time: null,
+  apprv2_time: null,
+  apprv3_time: null,
+  reject: null,
+  reject_time: null,
+  reason: null,
   rprod: [],
   rjasa: [],
 };
@@ -353,7 +365,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
           <i className="fa fa-trash"></i>
         </Link>
 
-        {profile.previlage.approver && (
+        {profile.previlage?.approver && (
           <Link
             data-pr-tooltip="Approve"
             data-pr-position="right"

@@ -30,6 +30,7 @@ import ProfileReducer from "./ProfileReducer";
 import UserReducer from "./UserReducer";
 import SaldoAwalReducer from "./SaldoAwalReducer";
 import PnlReducer from "./PnlReducer";
+import RpAutoReducer from "./RpAutoReducer";
 // import PBNReducer from "./PBNReducer";
 
 
@@ -68,6 +69,7 @@ const rootReducer = combineReducers({
   fk_pb: INVReducer,
   sa: SaldoAwalReducer,
   pnl: PnlReducer,
+  rpauto: RpAutoReducer,
 });
 
 export default rootReducer;

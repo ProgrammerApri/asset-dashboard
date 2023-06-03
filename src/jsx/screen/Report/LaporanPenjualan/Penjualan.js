@@ -38,7 +38,7 @@ const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
 const SalesReport = () => {
   const [sales, setSales] = useState(null);
-  const [produk, setProduk] = useState(null);
+  const [currency, setCurr] = useState(null);
   const [customer, setCustomer] = useState(null);
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -56,6 +56,7 @@ const SalesReport = () => {
     d.setDate(d.getDate() - 30);
     setFiltersDate([d, new Date()]);
     getSale();
+    getCur();
   }, []);
 
   const getSale = async (isUpdate = false) => {
@@ -88,9 +89,9 @@ const SalesReport = () => {
     }
   };
 
-  const getCus = async () => {
+  const getCur = async () => {
     const config = {
-      ...endpoints.customer,
+      ...endpoints.currency,
       data: {},
     };
     let response = null;
@@ -99,7 +100,7 @@ const SalesReport = () => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        setCustomer(data);
+        setCurr(data);
       }
     } catch (error) {}
   };
@@ -152,6 +153,18 @@ const SalesReport = () => {
 
   const jsonForExcel = (sales, excel = false) => {
     let data = [];
+    let cur_rate = 0;
+    let cur_name = null;
+
+    sales?.forEach((sls) => {
+      currency?.forEach((cur) => {
+        if (sls?.pel_id?.cus_curren === cur?.id) {
+          cur_rate = cur?.rate;
+          cur_name = cur?.code;
+        }
+      });
+    });
+    // console.log(currency);
 
     if (selectedCus) {
       sales?.forEach((el) => {
@@ -164,7 +177,7 @@ const SalesReport = () => {
                 type: "header",
                 value: {
                   date: "Date",
-                  po: "Code",
+                  po: "SO Code",
                   sup: "Customer",
                   prod: "Product Name",
                   ord: "Quantity",
@@ -183,12 +196,14 @@ const SalesReport = () => {
                 type: "item",
                 value: {
                   date: formatDate(el.ord_date),
-                  po: el.so_id.so_code,
+                  po: el.so_id?.so_code ?? "-",
                   sup: `${el.pel_id.cus_name} (${el.pel_id.cus_code})`,
                   prod: `${ek.prod_id.name} (${ek.prod_id.code})`,
-                  ord: ek.order,
-                  unit: ek.unit_id.code,
-                  prc: `Rp. ${formatIdr(ek.price)}`,
+                  ord: formatIdr(ek.order),
+                  unit: ek.unit_id?.code ?? "-",
+                  prc: el?.pel_id?.cus_curren
+                    ? `Rp. ${formatIdr(ek.price * cur_rate)}`
+                    : `Rp. ${formatIdr(ek.price)}`,
                   tot: `Rp. ${formatIdr(ek.total)}`,
                 },
               });
@@ -223,7 +238,7 @@ const SalesReport = () => {
               type: "header",
               value: {
                 date: "Date",
-                po: "Code",
+                po: "SO Code",
                 sup: "Customer",
                 prod: "Product Name",
                 ord: "Quantity",
@@ -242,12 +257,14 @@ const SalesReport = () => {
               type: "item",
               value: {
                 date: formatDate(el.ord_date),
-                po: el.so_id.so_code,
+                po: el.so_id?.so_code ?? "-",
                 sup: `${el.pel_id.cus_name} (${el.pel_id.cus_code})`,
                 prod: `${ek.prod_id.name} (${ek.prod_id.code})`,
-                ord: ek.order,
-                unit: ek.unit_id.code,
-                prc: `Rp. ${formatIdr(ek.price)}`,
+                ord: formatIdr(ek.order),
+                unit: ek.unit_id?.code ?? "-",
+                prc: el?.pel_id?.cus_curren !== null
+                  ? `Rp. ${formatIdr(ek.price * cur_rate)}`
+                  : `Rp. ${formatIdr(ek.price)}`,
                 tot: `Rp. ${formatIdr(ek.total)}`,
               },
             });
@@ -662,7 +679,7 @@ const SalesReport = () => {
   };
 
   const formatIdr = (value) => {
-    return `${value}`
+    return `${value?.toFixed(2)}`
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };

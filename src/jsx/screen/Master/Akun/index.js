@@ -70,7 +70,7 @@ const Akun = () => {
         endpoint:
           endpoints.accountFilter.endpoint + `${page}/${length}/${filter}`,
       };
-      console.log(config.data);
+      console.log("akun",config.data);
       let response = null;
       try {
         response = await request(null, config);

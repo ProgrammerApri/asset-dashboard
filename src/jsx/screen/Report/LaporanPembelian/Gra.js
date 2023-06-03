@@ -221,7 +221,7 @@ const ReportGRA = () => {
                   po: el.po_id.po_code,
                   sup: `${el.sup_id.sup_name} (${el.sup_id.sup_name})`,
                   prod: `${ek.prod_id.name} (${ek.prod_id.code})`,
-                  ord: ek.order,
+                  ord: formatIdr(ek.order),
                   unit: ek.unit_id.name,
                   prc: `Rp. ${formatIdr(ek.price)}`,
                   tot: `Rp. ${formatIdr(ek.total)}`,
@@ -280,7 +280,7 @@ const ReportGRA = () => {
                 po: el.po_id.po_code,
                 sup: `${el.sup_id.sup_name} (${el.sup_id.sup_name})`,
                 prod: `${ek.prod_id.name} (${ek.prod_id.code})`,
-                ord: ek.order,
+                ord: formatIdr(ek.order),
                 unit: ek.unit_id.name,
                 prc: `Rp. ${formatIdr(ek.price)}`,
                 tot: `Rp. ${formatIdr(ek.total)}`,
@@ -695,7 +695,7 @@ const ReportGRA = () => {
   };
 
   const formatIdr = (value) => {
-    return `${value}`
+    return `${value?.toFixed(2)}`
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };

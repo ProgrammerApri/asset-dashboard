@@ -59,7 +59,7 @@ const UmurHutang = () => {
           });
           element.ap.forEach((el) => {
             data.forEach((ek) => {
-              if (el.ord_id.id === ek.ord_id.id) {
+              if (el.ord_id?.id === ek.ord_id?.id) {
                 el.trx_amnh = ek?.trx_amnh ?? 0;
                 el.acq_amnh += ek?.acq_amnh ?? 0;
               }
@@ -149,8 +149,8 @@ const UmurHutang = () => {
           sup: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
           type: "item",
           value: {
-            fk: ek.ord_id.fk_code,
-            tgl: formatDate(ek.ord_id.fk_date),
+            fk: ek.trx_code,
+            tgl: formatDate(ek.ord_date),
             jt: diff <= 0 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
             day1: diff <= 7 && diff > 0 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
             day2:
@@ -484,7 +484,7 @@ const UmurHutang = () => {
   };
 
   const formatIdr = (value) => {
-    return `${value}`
+    return `${value?.toFixed(2)}`
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };

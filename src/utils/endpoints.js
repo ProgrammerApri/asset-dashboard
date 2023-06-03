@@ -1196,6 +1196,13 @@ const endpoints = {
     data: {},
   },
 
+  // Report Jurnal
+  reportJurnal: {
+    endpoint: "/v1/api/report/jurnal/",
+    method: "GET",
+    data: {},
+  },
+
   trans: {
     endpoint: "/v1/api/trans",
     method: "GET",

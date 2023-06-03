@@ -53,9 +53,9 @@ const Setup = () => {
       <TabPanel header="Setup Saldo Akhir">
         <SetupSaldoAkhir/>
       </TabPanel>
-      {/* <TabPanel header="Setup Auto Number">
+      <TabPanel header="Setup Auto Number">
         <SetupAutoNumber/>
-      </TabPanel> */}
+      </TabPanel>
       <TabPanel header="Setup Auto Number">
         <AutoNumber/>
       </TabPanel>

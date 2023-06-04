@@ -16,6 +16,7 @@ import { SET_CURRENT_PO, SET_EDIT_PO } from "src/redux/actions";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { tr } from "src/data/tr";
 import { Tooltip } from "primereact/tooltip";
+import { InputTextarea } from "primereact/inputtextarea";
 
 const data = {
   id: null,
@@ -40,6 +41,7 @@ const data = {
 
 const PesananPO = ({ onAdd, onEdit, onDetail }) => {
   const [po, setPO] = useState(null);
+  const [reject, setReject] = useState(null);
   const [comp, setComp] = useState(null);
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(false);
@@ -179,6 +181,85 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
           severity: "error",
           summary: tr[localStorage.getItem("language")].gagal,
           detail: tr[localStorage.getItem("language")].pesan_gagal,
+          life: 3000,
+        });
+      }, 500);
+    }
+  };
+
+  const approvePo = async (id) => {
+    setUpdate(true);
+    const config = {
+      ...endpoints.approvePo,
+      endpoint: endpoints.approvePo.endpoint + currentItem.id,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setTimeout(() => {
+          setUpdate(false);
+          setDisplayApprove(false);
+          getPO(true);
+          toast.current.show({
+            severity: "info",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: "Approve Success",
+            life: 3000,
+          });
+        }, 500);
+      }
+    } catch (error) {
+      console.log(error);
+      setTimeout(() => {
+        setUpdate(false);
+        setDisplayApprove(false);
+        toast.current.show({
+          severity: "error",
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: "Failed to approve",
+          life: 3000,
+        });
+      }, 500);
+    }
+  };
+
+  const rejectPo = async (id) => {
+    setUpdate(true);
+    const config = {
+      ...endpoints.rejectPo,
+      endpoint: endpoints.rejectPo.endpoint + currentItem.id,
+      data: { reason: reject ?? null },
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setTimeout(() => {
+          setUpdate(false);
+          setDisplayReject(false);
+          getPO(true);
+          toast.current.show({
+            severity: "info",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: "Approve Success",
+            life: 3000,
+          });
+        }, 500);
+      }
+    } catch (error) {
+      console.log(error);
+      setTimeout(() => {
+        setUpdate(false);
+        setDisplayApprove(false);
+        toast.current.show({
+          severity: "error",
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: "Failed to approve",
           life: 3000,
         });
       }, 500);
@@ -449,9 +530,18 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
             data-pr-position="right"
             data-pr-my="left center-2"
             onClick={() => {
-              setEdit(true);
-              setDisplayApprove(true);
-              setCurrentItem(data);
+              if (
+                canApprove(
+                  profile?.approval_settings?.filter(
+                    (v) => v.approval_module === "po"
+                  )[0]?.approval_level,
+                  data
+                )
+              ) {
+                setEdit(true);
+                setDisplayApprove(true);
+                setCurrentItem(data);
+              }
             }}
             className={`btn ${
               canApprove(
@@ -473,9 +563,18 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
             data-pr-position="right"
             data-pr-my="left center-2"
             onClick={() => {
-              setEdit(true);
-              setDisplayReject(true);
-              setCurrentItem(data);
+              if (
+                canApprove(
+                  profile?.approval_settings?.filter(
+                    (v) => v.approval_module === "po"
+                  )[0]?.approval_level,
+                  data
+                )
+              ) {
+                setEdit(true);
+                setDisplayReject(true);
+                setCurrentItem(data);
+              }
             }}
             className={`btn ${
               canApprove(
@@ -602,6 +701,48 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
           }}
           autoFocus
           loading={loading}
+        />
+      </div>
+    );
+  };
+
+  const renderFooterReject = () => {
+    return (
+      <div>
+        <PButton
+          label={tr[localStorage.getItem("language")].batal}
+          onClick={() => setDisplayReject(false)}
+          className="p-button-text btn-primary"
+        />
+        <PButton
+          label={"Reject"}
+          icon="pi pi-times"
+          onClick={() => {
+            rejectPo();
+          }}
+          autoFocus
+          loading={update}
+        />
+      </div>
+    );
+  };
+
+  const renderFooterApprove = () => {
+    return (
+      <div>
+        <PButton
+          label={tr[localStorage.getItem("language")].batal}
+          onClick={() => setDisplayApprove(false)}
+          className="p-button-text btn-primary"
+        />
+        <PButton
+          label={"Approve"}
+          icon="pi pi-check"
+          onClick={() => {
+            approvePo();
+          }}
+          autoFocus
+          loading={update}
         />
       </div>
     );
@@ -905,6 +1046,49 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
             style={{ fontSize: "2rem" }}
           />
           <span>{tr[localStorage.getItem("language")].pesan_hapus}</span>
+        </div>
+      </Dialog>
+
+      <Dialog
+        header={`Approve ${tr[localStorage.getItem("language")].ord_pur}`}
+        visible={displayApprove}
+        style={{ width: "30vw" }}
+        footer={renderFooterApprove()}
+        onHide={() => {
+          setDisplayApprove(false);
+        }}
+      >
+        <div className="ml-3 mr-3">
+          <i
+            className="pi pi-exclamation-triangle mr-3 align-middle"
+            style={{ fontSize: "2rem" }}
+          />
+          <span>{tr[localStorage.getItem("language")].pesan_approve}</span>
+        </div>
+      </Dialog>
+
+      <Dialog
+        header={`Reject ${tr[localStorage.getItem("language")].ord_pur}`}
+        visible={displayReject}
+        style={{ width: "35vw" }}
+        footer={renderFooterReject()}
+        onHide={() => {
+          setDisplayReject(false);
+        }}
+      >
+        <div className="row ml-0 mt-0">
+          <div className="col-12">
+            <label className="text-label">{"Reason"}</label>
+            <div className="p-inputgroup">
+              <InputTextarea
+                value={reject ? `${reject}` : ""}
+                onChange={(e) => {
+                  setReject(e.target.value);
+                }}
+                placeholder={"Reason"}
+              />
+            </div>
+          </div>
         </div>
       </Dialog>
     </>

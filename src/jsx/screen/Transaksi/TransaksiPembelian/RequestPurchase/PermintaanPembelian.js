@@ -371,9 +371,18 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
             data-pr-position="right"
             data-pr-my="left center-2"
             onClick={() => {
-              setEdit(true);
-              setDisplayApprove(true);
-              setCurrentItem(data);
+              if (
+                canApprove(
+                  profile?.approval_settings?.filter(
+                    (v) => v.approval_module === "rp"
+                  )[0]?.approval_level,
+                  data
+                )
+              ) {
+                setEdit(true);
+                setDisplayApprove(true);
+                setCurrentItem(data);
+              }
             }}
             className={`btn ${
               canApprove(
@@ -395,9 +404,18 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
             data-pr-position="right"
             data-pr-my="left center-2"
             onClick={() => {
-              setEdit(true);
-              setDisplayReject(true);
-              setCurrentItem(data);
+              if (
+                canApprove(
+                  profile?.approval_settings?.filter(
+                    (v) => v.approval_module === "rp"
+                  )[0]?.approval_level,
+                  data
+                )
+              ) {
+                setEdit(true);
+                setDisplayReject(true);
+                setCurrentItem(data);
+              }
             }}
             className={`btn ${
               canApprove(
@@ -646,24 +664,16 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
       <span
         className="flex align-items-center justify-content-center z-1 p-1 border-circle"
         style={{
-          backgroundColor:
-            !item.approved
-              ? "red"
-              : item.complete
-              ? "#21BF99"
-              : "white",
-          border:
-          !item.approved
-              ? "2px solid red"
-              : "2px solid #21BF99",
+          backgroundColor: !item.approved
+            ? "red"
+            : item.complete
+            ? "#21BF99"
+            : "white",
+          border: !item.approved ? "2px solid red" : "2px solid #21BF99",
         }}
       >
         <i
-          className={
-            !item.approved
-              ? "pi pi-times"
-              : "pi pi-check"
-          }
+          className={!item.approved ? "pi pi-times" : "pi pi-check"}
           style={{ fontSize: "0.4rem", fontWeight: "bold", color: "white" }}
         ></i>
       </span>

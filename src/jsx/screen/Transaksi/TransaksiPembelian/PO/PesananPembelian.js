@@ -17,6 +17,7 @@ import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleB
 import { tr } from "src/data/tr";
 import { Tooltip } from "primereact/tooltip";
 import { InputTextarea } from "primereact/inputtextarea";
+import { Timeline } from "primereact/timeline";
 
 const data = {
   id: null,
@@ -60,6 +61,7 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
   const PO = useSelector((state) => state.po.po);
   const closePo = useSelector((state) => state.po.current);
   const profile = useSelector((state) => state.profile.profile);
+  const [expandedRows, setExpandedRows] = useState(null);
 
   const dummy = Array.from({ length: 10 });
 
@@ -706,6 +708,133 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
     );
   };
 
+  const formatDateTime = (date) => {
+    var d = new Date(`${date}Z`),
+      month = "" + (d.getMonth() + 1),
+      day = "" + d.getDate(),
+      year = "" + d.getFullYear(),
+      hour = "" + d.getHours(),
+      minute = "" + d.getMinutes(),
+      second = "" + d.getSeconds();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+    if (hour.length < 2) hour = "0" + hour;
+    if (minute.length < 2) minute = "0" + minute;
+    if (second.length < 2) second = "0" + second;
+
+    return `${[day, month, year].join("-")} || ${[hour, minute, second].join(
+      ":"
+    )}`;
+  };
+
+  const customizedMarker = (item, index, data) => {
+    console.log(index);
+    return (
+      <span
+        className="flex align-items-center justify-content-center z-1 p-1 border-circle"
+        style={{
+          backgroundColor: !item.approved
+            ? "red"
+            : item.complete
+            ? "#21BF99"
+            : "white",
+          border: !item.approved ? "2px solid red" : "2px solid #21BF99",
+        }}
+      >
+        <i
+          className={!item.approved ? "pi pi-times" : "pi pi-check"}
+          style={{ fontSize: "0.4rem", fontWeight: "bold", color: "white" }}
+        ></i>
+      </span>
+    );
+  };
+
+  const rowExpansionTemplate = (data) => {
+    return (
+      <div className="row">
+        <div className="col-12 pb-0">
+          <Timeline
+            value={data.timeline}
+            layout="horizontal"
+            align="top"
+            marker={(item, index) => customizedMarker(item, index, data)}
+            content={(item) => (
+              <div
+                className=""
+                style={{
+                  minWidth: "12rem",
+                  minHeight: "4.5rem",
+                  // maxHeight: "8rem",
+                }}
+              >
+                <div className="pt-0 mt-0">
+                  <b>{item.label}</b>
+                </div>
+                <div className="fs-12">
+                  {item?.date ? formatDateTime(item?.date) : "-"}
+                </div>
+
+                <div className="fs-12">{item.approved_by}</div>
+
+                <div className="fs-12">{item.reason}</div>
+              </div>
+            )}
+          />
+        </div>
+        {/* <div className="col-12 pt-0">
+          <DataTable value={data?.rprod} responsiveLayout="scroll">
+            <Column
+              header="Produk"
+              field={(e) => e.prod_id?.name}
+              style={{ minWidth: "14rem" }}
+              // body={loading && <Skeleton />}
+            />
+            <Column
+              header="Jumlah"
+              field={(e) => e.request}
+              style={{ minWidth: "12rem" }}
+              // body={loading && <Skeleton />}
+            />
+            <Column
+              header="Satuan"
+              field={(e) => e.unit_id?.name}
+              style={{ minWidth: "12rem" }}
+              // body={loading && <Skeleton />}
+            />
+          </DataTable>
+        </div>
+        {data?.rjasa.length > 0 && (
+          <div className="col-12">
+            <DataTable
+              value={data?.rjasa}
+              responsiveLayout="scroll"
+              className="mt-2"
+            >
+              <Column
+                header="Jasa"
+                field={(e) => e.jasa_id?.name}
+                style={{ minWidth: "13rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header="Jumlah"
+                field={(e) => e.request}
+                style={{ minWidth: "13rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header="Satuan"
+                field={(e) => e.unit_id?.name}
+                style={{ minWidth: "12rem" }}
+              />
+            </DataTable>
+          </div>
+        )} */}
+      </div>
+    );
+  };
+
   const renderFooterReject = () => {
     return (
       <div>
@@ -911,7 +1040,11 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
                 rows={rows2}
                 onPage={onCustomPage2}
                 paginatorClassName="justify-content-end mt-3"
+                expandedRows={expandedRows}
+                onRowToggle={(e) => setExpandedRows(e.data)}
+                rowExpansionTemplate={rowExpansionTemplate}
               >
+                <Column expander style={{ width: "3em" }} />
                 <Column
                   header={tr[localStorage.getItem("language")].tgl}
                   style={{

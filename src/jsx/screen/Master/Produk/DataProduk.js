@@ -27,11 +27,13 @@ import formatIdr from "src/utils/formatIdr";
 import { useDispatch, useSelector } from "react-redux";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 import { InputTextarea } from "primereact/inputtextarea";
+import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
 
 const def = {
   id: null,
   code: null,
   name: null,
+  exp_date: null,
   brand: null,
   group: null,
   type: null,
@@ -780,6 +782,7 @@ const DataProduk = ({
           prod?.push({
             code: el.code,
             name: el.name,
+            exp_date: el.exp_date,
             group: el.group_id,
             unit: el.unit_id,
             type: null,
@@ -849,6 +852,7 @@ const DataProduk = ({
       {
         code: !currentItem.code || currentItem.code === "",
         name: !currentItem.name || currentItem.name === "",
+        exp_date: !currentItem.exp_date || currentItem.exp_date === "",
         group: !currentItem.group,
         type: !currentItem.type,
         // sup: !currentItem.suplier?.id,
@@ -1101,6 +1105,12 @@ const DataProduk = ({
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
+          {/* <Column
+            header={tr[localStorage.getItem("language")].tgl_exp}
+            field={(e) => e.exp_date}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          /> */}
           <Column
             header={tr[localStorage.getItem("language")].g_prod}
             field={(e) => e?.group?.name ?? ""}
@@ -1187,7 +1197,33 @@ const DataProduk = ({
                     error={error[0]?.name}
                   />
                 </div>
+                <div className="col-4">
+                  <PrimeCalendar
+                    label={tr[localStorage.getItem("language")].tgl_exp}
+                    value={new Date(`${currentItem.exp_date}Z`)}
+                    onChange={(e) => {
+                      let result =new Date(e.value);
 
+                      result.setDate(result.getDate() + e.day);
+                      console.log(result);
+
+                      setCurrentItem({
+                        ...currentItem,
+                        exp_date: e.target.value,
+                      });
+                      let newError = error;
+                      newError[0].exp_date = false;
+                      setError(newError);
+                    }}
+                    placeholder={tr[localStorage.getItem("language")].pilih_tgl}
+                    error={error[0]?.exp_date}
+                    showIcon
+                    dateFormat="dd/mm/yy"
+                  />
+                </div>
+              </div>
+
+              <div className="row mr-0 ml-0">
                 <div className="col-4">
                   <PrimeInput
                     label={"Brands"}
@@ -1202,13 +1238,14 @@ const DataProduk = ({
                     // error={error[0]?.name}
                   />
                 </div>
-              </div>
-
-              <div className="row mr-0 ml-0">
                 <div className="col-4">
                   <PrimeDropdown
                     label={tr[localStorage.getItem("language")].g_prod}
-                    value={currentItem !== null ? checkGroup(currentItem.group) : null}
+                    value={
+                      currentItem !== null
+                        ? checkGroup(currentItem.group)
+                        : null
+                    }
                     options={group}
                     onChange={(e) => {
                       console.log(e.target?.value);
@@ -1401,7 +1438,9 @@ const DataProduk = ({
                 <div className="col-4">
                   <PrimeDropdown
                     label={tr[localStorage.getItem("language")].satuan}
-                    value={currentItem !== null ? checkUnit(currentItem.unit) : null}
+                    value={
+                      currentItem !== null ? checkUnit(currentItem.unit) : null
+                    }
                     options={unit}
                     onChange={(e) => {
                       console.log(e.value);

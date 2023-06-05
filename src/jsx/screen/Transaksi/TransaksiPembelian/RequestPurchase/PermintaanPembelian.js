@@ -66,7 +66,6 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
   const rp = useSelector((state) => state.rp.rp);
   const show = useSelector((state) => state.rp.current);
   const profile = useSelector((state) => state.profile.profile);
-
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {

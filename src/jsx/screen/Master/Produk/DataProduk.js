@@ -19,7 +19,7 @@ import { Tooltip } from "primereact/tooltip";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
-import { Divider } from "@material-ui/core";
+import { Divider, Icon } from "@material-ui/core";
 import { tr } from "src/data/tr";
 import { ProgressBar } from "primereact/progressbar";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
@@ -133,6 +133,10 @@ const DataProduk = ({
     getUnit();
     getSupplier();
     getHistori();
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   const getProductCode = async () => {
@@ -895,6 +899,25 @@ const DataProduk = ({
 
     return [day, month, year].join("-");
   };
+  const scrollToTop = () => {
+    // Menggulir halaman ke bagian atas
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+  };
+
+  const handleScroll = () => {
+    const scrollButton = document.getElementById("myBtn");
+    if (scrollButton) {
+      if (
+        document.body.scrollTop > 20 ||
+        document.documentElement.scrollTop > 20
+      ) {
+        scrollButton.style.display = "block";
+      } else {
+        scrollButton.style.display = "none";
+      }
+    }
+  };
 
   const renderFooterDetail = () => {
     return (
@@ -1133,6 +1156,23 @@ const DataProduk = ({
           />
           {/* )} */}
         </DataTable>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginTop: "1rem",
+          }}
+        >
+          <Button
+            onClick={scrollToTop}
+            id="myBtn"
+            title="Ke atas"
+            style={{ display: "none" }}
+            className="p-button-text p-button-plain"
+          >
+            <Icon className="pi pi-chevron-up" />
+          </Button>
+        </div>
       </>
     );
   };
@@ -1202,7 +1242,7 @@ const DataProduk = ({
                     label={tr[localStorage.getItem("language")].tgl_exp}
                     value={new Date(`${currentItem.exp_date}Z`)}
                     onChange={(e) => {
-                      let result =new Date(e.value);
+                      let result = new Date(e.value);
 
                       result.setDate(result.getDate() + e.day);
                       console.log(result);

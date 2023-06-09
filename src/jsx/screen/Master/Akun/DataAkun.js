@@ -21,6 +21,7 @@ import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import { ProgressBar } from "primereact/progressbar";
+import { Icon } from "@material-ui/core";
 
 const def = {
   account: {
@@ -101,6 +102,10 @@ const DataAkun = ({
   useEffect(() => {
     getKategori();
     initFilters1();
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   const getAccount = async (isUpdate = false) => {
@@ -109,7 +114,7 @@ const DataAkun = ({
       ...endpoints.account,
       data: {},
     };
-    console.log("jjjjjjjjjj",config.data);
+    console.log("jjjjjjjjjj", config.data);
     let response = null;
     try {
       response = await request(null, config);
@@ -165,7 +170,7 @@ const DataAkun = ({
       ...endpoints.kategori,
       data: {},
     };
-    let response = null
+    let response = null;
     console.log("kategori", config.data);
     try {
       const response = await request(null, config);
@@ -182,7 +187,6 @@ const DataAkun = ({
     }
     getAccount();
   };
-  
 
   const getAccountUmum = async () => {
     const config = {
@@ -221,7 +225,7 @@ const DataAkun = ({
             sld_type: data.kategory.kode_saldo,
             level: 1,
             dou_type: "U",
-            umm_code: null
+            umm_code: null,
           },
           kategory: data.kategory,
           klasifikasi: data.klasifikasi,
@@ -480,6 +484,25 @@ const DataAkun = ({
           // life: 3000,
         });
       }, 500);
+    }
+  };
+  const scrollToTop = () => {
+    // Menggulir halaman ke bagian atas
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+  };
+
+  const handleScroll = () => {
+    const scrollButton = document.getElementById("myBtn");
+    if (scrollButton) {
+      if (
+        document.body.scrollTop > 20 ||
+        document.documentElement.scrollTop > 20
+      ) {
+        scrollButton.style.display = "block";
+      } else {
+        scrollButton.style.display = "none";
+      }
     }
   };
 
@@ -1087,6 +1110,23 @@ const DataAkun = ({
             body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
           />
         </DataTable>
+     <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginTop: "1rem",
+          }}
+        >
+          <Button
+            onClick={scrollToTop}
+            id="myBtn"
+            title="Ke atas"
+            style={{ display: "none" }}
+            className="p-button-text p-button-plain"
+          >
+            <Icon className="pi pi-chevron-up" />
+          </Button>
+        </div>
       </>
     );
   };

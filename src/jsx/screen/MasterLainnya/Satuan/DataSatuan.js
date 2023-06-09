@@ -16,7 +16,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { TabView, TabPanel } from "primereact/tabview";
 import { InputNumber } from "primereact/inputnumber";
 import { InputSwitch } from "primereact/inputswitch";
-import { Divider } from "@material-ui/core";
+import { Divider, Icon } from "@material-ui/core";
 import { Badge } from "react-bootstrap";
 import { Badge as PBadge } from "primereact/badge";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
@@ -85,6 +85,13 @@ const DataSatuan = ({
   useEffect(() => {
     getSatuan();
     initFilters1();
+
+    window.addEventListener("scroll", handleScroll);
+
+    // Hapus event listener saat komponen tidak lagi digunakan
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   const getSatuan = async (isUpdate = false) => {
@@ -264,10 +271,10 @@ const DataSatuan = ({
               satuan.forEach((el) => {
                 if (el.code == data.code) {
                   conv.push({
-                    id: el.id,
-                    qty: el.qty,
-                    u_from: el.u_from.id,
-                    u_to: el.u_to.id,
+                    id: el?.id,
+                    qty: el?.qty,
+                    u_from: el.u_from?.id,
+                    u_to: el.u_to?.id,
                   });
                 }
               });
@@ -304,6 +311,25 @@ const DataSatuan = ({
       </div>
       // </React.Fragment>
     );
+  };
+  const scrollToTop = () => {
+    // Menggulir halaman ke bagian atas
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+  };
+
+  const handleScroll = () => {
+    const scrollButton = document.getElementById("myBtn");
+    if (scrollButton) {
+      if (
+        document.body.scrollTop > 20 ||
+        document.documentElement.scrollTop > 20
+      ) {
+        scrollButton.style.display = "block";
+      } else {
+        scrollButton.style.display = "none";
+      }
+    }
   };
 
   const onClick = () => {
@@ -480,7 +506,8 @@ const DataSatuan = ({
   };
 
   const template2 = {
-    layout: "RowsPerPageDropdown CurrentPageReport PrevPageLink NextPageLink",
+    layout:
+      "RowsPerPageDropdown CurrentPageReport PrevPageLink  NextPageLink",
     RowsPerPageDropdown: (options) => {
       const dropdownOptions = [
         { label: 20, value: 20 },
@@ -507,6 +534,7 @@ const DataSatuan = ({
         </React.Fragment>
       );
     },
+
     CurrentPageReport: (options) => {
       return (
         <span
@@ -522,6 +550,16 @@ const DataSatuan = ({
         </span>
       );
     },
+
+    // Top: () => {
+    //   return (
+    //     <div>
+    //       <Button onClick={scrollToTop} id="myBtn" title="Ke atas">
+    //         Ke atas
+    //       </Button>
+    //     </div>
+    //   );
+    // },
   };
 
   const onCustomPage2 = (event) => {
@@ -547,11 +585,18 @@ const DataSatuan = ({
     setShowInput(false);
     setError(defError);
   };
+  function topFunction() {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }
 
   const renderBody = () => {
     return (
       <>
         <Toast ref={toast} />
+
         <DataTable
           responsiveLayout="scroll"
           value={data}
@@ -635,6 +680,24 @@ const DataSatuan = ({
             body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
           />
         </DataTable>
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginTop: "1rem",
+          }}
+        >
+          <Button
+            onClick={scrollToTop}
+            id="myBtn"
+            title="Ke atas"
+            style={{ display: "none" }}
+            className="p-button-text p-button-plain"
+          >
+            <Icon className="pi pi-chevron-up" />
+          </Button>
+        </div>
       </>
     );
   };

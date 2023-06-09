@@ -14,7 +14,7 @@ import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { InputNumber } from "primereact/inputnumber";
-import { Divider } from "@material-ui/core";
+import { Divider, Icon } from "@material-ui/core";
 import { TabPanel, TabView } from "primereact/tabview";
 import { Badge } from "primereact/badge";
 import DataJenisPelanggan from "../../Master/JenisPelanggan/DataJenisPelanggan";
@@ -156,6 +156,10 @@ const DataCustomer = ({
     getComp();
     getPajak();
     initFilters1();
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   const getCustomer = async (isUpdate = false) => {
@@ -224,7 +228,6 @@ const DataCustomer = ({
           if (element.account.dou_type === "D") {
             filt.push(element.account);
           }
-
 
           if (
             element?.account?.umm_code === setup?.ar?.acc_code &&
@@ -541,6 +544,24 @@ const DataCustomer = ({
           life: 3000,
         });
       }, 500);
+    }
+  };
+  const scrollToTop = () => {
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+  };
+
+  const handleScroll = () => {
+    const scrollButton = document.getElementById("myBtn");
+    if (scrollButton) {
+      if (
+        document.body.scrollTop > 20 ||
+        document.documentElement.scrollTop > 20
+      ) {
+        scrollButton.style.display = "block";
+      } else {
+        scrollButton.style.display = "none";
+      }
     }
   };
 
@@ -946,90 +967,109 @@ const DataCustomer = ({
 
   const renderBody = () => {
     return (
-      <DataTable
-        responsiveLayout="scroll"
-        value={data}
-        className="display w-150 datatable-wrapper"
-        showGridlines
-        dataKey="id"
-        rowHover
-        header={renderHeader}
-        filters={filters1}
-        globalFilterFields={[
-          "customer.cus_code",
-          "customer.cus_name",
-          "customer.cus_address",
-          "customer.cus_telp1",
-          "customer.cus_limit",
-        ]}
-        emptyMessage={tr[localStorage.getItem("language")].empty_data}
-        paginator
-        paginatorTemplate={template2}
-        first={first2}
-        rows={rows2}
-        onPage={onCustomPage2}
-        paginatorClassName="justify-content-end mt-3"
-        selectionMode="single"
-        onRowSelect={onRowSelect}
-      >
-        <Column
-          header={tr[localStorage.getItem("language")].kd_pel}
-          style={{
-            minWidth: "8rem",
-          }}
-          field={(e) => e?.customer?.cus_code}
-          body={(e) =>
-            load ? (
-              <Skeleton />
-            ) : e?.customer?.sub_cus ? (
-              <div>
+      <>
+        <DataTable
+          responsiveLayout="scroll"
+          value={data}
+          className="display w-150 datatable-wrapper"
+          showGridlines
+          dataKey="id"
+          rowHover
+          header={renderHeader}
+          filters={filters1}
+          globalFilterFields={[
+            "customer.cus_code",
+            "customer.cus_name",
+            "customer.cus_address",
+            "customer.cus_telp1",
+            "customer.cus_limit",
+          ]}
+          emptyMessage={tr[localStorage.getItem("language")].empty_data}
+          paginator
+          paginatorTemplate={template2}
+          first={first2}
+          rows={rows2}
+          onPage={onCustomPage2}
+          paginatorClassName="justify-content-end mt-3"
+          selectionMode="single"
+          onRowSelect={onRowSelect}
+        >
+          <Column
+            header={tr[localStorage.getItem("language")].kd_pel}
+            style={{
+              minWidth: "8rem",
+            }}
+            field={(e) => e?.customer?.cus_code}
+            body={(e) =>
+              load ? (
+                <Skeleton />
+              ) : e?.customer?.sub_cus ? (
+                <div>
+                  <span>{e?.customer?.cus_code} </span>
+                  <Badge
+                    value={`Sub ${e?.customer?.cus_id?.cus_code}`}
+                    className={"active ml-2"}
+                  ></Badge>
+                </div>
+              ) : (
                 <span>{e?.customer?.cus_code} </span>
-                <Badge
-                  value={`Sub ${e?.customer?.cus_id?.cus_code}`}
-                  className={"active ml-2"}
-                ></Badge>
-              </div>
-            ) : (
-              <span>{e?.customer?.cus_code} </span>
-            )
-          }
-        />
-        <Column
-          header={tr[localStorage.getItem("language")].nm_pel}
-          field={(e) => e?.customer?.cus_name}
-          style={{ minWidth: "8rem" }}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header={tr[localStorage.getItem("language")].alamat}
-          field={(e) => e?.customer?.cus_address}
-          style={{ minWidth: "8rem", maxWidth: "25rem" }}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header={tr[localStorage.getItem("language")].telp}
-          field={(e) => e?.customer?.cus_telp1 ?? "-"}
-          style={{ minWidth: "8rem" }}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header={"Akun Distribusi GL"}
-          field={(e) =>
-            `${checkAcc(e?.customer.cus_gl)?.account?.acc_code} - ${
-              checkAcc(e?.customer.cus_gl)?.account?.acc_name
-            }`
-          }
-          style={{ minWidth: "8rem" }}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header="Action"
-          dataType="boolean"
-          bodyClassName="text-center"
-          style={{ minWidth: "2rem" }}
-          body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
-        />
-      </DataTable>
+              )
+            }
+          />
+          <Column
+            header={tr[localStorage.getItem("language")].nm_pel}
+            field={(e) => e?.customer?.cus_name}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header={tr[localStorage.getItem("language")].alamat}
+            field={(e) => e?.customer?.cus_address}
+            style={{ minWidth: "8rem", maxWidth: "25rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header={tr[localStorage.getItem("language")].telp}
+            field={(e) => e?.customer?.cus_telp1 ?? "-"}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header={"Akun Distribusi GL"}
+            field={(e) =>
+              `${checkAcc(e?.customer.cus_gl)?.account?.acc_code} - ${
+                checkAcc(e?.customer.cus_gl)?.account?.acc_name
+              }`
+            }
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Action"
+            dataType="boolean"
+            bodyClassName="text-center"
+            style={{ minWidth: "2rem" }}
+            body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
+          />
+        </DataTable>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginTop: "1rem",
+          }}
+        >
+          <Button
+            onClick={scrollToTop}
+            id="myBtn"
+            title="Ke atas"
+            style={{ display: "none" }}
+            className="p-button-text p-button-plain"
+          >
+            <Icon className="pi pi-chevron-up" />
+          </Button>
+        </div>
+      </>
     );
   };
 
@@ -1692,7 +1732,8 @@ const DataCustomer = ({
                     // disabled={localStorage.getItem("product") !== "inv+gl"}
                   />
                   <small className="text-blue">
-                    *Harap Periksa Setup Akun AR/AP Apabila Daftar Akun Tidak Muncul
+                    *Harap Periksa Setup Akun AR/AP Apabila Daftar Akun Tidak
+                    Muncul
                   </small>
                 </div>
 

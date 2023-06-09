@@ -14,7 +14,7 @@ import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { InputNumber } from "primereact/inputnumber";
-import { Divider } from "@material-ui/core";
+import { Divider, Icon } from "@material-ui/core";
 import { TabPanel, TabView } from "primereact/tabview";
 import { Badge } from "primereact/badge";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
@@ -139,6 +139,10 @@ const DataSupplier = ({
     getCompany();
     getPajak();
     initFilters1();
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   const getJpem = async (isUpdate = false) => {
@@ -755,6 +759,25 @@ const DataSupplier = ({
       </button>
     );
   };
+  const scrollToTop = () => {
+    // Menggulir halaman ke bagian atas
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+  };
+
+  const handleScroll = () => {
+    const scrollButton = document.getElementById("myBtn");
+    if (scrollButton) {
+      if (
+        document.body.scrollTop > 20 ||
+        document.documentElement.scrollTop > 20
+      ) {
+        scrollButton.style.display = "block";
+      } else {
+        scrollButton.style.display = "none";
+      }
+    }
+  };
 
   const formatIdr = (value) => {
     return `${value}`
@@ -840,76 +863,95 @@ const DataSupplier = ({
 
   const renderBody = () => {
     return (
-      <DataTable
-        responsiveLayout="scroll"
-        value={data}
-        className="display w-150 datatable-wrapper"
-        showGridlines
-        dataKey="id"
-        rowHover
-        header={renderHeader}
-        filters={filters1}
-        globalFilterFields={[
-          "supplier.sup_code",
-          "supplier.sup_name",
-          "supplier.sup_address",
-          "supplier.sup_telp1",
-          "supplier.sup_limit",
-        ]}
-        emptyMessage={tr[localStorage.getItem("language")].empty_data}
-        paginator
-        paginatorTemplate={template2}
-        first={first2}
-        rows={rows2}
-        onPage={onCustomPage2}
-        paginatorClassName="justify-content-end mt-3"
-        selectionMode="single"
-        onRowSelect={onRowSelect}
-      >
-        <Column
-          header={tr[localStorage.getItem("language")].kd_pem}
+      <>
+        <DataTable
+          responsiveLayout="scroll"
+          value={data}
+          className="display w-150 datatable-wrapper"
+          showGridlines
+          dataKey="id"
+          rowHover
+          header={renderHeader}
+          filters={filters1}
+          globalFilterFields={[
+            "supplier.sup_code",
+            "supplier.sup_name",
+            "supplier.sup_address",
+            "supplier.sup_telp1",
+            "supplier.sup_limit",
+          ]}
+          emptyMessage={tr[localStorage.getItem("language")].empty_data}
+          paginator
+          paginatorTemplate={template2}
+          first={first2}
+          rows={rows2}
+          onPage={onCustomPage2}
+          paginatorClassName="justify-content-end mt-3"
+          selectionMode="single"
+          onRowSelect={onRowSelect}
+        >
+          <Column
+            header={tr[localStorage.getItem("language")].kd_pem}
+            style={{
+              minWidth: "8rem",
+            }}
+            field={(e) => e.supplier?.sup_code}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header={tr[localStorage.getItem("language")].nm_pem}
+            field={(e) => e.supplier?.sup_name}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header={tr[localStorage.getItem("language")].alamat}
+            field={(e) => e.supplier?.sup_address}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header={tr[localStorage.getItem("language")].telp}
+            field={(e) => e.supplier?.sup_telp1 ?? "-"}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header={"Akun Distribusi GL"}
+            field={(e) =>
+              `${hut(e?.supplier?.sup_hutang)?.acc_code} - ${
+                hut(e?.supplier?.sup_hutang)?.acc_name
+              }`
+            }
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Action"
+            dataType="boolean"
+            bodyClassName="text-center"
+            style={{ minWidth: "3rem" }}
+            body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
+          />
+        </DataTable>
+        <div
           style={{
-            minWidth: "8rem",
+            display: "flex",
+            justifyContent: "flex-end",
+            marginTop: "1rem",
           }}
-          field={(e) => e.supplier?.sup_code}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header={tr[localStorage.getItem("language")].nm_pem}
-          field={(e) => e.supplier?.sup_name}
-          style={{ minWidth: "8rem" }}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header={tr[localStorage.getItem("language")].alamat}
-          field={(e) => e.supplier?.sup_address}
-          style={{ minWidth: "8rem" }}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header={tr[localStorage.getItem("language")].telp}
-          field={(e) => e.supplier?.sup_telp1 ?? "-"}
-          style={{ minWidth: "8rem" }}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header={"Akun Distribusi GL"}
-          field={(e) =>
-            `${hut(e?.supplier?.sup_hutang)?.acc_code} - ${
-              hut(e?.supplier?.sup_hutang)?.acc_name
-            }`
-          }
-          style={{ minWidth: "8rem" }}
-          body={load && <Skeleton />}
-        />
-        <Column
-          header="Action"
-          dataType="boolean"
-          bodyClassName="text-center"
-          style={{ minWidth: "3rem" }}
-          body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
-        />
-      </DataTable>
+        >
+          <Button
+            onClick={scrollToTop}
+            id="myBtn"
+            title="Ke atas"
+            style={{ display: "none" }}
+            className="p-button-text p-button-plain"
+          >
+            <Icon className="pi pi-chevron-up" />
+          </Button>
+        </div>
+      </>
     );
   };
 
@@ -1483,7 +1525,8 @@ const DataSupplier = ({
                     error={error[2]?.ap}
                   />
                   <small className="text-blue">
-                    *Harap Periksa Setup Akun AR/AP Apabila Daftar Akun Tidak Muncul
+                    *Harap Periksa Setup Akun AR/AP Apabila Daftar Akun Tidak
+                    Muncul
                   </small>
                 </div>
 

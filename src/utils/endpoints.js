@@ -131,6 +131,30 @@ const endpoints = {
     method: "DELETE",
     data: {},
   },
+  /// divisi Pusat Biaya
+  divpusatBiaya: {
+    endpoint: "/v1/api/divisi-cost-center",
+    method: "GET",
+    data: {},
+  },
+
+  addDivPusatBiaya: {
+    endpoint: "/v1/api/divisi-cost-center",
+    method: "POST",
+    data: {},
+  },
+
+  editDivPusatBiaya: {
+    endpoint: "/v1/api/divisi-cost-center/",
+    method: "PUT",
+    data: {},
+  },
+
+  delDivPusatBiaya: {
+    endpoint: "/v1/api/divisi-cost-center/",
+    method: "DELETE",
+    data: {},
+  },
 
   /// Project
   project: {

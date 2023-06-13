@@ -60,7 +60,8 @@ const def = {
 
 const type = [
   { name: "Stock", id: 1 },
-  { name: "Non Stock", id: 2 },
+  { name: "Non Stock", id: 0 },
+  { name: "Asset", id: 2 },
 ];
 
 const metode = [
@@ -801,7 +802,7 @@ const DataProduk = ({
             re_stock: null,
             lt_stock: null,
             max_order: null,
-            ns: false,
+            ns: null,
             image: null,
           });
         });
@@ -1292,7 +1293,7 @@ const DataProduk = ({
                       setCurrentItem({
                         ...currentItem,
                         group: e?.target.value?.id ?? null,
-                        ns: !e?.target?.value?.stok,
+                        ns: !e?.target?.value?.stok ? 0 : 1 ?? 2,
                       });
                       let newError = error;
                       newError[0].group = false;
@@ -1311,28 +1312,21 @@ const DataProduk = ({
                   <PrimeInput
                     label={tr[localStorage.getItem("language")].type_prod}
                     value={
-                      currentItem !== null && currentItem.ns !== null
-                        ? currentItem.ns === true
+                      currentItem !== null && currentItem.ns !== ""
+                        ? currentItem.ns === 1
+                          ? "Stock"
+                          : currentItem.ns === 0
                           ? "Non Stock"
-                          : "Stock"
+                          : currentItem.ns === 2
+                          ? "Asset"
+                          : ""
                         : ""
                     }
-                    // onChange={(e) => {
-                    //   console.log(e.value);
-                    //   setCurrentItem({
-                    //     ...currentItem,
-                    //     type: e.value.id,
-                    //   });
-                    //   let newError = error;
-                    //   newError[0].type = false;
-                    //   setError(newError);
-                    // }}
+                    options={type}
                     optionLabel="name"
                     filter
                     filterBy="name"
                     placeholder={tr[localStorage.getItem("language")].pilih}
-                    // errorMessage="Tipe Produk Belum Dipilih"
-                    // error={error[0]?.type}
                     disabled
                   />
                 </div>

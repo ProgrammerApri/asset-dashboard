@@ -15,6 +15,7 @@ import Pajak from "../Master/Pajak";
 import Jasa from "../Master/Jasa";
 import { Link } from "react-router-dom";
 import { tr } from "src/data/tr";
+import DivisiDep from "./DivisiDep";
 
 const MasterLainnya = (self) => {
   const [active, setActive] = useState(0);
@@ -25,7 +26,7 @@ const MasterLainnya = (self) => {
       component: <Satuan />,
     },
     {
-      tittle: tr[localStorage.getItem("language")].divisi,
+      tittle: tr[localStorage.getItem("language")].div_prod,
       icon: "bx-scatter-chart",
       component: <Divisi />,
     },
@@ -33,6 +34,11 @@ const MasterLainnya = (self) => {
       tittle: tr[localStorage.getItem("language")].dep,
       icon: "bx-globe-alt",
       component: <PusatBiaya />,
+    },
+    {
+      tittle: tr[localStorage.getItem("language")].divdep,
+      icon: "bx-globe-alt",
+      component: <DivisiDep />,
     },
     {
       tittle: tr[localStorage.getItem("language")].salesmn,

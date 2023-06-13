@@ -27,8 +27,8 @@ const def = {
     id: null,
     code: null,
     name: null,
-    wip: false,
-    stok: true,
+    wip: null,
+    stok: null,
     div_code: null,
     acc_sto: null,
     acc_send: null,
@@ -39,6 +39,7 @@ const def = {
     pengembalian: null,
     selisih: null,
     biaya: null,
+    aset: null,
   },
 
   divisi: {
@@ -65,12 +66,14 @@ const defError = [
     acc_8: false,
     acc_9: false,
     biaya: false,
+    aset: false,
   },
 ];
 
 const tipe = [
-  { name: "Stock", code: true },
-  { name: "Non Stock", code: false },
+  { name: "Stock", code: 0 },
+  { name: "Non Stock", code: 1 },
+  { name: "Asset", code: 2 },
 ];
 
 const DataGroupProduk = ({
@@ -239,6 +242,7 @@ const DataGroupProduk = ({
         pengembalian: currentItem?.groupPro?.pengembalian ?? null,
         selisih: currentItem?.groupPro?.selisih ?? null,
         biaya: currentItem?.groupPro?.biaya ?? null,
+        aset: currentItem?.groupPro?.aset ?? null,
       },
     };
     console.log(config.data);
@@ -293,6 +297,7 @@ const DataGroupProduk = ({
         pengembalian: currentItem?.groupPro?.pengembalian ?? null,
         selisih: currentItem?.groupPro?.selisih ?? null,
         biaya: currentItem?.groupPro?.biaya ?? null,
+        aset: currentItem?.groupPro?.aset ?? null,
       },
     };
     console.log(config.data);
@@ -429,7 +434,7 @@ const DataGroupProduk = ({
   };
 
   const onSubmit = () => {
-    if (isValid()) {
+    // if (isValid()) {
       if (isEdit) {
         setUpdate(true);
         editGroupProduk();
@@ -439,7 +444,7 @@ const DataGroupProduk = ({
         addGroupProduk();
         setActive(0);
       }
-    }
+    // }
   };
 
   const renderFooter = () => {
@@ -563,7 +568,7 @@ const DataGroupProduk = ({
                 ...def,
                 groupPro: {
                   ...def.groupPro,
-                  wip: false,
+                  wip: 1,
                   // acc_sto: setup?.sto?.id,
                   // acc_send: setup?.pur_shipping?.id,
                   // acc_terima: setup?.ap?.id,
@@ -685,7 +690,7 @@ const DataGroupProduk = ({
   };
 
   const isValid = () => {
-    let valid = false;
+    let valid = 1;
     let active = 1;
     let errors = [
       {
@@ -721,9 +726,9 @@ const DataGroupProduk = ({
         //   ? false
         //   : !currentItem.groupPro?.acc_wip,
         biaya:
-          currentItem.groupPro.stok === false
-            ? !currentItem.groupPro?.biaya
-            : false,
+          currentItem.groupPro.stok === 1 ? !currentItem.groupPro?.biaya : 1,
+        aset:
+          currentItem.groupPro.stok === 2 ? !currentItem.groupPro?.aset : 2,
       },
     ];
 
@@ -921,9 +926,11 @@ const DataGroupProduk = ({
                       value={
                         currentItem.groupPro !== null &&
                         currentItem.groupPro.stok !== ""
-                          ? currentItem.groupPro.stok === true
-                            ? { code: true, name: "Stock" }
-                            : { code: false, name: "Non Stock" }
+                          ? currentItem.groupPro.stok === 0
+                            ? { code: 0, name: "Stock" }
+                            : currentItem.groupPro.stok === 1
+                            ? { code: 1, name: "Non Stock" }
+                            : { code: 2, name: "Asset" }
                           : null
                       }
                       options={tipe}
@@ -933,7 +940,7 @@ const DataGroupProduk = ({
                           groupPro: {
                             ...currentItem.groupPro,
                             stok: e.value?.code,
-                            wip: false,
+                            wip: 0,
                           },
                         });
                       }}
@@ -964,7 +971,7 @@ const DataGroupProduk = ({
                             },
                           });
                         }}
-                        disabled={currentItem.groupPro.stok === false}
+                        disabled={currentItem.groupPro.stok !== 0}
                       />
                       <label className="mr-5 mt-1">{`${
                         tr[localStorage.getItem("language")].g_prod
@@ -979,7 +986,7 @@ const DataGroupProduk = ({
               header="Distribusi GL Kontrol Stock"
               headerTemplate={renderTabHeader}
             >
-              {currentItem && currentItem?.groupPro?.stok ? (
+              {currentItem !== null && currentItem?.groupPro?.stok === 0 ? (
                 <>
                   <div className="row mr-0 ml-0">
                     <div className="col-6">
@@ -992,7 +999,7 @@ const DataGroupProduk = ({
                         }
                         options={accSto}
                         onChange={(e) => {
-                          console.log("akunwe",e.value);
+                          console.log("akunwe", e.value);
                           setCurrentItem({
                             ...currentItem,
                             groupPro: {
@@ -1013,7 +1020,7 @@ const DataGroupProduk = ({
                         showClear
                         errorMessage="Akun Persediaan Belum Dipilih"
                         error={error[1]?.acc_1}
-                        disabled={currentItem.groupPro.wip === true}
+                        disabled={currentItem.groupPro.wip === 1}
                       />
                       <small
                         className="text-blue"
@@ -1054,7 +1061,7 @@ const DataGroupProduk = ({
                         showClear
                         // errorMessage="Akun Pengiriman Belum Dipilih"
                         // error={error[1]?.acc_2}
-                        disabled={currentItem.groupPro.wip === true}
+                        disabled={currentItem.groupPro.wip === 1}
                       />
                     </div>
                   </div>
@@ -1091,7 +1098,7 @@ const DataGroupProduk = ({
                         showClear
                         // errorMessage="Akun Penerimaan Belum Dipilih"
                         // error={error[1]?.acc_3}
-                        disabled={currentItem.groupPro.wip === true}
+                        disabled={currentItem.groupPro.wip === 1}
                       />
                     </div>
                     <div className="col-6">
@@ -1177,7 +1184,7 @@ const DataGroupProduk = ({
                         showClear
                         // errorMessage="Akun HPP Belum Dipilih"
                         // error={error[1]?.acc_4}
-                        disabled={currentItem.groupPro.wip === true}
+                        disabled={currentItem.groupPro.wip === 1}
                       />
                     </div>
 
@@ -1212,7 +1219,7 @@ const DataGroupProduk = ({
                         showClear
                         // errorMessage="Akun Penjualan Belum Dipilih"
                         // error={error[1]?.acc_5}
-                        disabled={currentItem.groupPro.wip === true}
+                        disabled={currentItem.groupPro.wip === 1}
                       />
                     </div>
                   </div>
@@ -1249,7 +1256,7 @@ const DataGroupProduk = ({
                         showClear
                         // errorMessage="Akun Potongan Penjualan Belum Dipilih"
                         // error={error[1]?.acc_6}
-                        disabled={currentItem.groupPro.wip === true}
+                        disabled={currentItem.groupPro.wip === 1}
                       />
                     </div>
 
@@ -1284,7 +1291,7 @@ const DataGroupProduk = ({
                         showClear
                         // errorMessage="Akun Pengembalian Belum Dipilih"
                         // error={error[1]?.acc_7}
-                        disabled={currentItem.groupPro.wip === true}
+                        disabled={currentItem.groupPro.wip === 1}
                       />
                     </div>
                   </div>
@@ -1321,12 +1328,12 @@ const DataGroupProduk = ({
                         showClear
                         // errorMessage="Akun Selisih Harga Belum Dipilih"
                         // error={error[1]?.acc_8}
-                        disabled={currentItem.groupPro.wip === true}
+                        disabled={currentItem.groupPro.wip === 1}
                       />
                     </div>
                   </div>
                 </>
-              ) : (
+              ) : currentItem !== null && currentItem?.groupPro?.stok === 1 ? (
                 <div className="row mr-0 ml-0">
                   <div className="col-12">
                     <PrimeDropdown
@@ -1362,6 +1369,44 @@ const DataGroupProduk = ({
                     />
                   </div>
                 </div>
+              ) : (
+                <>
+                  <div className="row mr-0 ml-0">
+                    <div className="col-12">
+                      <PrimeDropdown
+                        label={"Akun Distribusi GL"}
+                        value={
+                          currentItem.groupPro.aset !== null
+                            ? gl(currentItem.groupPro.aset)
+                            : null
+                        }
+                        options={account}
+                        onChange={(e) => {
+                          setCurrentItem({
+                            ...currentItem,
+                            groupPro: {
+                              ...currentItem.groupPro,
+                              aset: e.value?.account?.id ?? null,
+                            },
+                          });
+                          let newError = error;
+                          // newError[1].aset = false;
+                          setError(newError);
+                        }}
+                        optionLabel="account.acc_name"
+                        valueTemplate={clear}
+                        itemTemplate={glTemplate}
+                        filter
+                        filterBy="account.acc_name"
+                        placeholder="Pilih Akun Biaya"
+                        showClear
+                        errorMessage="Akun Biaya Belum Dipilih"
+                        // error={error[2]?.aset}
+                        // disabled={currentItem.groupPro.wip === true}
+                      />
+                    </div>
+                  </div>
+                </>
               )}
             </TabPanel>
           </TabView>

@@ -15,38 +15,23 @@ import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
-import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import { tr } from "src/data/tr";
+import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 
 const def = {
-  jasa: {
-    id: null,
-    code: null,
-    name: null,
-    desc: null,
-    acc_id: null,
-  },
-
-  account: {
-    id: 0,
-    acc_code: "",
-    acc_name: "",
-    umm_code: null,
-    kat_code: 0,
-    dou_type: "",
-    sld_type: "",
-    connect: true,
-    sld_awal: 0,
-  },
+  id: 1,
+  div_ccost_code: "",
+  div_ccost_name: "",
+  div_ccost_ket: "",
+  dep_id: null,
 };
 
 const defError = {
   code: false,
   name: false,
-  acc1: false,
 };
 
-const DataJasa = ({
+const DataDivisiDep = ({
   data,
   load,
   popUp = false,
@@ -56,66 +41,34 @@ const DataJasa = ({
   onRowSelect,
   onSuccessInput,
 }) => {
-  const [account, setAccount] = useState(null);
-  const [allAcc, setAllAcc] = useState(null);
   const [first2, setFirst2] = useState(0);
+  const [pusatbiaya, setPusatBiaya] = useState(0);
   const [rows2, setRows2] = useState(20);
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
   const [loading, setLoading] = useState(false);
-  const [update, setUpdate] = useState(false);
   const toast = useRef(null);
   const [currentItem, setCurrentItem] = useState(def);
-  const [isEdit, setEdit] = useState(false);
+  const [isEdit, setEdit] = useState(def);
   const [showInput, setShowInput] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [error, setError] = useState(defError);
 
   useEffect(() => {
-    getAccount();
     initFilters1();
+    getPusatBiaya();
   }, []);
 
-  const getAccount = async () => {
+  const editPusatBiaya = async () => {
     setLoading(true);
     const config = {
-      ...endpoints.account,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        let all = [];
-        let filt = [];
-
-        data.forEach((element) => {
-          if (element.account.dou_type === "D" && !element.account.connect) {
-            filt.push(element.account);
-          }
-
-          all.push(element.account);
-        });
-        console.log(data);
-        setAllAcc(all);
-        setAccount(filt);
-      }
-    } catch (error) {}
-  };
-
-  const editJasa = async () => {
-    setLoading(true);
-    const config = {
-      ...endpoints.editJasa,
-      endpoint: endpoints.editJasa.endpoint + currentItem.jasa.id,
+      ...endpoints.editDivPusatBiaya,
+      endpoint: endpoints.editDivPusatBiaya.endpoint + currentItem.id,
       data: {
-        code: currentItem.jasa.code,
-        name: currentItem.jasa.name,
-        desc: currentItem.jasa.desc,
-        acc_id: currentItem.account.id,
+        div_ccost_code: currentItem.div_ccost_code,
+        div_ccost_name: currentItem.div_ccost_name,
+        div_ccost_ket: currentItem.div_ccost_ket,
+        dep_id: currentItem.dep_id.id,
       },
     };
     console.log(config.data);
@@ -139,7 +92,7 @@ const DataJasa = ({
       }
     } catch (error) {
       setTimeout(() => {
-        setUpdate(false);
+        setLoading(false);
         toast.current.show({
           severity: "error",
           summary: tr[localStorage.getItem("language")].gagal,
@@ -150,15 +103,15 @@ const DataJasa = ({
     }
   };
 
-  const addJasa = async () => {
+  const addPusatBiaya = async () => {
     setLoading(true);
     const config = {
-      ...endpoints.addJasa,
+      ...endpoints.addDivPusatBiaya,
       data: {
-        code: currentItem.jasa.code,
-        name: currentItem.jasa.name,
-        desc: currentItem.jasa.desc,
-        acc_id: currentItem.account.id,
+        div_ccost_code: currentItem.div_ccost_code,
+        div_ccost_name: currentItem.div_ccost_name,
+        div_ccost_ket: currentItem.div_ccost_ket,
+        dep_id: currentItem.dep_id.id,
       },
     };
     console.log(config.data);
@@ -184,17 +137,17 @@ const DataJasa = ({
       console.log(error);
       if (error.status === 400) {
         setTimeout(() => {
-          setUpdate(false);
+          setLoading(false);
           toast.current.show({
             severity: "error",
             summary: tr[localStorage.getItem("language")].gagal,
-            detail: `Kode ${currentItem.jasa.code} Sudah Digunakan`,
+            detail: `Kode ${currentItem.div_ccost_code} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
       } else {
         setTimeout(() => {
-          setUpdate(false);
+          setLoading(false);
           toast.current.show({
             severity: "error",
             summary: tr[localStorage.getItem("language")].gagal,
@@ -206,11 +159,33 @@ const DataJasa = ({
     }
   };
 
-  const delJasa = async (id) => {
+  const getPusatBiaya = async (isUpdate = false) => {
+    const config = {
+      ...endpoints.pusatBiaya,
+      data: {},
+    };
+    console.log("jjjjjjjjj", config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setPusatBiaya(data);
+      }
+    } catch (error) {}
+    if (isUpdate) {
+      setLoading(false);
+    } else {
+    }
+  };
+
+  const delPusatBiaya = async (id) => {
     setLoading(true);
     const config = {
-      ...endpoints.delJasa,
-      endpoint: endpoints.delJasa.endpoint + currentItem.jasa.id,
+      ...endpoints.delDivPusatBiaya,
+      endpoint: endpoints.delDivPusatBiaya.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -219,9 +194,9 @@ const DataJasa = ({
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          onSuccessInput();
           setLoading(false);
-          onHideInput();
+          setShowDelete(false);
+          onSuccessInput();
           onInput(false);
           toast.current.show({
             severity: "info",
@@ -234,7 +209,9 @@ const DataJasa = ({
     } catch (error) {
       console.log(error);
       setTimeout(() => {
-        setUpdate(false);
+        setLoading(false);
+        setShowDelete(false);
+        onInput(false);
         toast.current.show({
           severity: "error",
           summary: tr[localStorage.getItem("language")].gagal,
@@ -256,7 +233,7 @@ const DataJasa = ({
             setShowInput(true);
             onInput(true);
           }}
-          className="btn btn-primary shadow btn-xs sharp ml-2"
+          className="btn btn-primary shadow btn-xs sharp ml-1"
         >
           <i className="fa fa-pencil"></i>
         </Link>
@@ -267,7 +244,7 @@ const DataJasa = ({
             setShowDelete(true);
             onInput(true);
           }}
-          className="btn btn-danger shadow btn-xs sharp ml-2"
+          className="btn btn-danger shadow btn-xs sharp ml-1"
         >
           <i className="fa fa-trash"></i>
         </Link>
@@ -291,18 +268,16 @@ const DataJasa = ({
           label={tr[localStorage.getItem("language")].simpan}
           icon="pi pi-check"
           onClick={() => {
-            if (isValid()) {
-              if (isEdit) {
-                setLoading(true);
-                editJasa();
-              } else {
-                setLoading(true);
-                addJasa();
-              }
+            // if (isValid()) {
+            if (isEdit) {
+              editPusatBiaya();
+            } else {
+              addPusatBiaya();
             }
+            // }
           }}
           autoFocus
-          loading={update}
+          loading={loading}
         />
       </div>
     );
@@ -324,10 +299,10 @@ const DataJasa = ({
           label={tr[localStorage.getItem("language")].hapus}
           icon="pi pi-trash"
           onClick={() => {
-            delJasa();
+            delPusatBiaya();
           }}
           autoFocus
-          loading={update}
+          loading={loading}
         />
       </div>
     );
@@ -363,7 +338,6 @@ const DataJasa = ({
           label={tr[localStorage.getItem("language")].tambh}
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
-            setError(false);
             setShowInput(true);
             setEdit(false);
             setLoading(false);
@@ -425,48 +399,18 @@ const DataJasa = ({
     setRows2(event.rows);
   };
 
-  const glTemplate = (option) => {
-    return (
-      <div>
-        {option !== null ? `${option.acc_name} - ${option.acc_code}` : ""}
-      </div>
-    );
-  };
+  // const isValid = () => {
+  //   let valid = false;
+  //   let errors = {
+  //     code: !currentItem.div_ccost_code || currentItem.div_ccost_code === "",
+  //     name: !currentItem.div_ccost_name || currentItem.div_ccost_name === "",
+  //   };
 
-  const clear = (option, props) => {
-    if (option) {
-      return (
-        <div>
-          {option !== null ? `${option.acc_name} - ${option.acc_code}` : ""}
-        </div>
-      );
-    }
+  //   setError(errors);
+  //   valid = !errors.code && !errors.name;
 
-    return <span>{props.placeholder}</span>;
-  };
-
-  const onHideInput = () => {
-    setLoading(false);
-    setCurrentItem(def);
-    setEdit(false);
-    setShowInput(false);
-  };
-
-  const isValid = () => {
-    console.log(currentItem);
-    let valid = false;
-    let errors = {
-      code: !currentItem.jasa.code || currentItem.jasa.code === "",
-      name: !currentItem.jasa.name || currentItem.jasa.name === "",
-      acc1: !currentItem?.account?.id,
-    };
-
-    setError(errors);
-
-    valid = !errors.code && !errors.name && !errors.acc1;
-
-    return valid;
-  };
+  //   return valid;
+  // };
 
   const renderBody = () => {
     return (
@@ -482,10 +426,10 @@ const DataJasa = ({
           header={renderHeader}
           filters={filters1}
           globalFilterFields={[
-            "jasa.code",
-            "jasa.name",
-            "jasa.desc",
-            "account.acc_name",
+            "div_ccost_code",
+            "div_ccost_name",
+            "div_ccost_ket",
+            "dep_id",
           ]}
           emptyMessage={tr[localStorage.getItem("language")].empty_data}
           paginator
@@ -498,28 +442,22 @@ const DataJasa = ({
           onRowSelect={onRowSelect}
         >
           <Column
-            header={tr[localStorage.getItem("language")].kd_jasa}
+            header={tr[localStorage.getItem("language")].kd_dep}
             style={{
               minWidth: "8rem",
             }}
-            field={(e) => e.jasa.code}
+            field="div_ccost_code"
             body={load && <Skeleton />}
           />
           <Column
-            header={tr[localStorage.getItem("language")].nm_jasa}
-            field={(e) => e.jasa.name}
-            style={{ minWidth: "8rem" }}
-            body={load && <Skeleton />}
-          />
-          <Column
-            header={tr[localStorage.getItem("language")].akun}
-            field={(e) => `${e.account?.acc_code} - ${e.account?.acc_name}`}
+            header={tr[localStorage.getItem("language")].nm_dep}
+            field="div_ccost_name"
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
           <Column
             header={tr[localStorage.getItem("language")].ket}
-            field={(e) => e.jasa?.desc ?? "-"}
+            field="div_ccost_ket"
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
@@ -536,7 +474,7 @@ const DataJasa = ({
   };
 
   const renderDialog = () => {
-    console.log("datajasa",data);
+    console.log("data", data);
     return (
       <>
         <Toast ref={toast} />
@@ -544,10 +482,10 @@ const DataJasa = ({
           header={
             isEdit
               ? `${tr[localStorage.getItem("language")].edit} ${
-                  tr[localStorage.getItem("language")].jasa
+                  tr[localStorage.getItem("language")].dep
                 }`
               : `${tr[localStorage.getItem("language")].tambh} ${
-                  tr[localStorage.getItem("language")].jasa
+                  tr[localStorage.getItem("language")].divdep
                 }`
           }
           visible={showInput}
@@ -558,82 +496,77 @@ const DataJasa = ({
             onInput(false);
           }}
         >
-          <div className="row ml-0 mt-0">
+          <div className="row mr-0 mt-0">
             <div className="col-6">
               <PrimeInput
-                label={tr[localStorage.getItem("language")].kd_jasa}
+                label={tr[localStorage.getItem("language")].kd_divdep}
                 value={
-                  currentItem !== null ? `${currentItem?.jasa?.code ?? ""}` : ""
+                  currentItem !== null ? `${currentItem.div_ccost_code}` : ""
                 }
                 onChange={(e) => {
                   setCurrentItem({
                     ...currentItem,
-                    jasa: { ...currentItem.jasa, code: e.target.value },
+                    div_ccost_code: e.target.value,
                   });
-                  let newError = error;
-                  newError.code = false;
-                  setError(newError);
+                  // let newError = error;
+                  // newError.code = false;
+                  // setError(newError);
                 }}
                 placeholder={tr[localStorage.getItem("language")].masuk}
-                error={error?.code}
+                // error={error?.code}
               />
             </div>
-
             <div className="col-6">
               <PrimeInput
-                label={tr[localStorage.getItem("language")].nm_jasa}
+                label={tr[localStorage.getItem("language")].nm_divdep}
                 value={
-                  currentItem !== null ? `${currentItem?.jasa?.name ?? ""}` : ""
+                  currentItem !== null ? `${currentItem?.div_ccost_name}` : ""
                 }
                 onChange={(e) => {
                   setCurrentItem({
                     ...currentItem,
-                    jasa: { ...currentItem.jasa, name: e.target.value },
+                    div_ccost_name: e.target.value,
                   });
-                  let newError = error;
-                  newError.name = false;
-                  setError(newError);
+                  // let newError = error;
+                  // newError.code = false;
+                  // setError(newError);
                 }}
                 placeholder={tr[localStorage.getItem("language")].masuk}
-                error={error?.name}
+                // error={error?.code}
               />
             </div>
-          </div>
 
-          <div className="row ml-0 mt-0">
-            <div className="col-12">
+            <div className="col-6">
               <PrimeDropdown
-                label={tr[localStorage.getItem("language")].akun}
-                value={
-                  currentItem !== null && currentItem.account !== null
-                    ? currentItem.account
-                    : null
-                }
-                options={account}
+                label={tr[localStorage.getItem("language")].nm_dep}
+                value={currentItem !== null ? currentItem.dep_id : null}
                 onChange={(e) => {
-                  console.log(e.value);
                   setCurrentItem({
                     ...currentItem,
-                    account: e.value ?? null,
+                    dep_id: e.target.value || null,
                   });
-                  let newError = error;
-                  // newError.acc1 = false;
-                  setError(newError);
                 }}
-                optionLabel="acc_name"
-                valueTemplate={clear}
-                itemTemplate={glTemplate}
+                // onChange={(e) => {
+                //   setCurrentItem({
+                //     ...currentItem,
+                //     ccost_name: e.value ?? null,
+                //   });
+                //   // let newError = error;
+                //   // newError.name = false;
+                //   // setError(newError);
+                // }}
+                options={pusatbiaya}
+                // placeholder={tr[localStorage.getItem("language")].masuk}
+                // error={error?.name}
+                optionLabel="ccost_name"
                 filter
-                filterBy="acc_name"
+                filterBy="ccost_name"
                 placeholder={tr[localStorage.getItem("language")].pilih}
-                errorMessage="Akun Distribusi Belum Dipilih"
-                error={error?.acc1}
-                showClear
               />
             </div>
           </div>
 
-          <div className="row ml-0 mt-0">
+          <div className="row mr-0 mt-0">
             <div className="col-12">
               <label className="text-label">
                 {tr[localStorage.getItem("language")].ket}
@@ -641,14 +574,12 @@ const DataJasa = ({
               <div className="p-inputgroup">
                 <InputTextarea
                   value={
-                    currentItem !== null
-                      ? `${currentItem?.jasa?.desc ?? ""}`
-                      : ""
+                    currentItem !== null ? `${currentItem.div_ccost_ket}` : ""
                   }
                   onChange={(e) =>
                     setCurrentItem({
                       ...currentItem,
-                      jasa: { ...currentItem.jasa, desc: e.target.value },
+                      div_ccost_ket: e.target.value,
                     })
                   }
                   placeholder={tr[localStorage.getItem("language")].masuk}
@@ -660,7 +591,7 @@ const DataJasa = ({
 
         <Dialog
           header={`${tr[localStorage.getItem("language")].hapus} ${
-            tr[localStorage.getItem("language")].jasa
+            tr[localStorage.getItem("language")].dep
           }`}
           visible={showDelete}
           style={{ width: "30vw" }}
@@ -683,12 +614,19 @@ const DataJasa = ({
     );
   };
 
+  const onHideInput = () => {
+    setLoading(false);
+    setCurrentItem(def);
+    setEdit(false);
+    setShowInput(false);
+  };
+
   if (popUp) {
     return (
       <>
         <Dialog
           header={`${tr[localStorage.getItem("language")].data} ${
-            tr[localStorage.getItem("language")].jasa
+            tr[localStorage.getItem("language")].dev
           }`}
           visible={show}
           footer={() => <div></div>}
@@ -712,4 +650,4 @@ const DataJasa = ({
   }
 };
 
-export default DataJasa;
+export default DataDivisiDep;

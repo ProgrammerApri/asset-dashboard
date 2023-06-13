@@ -598,6 +598,7 @@ const DataPajak = ({
   };
 
   const renderDialog = () => {
+    console.log("dataaaaaa",data);
     return (
       <>
         <Toast ref={toast} />

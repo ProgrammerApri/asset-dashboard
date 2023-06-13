@@ -75,6 +75,13 @@ const Master = (self) => {
                   component: <Lokasi edit={e.edit} del={e.delete} />,
                 });
                 break;
+              case "asset":
+                sub.push({
+                  tittle: tr[localStorage.getItem("language")].asset,
+                  icon: e.icon_file,
+                  component: <Lokasi edit={e.edit} del={e.delete} />,
+                });
+                break;
 
               default:
                 break;

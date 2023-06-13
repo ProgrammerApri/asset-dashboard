@@ -395,7 +395,7 @@ const SetupAkun = () => {
                 submitUpdate({ ...setup, fixed_assets: e.value });
               },
               true,
-              "d"
+              "u"
             )}
           </Row>
         }
@@ -666,15 +666,30 @@ const SetupAkun = () => {
         }}
         body={
           <Row className="mr-0 ml-0">
-            {renderAccountDropdown("Piutang Usaha", setup && setup.ar, (e) => {
-              setSetup({ ...setup, ar: e.value });
-              submitUpdate({ ...setup, ar: e.value });
-            })}
-
-            {renderAccountDropdown("Hutang Usaha", setup && setup.ap, (e) => {
-              setSetup({ ...setup, ap: e.value });
-              submitUpdate({ ...setup, ap: e.value });
-            })}
+            <div>
+              {renderAccountDropdown(
+                "Piutang Usaha - Akun Umum",
+                setup && setup.ar,
+                (e) => {
+                  setSetup({ ...setup, ar: e.value });
+                  submitUpdate({ ...setup, ar: e.value });
+                },
+                true,
+                "u"
+              )}
+            </div>
+            <div>
+              {renderAccountDropdown(
+                "Hutang Usaha - Akun Umum",
+                setup && setup.ap,
+                (e) => {
+                  setSetup({ ...setup, ap: e.value });
+                  submitUpdate({ ...setup, ap: e.value });
+                },
+                true,
+                "u"
+              )}
+            </div>
           </Row>
         }
       />
@@ -706,7 +721,9 @@ const SetupAkun = () => {
               (e) => {
                 setSetup({ ...setup, sto_general: e.value });
                 submitUpdate({ ...setup, sto_general: e.value });
-              }
+              },
+              true,
+              "u"
             )}
 
             {renderAccountDropdown(
@@ -742,7 +759,7 @@ const SetupAkun = () => {
               (e) => {
                 setSetup({ ...setup, sto_wip: e.value });
                 submitUpdate({ ...setup, sto_wip: e.value });
-              }
+              },true,"u"
             )}
 
             {renderAccountDropdown(

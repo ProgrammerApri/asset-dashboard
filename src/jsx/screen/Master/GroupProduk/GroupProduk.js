@@ -93,6 +93,7 @@ const DataGroupProduk = ({
   const [setup, setSetup] = useState(null);
   const [account, setAccount] = useState(null);
   const [accSto, setAccSto] = useState(null);
+  const [fixedAset, setFixedAset] = useState(null);
   const [accSlsRet, setAccSlsRet] = useState(null);
   const [accSlsDisc, setAccSlsDisc] = useState(null);
   const [accSelisih, setAccSelisih] = useState(null);
@@ -171,13 +172,15 @@ const DataGroupProduk = ({
         let acc_sls_ret = [];
         let acc_sls_disc = [];
         let acc_selisih = [];
+        let acc_fixed_assets = [];
 
         data.forEach((element) => {
           if (
             element.account.kat_code === setup?.sto_wip?.kat_code &&
             element.account.dou_type === "U"
           ) {
-            filt.push(element);
+            filt.push(element.account);
+            console.log("tt,", filt.push(element));
           }
 
           if (
@@ -194,6 +197,7 @@ const DataGroupProduk = ({
               element.account?.dou_type === "D")
           ) {
             acc_sls_ret.push(element);
+            console.log("qqq,", acc_sls_ret.push(element));
           }
 
           if (
@@ -202,6 +206,7 @@ const DataGroupProduk = ({
               element.account?.dou_type === "D")
           ) {
             acc_sls_disc.push(element);
+            console.log("www,", acc_sls_disc.push(element));
           }
 
           if (
@@ -210,7 +215,17 @@ const DataGroupProduk = ({
               element.account?.dou_type === "D")
           ) {
             acc_selisih.push(element);
+            console.log("eee,", acc_selisih.push(element));
           }
+          if (
+            element.account?.umm_code === setup?.fixed_assets?.acc_code &&
+            element.account?.dou_type === "D"
+          ) {
+            acc_fixed_assets.push(element);
+            console.log("rrr,", acc_fixed_assets.push(element));
+          }
+          console.log("akun aset");
+          console.log( acc_fixed_assets);
         });
         setAccount(data);
         setWip(filt);
@@ -218,6 +233,7 @@ const DataGroupProduk = ({
         setAccSlsRet(acc_sls_ret);
         setAccSlsDisc(acc_sls_disc);
         setAccSelisih(acc_selisih);
+        setFixedAset(acc_fixed_assets);
       }
     } catch (error) {}
   };
@@ -435,15 +451,15 @@ const DataGroupProduk = ({
 
   const onSubmit = () => {
     // if (isValid()) {
-      if (isEdit) {
-        setUpdate(true);
-        editGroupProduk();
-        setActive(0);
-      } else {
-        setUpdate(true);
-        addGroupProduk();
-        setActive(0);
-      }
+    if (isEdit) {
+      setUpdate(true);
+      editGroupProduk();
+      setActive(0);
+    } else {
+      setUpdate(true);
+      addGroupProduk();
+      setActive(0);
+    }
     // }
   };
 
@@ -668,9 +684,7 @@ const DataGroupProduk = ({
   const glTemplate = (option) => {
     return (
       <div>
-        {option !== null
-          ? `${option.account.acc_name} - ${option.account.acc_code}`
-          : ""}
+        {option !== null ? `${option?.account?.acc_name} - ${option?.account?.acc_code}` : ""}
       </div>
     );
   };
@@ -727,8 +741,7 @@ const DataGroupProduk = ({
         //   : !currentItem.groupPro?.acc_wip,
         biaya:
           currentItem.groupPro.stok === 1 ? !currentItem.groupPro?.biaya : 1,
-        aset:
-          currentItem.groupPro.stok === 2 ? !currentItem.groupPro?.aset : 2,
+        aset: currentItem.groupPro.stok === 2 ? !currentItem.groupPro?.aset : 2,
       },
     ];
 
@@ -1376,11 +1389,12 @@ const DataGroupProduk = ({
                       <PrimeDropdown
                         label={"Akun Distribusi GL"}
                         value={
-                          currentItem.groupPro.aset !== null
-                            ? gl(currentItem.groupPro.aset)
+                          // currentItem !== null &&
+                          currentItem.groupPro?.aset !== null
+                            ? gl(currentItem.groupPro?.aset)
                             : null
                         }
-                        options={account}
+                        options={fixedAset}
                         onChange={(e) => {
                           setCurrentItem({
                             ...currentItem,

@@ -240,7 +240,7 @@ const DataCustomer = ({
         });
 
         console.log("setup");
-        console.log(setup?.ar?.acc_code);
+        console.log(filt);
 
         setAcc(data);
         setAccAr(acc_ar);

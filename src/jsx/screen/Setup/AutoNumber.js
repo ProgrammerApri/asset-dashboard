@@ -237,57 +237,77 @@ const AutoNumber = () => {
   ) => {
     return (
       <div className="col-12">
-        {/* Kode yang sebelumnya untuk loading telah dihapus untuk kesederhanaan contoh */}
         <>
           <label className="text-label">{label}</label>
-          <div className=" col-2  "> </div>
-          <InputText
-            value={current?.rp_no_ref ?? ""}
-            onChange={(e) => {
-              setCurrent({ ...current, rp_no_ref: e.target.value });
-            }}
-            placeholder="Masukkan Disini"
-          />
-          <InputText
-            value={romanNumeral}
-            // onChange={onChange}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={year}
-            // onChange={year}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={current.show_dept ? "SUPERVISOR" : ""}
-            placeholder="Masukkan Disini"
-            disabled
-          />{" "}
-          <InputSwitch
-            checked={current.show_dept}
-            onChange={(e) => {
-              setCurrent({ ...current, show_dept: e.value });
-            }}
-          />
-          <div></div>
-          <InputSwitch
-            checked={current.auto_renew}
-            onChange={(e) => {
-              setCurrent({ ...current, auto_renew: e.value });
-            }}
-          />
-          <Button
-            label={tr[localStorage.getItem("language")].update}
-            icon="pi pi-check"
-            onClick={(e) => {
-              onSubmit();
-            }}
-            autoFocus
-            loading={loading}
-          />
-          {/* Komponen InputText lainnya bisa ditambahkan sesuai kebutuhan */}
+          <div className=" d-flex  ">
+            <InputText
+              value={current?.rp_no_ref ?? ""}
+              onChange={(e) => {
+                setCurrent({ ...current, rp_no_ref: e.target.value });
+              }}
+              placeholder="Masukkan Disini"
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={romanNumeral}
+              // onChange={onChange}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={year}
+              // onChange={year}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={current.show_dept ? "SUPERVISOR" : ""}
+              placeholder="Masukkan Disini"
+              disabled
+            />{" "}
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.show_dept}
+              onChange={(e) => {
+                setCurrent({ ...current, show_dept: e.value });
+              }}
+            />{" "}
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <div></div>
+            <InputSwitch
+              placeholder="Top"
+              tooltip="Reset Tahun"
+              tooltipOptions={{ position: "top" }}
+              checked={current.auto_renew}
+              onChange={(e) => {
+                setCurrent({ ...current, auto_renew: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "50px" }}
+            ></div>
+            <Button
+              label={tr[localStorage.getItem("language")].update}
+              icon="pi pi-check"
+              onClick={(e) => {
+                onSubmit();
+              }}
+              autoFocus
+              // loading={loading}
+            />
+          </div>
         </>
       </div>
     );
@@ -300,58 +320,75 @@ const AutoNumber = () => {
     type = "all"
   ) => {
     return (
-      <div className="col-8">
-        {/* Kode yang sebelumnya untuk loading telah dihapus untuk kesederhanaan contoh */}
+      <div className="col-12">
         <>
           <label className="text-label">{label}</label>
-          <div className=" col-2"> </div>
-          <InputText
-            value={current && current.po_no_ref}
-            onChange={(e) => {
-              setCurrent({ ...current, po_no_ref: e.target.value });
-            }}
-            placeholder="Masukkan Disini"
-          />
-          <InputText
-            value={romanNumeral}
-            // onChange={onChange}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={year}
-            // onChange={year}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={current.show_dept1 ? "TI" : ""}
-            placeholder="Masukkan Disini"
-            disabled
-          />{" "}
-          <InputSwitch
-            checked={current.show_dept1}
-            onChange={(e) => {
-              setCurrent({ ...current, show_dept1: e.value });
-              // updateAuto({ ...current, show_dept: e.value });
-            }}
-          />
-          <InputSwitch
-            checked={current.auto_renew1}
-            onChange={(e) => {
-              setCurrent({ ...current, auto_renew1: e.value });
-            }}
-          />
-          <Button
-            label={tr[localStorage.getItem("language")].update}
-            icon="pi pi-check"
-            onClick={(e) => {
-              addAuto();
-            }}
-            autoFocus
-            // loading={loading}
-          />
-          {/* Komponen InputText lainnya bisa ditambahkan sesuai kebutuhan */}
+          <div className=" d-flex">
+            <InputText
+              value={current && current.po_no_ref}
+              onChange={(e) => {
+                setCurrent({ ...current, po_no_ref: e.target.value });
+              }}
+              placeholder="Masukkan Disini"
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={romanNumeral}
+              // onChange={onChange}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={year}
+              // onChange={year}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={current.show_dept1 ? "TI" : ""}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.show_dept1}
+              onChange={(e) => {
+                setCurrent({ ...current, show_dept1: e.value });
+                // updateAuto({ ...current, show_dept: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.auto_renew1}
+              onChange={(e) => {
+                setCurrent({ ...current, auto_renew1: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "50px" }}
+            ></div>
+            <Button
+              label={tr[localStorage.getItem("language")].update}
+              icon="pi pi-check"
+              onClick={(e) => {
+                addAuto();
+              }}
+              autoFocus
+              // loading={loading}
+            />
+          </div>
         </>
       </div>
     );
@@ -364,58 +401,75 @@ const AutoNumber = () => {
     type = "all"
   ) => {
     return (
-      <div className="col-9">
-        {/* Kode yang sebelumnya untuk loading telah dihapus untuk kesederhanaan contoh */}
+      <div className="col-12">
         <>
           <label className="text-label">{label}</label>
-          <div className=" col-2"> </div>
-          <InputText
-            value={current && current.gra_no_ref}
-            onChange={(e) => {
-              setCurrent({ ...current, gra_no_ref: e.target.value });
-            }}
-            placeholder="Masukkan Disini"
-          />
-          <InputText
-            value={romanNumeral}
-            // onChange={onChange}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={year}
-            // onChange={year}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={current.show_dept2 ? "SUPERVISOR" : ""}
-            placeholder="Masukkan Disini"
-            disabled
-          />{" "}
-          <InputSwitch
-            checked={current.show_dept2}
-            onChange={(e) => {
-              setCurrent({ ...current, show_dept2: e.value });
-              // updateAuto({ ...current, show_dept: e.value });
-            }}
-          />
-         <InputSwitch
-            checked={current.auto_renew2}
-            onChange={(e) => {
-              setCurrent({ ...current, auto_renew2: e.value });
-            }}
-          />
-          <Button
-            label={tr[localStorage.getItem("language")].update}
-            icon="pi pi-check"
-            onClick={(e) => {
-              addAuto();
-            }}
-            autoFocus
-            // loading={loading}
-          />
-          {/* Komponen InputText lainnya bisa ditambahkan sesuai kebutuhan */}
+          <div className=" d-flex">
+            <InputText
+              value={current && current.gra_no_ref}
+              onChange={(e) => {
+                setCurrent({ ...current, gra_no_ref: e.target.value });
+              }}
+              placeholder="Masukkan Disini"
+            />{" "}
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={romanNumeral}
+              // onChange={onChange}
+              placeholder="Masukkan Disini"
+              disabled
+            />{" "}
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={year}
+              // onChange={year}
+              placeholder="Masukkan Disini"
+              disabled
+            />{" "}
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={current.show_dept2 ? "SUPERVISOR" : ""}
+              placeholder="Masukkan Disini"
+              disabled
+            />{" "}
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.show_dept2}
+              onChange={(e) => {
+                setCurrent({ ...current, show_dept2: e.value });
+                // updateAuto({ ...current, show_dept: e.value });
+              }}
+            />{" "}
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.auto_renew2}
+              onChange={(e) => {
+                setCurrent({ ...current, auto_renew2: e.value });
+              }}
+            />{" "}
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "50px" }}
+            ></div>
+            <Button
+              label={tr[localStorage.getItem("language")].update}
+              icon="pi pi-check"
+              onClick={(e) => {
+                addAuto();
+              }}
+              autoFocus
+              // loading={loading}
+            />
+          </div>
         </>
       </div>
     );
@@ -428,58 +482,75 @@ const AutoNumber = () => {
     type = "all"
   ) => {
     return (
-      <div className="col-9">
-        {/* Kode yang sebelumnya untuk loading telah dihapus untuk kesederhanaan contoh */}
+      <div className="col-12">
         <>
           <label className="text-label">{label}</label>
-          <div className=" col-2"> </div>
-          <InputText
-            value={current && current.ip_no_ref}
-            onChange={(e) => {
-              setCurrent({ ...current, ip_no_ref: e.target.value });
-            }}
-            placeholder="Masukkan Disini"
-          />
-          <InputText
-            value={romanNumeral}
-            // onChange={onChange}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={year}
-            // onChange={year}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={current.show_dept3 ? "MANAGER" : ""}
-            placeholder="Masukkan Disini"
-            disabled
-          />{" "}
-          <InputSwitch
-            checked={current.show_dept3}
-            onChange={(e) => {
-              setCurrent({ ...current, show_dept3: e.value });
-              // updateAuto({ ...current, show_dept: e.value });
-            }}
-          />
-         <InputSwitch
-            checked={current.auto_renew3}
-            onChange={(e) => {
-              setCurrent({ ...current, auto_renew3: e.value });
-            }}
-          />
-          <Button
-            label={tr[localStorage.getItem("language")].update}
-            icon="pi pi-check"
-            onClick={(e) => {
-              addAuto();
-            }}
-            autoFocus
-            // loading={loading}
-          />
-          {/* Komponen InputText lainnya bisa ditambahkan sesuai kebutuhan */}
+          <div className=" d-flex">
+            <InputText
+              value={current && current.ip_no_ref}
+              onChange={(e) => {
+                setCurrent({ ...current, ip_no_ref: e.target.value });
+              }}
+              placeholder="Masukkan Disini"
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={romanNumeral}
+              // onChange={onChange}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={year}
+              // onChange={year}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={current.show_dept3 ? "MANAGER" : ""}
+              placeholder="Masukkan Disini"
+              disabled
+            />{" "}
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.show_dept3}
+              onChange={(e) => {
+                setCurrent({ ...current, show_dept3: e.value });
+                // updateAuto({ ...current, show_dept: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.auto_renew3}
+              onChange={(e) => {
+                setCurrent({ ...current, auto_renew3: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "50px" }}
+            ></div>
+            <Button
+              label={tr[localStorage.getItem("language")].update}
+              icon="pi pi-check"
+              onClick={(e) => {
+                addAuto();
+              }}
+              autoFocus
+              // loading={loading}
+            />
+          </div>
         </>
       </div>
     );
@@ -492,58 +563,75 @@ const AutoNumber = () => {
     type = "all"
   ) => {
     return (
-      <div className="col-9">
-        {/* Kode yang sebelumnya untuk loading telah dihapus untuk kesederhanaan contoh */}
+      <div className="col-12">
         <>
           <label className="text-label">{label}</label>
-          <div className=" col-2"> </div>
-          <InputText
-            value={current && current.gra_no_ref}
-            onChange={(e) => {
-              setCurrent({ ...current, gra_no_ref: e.target.value });
-            }}
-            placeholder="Masukkan Disini"
-          />
-          <InputText
-            value={romanNumeral}
-            // onChange={onChange}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={year}
-            // onChange={year}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={current.show_dept4 ? "WAKIL MANAGER" : ""}
-            placeholder="Masukkan Disini"
-            disabled
-          />{" "}
-          <InputSwitch
-            checked={current.show_dept4}
-            onChange={(e) => {
-              setCurrent({ ...current, show_dept4: e.value });
-              // updateAuto({ ...current, show_dept: e.value });
-            }}
-          />
-          <InputSwitch
-            checked={current.auto_renew4}
-            onChange={(e) => {
-              setCurrent({ ...current, auto_renew4: e.value });
-            }}
-          />
-          <Button
-            label={tr[localStorage.getItem("language")].update}
-            icon="pi pi-check"
-            onClick={(e) => {
-              addAuto();
-            }}
-            autoFocus
-            // loading={loading}
-          />
-          {/* Komponen InputText lainnya bisa ditambahkan sesuai kebutuhan */}
+          <div className=" d-flex">
+            <InputText
+              value={current && current.fp_no_ref}
+              onChange={(e) => {
+                setCurrent({ ...current, fp_no_ref: e.target.value });
+              }}
+              placeholder="Masukkan Disini"
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={romanNumeral}
+              // onChange={onChange}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={year}
+              // onChange={year}
+              placeholder="Masukkan Disini"
+              disabled
+            />{" "}
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={current.show_dept4 ? "WAKIL MANAGER" : ""}
+              placeholder="Masukkan Disini"
+              disabled
+            />{" "}
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.show_dept4}
+              onChange={(e) => {
+                setCurrent({ ...current, show_dept4: e.value });
+                // updateAuto({ ...current, show_dept: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.auto_renew4}
+              onChange={(e) => {
+                setCurrent({ ...current, auto_renew4: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "50px" }}
+            ></div>
+            <Button
+              label={tr[localStorage.getItem("language")].update}
+              icon="pi pi-check"
+              onClick={(e) => {
+                addAuto();
+              }}
+              autoFocus
+              // loading={loading}
+            />
+          </div>
         </>
       </div>
     );
@@ -556,58 +644,75 @@ const AutoNumber = () => {
     type = "all"
   ) => {
     return (
-      <div className="col-9">
-        {/* Kode yang sebelumnya untuk loading telah dihapus untuk kesederhanaan contoh */}
+      <div className="col-12">
         <>
           <label className="text-label">{label}</label>
-          <div className=" col-2"> </div>
-          <InputText
-            value={current && current.so_no_ref}
-            onChange={(e) => {
-              setCurrent({ ...current, so_no_ref: e.target.value });
-            }}
-            placeholder="Masukkan Disini"
-          />
-          <InputText
-            value={romanNumeral}
-            // onChange={onChange}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={year}
-            // onChange={year}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={current.show_dept5 ? "SUPPORT" : ""}
-            placeholder="Masukkan Disini"
-            disabled
-          />{" "}
-          <InputSwitch
-            checked={current.show_dept5}
-            onChange={(e) => {
-              setCurrent({ ...current, show_dept5: e.value });
-              // updateAuto({ ...current, show_dept: e.value });
-            }}
-          />
-          <InputSwitch
-            checked={current.auto_renew5}
-            onChange={(e) => {
-              setCurrent({ ...current, auto_renew5: e.value });
-            }}
-          />
-          <Button
-            label={tr[localStorage.getItem("language")].update}
-            icon="pi pi-check"
-            onClick={(e) => {
-              addAuto();
-            }}
-            autoFocus
-            // loading={loading}
-          />
-          {/* Komponen InputText lainnya bisa ditambahkan sesuai kebutuhan */}
+          <div className=" d-flex">
+            <InputText
+              value={current && current.so_no_ref}
+              onChange={(e) => {
+                setCurrent({ ...current, so_no_ref: e.target.value });
+              }}
+              placeholder="Masukkan Disini"
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={romanNumeral}
+              // onChange={onChange}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={year}
+              // onChange={year}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={current.show_dept5 ? "SUPPORT" : ""}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.show_dept5}
+              onChange={(e) => {
+                setCurrent({ ...current, show_dept5: e.value });
+                // updateAuto({ ...current, show_dept: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.auto_renew5}
+              onChange={(e) => {
+                setCurrent({ ...current, auto_renew5: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "50px" }}
+            ></div>
+            <Button
+              label={tr[localStorage.getItem("language")].update}
+              icon="pi pi-check"
+              onClick={(e) => {
+                addAuto();
+              }}
+              autoFocus
+              // loading={loading}
+            />{" "}
+          </div>
         </>
       </div>
     );
@@ -620,58 +725,75 @@ const AutoNumber = () => {
     type = "all"
   ) => {
     return (
-      <div className="col-9">
-        {/* Kode yang sebelumnya untuk loading telah dihapus untuk kesederhanaan contoh */}
+      <div className="col-12">
         <>
           <label className="text-label">{label}</label>
-          <div className=" col-2"> </div>
-          <InputText
-            value={current && current.sl_no_ref}
-            onChange={(e) => {
-              setCurrent({ ...current, sl_no_ref: e.target.value });
-            }}
-            placeholder="Masukkan Disini"
-          />
-          <InputText
-            value={romanNumeral}
-            // onChange={onChange}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={year}
-            // onChange={year}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={current.show_dept6 ? "AUDIT" : ""}
-            placeholder="Masukkan Disini"
-            disabled
-          />{" "}
-          <InputSwitch
-            checked={current.show_dept6}
-            onChange={(e) => {
-              setCurrent({ ...current, show_dept6: e.value });
-              // updateAuto({ ...current, show_dept: e.value });
-            }}
-          />
-          <InputSwitch
-            checked={current.auto_renew6}
-            onChange={(e) => {
-              setCurrent({ ...current, auto_renew6: e.value });
-            }}
-          />
-          <Button
-            label={tr[localStorage.getItem("language")].update}
-            icon="pi pi-check"
-            onClick={(e) => {
-              addAuto();
-            }}
-            autoFocus
-            // loading={loading}
-          />
-          {/* Komponen InputText lainnya bisa ditambahkan sesuai kebutuhan */}
+          <div className=" d-flex">
+            <InputText
+              value={current && current.sl_no_ref}
+              onChange={(e) => {
+                setCurrent({ ...current, sl_no_ref: e.target.value });
+              }}
+              placeholder="Masukkan Disini"
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={romanNumeral}
+              // onChange={onChange}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={year}
+              // onChange={year}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={current.show_dept6 ? "AUDIT" : ""}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>{" "}
+            <InputSwitch
+              checked={current.show_dept6}
+              onChange={(e) => {
+                setCurrent({ ...current, show_dept6: e.value });
+                // updateAuto({ ...current, show_dept: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.auto_renew6}
+              onChange={(e) => {
+                setCurrent({ ...current, auto_renew6: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "50px" }}
+            ></div>
+            <Button
+              label={tr[localStorage.getItem("language")].update}
+              icon="pi pi-check"
+              onClick={(e) => {
+                addAuto();
+              }}
+              autoFocus
+              // loading={loading}
+            />
+          </div>
         </>
       </div>
     );
@@ -684,58 +806,75 @@ const AutoNumber = () => {
     type = "all"
   ) => {
     return (
-      <div className="col-9">
-        {/* Kode yang sebelumnya untuk loading telah dihapus untuk kesederhanaan contoh */}
+      <div className="col-12">
         <>
           <label className="text-label">{label}</label>
-          <div className=" col-2"> </div>
-          <InputText
-            value={current && current.ins_no_ref}
-            onChange={(e) => {
-              setCurrent({ ...current, ins_no_ref: e.target.value });
-            }}
-            placeholder="Masukkan Disini"
-          />
-          <InputText
-            value={romanNumeral}
-            // onChange={onChange}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={year}
-            // onChange={year}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={current.show_dept7 ? "SUPERVISOR" : ""}
-            placeholder="Masukkan Disini"
-            disabled
-          />{" "}
-          <InputSwitch
-            checked={current.show_dept7}
-            onChange={(e) => {
-              setCurrent({ ...current, show_dept7: e.value });
-              // updateAuto({ ...current, show_dept: e.value });
-            }}
-          />
-         <InputSwitch
-            checked={current.auto_renew7}
-            onChange={(e) => {
-              setCurrent({ ...current, auto_renew7: e.value });
-            }}
-          />
-          <Button
-            label={tr[localStorage.getItem("language")].update}
-            icon="pi pi-check"
-            onClick={(e) => {
-              addAuto();
-            }}
-            autoFocus
-            // loading={loading}
-          />
-          {/* Komponen InputText lainnya bisa ditambahkan sesuai kebutuhan */}
+          <div className=" d-flex">
+            <InputText
+              value={current && current.ins_no_ref}
+              onChange={(e) => {
+                setCurrent({ ...current, ins_no_ref: e.target.value });
+              }}
+              placeholder="Masukkan Disini"
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={romanNumeral}
+              // onChange={onChange}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={year}
+              // onChange={year}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={current.show_dept7 ? "SUPERVISOR" : ""}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>{" "}
+            <InputSwitch
+              checked={current.show_dept7}
+              onChange={(e) => {
+                setCurrent({ ...current, show_dept7: e.value });
+                // updateAuto({ ...current, show_dept: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.auto_renew7}
+              onChange={(e) => {
+                setCurrent({ ...current, auto_renew7: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "50px" }}
+            ></div>
+            <Button
+              label={tr[localStorage.getItem("language")].update}
+              icon="pi pi-check"
+              onClick={(e) => {
+                addAuto();
+              }}
+              autoFocus
+              // loading={loading}
+            />{" "}
+          </div>
         </>
       </div>
     );
@@ -748,58 +887,75 @@ const AutoNumber = () => {
     type = "all"
   ) => {
     return (
-      <div className="col-9">
-        {/* Kode yang sebelumnya untuk loading telah dihapus untuk kesederhanaan contoh */}
+      <div className="col-12">
         <>
           <label className="text-label">{label}</label>
-          <div className=" col-2"> </div>
-          <InputText
-            value={current && current.fs_no_ref}
-            onChange={(e) => {
-              setCurrent({ ...current, fs_no_ref: e.target.value });
-            }}
-            placeholder="Masukkan Disini"
-          />
-          <InputText
-            value={romanNumeral}
-            // onChange={onChange}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={year}
-            // onChange={year}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={current.show_dept8 ? "SUPERVISOR" : ""}
-            placeholder="Masukkan Disini"
-            disabled
-          />{" "}
-          <InputSwitch
-            checked={current.show_dept8}
-            onChange={(e) => {
-              setCurrent({ ...current, show_dept8: e.value });
-              // updateAuto({ ...current, show_dept: e.value });
-            }}
-          />
-          <InputSwitch
-            checked={current.auto_renew8}
-            onChange={(e) => {
-              setCurrent({ ...current, auto_renew8: e.value });
-            }}
-          />
-          <Button
-            label={tr[localStorage.getItem("language")].update}
-            icon="pi pi-check"
-            onClick={(e) => {
-              addAuto();
-            }}
-            autoFocus
-            // loading={loading}
-          />
-          {/* Komponen InputText lainnya bisa ditambahkan sesuai kebutuhan */}
+          <div className=" d-flex">
+            <InputText
+              value={current && current.fs_no_ref}
+              onChange={(e) => {
+                setCurrent({ ...current, fs_no_ref: e.target.value });
+              }}
+              placeholder="Masukkan Disini"
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={romanNumeral}
+              // onChange={onChange}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={year}
+              // onChange={year}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={current.show_dept8 ? "SUPERVISOR" : ""}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>{" "}
+            <InputSwitch
+              checked={current.show_dept8}
+              onChange={(e) => {
+                setCurrent({ ...current, show_dept8: e.value });
+                // updateAuto({ ...current, show_dept: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.auto_renew8}
+              onChange={(e) => {
+                setCurrent({ ...current, auto_renew8: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "50px" }}
+            ></div>
+            <Button
+              label={tr[localStorage.getItem("language")].update}
+              icon="pi pi-check"
+              onClick={(e) => {
+                addAuto();
+              }}
+              autoFocus
+              // loading={loading}
+            />{" "}
+          </div>
         </>
       </div>
     );
@@ -812,58 +968,75 @@ const AutoNumber = () => {
     type = "all"
   ) => {
     return (
-      <div className="col-9">
-        {/* Kode yang sebelumnya untuk loading telah dihapus untuk kesederhanaan contoh */}
+      <div className="col-12">
         <>
           <label className="text-label">{label}</label>
-          <div className=" col-2"> </div>
-          <InputText
-            value={current && current.sr_no_ref}
-            onChange={(e) => {
-              setCurrent({ ...current, sr_no_ref: e.target.value });
-            }}
-            placeholder="Masukkan Disini"
-          />
-          <InputText
-            value={romanNumeral}
-            // onChange={onChange}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={year}
-            // onChange={year}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={current.show_dept9 ? "SUPERVISOR9" : ""}
-            placeholder="Masukkan Disini"
-            disabled
-          />{" "}
-          <InputSwitch
-            checked={current.show_dept9}
-            onChange={(e) => {
-              setCurrent({ ...current, show_dept9: e.value });
-              // updateAuto({ ...current, show_dept: e.value });
-            }}
-          />
-           <InputSwitch
-            checked={current.auto_renew9}
-            onChange={(e) => {
-              setCurrent({ ...current, auto_renew9: e.value });
-            }}
-          />
-          <Button
-            label={tr[localStorage.getItem("language")].update}
-            icon="pi pi-check"
-            onClick={(e) => {
-              addAuto();
-            }}
-            autoFocus
-            // loading={loading}
-          />
-          {/* Komponen InputText lainnya bisa ditambahkan sesuai kebutuhan */}
+          <div className=" d-flex">
+            <InputText
+              value={current && current.sr_no_ref}
+              onChange={(e) => {
+                setCurrent({ ...current, sr_no_ref: e.target.value });
+              }}
+              placeholder="Masukkan Disini"
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={romanNumeral}
+              // onChange={onChange}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={year}
+              // onChange={year}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={current.show_dept9 ? "SUPERVISOR9" : ""}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>{" "}
+            <InputSwitch
+              checked={current.show_dept9}
+              onChange={(e) => {
+                setCurrent({ ...current, show_dept9: e.value });
+                // updateAuto({ ...current, show_dept: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.auto_renew9}
+              onChange={(e) => {
+                setCurrent({ ...current, auto_renew9: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "50px" }}
+            ></div>
+            <Button
+              label={tr[localStorage.getItem("language")].update}
+              icon="pi pi-check"
+              onClick={(e) => {
+                addAuto();
+              }}
+              autoFocus
+              // loading={loading}
+            />{" "}
+          </div>
         </>
       </div>
     );
@@ -876,58 +1049,75 @@ const AutoNumber = () => {
     type = "all"
   ) => {
     return (
-      <div className="col-9">
-        {/* Kode yang sebelumnya untuk loading telah dihapus untuk kesederhanaan contoh */}
+      <div className="col-12">
         <>
           <label className="text-label">{label}</label>
-          <div className=" col-2"> </div>
-          <InputText
-            value={current && current.memorial_no_ref}
-            onChange={(e) => {
-              setCurrent({ ...current, memorial_no_ref: e.target.value });
-            }}
-            placeholder="Masukkan Disini"
-          />
-          <InputText
-            value={romanNumeral}
-            // onChange={onChange}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={year}
-            // onChange={year}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={current.show_dept10 ? "SUPERVISOR" : ""}
-            placeholder="Masukkan Disini"
-            disabled
-          />{" "}
-          <InputSwitch
-            checked={current.show_dept10}
-            onChange={(e) => {
-              setCurrent({ ...current, show_dept10: e.value });
-              // updateAuto({ ...current, show_dept: e.value });
-            }}
-          />
-          <InputSwitch
-            checked={current.auto_renew10}
-            onChange={(e) => {
-              setCurrent({ ...current, auto_renew10: e.value });
-            }}
-          />
-          <Button
-            label={tr[localStorage.getItem("language")].update}
-            icon="pi pi-check"
-            onClick={(e) => {
-              addAuto();
-            }}
-            autoFocus
-            // loading={loading}
-          />
-          {/* Komponen InputText lainnya bisa ditambahkan sesuai kebutuhan */}
+          <div className=" d-flex">
+            <InputText
+              value={current && current.memorial_no_ref}
+              onChange={(e) => {
+                setCurrent({ ...current, memorial_no_ref: e.target.value });
+              }}
+              placeholder="Masukkan Disini"
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={romanNumeral}
+              // onChange={onChange}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={year}
+              // onChange={year}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={current.show_dept10 ? "SUPERVISOR" : ""}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>{" "}
+            <InputSwitch
+              checked={current.show_dept10}
+              onChange={(e) => {
+                setCurrent({ ...current, show_dept10: e.value });
+                // updateAuto({ ...current, show_dept: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.auto_renew10}
+              onChange={(e) => {
+                setCurrent({ ...current, auto_renew10: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "50px" }}
+            ></div>
+            <Button
+              label={tr[localStorage.getItem("language")].update}
+              icon="pi pi-check"
+              onClick={(e) => {
+                addAuto();
+              }}
+              autoFocus
+              // loading={loading}
+            />
+          </div>
         </>
       </div>
     );
@@ -940,58 +1130,75 @@ const AutoNumber = () => {
     type = "all"
   ) => {
     return (
-      <div className="col-9">
-        {/* Kode yang sebelumnya untuk loading telah dihapus untuk kesederhanaan contoh */}
+      <div className="col-12">
         <>
           <label className="text-label">{label}</label>
-          <div className=" col-2"> </div>
-          <InputText
-            value={current && current.mutasi_no_ref}
-            onChange={(e) => {
-              setCurrent({ ...current, mutasi_no_ref: e.target.value });
-            }}
-            placeholder="Masukkan Disini"
-          />
-          <InputText
-            value={romanNumeral}
-            // onChange={onChange}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={year}
-            // onChange={year}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={current.show_dept11 ? "SUPERVISOR" : ""}
-            placeholder="Masukkan Disini"
-            disabled
-          />{" "}
-          <InputSwitch
-            checked={current.show_dept11}
-            onChange={(e) => {
-              setCurrent({ ...current, show_dept11: e.value });
-              // updateAuto({ ...current, show_dept: e.value });
-            }}
-          />
-         <InputSwitch
-            checked={current.auto_renew11}
-            onChange={(e) => {
-              setCurrent({ ...current, auto_renew11: e.value });
-            }}
-          />
-          <Button
-            label={tr[localStorage.getItem("language")].update}
-            icon="pi pi-check"
-            onClick={(e) => {
-              addAuto();
-            }}
-            autoFocus
-            // loading={loading}
-          />
-          {/* Komponen InputText lainnya bisa ditambahkan sesuai kebutuhan */}
+          <div className=" d-flex">
+            <InputText
+              value={current && current.mutasi_no_ref}
+              onChange={(e) => {
+                setCurrent({ ...current, mutasi_no_ref: e.target.value });
+              }}
+              placeholder="Masukkan Disini"
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={romanNumeral}
+              // onChange={onChange}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={year}
+              // onChange={year}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={current.show_dept11 ? "SUPERVISOR" : ""}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>{" "}
+            <InputSwitch
+              checked={current.show_dept11}
+              onChange={(e) => {
+                setCurrent({ ...current, show_dept11: e.value });
+                // updateAuto({ ...current, show_dept: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.auto_renew11}
+              onChange={(e) => {
+                setCurrent({ ...current, auto_renew11: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "50px" }}
+            ></div>
+            <Button
+              label={tr[localStorage.getItem("language")].update}
+              icon="pi pi-check"
+              onClick={(e) => {
+                addAuto();
+              }}
+              autoFocus
+              // loading={loading}
+            />
+          </div>
         </>
       </div>
     );
@@ -1004,61 +1211,78 @@ const AutoNumber = () => {
     type = "all"
   ) => {
     return (
-      <div className="col-9">
-        {/* Kode yang sebelumnya untuk loading telah dihapus untuk kesederhanaan contoh */}
+      <div className="col-12">
         <>
           <label className="text-label">{label}</label>
-          <div className=" col-2"> </div>
-          <InputText
-            value={current && current.koreksipersediaan_no_ref}
-            onChange={(e) => {
-              setCurrent({
-                ...current,
-                koreksipersediaan_no_ref: e.target.value,
-              });
-            }}
-            placeholder="Masukkan Disini"
-          />
-          <InputText
-            value={romanNumeral}
-            // onChange={onChange}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={year}
-            // onChange={year}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={current.show_dept12 ? "SUPERVISOR" : ""}
-            placeholder="Masukkan Disini"
-            disabled
-          />{" "}
-          <InputSwitch
-            checked={current.show_dept12}
-            onChange={(e) => {
-              setCurrent({ ...current, show_dept12: e.value });
-              // updateAuto({ ...current, show_dept: e.value });
-            }}
-          />
-         <InputSwitch
-            checked={current.auto_renew12}
-            onChange={(e) => {
-              setCurrent({ ...current, auto_renew12: e.value });
-            }}
-          />
-          <Button
-            label={tr[localStorage.getItem("language")].update}
-            icon="pi pi-check"
-            onClick={(e) => {
-              addAuto();
-            }}
-            autoFocus
-            // loading={loading}
-          />
-          {/* Komponen InputText lainnya bisa ditambahkan sesuai kebutuhan */}
+          <div className=" d-flex">
+            <InputText
+              value={current && current.koreksipersediaan_no_ref}
+              onChange={(e) => {
+                setCurrent({
+                  ...current,
+                  koreksipersediaan_no_ref: e.target.value,
+                });
+              }}
+              placeholder="Masukkan Disini"
+            />{" "}
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={romanNumeral}
+              // onChange={onChange}
+              placeholder="Masukkan Disini"
+              disabled
+            />{" "}
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={year}
+              // onChange={year}
+              placeholder="Masukkan Disini"
+              disabled
+            />{" "}
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={current.show_dept12 ? "SUPERVISOR" : ""}
+              placeholder="Masukkan Disini"
+              disabled
+            />{" "}
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>{" "}
+            <InputSwitch
+              checked={current.show_dept12}
+              onChange={(e) => {
+                setCurrent({ ...current, show_dept12: e.value });
+                // updateAuto({ ...current, show_dept: e.value });
+              }}
+            />{" "}
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.auto_renew12}
+              onChange={(e) => {
+                setCurrent({ ...current, auto_renew12: e.value });
+              }}
+            />{" "}
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "50px" }}
+            ></div>
+            <Button
+              label={tr[localStorage.getItem("language")].update}
+              icon="pi pi-check"
+              onClick={(e) => {
+                addAuto();
+              }}
+              autoFocus
+              // loading={loading}
+            />
+          </div>
         </>
       </div>
     );
@@ -1071,58 +1295,75 @@ const AutoNumber = () => {
     type = "all"
   ) => {
     return (
-      <div className="col-9">
-        {/* Kode yang sebelumnya untuk loading telah dihapus untuk kesederhanaan contoh */}
+      <div className="col-12">
         <>
           <label className="text-label">{label}</label>
-          <div className=" col-2"> </div>
-          <InputText
-            value={current && current.penerimaan_no_ref}
-            onChange={(e) => {
-              setCurrent({ ...current, penerimaan_no_ref: e.target.value });
-            }}
-            placeholder="Masukkan Disini"
-          />
-          <InputText
-            value={romanNumeral}
-            // onChange={onChange}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={year}
-            // onChange={year}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={current.show_dept13 ? "SUPERVISOR" : ""}
-            placeholder="Masukkan Disini"
-            disabled
-          />{" "}
-          <InputSwitch
-            checked={current.show_dept13}
-            onChange={(e) => {
-              setCurrent({ ...current, show_dept13: e.value });
-              // updateAuto({ ...current, show_dept: e.value });
-            }}
-          />
-         <InputSwitch
-            checked={current.auto_renew13}
-            onChange={(e) => {
-              setCurrent({ ...current, auto_renew13: e.value });
-            }}
-          />
-          <Button
-            label={tr[localStorage.getItem("language")].update}
-            icon="pi pi-check"
-            onClick={(e) => {
-              addAuto();
-            }}
-            autoFocus
-            // loading={loading}
-          />
-          {/* Komponen InputText lainnya bisa ditambahkan sesuai kebutuhan */}
+          <div className=" d-flex">
+            <InputText
+              value={current && current.penerimaan_no_ref}
+              onChange={(e) => {
+                setCurrent({ ...current, penerimaan_no_ref: e.target.value });
+              }}
+              placeholder="Masukkan Disini"
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={romanNumeral}
+              // onChange={onChange}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={year}
+              // onChange={year}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={current.show_dept13 ? "SUPERVISOR" : ""}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>{" "}
+            <InputSwitch
+              checked={current.show_dept13}
+              onChange={(e) => {
+                setCurrent({ ...current, show_dept13: e.value });
+                // updateAuto({ ...current, show_dept: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.auto_renew13}
+              onChange={(e) => {
+                setCurrent({ ...current, auto_renew13: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "50px" }}
+            ></div>
+            <Button
+              label={tr[localStorage.getItem("language")].update}
+              icon="pi pi-check"
+              onClick={(e) => {
+                addAuto();
+              }}
+              autoFocus
+              // loading={loading}
+            />
+          </div>
         </>
       </div>
     );
@@ -1135,58 +1376,75 @@ const AutoNumber = () => {
     type = "all"
   ) => {
     return (
-      <div className="col-9">
-        {/* Kode yang sebelumnya untuk loading telah dihapus untuk kesederhanaan contoh */}
+      <div className="col-12">
         <>
           <label className="text-label">{label}</label>
-          <div className=" col-2"> </div>
-          <InputText
-            value={current && current.pemakaian_no_ref}
-            onChange={(e) => {
-              setCurrent({ ...current, pemakaian_no_ref: e.target.value });
-            }}
-            placeholder="Masukkan Disini"
-          />
-          <InputText
-            value={romanNumeral}
-            // onChange={onChange}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={year}
-            // onChange={year}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={current.show_dept14 ? "SUPERVISOR" : ""}
-            placeholder="Masukkan Disini"
-            disabled
-          />{" "}
-          <InputSwitch
-            checked={current.show_dept14}
-            onChange={(e) => {
-              setCurrent({ ...current, show_dept14: e.value });
-              // updateAuto({ ...current, show_dept: e.value });
-            }}
-          />
-          <InputSwitch
-            checked={current.auto_renew14}
-            onChange={(e) => {
-              setCurrent({ ...current, auto_renew14: e.value });
-            }}
-          />
-          <Button
-            label={tr[localStorage.getItem("language")].update}
-            icon="pi pi-check"
-            onClick={(e) => {
-              addAuto();
-            }}
-            autoFocus
-            // loading={loading}
-          />
-          {/* Komponen InputText lainnya bisa ditambahkan sesuai kebutuhan */}
+          <div className=" d-flex">
+            <InputText
+              value={current && current.pemakaian_no_ref}
+              onChange={(e) => {
+                setCurrent({ ...current, pemakaian_no_ref: e.target.value });
+              }}
+              placeholder="Masukkan Disini"
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={romanNumeral}
+              // onChange={onChange}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={year}
+              // onChange={year}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={current.show_dept14 ? "SUPERVISOR" : ""}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>{" "}
+            <InputSwitch
+              checked={current.show_dept14}
+              onChange={(e) => {
+                setCurrent({ ...current, show_dept14: e.value });
+                // updateAuto({ ...current, show_dept: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.auto_renew14}
+              onChange={(e) => {
+                setCurrent({ ...current, auto_renew14: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "50px" }}
+            ></div>
+            <Button
+              label={tr[localStorage.getItem("language")].update}
+              icon="pi pi-check"
+              onClick={(e) => {
+                addAuto();
+              }}
+              autoFocus
+              // loading={loading}
+            />
+          </div>
         </>
       </div>
     );
@@ -1199,58 +1457,75 @@ const AutoNumber = () => {
     type = "all"
   ) => {
     return (
-      <div className="col-9">
-        {/* Kode yang sebelumnya untuk loading telah dihapus untuk kesederhanaan contoh */}
+      <div className="col-12">
         <>
           <label className="text-label">{label}</label>
-          <div className=" col-2"> </div>
-          <InputText
-            value={current && current.pengeluaran_no_ref}
-            onChange={(e) => {
-              setCurrent({ ...current, pengeluaran_no_ref: e.target.value });
-            }}
-            placeholder="Masukkan Disini"
-          />
-          <InputText
-            value={romanNumeral}
-            // onChange={onChange}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={year}
-            // onChange={year}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={current.show_dept15 ? "SUPERVISOR" : ""}
-            placeholder="Masukkan Disini"
-            disabled
-          />{" "}
-          <InputSwitch
-            checked={current.show_dept15}
-            onChange={(e) => {
-              setCurrent({ ...current, show_dept15: e.value });
-              // updateAuto({ ...current, show_dept: e.value });
-            }}
-          />
-         <InputSwitch
-            checked={current.auto_renew15}
-            onChange={(e) => {
-              setCurrent({ ...current, auto_renew15: e.value });
-            }}
-          />
-          <Button
-            label={tr[localStorage.getItem("language")].update}
-            icon="pi pi-check"
-            onClick={(e) => {
-              addAuto();
-            }}
-            autoFocus
-            // loading={loading}
-          />
-          {/* Komponen InputText lainnya bisa ditambahkan sesuai kebutuhan */}
+          <div className=" d-flex">
+            <InputText
+              value={current && current.pengeluaran_no_ref}
+              onChange={(e) => {
+                setCurrent({ ...current, pengeluaran_no_ref: e.target.value });
+              }}
+              placeholder="Masukkan Disini"
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={romanNumeral}
+              // onChange={onChange}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={year}
+              // onChange={year}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={current.show_dept15 ? "SUPERVISOR" : ""}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>{" "}
+            <InputSwitch
+              checked={current.show_dept15}
+              onChange={(e) => {
+                setCurrent({ ...current, show_dept15: e.value });
+                // updateAuto({ ...current, show_dept: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.auto_renew15}
+              onChange={(e) => {
+                setCurrent({ ...current, auto_renew15: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "50px" }}
+            ></div>
+            <Button
+              label={tr[localStorage.getItem("language")].update}
+              icon="pi pi-check"
+              onClick={(e) => {
+                addAuto();
+              }}
+              autoFocus
+              // loading={loading}
+            />
+          </div>
         </>
       </div>
     );
@@ -1263,61 +1538,78 @@ const AutoNumber = () => {
     type = "all"
   ) => {
     return (
-      <div className="col-9">
-        {/* Kode yang sebelumnya untuk loading telah dihapus untuk kesederhanaan contoh */}
+      <div className="col-12">
         <>
           <label className="text-label">{label}</label>
-          <div className=" col-2"> </div>
-          <InputText
-            value={current && current.pencairankeluar_no_ref}
-            onChange={(e) => {
-              setCurrent({
-                ...current,
-                pencairankeluar_no_ref: e.target.value,
-              });
-            }}
-            placeholder="Masukkan Disini"
-          />
-          <InputText
-            value={romanNumeral}
-            // onChange={onChange}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={year}
-            // onChange={year}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={current.show_dept16 ? "SUPERVISOR" : ""}
-            placeholder="Masukkan Disini"
-            disabled
-          />{" "}
-          <InputSwitch
-            checked={current.show_dept16}
-            onChange={(e) => {
-              setCurrent({ ...current, show_dept16: e.value });
-              // updateAuto({ ...current, show_dept: e.value });
-            }}
-          />
-        <InputSwitch
-            checked={current.auto_renew16}
-            onChange={(e) => {
-              setCurrent({ ...current, auto_renew16: e.value });
-            }}
-          />
-          <Button
-            label={tr[localStorage.getItem("language")].update}
-            icon="pi pi-check"
-            onClick={(e) => {
-              addAuto();
-            }}
-            autoFocus
-            // loading={loading}
-          />
-          {/* Komponen InputText lainnya bisa ditambahkan sesuai kebutuhan */}
+          <div className=" d-flex">
+            <InputText
+              value={current && current.pencairankeluar_no_ref}
+              onChange={(e) => {
+                setCurrent({
+                  ...current,
+                  pencairankeluar_no_ref: e.target.value,
+                });
+              }}
+              placeholder="Masukkan Disini"
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={romanNumeral}
+              // onChange={onChange}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={year}
+              // onChange={year}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={current.show_dept16 ? "SUPERVISOR" : ""}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>{" "}
+            <InputSwitch
+              checked={current.show_dept16}
+              onChange={(e) => {
+                setCurrent({ ...current, show_dept16: e.value });
+                // updateAuto({ ...current, show_dept: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.auto_renew16}
+              onChange={(e) => {
+                setCurrent({ ...current, auto_renew16: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "50px" }}
+            ></div>
+            <Button
+              label={tr[localStorage.getItem("language")].update}
+              icon="pi pi-check"
+              onClick={(e) => {
+                addAuto();
+              }}
+              autoFocus
+              // loading={loading}
+            />
+          </div>
         </>
       </div>
     );
@@ -1330,58 +1622,78 @@ const AutoNumber = () => {
     type = "all"
   ) => {
     return (
-      <div className="col-9">
-        {/* Kode yang sebelumnya untuk loading telah dihapus untuk kesederhanaan contoh */}
+      <div className="col-12">
         <>
           <label className="text-label">{label}</label>
-          <div className=" col-2"> </div>
-          <InputText
-            value={current && current.koreksihutang_no_ref}
-            onChange={(e) => {
-              setCurrent({ ...current, koreksihutang_no_ref: e.target.value });
-            }}
-            placeholder="Masukkan Disini"
-          />
-          <InputText
-            value={romanNumeral}
-            // onChange={onChange}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={year}
-            // onChange={year}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={current.show_dept17 ? "SUPERVISOR" : ""}
-            placeholder="Masukkan Disini"
-            disabled
-          />{" "}
-          <InputSwitch
-            checked={current.show_dept17}
-            onChange={(e) => {
-              setCurrent({ ...current, show_dept17: e.value });
-              // updateAuto({ ...current, show_dept: e.value });
-            }}
-          />
-         <InputSwitch
-            checked={current.auto_renew17}
-            onChange={(e) => {
-              setCurrent({ ...current, auto_renew17: e.value });
-            }}
-          />
-          <Button
-            label={tr[localStorage.getItem("language")].update}
-            icon="pi pi-check"
-            onClick={(e) => {
-              addAuto();
-            }}
-            autoFocus
-            // loading={loading}
-          />
-          {/* Komponen InputText lainnya bisa ditambahkan sesuai kebutuhan */}
+          <div className=" d-flex">
+            <InputText
+              value={current && current.koreksihutang_no_ref}
+              onChange={(e) => {
+                setCurrent({
+                  ...current,
+                  koreksihutang_no_ref: e.target.value,
+                });
+              }}
+              placeholder="Masukkan Disini"
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={romanNumeral}
+              // onChange={onChange}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={year}
+              // onChange={year}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={current.show_dept17 ? "SUPERVISOR" : ""}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>{" "}
+            <InputSwitch
+              checked={current.show_dept17}
+              onChange={(e) => {
+                setCurrent({ ...current, show_dept17: e.value });
+                // updateAuto({ ...current, show_dept: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.auto_renew17}
+              onChange={(e) => {
+                setCurrent({ ...current, auto_renew17: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "50px" }}
+            ></div>
+            <Button
+              label={tr[localStorage.getItem("language")].update}
+              icon="pi pi-check"
+              onClick={(e) => {
+                addAuto();
+              }}
+              autoFocus
+              // loading={loading}
+            />
+          </div>
         </>
       </div>
     );
@@ -1394,58 +1706,75 @@ const AutoNumber = () => {
     type = "all"
   ) => {
     return (
-      <div className="col-9">
-        {/* Kode yang sebelumnya untuk loading telah dihapus untuk kesederhanaan contoh */}
+      <div className="col-12">
         <>
           <label className="text-label">{label}</label>
-          <div className=" col-2"> </div>
-          <InputText
-            value={current && current.pemasukan_no_ref}
-            onChange={(e) => {
-              setCurrent({ ...current, pemasukan_no_ref: e.target.value });
-            }}
-            placeholder="Masukkan Disini"
-          />
-          <InputText
-            value={romanNumeral}
-            // onChange={onChange}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={year}
-            // onChange={year}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={current.show_dept18 ? "SUPERVISOR" : ""}
-            placeholder="Masukkan Disini"
-            disabled
-          />{" "}
-          <InputSwitch
-            checked={current.show_dept18}
-            onChange={(e) => {
-              setCurrent({ ...current, show_dept18: e.value });
-              // updateAuto({ ...current, show_dept: e.value });
-            }}
-          />
-           <InputSwitch
-            checked={current.auto_renew18}
-            onChange={(e) => {
-              setCurrent({ ...current, auto_renew18: e.value });
-            }}
-          />
-          <Button
-            label={tr[localStorage.getItem("language")].update}
-            icon="pi pi-check"
-            onClick={(e) => {
-              addAuto();
-            }}
-            autoFocus
-            // loading={loading}
-          />
-          {/* Komponen InputText lainnya bisa ditambahkan sesuai kebutuhan */}
+          <div className=" d-flex">
+            <InputText
+              value={current && current.pemasukan_no_ref}
+              onChange={(e) => {
+                setCurrent({ ...current, pemasukan_no_ref: e.target.value });
+              }}
+              placeholder="Masukkan Disini"
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={romanNumeral}
+              // onChange={onChange}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={year}
+              // onChange={year}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={current.show_dept18 ? "SUPERVISOR" : ""}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>{" "}
+            <InputSwitch
+              checked={current.show_dept18}
+              onChange={(e) => {
+                setCurrent({ ...current, show_dept18: e.value });
+                // updateAuto({ ...current, show_dept: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.auto_renew18}
+              onChange={(e) => {
+                setCurrent({ ...current, auto_renew18: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "50px" }}
+            ></div>
+            <Button
+              label={tr[localStorage.getItem("language")].update}
+              icon="pi pi-check"
+              onClick={(e) => {
+                addAuto();
+              }}
+              autoFocus
+              // loading={loading}
+            />
+          </div>
         </>
       </div>
     );
@@ -1458,58 +1787,78 @@ const AutoNumber = () => {
     type = "all"
   ) => {
     return (
-      <div className="col-9">
-        {/* Kode yang sebelumnya untuk loading telah dihapus untuk kesederhanaan contoh */}
+      <div className="col-12">
         <>
           <label className="text-label">{label}</label>
-          <div className=" col-2"> </div>
-          <InputText
-            value={current && current.pencairanmasuk_no_ref}
-            onChange={(e) => {
-              setCurrent({ ...current, pencairanmasuk_no_ref: e.target.value });
-            }}
-            placeholder="Masukkan Disini"
-          />
-          <InputText
-            value={romanNumeral}
-            // onChange={onChange}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={year}
-            // onChange={year}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={current.show_dept19 ? "SUPERVISOR" : ""}
-            placeholder="Masukkan Disini"
-            disabled
-          />{" "}
-          <InputSwitch
-            checked={current.show_dept19}
-            onChange={(e) => {
-              setCurrent({ ...current, show_dept19: e.value });
-              // updateAuto({ ...current, show_dept: e.value });
-            }}
-          />
-          <InputSwitch
-            checked={current.auto_renew19}
-            onChange={(e) => {
-              setCurrent({ ...current, auto_renew19: e.value });
-            }}
-          />
-          <Button
-            label={tr[localStorage.getItem("language")].update}
-            icon="pi pi-check"
-            onClick={(e) => {
-              addAuto();
-            }}
-            autoFocus
-            // loading={loading}
-          />
-          {/* Komponen InputText lainnya bisa ditambahkan sesuai kebutuhan */}
+          <div className=" d-flex">
+            <InputText
+              value={current && current.pencairanmasuk_no_ref}
+              onChange={(e) => {
+                setCurrent({
+                  ...current,
+                  pencairanmasuk_no_ref: e.target.value,
+                });
+              }}
+              placeholder="Masukkan Disini"
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={romanNumeral}
+              // onChange={onChange}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={year}
+              // onChange={year}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={current.show_dept19 ? "SUPERVISOR" : ""}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>{" "}
+            <InputSwitch
+              checked={current.show_dept19}
+              onChange={(e) => {
+                setCurrent({ ...current, show_dept19: e.value });
+                // updateAuto({ ...current, show_dept: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.auto_renew19}
+              onChange={(e) => {
+                setCurrent({ ...current, auto_renew19: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "50px" }}
+            ></div>
+            <Button
+              label={tr[localStorage.getItem("language")].update}
+              icon="pi pi-check"
+              onClick={(e) => {
+                addAuto();
+              }}
+              autoFocus
+              // loading={loading}
+            />
+          </div>
         </>
       </div>
     );
@@ -1522,58 +1871,78 @@ const AutoNumber = () => {
     type = "all"
   ) => {
     return (
-      <div className="col-9">
-        {/* Kode yang sebelumnya untuk loading telah dihapus untuk kesederhanaan contoh */}
+      <div className="col-12">
         <>
           <label className="text-label">{label}</label>
-          <div className=" col-2"> </div>
-          <InputText
-            value={current && current.koreksipiutang_no_ref}
-            onChange={(e) => {
-              setCurrent({ ...current, koreksipiutang_no_ref: e.target.value });
-            }}
-            placeholder="Masukkan Disini"
-          />
-          <InputText
-            value={romanNumeral}
-            // onChange={onChange}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={year}
-            // onChange={year}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={current.show_dept20 ? "SUPERVISOR" : ""}
-            placeholder="Masukkan Disini"
-            disabled
-          />{" "}
-          <InputSwitch
-            checked={current.show_dept20}
-            onChange={(e) => {
-              setCurrent({ ...current, show_dept20: e.value });
-              // updateAuto({ ...current, show_dept: e.value });
-            }}
-          />
-           <InputSwitch
-            checked={current.auto_renew20}
-            onChange={(e) => {
-              setCurrent({ ...current, auto_renew20: e.value });
-            }}
-          />
-          <Button
-            label={tr[localStorage.getItem("language")].update}
-            icon="pi pi-check"
-            onClick={(e) => {
-              addAuto();
-            }}
-            autoFocus
-            // loading={loading}
-          />
-          {/* Komponen InputText lainnya bisa ditambahkan sesuai kebutuhan */}
+          <div className=" d-flex">
+            <InputText
+              value={current && current.koreksipiutang_no_ref}
+              onChange={(e) => {
+                setCurrent({
+                  ...current,
+                  koreksipiutang_no_ref: e.target.value,
+                });
+              }}
+              placeholder="Masukkan Disini"
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={romanNumeral}
+              // onChange={onChange}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={year}
+              // onChange={year}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={current.show_dept20 ? "SUPERVISOR" : ""}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>{" "}
+            <InputSwitch
+              checked={current.show_dept20}
+              onChange={(e) => {
+                setCurrent({ ...current, show_dept20: e.value });
+                // updateAuto({ ...current, show_dept: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.auto_renew20}
+              onChange={(e) => {
+                setCurrent({ ...current, auto_renew20: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "50px" }}
+            ></div>
+            <Button
+              label={tr[localStorage.getItem("language")].update}
+              icon="pi pi-check"
+              onClick={(e) => {
+                addAuto();
+              }}
+              autoFocus
+              // loading={loading}
+            />
+          </div>
         </>
       </div>
     );
@@ -1586,58 +1955,75 @@ const AutoNumber = () => {
     type = "all"
   ) => {
     return (
-      <div className="col-9">
-        {/* Kode yang sebelumnya untuk loading telah dihapus untuk kesederhanaan contoh */}
+      <div className="col-12">
         <>
           <label className="text-label">{label}</label>
-          <div className=" col-2"> </div>
-          <InputText
-            value={current && current.mesin_no_ref}
-            onChange={(e) => {
-              setCurrent({ ...current, mesin_no_ref: e.target.value });
-            }}
-            placeholder="Masukkan Disini"
-          />
-          <InputText
-            value={romanNumeral}
-            // onChange={onChange}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={year}
-            // onChange={year}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={current.show_dept21 ? "SUPERVISOR" : ""}
-            placeholder="Masukkan Disini"
-            disabled
-          />{" "}
-          <InputSwitch
-            checked={current.show_dept21}
-            onChange={(e) => {
-              setCurrent({ ...current, show_dept21: e.value });
-              // updateAuto({ ...current, show_dept: e.value });
-            }}
-          />
-         <InputSwitch
-            checked={current.auto_renew21}
-            onChange={(e) => {
-              setCurrent({ ...current, auto_renew21: e.value });
-            }}
-          />
-          <Button
-            label={tr[localStorage.getItem("language")].update}
-            icon="pi pi-check"
-            onClick={(e) => {
-              addAuto();
-            }}
-            autoFocus
-            // loading={loading}
-          />
-          {/* Komponen InputText lainnya bisa ditambahkan sesuai kebutuhan */}
+          <div className=" d-flex">
+            <InputText
+              value={current && current.mesin_no_ref}
+              onChange={(e) => {
+                setCurrent({ ...current, mesin_no_ref: e.target.value });
+              }}
+              placeholder="Masukkan Disini"
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={romanNumeral}
+              // onChange={onChange}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={year}
+              // onChange={year}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={current.show_dept21 ? "SUPERVISOR" : ""}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>{" "}
+            <InputSwitch
+              checked={current.show_dept21}
+              onChange={(e) => {
+                setCurrent({ ...current, show_dept21: e.value });
+                // updateAuto({ ...current, show_dept: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.auto_renew21}
+              onChange={(e) => {
+                setCurrent({ ...current, auto_renew21: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "50px" }}
+            ></div>
+            <Button
+              label={tr[localStorage.getItem("language")].update}
+              icon="pi pi-check"
+              onClick={(e) => {
+                addAuto();
+              }}
+              autoFocus
+              // loading={loading}
+            />
+          </div>
         </>
       </div>
     );
@@ -1650,58 +2036,75 @@ const AutoNumber = () => {
     type = "all"
   ) => {
     return (
-      <div className="col-9">
-        {/* Kode yang sebelumnya untuk loading telah dihapus untuk kesederhanaan contoh */}
+      <div className="col-12">
         <>
           <label className="text-label">{label}</label>
-          <div className=" col-2"> </div>
-          <InputText
-            value={current && current.formula_no_ref}
-            onChange={(e) => {
-              setCurrent({ ...current, formula_no_ref: e.target.value });
-            }}
-            placeholder="Masukkan Disini"
-          />
-          <InputText
-            value={romanNumeral}
-            // onChange={onChange}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={year}
-            // onChange={year}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={current.show_dept22 ? "SUPERVISOR" : ""}
-            placeholder="Masukkan Disini"
-            disabled
-          />{" "}
-          <InputSwitch
-            checked={current.show_dept22}
-            onChange={(e) => {
-              setCurrent({ ...current, show_dept22: e.value });
-              // updateAuto({ ...current, show_dept: e.value });
-            }}
-          />
-         <InputSwitch
-            checked={current.auto_renew22}
-            onChange={(e) => {
-              setCurrent({ ...current, auto_renew22: e.value });
-            }}
-          />
-          <Button
-            label={tr[localStorage.getItem("language")].update}
-            icon="pi pi-check"
-            onClick={(e) => {
-              addAuto();
-            }}
-            autoFocus
-            // loading={loading}
-          />
-          {/* Komponen InputText lainnya bisa ditambahkan sesuai kebutuhan */}
+          <div className=" d-flex">
+            <InputText
+              value={current && current.formula_no_ref}
+              onChange={(e) => {
+                setCurrent({ ...current, formula_no_ref: e.target.value });
+              }}
+              placeholder="Masukkan Disini"
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={romanNumeral}
+              // onChange={onChange}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={year}
+              // onChange={year}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={current.show_dept22 ? "SUPERVISOR" : ""}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>{" "}
+            <InputSwitch
+              checked={current.show_dept22}
+              onChange={(e) => {
+                setCurrent({ ...current, show_dept22: e.value });
+                // updateAuto({ ...current, show_dept: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.auto_renew22}
+              onChange={(e) => {
+                setCurrent({ ...current, auto_renew22: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "50px" }}
+            ></div>
+            <Button
+              label={tr[localStorage.getItem("language")].update}
+              icon="pi pi-check"
+              onClick={(e) => {
+                addAuto();
+              }}
+              autoFocus
+              // loading={loading}
+            />
+          </div>
         </>
       </div>
     );
@@ -1714,58 +2117,76 @@ const AutoNumber = () => {
     type = "all"
   ) => {
     return (
-      <div className="col-9">
-        {/* Kode yang sebelumnya untuk loading telah dihapus untuk kesederhanaan contoh */}
+      <div className="col-12">
         <>
           <label className="text-label">{label}</label>
-          <div className=" col-2"> </div>
-          <InputText
-            value={current && current.planning_no_ref}
-            onChange={(e) => {
-              setCurrent({ ...current, planning_no_ref: e.target.value });
-            }}
-            placeholder="Masukkan Disini"
-          />
-          <InputText
-            value={romanNumeral}
-            // onChange={onChange}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={year}
-            // onChange={year}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={current.show_dept23 ? "SUPERVISOR" : ""}
-            placeholder="Masukkan Disini"
-            disabled
-          />{" "}
-          <InputSwitch
-            checked={current.show_dept23}
-            onChange={(e) => {
-              setCurrent({ ...current, show_dept23: e.value });
-              // updateAuto({ ...current, show_dept: e.value });
-            }}
-          />
-          <InputSwitch
-            checked={current.auto_renew23}
-            onChange={(e) => {
-              setCurrent({ ...current, auto_renew23: e.value });
-            }}
-          />
-          <Button
-            label={tr[localStorage.getItem("language")].update}
-            icon="pi pi-check"
-            onClick={(e) => {
-              addAuto();
-            }}
-            autoFocus
-            // loading={loading}
-          />
-          {/* Komponen InputText lainnya bisa ditambahkan sesuai kebutuhan */}
+          <div className=" d-flex">
+            <InputText
+              value={current && current.planning_no_ref}
+              onChange={(e) => {
+                setCurrent({ ...current, planning_no_ref: e.target.value });
+              }}
+              placeholder="Masukkan Disini"
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={romanNumeral}
+              // onChange={onChange}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={year}
+              // onChange={year}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={current.show_dept23 ? "SUPERVISOR" : ""}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+
+            <InputSwitch
+              checked={current.show_dept23}
+              onChange={(e) => {
+                setCurrent({ ...current, show_dept23: e.value });
+                // updateAuto({ ...current, show_dept: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.auto_renew23}
+              onChange={(e) => {
+                setCurrent({ ...current, auto_renew23: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "50px" }}
+            ></div>
+            <Button
+              label={tr[localStorage.getItem("language")].update}
+              icon="pi pi-check"
+              onClick={(e) => {
+                addAuto();
+              }}
+              autoFocus
+              // loading={loading}
+            />
+          </div>
         </>
       </div>
     );
@@ -1778,58 +2199,75 @@ const AutoNumber = () => {
     type = "all"
   ) => {
     return (
-      <div className="col-9">
-        {/* Kode yang sebelumnya untuk loading telah dihapus untuk kesederhanaan contoh */}
+      <div className="col-12">
         <>
           <label className="text-label">{label}</label>
-          <div className=" col-2"> </div>
-          <InputText
-            value={current && current.batch_no_ref}
-            onChange={(e) => {
-              setCurrent({ ...current, batch_no_ref: e.target.value });
-            }}
-            placeholder="Masukkan Disini"
-          />
-          <InputText
-            value={romanNumeral}
-            // onChange={onChange}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={year}
-            // onChange={year}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={current.show_dept24 ? "SUPERVISOR" : ""}
-            placeholder="Masukkan Disini"
-            disabled
-          />{" "}
-          <InputSwitch
-            checked={current.show_dept24}
-            onChange={(e) => {
-              setCurrent({ ...current, show_dept24: e.value });
-              // updateAuto({ ...current, show_dept: e.value });
-            }}
-          />
-          <InputSwitch
-            checked={current.auto_renew24}
-            onChange={(e) => {
-              setCurrent({ ...current, auto_renew24: e.value });
-            }}
-          />
-          <Button
-            label={tr[localStorage.getItem("language")].update}
-            icon="pi pi-check"
-            onClick={(e) => {
-              addAuto();
-            }}
-            autoFocus
-            // loading={loading}
-          />
-          {/* Komponen InputText lainnya bisa ditambahkan sesuai kebutuhan */}
+          <div className=" d-flex">
+            <InputText
+              value={current && current.batch_no_ref}
+              onChange={(e) => {
+                setCurrent({ ...current, batch_no_ref: e.target.value });
+              }}
+              placeholder="Masukkan Disini"
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={romanNumeral}
+              // onChange={onChange}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={year}
+              // onChange={year}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={current.show_dept24 ? "SUPERVISOR" : ""}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>{" "}
+            <InputSwitch
+              checked={current.show_dept24}
+              onChange={(e) => {
+                setCurrent({ ...current, show_dept24: e.value });
+                // updateAuto({ ...current, show_dept: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.auto_renew24}
+              onChange={(e) => {
+                setCurrent({ ...current, auto_renew24: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "50px" }}
+            ></div>
+            <Button
+              label={tr[localStorage.getItem("language")].update}
+              icon="pi pi-check"
+              onClick={(e) => {
+                addAuto();
+              }}
+              autoFocus
+              // loading={loading}
+            />
+          </div>
         </>
       </div>
     );
@@ -1842,58 +2280,78 @@ const AutoNumber = () => {
     type = "all"
   ) => {
     return (
-      <div className="col-9">
-        {/* Kode yang sebelumnya untuk loading telah dihapus untuk kesederhanaan contoh */}
+      <div className="col-12">
         <>
           <label className="text-label">{label}</label>
-          <div className=" col-2"> </div>
-          <InputText
-            value={current && current.penerimaanjadi_no_ref}
-            onChange={(e) => {
-              setCurrent({ ...current, penerimaanjadi_no_ref: e.target.value });
-            }}
-            placeholder="Masukkan Disini"
-          />
-          <InputText
-            value={romanNumeral}
-            // onChange={onChange}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={year}
-            // onChange={year}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={current.show_dept25 ? "SUPERVISOR" : ""}
-            placeholder="Masukkan Disini"
-            disabled
-          />{" "}
-          <InputSwitch
-            checked={current.show_dept25}
-            onChange={(e) => {
-              setCurrent({ ...current, show_dept25: e.value });
-              // updateAuto({ ...current, show_dept: e.value });
-            }}
-          />
-       <InputSwitch
-            checked={current.auto_renew25}
-            onChange={(e) => {
-              setCurrent({ ...current, auto_renew25: e.value });
-            }}
-          />
-          <Button
-            label={tr[localStorage.getItem("language")].update}
-            icon="pi pi-check"
-            onClick={(e) => {
-              addAuto();
-            }}
-            autoFocus
-            // loading={loading}
-          />
-          {/* Komponen InputText lainnya bisa ditambahkan sesuai kebutuhan */}
+          <div className=" d-flex">
+            <InputText
+              value={current && current.penerimaanjadi_no_ref}
+              onChange={(e) => {
+                setCurrent({
+                  ...current,
+                  penerimaanjadi_no_ref: e.target.value,
+                });
+              }}
+              placeholder="Masukkan Disini"
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={romanNumeral}
+              // onChange={onChange}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={year}
+              // onChange={year}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={current.show_dept25 ? "SUPERVISOR" : ""}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>{" "}
+            <InputSwitch
+              checked={current.show_dept25}
+              onChange={(e) => {
+                setCurrent({ ...current, show_dept25: e.value });
+                // updateAuto({ ...current, show_dept: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.auto_renew25}
+              onChange={(e) => {
+                setCurrent({ ...current, auto_renew25: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "50px" }}
+            ></div>
+            <Button
+              label={tr[localStorage.getItem("language")].update}
+              icon="pi pi-check"
+              onClick={(e) => {
+                addAuto();
+              }}
+              autoFocus
+              // loading={loading}
+            />
+          </div>
         </>
       </div>
     );
@@ -1906,58 +2364,75 @@ const AutoNumber = () => {
     type = "all"
   ) => {
     return (
-      <div className="col-9">
-        {/* Kode yang sebelumnya untuk loading telah dihapus untuk kesederhanaan contoh */}
+      <div className="col-12">
         <>
           <label className="text-label">{label}</label>
-          <div className=" col-2"> </div>
-          <InputText
-            value={current && current.pembebanan_no_ref}
-            onChange={(e) => {
-              setCurrent({ ...current, pembebanan_no_ref: e.target.value });
-            }}
-            placeholder="Masukkan Disini"
-          />
-          <InputText
-            value={romanNumeral}
-            // onChange={onChange}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={year}
-            // onChange={year}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={current.show_dept26 ? "SUPERVISOR" : ""}
-            placeholder="Masukkan Disini"
-            disabled
-          />{" "}
-          <InputSwitch
-            checked={current.show_dept26}
-            onChange={(e) => {
-              setCurrent({ ...current, show_dept26: e.value });
-              // updateAuto({ ...current, show_dept: e.value });
-            }}
-          />
-         <InputSwitch
-            checked={current.auto_renew26}
-            onChange={(e) => {
-              setCurrent({ ...current, auto_renew26: e.value });
-            }}
-          />
-          <Button
-            label={tr[localStorage.getItem("language")].update}
-            icon="pi pi-check"
-            onClick={(e) => {
-              addAuto();
-            }}
-            autoFocus
-            // loading={loading}
-          />
-          {/* Komponen InputText lainnya bisa ditambahkan sesuai kebutuhan */}
+          <div className=" d-flex">
+            <InputText
+              value={current && current.pembebanan_no_ref}
+              onChange={(e) => {
+                setCurrent({ ...current, pembebanan_no_ref: e.target.value });
+              }}
+              placeholder="Masukkan Disini"
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={romanNumeral}
+              // onChange={onChange}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={year}
+              // onChange={year}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={current.show_dept26 ? "SUPERVISOR" : ""}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>{" "}
+            <InputSwitch
+              checked={current.show_dept26}
+              onChange={(e) => {
+                setCurrent({ ...current, show_dept26: e.value });
+                // updateAuto({ ...current, show_dept: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.auto_renew26}
+              onChange={(e) => {
+                setCurrent({ ...current, auto_renew26: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "50px" }}
+            ></div>
+            <Button
+              label={tr[localStorage.getItem("language")].update}
+              icon="pi pi-check"
+              onClick={(e) => {
+                addAuto();
+              }}
+              autoFocus
+              // loading={loading}
+            />
+          </div>
         </>
       </div>
     );
@@ -1970,58 +2445,75 @@ const AutoNumber = () => {
     type = "all"
   ) => {
     return (
-      <div className="col-9">
-        {/* Kode yang sebelumnya untuk loading telah dihapus untuk kesederhanaan contoh */}
+      <div className="col-12">
         <>
           <label className="text-label">{label}</label>
-          <div className=" col-2"> </div>
-          <InputText
-            value={current && current.pembebanan_no_ref}
-            onChange={(e) => {
-              setCurrent({ ...current, pembebanan_no_ref: e.target.value });
-            }}
-            placeholder="Masukkan Disini"
-          />
-          <InputText
-            value={romanNumeral}
-            // onChange={onChange}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={year}
-            // onChange={year}
-            placeholder="Masukkan Disini"
-            disabled
-          />
-          <InputText
-            value={current.show_dept27 ? "SUPERVISOR" : ""}
-            placeholder="Masukkan Disini"
-            disabled
-          />{" "}
-          <InputSwitch
-            checked={current.show_dept27}
-            onChange={(e) => {
-              setCurrent({ ...current, show_dept27: e.value });
-              // updateAuto({ ...current, show_dept: e.value });
-            }}
-          />
-          <InputSwitch
-            checked={current.auto_renew27}
-            onChange={(e) => {
-              setCurrent({ ...current, auto_renew27: e.value });
-            }}
-          />
-          <Button
-            label={tr[localStorage.getItem("language")].update}
-            icon="pi pi-check"
-            onClick={(e) => {
-              addAuto();
-            }}
-            autoFocus
-            // loading={loading}
-          />
-          {/* Komponen InputText lainnya bisa ditambahkan sesuai kebutuhan */}
+          <div className=" d-flex">
+            <InputText
+              value={current && current.pembebanan_no_ref}
+              onChange={(e) => {
+                setCurrent({ ...current, pembebanan_no_ref: e.target.value });
+              }}
+              placeholder="Masukkan Disini"
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={romanNumeral}
+              // onChange={onChange}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={year}
+              // onChange={year}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputText
+              value={current.show_dept27 ? "SUPERVISOR" : ""}
+              placeholder="Masukkan Disini"
+              disabled
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>{" "}
+            <InputSwitch
+              checked={current.show_dept27}
+              onChange={(e) => {
+                setCurrent({ ...current, show_dept27: e.value });
+                // updateAuto({ ...current, show_dept: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
+            <InputSwitch
+              checked={current.auto_renew27}
+              onChange={(e) => {
+                setCurrent({ ...current, auto_renew27: e.value });
+              }}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "50px" }}
+            ></div>
+            <Button
+              label={tr[localStorage.getItem("language")].update}
+              icon="pi pi-check"
+              onClick={(e) => {
+                addAuto();
+              }}
+              autoFocus
+              // loading={loading}
+            />
+          </div>
         </>
       </div>
     );
@@ -2081,9 +2573,9 @@ const AutoNumber = () => {
                 )}
                 {renderInputtext4(
                   "Purchase Return",
-                  current?.pr_no_ref,
+                  current?.fp_no_ref,
                   (e) => {
-                    setSetup({ ...setup, pr_no_ref: e.target.value });
+                    setSetup({ ...setup, fp_no_ref: e.target.value });
                     // submitUpdate({ ...setup, so_no_ref: e.target.value });
                   }
                 )}
@@ -2099,7 +2591,7 @@ const AutoNumber = () => {
       // <Col className="col-lg-12 col-sm-12 col-xs-12">
       <Accordion
         className=" col-lg-12 col-sm-12 col-xs-12"
-        defaultActiveKey="0"
+        defaultActiveKey="1"
       >
         <div className="accordion__item" key={0}>
           <Accordion.Toggle
@@ -2116,7 +2608,6 @@ const AutoNumber = () => {
             }}
           >
             <span className="accordion__header--text">Auto Number Sale</span>
-            <span className="accordion__header--indicator indicator_bordered"></span>
           </Accordion.Toggle>
           <Accordion.Collapse eventKey={"0"}>
             <div className="accordion__body--text">
@@ -2159,7 +2650,7 @@ const AutoNumber = () => {
       // <Col className="col-lg-12 col-sm-12 col-xs-12">
       <Accordion
         className=" col-lg-12 col-sm-12 col-xs-12"
-        defaultActiveKey="0"
+        defaultActiveKey="1"
       >
         <div className="accordion__item" key={0}>
           <Accordion.Toggle
@@ -2203,7 +2694,7 @@ const AutoNumber = () => {
       // <Col className="col-lg-12 col-sm-12 col-xs-12">
       <Accordion
         className=" col-lg-12 col-sm-12 col-xs-12"
-        defaultActiveKey="0"
+        defaultActiveKey="1"
       >
         <div className="accordion__item" key={0}>
           <Accordion.Toggle
@@ -2274,7 +2765,7 @@ const AutoNumber = () => {
       // <Col className="col-lg-12 col-sm-12 col-xs-12">
       <Accordion
         className=" col-lg-12 col-sm-12 col-xs-12"
-        defaultActiveKey="0"
+        defaultActiveKey="1"
       >
         <div className="accordion__item" key={0}>
           <Accordion.Toggle
@@ -2340,7 +2831,7 @@ const AutoNumber = () => {
       // <Col className="col-lg-12 col-sm-12 col-xs-12">
       <Accordion
         className=" col-lg-12 col-sm-12 col-xs-12"
-        defaultActiveKey="0"
+        defaultActiveKey="1"
       >
         <div className="accordion__item" key={0}>
           <Accordion.Toggle
@@ -2415,7 +2906,7 @@ const AutoNumber = () => {
       // <Col className="col-lg-12 col-sm-12 col-xs-12">
       <Accordion
         className=" col-lg-12 col-sm-12 col-xs-12"
-        defaultActiveKey="0"
+        defaultActiveKey="1"
       >
         <div className="accordion__item" key={0}>
           <Accordion.Toggle

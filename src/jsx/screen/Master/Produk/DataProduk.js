@@ -1290,10 +1290,24 @@ const DataProduk = ({
                     options={group}
                     onChange={(e) => {
                       console.log(e.target?.value);
+                      let nsValue = 2; // Nilai default jika tidak memenuhi kondisi berikut
+
+                      if (
+                        e?.target?.value?.stok !== 0 &&
+                        e?.target?.value?.stok !== 1 &&
+                        e?.target?.value?.stok !== 2
+                      ) {
+                        nsValue = 2; // Jika bukan 0, bukan 1, dan bukan 2
+                      } else if (e?.target?.value?.stok === 0) {
+                        nsValue = 0; // Jika nilai stok adalah 0
+                      } else if (e?.target?.value?.stok === 1) {
+                        nsValue = 1; // Jika nilai stok adalah 1
+                      }
+
                       setCurrentItem({
                         ...currentItem,
-                        group: e?.target.value?.id ?? null,
-                        ns: !e?.target?.value?.stok ? 0 : 1 ?? 2,
+                        group: e?.target?.value?.id ?? null,
+                        ns: nsValue,
                       });
                       let newError = error;
                       newError[0].group = false;

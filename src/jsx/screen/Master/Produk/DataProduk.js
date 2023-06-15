@@ -1273,28 +1273,49 @@ const DataProduk = ({
                 <div className="col-6">
                   <PrimeInput
                     label={tr[localStorage.getItem("language")].kd_prod}
-                    value={`${currentItem?.departement && checkDept(currentItem.departement)?.ccost_name  }-${
-                      currentItem?.group && checkGroup(currentItem?.group)?.name
-                    }-${
-                      currentItem !== null && currentItem.ns !== ""
-                        ? currentItem.ns === 1
-                          ? "Stock"
-                          : currentItem.ns === 0
-                          ? "Non Stock"
-                          : currentItem.ns === 2
-                          ? "Asset"
+                    value={
+                      currentItem?.code ??
+                      `${
+                        currentItem?.departement &&
+                        checkDept(currentItem.departement)?.ccost_code
+                      }-${
+                        currentItem?.group &&
+                        checkGroup(currentItem?.group)?.code
+                      }-${
+                        currentItem !== null && currentItem.ns !== ""
+                          ? currentItem.ns === 1
+                            ? "Stock"
+                            : currentItem.ns === 0
+                            ? "Non Stock"
+                            : currentItem.ns === 2
+                            ? "Asset"
+                            : ""
                           : ""
-                        : ""
-                    }-${serialNumber}`}
+                      }-${serialNumber}`
+                    }
                     onChange={(e) => {
-                      setCurrentItem({ ...currentItem, code: e.value });
-                      // let newError = error;
-                      // newError[0].code = false;
-                      // setError(newError);
+                      const generatedCode = `${
+                        currentItem?.departement &&
+                        checkDept(currentItem.departement)?.ccost_code
+                      }-${
+                        currentItem?.group &&
+                        checkGroup(currentItem?.group)?.code
+                      }-${
+                        currentItem !== null && currentItem.ns !== ""
+                          ? currentItem.ns === 1
+                            ? "Stock"
+                            : currentItem.ns === 0
+                            ? "Non Stock"
+                            : currentItem.ns === 2
+                            ? "Asset"
+                            : ""
+                          : ""
+                      }-${serialNumber}`;
+                      console.log("generat", generatedCode);
+                      setCurrentItem({ ...currentItem, code: generatedCode });
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[0]?.code}
-                    // options={departement}
                     disabled
                   />
                 </div>
@@ -1304,14 +1325,18 @@ const DataProduk = ({
                     value={
                       currentItem !== null
                         ? checkDept(currentItem.departement)
-                        : null }
+                        : null
+                    }
                     options={departement}
                     onChange={(e) => {
                       setCurrentItem({
                         ...currentItem,
-                        departement: e.value,
+                        departement: e.target.value,
                       });
-                      setCurrentItem({ ...currentItem, departement: e.value.id ?? null });
+                      setCurrentItem({
+                        ...currentItem,
+                        departement: e.value.id ?? null,
+                      });
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     optionLabel="ccost_name"
@@ -1331,19 +1356,19 @@ const DataProduk = ({
                     }
                     options={group}
                     onChange={(e) => {
-                      console.log(e.target?.value);
-                      let nsValue = 2; // Nilai default jika tidak memenuhi kondisi berikut
-
+                      console.log("cccccc", e.target?.value);
+                      console.log("hhhhhh", currentItem);
+                      let nsValue = 2; 
                       if (
                         e?.target?.value?.stok !== 0 &&
                         e?.target?.value?.stok !== 1 &&
                         e?.target?.value?.stok !== 2
                       ) {
-                        nsValue = 2; // Jika bukan 0, bukan 1, dan bukan 2
+                        nsValue = 2; 
                       } else if (e?.target?.value?.stok === 0) {
-                        nsValue = 0; // Jika nilai stok adalah 0
+                        nsValue = 0;
                       } else if (e?.target?.value?.stok === 1) {
-                        nsValue = 1; // Jika nilai stok adalah 1
+                        nsValue = 1; 
                       }
 
                       setCurrentItem({
@@ -1368,11 +1393,35 @@ const DataProduk = ({
                     label={tr[localStorage.getItem("language")].nm_prod}
                     value={`${currentItem?.name ?? ""}`}
                     onChange={(e) => {
-                      setCurrentItem({ ...currentItem, name: e.target.value });
+                      setCurrentItem({
+                        ...currentItem,
+                        name: e.target.value,
+                      });
                       let newError = error;
                       newError[0].name = false;
                       setError(newError);
+                      const generatedCode = `${
+                        currentItem?.departement &&
+                        checkDept(currentItem.departement)?.ccost_code
+                      }-${
+                        currentItem?.group &&
+                        checkGroup(currentItem?.group)?.code
+                      }-${
+                        currentItem !== null && currentItem.ns !== ""
+                          ? currentItem.ns === 1
+                            ? "Stock"
+                            : currentItem.ns === 0
+                            ? "Non Stock"
+                            : currentItem.ns === 2
+                            ? "Asset"
+                            : ""
+                          : ""
+                      }-${serialNumber}`;
+                      console.log("generat", generatedCode);
+                      setCurrentItem({ ...currentItem, code: generatedCode ,
+                        name: e.target.value,});
                     }}
+                    
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[0]?.name}
                   />

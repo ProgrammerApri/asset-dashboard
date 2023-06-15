@@ -199,9 +199,13 @@ const AutoNumber = () => {
     };
     console.log(config.data);
     let response = null;
+
     try {
       response = await request(null, config);
       console.log(response);
+      if (response && response.data) {
+        setCurrent(response.data);
+      }
     } catch (error) {}
     if (isUpdate) {
       setLoading(false);
@@ -288,7 +292,7 @@ const AutoNumber = () => {
             <div></div>
             <InputSwitch
               placeholder="Top"
-              tooltip="Reset Tahun"
+              tooltip="Reset Nomor"
               tooltipOptions={{ position: "top" }}
               checked={current.auto_renew}
               onChange={(e) => {

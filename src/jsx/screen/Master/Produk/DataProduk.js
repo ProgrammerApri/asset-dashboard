@@ -28,6 +28,7 @@ import { useDispatch, useSelector } from "react-redux";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 import { InputTextarea } from "primereact/inputtextarea";
 import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
+import { current } from "@reduxjs/toolkit";
 
 const def = {
   id: null,
@@ -35,6 +36,7 @@ const def = {
   name: null,
   exp_date: null,
   brand: null,
+  departement: null,
   group: null,
   type: null,
   codeb: null,
@@ -56,12 +58,19 @@ const def = {
   ns: null,
   ket: null,
   suplier: null,
+  serialnumber: null,
 };
 
 const type = [
   { name: "Stock", id: 1 },
   { name: "Non Stock", id: 0 },
   { name: "Asset", id: 2 },
+];
+
+const dpt = [
+  { name: "Purchasing", id: 1 },
+  { name: "PRODUKSI", id: 2 },
+  // { name: "Asset", id: 2 },
 ];
 
 const metode = [
@@ -98,6 +107,7 @@ const DataProduk = ({
   const product = useSelector((state) => state.product);
   const [prdCode, setPrdCode] = useState(null);
   const [group, setGroup] = useState(null);
+  const [departement, setDept] = useState(null);
   const [unit, setUnit] = useState(null);
   const [suplier, setSupplier] = useState(null);
   const [histori, setHistori] = useState(null);
@@ -117,11 +127,14 @@ const DataProduk = ({
   const [file, setFile] = useState(null);
   const [error, setError] = useState(defError);
   const progressBar = useRef(null);
+  const [number, setNumber] = useState("");
   const [progress, setProgress] = useState(0);
   const [detail, setDetail] = useState(null);
   const [showDetail, setShowDetail] = useState(false);
   const [expandedRows, setExpandedRows] = useState(null);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch(); // const PrimeInput = () => {
+  const [serialNumber, setSerialNumber] = useState("");
+  // const valueprefix = `${currentItem.departement}/${currentItem.name}/${serialNumber}`;
 
   useEffect(() => {
     if (!popUp) {
@@ -131,14 +144,26 @@ const DataProduk = ({
     initFilters1();
     getProductCode();
     getGroup();
+    getDept();
     getUnit();
     getSupplier();
     getHistori();
+    generateSerialNumber();
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
+  const generateSerialNumber = () => {
+    const nextSerialNumber = getNextSerialNumber();
+    const newSerialNumber = nextSerialNumber.toString().padStart(5, "0");
+    setSerialNumber(newSerialNumber);
+  };
+  const getNextSerialNumber = () => {
+    const currentSerialNumber = parseInt(serialNumber);
+    return currentSerialNumber + 1;
+  };
 
   const getProductCode = async () => {
     const config = {
@@ -177,6 +202,27 @@ const DataProduk = ({
         setGroup(grp);
       }
     } catch (error) {}
+  };
+  const getDept = async (isUpdate = false) => {
+    const config = {
+      ...endpoints.pusatBiaya,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setDept(data);
+      }
+    } catch (error) {}
+    if (isUpdate) {
+      // setLoading(false);
+    } else {
+    }
   };
 
   const getUnit = async () => {
@@ -788,6 +834,8 @@ const DataProduk = ({
             code: el.code,
             name: el.name,
             exp_date: el.exp_date,
+            departement: el.departement,
+            serialnumber: el.serialnumber,
             group: el.group_id,
             unit: el.unit_id,
             type: null,
@@ -1044,6 +1092,19 @@ const DataProduk = ({
   const checkGroup = (value) => {
     let selected = {};
     group?.forEach((element) => {
+      console.log("ggggggggg", group);
+      if (value === element?.id) {
+        selected = element;
+        console.log(selected);
+      }
+    });
+
+    return selected;
+  };
+  const checkDept = (value) => {
+    let selected = {};
+    departement?.forEach((element) => {
+      // console.log("hhhh", deptement);
       if (value === element?.id) {
         selected = element;
         console.log(selected);
@@ -1209,74 +1270,55 @@ const DataProduk = ({
               headerTemplate={renderTabHeader}
             >
               <div className="row mr-0 ml-0">
-                <div className="col-4">
+                <div className="col-6">
                   <PrimeInput
                     label={tr[localStorage.getItem("language")].kd_prod}
-                    value={`${currentItem?.code ?? ""}`}
+                    value={`${currentItem?.departement && checkDept(currentItem.departement)?.ccost_name  }-${
+                      currentItem?.group && checkGroup(currentItem?.group)?.name
+                    }-${
+                      currentItem !== null && currentItem.ns !== ""
+                        ? currentItem.ns === 1
+                          ? "Stock"
+                          : currentItem.ns === 0
+                          ? "Non Stock"
+                          : currentItem.ns === 2
+                          ? "Asset"
+                          : ""
+                        : ""
+                    }-${serialNumber}`}
                     onChange={(e) => {
-                      setCurrentItem({ ...currentItem, code: e.target.value });
-                      let newError = error;
-                      newError[0].code = false;
-                      setError(newError);
-                    }}
-                    placeholder={tr[localStorage.getItem("language")].masuk}
-                    error={error[0]?.code}
-                  />
-                </div>
-
-                <div className="col-4">
-                  <PrimeInput
-                    label={tr[localStorage.getItem("language")].nm_prod}
-                    value={`${currentItem?.name ?? ""}`}
-                    onChange={(e) => {
-                      setCurrentItem({ ...currentItem, name: e.target.value });
-                      let newError = error;
-                      newError[0].name = false;
-                      setError(newError);
-                    }}
-                    placeholder={tr[localStorage.getItem("language")].masuk}
-                    error={error[0]?.name}
-                  />
-                </div>
-                <div className="col-4">
-                  <PrimeCalendar
-                    label={tr[localStorage.getItem("language")].tgl_exp}
-                    value={new Date(`${currentItem.exp_date}Z`)}
-                    onChange={(e) => {
-                      let result = new Date(e.value);
-
-                      result.setDate(result.getDate() + e.day);
-                      console.log(result);
-
-                      setCurrentItem({
-                        ...currentItem,
-                        exp_date: e.target.value,
-                      });
-                      let newError = error;
-                      newError[0].exp_date = false;
-                      setError(newError);
-                    }}
-                    placeholder={tr[localStorage.getItem("language")].pilih_tgl}
-                    error={error[0]?.exp_date}
-                    showIcon
-                    dateFormat="dd/mm/yy"
-                  />
-                </div>
-              </div>
-
-              <div className="row mr-0 ml-0">
-                <div className="col-4">
-                  <PrimeInput
-                    label={"Brands"}
-                    value={`${currentItem?.brand ?? ""}`}
-                    onChange={(e) => {
-                      setCurrentItem({ ...currentItem, brand: e.target.value });
+                      setCurrentItem({ ...currentItem, code: e.value });
                       // let newError = error;
-                      // newError[0].name = false;
+                      // newError[0].code = false;
                       // setError(newError);
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
-                    // error={error[0]?.name}
+                    error={error[0]?.code}
+                    // options={departement}
+                    disabled
+                  />
+                </div>
+                <div className="col-4">
+                  <PrimeDropdown
+                    label={"Nama Departement"}
+                    value={
+                      currentItem !== null
+                        ? checkDept(currentItem.departement)
+                        : null }
+                    options={departement}
+                    onChange={(e) => {
+                      setCurrentItem({
+                        ...currentItem,
+                        departement: e.value,
+                      });
+                      setCurrentItem({ ...currentItem, departement: e.value.id ?? null });
+                    }}
+                    placeholder={tr[localStorage.getItem("language")].masuk}
+                    optionLabel="ccost_name"
+                    filter
+                    filterBy="ccost_name"
+                    errorMessage="Grup Produk Belum Dipilih"
+                    // error={error[0]?.group}
                   />
                 </div>
                 <div className="col-4">
@@ -1321,6 +1363,60 @@ const DataProduk = ({
                     error={error[0]?.group}
                   />
                 </div>
+                <div className="col-4">
+                  <PrimeInput
+                    label={tr[localStorage.getItem("language")].nm_prod}
+                    value={`${currentItem?.name ?? ""}`}
+                    onChange={(e) => {
+                      setCurrentItem({ ...currentItem, name: e.target.value });
+                      let newError = error;
+                      newError[0].name = false;
+                      setError(newError);
+                    }}
+                    placeholder={tr[localStorage.getItem("language")].masuk}
+                    error={error[0]?.name}
+                  />
+                </div>
+                <div className="col-4">
+                  <PrimeCalendar
+                    label={tr[localStorage.getItem("language")].tgl_exp}
+                    value={new Date(`${currentItem?.exp_date}Z`)}
+                    onChange={(e) => {
+                      let result = new Date(e.value);
+
+                      result.setDate(result.getDate() + e.day);
+                      console.log(result);
+
+                      setCurrentItem({
+                        ...currentItem,
+                        exp_date: e.target.value,
+                      });
+                      let newError = error;
+                      newError[0].exp_date = false;
+                      setError(newError);
+                    }}
+                    placeholder={tr[localStorage.getItem("language")].pilih_tgl}
+                    error={error[0]?.exp_date}
+                    showIcon
+                    dateFormat="dd/mm/yy"
+                  />
+                </div>
+              </div>
+              <div className="row mr-0 ml-0">
+                <div className="col-4">
+                  <PrimeInput
+                    label={"Brands"}
+                    value={`${currentItem?.brand ?? ""}`}
+                    onChange={(e) => {
+                      setCurrentItem({ ...currentItem, brand: e.target.value });
+                      // let newError = error;
+                      // newError[0].name = false;
+                      // setError(newError);
+                    }}
+                    placeholder={tr[localStorage.getItem("language")].masuk}
+                    // error={error[0]?.name}
+                  />
+                </div>
 
                 <div className="col-4">
                   <PrimeInput
@@ -1344,15 +1440,18 @@ const DataProduk = ({
                     disabled
                   />
                 </div>
-              </div>
 
+                <div className="col-4">
+                  <label>Serial Number</label>
+                  <PrimeInput value={`${serialNumber}`} disabled />
+                </div>
+              </div>{" "}
               <div className="col-12 p-0">
                 <div className="mt-4 ml-3 mr-3 fs-16 mb-1">
                   <b>{tr[localStorage.getItem("language")].supplier}</b>
                 </div>
                 <Divider className="mb-2 ml-3 mr-3"></Divider>
               </div>
-
               <DataTable
                 responsiveLayout="none"
                 value={currentItem?.suplier?.map((v, i) => {
@@ -1455,7 +1554,6 @@ const DataProduk = ({
                   }
                 />
               </DataTable>
-
               <div className="row mr-0 ml-0">
                 <div className="col-6"></div>
               </div>

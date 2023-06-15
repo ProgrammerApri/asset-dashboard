@@ -21,7 +21,6 @@ import { SET_CURRENT_AUTO } from "src/redux/actions";
 const data = {
   id: 0,
   comp_id: null,
-  modules: null,
   prefix: null,
   month: null,
   year: null,
@@ -40,18 +39,18 @@ const SetupAutoNumber = () => {
   const [setup, setSetup] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
   const [middle, setMiddle] = useState(new Date().getMonth() + 1);
-  const [purchaseRequest, setPurchaseRequest] = useState(rpauto?.prefix || "");
+  // const [purchaseRequest, setPurchaseRequest] = useState(rpauto?.prefix || "");
   const [purchaseRequestExpanded, setpurchaseRequestExpanded] = useState(
     rpauto?.auto_renew || false
   );
   const [purchaseOrderExpanded, setpurchaseOrderExpanded] = useState(
     rpauto?.auto_renew || false
   );
-  const [purchaseOrder, setPurchaseOrder] = useState(rpauto?.prefix || "");
+  const [purchaseOrder, setPurchaseOrder] = useState(null);
   const [gra, setGra] = useState(rpauto?.prefix || "");
   const [invoicepurchase, setInvoicepurchase] = useState(rpauto?.prefix || "");
   const [fakturinvoice, setFakturinvoice] = useState(rpauto?.prefix || "");
-  const [expanded, setExpanded] = useState(rpauto?.auto_renew || false);
+  // const [expanded, setExpanded] = useState(rpauto?.auto_renew || false);
 
   const monthsInRomanNumerals = [
     "I",
@@ -92,69 +91,40 @@ const SetupAutoNumber = () => {
     initFilters1();
   }, []);
 
-  const handleSaveData = async () => {
-    const updatedData = {
-      ...data,
-      prefix: purchaseRequest,
-      prefix: purchaseOrder,
-      prefix: purchaseOrder,
-      prefix: purchaseOrder,
-      prefix: purchaseOrder,
-      prefix: purchaseOrder,
-      prefix: purchaseOrder,
-      prefix: purchaseOrder,
-      prefix: purchaseOrder,
-      prefix: purchaseOrder,
-      prefix: purchaseOrder,
-      prefix: purchaseOrder,
-      prefix: purchaseOrder,
-      prefix: purchaseOrder,
-      prefix: purchaseOrder,
-      prefix: purchaseOrder,
-      prefix: purchaseOrder,
-      prefix: purchaseOrder,
-      prefix: purchaseOrder,
-      prefix: purchaseOrder,
-      prefix: purchaseOrder,
-      // Assign nilai-nilai komponen lainnya ke properti yang sesuai di objek `data`
+  const handleSaveData = async (data) => {
+    let config = {
+      ...endpoints.addSetupautonumber,
+      data: {
+        pr_no_ref: data?.compi_id?.id ?? null,
+        pr_no_ref: data?.prefix?.id ?? null,
+        month: data?.month?.id ?? null,
+        year: data?.year?.id ?? null,
+        auto_renew: data?.auto_renew ??false,
+        show_dept: data?.show_dept ??false,
+      },
     };
-
+    let response = null;
     try {
-      setLoadingSubmit(true);
-      const config = {
-        ...endpoints.addSetupautonumber,
-        data: updatedData,
-      };
-
-      const response = await request(null, config);
-
+      response = await request(null, config);
+      console.log(response);
       if (response.status) {
-        setTimeout(() => {
-          setLoadingSubmit(false);
-          setDisplayInput(false);
-          getAuto();
-          // getProfile();
-          toast.current.show({
-            severity: "info",
-            summary: "Berhasil",
-            detail: "Data Berhasil Ditambahkan",
-            life: 3000,
-          });
-        }, 500);
-      } else {
-        throw new Error(response.error);
-      }
-    } catch (error) {
-      setTimeout(() => {
-        setLoadingSubmit(false);
         toast.current.show({
-          severity: "error",
-          summary: "Gagal",
-          detail: "Gagal Memperbarui Data",
+          severity: "info",
+          summary: "Berhasil",
+          detail: "Data berhasil diperbarui",
           life: 3000,
         });
-      }, 500);
+      }
+    } catch (error) {
+      toast.current.show({
+        severity: "error",
+        summary: "Gagal",
+        detail: "Gagal memperbarui data",
+        life: 3000,
+      });
     }
+
+    getAuto(false);
   };
 
   const getAuto = async (isUpdate = false) => {
@@ -213,55 +183,89 @@ const SetupAutoNumber = () => {
         {/* Kode yang sebelumnya untuk loading telah dihapus untuk kesederhanaan contoh */}
         <>
           <label className="text-label">{label}</label>
-          <div className=" col-2  "> </div>
-          <InputText
-            value={value}
-            onChange={onChange}
-            placeholder="Masukkan Disini"
-            // disabled={type === "all" && expanded}
-          />
+          <div className="d-flex">
+            <InputText
+              value={value}
+              onChange={onChange}
+              placeholder="Masukkan Disini"
+              // disabled={type === "all" && expanded}
+            />
+            <div
+              style={{ width: "10px", marginLeft: "5px", marginRight: "5px" }}
+            ></div>
 
-          {type === "all" && (
-            <>
-              <InputText
-                value={romanNumeral}
-                // onChange={onChange}
-                placeholder="Masukkan Disini"
-                disabled
-              />
-              <InputText
-                value={year}
-                // onChange={year}
-                placeholder="Masukkan Disini"
-                disabled
-              />
-              <InputText
-                value={expanded ? "SUPERVISOR" : ""}
-                placeholder="Masukkan Disini"
-                disabled
-              />{" "}
-              <InputSwitch
-                checked={expanded}
-                onChange={(expanded) => onChange(expanded)}
-              />
-              <div></div>
-              <InputSwitch checked={value} onChange={onChange} />
-              <Button
-                label={tr[localStorage.getItem("language")].update}
-                icon="pi pi-check"
-                onClick={(e) => {
-                  onSubmit();
-                }}
-                autoFocus
-                loading={loading}
-              />
-              {/* Komponen InputText lainnya bisa ditambahkan sesuai kebutuhan */}
-            </>
-          )}
+            {type === "all" && (
+              <>
+                <InputText
+                  value={romanNumeral}
+                  placeholder="Masukkan Disini"
+                  disabled
+                />
+                <div
+                  style={{
+                    width: "10px",
+                    marginLeft: "5px",
+                    marginRight: "5px",
+                  }}
+                ></div>
+                <InputText
+                  value={year}
+                  placeholder="Masukkan Disini"
+                  disabled
+                />
+                <div
+                  style={{
+                    width: "10px",
+                    marginLeft: "5px",
+                    marginRight: "5px",
+                  }}
+                ></div>
+                <InputText
+                  value={expanded ? "SUPERVISOR" : ""}
+                  placeholder="Masukkan Disini"
+                  disabled
+                />
+                <div
+                  style={{
+                    width: "10px",
+                    marginLeft: "5px",
+                    marginRight: "5px",
+                  }}
+                ></div>
+                <InputSwitch checked={expanded} />
+                <div
+                  style={{
+                    width: "10px",
+                    marginLeft: "5px",
+                    marginRight: "5px",
+                  }}
+                ></div>
+                <InputSwitch checked={value} onChange={onChange} />
+                <div
+                  style={{
+                    width: "10px",
+                    marginLeft: "5px",
+                    marginRight: "50px",
+                  }}
+                ></div>
+                <Button
+                  label={tr[localStorage.getItem("language")].update}
+                  icon="pi pi-check"
+                  onClick={(e) => {
+                    onSubmit();
+                  }}
+                  autoFocus
+                  loading={loading}
+                />
+                {/* Komponen InputText lainnya bisa ditambahkan sesuai kebutuhan */}
+              </>
+            )}
+          </div>
         </>
       </div>
     );
   };
+
   const renderPurchase = () => {
     return (
       // <Col className="col-lg-12 col-sm-12 col-xs-12">
@@ -292,27 +296,12 @@ const SetupAutoNumber = () => {
             <div className="accordion__body--text">
               <Col className="mr-0 ml-0 ">
                 {renderInputtext(
-                  "Purchase Request",
-                  purchaseRequest,
-                  (e) => {
-                    setPurchaseRequest(e.target.value);
-                  },
-                  purchaseRequestExpanded
-                  // (value) => {
-                  //   setpurchaseRequestExpanded(value);
-                  // }
+                  "Purchase Request"
+                  // purchaseRequest.prefix,
+                  // handleInputChange,
+                  // expanded
                 )}
-                {renderInputtext(
-                  "Purchase Order",
-                  purchaseOrder,
-                  (e) => {
-                    setPurchaseOrder(e.target.value);
-                  },
-                  purchaseOrderExpanded,
-                  (value) => {
-                    setpurchaseOrderExpanded(value);
-                  }
-                )}
+                {renderInputtext("Purchase Order")}
                 {renderInputtext("Purchase ", gra, (e) => {
                   setGra(e.target.value);
                   // submitUpdate({ ...setup, prefix: e.target.value });
@@ -322,7 +311,7 @@ const SetupAutoNumber = () => {
                   // submitUpdate({ ...setup, prefix: e.target.value });
                 })}
                 {renderInputtext("Purchase Return", rpauto?.pr_no_ref, (e) => {
-                  setSetup({ ...setup, pr_no_ref: e.target.value });
+                  setSetup({ ...rpauto, pr_no_ref: e.target.value });
                   // submitUpdate({ ...setup, prefix: e.target.value });
                 })}
               </Col>

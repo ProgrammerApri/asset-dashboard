@@ -16,6 +16,7 @@ import SetupCashFlow from "./setupCashFlow";
 // import SetupAutoNumber from "./SetupAutoNumber";
 // import SetupAutoNumbercopy from "./SetupAutoNumbercopy";
 import AutoNumber from "./AutoNumber";
+import SetupAutoNumber from "./SetupAutoNumber";
 
 const Setup = () => {
   return (
@@ -53,9 +54,9 @@ const Setup = () => {
       <TabPanel header="Setup Saldo Akhir">
         <SetupSaldoAkhir/>
       </TabPanel>
-      {/* <TabPanel header="Setup Auto Number">
+      <TabPanel header="Setup Auto Number">
         <SetupAutoNumber/>
-      </TabPanel> */}
+      </TabPanel>
       <TabPanel header="Setup Auto Number">
         <AutoNumber/>
       </TabPanel>

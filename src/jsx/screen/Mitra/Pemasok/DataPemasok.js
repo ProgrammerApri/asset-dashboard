@@ -999,8 +999,8 @@ const DataSupplier = ({
                       currentItem?.supplier?.sup_code ??
                       (currentItem?.supplier?.sup_code ||
                         `${currentItem?.supplier?.sup_country}-${
-                          currentItem?.jpem?.jpem_code ?? ""
-                        }-${serialNumber}`) + ``
+                          currentItem?.jpem?.jpem_code 
+                        }-0000${currentItem?.jpem?.id ?? ""}`) + ``
                     }`}
                     onChange={(e) => {
                       setCurrentItem({
@@ -1039,8 +1039,6 @@ const DataSupplier = ({
                       let newError = error;
                       newError[0].name = false;
                       setError(newError);
-                     
-                      
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[0]?.name}
@@ -1116,7 +1114,7 @@ const DataSupplier = ({
                         : ""
                     }
                     onChange={(e) => {
-                      console.log("dadada",currentItem);
+                      console.log("dadada", currentItem);
                       setCurrentItem({
                         ...currentItem,
                         supplier: {
@@ -1124,22 +1122,7 @@ const DataSupplier = ({
                           sup_npwp: e.target.value,
                         },
                       });
-                      const generatedCode = `${
-                        currentItem?.supplier?.sup_code ??
-                        (currentItem?.supplier?.sup_code ||
-                          `${currentItem?.supplier?.sup_country}-${
-                            currentItem?.jpem?.jpem_code ?? ""
-                          }-${serialNumber}`) + ``
-                      }`;
-                      setCurrentItem({
-                        ...currentItem,
-                        supplier: {
-                          ...currentItem.supplier,
 
-                          sup_code: generatedCode,
-                          sup_npwp: e.target.value,
-                        },
-                      });
                       // let newError = error;
                       // newError[0].npwp = false;
                       // setError(newError);
@@ -1156,7 +1139,10 @@ const DataSupplier = ({
                 ></div>
                 <div className="col-3">
                   <label>Serial Number</label>
-                  <PrimeInput value={`${serialNumber}`} disabled />
+                  <PrimeInput
+                    value={`0000${currentItem?.jpem?.id ?? ""}`}
+                    disabled
+                  />
                 </div>
               </div>
 
@@ -1231,6 +1217,22 @@ const DataSupplier = ({
                         ...currentItem,
                         supplier: {
                           ...currentItem.supplier,
+                          sup_address: e.target.value,
+                        },
+                      });
+                      const generatedCode = `${
+                        currentItem?.supplier?.sup_code ??
+                        (currentItem?.supplier?.sup_code ||
+                          `${currentItem?.supplier?.sup_country}-${
+                            currentItem?.jpem?.jpem_code ?? ""
+                          }-0000${currentItem?.jpem?.id ?? ""}`) + ``
+                      }`;
+                      setCurrentItem({
+                        ...currentItem,
+                        supplier: {
+                          ...currentItem.supplier,
+
+                          sup_code: generatedCode,
                           sup_address: e.target.value,
                         },
                       });

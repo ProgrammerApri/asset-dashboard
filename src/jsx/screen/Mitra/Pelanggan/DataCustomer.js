@@ -1117,8 +1117,9 @@ const DataCustomer = ({
                     value={`${
                       currentItem?.customer?.cus_code ??
                       (currentItem?.customer?.cus_code ||
-                        `${currentItem?.customer?.cus_country}-${currentItem?.jpel?.jpel_code}-${serialNumber}`) +
-                        ``
+                        `${currentItem?.customer?.cus_country}-${
+                          currentItem?.jpel?.jpel_code
+                        }-0000${currentItem?.jpel?.id ?? ""}`) + ``
                     }`}
                     onChange={(e) => {
                       setCurrentItem({
@@ -1250,21 +1251,6 @@ const DataCustomer = ({
                       let newError = error;
                       newError[0].npwp = false;
                       setError(newError);
-                      const generatedCode = `${
-                        currentItem?.customer?.cus_code ??
-                        (currentItem?.customer?.cus_code ||
-                          `${currentItem?.customer?.cus_country}-${currentItem?.jpel?.jpel_code}-${serialNumber}`) +
-                          ``
-                      }`;
-                      console.log("generat", generatedCode);
-                      setCurrentItem({
-                        ...currentItem,
-                        customer: {
-                          ...currentItem.customer,
-                          cus_code: generatedCode,
-                          cus_npwp: e.target.value,
-                        },
-                      });
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     type="number"
@@ -1316,7 +1302,10 @@ const DataCustomer = ({
                 ></div>
                 <div className="col-3">
                   <label>Serial Number</label>
-                  <PrimeInput value={`${serialNumber}`} disabled />
+                  <PrimeInput
+                    value={`0000${currentItem?.jpel?.id ?? ""}`}
+                    disabled
+                  />
                 </div>
               </div>
 
@@ -1415,6 +1404,23 @@ const DataCustomer = ({
                       let newError = error;
                       newError[0].addrs = false;
                       setError(newError);
+                      const generatedCode = `${
+                        currentItem?.customer?.cus_code ??
+                        (currentItem?.customer?.cus_code ||
+                          `${currentItem?.customer?.cus_country}-${
+                            currentItem?.jpel?.jpel_code
+                          }-0000${currentItem?.jpel?.id ?? ""}`) + ``
+                      }`;
+                      console.log("generat", generatedCode);
+                      setCurrentItem({
+                        ...currentItem,
+                        customer: {
+                          ...currentItem.customer,
+                          cus_code: generatedCode,
+                          cus_address: e.target.value,
+                          // cus_npwp: e.target.id,
+                        },
+                      });
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[0]?.addrs}

@@ -1296,36 +1296,40 @@ const DataProduk = ({
                               ? "Asset"
                               : ""
                             : ""
-                        }-${serialNumber}`) + ``
+                        }-0000${
+                          currentItem?.departement
+                            ? String(checkDept(currentItem.departement)?.id)
+                            : ""
+                        }`) + ``
                     }
-                    // onChange={(e) => {
-                    //   const generatedCode = `${
-                    //     (currentItem?.code ||
-                    //       `${
-                    //         currentItem?.departement
-                    //           ? String(
-                    //               checkDept(currentItem.departement)?.ccost_code
-                    //             )
-                    //           : ""
-                    //       }-${
-                    //         currentItem !== null && currentItem?.group
-                    //           ? String(checkGroup(currentItem.group)?.code)
-                    //           : ""
-                    //       }-${
-                    //         currentItem !== null && currentItem.ns !== ""
-                    //           ? currentItem.ns === 1
-                    //             ? "Stock"
-                    //             : currentItem.ns === 0
-                    //             ? "Non Stock"
-                    //             : currentItem.ns === 2
-                    //             ? "Asset"
-                    //             : ""
-                    //           : ""
-                    //       }-${serialNumber}`) + ``
-                    //   }`;
-                    //   console.log("generat", generatedCode);
-                    //   setCurrentItem({ ...currentItem, code: generatedCode });
-                    // }}
+                    onChange={(e) => {
+                      const generatedCode = `${
+                        (currentItem?.code ||
+                          `${
+                            currentItem?.departement
+                              ? String(
+                                  checkDept(currentItem.departement)?.ccost_code
+                                )
+                              : ""
+                          }-${
+                            currentItem !== null && currentItem?.group
+                              ? String(checkGroup(currentItem.group)?.code)
+                              : ""
+                          }-${
+                            currentItem !== null && currentItem.ns !== ""
+                              ? currentItem.ns === 1
+                                ? "Stock"
+                                : currentItem.ns === 0
+                                ? "Non Stock"
+                                : currentItem.ns === 2
+                                ? "Asset"
+                                : ""
+                              : ""
+                          }-${`0000${currentItem.departement ?? ""}`}`) + ``
+                      }`;
+                      console.log("generat", generatedCode);
+                      setCurrentItem({ ...currentItem, code: generatedCode });
+                    }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[0]?.code}
                     disabled
@@ -1341,10 +1345,6 @@ const DataProduk = ({
                     }
                     options={departement}
                     onChange={(e) => {
-                      setCurrentItem({
-                        ...currentItem,
-                        departement: e.target.value,
-                      });
                       setCurrentItem({
                         ...currentItem,
                         departement: e.value.id ?? null,
@@ -1368,7 +1368,7 @@ const DataProduk = ({
                     }
                     options={group}
                     onChange={(e) => {
-                      console.log("cccccc", e.target?.value);
+                      console.log("cccccc", e.value?.id);
                       console.log("hhhhhh", currentItem);
                       let nsValue = 2;
                       if (
@@ -1387,6 +1387,7 @@ const DataProduk = ({
                         ...currentItem,
                         group: e?.target?.value?.id ?? null,
                         ns: nsValue,
+                        // serialnumber: e?.value?.id,
                       });
                       let newError = error;
                       newError[0].group = false;
@@ -1428,7 +1429,7 @@ const DataProduk = ({
                             ? "Asset"
                             : ""
                           : ""
-                      }-${serialNumber}`;
+                      }-${`0000${currentItem.departement ?? ""}`}`;
                       console.log("generat", generatedCode);
                       setCurrentItem({
                         ...currentItem,
@@ -1506,7 +1507,14 @@ const DataProduk = ({
 
                 <div className="col-4">
                   <label>Serial Number</label>
-                  <PrimeInput value={`${serialNumber}`} disabled />
+                  <PrimeInput
+                    value={
+                      currentItem.serialnumber ??
+                      (currentItem.serialnumber ||
+                        `0000${currentItem.departement ?? ""}`)
+                    }
+                    disabled
+                  />
                 </div>
               </div>{" "}
               <div className="col-12 p-0">

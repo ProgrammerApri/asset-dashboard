@@ -34,7 +34,7 @@ const def = {
     sup_ppn: null,
     sup_pkp: false,
     sup_npwp: null,
-    sup_country: 1,
+    sup_country: "DN",
     sup_address: null,
     sup_kota: null,
     sup_kpos: null,
@@ -55,7 +55,7 @@ const def = {
     name: "",
   },
 
-  jenisPemasok: {
+  jpem: {
     id: 1,
     jpem_code: "",
     jpem_name: "",
@@ -93,8 +93,8 @@ const defError = [
 ];
 
 const opt = [
-  { name: "Dalam Negeri", code: 1 },
-  { name: "Luar Negeri", code: 2 },
+  { name: "Dalam Negeri", code: "DN" },
+  { name: "Luar Negeri", code: "LN" },
 ];
 
 const DataSupplier = ({
@@ -129,6 +129,7 @@ const DataSupplier = ({
   const [rows2, setRows2] = useState(20);
   const [active, setActive] = useState(0);
   const [error, setError] = useState(defError);
+  const [serialNumber, setSerialNumber] = useState("");
 
   useEffect(() => {
     getJpem();
@@ -138,12 +139,23 @@ const DataSupplier = ({
     // getAccHut();
     getCompany();
     getPajak();
+    generateSerialNumber();
     initFilters1();
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
+  const generateSerialNumber = () => {
+    const nextSerialNumber = getNextSerialNumber();
+    const newSerialNumber = nextSerialNumber.toString().padStart(5, "0");
+    setSerialNumber(newSerialNumber);
+  };
+  const getNextSerialNumber = () => {
+    const currentSerialNumber = parseInt(serialNumber);
+    return currentSerialNumber + 1;
+  };
 
   const getJpem = async (isUpdate = false) => {
     setLoading(true);
@@ -983,11 +995,13 @@ const DataSupplier = ({
                 <div className="col-4 mt-0">
                   <PrimeInput
                     label={tr[localStorage.getItem("language")].kd_pem}
-                    value={
-                      currentItem !== null
-                        ? currentItem?.supplier?.sup_code
-                        : null
-                    }
+                    value={`${
+                      currentItem?.supplier?.sup_code ??
+                      (currentItem?.supplier?.sup_code ||
+                        `${currentItem?.supplier?.sup_country}-${
+                          currentItem?.jpem?.jpem_code ?? ""
+                        }-${serialNumber}`) + ``
+                    }`}
                     onChange={(e) => {
                       setCurrentItem({
                         ...currentItem,
@@ -1002,6 +1016,7 @@ const DataSupplier = ({
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[0]?.code}
+                    disabled
                   />
                 </div>
 
@@ -1024,14 +1039,13 @@ const DataSupplier = ({
                       let newError = error;
                       newError[0].name = false;
                       setError(newError);
+                     
+                      
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[0]?.name}
                   />
                 </div>
-              </div>
-
-              <div className="row ml-0 mt-0">
                 <div className="col-4 mt-0">
                   <PrimeDropdown
                     label={"Jenis Pemasok"}
@@ -1055,7 +1069,9 @@ const DataSupplier = ({
                     // error={error[0]?.jpem}
                   />
                 </div>
+              </div>
 
+              <div className="row ml-0 mt-0">
                 <div className="col-4">
                   <label className="text-label">
                     {tr[localStorage.getItem("language")].kd_cr}
@@ -1090,7 +1106,6 @@ const DataSupplier = ({
                     Dahulu
                   </small> */}
                 </div>
-
                 <div className="col-4">
                   <PrimeNumber
                     number
@@ -1101,10 +1116,27 @@ const DataSupplier = ({
                         : ""
                     }
                     onChange={(e) => {
+                      console.log("dadada",currentItem);
                       setCurrentItem({
                         ...currentItem,
                         supplier: {
                           ...currentItem.supplier,
+                          sup_npwp: e.target.value,
+                        },
+                      });
+                      const generatedCode = `${
+                        currentItem?.supplier?.sup_code ??
+                        (currentItem?.supplier?.sup_code ||
+                          `${currentItem?.supplier?.sup_country}-${
+                            currentItem?.jpem?.jpem_code ?? ""
+                          }-${serialNumber}`) + ``
+                      }`;
+                      setCurrentItem({
+                        ...currentItem,
+                        supplier: {
+                          ...currentItem.supplier,
+
+                          sup_code: generatedCode,
                           sup_npwp: e.target.value,
                         },
                       });
@@ -1118,6 +1150,13 @@ const DataSupplier = ({
                     maxLength={16}
                     // error={error[0]?.npwp}
                   />
+                </div>{" "}
+                <div
+                  style={{ width: "px", marginLeft: "px", marginRight: "px" }}
+                ></div>
+                <div className="col-3">
+                  <label>Serial Number</label>
+                  <PrimeInput value={`${serialNumber}`} disabled />
                 </div>
               </div>
 
@@ -1156,9 +1195,9 @@ const DataSupplier = ({
                   <SelectButton
                     value={
                       currentItem?.supplier?.sup_country !== null
-                        ? currentItem?.supplier?.sup_country === 1
-                          ? { name: "Dalam Negeri", code: 1 }
-                          : { name: "Luar Negeri", code: 2 }
+                        ? currentItem?.supplier?.sup_country === "DN"
+                          ? { name: "Dalam Negeri", code: "DN" }
+                          : { name: "Luar Negeri", code: "LN" }
                         : null
                     }
                     options={opt}
@@ -1207,7 +1246,7 @@ const DataSupplier = ({
 
               <div className="row ml-0 mt-0">
                 <div className="col-6 mt-0">
-                  {currentItem?.supplier?.sup_country === 1 ? (
+                  {currentItem?.supplier?.sup_country === "DN" ? (
                     <PrimeDropdown
                       label={tr[localStorage.getItem("language")].kota}
                       value={

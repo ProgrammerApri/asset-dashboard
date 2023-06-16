@@ -1275,45 +1275,57 @@ const DataProduk = ({
                     label={tr[localStorage.getItem("language")].kd_prod}
                     value={
                       currentItem?.code ??
-                      `${
-                        currentItem?.departement &&
-                        checkDept(currentItem.departement)?.ccost_code
-                      }-${
-                        currentItem?.group &&
-                        checkGroup(currentItem?.group)?.code
-                      }-${
-                        currentItem !== null && currentItem.ns !== ""
-                          ? currentItem.ns === 1
-                            ? "Stock"
-                            : currentItem.ns === 0
-                            ? "Non Stock"
-                            : currentItem.ns === 2
-                            ? "Asset"
+                      (currentItem?.code ||
+                        `${
+                          currentItem?.departement
+                            ? String(
+                                checkDept(currentItem.departement)?.ccost_code
+                              )
                             : ""
-                          : ""
-                      }-${serialNumber}`
+                        }-${
+                          currentItem !== null && currentItem?.group
+                            ? String(checkGroup(currentItem.group)?.code)
+                            : ""
+                        }-${
+                          currentItem !== null && currentItem.ns !== ""
+                            ? currentItem.ns === 1
+                              ? "Stock"
+                              : currentItem.ns === 0
+                              ? "Non Stock"
+                              : currentItem.ns === 2
+                              ? "Asset"
+                              : ""
+                            : ""
+                        }-${serialNumber}`) + ``
                     }
-                    onChange={(e) => {
-                      const generatedCode = `${
-                        currentItem?.departement &&
-                        checkDept(currentItem.departement)?.ccost_code
-                      }-${
-                        currentItem?.group &&
-                        checkGroup(currentItem?.group)?.code
-                      }-${
-                        currentItem !== null && currentItem.ns !== ""
-                          ? currentItem.ns === 1
-                            ? "Stock"
-                            : currentItem.ns === 0
-                            ? "Non Stock"
-                            : currentItem.ns === 2
-                            ? "Asset"
-                            : ""
-                          : ""
-                      }-${serialNumber}`;
-                      console.log("generat", generatedCode);
-                      setCurrentItem({ ...currentItem, code: generatedCode });
-                    }}
+                    // onChange={(e) => {
+                    //   const generatedCode = `${
+                    //     (currentItem?.code ||
+                    //       `${
+                    //         currentItem?.departement
+                    //           ? String(
+                    //               checkDept(currentItem.departement)?.ccost_code
+                    //             )
+                    //           : ""
+                    //       }-${
+                    //         currentItem !== null && currentItem?.group
+                    //           ? String(checkGroup(currentItem.group)?.code)
+                    //           : ""
+                    //       }-${
+                    //         currentItem !== null && currentItem.ns !== ""
+                    //           ? currentItem.ns === 1
+                    //             ? "Stock"
+                    //             : currentItem.ns === 0
+                    //             ? "Non Stock"
+                    //             : currentItem.ns === 2
+                    //             ? "Asset"
+                    //             : ""
+                    //           : ""
+                    //       }-${serialNumber}`) + ``
+                    //   }`;
+                    //   console.log("generat", generatedCode);
+                    //   setCurrentItem({ ...currentItem, code: generatedCode });
+                    // }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[0]?.code}
                     disabled
@@ -1358,17 +1370,17 @@ const DataProduk = ({
                     onChange={(e) => {
                       console.log("cccccc", e.target?.value);
                       console.log("hhhhhh", currentItem);
-                      let nsValue = 2; 
+                      let nsValue = 2;
                       if (
                         e?.target?.value?.stok !== 0 &&
                         e?.target?.value?.stok !== 1 &&
                         e?.target?.value?.stok !== 2
                       ) {
-                        nsValue = 2; 
+                        nsValue = 2;
                       } else if (e?.target?.value?.stok === 0) {
                         nsValue = 0;
                       } else if (e?.target?.value?.stok === 1) {
-                        nsValue = 1; 
+                        nsValue = 1;
                       }
 
                       setCurrentItem({
@@ -1418,10 +1430,12 @@ const DataProduk = ({
                           : ""
                       }-${serialNumber}`;
                       console.log("generat", generatedCode);
-                      setCurrentItem({ ...currentItem, code: generatedCode ,
-                        name: e.target.value,});
+                      setCurrentItem({
+                        ...currentItem,
+                        code: generatedCode,
+                        name: e.target.value,
+                      });
                     }}
-                    
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[0]?.name}
                   />

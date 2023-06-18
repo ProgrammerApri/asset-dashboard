@@ -177,7 +177,7 @@ const DataAkun = ({
       console.log(response);
       if (response.status) {
         const { data } = response;
-        console.log(data);
+        console.log("bayu",data);
         setKategori(data);
       }
     } catch (error) {
@@ -246,6 +246,7 @@ const DataAkun = ({
       console.log(response);
       if (response.status) {
         const res = response.data;
+        console.log("serigala",res);
         setCurrentItem({
           ...currentItem,
           account: {

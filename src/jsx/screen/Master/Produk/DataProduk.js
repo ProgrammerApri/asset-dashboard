@@ -58,7 +58,7 @@ const def = {
   ns: null,
   ket: null,
   suplier: null,
-  serialnumber: null,
+  serialNumber: null,
 };
 
 const type = [
@@ -133,7 +133,7 @@ const DataProduk = ({
   const [showDetail, setShowDetail] = useState(false);
   const [expandedRows, setExpandedRows] = useState(null);
   const dispatch = useDispatch(); // const PrimeInput = () => {
-  const [serialNumber, setSerialNumber] = useState("");
+  const [serialNumber, setserialNumber] = useState(0);
   // const valueprefix = `${currentItem.departement}/${currentItem.name}/${serialNumber}`;
 
   useEffect(() => {
@@ -148,22 +148,24 @@ const DataProduk = ({
     getUnit();
     getSupplier();
     getHistori();
-    generateSerialNumber();
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
-  const generateSerialNumber = () => {
-    const nextSerialNumber = getNextSerialNumber();
-    const newSerialNumber = nextSerialNumber.toString().padStart(5, "0");
-    setSerialNumber(newSerialNumber);
-  };
-  const getNextSerialNumber = () => {
-    const currentSerialNumber = parseInt(serialNumber);
-    return currentSerialNumber + 1;
-  };
+  function generateserialNumber(serialNumber) {
+    const leadingZeros = "0000";
+    const formattedserialNumber = (leadingZeros + serialNumber).slice(
+      -leadingZeros.length
+    );
+    return formattedserialNumber;
+  }
+  console.log("generrrrr", generateserialNumber(serialNumber));
+
+  function handleGenerateserialNumber() {
+    setserialNumber(serialNumber + 1);
+  }
 
   const getProductCode = async () => {
     const config = {
@@ -293,6 +295,7 @@ const DataProduk = ({
       endpoint: endpoints.editProduct.endpoint + currentItem.id,
       data: {
         ...currentItem,
+        serialNumber: generateserialNumber(serialNumber),
         // group: currentItem?.group?.id ?? null,
         // suplier: currentItem?.suplier?.id ?? null,
         // unit: currentItem?.unit?.id ?? null,
@@ -337,9 +340,7 @@ const DataProduk = ({
       ...endpoints.addProduct,
       data: {
         ...currentItem,
-        // group: currentItem?.group?.id ?? null,
-        // suplier: currentItem?.suplier?.id ?? null,
-        // unit: currentItem?.unit?.id ?? null,
+        serialNumber: generateserialNumber(serialNumber),
         image: image,
       },
     };
@@ -540,7 +541,6 @@ const DataProduk = ({
 
   const onClick = () => {
     setDisplayData(true);
-    // setCurrentItem();
 
     if (position) {
       setPosition(position);
@@ -835,7 +835,7 @@ const DataProduk = ({
             name: el.name,
             exp_date: el.exp_date,
             departement: el.departement,
-            serialnumber: el.serialnumber,
+            serialNumber: el.serialNumber,
             group: el.group_id,
             unit: el.unit_id,
             type: null,
@@ -1270,7 +1270,7 @@ const DataProduk = ({
               headerTemplate={renderTabHeader}
             >
               <div className="row mr-0 ml-0">
-                <div className="col-6">
+                <div className="col-5">
                   <PrimeInput
                     label={tr[localStorage.getItem("language")].kd_prod}
                     value={
@@ -1296,11 +1296,7 @@ const DataProduk = ({
                               ? "Asset"
                               : ""
                             : ""
-                        }-0000${
-                          currentItem?.departement
-                            ? String(checkDept(currentItem.departement)?.id)
-                            : ""
-                        }`) + ``
+                        }-${generateserialNumber(serialNumber)}`) + ``
                     }
                     onChange={(e) => {
                       const generatedCode = `${
@@ -1325,7 +1321,7 @@ const DataProduk = ({
                                 ? "Asset"
                                 : ""
                               : ""
-                          }-${`0000${currentItem.departement ?? ""}`}`) + ``
+                          }-${generateserialNumber(serialNumber)}`) + ``
                       }`;
                       console.log("generat", generatedCode);
                       setCurrentItem({ ...currentItem, code: generatedCode });
@@ -1334,6 +1330,12 @@ const DataProduk = ({
                     error={error[0]?.code}
                     disabled
                   />
+                </div>
+                <div className="col-3">
+                  <label>generate</label>
+                  <div></div>
+                  {/* <PrimeInput value={generateserialNumber(serialNumber)} disabled /> */}
+                  <Button onClick={handleGenerateserialNumber}>Generate</Button>
                 </div>
                 <div className="col-4">
                   <PrimeDropdown
@@ -1387,7 +1389,7 @@ const DataProduk = ({
                         ...currentItem,
                         group: e?.target?.value?.id ?? null,
                         ns: nsValue,
-                        // serialnumber: e?.value?.id,
+                        // serialNumber: e?.value?.id,
                       });
                       let newError = error;
                       newError[0].group = false;
@@ -1429,7 +1431,7 @@ const DataProduk = ({
                             ? "Asset"
                             : ""
                           : ""
-                      }-${`0000${currentItem.departement ?? ""}`}`;
+                      }-${generateserialNumber(serialNumber)}`;
                       console.log("generat", generatedCode);
                       setCurrentItem({
                         ...currentItem,
@@ -1501,18 +1503,6 @@ const DataProduk = ({
                     filter
                     filterBy="name"
                     placeholder={tr[localStorage.getItem("language")].pilih}
-                    disabled
-                  />
-                </div>
-
-                <div className="col-4">
-                  <label>Serial Number</label>
-                  <PrimeInput
-                    value={
-                      currentItem.serialnumber ??
-                      (currentItem.serialnumber ||
-                        `0000${currentItem.departement ?? ""}`)
-                    }
                     disabled
                   />
                 </div>

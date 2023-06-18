@@ -55,6 +55,7 @@ const def = {
     cus_limit: null,
     sub_cus: false,
     cus_id: null,
+    cus_serialNumber: 0,
   },
 
   jpel: {
@@ -145,7 +146,7 @@ const DataCustomer = ({
   const [showPajak, setShowPajak] = useState(false);
   const [doubleClick, setDoubleClick] = useState(false);
   const [error, setError] = useState(defError);
-  const [serialNumber, setSerialNumber] = useState("");
+  const [serialNumber, setserialNumber] = useState(0);
 
   useEffect(() => {
     getCustomer();
@@ -157,22 +158,25 @@ const DataCustomer = ({
     getComp();
     getPajak();
     initFilters1();
-    generateSerialNumber();
+    // generateSerialNumber();
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
-  const generateSerialNumber = () => {
-    const nextSerialNumber = getNextSerialNumber();
-    const newSerialNumber = nextSerialNumber.toString().padStart(5, "0");
-    setSerialNumber(newSerialNumber);
-  };
-  const getNextSerialNumber = () => {
-    const currentSerialNumber = parseInt(serialNumber);
-    return currentSerialNumber + 1;
-  };
+  function generateSerialNumber(serialNumber) {
+    const leadingZeros = "0000";
+    const formattedserialNumber = (leadingZeros + serialNumber).slice(
+      -leadingZeros.length
+    );
+    return formattedserialNumber;
+  }
+  console.log("generrrrr", generateSerialNumber(serialNumber));
+
+  function handlegenerateSerialNumber() {
+    setserialNumber(serialNumber + 1);
+  }
 
   const getCustomer = async (isUpdate = false) => {
     setLoading(true);
@@ -409,6 +413,8 @@ const DataCustomer = ({
         sub_cus: currentItem?.customer?.sub_cus ?? null,
         cus_id: currentItem?.customer?.cus_id ?? null,
         cus_curren: currentItem?.customer?.cus_curren ?? null,
+        cus_serialNumber:
+          currentItem?.generateSerialNumber(serialNumber) ?? null,
       },
     };
     console.log(config.data);
@@ -471,6 +477,7 @@ const DataCustomer = ({
         cus_limit: currentItem?.customer?.cus_limit ?? null,
         sub_cus: currentItem?.customer?.sub_cus ?? null,
         cus_id: currentItem?.customer?.cus_id ?? null,
+        cus_serialNumber:generateSerialNumber(serialNumber) ?? null,
       },
     };
     console.log(config.data);
@@ -1119,7 +1126,7 @@ const DataCustomer = ({
                       (currentItem?.customer?.cus_code ||
                         `${currentItem?.customer?.cus_country}-${
                           currentItem?.jpel?.jpel_code
-                        }-0000${currentItem?.jpel?.id ?? ""}`) + ``
+                        }-${generateSerialNumber(serialNumber)}`) + ``
                     }`}
                     onChange={(e) => {
                       setCurrentItem({
@@ -1138,7 +1145,15 @@ const DataCustomer = ({
                     disabled
                   />
                 </div>
+                <div className="col-4">
+                  <label>Seri Number</label>
+                  <div></div>
+                  {/* <PrimeInput value={generateSerialNumber(serialNumber)} disabled /> */}
+                  <Button onClick={handlegenerateSerialNumber}>Generate</Button>
+                </div>
+              </div>
 
+              <div className="row mr-0 ml-0">
                 <div className="col-6">
                   <PrimeInput
                     label={tr[localStorage.getItem("language")].nm_pel}
@@ -1159,9 +1174,6 @@ const DataCustomer = ({
                     error={error[0]?.name}
                   />
                 </div>
-              </div>
-
-              <div className="row mr-0 ml-0">
                 <div className="col-6">
                   <PrimeDropdown
                     label={"Jenis Pelanggan"}
@@ -1207,11 +1219,7 @@ const DataCustomer = ({
                       placeholder={tr[localStorage.getItem("language")].pilih}
                     />
                   </div>
-                </div>
-              </div>
-
-              <div className="row mr-0 ml-0">
-                <div className="col-6">
+                </div><div className="col-6">
                   <PrimeDropdown
                     label={tr[localStorage.getItem("language")].currency}
                     value={
@@ -1236,6 +1244,10 @@ const DataCustomer = ({
                     placeholder={tr[localStorage.getItem("language")].pilih}
                   />
                 </div>
+              </div>
+
+              <div className="row mr-0 ml-0">
+                
                 <div className="col-4">
                   <PrimeNumber
                     label={"NPWP"}
@@ -1300,13 +1312,13 @@ const DataCustomer = ({
                 <div
                   style={{ width: "8px", marginLeft: "px", marginRight: "5px" }}
                 ></div>
-                <div className="col-3">
+                {/* <div className="col-3">
                   <label>Serial Number</label>
                   <PrimeInput
                     value={`0000${currentItem?.jpel?.id ?? ""}`}
                     disabled
                   />
-                </div>
+                </div> */}
               </div>
 
               {currentItem?.customer?.sub_cus && (
@@ -1409,7 +1421,7 @@ const DataCustomer = ({
                         (currentItem?.customer?.cus_code ||
                           `${currentItem?.customer?.cus_country}-${
                             currentItem?.jpel?.jpel_code
-                          }-0000${currentItem?.jpel?.id ?? ""}`) + ``
+                          }-${generateSerialNumber(serialNumber)}`) + ``
                       }`;
                       console.log("generat", generatedCode);
                       setCurrentItem({

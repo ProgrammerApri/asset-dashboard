@@ -100,6 +100,7 @@ const LaporanPersediaan = React.lazy(() =>
   import("./screen/Report/LaporanPersediaan")
 );
 const SaldoAwal = React.lazy(() => import("./screen/SaldoAwal"));
+const Budgeting = React.lazy(() => import("./screen/Budget"));
 const Posting = React.lazy(() => import("./screen/Posting/PostingGl"));
 const SaldoAkhir = React.lazy(() =>
   import("./screen/Transaksi/SaldoAkhir/SaldoAkhir")
@@ -181,6 +182,9 @@ const Markup = ({ width }) => {
 
     { url: "saldo-awal", component: SaldoAwal },
     { url: "saldo-awal/:active", component: SaldoAwal },
+
+    { url: "budget", component: Budgeting },
+    { url: "budget/:active", component: Budgeting },
 
     { url: "saldo-akhir", component: SaldoAkhir },
     { url: "saldo-akhir/:active", component: SaldoAkhir },

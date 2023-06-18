@@ -29,6 +29,7 @@ import GIROINReducer from "./GiroIncReducer";
 import ProfileReducer from "./ProfileReducer";
 import UserReducer from "./UserReducer";
 import SaldoAwalReducer from "./SaldoAwalReducer";
+import BudgetingReducer from "./BudgetingReducer";
 import PnlReducer from "./PnlReducer";
 import RpAutoReducer from "./RpAutoReducer";
 // import PBNReducer from "./PBNReducer";
@@ -68,6 +69,7 @@ const rootReducer = combineReducers({
   inv_pj: INVReducer,
   fk_pb: INVReducer,
   sa: SaldoAwalReducer,
+  bu: BudgetingReducer,
   pnl: PnlReducer,
   rpauto: RpAutoReducer,
 });

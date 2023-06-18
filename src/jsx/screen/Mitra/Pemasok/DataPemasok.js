@@ -47,6 +47,7 @@ const def = {
     sup_hutang: null,
     sup_uang_muka: null,
     sup_limit: null,
+    sup_serialNumber: 0,
   },
 
   currency: {
@@ -129,7 +130,7 @@ const DataSupplier = ({
   const [rows2, setRows2] = useState(20);
   const [active, setActive] = useState(0);
   const [error, setError] = useState(defError);
-  const [serialNumber, setSerialNumber] = useState("");
+  const [serialNumber, setserialNumber] = useState(0);
 
   useEffect(() => {
     getJpem();
@@ -139,7 +140,6 @@ const DataSupplier = ({
     // getAccHut();
     getCompany();
     getPajak();
-    generateSerialNumber();
     initFilters1();
     window.addEventListener("scroll", handleScroll);
     return () => {
@@ -147,15 +147,18 @@ const DataSupplier = ({
     };
   }, []);
 
-  const generateSerialNumber = () => {
-    const nextSerialNumber = getNextSerialNumber();
-    const newSerialNumber = nextSerialNumber.toString().padStart(5, "0");
-    setSerialNumber(newSerialNumber);
-  };
-  const getNextSerialNumber = () => {
-    const currentSerialNumber = parseInt(serialNumber);
-    return currentSerialNumber + 1;
-  };
+  function generateserialNumber(serialNumber) {
+    const leadingZeros = "0000";
+    const formattedserialNumber = (leadingZeros + serialNumber).slice(
+      -leadingZeros.length
+    );
+    return formattedserialNumber;
+  }
+  console.log("generrrrr", generateserialNumber(serialNumber));
+
+  function handleGenerateserialNumber() {
+    setserialNumber(serialNumber + 1);
+  }
 
   const getJpem = async (isUpdate = false) => {
     setLoading(true);
@@ -390,6 +393,7 @@ const DataSupplier = ({
         sup_hutang: currentItem?.supplier?.sup_hutang ?? null,
         sup_uang_muka: currentItem?.supplier?.sup_uang_muka ?? null,
         sup_limit: currentItem?.supplier?.sup_limit ?? null,
+        sup_serialNumber: generateserialNumber(serialNumber),
       },
     };
     console.log(config.data);
@@ -1000,7 +1004,7 @@ const DataSupplier = ({
                       (currentItem?.supplier?.sup_code ||
                         `${currentItem?.supplier?.sup_country}-${
                           currentItem?.jpem?.jpem_code 
-                        }-0000${currentItem?.jpem?.id ?? ""}`) + ``
+                        }-${generateserialNumber(serialNumber)}`) + ``
                     }`}
                     onChange={(e) => {
                       setCurrentItem({
@@ -1019,8 +1023,14 @@ const DataSupplier = ({
                     disabled
                   />
                 </div>
+                <div className="col-2">
+                  <label>Seri Number</label>
+                  <div></div>
+                  {/* <PrimeInput value={generateserialNumber(serialNumber)} disabled /> */}
+                  <Button onClick={handleGenerateserialNumber}>Generate</Button>
+                </div>
 
-                <div className="col-4">
+                <div className="col-6">
                   <PrimeInput
                     label={tr[localStorage.getItem("language")].nm_pem}
                     value={
@@ -1066,11 +1076,7 @@ const DataSupplier = ({
                     // errorMessage="Jenis Pemasok Belum Dipilih"
                     // error={error[0]?.jpem}
                   />
-                </div>
-              </div>
-
-              <div className="row ml-0 mt-0">
-                <div className="col-4">
+                </div> <div className="col-4">
                   <label className="text-label">
                     {tr[localStorage.getItem("language")].kd_cr}
                   </label>
@@ -1103,8 +1109,7 @@ const DataSupplier = ({
                     *Aktifkan Multi Currency Pada Setup Perusahaan Terlebih
                     Dahulu
                   </small> */}
-                </div>
-                <div className="col-4">
+                </div><div className="col-4">
                   <PrimeNumber
                     number
                     label={"NPWP"}
@@ -1134,16 +1139,21 @@ const DataSupplier = ({
                     // error={error[0]?.npwp}
                   />
                 </div>{" "}
+              </div>
+
+              <div className="row ml-0 mt-0">
+               
+                
                 <div
                   style={{ width: "px", marginLeft: "px", marginRight: "px" }}
                 ></div>
-                <div className="col-3">
+                {/* <div className="col-3">
                   <label>Serial Number</label>
                   <PrimeInput
                     value={`0000${currentItem?.jpem?.id ?? ""}`}
                     disabled
                   />
-                </div>
+                </div> */}
               </div>
 
               <div className="d-flex col-12 align-items-center mt-0">
@@ -1225,7 +1235,7 @@ const DataSupplier = ({
                         (currentItem?.supplier?.sup_code ||
                           `${currentItem?.supplier?.sup_country}-${
                             currentItem?.jpem?.jpem_code ?? ""
-                          }-0000${currentItem?.jpem?.id ?? ""}`) + ``
+                          }-${generateserialNumber(serialNumber)}`) + ``
                       }`;
                       setCurrentItem({
                         ...currentItem,

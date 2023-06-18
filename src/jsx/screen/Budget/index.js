@@ -1,33 +1,14 @@
 import React, { useState } from "react";
 import { Button, Col, Row } from "react-bootstrap";
-import SaldoAwalInv from "./SaldoAwal";
-import SaldoAwalAP from "./SaldoAwalAP";
-import SaldoAwalAR from "./SaldoAwalAR";
-import SaldoAwalGL from "./SaldoGl";
-// import SaldoAwalGL from "./SaldoGl";
+import Budgeting from "./Budgeting";
 
-const SaldoAwal = () => {
+const Budget = () => {
   const [active, setActive] = useState(0);
   const [subMenu, setSubMenu] = useState([
     {
-      tittle: "Saldo Awal GL",
+      tittle: "Budgeting",
       icon: "bx-receipt",
-      component: <SaldoAwalGL />,
-    },
-    {
-      tittle: "Saldo Awal Persediaan",
-      icon: "bx-receipt",
-      component: <SaldoAwalInv />,
-    },
-    {
-      tittle: "Saldo Awal A/P",
-      icon: "bx-receipt",
-      component: <SaldoAwalAP />,
-    },
-    {
-      tittle: "Saldo Awal A/R",
-      icon: "bx-receipt",
-      component: <SaldoAwalAR />,
+      component: <Budgeting />,
     },
   ]);
 
@@ -66,4 +47,4 @@ const SaldoAwal = () => {
   );
 };
 
-export default SaldoAwal;
+export default Budget;

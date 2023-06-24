@@ -201,6 +201,11 @@ const Markup = ({ width }) => {
     ? body.setAttribute("data-sidebar-style", "mini")
     : body.setAttribute("data-sidebar-style", "overlay");
 
+  
+  const interfaceType = "normal"
+
+  body.setAttribute("data-interface-type", interfaceType)
+
 
   const [comp, setComp] = useState(null);
 
@@ -271,7 +276,7 @@ const Markup = ({ width }) => {
   ) : (
     <Router>
       <div id="main-wrapper" className="show">
-        <Nav />
+        {interfaceType !== 'frame' ? <Nav /> :<></>}
 
         <div className="content-body">
           <div className="container-fluid">

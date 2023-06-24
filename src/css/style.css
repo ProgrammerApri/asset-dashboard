@@ -47897,3 +47897,16 @@ a .sidebar-logo .logo{
   padding: 7px 10px;
   border-radius: 10px;
 }
+
+[data-interface-type="frame"] .content-body {
+  padding-top: 0 !important;
+  margin-left: 0 !important;
+}
+
+[data-interface-type="frame"] .header {
+  display: none;
+}
+
+[data-interface-type="frame"] .sidebar {
+  display: none;
+}

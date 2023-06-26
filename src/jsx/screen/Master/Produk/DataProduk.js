@@ -62,15 +62,15 @@ const def = {
 };
 
 const type = [
-  { name: "Stock", id: 1 },
-  { name: "Non Stock", id: 0 },
-  { name: "Asset", id: 2 },
+  { name: "S", id: 1 },
+  { name: "NS", id: 0 },
+  { name: "A", id: 2 },
 ];
 
 const dpt = [
   { name: "Purchasing", id: 1 },
   { name: "PRODUKSI", id: 2 },
-  // { name: "Asset", id: 2 },
+  // { name: "A", id: 2 },
 ];
 
 const metode = [
@@ -107,6 +107,7 @@ const DataProduk = ({
   const product = useSelector((state) => state.product);
   const [prdCode, setPrdCode] = useState(null);
   const [group, setGroup] = useState(null);
+  const [nomor, setNomor] = useState(null);
   const [departement, setDept] = useState(null);
   const [unit, setUnit] = useState(null);
   const [suplier, setSupplier] = useState(null);
@@ -125,6 +126,7 @@ const DataProduk = ({
   const [active, setActive] = useState(0);
   const picker = useRef(null);
   const [file, setFile] = useState(null);
+  const [prodcode, setProdcode] = useState(null);
   const [error, setError] = useState(defError);
   const progressBar = useRef(null);
   const [number, setNumber] = useState("");
@@ -132,9 +134,9 @@ const DataProduk = ({
   const [detail, setDetail] = useState(null);
   const [showDetail, setShowDetail] = useState(false);
   const [expandedRows, setExpandedRows] = useState(null);
-  const dispatch = useDispatch(); // const PrimeInput = () => {
-  const [serialNumber, setserialNumber] = useState(0);
-  // const valueprefix = `${currentItem.departement}/${currentItem.name}/${serialNumber}`;
+  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  const [lastSerialNumber, setLastSerialNumber] = useState("");
 
   useEffect(() => {
     if (!popUp) {
@@ -142,7 +144,6 @@ const DataProduk = ({
     }
 
     initFilters1();
-    getProductCode();
     getGroup();
     getDept();
     getUnit();
@@ -154,35 +155,35 @@ const DataProduk = ({
     };
   }, []);
 
-  function generateserialNumber(serialNumber) {
-    const leadingZeros = "0000";
-    const formattedserialNumber = (leadingZeros + serialNumber).slice(
-      -leadingZeros.length
-    );
-    return formattedserialNumber;
-  }
-  console.log("generrrrr", generateserialNumber(serialNumber));
-
-  function handleGenerateserialNumber() {
-    setserialNumber(serialNumber + 1);
-  }
-
-  const getProductCode = async () => {
+  const getProduct = async () => {
     const config = {
-      ...endpoints.product_code,
+      ...endpoints.product,
       data: {},
     };
-    console.log(config.data);
-    let response = null;
+
     try {
-      response = await request(null, config);
-      console.log(response);
+      const response = await request(null, config);
+
       if (response.status) {
         const { data } = response;
-
-        setPrdCode(data);
+        console.log(data);
+      const lastData = data.reduce((prev, current) => {
+        return prev.id > current.id ? prev : current;
+      });
+        console.log(lastData);
+        let serialNumber = lastData.serialNumber;
+        console.log(serialNumber);
+        if (!serialNumber) {
+          serialNumber = "00000";
+        }
+        const nextSerialNumberValue = parseInt(serialNumber, 10) + 1;
+        const nextSerialNumber = String(nextSerialNumberValue).padStart(5, "0");
+        console.log(nextSerialNumber);
+        setLastSerialNumber(nextSerialNumber);
       }
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const getGroup = async () => {
@@ -222,9 +223,24 @@ const DataProduk = ({
       }
     } catch (error) {}
     if (isUpdate) {
-      // setLoading(false);
     } else {
     }
+  };
+
+  const getCodeProd = async () => {
+    const config = {
+      ...endpoints.product_code,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setProdcode(data);
+      }
+    } catch (error) {}
   };
 
   const getUnit = async () => {
@@ -278,12 +294,6 @@ const DataProduk = ({
       console.log(response);
       if (response.status) {
         const { data } = response;
-        // let his = [];
-        // data.forEach((elem) => {
-        //   if (elem.product.id === t.id) {
-        //     his.push(elem);
-        //   }
-        // });
         setHistori(data);
       }
     } catch (error) {}
@@ -295,10 +305,6 @@ const DataProduk = ({
       endpoint: endpoints.editProduct.endpoint + currentItem.id,
       data: {
         ...currentItem,
-        serialNumber: generateserialNumber(serialNumber),
-        // group: currentItem?.group?.id ?? null,
-        // suplier: currentItem?.suplier?.id ?? null,
-        // unit: currentItem?.unit?.id ?? null,
         image: image,
       },
     };
@@ -340,7 +346,7 @@ const DataProduk = ({
       ...endpoints.addProduct,
       data: {
         ...currentItem,
-        serialNumber: generateserialNumber(serialNumber),
+        serialNumber: lastSerialNumber,
         image: image,
       },
     };
@@ -408,6 +414,7 @@ const DataProduk = ({
           setDisplayDel(false);
           onSuccessInput();
           onInput(false);
+
           toast.current.show({
             severity: "info",
             summary: tr[localStorage.getItem("language")].berhsl,
@@ -519,9 +526,6 @@ const DataProduk = ({
         >
           <i className="fa fa-pencil"></i>
         </Link>
-        {/* } */}
-
-        {/* {del && ( */}
         <Link
           onClick={() => {
             setEdit(true);
@@ -549,7 +553,6 @@ const DataProduk = ({
 
   const onSubmit = () => {
     if (isValid()) {
-      setUpdate(true);
       uploadImage();
     }
   };
@@ -608,12 +611,15 @@ const DataProduk = ({
         <PButton
           label={tr[localStorage.getItem("language")].simpan}
           icon="pi pi-check"
-          onClick={() => onSubmit()}
-          // onClick={() => {
-          //   setUpdate(true);
-          //   setActive(0);
-          //   submitUpdate();
-          // }}
+          // onClick={() => onSubmit()}
+          onClick={() => {
+            setUpdate(true);
+            setActive(0);
+            onSubmit();
+            setTimeout(() => {
+              window.location.reload();
+            }, 500);
+          }}
           autoFocus
           loading={update}
         />
@@ -704,7 +710,7 @@ const DataProduk = ({
                 });
                 setDisplayData(true);
                 onInput(true);
-                // getSetupWip();
+                getProduct();
               }}
             />
           </Row>
@@ -1092,7 +1098,6 @@ const DataProduk = ({
   const checkGroup = (value) => {
     let selected = {};
     group?.forEach((element) => {
-      console.log("ggggggggg", group);
       if (value === element?.id) {
         selected = element;
         console.log(selected);
@@ -1156,7 +1161,7 @@ const DataProduk = ({
             "name",
             "group.group",
             "type",
-            "stock",
+            "S",
           ]}
           emptyMessage={tr[localStorage.getItem("language")].empty_data}
           paginator
@@ -1238,7 +1243,6 @@ const DataProduk = ({
       </>
     );
   };
-
   const renderDialog = () => {
     return (
       <>
@@ -1258,7 +1262,6 @@ const DataProduk = ({
           footer={renderFooter()}
           onHide={() => {
             setEdit(false);
-            setDisplayData(false);
             setActive(0);
             setFile(null);
             onInput(false);
@@ -1270,7 +1273,7 @@ const DataProduk = ({
               headerTemplate={renderTabHeader}
             >
               <div className="row mr-0 ml-0">
-                <div className="col-5">
+                <div className="col-4 ">
                   <PrimeInput
                     label={tr[localStorage.getItem("language")].kd_prod}
                     value={
@@ -1289,14 +1292,14 @@ const DataProduk = ({
                         }-${
                           currentItem !== null && currentItem.ns !== ""
                             ? currentItem.ns === 1
-                              ? "Stock"
+                              ? "S"
                               : currentItem.ns === 0
-                              ? "Non Stock"
+                              ? "NS"
                               : currentItem.ns === 2
-                              ? "Asset"
+                              ? "A"
                               : ""
                             : ""
-                        }-${generateserialNumber(serialNumber)}`) + ``
+                        }-${lastSerialNumber}`) + ``
                     }
                     onChange={(e) => {
                       const generatedCode = `${
@@ -1314,29 +1317,37 @@ const DataProduk = ({
                           }-${
                             currentItem !== null && currentItem.ns !== ""
                               ? currentItem.ns === 1
-                                ? "Stock"
+                                ? "S"
                                 : currentItem.ns === 0
-                                ? "Non Stock"
+                                ? "NS"
                                 : currentItem.ns === 2
-                                ? "Asset"
+                                ? "A"
                                 : ""
                               : ""
-                          }-${generateserialNumber(serialNumber)}`) + ``
+                          }-${lastSerialNumber}`) + ``
                       }`;
-                      console.log("generat", generatedCode);
-                      setCurrentItem({ ...currentItem, code: generatedCode });
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[0]?.code}
                     disabled
                   />
                 </div>
-                <div className="col-3">
+
+                {/* <div className="col-4 ">
+                  <PrimeInput
+                    label="number"
+                    value={lastSerialNumber}
+                    placeholder={tr[localStorage.getItem("language")].masuk}
+                    error={error[0]?.code}
+                    disabled
+                  />
+                </div> */}
+                {/* <div className="col-3">
                   <label>generate</label>
                   <div></div>
                   {/* <PrimeInput value={generateserialNumber(serialNumber)} disabled /> */}
-                  <Button onClick={handleGenerateserialNumber}>Generate</Button>
-                </div>
+                {/* <Button onClick={handleGenerateserialNumber}>Generate</Button>
+                </div> */}
                 <div className="col-4">
                   <PrimeDropdown
                     label={"Nama Departement"}
@@ -1351,6 +1362,7 @@ const DataProduk = ({
                         ...currentItem,
                         departement: e.value.id ?? null,
                       });
+                      // getCodeProd()
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     optionLabel="ccost_name"
@@ -1389,8 +1401,8 @@ const DataProduk = ({
                         ...currentItem,
                         group: e?.target?.value?.id ?? null,
                         ns: nsValue,
-                        // serialNumber: e?.value?.id,
                       });
+
                       let newError = error;
                       newError[0].group = false;
                       setError(newError);
@@ -1424,14 +1436,14 @@ const DataProduk = ({
                       }-${
                         currentItem !== null && currentItem.ns !== ""
                           ? currentItem.ns === 1
-                            ? "Stock"
+                            ? "S"
                             : currentItem.ns === 0
-                            ? "Non Stock"
+                            ? "NS"
                             : currentItem.ns === 2
-                            ? "Asset"
+                            ? "A"
                             : ""
                           : ""
-                      }-${generateserialNumber(serialNumber)}`;
+                      }-${lastSerialNumber}`;
                       console.log("generat", generatedCode);
                       setCurrentItem({
                         ...currentItem,
@@ -1443,6 +1455,45 @@ const DataProduk = ({
                     error={error[0]?.name}
                   />
                 </div>
+
+                <div className="col-4">
+                  <PrimeInput
+                    label={"Brands"}
+                    value={`${currentItem?.brand ?? ""}`}
+                    onChange={(e) => {
+                      setCurrentItem({ ...currentItem, brand: e.target.value });
+                      // let newError = error;
+                      // newError[0].name = false;
+                      // setError(newError);
+                    }}
+                    placeholder={tr[localStorage.getItem("language")].masuk}
+                    // error={error[0]?.name}
+                  />
+                </div>
+                <div className="col-4">
+                  <PrimeInput
+                    label={tr[localStorage.getItem("language")].type_prod}
+                    value={
+                      currentItem !== null && currentItem.ns !== ""
+                        ? currentItem.ns === 1
+                          ? "Stock"
+                          : currentItem.ns === 0
+                          ? "Non Stock"
+                          : currentItem.ns === 2
+                          ? "Asset"
+                          : ""
+                        : ""
+                    }
+                    options={type}
+                    optionLabel="name"
+                    filter
+                    filterBy="name"
+                    placeholder={tr[localStorage.getItem("language")].pilih}
+                    disabled
+                  />
+                </div>
+              </div>
+              <div className="row mr-0 ml-0">
                 <div className="col-4">
                   <PrimeCalendar
                     label={tr[localStorage.getItem("language")].tgl_exp}
@@ -1465,45 +1516,6 @@ const DataProduk = ({
                     error={error[0]?.exp_date}
                     showIcon
                     dateFormat="dd/mm/yy"
-                  />
-                </div>
-              </div>
-              <div className="row mr-0 ml-0">
-                <div className="col-4">
-                  <PrimeInput
-                    label={"Brands"}
-                    value={`${currentItem?.brand ?? ""}`}
-                    onChange={(e) => {
-                      setCurrentItem({ ...currentItem, brand: e.target.value });
-                      // let newError = error;
-                      // newError[0].name = false;
-                      // setError(newError);
-                    }}
-                    placeholder={tr[localStorage.getItem("language")].masuk}
-                    // error={error[0]?.name}
-                  />
-                </div>
-
-                <div className="col-4">
-                  <PrimeInput
-                    label={tr[localStorage.getItem("language")].type_prod}
-                    value={
-                      currentItem !== null && currentItem.ns !== ""
-                        ? currentItem.ns === 1
-                          ? "Stock"
-                          : currentItem.ns === 0
-                          ? "Non Stock"
-                          : currentItem.ns === 2
-                          ? "Asset"
-                          : ""
-                        : ""
-                    }
-                    options={type}
-                    optionLabel="name"
-                    filter
-                    filterBy="name"
-                    placeholder={tr[localStorage.getItem("language")].pilih}
-                    disabled
                   />
                 </div>
               </div>{" "}

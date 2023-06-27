@@ -146,10 +146,9 @@ const DataCustomer = ({
   const [showPajak, setShowPajak] = useState(false);
   const [doubleClick, setDoubleClick] = useState(false);
   const [error, setError] = useState(defError);
-  const [serialNumber, setserialNumber] = useState(0);
+  const [lastSerialNumber, setLastSerialNumber] = useState("");
 
   useEffect(() => {
-    getCustomer();
     getSetup();
     getCity();
     getJpel();
@@ -158,50 +157,59 @@ const DataCustomer = ({
     getComp();
     getPajak();
     initFilters1();
-    // generateSerialNumber();
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
-  function generateSerialNumber(serialNumber) {
-    const leadingZeros = "0000";
-    const formattedserialNumber = (leadingZeros + serialNumber).slice(
-      -leadingZeros.length
-    );
-    return formattedserialNumber;
-  }
-  console.log("generrrrr", generateSerialNumber(serialNumber));
+  const countries = [
+    { name: "Australia", code: "AU" },
+    { name: "Brazil", code: "BR" },
+    { name: "China", code: "CN" },
+    { name: "Egypt", code: "EG" },
+    { name: "France", code: "FR" },
+    { name: "Germany", code: "DE" },
+    { name: "India", code: "IN" },
+    { name: "Indonesia", code: "IND" },
+    { name: "Japan", code: "JP" },
+    { name: "Spain", code: "ES" },
+    { name: "United States", code: "US" },
+  ];
 
-  function handlegenerateSerialNumber() {
-    setserialNumber(serialNumber + 1);
-  }
-
-  const getCustomer = async (isUpdate = false) => {
+  const getCustomer = async () => {
     setLoading(true);
     const config = {
       ...endpoints.customer,
       data: {},
     };
     console.log(config.data);
-    let response = null;
     try {
-      response = await request(null, config);
+      const response = await request(null, config);
       console.log(response);
       if (response.status) {
         const { data } = response;
         console.log(data);
-        setCustomer(data);
-        let non = [];
-        data.forEach((el) => {
-          if (!el.customer.sub_cus) {
-            non.push(el);
-          }
-        });
-        setNonSub(non);
+
+        const sortedData = data.sort((a, b) => b.customer.id - a.customer.id);
+        const lastData = sortedData.find(
+          (item) => item.customer.cus_serialNumber
+        );
+        let serialNumber = lastData
+          ? lastData.customer.cus_serialNumber
+          : "00000";
+        console.log(serialNumber);
+
+        const nextSerialNumberValue = parseInt(serialNumber, 10) + 1;
+        const nextSerialNumber = String(nextSerialNumberValue).padStart(5, "0");
+        console.log(nextSerialNumber);
+        setLastSerialNumber(nextSerialNumber);
       }
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getSetup = async () => {
@@ -214,7 +222,7 @@ const DataCustomer = ({
     try {
       response = await request(null, config);
       console.log(response);
-      if (response.status) {
+      if (response?.status) {
         const { data } = response;
         console.log(data);
         setSetup(data);
@@ -397,7 +405,7 @@ const DataCustomer = ({
         cus_pjk: currentItem?.customer?.cus_pjk ?? null,
         cus_npwp: currentItem?.customer?.cus_npwp ?? null,
         cus_pkp: currentItem?.customer?.cus_pkp ?? null,
-        cus_country: currentItem?.customer?.cus_country ?? null,
+        cus_country: currentItem?.customer?.cus_country.code ?? null,
         cus_address: currentItem?.customer?.cus_address ?? null,
         cus_kota: currentItem?.customer?.cus_kota ?? null,
         cus_kpos: currentItem?.customer?.cus_kpos ?? null,
@@ -413,8 +421,7 @@ const DataCustomer = ({
         sub_cus: currentItem?.customer?.sub_cus ?? null,
         cus_id: currentItem?.customer?.cus_id ?? null,
         cus_curren: currentItem?.customer?.cus_curren ?? null,
-        cus_serialNumber:
-          currentItem?.generateSerialNumber(serialNumber) ?? null,
+        cus_serialNumber: currentItem?.customer?.cus_serialNumber ?? null,
       },
     };
     console.log(config.data);
@@ -461,7 +468,7 @@ const DataCustomer = ({
         cus_pjk: currentItem?.customer?.cus_pjk ?? null,
         cus_npwp: currentItem?.customer?.cus_npwp ?? null,
         cus_pkp: currentItem?.customer?.cus_pkp ?? null,
-        cus_country: currentItem?.customer?.cus_country ?? null,
+        cus_country: currentItem?.customer?.cus_country.code ?? null,
         cus_address: currentItem?.customer?.cus_address ?? null,
         cus_kota: currentItem?.customer?.cus_kota ?? null,
         cus_kpos: currentItem?.customer?.cus_kpos ?? null,
@@ -477,7 +484,7 @@ const DataCustomer = ({
         cus_limit: currentItem?.customer?.cus_limit ?? null,
         sub_cus: currentItem?.customer?.sub_cus ?? null,
         cus_id: currentItem?.customer?.cus_id ?? null,
-        cus_serialNumber:generateSerialNumber(serialNumber) ?? null,
+        cus_serialNumber: lastSerialNumber ?? null,
       },
     };
     console.log(config.data);
@@ -526,7 +533,7 @@ const DataCustomer = ({
   };
 
   const delCustomer = async () => {
-    setLoading(true);
+    setUpdate(true);
     const config = {
       ...endpoints.delCustomer,
       endpoint: endpoints.delCustomer.endpoint + currentItem.customer.id,
@@ -643,25 +650,10 @@ const DataCustomer = ({
         name:
           !currentItem.customer.cus_name ||
           currentItem.customer.cus_name === "",
-        // jpel: !currentItem.jpel?.id,
-        // addrs:
-        //   !currentItem.customer.cus_address ||
-        //   currentItem.customer.cus_address === "",
-        // city: !currentItem.customer.cus_kota,
-        // npwp:
-        //   !currentItem.customer.cus_npwp ||
-        //   currentItem.customer.cus_npwp === "",
       },
+      {},
       {
-        // phone:
-        //   !currentItem.customer.cus_telp1 ||
-        //   currentItem.customer.cus_telp1 === "0",
-        // cp: !currentItem.customer.cus_cp || currentItem.customer.cus_cp === "",
-      },
-      {
-        // ppn: !currentItem.customer.cus_pjk,
         ar: !currentItem.customer.cus_gl,
-        // um: !currentItem.customer.cus_uang_muka,
       },
     ];
 
@@ -738,7 +730,13 @@ const DataCustomer = ({
         <PButton
           label={tr[localStorage.getItem("language")].simpan}
           icon="pi pi-check"
-          onClick={() => onSubmit()}
+          onClick={() => {
+            setUpdate(true);
+            onSubmit();
+            setTimeout(() => {
+              window.location.reload();
+            }, 500);
+          }}
           autoFocus
           loading={update}
         />
@@ -753,7 +751,6 @@ const DataCustomer = ({
           label={tr[localStorage.getItem("language")].batal}
           onClick={() => {
             setShowDelete(false);
-            setUpdate(false);
             onInput(false);
           }}
           className="p-button-text btn-primary"
@@ -802,17 +799,11 @@ const DataCustomer = ({
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             setShowInput(true);
+
             setEdit(false);
             setLoading(false);
             setCurrentItem(def);
-            //   {
-            //   ...def,
-            //   customer: {
-            //     ...def.customer,
-            //     cus_gl: setup?.ar?.id,
-            //     cus_uang_muka: setup?.sls_prepaid?.id,
-            //   },
-            // }
+            getCustomer();
             onInput(true);
           }}
         />
@@ -1124,9 +1115,9 @@ const DataCustomer = ({
                     value={`${
                       currentItem?.customer?.cus_code ??
                       (currentItem?.customer?.cus_code ||
-                        `${currentItem?.customer?.cus_country}-${
+                        `${currentItem?.customer?.cus_country ?? ""}-${
                           currentItem?.jpel?.jpel_code
-                        }-${generateSerialNumber(serialNumber)}`) + ``
+                        }-${lastSerialNumber ?? ""}`) + ``
                     }`}
                     onChange={(e) => {
                       setCurrentItem({
@@ -1145,15 +1136,6 @@ const DataCustomer = ({
                     disabled
                   />
                 </div>
-                <div className="col-4">
-                  <label>Seri Number</label>
-                  <div></div>
-                  {/* <PrimeInput value={generateSerialNumber(serialNumber)} disabled /> */}
-                  <Button onClick={handlegenerateSerialNumber}>Generate</Button>
-                </div>
-              </div>
-
-              <div className="row mr-0 ml-0">
                 <div className="col-6">
                   <PrimeInput
                     label={tr[localStorage.getItem("language")].nm_pel}
@@ -1174,6 +1156,9 @@ const DataCustomer = ({
                     error={error[0]?.name}
                   />
                 </div>
+              </div>
+
+              <div className="row mr-0 ml-0">
                 <div className="col-6">
                   <PrimeDropdown
                     label={"Jenis Pelanggan"}
@@ -1219,7 +1204,8 @@ const DataCustomer = ({
                       placeholder={tr[localStorage.getItem("language")].pilih}
                     />
                   </div>
-                </div><div className="col-6">
+                </div>
+                <div className="col-6">
                   <PrimeDropdown
                     label={tr[localStorage.getItem("language")].currency}
                     value={
@@ -1247,7 +1233,6 @@ const DataCustomer = ({
               </div>
 
               <div className="row mr-0 ml-0">
-                
                 <div className="col-4">
                   <PrimeNumber
                     label={"NPWP"}
@@ -1371,32 +1356,29 @@ const DataCustomer = ({
                 <Divider className="mb-2 ml-3 mr-3"></Divider>
               </div>
 
-              <div className="col-6 mt-2">
+              <div className="col-12">
                 <div className="text-label">
-                  {/* <label className="text-label"></label> */}
-                  <SelectButton
-                    value={
-                      currentItem?.customer?.cus_country !== null
-                        ? currentItem?.customer?.cus_country === "DN"
-                          ? { name: "Dalam Negeri", code: "DN" }
-                          : { name: "Luar Negeri", code: "LN" }
-                        : null
-                    }
-                    options={opt}
-                    onChange={(e) => {
-                      console.log("nnnnnnn", currentItem.customer);
-                      setCurrentItem({
-                        ...currentItem,
-                        customer: {
-                          ...currentItem.customer,
-                          cus_country: e.value?.code,
-                          cus_kota: null,
-                          cus_kpos: null,
-                        },
-                      });
-                    }}
-                    optionLabel="name"
-                  />
+                  <label className="text-label"></label>
+                  <div className="justify-content-center">
+                    <Dropdown
+                      value={currentItem?.customer?.cus_country}
+                      onChange={(e) => {
+                        console.log("Selected country:", e.value.code);
+                        setCurrentItem({
+                          ...currentItem,
+                          customer: {
+                            ...currentItem.customer,
+                            cus_country: e.value,
+                          },
+                        });
+                      }}
+                      options={countries}
+                      optionLabel="name"
+                      placeholder="Select a Country"
+                      filter
+                      className="w-full"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -1419,18 +1401,16 @@ const DataCustomer = ({
                       const generatedCode = `${
                         currentItem?.customer?.cus_code ??
                         (currentItem?.customer?.cus_code ||
-                          `${currentItem?.customer?.cus_country}-${
-                            currentItem?.jpel?.jpel_code
-                          }-${generateSerialNumber(serialNumber)}`) + ``
+                          `${currentItem?.customer?.cus_country}-${currentItem?.jpel?.jpel_code}-${lastSerialNumber}`) +
+                          ``
                       }`;
-                      console.log("generat", generatedCode);
+                      console.log("generat", currentItem);
                       setCurrentItem({
                         ...currentItem,
                         customer: {
                           ...currentItem.customer,
                           cus_code: generatedCode,
                           cus_address: e.target.value,
-                          // cus_npwp: e.target.id,
                         },
                       });
                     }}
@@ -1442,15 +1422,10 @@ const DataCustomer = ({
 
               <div className="row mr-0 ml-0">
                 <div className="col-6">
-                  {currentItem?.customer?.cus_country === "DN" ? (
+                  {currentItem?.customer?.cus_country?.code === "IND" ? (
                     <PrimeDropdown
                       label={tr[localStorage.getItem("language")].kota}
-                      value={
-                        currentItem !== null &&
-                        currentItem.customer.cus_kota !== null
-                          ? kota(currentItem.customer.cus_kota)
-                          : null
-                      }
+                      value={currentItem.customer.cus_kota ?? null}
                       options={city}
                       onChange={(e) => {
                         console.log(e.value);

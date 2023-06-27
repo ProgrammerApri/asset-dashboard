@@ -669,6 +669,7 @@ const endpoints = {
   },
 
   /// Produk
+ 
   product: {
     endpoint: "/v1/api/product",
     method: "GET",
@@ -676,7 +677,7 @@ const endpoints = {
   },
 
   product_code: {
-    endpoint: "/v1/api/product/code",
+    endpoint: "/v1/api/product/code/",
     method: "GET",
     data: {},
   },
@@ -1626,6 +1627,25 @@ const endpoints = {
   delKorPiu: {
     endpoint: "/v1/api/koreksi-piu/",
     method: "DELETE",
+    data: {},
+  },
+
+  // Budget
+  budgeting: {
+    endpoint: "/v1/api/budget",
+    method: "GET",
+    data: {},
+  },
+
+  add_budgeting: {
+    endpoint: "/v1/api/budgeting",
+    method: "POST",
+    data: {},
+  },
+
+  edit_budget: {
+    endpoint: "/v1/api/budgeting",
+    method: "PUT",
     data: {},
   },
 

@@ -93,11 +93,6 @@ const defError = [
   },
 ];
 
-const opt = [
-  { name: "Dalam Negeri", code: "DN" },
-  { name: "Luar Negeri", code: "LN" },
-];
-
 const DataSupplier = ({
   data,
   load,
@@ -125,19 +120,20 @@ const DataSupplier = ({
   const toast = useRef(null);
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState(null);
   const [isEdit, setEdit] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const [active, setActive] = useState(0);
   const [error, setError] = useState(defError);
   const [serialNumber, setserialNumber] = useState(0);
+  const [lastSerialNumber, setLastSerialNumber] = useState("");
 
   useEffect(() => {
     getJpem();
     getCurrency();
     getCity();
     getSetup();
-    // getAccHut();
     getCompany();
     getPajak();
     initFilters1();
@@ -159,6 +155,54 @@ const DataSupplier = ({
   function handleGenerateserialNumber() {
     setserialNumber(serialNumber + 1);
   }
+
+  const countries = [
+    { name: "Australia", code: "AU" },
+    { name: "Brazil", code: "BR" },
+    { name: "China", code: "CN" },
+    { name: "Egypt", code: "EG" },
+    { name: "France", code: "FR" },
+    { name: "Germany", code: "DE" },
+    { name: "India", code: "IN" },
+    { name: "Indonesia", code: "IND" },
+    { name: "Japan", code: "JP" },
+    { name: "Spain", code: "ES" },
+    { name: "United States", code: "US" },
+  ];
+
+  const getSup = async () => {
+    setLoading(true);
+    const config = {
+      ...endpoints.supplier,
+      data: {},
+    };
+
+    try {
+      const response = await request(null, config);
+
+      if (response.status) {
+        const { data } = response;
+        const sortedData = data.sort((a, b) => b.supplier.id - a.supplier.id);
+        const lastData = sortedData[0];
+
+        if (lastData) {
+          const lastSerialNumber = lastData.supplier.sup_serialNumber;
+          const nextSerialNumberValue = parseInt(lastSerialNumber, 10) + 1;
+          const nextSerialNumber = String(nextSerialNumberValue).padStart(
+            5,
+            "0"
+          );
+          setLastSerialNumber(nextSerialNumber);
+        } else {
+          setLastSerialNumber("00001");
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getJpem = async (isUpdate = false) => {
     setLoading(true);
@@ -323,7 +367,7 @@ const DataSupplier = ({
         sup_ppn: currentItem?.supplier?.sup_ppn ?? null,
         sup_pkp: currentItem?.supplier?.sup_pkp ?? null,
         sup_npwp: currentItem?.supplier?.sup_npwp ?? null,
-        sup_country: currentItem?.supplier?.sup_country ?? null,
+        sup_country: currentItem?.supplier?.sup_country.code ?? null,
         sup_address: currentItem?.supplier?.sup_address ?? null,
         sup_kota: currentItem?.supplier?.sup_kota ?? null,
         sup_kpos: currentItem?.supplier?.sup_kpos ?? null,
@@ -380,7 +424,7 @@ const DataSupplier = ({
         sup_ppn: currentItem?.supplier?.sup_ppn ?? null,
         sup_pkp: currentItem?.supplier?.sup_pkp ?? null,
         sup_npwp: currentItem?.supplier?.sup_npwp ?? null,
-        sup_country: currentItem?.supplier?.sup_country ?? null,
+        sup_country: currentItem?.supplier?.sup_country.code ?? null,
         sup_address: currentItem?.supplier?.sup_address ?? null,
         sup_kota: currentItem?.supplier?.sup_kota ?? null,
         sup_kpos: currentItem?.supplier?.sup_kpos ?? null,
@@ -393,7 +437,7 @@ const DataSupplier = ({
         sup_hutang: currentItem?.supplier?.sup_hutang ?? null,
         sup_uang_muka: currentItem?.supplier?.sup_uang_muka ?? null,
         sup_limit: currentItem?.supplier?.sup_limit ?? null,
-        sup_serialNumber: generateserialNumber(serialNumber),
+        sup_serialNumber: lastSerialNumber ?? null,
       },
     };
     console.log(config.data);
@@ -442,7 +486,7 @@ const DataSupplier = ({
   };
 
   const delSupplier = async () => {
-    setLoading(true);
+    setUpdate(true);
     const config = {
       ...endpoints.delSupplier,
       endpoint: endpoints.delSupplier.endpoint + currentItem.supplier.id,
@@ -515,11 +559,11 @@ const DataSupplier = ({
   const onSubmit = () => {
     if (isValid()) {
       if (isEdit) {
-        setUpdate(true);
+        // setUpdate(true);
         editSupplier();
         setActive(0);
       } else {
-        setUpdate(true);
+        // setUpdate(true);
         addSupplier();
         setActive(0);
       }
@@ -578,7 +622,13 @@ const DataSupplier = ({
         <PButton
           label={tr[localStorage.getItem("language")].simpan}
           icon="pi pi-check"
-          onClick={() => onSubmit()}
+          onClick={() => {
+            setUpdate(true);
+            onSubmit();
+            setTimeout(() => {
+              window.location.reload();
+            }, 500);
+          }}
           autoFocus
           loading={update}
         />
@@ -653,6 +703,7 @@ const DataSupplier = ({
               },
             });
             onInput(true);
+            getSup();
           }}
         />
       </div>
@@ -1001,10 +1052,10 @@ const DataSupplier = ({
                     label={tr[localStorage.getItem("language")].kd_pem}
                     value={`${
                       currentItem?.supplier?.sup_code ??
-                      (currentItem?.supplier?.sup_code ||
-                        `${currentItem?.supplier?.sup_country}-${
-                          currentItem?.jpem?.jpem_code 
-                        }-${generateserialNumber(serialNumber)}`) + ``
+                      (currentItem?.supplier.sup_code ||
+                        `${currentItem?.supplier.sup_country?.code ?? ""}-${
+                          currentItem?.jpem?.jpem_code
+                        }-${lastSerialNumber ?? ""}`) + ``
                     }`}
                     onChange={(e) => {
                       setCurrentItem({
@@ -1023,14 +1074,7 @@ const DataSupplier = ({
                     disabled
                   />
                 </div>
-                <div className="col-2">
-                  <label>Seri Number</label>
-                  <div></div>
-                  {/* <PrimeInput value={generateserialNumber(serialNumber)} disabled /> */}
-                  <Button onClick={handleGenerateserialNumber}>Generate</Button>
-                </div>
-
-                <div className="col-6">
+                <div className="col-4">
                   <PrimeInput
                     label={tr[localStorage.getItem("language")].nm_pem}
                     value={
@@ -1076,7 +1120,8 @@ const DataSupplier = ({
                     // errorMessage="Jenis Pemasok Belum Dipilih"
                     // error={error[0]?.jpem}
                   />
-                </div> <div className="col-4">
+                </div>{" "}
+                <div className="col-4">
                   <label className="text-label">
                     {tr[localStorage.getItem("language")].kd_cr}
                   </label>
@@ -1109,7 +1154,8 @@ const DataSupplier = ({
                     *Aktifkan Multi Currency Pada Setup Perusahaan Terlebih
                     Dahulu
                   </small> */}
-                </div><div className="col-4">
+                </div>
+                <div className="col-4">
                   <PrimeNumber
                     number
                     label={"NPWP"}
@@ -1142,8 +1188,6 @@ const DataSupplier = ({
               </div>
 
               <div className="row ml-0 mt-0">
-               
-                
                 <div
                   style={{ width: "px", marginLeft: "px", marginRight: "px" }}
                 ></div>
@@ -1185,31 +1229,30 @@ const DataSupplier = ({
                 <Divider className="mb-2 ml-3 mr-3"></Divider>
               </div>
 
-              <div className="col-6 mt-2">
+              <div className="col-12 ">
                 <div className="text-label">
-                  {/* <label className="text-label"></label> */}
-                  <SelectButton
-                    value={
-                      currentItem?.supplier?.sup_country !== null
-                        ? currentItem?.supplier?.sup_country === "DN"
-                          ? { name: "Dalam Negeri", code: "DN" }
-                          : { name: "Luar Negeri", code: "LN" }
-                        : null
-                    }
-                    options={opt}
-                    onChange={(e) => {
-                      setCurrentItem({
-                        ...currentItem,
-                        supplier: {
-                          ...currentItem.supplier,
-                          sup_country: e.value?.code,
-                          sup_kota: null,
-                          sup_kpos: null,
-                        },
-                      });
-                    }}
-                    optionLabel="name"
-                  />
+                  <label className="text-label"></label>
+                  <div className="justify-content-center">
+                    <Dropdown
+                      label="negara"
+                      value={currentItem?.supplier?.sup_country}
+                      onChange={(e) => {
+                        console.log("negara", e.value.code);
+                        setCurrentItem({
+                          ...currentItem,
+                          supplier: {
+                            ...currentItem.supplier,
+                            sup_country: e.value,
+                          },
+                        });
+                      }}
+                      options={countries}
+                      optionLabel="name"
+                      placeholder="Select a Country"
+                      filter
+                      className="w-full "
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -1233,15 +1276,14 @@ const DataSupplier = ({
                       const generatedCode = `${
                         currentItem?.supplier?.sup_code ??
                         (currentItem?.supplier?.sup_code ||
-                          `${currentItem?.supplier?.sup_country}-${
+                          `${currentItem?.supplier?.sup_country?.code}-${
                             currentItem?.jpem?.jpem_code ?? ""
-                          }-${generateserialNumber(serialNumber)}`) + ``
+                          }-${lastSerialNumber}`) + ``
                       }`;
                       setCurrentItem({
                         ...currentItem,
                         supplier: {
                           ...currentItem.supplier,
-
                           sup_code: generatedCode,
                           sup_address: e.target.value,
                         },
@@ -1257,16 +1299,11 @@ const DataSupplier = ({
               </div>
 
               <div className="row ml-0 mt-0">
-                <div className="col-6 mt-0">
-                  {currentItem?.supplier?.sup_country === "DN" ? (
+                <div className="col-6">
+                  {currentItem?.supplier?.sup_country?.code === "IND" ? (
                     <PrimeDropdown
                       label={tr[localStorage.getItem("language")].kota}
-                      value={
-                        currentItem !== null &&
-                        currentItem.supplier.sup_kota !== null
-                          ? kota(currentItem.supplier.sup_kota)
-                          : null
-                      }
+                      value={currentItem?.supplier?.sup_kota ?? null}
                       options={city}
                       onChange={(e) => {
                         console.log(e.value);

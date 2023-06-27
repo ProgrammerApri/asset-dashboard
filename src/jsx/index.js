@@ -58,6 +58,8 @@ const Mitra = React.lazy(() => import("./screen/Mitra/Mitra"));
 const TransaksiPembelian = React.lazy(() =>
   import("./screen/Transaksi/TransaksiPembelian/TransaksiPembelian")
 );
+const Budgeting = React.lazy(() => import("./screen/Budgeting/Budget"));
+
 const GroupProduk = React.lazy(() => import("./screen/Master/GroupProduk"));
 const Satuan = React.lazy(() => import("./screen/MasterLainnya/Satuan"));
 const Master = React.lazy(() => import("./screen/Master"));
@@ -100,7 +102,6 @@ const LaporanPersediaan = React.lazy(() =>
   import("./screen/Report/LaporanPersediaan")
 );
 const SaldoAwal = React.lazy(() => import("./screen/SaldoAwal"));
-const Budgeting = React.lazy(() => import("./screen/Budget"));
 const Posting = React.lazy(() => import("./screen/Posting/PostingGl"));
 const SaldoAkhir = React.lazy(() =>
   import("./screen/Transaksi/SaldoAkhir/SaldoAkhir")

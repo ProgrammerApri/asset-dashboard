@@ -65,6 +65,7 @@ const Customer = ({ edit, del }) => {
   const [date, setDate] = useState(new Date());
   const [loading, setLoading] = useState(true);
   const [nonSub, setNonSub] = useState(true);
+  const [lastSerialNumber, setLastSerialNumber] = useState(true);
 
   const dummy = Array.from({ length: 10 });
 

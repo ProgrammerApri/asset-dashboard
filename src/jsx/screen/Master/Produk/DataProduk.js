@@ -160,10 +160,8 @@ const DataProduk = ({
       ...endpoints.product,
       data: {},
     };
-
     try {
       const response = await request(null, config);
-
       if (response.status) {
         const { data } = response;
         console.log(data);

@@ -114,7 +114,6 @@ const DataAkun = ({
       ...endpoints.account,
       data: {},
     };
-    console.log("jjjjjjjjjj", config.data);
     let response = null;
     try {
       response = await request(null, config);
@@ -199,6 +198,7 @@ const DataAkun = ({
       console.log(response);
       if (response.status) {
         const { data } = response;
+        // console.log("data akun ",data);
         setUmum(data);
       }
     } catch (error) {}
@@ -209,7 +209,7 @@ const DataAkun = ({
       ...endpoints.getAccKodeUm,
       endpoint: endpoints.getAccKodeUm.endpoint + data.kategory.id,
     };
-    console.log(config.data);
+    console.log("dataku",config.data);
     let response = null;
     try {
       response = await request(null, config);
@@ -246,7 +246,7 @@ const DataAkun = ({
       console.log(response);
       if (response.status) {
         const res = response.data;
-        console.log("serigala",res);
+        console.log("kode nambah 1",res);
         setCurrentItem({
           ...currentItem,
           account: {
@@ -380,7 +380,6 @@ const DataAkun = ({
           summary: "Gagal",
           detail: "Gagal memperbarui data",
           sticky: true,
-          // life: 3000,
         });
       }, 500);
     }
@@ -411,11 +410,9 @@ const DataAkun = ({
         setTimeout(() => {
           onSuccessInput();
           setUpdate(false);
-          // onHideInput();
           setLoading(false);
           setCurrentItem(def);
           setEdit(false);
-          // setShowInput(false);
           setEkat(false);
           setEname(false);
           onInput(false);
@@ -1302,7 +1299,7 @@ const DataAkun = ({
                         level: e.value.account.level + 1,
                       },
                     });
-                    console.log(e.value.account.level + 1);
+                    console.log("kode akun katanya",e.value.account.level + 1);
                     if (currentItem.account.dou_type === "U") {
                       getAccKodeSubUmum(e.value);
                     } else {

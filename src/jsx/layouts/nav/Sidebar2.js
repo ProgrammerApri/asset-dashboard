@@ -56,7 +56,6 @@ const SideMenu = () => {
         })),
     });
   }, []);
-  console.log("tai",accessMenu);
 
   
   const renderSidebar = () => {

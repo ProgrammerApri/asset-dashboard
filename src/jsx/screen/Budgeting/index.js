@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button, Col, Row } from "react-bootstrap";
-import Budgeting from "./Budgeting";
+import Budgeting from "./Budget";
 
 const Budget = () => {
   const [active, setActive] = useState(0);

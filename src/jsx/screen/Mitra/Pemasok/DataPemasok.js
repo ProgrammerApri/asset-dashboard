@@ -34,7 +34,7 @@ const def = {
     sup_ppn: null,
     sup_pkp: false,
     sup_npwp: null,
-    sup_country: "DN",
+    sup_country: "IND",
     sup_address: null,
     sup_kota: null,
     sup_kpos: null,
@@ -1302,30 +1302,33 @@ const DataSupplier = ({
                 <div className="col-6">
                   {currentItem?.supplier?.sup_country?.code === "IND" ? (
                     <PrimeDropdown
-                      label={tr[localStorage.getItem("language")].kota}
-                      value={currentItem?.supplier?.sup_kota ?? null}
-                      options={city}
-                      onChange={(e) => {
-                        console.log(e.value);
-                        setCurrentItem({
-                          ...currentItem,
-                          supplier: {
-                            ...currentItem.supplier,
-                            sup_kota: e.value.city_name ?? null,
-                            sup_kpos: e.value.postal_code ?? null,
-                          },
-                        });
-                        let newError = error;
-                        newError[0].city = false;
-                        setError(newError);
-                      }}
-                      optionLabel="city_name"
-                      filter
-                      filterBy="city_name"
-                      placeholder={tr[localStorage.getItem("language")].pilih}
-                      errorMessage="Kota Belum Dipilih"
-                      error={error[0]?.city}
-                    />
+                    label={tr[localStorage.getItem("language")].kota}
+                    value={currentItem?.supplier?.sup_kota ?? null}
+                    options={city}
+                    onChange={(e) => {
+                      console.log("tampil", currentItem?.supplier?.sup_kota ?? null);
+                      console.log("di kik ", e.value.city_name);
+                      console.log("di klik ", kota(e.value.city_name));
+                      setCurrentItem({
+                        ...currentItem,
+                        supplier: {
+                          ...currentItem.supplier,
+                          sup_kota: e.value ?? null,
+                          sup_kpos: e.value?.postal_code ?? null,
+                        },
+                      });
+                      let newError = error;
+                      newError[0].city = false;
+                      setError(newError);
+                    }}
+                    optionLabel="city_name"
+                    filter
+                    filterBy="city_name"
+                    placeholder={tr[localStorage.getItem("language")].pilih}
+                    errorMessage="Kota Belum Dipilih"
+                    error={error[0]?.city}
+                  />
+                  
                   ) : (
                     <PrimeInput
                       label={tr[localStorage.getItem("language")].kota}
@@ -1357,7 +1360,11 @@ const DataSupplier = ({
                       value={
                         currentItem !== null &&
                         currentItem.supplier.sup_kota !== null
-                          ? kota(currentItem.supplier.sup_kota)?.postal_code
+                          ? (() => {
+                              const postalCode = currentItem.supplier.sup_kpos;
+                              console.log("postalCode", postalCode);
+                              return postalCode;
+                            })()
                           : null
                       }
                       onChange={(e) =>
@@ -1370,6 +1377,7 @@ const DataSupplier = ({
                         })
                       }
                       placeholder={tr[localStorage.getItem("language")].masuk}
+                      disabled={currentItem?.supplier?.sup_kota !== null} 
                       type="number"
                     />
                   </div>

@@ -874,6 +874,7 @@ const DataCustomer = ({
   const kota = (value) => {
     let selected = {};
     city?.forEach((element) => {
+      console.log("cittyyy", currentItem);
       if (element.city_name === `${value}`) {
         selected = element;
       }
@@ -1115,7 +1116,7 @@ const DataCustomer = ({
                     value={`${
                       currentItem?.customer?.cus_code ??
                       (currentItem?.customer?.cus_code ||
-                        `${currentItem?.customer?.cus_country ?? ""}-${
+                        `${currentItem?.customer?.cus_country?.code ?? ""}-${
                           currentItem?.jpel?.jpel_code
                         }-${lastSerialNumber ?? ""}`) + ``
                     }`}
@@ -1401,7 +1402,7 @@ const DataCustomer = ({
                       const generatedCode = `${
                         currentItem?.customer?.cus_code ??
                         (currentItem?.customer?.cus_code ||
-                          `${currentItem?.customer?.cus_country}-${currentItem?.jpel?.jpel_code}-${lastSerialNumber}`) +
+                          `${currentItem?.customer?.cus_country?.code}-${currentItem?.jpel?.jpel_code}-${lastSerialNumber}`) +
                           ``
                       }`;
                       console.log("generat", currentItem);
@@ -1428,13 +1429,13 @@ const DataCustomer = ({
                       value={currentItem.customer.cus_kota ?? null}
                       options={city}
                       onChange={(e) => {
-                        console.log(e.value);
+                        console.log("joo", e.target.value.postal_code);
                         setCurrentItem({
                           ...currentItem,
                           customer: {
                             ...currentItem.customer,
-                            cus_kota: e.value.city_name ?? null,
-                            cus_kpos: e.value.postal_code ?? null,
+                            cus_kota: e.value ?? null,
+                            cus_kpos: e.target.value.postal_code,
                           },
                         });
                         let newError = error;
@@ -1474,12 +1475,17 @@ const DataCustomer = ({
                   <label className="text-label">
                     {tr[localStorage.getItem("language")].kd_pos}
                   </label>
+
                   <div className="p-inputgroup">
                     <InputNumber
                       value={
                         currentItem !== null &&
                         currentItem.customer.cus_kota !== null
-                          ? kota(currentItem.customer.cus_kota)?.postal_code
+                          ? (() => {
+                              const postalCode = currentItem.customer.cus_kpos;
+                              console.log("postalCode", postalCode);
+                              return postalCode;
+                            })()
                           : null
                       }
                       onChange={(e) =>

@@ -165,9 +165,9 @@ const DataProduk = ({
       if (response.status) {
         const { data } = response;
         console.log(data);
-      const lastData = data.reduce((prev, current) => {
-        return prev.id > current.id ? prev : current;
-      });
+        const lastData = data.reduce((prev, current) => {
+          return prev.id > current.id ? prev : current;
+        });
         console.log(lastData);
         let serialNumber = lastData.serialNumber;
         console.log(serialNumber);
@@ -276,6 +276,7 @@ const DataProduk = ({
         data.forEach((element) => {
           sup.push(element.supplier);
         });
+        console.log("dup", sup);
         setSupplier(sup);
       }
     } catch (error) {}
@@ -496,6 +497,7 @@ const DataProduk = ({
             console.log(data);
             let suplier = data.suplier;
 
+            console.log("supplier", data.supplier);
             suplier?.forEach((element) => {
               element.sup_id = element.sup_id?.id ?? null;
             });
@@ -506,7 +508,9 @@ const DataProduk = ({
               ...data,
               b_price: data?.b_price ?? null,
               unit: data?.unit?.id ?? null,
+              departement: data?.departement?.id ?? null,
               group: data?.group?.id ?? null,
+              exp_date: data?.exp_date ?? null,
               suplier:
                 suplier?.length > 0
                   ? suplier
@@ -1290,41 +1294,16 @@ const DataProduk = ({
                         }-${
                           currentItem !== null && currentItem.ns !== ""
                             ? currentItem.ns === 1
-                              ? "S"
+                              ? "S-"
                               : currentItem.ns === 0
-                              ? "NS"
+                              ? "NS-"
                               : currentItem.ns === 2
-                              ? "A"
+                              ? "A-"
                               : ""
                             : ""
-                        }-${lastSerialNumber}`) + ``
+                        }${lastSerialNumber}`) + ``
                     }
-                    onChange={(e) => {
-                      const generatedCode = `${
-                        (currentItem?.code ||
-                          `${
-                            currentItem?.departement
-                              ? String(
-                                  checkDept(currentItem.departement)?.ccost_code
-                                )
-                              : ""
-                          }-${
-                            currentItem !== null && currentItem?.group
-                              ? String(checkGroup(currentItem.group)?.code)
-                              : ""
-                          }-${
-                            currentItem !== null && currentItem.ns !== ""
-                              ? currentItem.ns === 1
-                                ? "S"
-                                : currentItem.ns === 0
-                                ? "NS"
-                                : currentItem.ns === 2
-                                ? "A"
-                                : ""
-                              : ""
-                          }-${lastSerialNumber}`) + ``
-                      }`;
-                    }}
+                 
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[0]?.code}
                     disabled
@@ -1434,14 +1413,14 @@ const DataProduk = ({
                       }-${
                         currentItem !== null && currentItem.ns !== ""
                           ? currentItem.ns === 1
-                            ? "S"
+                            ? "S-"
                             : currentItem.ns === 0
-                            ? "NS"
+                            ? "NS-"
                             : currentItem.ns === 2
-                            ? "A"
+                            ? "A-"
                             : ""
                           : ""
-                      }-${lastSerialNumber}`;
+                      }${lastSerialNumber}`;
                       console.log("generat", generatedCode);
                       setCurrentItem({
                         ...currentItem,

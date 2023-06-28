@@ -150,7 +150,6 @@ const DataSupplier = ({
     );
     return formattedserialNumber;
   }
-  console.log("generrrrr", generateserialNumber(serialNumber));
 
   function handleGenerateserialNumber() {
     setserialNumber(serialNumber + 1);
@@ -1165,7 +1164,6 @@ const DataSupplier = ({
                         : ""
                     }
                     onChange={(e) => {
-                      console.log("dadada", currentItem);
                       setCurrentItem({
                         ...currentItem,
                         supplier: {
@@ -1237,7 +1235,6 @@ const DataSupplier = ({
                       label="negara"
                       value={currentItem?.supplier?.sup_country}
                       onChange={(e) => {
-                        console.log("negara", e.value.code);
                         setCurrentItem({
                           ...currentItem,
                           supplier: {
@@ -1306,9 +1303,6 @@ const DataSupplier = ({
                     value={currentItem?.supplier?.sup_kota ?? null}
                     options={city}
                     onChange={(e) => {
-                      console.log("tampil", currentItem?.supplier?.sup_kota ?? null);
-                      console.log("di kik ", e.value.city_name);
-                      console.log("di klik ", kota(e.value.city_name));
                       setCurrentItem({
                         ...currentItem,
                         supplier: {
@@ -1362,7 +1356,6 @@ const DataSupplier = ({
                         currentItem.supplier.sup_kota !== null
                           ? (() => {
                               const postalCode = currentItem.supplier.sup_kpos;
-                              console.log("postalCode", postalCode);
                               return postalCode;
                             })()
                           : null

@@ -874,7 +874,6 @@ const DataCustomer = ({
   const kota = (value) => {
     let selected = {};
     city?.forEach((element) => {
-      console.log("cittyyy", currentItem);
       if (element.city_name === `${value}`) {
         selected = element;
       }
@@ -1154,7 +1153,7 @@ const DataCustomer = ({
                       setError(newError);
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
-                    error={error[0]?.name}
+                    error={error[0].name}
                   />
                 </div>
               </div>
@@ -1498,6 +1497,7 @@ const DataCustomer = ({
                         })
                       }
                       placeholder={tr[localStorage.getItem("language")].masuk}
+                      disabled={currentItem?.customer?.cus_kota !== null} 
                       mode="decimal"
                       useGrouping={false}
                     />

@@ -164,17 +164,17 @@ const DataCustomer = ({
   }, []);
 
   const countries = [
-    { name: "Australia", code: "AU" },
-    { name: "Brazil", code: "BR" },
-    { name: "China", code: "CN" },
-    { name: "Egypt", code: "EG" },
-    { name: "France", code: "FR" },
-    { name: "Germany", code: "DE" },
-    { name: "India", code: "IN" },
-    { name: "Indonesia", code: "IND" },
-    { name: "Japan", code: "JP" },
-    { name: "Spain", code: "ES" },
-    { name: "United States", code: "US" },
+    { name: "Australia", code: "AU -" },
+    { name: "Brazil", code: "BR -" },
+    { name: "China", code: "CN -" },
+    { name: "Egypt", code: "EG -" },
+    { name: "France", code: "FR -" },
+    { name: "Germany", code: "DE -" },
+    { name: "India", code: "IN -" },
+    { name: "Indonesia", code: "IND -" },
+    { name: "Japan", code: "JP -" },
+    { name: "Spain", code: "ES -" },
+    { name: "United States", code: "US -" },
   ];
 
   const getCustomer = async () => {
@@ -1115,9 +1115,9 @@ const DataCustomer = ({
                     value={`${
                       currentItem?.customer?.cus_code ??
                       (currentItem?.customer?.cus_code ||
-                        `${currentItem?.customer?.cus_country?.code ?? ""}-${
-                          currentItem?.jpel?.jpel_code
-                        }-${lastSerialNumber ?? ""}`) + ``
+                        `${currentItem?.customer?.cus_country?.code ?? ""} ${
+                          currentItem?.jpel?.jpel_code 
+                        } ${lastSerialNumber ?? ""}`) + ``
                     }`}
                     onChange={(e) => {
                       setCurrentItem({
@@ -1422,7 +1422,7 @@ const DataCustomer = ({
 
               <div className="row mr-0 ml-0">
                 <div className="col-6">
-                  {currentItem?.customer?.cus_country?.code === "IND" ? (
+                  {currentItem?.customer?.cus_country?.code === "IND -" ? (
                     <PrimeDropdown
                       label={tr[localStorage.getItem("language")].kota}
                       value={currentItem.customer.cus_kota ?? null}
@@ -1497,7 +1497,7 @@ const DataCustomer = ({
                         })
                       }
                       placeholder={tr[localStorage.getItem("language")].masuk}
-                      disabled={currentItem?.customer?.cus_kota !== null} 
+                      disabled={currentItem?.customer?.cus_kota !== null}
                       mode="decimal"
                       useGrouping={false}
                     />

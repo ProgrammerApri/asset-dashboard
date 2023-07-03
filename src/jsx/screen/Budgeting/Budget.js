@@ -271,7 +271,7 @@ const Budgeting = () => {
     }
   };
 
-  const getSaldo = async (isUpdate = false, loading = true) => {
+  const getBudget = async (isUpdate = false, loading = true) => {
     if (loading) {
       setLoading(true);
     }
@@ -341,7 +341,7 @@ const Budgeting = () => {
         setSetupAcc(data);
       }
     } catch (error) {}
-    getSaldo();
+    getBudget();
   };
 
   const addSal = async () => {
@@ -385,7 +385,7 @@ const Budgeting = () => {
       console.log(response);
       if (response.status) {
         setTimeout(() => {
-          getSaldo(true, false);
+          getBudget(true, false);
           toast?.current?.show({
             severity: "info",
             summary: "Berhasil",
@@ -408,7 +408,7 @@ const Budgeting = () => {
     }
   };
 
-  const editSaldo = async () => {
+  const editBudget = async () => {
     let acc = [];
     budget?.forEach((element) => {
       acc.push({
@@ -451,7 +451,7 @@ const Budgeting = () => {
       if (response.status) {
         setTimeout(() => {
           setUpdate(false);
-          getSaldo(true, false);
+          getBudget(true, false);
           toast?.current?.show({
             severity: "info",
             summary: "Berhasil",
@@ -476,7 +476,7 @@ const Budgeting = () => {
 
   const onSubmit = () => {
     if (isEdit) {
-      editSaldo();
+      editBudget();
     } else {
       addSal();
     }
@@ -510,15 +510,16 @@ const Budgeting = () => {
         <div className="flex  col-3">
           <span className="p-float-label">
             <InputText
-             header="Februari"
-            //  field={(e) => formatIdr(e?.nama_budget)}
-             style={{ minWidth: "6rem" }}
-             body={loading && <Skeleton />}
-             editor={(e) => textEditor(e, "nama_budget")}
-             onCellEditComplete={(e) => {
-               console.log(e);
-               onSubmit();
-             }}
+              size="30"
+              header="Februari"
+              //  field={(e) => formatIdr(e?.nama_budget)}
+              style={{ minWidth: "8rem" }}
+              body={loading && <Skeleton />}
+              editor={(e) => textEditor(e, "nama_budget")}
+              onCellEditComplete={(e) => {
+                console.log(e);
+                onSubmit();
+              }}
             />
             <label htmlFor="username">Masukkan Nama Budget</label>
           </span>
@@ -674,134 +675,134 @@ const Budgeting = () => {
                 />
                 <Column
                   header="Januari"
-                  field={(e) => formatIdr(e?.nom_jan)}
+                  field={(e) => formatIdr(e?.nom_jan ?? "")}
                   style={{ minWidth: "6rem" }}
                   body={loading && <Skeleton />}
                   editor={(e) => textEditor(e, "nom_jan")}
                   onCellEditComplete={(e) => {
-                    console.log(e);
+                    console.log("janu", e.value);
                     onSubmit();
                   }}
                 />
 
                 <Column
                   header="Februari"
-                  field={(e) => formatIdr(e?.nom_feb)}
+                  field={(e) => formatIdr(e?.nom_feb ?? "")}
                   style={{ minWidth: "6rem" }}
                   body={loading && <Skeleton />}
                   editor={(e) => textEditor(e, "nom_feb")}
                   onCellEditComplete={(e) => {
-                    console.log(e);
+                    console.log("febru", e.value);
                     onSubmit();
                   }}
                 />
                 <Column
                   header="Maret"
-                  field={(e) => formatIdr(e?.nom_mar)}
+                  field={(e) => formatIdr(e?.nom_mar ?? "")}
                   style={{ minWidth: "6rem" }}
                   body={loading && <Skeleton />}
                   editor={(e) => textEditor(e, "nom_mar")}
                   onCellEditComplete={(e) => {
-                    console.log(e);
+                    console.log("maret", e.value);
                     onSubmit();
                   }}
                 />
                 <Column
                   header="April"
-                  field={(e) => formatIdr(e?.nom_apr)}
+                  field={(e) => formatIdr(e?.nom_apr ?? "")}
                   style={{ minWidth: "6rem" }}
                   body={loading && <Skeleton />}
                   editor={(e) => textEditor(e, "nom_apr")}
                   onCellEditComplete={(e) => {
-                    console.log(e);
+                    console.log("April", e.value);
                     onSubmit();
                   }}
                 />
                 <Column
                   header="Mei"
-                  field={(e) => formatIdr(e?.nom_mei)}
+                  field={(e) => formatIdr(e?.nom_mei ?? "")}
                   style={{ minWidth: "6rem" }}
                   body={loading && <Skeleton />}
                   editor={(e) => textEditor(e, "nom_mei")}
                   onCellEditComplete={(e) => {
-                    console.log(e);
+                    console.log("mei", e.value);
                     onSubmit();
                   }}
                 />
                 <Column
                   header="Juni"
-                  field={(e) => formatIdr(e?.nom_jun)}
+                  field={(e) => formatIdr(e?.nom_jun ?? "")}
                   style={{ minWidth: "6rem" }}
                   body={loading && <Skeleton />}
                   editor={(e) => textEditor(e, "nom_jun")}
                   onCellEditComplete={(e) => {
-                    console.log(e);
+                    console.log("juni", e.value);
                     onSubmit();
                   }}
                 />
                 <Column
                   header="Juli"
-                  field={(e) => formatIdr(e?.nom_jul)}
+                  field={(e) => formatIdr(e?.nom_jul ?? "")}
                   style={{ minWidth: "6rem" }}
                   body={loading && <Skeleton />}
                   editor={(e) => textEditor(e, "nom_jul")}
                   onCellEditComplete={(e) => {
-                    console.log(e);
+                    console.log("juli", e.value);
                     onSubmit();
                   }}
                 />
                 <Column
                   header="Agustus"
-                  field={(e) => formatIdr(e?.nom_agu)}
+                  field={(e) => formatIdr(e?.nom_agu ?? "")}
                   style={{ minWidth: "6rem" }}
                   body={loading && <Skeleton />}
                   editor={(e) => textEditor(e, "nom_agu")}
                   onCellEditComplete={(e) => {
-                    console.log(e);
+                    console.log("agustus", e.value);
                     onSubmit();
                   }}
                 />
                 <Column
                   header="September"
-                  field={(e) => formatIdr(e?.nom_sep)}
+                  field={(e) => formatIdr(e?.nom_sep ?? "")}
                   style={{ minWidth: "6rem" }}
                   body={loading && <Skeleton />}
                   editor={(e) => textEditor(e, "nom_sep")}
                   onCellEditComplete={(e) => {
-                    console.log(e);
+                    console.log("september", e.value);
                     onSubmit();
                   }}
                 />
                 <Column
                   header="Oktober"
-                  field={(e) => formatIdr(e?.nom_okt)}
+                  field={(e) => formatIdr(e?.nom_okt ?? "")}
                   style={{ minWidth: "6rem" }}
                   body={loading && <Skeleton />}
                   editor={(e) => textEditor(e, "nom_okt")}
                   onCellEditComplete={(e) => {
-                    console.log(e);
+                    console.log("okto", e.value);
                     onSubmit();
                   }}
                 />
                 <Column
                   header="November"
-                  field={(e) => formatIdr(e?.nom_nov)}
+                  field={(e) => formatIdr(e?.nom_nov ?? "")}
                   style={{ minWidth: "6rem" }}
                   body={loading && <Skeleton />}
                   editor={(e) => textEditor(e, "nom_nov")}
                   onCellEditComplete={(e) => {
-                    console.log(e);
+                    console.log("November", e.value);
                     onSubmit();
                   }}
                 />
                 <Column
                   header="Desember"
-                  field={(e) => formatIdr(e?.nom_des)}
+                  field={(e) => formatIdr(e?.nom_des ?? "")}
                   style={{ minWidth: "6rem" }}
                   body={loading && <Skeleton />}
                   editor={(e) => textEditor(e, "nom_des")}
                   onCellEditComplete={(e) => {
-                    console.log(e);
+                    console.log("desember", e.value);
                     onSubmit();
                   }}
                 />

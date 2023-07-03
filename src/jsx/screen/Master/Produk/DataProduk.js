@@ -1287,11 +1287,11 @@ const DataProduk = ({
                                 checkDept(currentItem.departement)?.ccost_code
                               )
                             : ""
-                        }-${
+                        } ${
                           currentItem !== null && currentItem?.group
                             ? String(checkGroup(currentItem.group)?.code)
                             : ""
-                        }-${
+                        } ${
                           currentItem !== null && currentItem.ns !== ""
                             ? currentItem.ns === 1
                               ? "S-"
@@ -1303,28 +1303,12 @@ const DataProduk = ({
                             : ""
                         }${lastSerialNumber}`) + ``
                     }
-                 
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[0]?.code}
                     disabled
                   />
                 </div>
 
-                {/* <div className="col-4 ">
-                  <PrimeInput
-                    label="number"
-                    value={lastSerialNumber}
-                    placeholder={tr[localStorage.getItem("language")].masuk}
-                    error={error[0]?.code}
-                    disabled
-                  />
-                </div> */}
-                {/* <div className="col-3">
-                  <label>generate</label>
-                  <div></div>
-                  {/* <PrimeInput value={generateserialNumber(serialNumber)} disabled /> */}
-                {/* <Button onClick={handleGenerateserialNumber}>Generate</Button>
-                </div> */}
                 <div className="col-4">
                   <PrimeDropdown
                     label={"Nama Departement"}
@@ -1339,14 +1323,12 @@ const DataProduk = ({
                         ...currentItem,
                         departement: e.value.id ?? null,
                       });
-                      // getCodeProd()
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     optionLabel="ccost_name"
                     filter
                     filterBy="ccost_name"
                     errorMessage="Grup Produk Belum Dipilih"
-                    // error={error[0]?.group}
                   />
                 </div>
                 <div className="col-4">
@@ -1359,8 +1341,6 @@ const DataProduk = ({
                     }
                     options={group}
                     onChange={(e) => {
-                      console.log("cccccc", e.value?.id);
-                      console.log("hhhhhh", currentItem);
                       let nsValue = 2;
                       if (
                         e?.target?.value?.stok !== 0 &&
@@ -1426,25 +1406,21 @@ const DataProduk = ({
                         ...currentItem,
                         code: generatedCode,
                         name: e.target.value,
+                        
                       });
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[0]?.name}
                   />
                 </div>
-
                 <div className="col-4">
                   <PrimeInput
                     label={"Brands"}
                     value={`${currentItem?.brand ?? ""}`}
                     onChange={(e) => {
                       setCurrentItem({ ...currentItem, brand: e.target.value });
-                      // let newError = error;
-                      // newError[0].name = false;
-                      // setError(newError);
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
-                    // error={error[0]?.name}
                   />
                 </div>
                 <div className="col-4">
@@ -1492,7 +1468,7 @@ const DataProduk = ({
                     placeholder={tr[localStorage.getItem("language")].pilih_tgl}
                     error={error[0]?.exp_date}
                     showIcon
-                    dateFormat="dd/mm/yy"
+                    dateFormat="dd-mm-yy"
                   />
                 </div>
               </div>{" "}
@@ -1508,7 +1484,6 @@ const DataProduk = ({
                   return {
                     ...v,
                     index: i,
-                    // order: v?.order ?? 0,
                   };
                 })}
                 className="display w-150 datatable-wrapper header-white no-border ml-2"

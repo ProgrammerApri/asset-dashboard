@@ -34,7 +34,7 @@ const def = {
     sup_ppn: null,
     sup_pkp: false,
     sup_npwp: null,
-    sup_country: "IND",
+    sup_country: "IND -",
     sup_address: null,
     sup_kota: null,
     sup_kpos: null,
@@ -156,17 +156,17 @@ const DataSupplier = ({
   }
 
   const countries = [
-    { name: "Australia", code: "AU" },
-    { name: "Brazil", code: "BR" },
-    { name: "China", code: "CN" },
-    { name: "Egypt", code: "EG" },
-    { name: "France", code: "FR" },
-    { name: "Germany", code: "DE" },
-    { name: "India", code: "IN" },
-    { name: "Indonesia", code: "IND" },
-    { name: "Japan", code: "JP" },
-    { name: "Spain", code: "ES" },
-    { name: "United States", code: "US" },
+    { name: "Australia", code: "AU -" },
+    { name: "Brazil", code: "BR -" },
+    { name: "China", code: "CN -" },
+    { name: "Egypt", code: "EG -" },
+    { name: "France", code: "FR -" },
+    { name: "Germany", code: "DE -" },
+    { name: "India", code: "IN -" },
+    { name: "Indonesia", code: "IND -" },
+    { name: "Japan", code: "JP -" },
+    { name: "Spain", code: "ES -" },
+    { name: "United States", code: "US -" },
   ];
 
   const getSup = async () => {
@@ -1052,9 +1052,9 @@ const DataSupplier = ({
                     value={`${
                       currentItem?.supplier?.sup_code ??
                       (currentItem?.supplier.sup_code ||
-                        `${currentItem?.supplier.sup_country?.code ?? ""}-${
+                        `${currentItem?.supplier.sup_country?.code ?? ""} ${
                           currentItem?.jpem?.jpem_code
-                        }-${lastSerialNumber ?? ""}`) + ``
+                        } ${lastSerialNumber ?? ""}`) + ``
                     }`}
                     onChange={(e) => {
                       setCurrentItem({
@@ -1297,32 +1297,31 @@ const DataSupplier = ({
 
               <div className="row ml-0 mt-0">
                 <div className="col-6">
-                  {currentItem?.supplier?.sup_country?.code === "IND" ? (
+                  {currentItem?.supplier?.sup_country?.code === "IND -" ? (
                     <PrimeDropdown
-                    label={tr[localStorage.getItem("language")].kota}
-                    value={currentItem?.supplier?.sup_kota ?? null}
-                    options={city}
-                    onChange={(e) => {
-                      setCurrentItem({
-                        ...currentItem,
-                        supplier: {
-                          ...currentItem.supplier,
-                          sup_kota: e.value ?? null,
-                          sup_kpos: e.value?.postal_code ?? null,
-                        },
-                      });
-                      let newError = error;
-                      newError[0].city = false;
-                      setError(newError);
-                    }}
-                    optionLabel="city_name"
-                    filter
-                    filterBy="city_name"
-                    placeholder={tr[localStorage.getItem("language")].pilih}
-                    errorMessage="Kota Belum Dipilih"
-                    error={error[0]?.city}
-                  />
-                  
+                      label={tr[localStorage.getItem("language")].kota}
+                      value={currentItem?.supplier?.sup_kota ?? null}
+                      options={city}
+                      onChange={(e) => {
+                        setCurrentItem({
+                          ...currentItem,
+                          supplier: {
+                            ...currentItem.supplier,
+                            sup_kota: e.value ?? null,
+                            sup_kpos: e.value?.postal_code ?? null,
+                          },
+                        });
+                        let newError = error;
+                        newError[0].city = false;
+                        setError(newError);
+                      }}
+                      optionLabel="city_name"
+                      filter
+                      filterBy="city_name"
+                      placeholder={tr[localStorage.getItem("language")].pilih}
+                      errorMessage="Kota Belum Dipilih"
+                      error={error[0]?.city}
+                    />
                   ) : (
                     <PrimeInput
                       label={tr[localStorage.getItem("language")].kota}
@@ -1370,7 +1369,7 @@ const DataSupplier = ({
                         })
                       }
                       placeholder={tr[localStorage.getItem("language")].masuk}
-                      disabled={currentItem?.supplier?.sup_kota !== null} 
+                      disabled={currentItem?.supplier?.sup_kota !== null}
                       type="number"
                     />
                   </div>

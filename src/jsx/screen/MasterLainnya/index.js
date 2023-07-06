@@ -90,13 +90,13 @@ const MasterLainnya = (self) => {
   let id =
     subMenu.findIndex(
       (e) =>
-        e.tittle.toLowerCase() ===
+        e.tittle?.toLowerCase() ===
         self?.match?.params?.active?.replaceAll("-", " ")
     ) < 0
       ? 0
       : subMenu.findIndex(
           (e) =>
-            e.tittle.toLowerCase() ===
+            e.tittle?.toLowerCase() ===
             self?.match?.params?.active?.replaceAll("-", " ")
         );
 
@@ -106,7 +106,7 @@ const MasterLainnya = (self) => {
     subMenu.forEach((el, i) => {
       menu.push(
         <Link
-          to={"/master-lainnya/" + el.tittle.toLowerCase().replaceAll(" ", "-")}
+          to={"/master-lainnya/" + el.tittle?.toLowerCase().replaceAll(" ", "-")}
         >
           <Button
             className={`sub-menu mr-4 mb-4 ${id == i ? "act" : ""}`}

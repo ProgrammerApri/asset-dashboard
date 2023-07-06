@@ -869,10 +869,36 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
           }
         />
         <Column
-          header={"PO Code"}
+          header={"PO"}
           field={(e) => e.po_code ?? "-"}
-          style={{ minWidth: "10rem" }}
-          body={loading && <Skeleton />}
+          // style={{ minWidth: "10rem" }}
+          body={(e) =>
+            loading ? (
+              <Skeleton />
+            ) : (
+              e.po_code ? <Badge variant="success light">
+                <i className="bx bx-check-double text-success"></i>
+              </Badge> : <Badge variant="danger light">
+                <i className="bx bx-x text-danger"></i>
+              </Badge>
+            )
+          }
+        />
+        <Column
+          header={"GRA"}
+          field={(e) => e.gra_code ?? "-"}
+          // style={{ minWidth: "10rem" }}
+          body={(e) =>
+            loading ? (
+              <Skeleton />
+            ) : (
+              e.gra_code ? <Badge variant="success light">
+                <i className="bx bx-check-double text-success"></i>
+              </Badge> : <Badge variant="danger light">
+                <i className="bx bx-x text-danger"></i>
+              </Badge>
+            )
+          }
         />
         <Column
           header="Action"

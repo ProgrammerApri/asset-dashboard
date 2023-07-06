@@ -204,7 +204,7 @@ export const  tr = {
   en: {
     berhsl: "Succeed",
     gagal: "Fail",
-
+    div_prod: "Product Division",
     no_reff: "Code Reff",
     reff_month: "Reff Month",
     reff_year: "Reff Year",

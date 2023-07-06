@@ -1124,10 +1124,22 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
                   }
                 />
                 <Column
-                  header={"GRA Code"}
+                  header={"GRA"}
                   field={(e) => e.gra_code ?? "-"}
-                  style={{ minWidth: "10rem" }}
-                  body={loading && <Skeleton />}
+                  // style={{ minWidth: "10rem" }}
+                  body={(e) =>
+                    loading ? (
+                      <Skeleton />
+                    ) : e.gra_code ? (
+                      <Badge variant="success light">
+                        <i className="bx bx-check-double text-success"></i>
+                      </Badge>
+                    ) : (
+                      <Badge variant="danger light">
+                        <i className="bx bx-x text-danger"></i>
+                      </Badge>
+                    )
+                  }
                 />
                 <Column
                   header="Action"

@@ -18,6 +18,7 @@ import { tr } from "src/data/tr";
 import { Tooltip } from "primereact/tooltip";
 import { Timeline } from "primereact/timeline";
 import { InputTextarea } from "primereact/inputtextarea";
+import DrawTimeline from "src/jsx/components/CustomTimeline/DrawTimeline";
 
 const data = {
   id: null,
@@ -909,7 +910,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
         />
       </DataTable>
 
-      <Dialog
+      {/* <Dialog
         header={"Detail Permintaan"}
         visible={displayData}
         style={{ width: "38vw" }}
@@ -1025,6 +1026,18 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
             <></>
           )}
         </Row>
+      </Dialog> */}
+
+      <Dialog
+        header={"Detail Permintaan"}
+        visible={displayData}
+        style={{ width: "38vw" }}
+        footer={renderFooter("displayData")}
+        onHide={() => {
+          setDisplayDat(false);
+        }}
+      >
+       <DrawTimeline/>
       </Dialog>
 
       <Dialog

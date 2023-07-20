@@ -486,7 +486,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
             </label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
-              value={rp.req_dep !== null ? dept(rp.req_dep) : null}
+              value={rp.req_dep ? dept(rp.req_dep) : null}
               onChange={(e) => {
                 updateRp({ ...rp, req_dep: e.id });
               }}

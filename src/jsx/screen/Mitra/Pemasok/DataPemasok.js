@@ -34,7 +34,7 @@ const def = {
     sup_ppn: null,
     sup_pkp: false,
     sup_npwp: null,
-    sup_country: "IND -",
+    sup_country: "IND-",
     sup_address: null,
     sup_kota: null,
     sup_kpos: null,
@@ -156,45 +156,34 @@ const DataSupplier = ({
   }
 
   const countries = [
-    { name: "Australia", code: "AU -" },
-    { name: "Brazil", code: "BR -" },
-    { name: "China", code: "CN -" },
-    { name: "Egypt", code: "EG -" },
-    { name: "France", code: "FR -" },
-    { name: "Germany", code: "DE -" },
-    { name: "India", code: "IN -" },
-    { name: "Indonesia", code: "IND -" },
-    { name: "Japan", code: "JP -" },
-    { name: "Spain", code: "ES -" },
-    { name: "United States", code: "US -" },
+    { name: "Australia", code: "AU-" },
+    { name: "Brazil", code: "BR-" },
+    { name: "China", code: "CN-" },
+    { name: "Egypt", code: "EG-" },
+    { name: "France", code: "FR-" },
+    { name: "Germany", code: "DE-" },
+    { name: "India", code: "IN-" },
+    { name: "Indonesia", code: "IND-" },
+    { name: "Japan", code: "JP-" },
+    { name: "Spain", code: "ES-" },
+    { name: "United States", code: "US-" },
   ];
 
   const getSup = async () => {
     setLoading(true);
     const config = {
-      ...endpoints.supplier,
+      ...endpoints.supplier_code,
       data: {},
     };
-
     try {
-      const response = await request(null, config);
+      console.log(config.data);
+      let response = await request(null, config);
+      console.log("code suplier");
+      console.log(response);
 
       if (response.status) {
         const { data } = response;
-        const sortedData = data.sort((a, b) => b.supplier.id - a.supplier.id);
-        const lastData = sortedData[0];
-
-        if (lastData) {
-          const lastSerialNumber = lastData.supplier.sup_serialNumber;
-          const nextSerialNumberValue = parseInt(lastSerialNumber, 10) + 1;
-          const nextSerialNumber = String(nextSerialNumberValue).padStart(
-            5,
-            "0"
-          );
-          setLastSerialNumber(nextSerialNumber);
-        } else {
-          setLastSerialNumber("00001");
-        }
+        setLastSerialNumber(data);
       }
     } catch (error) {
       console.error(error);
@@ -366,7 +355,7 @@ const DataSupplier = ({
         sup_ppn: currentItem?.supplier?.sup_ppn ?? null,
         sup_pkp: currentItem?.supplier?.sup_pkp ?? null,
         sup_npwp: currentItem?.supplier?.sup_npwp ?? null,
-        sup_country: currentItem?.supplier?.sup_country.code ?? null,
+        sup_country: currentItem?.supplier?.sup_country.name ?? null,
         sup_address: currentItem?.supplier?.sup_address ?? null,
         sup_kota: currentItem?.supplier?.sup_kota ?? null,
         sup_kpos: currentItem?.supplier?.sup_kpos ?? null,
@@ -423,7 +412,7 @@ const DataSupplier = ({
         sup_ppn: currentItem?.supplier?.sup_ppn ?? null,
         sup_pkp: currentItem?.supplier?.sup_pkp ?? null,
         sup_npwp: currentItem?.supplier?.sup_npwp ?? null,
-        sup_country: currentItem?.supplier?.sup_country.code ?? null,
+        sup_country: currentItem?.supplier?.sup_country.name ?? null,
         sup_address: currentItem?.supplier?.sup_address ?? null,
         sup_kota: currentItem?.supplier?.sup_kota ?? null,
         sup_kpos: currentItem?.supplier?.sup_kpos ?? null,
@@ -1273,9 +1262,9 @@ const DataSupplier = ({
                       const generatedCode = `${
                         currentItem?.supplier?.sup_code ??
                         (currentItem?.supplier?.sup_code ||
-                          `${currentItem?.supplier?.sup_country?.code}-${
+                          `${currentItem?.supplier?.sup_country?.code}${
                             currentItem?.jpem?.jpem_code ?? ""
-                          }-${lastSerialNumber}`) + ``
+                          } ${lastSerialNumber}`) + ``
                       }`;
                       setCurrentItem({
                         ...currentItem,
@@ -1297,7 +1286,7 @@ const DataSupplier = ({
 
               <div className="row ml-0 mt-0">
                 <div className="col-6">
-                  {currentItem?.supplier?.sup_country?.code === "IND -" ? (
+                  {currentItem?.supplier?.sup_country?.code === "IND-" ? (
                     <PrimeDropdown
                       label={tr[localStorage.getItem("language")].kota}
                       value={currentItem?.supplier?.sup_kota ?? null}
@@ -1308,7 +1297,7 @@ const DataSupplier = ({
                           supplier: {
                             ...currentItem.supplier,
                             sup_kota: e.value ?? null,
-                            sup_kpos: e.value?.postal_code ?? null,
+                            sup_kpos: e.target.value?.postal_code,
                           },
                         });
                         let newError = error;
@@ -1571,14 +1560,12 @@ const DataSupplier = ({
                   </div>
                 </div>
               </div>
-
               <div className="col-12 p-0">
                 <div className="mt-4 ml-3 mr-3 fs-16 mb-1">
                   <b>Distribusi GL/AP</b>
                 </div>
                 <Divider className="mb-2 ml-3 mr-3"></Divider>
               </div>
-
               <div className="row ml-0 mt-0">
                 <div className="col-6">
                   <PrimeDropdown
@@ -1652,7 +1639,6 @@ const DataSupplier = ({
                   />
                 </div>
               </div>
-
               <div className="row ml-0 mt-0"></div>
             </TabPanel>
           </TabView>

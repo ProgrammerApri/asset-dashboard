@@ -38,7 +38,7 @@ const def = {
     cus_sub_area: null,
     cus_npwp: null,
     cus_pkp: null,
-    cus_country: "DN",
+    cus_country: "IND- ",
     cus_address: null,
     cus_kota: null,
     cus_kpos: null,
@@ -164,47 +164,37 @@ const DataCustomer = ({
   }, []);
 
   const countries = [
-    { name: "Australia", code: "AU -" },
-    { name: "Brazil", code: "BR -" },
-    { name: "China", code: "CN -" },
-    { name: "Egypt", code: "EG -" },
-    { name: "France", code: "FR -" },
-    { name: "Germany", code: "DE -" },
-    { name: "India", code: "IN -" },
-    { name: "Indonesia", code: "IND -" },
-    { name: "Japan", code: "JP -" },
-    { name: "Spain", code: "ES -" },
-    { name: "United States", code: "US -" },
+    { name: "Australia", code: "AU-" },
+    { name: "Brazil", code: "BR-" },
+    { name: "China", code: "CN-" },
+    { name: "Egypt", code: "EG-" },
+    { name: "France", code: "FR-" },
+    { name: "Germany", code: "DE-" },
+    { name: "India", code: "IN-" },
+    { name: "Indonesia", code: "IND-" },
+    { name: "Japan", code: "JP-" },
+    { name: "Spain", code: "ES-" },
+    { name: "United States", code: "US-" },
   ];
 
   const getCustomer = async () => {
     setLoading(true);
     const config = {
-      ...endpoints.customer,
+      ...endpoints.customer_code,
       data: {},
     };
-    console.log(config.data);
+
     try {
-      const response = await request(null, config);
+      console.log(config.data);
+      let response = await request(null, config);
+      console.log("codeeeee");
       console.log(response);
+
       if (response.status) {
         const { data } = response;
-        console.log(data);
-
-        const sortedData = data.sort((a, b) => b.customer.id - a.customer.id);
-        const lastData = sortedData.find(
-          (item) => item.customer.cus_serialNumber
-        );
-        let serialNumber = lastData
-          ? lastData.customer.cus_serialNumber
-          : "00000";
-        console.log(serialNumber);
-
-        const nextSerialNumberValue = parseInt(serialNumber, 10) + 1;
-        const nextSerialNumber = String(nextSerialNumberValue).padStart(5, "0");
-        console.log(nextSerialNumber);
-        setLastSerialNumber(nextSerialNumber);
+        setLastSerialNumber(data);
       }
+      setLoading(false);
     } catch (error) {
       console.error(error);
     } finally {
@@ -405,7 +395,7 @@ const DataCustomer = ({
         cus_pjk: currentItem?.customer?.cus_pjk ?? null,
         cus_npwp: currentItem?.customer?.cus_npwp ?? null,
         cus_pkp: currentItem?.customer?.cus_pkp ?? null,
-        cus_country: currentItem?.customer?.cus_country.code ?? null,
+        cus_country: currentItem?.customer?.cus_country.name ?? null,
         cus_address: currentItem?.customer?.cus_address ?? null,
         cus_kota: currentItem?.customer?.cus_kota ?? null,
         cus_kpos: currentItem?.customer?.cus_kpos ?? null,
@@ -468,7 +458,7 @@ const DataCustomer = ({
         cus_pjk: currentItem?.customer?.cus_pjk ?? null,
         cus_npwp: currentItem?.customer?.cus_npwp ?? null,
         cus_pkp: currentItem?.customer?.cus_pkp ?? null,
-        cus_country: currentItem?.customer?.cus_country.code ?? null,
+        cus_country: currentItem?.customer?.cus_country.name ?? null,
         cus_address: currentItem?.customer?.cus_address ?? null,
         cus_kota: currentItem?.customer?.cus_kota ?? null,
         cus_kpos: currentItem?.customer?.cus_kpos ?? null,
@@ -796,15 +786,13 @@ const DataCustomer = ({
         </span>
         <PrimeSingleButton
           label={tr[localStorage.getItem("language")].tambh}
-          icon={<i class="bx bx-plus px-2"></i>}
+          icon={<i className="bx bx-plus px-2"></i>}
           onClick={() => {
             setShowInput(true);
-
             setEdit(false);
             setLoading(false);
             setCurrentItem(def);
-            getCustomer();
-            onInput(true);
+            getCustomer();   onInput(true);
           }}
         />
       </div>
@@ -1084,6 +1072,8 @@ const DataCustomer = ({
   };
 
   const renderDialog = () => {
+    console.log("data customer");
+    console.log(currentItem);
     return (
       <>
         <Toast ref={toast} />
@@ -1116,7 +1106,7 @@ const DataCustomer = ({
                       currentItem?.customer?.cus_code ??
                       (currentItem?.customer?.cus_code ||
                         `${currentItem?.customer?.cus_country?.code ?? ""} ${
-                          currentItem?.jpel?.jpel_code 
+                          currentItem?.jpel?.jpel_code
                         } ${lastSerialNumber ?? ""}`) + ``
                     }`}
                     onChange={(e) => {
@@ -1363,7 +1353,7 @@ const DataCustomer = ({
                     <Dropdown
                       value={currentItem?.customer?.cus_country}
                       onChange={(e) => {
-                        console.log("Selected country:", e.value.code);
+                        console.log("Selected country:", e.value.name);
                         setCurrentItem({
                           ...currentItem,
                           customer: {
@@ -1401,7 +1391,7 @@ const DataCustomer = ({
                       const generatedCode = `${
                         currentItem?.customer?.cus_code ??
                         (currentItem?.customer?.cus_code ||
-                          `${currentItem?.customer?.cus_country?.code}-${currentItem?.jpel?.jpel_code}-${lastSerialNumber}`) +
+                          `${currentItem?.customer?.cus_country?.code}${currentItem?.jpel?.jpel_code} ${lastSerialNumber}`) +
                           ``
                       }`;
                       console.log("generat", currentItem);
@@ -1422,7 +1412,7 @@ const DataCustomer = ({
 
               <div className="row mr-0 ml-0">
                 <div className="col-6">
-                  {currentItem?.customer?.cus_country?.code === "IND -" ? (
+                  {currentItem?.customer?.cus_country?.code === "IND-" ? (
                     <PrimeDropdown
                       label={tr[localStorage.getItem("language")].kota}
                       value={currentItem.customer.cus_kota ?? null}

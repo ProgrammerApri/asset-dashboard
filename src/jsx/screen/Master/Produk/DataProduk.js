@@ -103,6 +103,7 @@ const DataProduk = ({
   onSuccessInput,
   edit,
   del,
+  dataLength,
 }) => {
   const product = useSelector((state) => state.product);
   const [prdCode, setPrdCode] = useState(null);
@@ -137,6 +138,7 @@ const DataProduk = ({
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
   const [lastSerialNumber, setLastSerialNumber] = useState("");
+  const [isFetchingCode, setIsFetchingCode] = useState(false);
 
   useEffect(() => {
     if (!popUp) {
@@ -144,6 +146,7 @@ const DataProduk = ({
     }
 
     initFilters1();
+    getCodeProd();
     getGroup();
     getDept();
     getUnit();
@@ -155,34 +158,34 @@ const DataProduk = ({
     };
   }, []);
 
-  const getProduct = async () => {
-    const config = {
-      ...endpoints.product,
-      data: {},
-    };
-    try {
-      const response = await request(null, config);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        const lastData = data.reduce((prev, current) => {
-          return prev.id > current.id ? prev : current;
-        });
-        console.log(lastData);
-        let serialNumber = lastData.serialNumber;
-        console.log(serialNumber);
-        if (!serialNumber) {
-          serialNumber = "00000";
-        }
-        const nextSerialNumberValue = parseInt(serialNumber, 10) + 1;
-        const nextSerialNumber = String(nextSerialNumberValue).padStart(5, "0");
-        console.log(nextSerialNumber);
-        setLastSerialNumber(nextSerialNumber);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  // const getProduct = async () => {
+  //   const config = {
+  //     ...endpoints.product,
+  //     data: {},
+  //   };
+  //   try {
+  //     const response = await request(null, config);
+  //     if (response.status) {
+  //       const { data } = response;
+  //       console.log(data);
+  //       const lastData = data.reduce((prev, current) => {
+  //         return prev.id > current.id ? prev : current;
+  //       });
+  //       console.log(lastData);
+  //       let serialNumber = lastData.serialNumber;
+  //       console.log(serialNumber);
+  //       if (!serialNumber) {
+  //         serialNumber = "00000";
+  //       }
+  //       const nextSerialNumberValue = parseInt(serialNumber, 10) + 1;
+  //       const nextSerialNumber = String(nextSerialNumberValue).padStart(5, "0");
+  //       console.log(nextSerialNumber);
+  //       setLastSerialNumber(nextSerialNumber);
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
   const getGroup = async () => {
     const config = {
@@ -225,20 +228,45 @@ const DataProduk = ({
     }
   };
 
+  // const getCodeProd = async () => {
+  //   const config = {
+  //     ...endpoints.product_code,
+  //   };
+  //   console.log(config.data);
+  //   let response = null;
+  //   try {
+  //     response = await request(null, config);
+  //     console.log(response);
+  //     if (response.status) {
+  //       const { data } = response;
+  //       setProdcode(data);
+  //     }
+  //   } catch (error) {}
+  // };
+
   const getCodeProd = async () => {
+    if (isFetchingCode) {
+      return; // Menghindari pemanggilan berulang saat kode sedang diambil
+    }
+
+    setIsFetchingCode(true); // Menandai bahwa kode sedang diambil
+
     const config = {
-      ...endpoints.product_code,
+      ...endpoints.product_generate_code,
     };
-    console.log(config.data);
-    let response = null;
+
     try {
-      response = await request(null, config);
+      console.log(config.data);
+      let response = await request(null, config);
+      console.log("codeeeee");
       console.log(response);
       if (response.status) {
         const { data } = response;
         setProdcode(data);
       }
-    } catch (error) {}
+    } catch (error) {
+    } finally {
+      setIsFetchingCode(false);  }
   };
 
   const getUnit = async () => {
@@ -276,7 +304,6 @@ const DataProduk = ({
         data.forEach((element) => {
           sup.push(element.supplier);
         });
-        console.log("dup", sup);
         setSupplier(sup);
       }
     } catch (error) {}
@@ -345,7 +372,7 @@ const DataProduk = ({
       ...endpoints.addProduct,
       data: {
         ...currentItem,
-        serialNumber: lastSerialNumber,
+        serialNumber: prodcode,
         image: image,
       },
     };
@@ -697,26 +724,36 @@ const DataProduk = ({
             <PrimeSingleButton
               label={tr[localStorage.getItem("language")].tambh}
               icon={<i class="bx bx-plus px-2"></i>}
-              onClick={() => {
+              onClick={async () => {
                 setEdit(false);
-                setCurrentItem({
-                  ...def,
-                  // code: prdCode,
-                  suplier: [
-                    {
-                      id: 0,
-                      prod_id: null,
-                      sup_id: null,
-                    },
-                  ],
-                });
-                setDisplayData(true);
-                onInput(true);
-                getProduct();
+
+                if (!isFetchingCode) {
+                  await getCodeProd();
+                  setCurrentItem({
+                    ...def,
+                    serialNumber: prodcode,
+                    suplier: [
+                      {
+                        id: 0,
+                        prod_id: null,
+                        sup_id: null,
+                      },
+                    ],
+                  });
+
+                  console.log(
+                    "Data yang ditampilkan di serialNumber:",
+                    prodcode
+                  );
+
+                  setDisplayData(true);
+                  onInput(true);
+
+                  await getCodeProd();
+                }
               }}
             />
           </Row>
-          {/* )} */}
         </div>
         {popUp ? (
           <></>
@@ -1174,6 +1211,8 @@ const DataProduk = ({
           paginatorClassName="justify-content-end mt-3"
           selectionMode="single"
           onRowSelect={onRowSelect}
+          totalRecords={dataLength ?? data?.length}
+          lazy={dataLength}
         >
           <Column
             header={tr[localStorage.getItem("language")].kd_prod}
@@ -1246,6 +1285,7 @@ const DataProduk = ({
     );
   };
   const renderDialog = () => {
+    console.log("hai", currentItem);
     return (
       <>
         <Toast ref={toast} />
@@ -1301,7 +1341,7 @@ const DataProduk = ({
                               ? "A-"
                               : ""
                             : ""
-                        }${lastSerialNumber}`) + ``
+                        }${prodcode}`) + ``
                     }
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[0]?.code}
@@ -1387,10 +1427,10 @@ const DataProduk = ({
                       const generatedCode = `${
                         currentItem?.departement &&
                         checkDept(currentItem.departement)?.ccost_code
-                      }-${
+                      } ${
                         currentItem?.group &&
                         checkGroup(currentItem?.group)?.code
-                      }-${
+                      } ${
                         currentItem !== null && currentItem.ns !== ""
                           ? currentItem.ns === 1
                             ? "S-"
@@ -1400,13 +1440,12 @@ const DataProduk = ({
                             ? "A-"
                             : ""
                           : ""
-                      }${lastSerialNumber}`;
+                      } ${prodcode}`;
                       console.log("generat", generatedCode);
                       setCurrentItem({
                         ...currentItem,
                         code: generatedCode,
                         name: e.target.value,
-                        
                       });
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}

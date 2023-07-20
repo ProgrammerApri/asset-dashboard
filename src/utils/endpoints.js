@@ -562,6 +562,11 @@ const endpoints = {
     data: {},
   },
 
+  customer_code: {
+    endpoint: "/v1/api/customer/generate_code",
+    method: "GET",
+    data: {},
+  },
   customer: {
     endpoint: "/v1/api/customer",
     method: "GET",
@@ -581,6 +586,11 @@ const endpoints = {
   },
 
   /// Supplier
+  supplier_code: {
+    endpoint: "/v1/api/supplier/generate_code",
+    method: "GET",
+    data: {},
+  },
   supplier: {
     endpoint: "/v1/api/supplier",
     method: "GET",
@@ -678,6 +688,11 @@ const endpoints = {
 
   product_code: {
     endpoint: "/v1/api/product/code/",
+    method: "GET",
+    data: {},
+  },
+  product_generate_code: {
+    endpoint: "/v1/api/product/generate_code",
     method: "GET",
     data: {},
   },

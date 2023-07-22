@@ -24,6 +24,7 @@ import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 import { tr } from "../../../../data/tr";
 import { InputSwitch } from "primereact/inputswitch";
 import { SelectButton } from "primereact/selectbutton";
+import { Checkbox } from "primereact/checkbox";
 
 const def = {
   supplier: {
@@ -110,6 +111,9 @@ const DataSupplier = ({
   const [accHut, setAccHut] = useState(null);
   const [accUm, setAccUm] = useState(null);
   const [accAll, setAccAll] = useState(null);
+  const [checked, setChecked] = useState({
+    supplier: { sup_country: { code: "" } },
+  });
   const [comp, setComp] = useState(null);
   const [pajak, setPajak] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -168,6 +172,14 @@ const DataSupplier = ({
     { name: "Spain", code: "ES-" },
     { name: "United States", code: "US-" },
   ];
+
+  const generateCode = () => {
+    const countryCode = checked?.supplier?.sup_country?.code || "";
+    const jpelCode = currentItem?.jpem?.jpem_code || "";
+    return checked?.supplier?.sup_country?.code
+      ? `${countryCode}${jpelCode}-${lastSerialNumber}`
+      : `${countryCode}${jpelCode}-${lastSerialNumber}`;
+  };
 
   const getSup = async () => {
     setLoading(true);
@@ -815,7 +827,6 @@ const DataSupplier = ({
     );
   };
   const scrollToTop = () => {
-    // Menggulir halaman ke bagian atas
     document.body.scrollTop = 0;
     document.documentElement.scrollTop = 0;
   };
@@ -1039,12 +1050,9 @@ const DataSupplier = ({
                   <PrimeInput
                     label={tr[localStorage.getItem("language")].kd_pem}
                     value={`${
-                      currentItem?.supplier?.sup_code ??
-                      (currentItem?.supplier.sup_code ||
-                        `${currentItem?.supplier.sup_country?.code ?? ""} ${
-                          currentItem?.jpem?.jpem_code
-                        } ${lastSerialNumber ?? ""}`) + ``
-                    }`}
+                      currentItem?.supplier.sup_code ??
+                      (currentItem?.supplier.sup_code || `${generateCode()}`)
+                    } `}
                     onChange={(e) => {
                       setCurrentItem({
                         ...currentItem,
@@ -1172,6 +1180,27 @@ const DataSupplier = ({
                     // error={error[0]?.npwp}
                   />
                 </div>{" "}
+                <div className="d-flex col-4 align-items-center mt-0">
+                  <InputSwitch
+                    className="ml-0 mt-1"
+                    checked={
+                      currentItem !== null ? currentItem.supplier.sup_pkp : null
+                    }
+                    onChange={(e) => {
+                      setCurrentItem({
+                        ...currentItem,
+                        supplier: {
+                          ...currentItem.supplier,
+                          sup_pkp: e.value,
+                        },
+                      });
+                    }}
+                    // disabled
+                  />
+                  <label className="ml-3 mt-2">
+                    <b>{"PKP"}</b>
+                  </label>
+                </div>
               </div>
 
               <div className="row ml-0 mt-0">
@@ -1187,28 +1216,6 @@ const DataSupplier = ({
                 </div> */}
               </div>
 
-              <div className="d-flex col-12 align-items-center mt-0">
-                <InputSwitch
-                  className="ml-0 mt-1"
-                  checked={
-                    currentItem !== null ? currentItem.supplier.sup_pkp : null
-                  }
-                  onChange={(e) => {
-                    setCurrentItem({
-                      ...currentItem,
-                      supplier: {
-                        ...currentItem.supplier,
-                        sup_pkp: e.value,
-                      },
-                    });
-                  }}
-                  // disabled
-                />
-                <label className="ml-3 mt-2">
-                  <b>{"PKP"}</b>
-                </label>
-              </div>
-
               <div className="col-12 p-0">
                 <div className="mt-4 ml-3 mr-3 fs-16 mb-1">
                   <b>Alamat Pemasok</b>
@@ -1217,27 +1224,48 @@ const DataSupplier = ({
               </div>
 
               <div className="col-12 ">
-                <div className="text-label">
-                  <label className="text-label"></label>
-                  <div className="justify-content-center">
-                    <Dropdown
-                      label="negara"
-                      value={currentItem?.supplier?.sup_country}
+                <div className="d-flex flex-column">
+                  <label className="text-label">Negara</label>
+                  <div className="d-flex align-items-center">
+                    <Checkbox
+                      className="mr-2"
+                      checked={!!checked?.supplier?.sup_country?.code}
                       onChange={(e) => {
-                        setCurrentItem({
-                          ...currentItem,
+                        const newChecked = {
+                          ...checked,
                           supplier: {
-                            ...currentItem.supplier,
-                            sup_country: e.value,
+                            ...checked.supplier,
+                            sup_country: {
+                              ...checked.supplier.sup_country,
+                              code: e.target.checked
+                                ? currentItem?.supplier?.sup_country?.code
+                                : "",
+                            },
                           },
-                        });
+                        };
+                        setChecked(newChecked);
                       }}
-                      options={countries}
-                      optionLabel="name"
-                      placeholder="Select a Country"
-                      filter
-                      className="w-full "
                     />
+
+                    <div className="justify-content-center flex-grow-1 ml-2">
+                      <Dropdown
+                        value={currentItem?.supplier?.sup_country}
+                        onChange={(e) => {
+                          setCurrentItem({
+                            ...currentItem,
+                            supplier: {
+                              ...currentItem.supplier,
+                              sup_country: e.value,
+                            },
+                          });
+                        }}
+                        options={countries}
+                        optionLabel="name"
+                        placeholder="Select a Country"
+                        filter
+                        className="w-full "
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1262,9 +1290,9 @@ const DataSupplier = ({
                       const generatedCode = `${
                         currentItem?.supplier?.sup_code ??
                         (currentItem?.supplier?.sup_code ||
-                          `${currentItem?.supplier?.sup_country?.code}${
-                            currentItem?.jpem?.jpem_code ?? ""
-                          } ${lastSerialNumber}`) + ``
+                          `${currentItem?.supplier?.sup_country?.code ?? ""}${
+                            currentItem?.jpem?.jpem_code
+                          }-${lastSerialNumber}`) + ``
                       }`;
                       setCurrentItem({
                         ...currentItem,

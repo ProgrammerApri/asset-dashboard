@@ -246,11 +246,10 @@ const DataProduk = ({
 
   const getCodeProd = async () => {
     if (isFetchingCode) {
-      return; // Menghindari pemanggilan berulang saat kode sedang diambil
+      return;
     }
 
-    setIsFetchingCode(true); // Menandai bahwa kode sedang diambil
-
+    setIsFetchingCode(true);
     const config = {
       ...endpoints.product_generate_code,
     };
@@ -266,7 +265,8 @@ const DataProduk = ({
       }
     } catch (error) {
     } finally {
-      setIsFetchingCode(false);  }
+      setIsFetchingCode(false);
+    }
   };
 
   const getUnit = async () => {
@@ -1285,7 +1285,6 @@ const DataProduk = ({
     );
   };
   const renderDialog = () => {
-    console.log("hai", currentItem);
     return (
       <>
         <Toast ref={toast} />
@@ -1304,6 +1303,7 @@ const DataProduk = ({
           footer={renderFooter()}
           onHide={() => {
             setEdit(false);
+            setDisplayData(false);
             setActive(0);
             setFile(null);
             onInput(false);
@@ -1327,11 +1327,11 @@ const DataProduk = ({
                                 checkDept(currentItem.departement)?.ccost_code
                               )
                             : ""
-                        } ${
+                        }${
                           currentItem !== null && currentItem?.group
                             ? String(checkGroup(currentItem.group)?.code)
                             : ""
-                        } ${
+                        }${
                           currentItem !== null && currentItem.ns !== ""
                             ? currentItem.ns === 1
                               ? "S-"
@@ -1427,10 +1427,10 @@ const DataProduk = ({
                       const generatedCode = `${
                         currentItem?.departement &&
                         checkDept(currentItem.departement)?.ccost_code
-                      } ${
+                      }-${
                         currentItem?.group &&
                         checkGroup(currentItem?.group)?.code
-                      } ${
+                      }-${
                         currentItem !== null && currentItem.ns !== ""
                           ? currentItem.ns === 1
                             ? "S-"
@@ -1440,7 +1440,7 @@ const DataProduk = ({
                             ? "A-"
                             : ""
                           : ""
-                      } ${prodcode}`;
+                      }${prodcode}`;
                       console.log("generat", generatedCode);
                       setCurrentItem({
                         ...currentItem,

@@ -28,6 +28,7 @@ import { tr } from "../../../../data/tr";
 import { SelectButton } from "primereact/selectbutton";
 import endpoints from "../../../../utils/endpoints";
 import { set } from "date-fns";
+import { Checkbox } from "primereact/checkbox";
 
 const def = {
   customer: {
@@ -124,6 +125,10 @@ const DataCustomer = ({
   const [subArea, setSubArea] = useState(null);
   const [setup, setSetup] = useState(null);
   const [acc, setAcc] = useState(null);
+  const [checked, setChecked] = useState({
+    customer: { cus_country: { code: "" } },
+  });
+
   const [accAr, setAccAr] = useState(null);
   const [accUm, setAccUm] = useState(null);
   const [allAcc, setAllAcc] = useState(null);
@@ -176,6 +181,14 @@ const DataCustomer = ({
     { name: "Spain", code: "ES-" },
     { name: "United States", code: "US-" },
   ];
+
+  const generateCode = () => {
+    const countryCode = checked?.customer?.cus_country?.code || "";
+    const jpelCode = currentItem?.jpel?.jpel_code || "";
+    return checked?.customer?.cus_country?.code
+      ? `${countryCode}${jpelCode}-${lastSerialNumber}`
+      : `${countryCode}${jpelCode}-${lastSerialNumber}`;
+  };
 
   const getCustomer = async () => {
     setLoading(true);
@@ -792,7 +805,8 @@ const DataCustomer = ({
             setEdit(false);
             setLoading(false);
             setCurrentItem(def);
-            getCustomer();   onInput(true);
+            getCustomer();
+            onInput(true);
           }}
         />
       </div>
@@ -1103,12 +1117,9 @@ const DataCustomer = ({
                   <PrimeInput
                     label={tr[localStorage.getItem("language")].kd_pel}
                     value={`${
-                      currentItem?.customer?.cus_code ??
-                      (currentItem?.customer?.cus_code ||
-                        `${currentItem?.customer?.cus_country?.code ?? ""} ${
-                          currentItem?.jpel?.jpel_code
-                        } ${lastSerialNumber ?? ""}`) + ``
-                    }`}
+                      currentItem?.customer.cus_code ??
+                      (currentItem?.customer.cus_code || `${generateCode()}`)
+                    } `}
                     onChange={(e) => {
                       setCurrentItem({
                         ...currentItem,
@@ -1347,27 +1358,48 @@ const DataCustomer = ({
               </div>
 
               <div className="col-12">
-                <div className="text-label">
-                  <label className="text-label"></label>
-                  <div className="justify-content-center">
-                    <Dropdown
-                      value={currentItem?.customer?.cus_country}
+                <div className="d-flex flex-column">
+                  <label className="text-label">Negara</label>
+                  <div className="d-flex align-items-center">
+                    <Checkbox
+                      className="mr-2"
+                      checked={!!checked?.customer?.cus_country?.code}
                       onChange={(e) => {
-                        console.log("Selected country:", e.value.name);
-                        setCurrentItem({
-                          ...currentItem,
+                        const newChecked = {
+                          ...checked,
                           customer: {
-                            ...currentItem.customer,
-                            cus_country: e.value,
+                            ...checked.customer,
+                            cus_country: {
+                              ...checked.customer.cus_country,
+                              code: e.target.checked
+                                ? currentItem?.customer?.cus_country?.code
+                                : "",
+                            },
                           },
-                        });
+                        };
+                        setChecked(newChecked);
                       }}
-                      options={countries}
-                      optionLabel="name"
-                      placeholder="Select a Country"
-                      filter
-                      className="w-full"
                     />
+                    <div className="justify-content-center flex-grow-1 ml-2">
+                      <Dropdown
+                        value={currentItem?.customer?.cus_country}
+                        onChange={(e) => {
+                          console.log("Selected country:", e.value.name);
+                          setCurrentItem({
+                            ...currentItem,
+                            customer: {
+                              ...currentItem.customer,
+                              cus_country: e.value,
+                            },
+                          });
+                        }}
+                        options={countries}
+                        optionLabel="name"
+                        placeholder="Select a Country"
+                        filter
+                        className="w-full"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1391,8 +1423,9 @@ const DataCustomer = ({
                       const generatedCode = `${
                         currentItem?.customer?.cus_code ??
                         (currentItem?.customer?.cus_code ||
-                          `${currentItem?.customer?.cus_country?.code}${currentItem?.jpel?.jpel_code} ${lastSerialNumber}`) +
-                          ``
+                          `${checked?.customer?.cus_country?.code ?? ""}${
+                            currentItem?.jpel?.jpel_code
+                          }-${lastSerialNumber}`) + ``
                       }`;
                       console.log("generat", currentItem);
                       setCurrentItem({

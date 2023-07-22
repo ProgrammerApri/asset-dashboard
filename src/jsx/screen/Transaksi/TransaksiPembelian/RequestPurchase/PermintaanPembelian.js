@@ -60,6 +60,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
   const toast = useRef(null);
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
+  const [lastNumber, setLastNumber] = useState("");
   const [isEdit, setEdit] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
@@ -99,6 +100,24 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
       }, 500);
     }
   };
+  const getCoderp = async () => {
+    const config = {
+      ...endpoints.codeRp,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setLastNumber(data);
+      }
+    } catch (error) {}
+  };
+
 
   const approveRp = async (id) => {
     setUpdate(true);
@@ -318,7 +337,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
               type: SET_CURRENT_RP,
               payload: {
                 ...data,
-                req_dep: data?.req_dep?.id ?? null,
+                req_dep: data.lastNumber ?? null,
                 ref_sup: data?.ref_sup?.id ?? null,
                 rprod:
                   rprod.length > 0
@@ -515,6 +534,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
   };
 
   const renderHeader = () => {
+    console.log("data",data);
     return (
       <div className="flex justify-content-between">
         <span className="p-input-icon-left">
@@ -530,6 +550,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
+            getCoderp()
             dispatch({
               type: SET_EDIT,
               payload: false,
@@ -539,6 +560,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
               type: SET_CURRENT_RP,
               payload: {
                 ...data,
+                req_code: lastNumber ?? null,
                 req_dep: profile.previlage?.dep_id ?? null,
                 rprod: [
                   {

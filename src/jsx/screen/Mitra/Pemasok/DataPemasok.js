@@ -35,7 +35,7 @@ const def = {
     sup_ppn: null,
     sup_pkp: false,
     sup_npwp: null,
-    sup_country: "IND-",
+    sup_country: null,
     sup_address: null,
     sup_kota: null,
     sup_kpos: null,
@@ -1113,6 +1113,7 @@ const DataSupplier = ({
                     filter
                     filterBy="jpem_name"
                     placeholder={tr[localStorage.getItem("language")].pilih}
+                    disabled={isEdit}
                     // errorMessage="Jenis Pemasok Belum Dipilih"
                     // error={error[0]?.jpem}
                   />

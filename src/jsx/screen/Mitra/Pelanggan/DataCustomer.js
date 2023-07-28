@@ -39,7 +39,7 @@ const def = {
     cus_sub_area: null,
     cus_npwp: null,
     cus_pkp: null,
-    cus_country: "IND- ",
+    cus_country: null,
     cus_address: null,
     cus_kota: null,
     cus_kpos: null,
@@ -368,7 +368,7 @@ const DataCustomer = ({
       if (response.status) {
         const { data } = response;
         console.log(data);
-        let sub = [];
+        let sub = [];   
         data.forEach((element) => {
           sub.push(element.subArea);
         });
@@ -408,7 +408,7 @@ const DataCustomer = ({
         cus_pjk: currentItem?.customer?.cus_pjk ?? null,
         cus_npwp: currentItem?.customer?.cus_npwp ?? null,
         cus_pkp: currentItem?.customer?.cus_pkp ?? null,
-        cus_country: currentItem?.customer?.cus_country.name ?? null,
+        cus_country: currentItem?.customer?.cus_country ?? null,
         cus_address: currentItem?.customer?.cus_address ?? null,
         cus_kota: currentItem?.customer?.cus_kota ?? null,
         cus_kpos: currentItem?.customer?.cus_kpos ?? null,
@@ -1086,7 +1086,7 @@ const DataCustomer = ({
   };
 
   const renderDialog = () => {
-    console.log("data customer");
+    console.log("edit data customer");
     console.log(currentItem);
     return (
       <>
@@ -1179,6 +1179,7 @@ const DataCustomer = ({
                     filter
                     filterBy="jpel_name"
                     placeholder={tr[localStorage.getItem("language")].pilih}
+                    disabled={isEdit}  
                     // errorMessage="Jenis pelanggan harus dipilih"
                     // error={error[0]?.jpel}
                   />
@@ -1382,7 +1383,7 @@ const DataCustomer = ({
                     />
                     <div className="justify-content-center flex-grow-1 ml-2">
                       <Dropdown
-                        value={currentItem?.customer?.cus_country}
+                        value={ currentItem?.customer?.cus_country ?? null }
                         onChange={(e) => {
                           console.log("Selected country:", e.value.name);
                           setCurrentItem({

@@ -563,7 +563,7 @@ const endpoints = {
   },
 
   customer_code: {
-    endpoint: "/v1/api/customer/generate_code",
+    endpoint: "/v1/api/customer/generate-code",
     method: "GET",
     data: {},
   },
@@ -587,7 +587,7 @@ const endpoints = {
 
   /// Supplier
   supplier_code: {
-    endpoint: "/v1/api/supplier/generate_code",
+    endpoint: "/v1/api/supplier/generate-code",
     method: "GET",
     data: {},
   },
@@ -692,7 +692,7 @@ const endpoints = {
     data: {},
   },
   product_generate_code: {
-    endpoint: "/v1/api/product/generate_code",
+    endpoint: "/v1/api/product/generate-code",
     method: "GET",
     data: {},
   },
@@ -790,11 +790,7 @@ const endpoints = {
   },
 
   /// Request Puechase
-  codeRp: {
-    endpoint: "/v1/api/rp/generate_code",
-    method: "GET",
-    data: {},
-  },
+  
   rPurchase: {
     endpoint: "/v1/api/rp",
     method: "GET",

@@ -462,7 +462,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
           <div className="col-4">
             <PrimeInput
               label={tr[localStorage.getItem("language")].kd_req}
-              value={`${lastNumber}`}
+              value={rp.req_code}
               onChange={(e) => {
                 updateRp({ ...rp, req_code: e.target.value });
                 let newError = error;

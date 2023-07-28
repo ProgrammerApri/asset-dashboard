@@ -1285,6 +1285,7 @@ const DataProduk = ({
     );
   };
   const renderDialog = () => {
+    console.log("data :",currentItem);
     return (
       <>
         <Toast ref={toast} />
@@ -1369,6 +1370,7 @@ const DataProduk = ({
                     filter
                     filterBy="ccost_name"
                     errorMessage="Grup Produk Belum Dipilih"
+                    disabled={isEdit}
                   />
                 </div>
                 <div className="col-4">
@@ -1410,6 +1412,7 @@ const DataProduk = ({
                     placeholder={tr[localStorage.getItem("language")].pilih}
                     errorMessage="Grup Produk Belum Dipilih"
                     error={error[0]?.group}
+                    disabled={isEdit}
                   />
                 </div>
                 <div className="col-4">
@@ -1489,7 +1492,9 @@ const DataProduk = ({
                 <div className="col-4">
                   <PrimeCalendar
                     label={tr[localStorage.getItem("language")].tgl_exp}
-                    value={new Date(`${currentItem?.exp_date}Z`)}
+                    // value={new Date(`${currentItem?.exp_date }Z`)}
+                    value={currentItem?.exp_date ? new Date(currentItem.exp_date) : null}
+        
                     onChange={(e) => {
                       let result = new Date(e.value);
 
@@ -1498,7 +1503,7 @@ const DataProduk = ({
 
                       setCurrentItem({
                         ...currentItem,
-                        exp_date: e.target.value,
+                        exp_date: e.value,
                       });
                       let newError = error;
                       newError[0].exp_date = false;

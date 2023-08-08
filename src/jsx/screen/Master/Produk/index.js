@@ -5,6 +5,7 @@ import CircleProgress from "../../../components/CircleProgress/circleProgress";
 import DataProduk from "./DataProduk";
 import { SET_ORIGINAL_PRODUCT, SET_PRODUCT } from "src/redux/actions";
 import { useDispatch } from "react-redux";
+import DataProdukMentah from "./DataProdukMentah";
 
 const Produk = ({ edit, del }) => {
   const [product, setProduk] = useState(null);
@@ -290,6 +291,11 @@ const Produk = ({ edit, del }) => {
                 data={loading ? dummy : product}
                 load={loading}
                 onSuccessInput={() => getProduk(true)}
+              />
+              <DataProdukMentah
+                data={loading ? dummy : product}
+                load={loading}
+                onSuccessInput={() => getProduk()}
               />
             </Card.Body>
           </Card>

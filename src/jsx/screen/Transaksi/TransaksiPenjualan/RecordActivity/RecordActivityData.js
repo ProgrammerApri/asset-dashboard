@@ -344,7 +344,7 @@ const RecordActivityData = ({ onAdd, onEdit }) => {
               if (
                 canApprove(
                   profile?.approval_settings?.filter(
-                    (v) => v.approval_module === "rp"
+                    (v) => v.approval_module === "ra"
                   )[0]?.approval_level,
                   data
                 )
@@ -357,7 +357,7 @@ const RecordActivityData = ({ onAdd, onEdit }) => {
             className={`btn ${
               canApprove(
                 profile?.approval_settings?.filter(
-                  (v) => v.approval_module === "rp"
+                  (v) => v.approval_module === "ra"
                 )[0]?.approval_level,
                 data
               )
@@ -377,7 +377,7 @@ const RecordActivityData = ({ onAdd, onEdit }) => {
               if (
                 canApprove(
                   profile?.approval_settings?.filter(
-                    (v) => v.approval_module === "rp"
+                    (v) => v.approval_module === "ra"
                   )[0]?.approval_level,
                   data
                 )
@@ -390,7 +390,7 @@ const RecordActivityData = ({ onAdd, onEdit }) => {
             className={`btn ${
               canApprove(
                 profile?.approval_settings?.filter(
-                  (v) => v.approval_module === "rp"
+                  (v) => v.approval_module === "ra"
                 )[0]?.approval_level,
                 data
               )

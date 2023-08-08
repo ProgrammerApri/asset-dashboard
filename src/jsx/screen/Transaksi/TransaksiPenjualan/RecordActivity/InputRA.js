@@ -34,6 +34,7 @@ import { tr } from "../../../../../data/tr";
 import DataCustomer from "src/jsx/screen/Mitra/Pelanggan/DataCustomer";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
+import DataProdukMentah from "src/jsx/screen/Master/Produk/DataProdukMentah";
 
 const defError = {
   code: false,
@@ -60,6 +61,7 @@ const tipe = [
 
 const InputRA = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
   const enterEvent = useRef();
+  const profile = useSelector((state) => state.profile.profile);
   const [update, setUpdate] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
@@ -71,6 +73,7 @@ const InputRA = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
   const [showJasa, setShowJasa] = useState(false);
   const [showSatuan, setShowSatuan] = useState(false);
   const product = useSelector((state) => state.product.list);
+  // const [product, setProd] = useState(null);
   const [satuan, setSatuan] = useState(null);
   const [customer, setCustomer] = useState(null);
   const [doubleClick, setDoubleClick] = useState(false);
@@ -78,7 +81,6 @@ const InputRA = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [error, setError] = useState(defError);
   const isEdit = useSelector((state) => state.recAct.editRp);
-  const profile = useSelector((state) => state.profile.profile);
   const dispatch = useDispatch();
   const [accor, setAccor] = useState({
     produk: true,
@@ -192,8 +194,8 @@ const InputRA = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
             filt.push(element);
           }
         });
-            console.log("profile");
-            console.log(filt);
+        console.log("profile");
+        console.log(filt);
 
         dispatch({
           type: SET_PRODUCT,
@@ -733,7 +735,7 @@ const InputRA = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
         }}
       />
 
-      <DataProduk
+      <DataProdukMentah
         data={product}
         loading={false}
         popUp={true}
@@ -743,9 +745,6 @@ const InputRA = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
         }}
         onInput={(e) => {
           setShowProduk(!e);
-        }}
-        onSuccessInput={(e) => {
-          getProduk();
         }}
         onRowSelect={(e) => {
           console.log(e);
@@ -774,6 +773,9 @@ const InputRA = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
           setTimeout(() => {
             setDoubleClick(false);
           }, 2000);
+        }}
+        onSuccessInput={(e) => {
+          getProduk();
         }}
       />
 

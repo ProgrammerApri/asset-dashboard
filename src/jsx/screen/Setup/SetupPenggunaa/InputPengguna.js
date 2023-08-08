@@ -26,6 +26,7 @@ const def = {
   active: true,
   menu: [],
   previlage: {
+    div_id: null,
     dep_id: null,
     access_type: 0,
     approver: false,
@@ -45,6 +46,10 @@ const modules = [
   {
     code: "invoice",
     name: "Invoice",
+  },
+  {
+    code: "ra",
+    name: "Record Activity",
   },
   {
     code: "so",
@@ -102,7 +107,7 @@ const InputPengguna = ({ onCancel, onSuccess, del }) => {
 
   const getDivisi = async () => {
     const config = {
-      ...endpoints.divisi,
+      ...endpoints.divpusatBiaya,
       data: {},
     };
     console.log(config.data);
@@ -571,7 +576,7 @@ const InputPengguna = ({ onCancel, onSuccess, del }) => {
                   : null
               }
               options={divisi}
-              optionLabel={"div_name"}
+              optionLabel={"div_ccost_name"}
               onChange={(e) => {
                 console.log(e);
                 updateUser({
@@ -583,7 +588,7 @@ const InputPengguna = ({ onCancel, onSuccess, del }) => {
                 });
               }}
               filter
-              filterBy={"div_name"}
+              filterBy={"div_ccost_name"}
               placeholder="Pilih Divisi"
             />
           </div>
@@ -599,7 +604,7 @@ const InputPengguna = ({ onCancel, onSuccess, del }) => {
               options={pusatBiaya}
               optionLabel={"ccost_name"}
               onChange={(e) => {
-                console.log(e);
+                console.log(e.value);
                 updateUser({
                   ...user,
                   previlage: {

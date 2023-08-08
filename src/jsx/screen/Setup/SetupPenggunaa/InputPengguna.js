@@ -67,6 +67,7 @@ const InputPengguna = ({ onCancel, onSuccess, del }) => {
   const [menu, setMenu] = useState(null);
   const [current, setCurrent] = useState(def);
   const [pusatBiaya, setPusatBiaya] = useState(null);
+  const [divisi, setDivisi] = useState(null);
 
   const dummy = Array.from({ length: 10 });
 
@@ -78,6 +79,7 @@ const InputPengguna = ({ onCancel, onSuccess, del }) => {
     });
     getMenu();
     getPusatBiaya();
+    getDivisi()
   }, []);
 
   const getPusatBiaya = async () => {
@@ -94,6 +96,24 @@ const InputPengguna = ({ onCancel, onSuccess, del }) => {
         const { data } = response;
         console.log(data);
         setPusatBiaya(data);
+      }
+    } catch (error) {}
+  };
+
+  const getDivisi = async () => {
+    const config = {
+      ...endpoints.divisi,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setDivisi(data);
       }
     } catch (error) {}
   };
@@ -325,6 +345,17 @@ const InputPengguna = ({ onCancel, onSuccess, del }) => {
     return selected;
   };
 
+  const checkDivisi = (value) => {
+    let selected = null;
+    divisi?.forEach((element) => {
+      if (element.id === value) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
   const checkModules = (value) => {
     let selected = null;
     modules?.forEach((element) => {
@@ -530,6 +561,33 @@ const InputPengguna = ({ onCancel, onSuccess, del }) => {
             </span>
             <Divider className="mt-1"></Divider>
           </div>
+
+          <div className="col-3 ">
+            <PrimeDropdown
+              label={"Divisi"}
+              value={
+                user.previlage?.div_id
+                  ? checkDivisi(user.previlage.div_id)
+                  : null
+              }
+              options={divisi}
+              optionLabel={"div_name"}
+              onChange={(e) => {
+                console.log(e);
+                updateUser({
+                  ...user,
+                  previlage: {
+                    ...user.previlage,
+                    div_id: e.value.id,
+                  },
+                });
+              }}
+              filter
+              filterBy={"div_name"}
+              placeholder="Pilih Divisi"
+            />
+          </div>
+
           <div className="col-3 ">
             <PrimeDropdown
               label={"Department"}

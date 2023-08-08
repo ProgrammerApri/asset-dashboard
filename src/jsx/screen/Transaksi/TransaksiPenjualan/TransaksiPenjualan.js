@@ -5,6 +5,7 @@ import { tr } from "src/data/tr";
 import FakturPenjualan from "./FakturPenjualan";
 import InvoicePenjualan from "./InvoicePenjualan";
 import Penjualan from "./Penjualan";
+import RecordActivity from "./RecordActivity";
 import ReturPenjualan from "./ReturPenjualan";
 import SalesOrder from "./SalesOrder";
 
@@ -19,6 +20,9 @@ const TransaksiPenjualan = () => {
         setTrigger(current => current + 1);
       }}
     >
+      <TabPanel header={"Record Activity (RA)"}>
+        <RecordActivity trigger={trigger}/>
+      </TabPanel>
       <TabPanel header={tr[localStorage.getItem("language")].sal_ord}>
         <SalesOrder trigger={trigger}/>
       </TabPanel>

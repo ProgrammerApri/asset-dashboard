@@ -32,6 +32,7 @@ import SaldoAwalReducer from "./SaldoAwalReducer";
 import BudgetingReducer from "./BudgetingReducer";
 import PnlReducer from "./PnlReducer";
 import RpAutoReducer from "./RpAutoReducer";
+import RecActReducer from "./RecActReducer";
 // import PBNReducer from "./PBNReducer";
 
 
@@ -72,6 +73,7 @@ const rootReducer = combineReducers({
   bu: BudgetingReducer,
   pnl: PnlReducer,
   rpauto: RpAutoReducer,
+  recAct: RecActReducer,
 });
 
 export default rootReducer;

@@ -679,7 +679,7 @@ const endpoints = {
   },
 
   /// Produk
- 
+
   product: {
     endpoint: "/v1/api/product",
     method: "GET",
@@ -790,7 +790,7 @@ const endpoints = {
   },
 
   /// Request Puechase
-  
+
   rPurchase: {
     endpoint: "/v1/api/rp",
     method: "GET",
@@ -897,6 +897,44 @@ const endpoints = {
 
   closeSO: {
     endpoint: "/v1/api/so-close/",
+    method: "PUT",
+    data: {},
+  },
+
+  /// Record Activity
+  recordAct: {
+    endpoint: "/v1/api/record-activity",
+    method: "GET",
+    data: {},
+  },
+
+  addRecordAct: {
+    endpoint: "/v1/api/record-activity",
+    method: "POST",
+    data: {},
+  },
+
+  editRecordAct: {
+    endpoint: "/v1/api/record-activity/",
+    method: "PUT",
+    data: {},
+  },
+
+  delRecordAct: {
+    endpoint: "/v1/api/record-activity/",
+    method: "DELETE",
+    data: {},
+  },
+
+  // Approval Record Activity
+  approveRec: {
+    endpoint: "/v1/api/approval/rec-activity/",
+    method: "PUT",
+    data: {},
+  },
+
+  rejectRec: {
+    endpoint: "/v1/api/reject/rec-activity/",
     method: "PUT",
     data: {},
   },

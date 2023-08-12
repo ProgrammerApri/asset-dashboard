@@ -2,48 +2,46 @@ import React, { useState, useEffect, useRef } from "react";
 import { request, endpoints } from "src/utils";
 import { Row, Col, Card } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_MSN } from "src/redux/actions";
-import DataMesin from "./DataMesin";
+import { SET_JENIS_KERJA } from "src/redux/actions";
+import DataJeniskerja from "./DataJeniskerja";
+// import DataJeniskerja from "./DataJeniskerja";
 
 const data = {
   id: null,
-  msn_code: null,
-  msn_name: null,
-  max_sdm: null,
-  clean_up: null,
-  ttl_kerja: null,
-  ttl_kerja_msn: null,
-  bts_bwh_toleransi: null,
-  bts_atas_toleransi: null,
+  jenis_code: null,
+  jenis_name: null,
+  mutasi: null,
   desc: null,
 };
 
-const Mesin = () => {
-  const msn = useSelector((state) => state.msn.msn);
+const Jeniskerja = () => {
+  const jns_kerja = useSelector((state) => state.jns_kerja.jns_kerja);
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getMesin();
+    getJeniskerja();
   }, []);
 
-  const getMesin = async (isUpdate = false) => {
+  const getJeniskerja = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.mesin,
-      data: msn,
+      ...endpoints.Jeniskerja,
+      data: jns_kerja,
     };
-    console.log(config.data);
+    console.log("datanya");
+    console.log(config?.data);
     let response = null;
     try {
       response = await request(null, config);
       console.log(response);
       if (response.status) {
         const { data } = response;
+        console.log("hello bawah");
         console.log(data);
-        dispatch({ type: SET_MSN, payload: data });
+        dispatch({ type: SET_JENIS_KERJA, payload: data });
       }
     } catch (error) {}
     if (isUpdate) {
@@ -61,10 +59,10 @@ const Mesin = () => {
         <Col>
           <Card>
             <Card.Body>
-              <DataMesin
-                data={loading ? dummy : msn}
+              <DataJeniskerja
+                data={loading ? dummy : jns_kerja}
                 load={loading}
-                onSuccessInput={() => getMesin()}
+                onSuccessInput={() => getJeniskerja()}
               />
             </Card.Body>
           </Card>
@@ -74,4 +72,4 @@ const Mesin = () => {
   );
 };
 
-export default Mesin;
+export default Jeniskerja;

@@ -34,6 +34,7 @@ import PnlReducer from "./PnlReducer";
 import RpAutoReducer from "./RpAutoReducer";
 import RecActReducer from "./RecActReducer";
 import WorkCenterReducer from "./WorkCenterReducer";
+import JENISKERJAReducer from "./JENISKERJAReducer";
 // import PBNReducer from "./PBNReducer";
 
 
@@ -76,6 +77,7 @@ const rootReducer = combineReducers({
   rpauto: RpAutoReducer,
   recAct: RecActReducer,
   wc: WorkCenterReducer,
+  jns_kerja: JENISKERJAReducer,
 });
 
 export default rootReducer;

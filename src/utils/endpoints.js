@@ -1410,6 +1410,50 @@ const endpoints = {
     data: {},
   },
 
+  //setup auto number
+  getNumber: {
+    endpoint: "/v1/api/numb",
+    method: "GET",
+    data: {},
+  },
+
+  addNumber: {
+    endpoint: "/v1/api/numb",
+    method: "POST",
+    data: {},
+  },
+
+  updateNumber: {
+    endpoint: "/v1/api/numb/",
+    method: "PUT",
+    data: {},
+  },
+
+  /// Jenis Kerja
+  Jeniskerja: {
+    endpoint: "/v1/api/jenis-pekerjaan",
+    method: "GET",
+    data: {},
+  },
+
+  addJeniskerja: {
+    endpoint: "/v1/api/jenis-pekerjaan",
+    method: "POST",
+    data: {},
+  },
+
+  editJeniskerja: {
+    endpoint: "/v1/api/jenis-pekerjaan/",
+    method: "PUT",
+    data: {},
+  },
+
+  delJeniskerja: {
+    endpoint: "/v1/api/jenis-pekerjaan/",
+    method: "DELETE",
+    data: {},
+  },
+
   /// Mesin
   mesin: {
     endpoint: "/v1/api/mesin",
@@ -1859,7 +1903,6 @@ const endpoints = {
     method: "POST",
     data: {},
   },
-
 
   // Work Center
   work_center: {

@@ -13,6 +13,7 @@ import Pajak from "./Pajak";
 import Produk from "./Produk";
 import Mesin from "./Mesin";
 import WorkCenter from "./WorkCenter";
+import Jeniskerja from "./Jenis_kerja";
 
 const Master = (self) => {
   const [active, setActive] = useState(0);
@@ -96,6 +97,13 @@ const Master = (self) => {
                   tittle: "Work Center",
                   icon: e.icon_file,
                   component: <WorkCenter edit={e.edit} del={e.delete} />,
+                });
+                break;
+              case "jenis-pekerjaan":
+                sub.push({
+                  tittle: "Jenis Pekerjaan",
+                  icon: e.icon_file,
+                  component: <Jeniskerja edit={e.edit} del={e.delete} />,
                 });
                 break;
 

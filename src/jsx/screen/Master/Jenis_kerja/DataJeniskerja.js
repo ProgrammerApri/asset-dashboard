@@ -21,19 +21,20 @@ import {
   SET_EDIT_JENIS_KERJA,
 } from "src/redux/actions";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
+import { InputSwitch } from "primereact/inputswitch";
 
 const def = {
   id: 1,
   jenis_code: null,
   jenis_name: null,
-  mutasi: null,
+  mutasi: false,
   desc: null,
 };
 
 const defError = {
   code: false,
   name: false,
-  mts: false,
+  // mts: false,
 };
 
 const mts = [
@@ -331,7 +332,13 @@ const DataJeniskerja = ({
               }),
               dispatch({
                 type: SET_CURRENT_JENIS_KERJA,
-                payload: data,
+                payload: {
+                  ...data,
+                  mutasi: false,
+                  jenis_code: null,
+                  jenis_name: null,
+                  desc: null,
+                },
               })
             );
           }}
@@ -408,14 +415,14 @@ const DataJeniskerja = ({
     let errors = {
       code: !jns_kerja.jenis_code || jns_kerja.jenis_code === "",
       name: !jns_kerja.jenis_name || jns_kerja.jenis_name === "",
-      mts: !jns_kerja.mutasi || jns_kerja.mutasi === "",
+      // mts: !jns_kerja.mutasi || jns_kerja.mutasi === "",
     };
 
-    valid = !errors.code && !errors.name && !errors.mts;
+    valid = !errors.code && !errors.name ;
 
     setError(errors);
 
-    valid = !errors.code && !errors.name && !errors.mts;
+    valid = !errors.code && !errors.name ;
 
     return valid;
   };
@@ -510,7 +517,7 @@ const DataJeniskerja = ({
 
             <div className="col-6">
               <PrimeInput
-                label={"Nama Jenos Pekerjaan"}
+                label={"Nama Jenis Pekerjaan"}
                 value={jns_kerja?.jenis_name}
                 onChange={(e) => {
                   updateJNSkerja({ ...jns_kerja, jenis_name: e.target.value });
@@ -522,25 +529,24 @@ const DataJeniskerja = ({
                 error={error?.name}
               />
             </div>
-            <div className="col-6">
-              <PrimeDropdown
-                label={"Mutasi"}
-                value={
-                  jns_kerja !== null && jns_kerja?.mutasi !== null
-                    ? cekMutasi(jns_kerja?.mutasi)
-                    : null
-                }
-                options={mts}
-                onChange={(e) => {
-                  updateJNSkerja({
-                    ...jns_kerja,
-                    mutasi: e.value.id,
-                  });
-                }}
-                optionLabel="name"
-                placeholder="Pilih Disini"
-                // error={error?.mts}
-              />
+            <div className="flex col-2 align-items-center mt-4">
+              <label className="ml-0 mt-1 fs-12 text-black">
+                <b>{"Mutasi"}</b>
+              </label>
+              <div className="col-6">
+                <InputSwitch
+                  checked={jns_kerja?.mutasi ?? false}
+                  onChange={(e) => {
+                    updateJNSkerja({
+                      ...jns_kerja,
+                      mutasi: e.target.value,
+                    });
+                  }}
+                  // optionLabel="name"
+                  // placeholder="Pilih Disini"
+                  // error={error?.mts}
+                />
+              </div>
             </div>
           </div>
 

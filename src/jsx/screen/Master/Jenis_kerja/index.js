@@ -15,7 +15,8 @@ const data = {
 };
 
 const Jeniskerja = () => {
-  const jns_kerja = useSelector((state) => state.jns_kerja.jns_kerja);
+  // const jenis_kerja = useSelector((state) => state.jns_kerja.jns_kerja);
+  const [jeniskerja, setJeniskerja] = useState(null);
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
 
@@ -29,7 +30,7 @@ const Jeniskerja = () => {
     setLoading(true);
     const config = {
       ...endpoints.Jeniskerja,
-      data: jns_kerja,
+      data: {},
     };
     console.log("datanya");
     console.log(config?.data);
@@ -41,7 +42,8 @@ const Jeniskerja = () => {
         const { data } = response;
         console.log("hello bawah");
         console.log(data);
-        dispatch({ type: SET_JENIS_KERJA, payload: data });
+        setJeniskerja(data);
+        // dispatch({ type: SET_JENIS_KERJA, payload: data });
       }
     } catch (error) {}
     if (isUpdate) {
@@ -60,7 +62,7 @@ const Jeniskerja = () => {
           <Card>
             <Card.Body>
               <DataJeniskerja
-                data={loading ? dummy : jns_kerja}
+                data={loading ? dummy : jeniskerja}
                 load={loading}
                 onSuccessInput={() => getJeniskerja()}
               />

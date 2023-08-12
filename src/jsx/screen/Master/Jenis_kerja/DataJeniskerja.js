@@ -116,7 +116,6 @@ const DataJeniskerja = ({
       ...endpoints.addJeniskerja,
       data: jns_kerja,
     };
-    console.log("nambah data");
     console.log(config.data);
     let response = null;
     try {
@@ -539,6 +538,7 @@ const DataJeniskerja = ({
                   });
                 }}
                 optionLabel="name"
+                placeholder="Pilih Disini"
                 // error={error?.mts}
               />
             </div>

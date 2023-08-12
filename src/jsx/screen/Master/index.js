@@ -11,6 +11,7 @@ import Jasa from "./Jasa";
 import Lokasi from "./Lokasi";
 import Pajak from "./Pajak";
 import Produk from "./Produk";
+import Mesin from "./Mesin";
 
 const Master = (self) => {
   const [active, setActive] = useState(0);
@@ -80,6 +81,13 @@ const Master = (self) => {
                   tittle: tr[localStorage.getItem("language")].asset,
                   icon: e.icon_file,
                   component: <Lokasi edit={e.edit} del={e.delete} />,
+                });
+                break;
+              case "mesin":
+                sub.push({
+                  tittle: "Mesin",
+                  icon: e.icon_file,
+                  component: <Mesin edit={e.edit} del={e.delete} />,
                 });
                 break;
 

@@ -19,7 +19,7 @@ import DataProduk from "../../Master/Produk/DataProduk";
 import DataSatuan from "../../MasterLainnya/Satuan/DataSatuan";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import { Dropdown } from "primereact/dropdown";
-import DataMesin from "../Mesin/DataMesin";
+import DataMesin from "../../Master/Mesin/DataMesin";
 import { TabPanel, TabView } from "primereact/tabview";
 import { Divider } from "@material-ui/core";
 import DataPusatBiaya from "../../MasterLainnya/PusatBiaya/DataPusatBiaya";

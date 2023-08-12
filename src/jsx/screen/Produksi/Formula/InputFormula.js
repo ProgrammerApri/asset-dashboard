@@ -9,7 +9,7 @@ import { InputSwitch } from "primereact/inputswitch";
 import CustomAccordion from "src/jsx/components/Accordion/Accordion";
 import { useDispatch, useSelector } from "react-redux";
 
-import { SET_CURRENT_FM } from "src/redux/actions";
+import { SET_CURRENT_FM, SET_PRODUCT } from "src/redux/actions";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
@@ -19,6 +19,7 @@ import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 import DataProduk from "../../Master/Produk/DataProduk";
 import DataSatuan from "../../MasterLainnya/Satuan/DataSatuan";
 import { TabPanel, TabView } from "primereact/tabview";
+import { Divider } from "@material-ui/core";
 
 const defError = {
   code: false,
@@ -52,10 +53,14 @@ const InputFormula = ({ onCancel, onSuccess }) => {
   const [date, setDate] = useState(new Date());
   const [showProd, setShowProd] = useState(false);
   const [showSatuan, setShowSatuan] = useState(false);
-  const [product, setProduct] = useState(null);
+  const [reqForm, setReqForm] = useState(null);
+  const product = useSelector((state) => state.product.list);
   const [satuan, setSatuan] = useState(null);
   const [active, setActive] = useState(0);
   const [state, setState] = useState(0);
+  const [accor, setAccor] = useState({
+    produk: true,
+  });
 
   useEffect(() => {
     window.scrollTo({
@@ -63,9 +68,29 @@ const InputFormula = ({ onCancel, onSuccess }) => {
       left: 0,
       behavior: "smooth",
     });
+    getReq();
     getProduct();
     getSatuan();
   }, []);
+
+  const getReq = async () => {
+    const config = {
+      ...endpoints.recordAct,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setReqForm(data);
+
+        console.log("===============");
+        console.log(data);
+      }
+    } catch (error) {}
+  };
 
   const getProduct = async () => {
     const config = {
@@ -78,9 +103,10 @@ const InputFormula = ({ onCancel, onSuccess }) => {
 
       if (response.status) {
         const { data } = response;
-        setProduct(data);
-        console.log("jsdj");
-        console.log(data);
+        dispatch({
+          type: SET_PRODUCT,
+          payload: data,
+        });
       }
     } catch (error) {}
   };
@@ -167,6 +193,18 @@ const InputFormula = ({ onCancel, onSuccess }) => {
     }
   };
 
+  const checkReq = (value) => {
+    let selected = {};
+    reqForm?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+        console.log(selected);
+      }
+    });
+
+    return selected;
+  };
+
   const checkProd = (value) => {
     let selected = {};
     product?.forEach((element) => {
@@ -217,7 +255,7 @@ const InputFormula = ({ onCancel, onSuccess }) => {
   const currentDate = (date) => {
     let now = new Date();
     let newDate = new Date(
-      date.getFullYear(),
+      date?.getFullYear(),
       date.getMonth(),
       date.getDate(),
       now.getHours(),
@@ -346,13 +384,10 @@ const InputFormula = ({ onCancel, onSuccess }) => {
     return valid;
   };
 
-  const header = () => {
-    return (
-      <h4 className="mb-5">
-        <b>Pembelian (PO)</b>
-        {/* <b>{isEdit ? "Edit" : "Buat"} Pembelian (PO)</b> */}
-      </h4>
-    );
+  const formatIdr = (value) => {
+    return `${value.toFixed(2)}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
 
   const body = () => {
@@ -376,6 +411,20 @@ const InputFormula = ({ onCancel, onSuccess }) => {
               error={error?.code}
             />
           </div>
+          <div className="col-4 text-black">
+            <PrimeInput
+              label={"Nama Formula"}
+              value={forml.fname}
+              onChange={(e) => {
+                updateFM({ ...forml, fname: e.target.value });
+                let newError = error;
+                newError.name = false;
+                setError(newError);
+              }}
+              placeholder="Masukan Nama Formula"
+              error={error?.name}
+            />
+          </div>
           <div className="col-2 text-black">
             <PrimeCalendar
               label={"Tanggal"}
@@ -393,22 +442,8 @@ const InputFormula = ({ onCancel, onSuccess }) => {
               error={error?.date}
             />
           </div>
-          <div className="col-7"></div>
-          <div className="col-3 text-black">
-            <PrimeInput
-              label={"Nama Formula"}
-              value={forml.fname}
-              onChange={(e) => {
-                updateFM({ ...forml, fname: e.target.value });
-                let newError = error;
-                newError.name = false;
-                setError(newError);
-              }}
-              placeholder="Masukan Nama Formula"
-              error={error?.name}
-            />
-          </div>
-          <div className="col-1 text-black">
+          <div className="col-3"></div>
+          <div className="col-2 text-black">
             <PrimeNumber
               label={"Versi"}
               value={forml.version}
@@ -444,18 +479,7 @@ const InputFormula = ({ onCancel, onSuccess }) => {
               disabled
             />
           </div>
-          <div className="col-5 text-black">
-            <label className="text-label">Keterangan</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={forml.desc}
-                onChange={(e) => updateFM({ ...forml, desc: e.target.value })}
-                placeholder="Masukan Keterangan"
-              />
-            </div>
-          </div>
-          <div className="col-3"></div>
-          <div className="flex col-12 align-items-center mt-1">
+          <div className="flex col-2 align-items-center mt-4">
             <label className="ml-0 mt-1 fs-12 text-black">
               <b>{"Aktif"}</b>
             </label>
@@ -467,7 +491,135 @@ const InputFormula = ({ onCancel, onSuccess }) => {
               }}
             />
           </div>
-          {/* <div className="col-7"></div> */}
+          <div className="col-5 text-black">
+            <label className="text-label">Keterangan</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={forml.desc}
+                onChange={(e) => updateFM({ ...forml, desc: e.target.value })}
+                placeholder="Masukan Keterangan"
+              />
+            </div>
+          </div>
+          <div className="col-12"></div>
+
+          {forml.ra_id ? (
+            <>
+              <CustomAccordion
+                tittle={"Product Request"}
+                defaultActive={true}
+                active={accor.produk}
+                onClick={() => {
+                  setAccor({
+                    ...accor,
+                    produk: !accor.produk,
+                  });
+                }}
+                key={1}
+                className="mt-3 ml-2 mr-2"
+                body={
+                  <>
+                    <div className="row ml-0">
+                      <div
+                        className="col-3 text-black"
+                        hidden={forml.ra_id === null}
+                      >
+                        <PrimeInput
+                          label={"Kode Request Formula"}
+                          value={
+                            forml.ra_id ? checkReq(forml?.ra_id)?.ra_code : null
+                          }
+                          onChange={(e) => {
+                            // updateFM({ ...forml, fname: e.target.value });
+                            // let newError = error;
+                            // newError.name = false;
+                            // setError(newError);
+                          }}
+                          placeholder="Kode Request Formula"
+                          disabled
+                        />
+                      </div>
+                      <div
+                        className="col-2 text-black"
+                        hidden={forml.ra_id === null}
+                      >
+                        <PrimeCalendar
+                          label={"Tanggal Request"}
+                          value={
+                            forml.ra_id
+                              ? new Date(`${checkReq(forml?.ra_id)?.ra_date}Z`)
+                              : null
+                          }
+                          onChange={(e) => {}}
+                          placeholder="Tanggal Request"
+                          dateFormat="dd-mm-yy"
+                          disabled
+                        />
+                      </div>
+                    </div>
+
+                    <DataTable
+                      responsiveLayout="none"
+                      value={forml.req_form?.map((v, i) => {
+                        return {
+                          ...v,
+                          index: i,
+                          // order: v?.order ?? 0,
+                        };
+                      })}
+                      className="display w-150 datatable-wrapper header-white no-border p-0"
+                      showGridlines={false}
+                      emptyMessage={() => <div></div>}
+                    >
+                      <Column
+                        className="align-text-top"
+                        style={{ width: "75rem" }}
+                        field={""}
+                        body={(e) => (
+                          <PrimeInput
+                            label={"Produk"}
+                            value={
+                              e.prod_id
+                                ? `${checkProd(e?.prod_id)?.name} (${
+                                    checkProd(e?.prod_id)?.code
+                                  })`
+                                : null
+                            }
+                            onChange={(e) => {}}
+                            placeholder="Produk"
+                            disabled
+                          />
+                        )}
+                      />
+
+                      <Column
+                        className="align-text-top"
+                        style={{ width: "35rem" }}
+                        field={""}
+                        body={(e) => (
+                          <PrimeInput
+                            label={"Satuan"}
+                            value={
+                              e.unit_id
+                                ? `${checkUnit(e?.unit_id)?.name} (${
+                                    checkUnit(e?.unit_id)?.code
+                                  })`
+                                : null
+                            }
+                            onChange={(e) => {}}
+                            placeholder="Satuan"
+                            disabled
+                          />
+                        )}
+                      />
+                    </DataTable>
+                  </>
+                }
+              />
+            </>
+          ) : (
+            <></>
+          )}
         </Row>
 
         <TabView
@@ -511,7 +663,7 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                               }
                             }
                           });
-                          setSatuan(sat);
+                          // setSatuan(sat);
 
                           let temp = [...forml.product];
                           temp[e.index].prod_id = u.id;
@@ -527,7 +679,7 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                           setCurrentIndex(e.index);
                           setShowProd(true);
                         }}
-                        label={"[name]"}
+                        label={"[name] ([code])"}
                         placeholder="Pilih Produk"
                         errorMessage="Produk Belum Dipilih"
                         error={error?.prod[e.index]?.id}
@@ -553,7 +705,7 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                           setCurrentIndex(e.index);
                           setShowSatuan(true);
                         }}
-                        label={"[name]"}
+                        label={"[name] ([code])"}
                         placeholder="Pilih Satuan"
                       />
                     )}
@@ -565,10 +717,11 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                     field={""}
                     body={(e) => (
                       <PrimeNumber
+                        price
                         value={e.qty && e.qty}
                         onChange={(u) => {
                           let temp = [...forml.product];
-                          temp[e.index].qty = u.target.value;
+                          temp[e.index].qty = u.value;
                           updateFM({ ...forml, product: temp });
 
                           let newError = error;
@@ -592,10 +745,11 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                     // }}
                     body={(e) => (
                       <PrimeNumber
+                        price
                         value={e.aloc && e.aloc}
                         onChange={(u) => {
                           let temp = [...forml.product];
-                          temp[e.index].aloc = u.target.value;
+                          temp[e.index].aloc = u.value;
                           updateFM({ ...forml, product: temp });
 
                           let newError = error;
@@ -703,11 +857,16 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                               }
                             }
                           });
-                          setSatuan(sat);
+                          // setSatuan(sat);
 
                           let temp = [...forml.material];
                           temp[e.index].prod_id = u.id;
                           temp[e.index].unit_id = u.unit?.id;
+                          temp[e.index].konv_qty = 0;
+                          temp[e.index].unit_konv =
+                            checkUnit(temp[e.index].unit_id)?.u_from !== null
+                              ? checkUnit(temp[e.index].unit_id)?.u_from?.code
+                              : checkUnit(temp[e.index].unit_id)?.code;
                           updateFM({ ...forml, material: temp });
 
                           let newError = error;
@@ -719,7 +878,7 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                           setCurrentIndex(e.index);
                           setShowProd(true);
                         }}
-                        label={"[name]"}
+                        label={"[name] ([code])"}
                         placeholder="Pilih Bahan"
                         errorMessage="Bahan Belum Dipilih"
                         error={error?.mtrl[e.index]?.id}
@@ -737,6 +896,10 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                         onChange={(u) => {
                           let temp = [...forml.material];
                           temp[e.index].unit_id = u.id;
+                          temp[e.index].konv_qty = temp[e.index].qty * u?.qty;
+                          temp[e.index].unit_konv = u?.u_from
+                            ? u?.u_from?.code
+                            : u?.code;
                           updateFM({ ...forml, material: temp });
                         }}
                         option={satuan}
@@ -745,7 +908,7 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                           setCurrentIndex(e.index);
                           setShowSatuan(true);
                         }}
-                        label={"[name]"}
+                        label={"[name] ([code])"}
                         placeholder="Pilih Satuan"
                       />
                     )}
@@ -757,10 +920,16 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                     field={""}
                     body={(e) => (
                       <PrimeNumber
+                        price
                         value={e.qty && e.qty}
                         onChange={(u) => {
                           let temp = [...forml.material];
-                          temp[e.index].qty = u.target.value;
+                          temp[e.index].qty = u.value;
+
+                          temp[e.index].konv_qty =
+                            temp[e.index].qty *
+                            checkUnit(temp[e.index].unit_id)?.qty;
+
                           updateFM({ ...forml, material: temp });
 
                           let newError = error;
@@ -772,6 +941,22 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                         min={0}
                         error={error?.mtrl[e.index]?.qty}
                       />
+                    )}
+                  />
+
+                  <Column
+                    header={"Konversi Qty"}
+                    className="align-text-top"
+                    style={{
+                      minWidth: "8rem",
+                    }}
+                    field={""}
+                    body={(e) => (
+                      <>
+                        <label className="ml-1">{`${formatIdr(
+                          e?.konv_qty ?? 0
+                        )} (${e?.unit_konv ?? ""})`}</label>
+                      </>
                     )}
                   />
 
@@ -946,7 +1131,7 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                 }
               }
             });
-            setSatuan(sat);
+            // setSatuan(sat);
 
             let temp = [...forml.product];
             temp[currentIndex].prod_id = e.data.id;

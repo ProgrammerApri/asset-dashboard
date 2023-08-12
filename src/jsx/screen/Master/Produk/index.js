@@ -292,11 +292,11 @@ const Produk = ({ edit, del }) => {
                 load={loading}
                 onSuccessInput={() => getProduk(true)}
               />
-              <DataProdukMentah
+              {/* <DataProdukMentah
                 data={loading ? dummy : product}
                 load={loading}
                 onSuccessInput={() => getProduk()}
-              />
+              /> */}
             </Card.Body>
           </Card>
         </Col>

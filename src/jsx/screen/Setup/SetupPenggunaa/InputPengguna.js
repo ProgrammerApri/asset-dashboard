@@ -49,7 +49,7 @@ const modules = [
   },
   {
     code: "ra",
-    name: "Record Activity",
+    name: "Request Production",
   },
   {
     code: "so",

@@ -16,17 +16,21 @@ import { SET_CURRENT_FM, SET_EDIT_FM, SET_FM } from "src/redux/actions";
 import { Divider } from "@material-ui/core";
 import ReactToPrint from "react-to-print";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import { Tooltip } from "primereact/tooltip";
+import { Timeline } from "primereact/timeline";
 
 const data = {
   id: null,
   fcode: null,
   fname: null,
+  ra_id: null,
   version: null,
   rev: null,
   desc: null,
   active: null,
   product: [],
   material: [],
+  req_form: [],
 };
 
 const DataFormula = ({ onAdd, onEdit, onDetail }) => {
@@ -42,6 +46,8 @@ const DataFormula = ({ onAdd, onEdit, onDetail }) => {
   const dispatch = useDispatch();
   const forml = useSelector((state) => state.forml.forml);
   const show = useSelector((state) => state.forml.current);
+  const profile = useSelector((state) => state.profile.profile);
+  const [expandedRows, setExpandedRows] = useState(null);
   const printPage = useRef(null);
 
   const dummy = Array.from({ length: 10 });
@@ -78,7 +84,7 @@ const DataFormula = ({ onAdd, onEdit, onDetail }) => {
   };
 
   const delFM = async (id) => {
-    setLoading(true)
+    setLoading(true);
     const config = {
       ...endpoints.delFormula,
       endpoint: endpoints.delFormula.endpoint + currentItem.id,
@@ -117,7 +123,7 @@ const DataFormula = ({ onAdd, onEdit, onDetail }) => {
   };
 
   const actionBodyTemplate = (data) => {
-    return (
+    return data?.id ? (
       // <React.Fragment>
       <div className="d-flex">
         {/* <Link
@@ -187,10 +193,18 @@ const DataFormula = ({ onAdd, onEdit, onDetail }) => {
               el.prod_id = el.prod_id.id;
               el.unit_id = el.unit_id.id;
             });
+            let req_form = data.req_form;
+            req_form.forEach((el) => {
+              el.prod_id = el.prod_id.id;
+              el.unit_id = el.unit_id.id;
+            });
             dispatch({
               type: SET_CURRENT_FM,
               payload: {
                 ...data,
+                ra_id: data?.ra_id?.id ?? null,
+                version: data?.version + 1,
+                rev: data?.rev + 1,
                 product:
                   product.length > 0
                     ? product
@@ -214,9 +228,12 @@ const DataFormula = ({ onAdd, onEdit, onDetail }) => {
                           prod_id: null,
                           unit_id: null,
                           qty: null,
+                          konv_qty: null,
+                          unit_konv: null,
                           price: null,
                         },
                       ],
+                req_form: req_form.length > 0 ? req_form : null,
               },
             });
           }}
@@ -236,7 +253,94 @@ const DataFormula = ({ onAdd, onEdit, onDetail }) => {
           <i className="fa fa-trash"></i>
         </Link>
       </div>
+    ) : (
       // </React.Fragment>
+      <div className="d-flex">
+        <Tooltip target={".btn"} />
+        <Link
+          data-pr-tooltip="Create Formula"
+          data-pr-position="right"
+          data-pr-my="left center-2"
+          onClick={() => {
+            onEdit();
+            dispatch({
+              type: SET_EDIT_FM,
+              payload: false,
+            });
+
+            let product = data.product;
+            product?.forEach((el) => {
+              el.prod_id = el.prod_id.id;
+              el.unit_id = el.unit_id.id;
+            });
+            let material = data.material;
+            material?.forEach((el) => {
+              el.prod_id = el.prod_id.id;
+              el.unit_id = el.unit_id.id;
+            });
+            let req_form = data.req_form;
+            req_form?.forEach((el) => {
+              el.prod_id = el.prod_id.id;
+              el.unit_id = el.unit_id.id;
+            });
+
+            dispatch({
+              type: SET_CURRENT_FM,
+              payload: {
+                ...data,
+                ra_id: data?.ra_id?.id ?? null,
+                active: false,
+                version: 1,
+                product:
+                  product?.length > 0
+                    ? product
+                    : [
+                        {
+                          id: 0,
+                          form_id: null,
+                          prod_id: null,
+                          unit_id: null,
+                          qty: null,
+                          aloc: null,
+                        },
+                      ],
+                material:
+                  material?.length > 0
+                    ? material
+                    : [
+                        {
+                          id: 0,
+                          form_id: null,
+                          prod_id: null,
+                          unit_id: null,
+                          qty: null,
+                          konv_qty: null,
+                          unit_konv: null,
+                          price: null,
+                        },
+                      ],
+                req_form:
+                  req_form?.length > 0
+                    ? req_form
+                    : [
+                        {
+                          id: 0,
+                          form_id: null,
+                          prod_id: null,
+                          unit_id: null,
+                        },
+                      ],
+              },
+            });
+          }}
+          // className={`btn ${
+          //   data.status === 0 ? "" : "disabled"
+          // } btn-primary shadow btn-xs sharp ml-1`}
+          className={`btn btn-primary shadow btn-xs sharp ml-1`}
+        >
+          <i className="fa fa-plus"></i>
+        </Link>
+      </div>
     );
   };
 
@@ -319,7 +423,17 @@ const DataFormula = ({ onAdd, onEdit, onDetail }) => {
                     prod_id: null,
                     unit_id: null,
                     qty: null,
+                    konv_qty: null,
+                    unit_konv: null,
                     price: null,
+                  },
+                ],
+                req_form: [
+                  {
+                    id: 0,
+                    form_id: null,
+                    prod_id: null,
+                    unit_id: null,
                   },
                 ],
               },
@@ -330,30 +444,83 @@ const DataFormula = ({ onAdd, onEdit, onDetail }) => {
     );
   };
 
-  // const renderFooter = () => {
-  //   return (
-  //     <div>
-  //       <PButton
-  //         label="Batal"
-  //         onClick={() => setDisplayData(false)}
-  //         className="p-button-text btn-primary"
-  //       />
-  //       <ReactToPrint
-  //         trigger={() => {
-  //           return (
-  //             <PButton variant="primary" onClick={() => {}}>
-  //               Print{" "}
-  //               <span className="btn-icon-right">
-  //                 <i class="bx bxs-printer"></i>
-  //               </span>
-  //             </PButton>
-  //           );
-  //         }}
-  //         content={() => printPage.current}
-  //       />
-  //     </div>
-  //   );
-  // };
+  const formatDateTime = (date) => {
+    var d = new Date(`${date}Z`),
+      month = "" + (d.getMonth() + 1),
+      day = "" + d.getDate(),
+      year = "" + d.getFullYear(),
+      hour = "" + d.getHours(),
+      minute = "" + d.getMinutes(),
+      second = "" + d.getSeconds();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+    if (hour.length < 2) hour = "0" + hour;
+    if (minute.length < 2) minute = "0" + minute;
+    if (second.length < 2) second = "0" + second;
+
+    return `${[day, month, year].join("-")} || ${[hour, minute, second].join(
+      ":"
+    )}`;
+  };
+
+  const customizedMarker = (item, index, data) => {
+    console.log(index);
+    return (
+      <span
+        className="flex align-items-center justify-content-center z-1 p-1 border-circle"
+        style={{
+          backgroundColor: !item.approved
+            ? "red"
+            : item.complete
+            ? "#21BF99"
+            : "white",
+          border: !item.approved ? "2px solid red" : "2px solid #21BF99",
+        }}
+      >
+        <i
+          className={!item.approved ? "pi pi-times" : "pi pi-check"}
+          style={{ fontSize: "0.4rem", fontWeight: "bold", color: "white" }}
+        ></i>
+      </span>
+    );
+  };
+
+  const rowExpansionTemplate = (data) => {
+    return (
+      <div className="row">
+        <div className="col-12 pb-0">
+          <Timeline
+            value={data.timeline}
+            layout="horizontal"
+            align="top"
+            marker={(item, index) => customizedMarker(item, index, data)}
+            content={(item) => (
+              <div
+                className=""
+                style={{
+                  minWidth: "12rem",
+                  minHeight: "4.5rem",
+                  // maxHeight: "8rem",
+                }}
+              >
+                <div className="pt-0 mt-0">
+                  <b>{item.label}</b>
+                </div>
+                <div className="fs-12">
+                  {item?.date ? formatDateTime(item?.date) : "-"}
+                </div>
+
+                <div className="fs-12">{item.approved_by}</div>
+
+                <div className="fs-12">{item.reason}</div>
+              </div>
+            )}
+          />
+        </div>
+      </div>
+    );
+  };
 
   const template2 = {
     layout: "RowsPerPageDropdown CurrentPageReport PrevPageLink NextPageLink",
@@ -439,7 +606,12 @@ const DataFormula = ({ onAdd, onEdit, onDetail }) => {
         rows={rows2}
         onPage={onCustomPage2}
         paginatorClassName="justify-content-end mt-3"
+        expandedRows={expandedRows}
+        onRowToggle={(e) => setExpandedRows(e.data)}
+        rowExpansionTemplate={rowExpansionTemplate}
       >
+        <Column expander style={{ width: "3em" }} />
+
         <Column
           header="Tanggal Formula"
           style={{
@@ -450,13 +622,19 @@ const DataFormula = ({ onAdd, onEdit, onDetail }) => {
         />
         <Column
           header="Kode Formula"
-          field={(e) => e.fcode}
+          field={(e) => e.fcode ?? "-"}
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
         />
         <Column
           header="Nama Formula"
-          field={(e) => e.fname}
+          field={(e) => e.fname ?? "-"}
+          style={{ minWidth: "8rem" }}
+          body={loading && <Skeleton />}
+        />
+        <Column
+          header="Request Formula"
+          field={(e) => (e?.ra_id ? e.ra_id?.ra_code : "-")}
           style={{ minWidth: "8rem" }}
           body={loading && <Skeleton />}
         />

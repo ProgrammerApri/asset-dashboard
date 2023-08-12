@@ -755,22 +755,15 @@ const RecordActivityData = ({ onAdd, onEdit }) => {
               <Skeleton />
             ) : (
               <div>
-                {
-                  e.status !== 2 ? (
-                    <Badge variant="success light">
-                      <i className="bx bxs-circle text-success mr-1"></i> Open
-                    </Badge>
-                  ) : (
-                    <Badge variant="danger light">
-                      <i className="bx bxs-circle text-danger mr-1"></i> Close
-                    </Badge>
-                  )
-                  // (
-                  //   <Badge variant="success light">
-                  //     <i className="bx bxs-circle text-success mr-1"></i> Selesai
-                  //   </Badge>
-                  // )
-                }
+                {e.status !== 2 ? (
+                  <Badge variant="success light">
+                    <i className="bx bxs-circle text-success mr-1"></i> Open
+                  </Badge>
+                ) : (
+                  <Badge variant="danger light">
+                    <i className="bx bxs-circle text-danger mr-1"></i> Close
+                  </Badge>
+                )}
               </div>
             )
           }
@@ -804,14 +797,14 @@ const RecordActivityData = ({ onAdd, onEdit }) => {
             )
           }
         />
-        {/* <Column
-          header={"PO"}
-          field={(e) => e.po_code ?? "-"}
+        <Column
+          header={"Formula"}
+          field={(e) => e.form_code ?? "-"}
           // style={{ minWidth: "10rem" }}
           body={(e) =>
             loading ? (
               <Skeleton />
-            ) : e.po_code ? (
+            ) : e.form_code ? (
               <Badge variant="success light">
                 <i className="bx bx-check-double text-success"></i>
               </Badge>
@@ -822,7 +815,7 @@ const RecordActivityData = ({ onAdd, onEdit }) => {
             )
           }
         />
-        <Column
+        {/* <Column
           header={"GRA"}
           field={(e) => e.gra_code ?? "-"}
           // style={{ minWidth: "10rem" }}

@@ -84,7 +84,7 @@ const ReportGRA = React.lazy(() =>
   import("./screen/Report/LaporanPembelian/Gra")
 );
 const Produksi = React.lazy(() => import("./screen/Produksi"));
-const DataMesin = React.lazy(() => import("./screen/Produksi/Mesin/DataMesin"));
+const DataMesin = React.lazy(() => import("./screen/Master/Mesin/DataMesin"));
 const GroupReport = React.lazy(() => import("./screen/Report"));
 const LaporanPenjualan = React.lazy(() =>
   import("./screen/Report/LaporanPenjualan")

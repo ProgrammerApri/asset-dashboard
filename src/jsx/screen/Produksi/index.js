@@ -6,24 +6,24 @@ import PenerimaanHJ from "./PenerimaanHJ";
 import Pembebanan from "./Pembebanan";
 import Batch from "./Batchh";
 import Formula from "./Formula";
-import Mesin from "./Mesin";
+// import Mesin from "../Master/Mesin";
 import Planning from "./Planning";
 
 const Produksi = () => {
   const [active, setActive] = useState(0);
   const [subMenu, setSubMenu] = useState([
+    // {
+    //   tittle: "Mesin",
+    //   icon: "bx-receipt",
+    //   component: <Mesin />,
+    // },
     {
-      tittle: "Mesin",
-      icon: "bx-receipt",
-      component: <Mesin />,
-    },
-    {
-      tittle: "Formula",
+      tittle: "Formula (Bill of Material)",
       icon: "bx-receipt",
       component: <Formula />,
     },
     {
-      tittle: "Planning",
+      tittle: "Planning (Routing)",
       icon: "bx-receipt",
       component: <Planning />,
     },

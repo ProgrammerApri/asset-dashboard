@@ -19,7 +19,7 @@ import { Link } from "react-router-dom";
 import endpoints from "../../../../utils/endpoints";
 import DataLokasi from "../../Master/Lokasi/DataLokasi";
 import DataPusatBiaya from "../../MasterLainnya/PusatBiaya/DataPusatBiaya";
-import DataMesin from "../../Produksi/Mesin/DataMesin";
+import DataMesin from "../../Master/Mesin/DataMesin";
 import { SET_CURRENT_USAGE } from "../../../../redux/actions";
 
 const defError = {

@@ -1859,6 +1859,32 @@ const endpoints = {
     method: "POST",
     data: {},
   },
+
+
+  // Work Center
+  work_center: {
+    endpoint: "/v1/api/work-center",
+    method: "GET",
+    data: {},
+  },
+
+  addWorkCenter: {
+    endpoint: "/v1/api/work-center",
+    method: "POST",
+    data: {},
+  },
+
+  editWorkCenter: {
+    endpoint: "/v1/api/work-center/",
+    method: "PUT",
+    data: {},
+  },
+
+  delWorkCenter: {
+    endpoint: "/v1/api/work-center/",
+    method: "DELETE",
+    data: {},
+  },
 };
 
 export default endpoints;

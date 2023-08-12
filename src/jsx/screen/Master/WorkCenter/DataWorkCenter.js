@@ -17,12 +17,8 @@ import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 import {
-  SET_CURRENT_FM,
   SET_CURRENT_WC,
-  SET_EDIT_FM,
   SET_EDIT_WC,
-  SET_FM,
-  SET_WC,
 } from "src/redux/actions";
 import { Divider } from "@material-ui/core";
 import ReactToPrint from "react-to-print";
@@ -30,6 +26,8 @@ import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleB
 import { Tooltip } from "primereact/tooltip";
 import { Timeline } from "primereact/timeline";
 import { tr } from "date-fns/locale";
+import DataLokasi from "../Lokasi/DataLokasi";
+import DataMesin from "../Mesin/DataMesin";
 
 const def = {
   id: null,
@@ -44,6 +42,10 @@ const def = {
   biaya_estimasi: null,
   desc: null,
 };
+
+const dum_data = {
+
+}
 
 const DataWorkCenter = ({
   data,
@@ -68,8 +70,8 @@ const DataWorkCenter = ({
   const [rows2, setRows2] = useState(20);
   const [doubleClick, setDoubleClick] = useState(false);
   const dispatch = useDispatch();
-  const work = useSelector((state) => state.work.current);
-  const isEdit = useSelector((state) => state.work.editWc);
+  const work = useSelector((state) => state.wc.current);
+  const isEdit = useSelector((state) => state.wc.editWc);
   const [showMachine, setShowMachine] = useState(false);
   const [showLocat, setShowLocat] = useState(false);
   const [showType, setShowType] = useState(false);
@@ -139,8 +141,8 @@ const DataWorkCenter = ({
 
   const editFM = async () => {
     const config = {
-      ...endpoints.editFormula,
-      endpoint: endpoints.editFormula.endpoint + work.id,
+      ...endpoints.editWorkCenter,
+      endpoint: endpoints.editWorkCenter.endpoint + work.id,
       data: work,
     };
     console.log(config.data);
@@ -176,7 +178,7 @@ const DataWorkCenter = ({
 
   const addFM = async () => {
     const config = {
-      ...endpoints.addFormula,
+      ...endpoints.addWorkCenter,
       data: work,
     };
     console.log(config.data);
@@ -226,8 +228,8 @@ const DataWorkCenter = ({
   const delFM = async (id) => {
     setLoading(true);
     const config = {
-      ...endpoints.delFormula,
-      endpoint: endpoints.delFormula.endpoint + currentItem.id,
+      ...endpoints.delWorkCenter,
+      endpoint: endpoints.delWorkCenter.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;
@@ -367,6 +369,7 @@ const DataWorkCenter = ({
           label="Tambah"
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
+            setUpdate(false)
             setShowInput(
               dispatch({
                 type: SET_EDIT_WC,
@@ -582,7 +585,7 @@ const DataWorkCenter = ({
           />
           <Column
             header="Jenis Pekerjaan"
-            field={(e) => (e?.work_type ? e.work_type?.name : "-")}
+            field={(e) => (e?.work_type ? checkType(e.work_type)?.jenis_name : "-")}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
@@ -636,15 +639,15 @@ const DataWorkCenter = ({
         <Dialog
           header={isEdit ? "Edit Data" : "Tambah Data"}
           visible={showInput}
-          style={{ width: "40vw" }}
+          style={{ width: "50vw" }}
           footer={renderFooter("displayData")}
           onHide={() => {
             onHideInput();
             onInput(false);
           }}
         >
-          <Row className="mb-4">
-            <div className="col-3 text-black">
+          <Row className="mb-0">
+            <div className="col-6 text-black">
               <PrimeInput
                 label={"Kode Work Center"}
                 value={work.work_code}
@@ -654,7 +657,7 @@ const DataWorkCenter = ({
                 placeholder="Masukan Kode Work Center"
               />
             </div>
-            <div className="col-4 text-black">
+            <div className="col-6 text-black">
               <PrimeInput
                 label={"Nama Work Center"}
                 value={work.work_name}
@@ -669,7 +672,7 @@ const DataWorkCenter = ({
               />
             </div>
 
-            <div className="col-5 text-black">
+            <div className="col-12 text-black">
               <label className="text-label">Keterangan</label>
               <div className="p-inputgroup">
                 <InputText
@@ -679,6 +682,7 @@ const DataWorkCenter = ({
                 />
               </div>
             </div>
+
 
             <div className="col-4 text-black">
               <label className="text-label">Lokasi</label>
@@ -729,6 +733,11 @@ const DataWorkCenter = ({
               />
             </div>
 
+            <div className="col-12 mt-3">
+              <label className="text-label fs-14"><b>Waktu dan Biaya Pengerjaan</b></label>
+              <Divider></Divider>
+            </div>
+
             <div className="col-3 text-black">
               <label className="text-label">Jumlah SDM</label>
               <PrimeNumber
@@ -776,7 +785,7 @@ const DataWorkCenter = ({
         </Dialog>
 
         <Dialog
-          header={tr[localStorage.getItem("language")].hapus_data}
+          header={"Hapus Data"}
           visible={showDelete}
           style={{ width: "30vw" }}
           footer={renderFooterDel("displayDel")}
@@ -791,9 +800,65 @@ const DataWorkCenter = ({
               className="pi pi-exclamation-triangle mr-3 align-middle"
               style={{ fontSize: "2rem" }}
             />
-            <span>{tr[localStorage.getItem("language")].pesan_hapus}</span>
+            <span>{"Apakah Anda Yakin Ingin Menghapus Data?"}</span>
           </div>
         </Dialog>
+
+        <DataLokasi
+        data={location}
+        loading={false}
+        popUp={true}
+        show={showLocat}
+        onHide={() => {
+          setShowLocat(false);
+        }}
+        onInput={(e) => {
+          setShowLocat(!e);
+        }}
+        onSuccessInput={(e) => {
+          getLocation();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowLocat(false);
+            updateWc({ ...work, loc_id: e?.data?.id ?? null });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataMesin
+        data={machine}
+        loading={false}
+        popUp={true}
+        show={showMachine}
+        onHide={() => {
+          setShowMachine(false);
+        }}
+        onInput={(e) => {
+          setShowMachine(!e);
+        }}
+        onSuccessInput={(e) => {
+          getMachine();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowMachine(false);
+            updateWc({ ...work, machine_id: e.data?.id ?? null });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
       </>
     );
   };
@@ -823,6 +888,9 @@ const DataWorkCenter = ({
       </>
     );
   }
+
+
+
 };
 
 export default DataWorkCenter;

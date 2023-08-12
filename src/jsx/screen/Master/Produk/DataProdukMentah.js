@@ -105,9 +105,10 @@ const DataProdukMentah = ({
   del,
   dataLength,
 }) => {
-  const product = useSelector((state) => state.product);
+  // const product = useSelector((state) => state.product);
   const profile = useSelector((state) => state.profile.profile);
   const [prdCode, setPrdCode] = useState(null);
+  const [product, setProduct] = useState(null);
   const [group, setGroup] = useState(null);
   const [nomor, setNomor] = useState(null);
   const [departement, setDept] = useState(null);
@@ -148,6 +149,7 @@ const DataProdukMentah = ({
 
     initFilters1();
     // getCodeProd();
+    getProduct();
     getGroup();
     getDept();
     getUnit();
@@ -158,6 +160,30 @@ const DataProdukMentah = ({
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
+  const getProduct = async () => {
+    const config = {
+      ...endpoints.product,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        let filt = [];
+        data?.forEach((element) => {
+          if (element.departement?.id === profile.previlage?.dep_id) {
+            filt.push(element);
+          }
+        });
+
+        setProduct(filt);
+      }
+    } catch (error) {}
+  };
 
   const getGroup = async () => {
     const config = {
@@ -300,7 +326,7 @@ const DataProdukMentah = ({
         setTimeout(() => {
           setUpdate(false);
           setDisplayData(false);
-          onSuccessInput();
+          getProduct();
           onInput(false);
           toast.current.show({
             severity: "info",
@@ -341,7 +367,7 @@ const DataProdukMentah = ({
         setTimeout(() => {
           setUpdate(false);
           setDisplayData(false);
-          onSuccessInput();
+          getProduct();
           onInput(false);
           toast.current.show({
             severity: "info",
@@ -392,7 +418,7 @@ const DataProdukMentah = ({
         setTimeout(() => {
           setUpdate(false);
           setDisplayDel(false);
-          onSuccessInput();
+          getProduct();
           onInput(false);
 
           toast.current.show({
@@ -408,7 +434,7 @@ const DataProdukMentah = ({
       setTimeout(() => {
         setUpdate(false);
         setDisplayDel(false);
-        onSuccessInput();
+        getProduct();
         onInput(false);
         toast.current.show({
           severity: "error",
@@ -863,7 +889,7 @@ const DataProdukMentah = ({
               detail: "Data berhasil diperbarui",
               life: 3000,
             });
-            onSuccessInput(true);
+            getProduct(true);
             picker.current.value = null;
             progressBar.current.style.display = "none";
           }, 1000);
@@ -1139,10 +1165,7 @@ const DataProdukMentah = ({
         <Toast ref={toast} />
         <DataTable
           responsiveLayout="scroll"
-          value={product.list?.map((v) => ({
-            ...v,
-            history: histori?.filter((el) => v?.id === el.product?.id),
-          }))}
+          value={product}
           className="display w-150 datatable-wrapper"
           showGridlines
           dataKey="id"
@@ -1166,8 +1189,8 @@ const DataProdukMentah = ({
           paginatorClassName="justify-content-end mt-3"
           selectionMode="single"
           onRowSelect={onRowSelect}
-          totalRecords={dataLength ?? data?.length}
-          lazy={dataLength}
+          // totalRecords={dataLength ?? data?.length}
+          // lazy={dataLength}
         >
           <Column
             header={tr[localStorage.getItem("language")].kd_prod}

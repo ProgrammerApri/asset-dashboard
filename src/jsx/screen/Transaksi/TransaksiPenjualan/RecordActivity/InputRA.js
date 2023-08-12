@@ -72,8 +72,8 @@ const InputRA = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
   const [showProduk, setShowProduk] = useState(false);
   const [showJasa, setShowJasa] = useState(false);
   const [showSatuan, setShowSatuan] = useState(false);
-  const product = useSelector((state) => state.product.list);
-  // const [product, setProd] = useState(null);
+  // const product = useSelector((state) => state.product.list);
+  const [product, setProd] = useState(null);
   const [satuan, setSatuan] = useState(null);
   const [customer, setCustomer] = useState(null);
   const [doubleClick, setDoubleClick] = useState(false);
@@ -194,14 +194,15 @@ const InputRA = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
             filt.push(element);
           }
         });
+        setProd(filt);
         console.log("profile");
         console.log(filt);
 
-        dispatch({
-          type: SET_PRODUCT,
-          payload: filt,
-          // .filter((v) => (v?.rec_act ? v?.rec_act === !ns : true)),
-        });
+        // dispatch({
+        //   type: SET_PRODUCT,
+        //   payload: filt,
+        //   // .filter((v) => (v?.rec_act ? v?.rec_act === !ns : true)),
+        // });
         // dispatch({
         //   type: SET_ORIGINAL_PRODUCT,
         //   payload: data.filter((v) => v?.group?.stock === !ns),
@@ -746,6 +747,9 @@ const InputRA = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
         onInput={(e) => {
           setShowProduk(!e);
         }}
+        onSuccessInput={(e) => {
+          getProduk();
+        }}
         onRowSelect={(e) => {
           console.log(e);
           if (doubleClick) {
@@ -773,9 +777,6 @@ const InputRA = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
           setTimeout(() => {
             setDoubleClick(false);
           }, 2000);
-        }}
-        onSuccessInput={(e) => {
-          getProduk();
         }}
       />
 

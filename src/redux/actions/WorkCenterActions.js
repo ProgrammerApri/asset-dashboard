@@ -1,0 +1,5 @@
+export const SET_CURRENT_WC = "wc.SET_CURRENT_WC"
+export const SET_WC = "wc.SET_WC"
+export const RESET_CURRENT_WC= "wc.RESET_CURRENT_WC"
+export const UPDATE_CURRENT_WC = "wc.UPDATE_CURRENT_WC"
+export const SET_EDIT_WC = "wc.SET_EDIT_WC"

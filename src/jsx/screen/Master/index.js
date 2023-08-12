@@ -12,6 +12,7 @@ import Lokasi from "./Lokasi";
 import Pajak from "./Pajak";
 import Produk from "./Produk";
 import Mesin from "./Mesin";
+import WorkCenter from "./WorkCenter";
 
 const Master = (self) => {
   const [active, setActive] = useState(0);
@@ -88,6 +89,13 @@ const Master = (self) => {
                   tittle: "Mesin",
                   icon: e.icon_file,
                   component: <Mesin edit={e.edit} del={e.delete} />,
+                });
+                break;
+              case "work-center":
+                sub.push({
+                  tittle: "Work Center",
+                  icon: e.icon_file,
+                  component: <WorkCenter edit={e.edit} del={e.delete} />,
                 });
                 break;
 

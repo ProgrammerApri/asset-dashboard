@@ -96,28 +96,8 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
     getJasa();
     getSatuan();
     getSupplier();
-    getCoderp();
     getSetup();
   }, []);
-
-  const getCoderp = async () => {
-    const config = {
-      ...endpoints.codeRp,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setLastNumber(data);
-      }
-    } catch (error) {}
-  };
-
 
   const getPusatBiaya = async () => {
     const config = {
@@ -160,7 +140,16 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
     let now = new Date();
     const config = {
       ...endpoints.addRp,
-      data: {...rp, req_date: new Date(rp.req_date?.setHours(now.getHours(), now.getMinutes(), now.getSeconds()))},
+      data: {
+        ...rp,
+        req_date: new Date(
+          rp.req_date?.setHours(
+            now.getHours(),
+            now.getMinutes(),
+            now.getSeconds()
+          )
+        ),
+      },
     };
     console.log(config.data);
     let response = null;
@@ -201,7 +190,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
         const { data } = response;
         dispatch({
           type: SET_PRODUCT,
-          payload: data
+          payload: data,
           // .filter((v) => v?.group?.stock ? v?.group?.stok === !ns : true),
         });
         dispatch({
@@ -479,7 +468,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
               }}
               placeholder={tr[localStorage.getItem("language")].masuk}
               error={error?.code}
-              disabled
+              // disabled
             />
           </div>
 

@@ -848,10 +848,10 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
     if (
       order.dprod[0]?.prod_id !== null &&
-      !errors.prod[0].id &&
-      !errors.prod[0].lok &&
-      !errors.prod[0].jum &&
-      !errors.prod[0].prc
+      !errors.prod[0]?.id &&
+      !errors.prod[0]?.lok &&
+      !errors.prod[0]?.jum &&
+      !errors.prod[0]?.prc
     ) {
       errors.jasa?.forEach((e) => {
         for (var key in e) {

@@ -177,8 +177,8 @@ const DataSupplier = ({
     const countryCode = checked?.supplier?.sup_country?.code || "";
     const jpelCode = currentItem?.jpem?.jpem_code || "";
     return checked?.supplier?.sup_country?.code
-      ? `${countryCode}${jpelCode}-${lastSerialNumber}`
-      : `${countryCode}${jpelCode}-${lastSerialNumber}`;
+      ? `${countryCode}${jpelCode}/${lastSerialNumber}`
+      : `${countryCode}${jpelCode}/${lastSerialNumber}`;
   };
 
   const getSup = async () => {
@@ -1293,7 +1293,7 @@ const DataSupplier = ({
                         (currentItem?.supplier?.sup_code ||
                           `${currentItem?.supplier?.sup_country?.code ?? ""}${
                             currentItem?.jpem?.jpem_code
-                          }-${lastSerialNumber}`) + ``
+                          }/${lastSerialNumber}`) + ``
                       }`;
                       setCurrentItem({
                         ...currentItem,

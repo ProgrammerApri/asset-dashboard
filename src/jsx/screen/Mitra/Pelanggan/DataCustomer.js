@@ -169,25 +169,25 @@ const DataCustomer = ({
   }, []);
 
   const countries = [
-    { name: "Australia", code: "AU-" },
-    { name: "Brazil", code: "BR-" },
-    { name: "China", code: "CN-" },
-    { name: "Egypt", code: "EG-" },
-    { name: "France", code: "FR-" },
-    { name: "Germany", code: "DE-" },
-    { name: "India", code: "IN-" },
-    { name: "Indonesia", code: "IND-" },
-    { name: "Japan", code: "JP-" },
-    { name: "Spain", code: "ES-" },
-    { name: "United States", code: "US-" },
+    { name: "Australia", code: "AU-", id: 1 },
+    { name: "Brazil", code: "BR-", id: 2 },
+    { name: "China", code: "CN-", id: 3 },
+    { name: "Egypt", code: "EG-", id: 4 },
+    { name: "France", code: "FR-", id: 5 },
+    { name: "Germany", code: "DE-", id: 6 },
+    { name: "India", code: "IN-", id: 7 },
+    { name: "Indonesia", code: "IND-", id: 8 },
+    { name: "Japan", code: "JP-", id: 9 },
+    { name: "Spain", code: "ES-", id: 10 },
+    { name: "United States", code: "US-", id: 11 },
   ];
 
   const generateCode = () => {
     const countryCode = checked?.customer?.cus_country?.code || "";
     const jpelCode = currentItem?.jpel?.jpel_code || "";
     return checked?.customer?.cus_country?.code
-      ? `${countryCode}${jpelCode}-${lastSerialNumber}`
-      : `${countryCode}${jpelCode}-${lastSerialNumber}`;
+      ? `${countryCode}${jpelCode}/${lastSerialNumber}`
+      : `${countryCode}${jpelCode}/${lastSerialNumber}`;
   };
 
   const getCustomer = async () => {
@@ -368,7 +368,7 @@ const DataCustomer = ({
       if (response.status) {
         const { data } = response;
         console.log(data);
-        let sub = [];   
+        let sub = [];
         data.forEach((element) => {
           sub.push(element.subArea);
         });
@@ -631,11 +631,11 @@ const DataCustomer = ({
   const onSubmit = () => {
     if (isValid()) {
       if (isEdit) {
-        setUpdate(true);
+        // setUpdate(true);
         editCustomer();
         setActive(0);
       } else {
-        setUpdate(true);
+        // setUpdate(true);
         addCustomer();
         setActive(0);
       }
@@ -955,6 +955,18 @@ const DataCustomer = ({
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
 
+  const chekcountry = (value) => {
+    let selected = {};
+    countries?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+        console.log(selected);
+      }
+    });
+
+    return selected;
+  };
+
   const checkCurrency = (value) => {
     let selected = {};
     currency?.forEach((element) => {
@@ -1179,7 +1191,7 @@ const DataCustomer = ({
                     filter
                     filterBy="jpel_name"
                     placeholder={tr[localStorage.getItem("language")].pilih}
-                    disabled={isEdit}  
+                    disabled={isEdit}
                     // errorMessage="Jenis pelanggan harus dipilih"
                     // error={error[0]?.jpel}
                   />
@@ -1383,7 +1395,7 @@ const DataCustomer = ({
                     />
                     <div className="justify-content-center flex-grow-1 ml-2">
                       <Dropdown
-                        value={ currentItem?.customer?.cus_country ?? null }
+                        value={currentItem?.customer?.cus_country ?? null}
                         onChange={(e) => {
                           console.log("Selected country:", e.value.name);
                           setCurrentItem({
@@ -1426,7 +1438,7 @@ const DataCustomer = ({
                         (currentItem?.customer?.cus_code ||
                           `${checked?.customer?.cus_country?.code ?? ""}${
                             currentItem?.jpel?.jpel_code
-                          }-${lastSerialNumber}`) + ``
+                          }/${lastSerialNumber}`) + ``
                       }`;
                       console.log("generat", currentItem);
                       setCurrentItem({

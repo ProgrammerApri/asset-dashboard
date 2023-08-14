@@ -36,6 +36,7 @@ const WorkCenter = ({trigger}) => {
       ...endpoints.work_center,
       data: work_list,
     };
+    console.log("data dibawah:");
     console.log(config.data);
     let response = null;
     try {

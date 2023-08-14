@@ -18,6 +18,7 @@ import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_MSN, SET_EDIT_MSN, SET_MSN } from "src/redux/actions";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
+import { Divider } from "primereact/divider";
 
 const def = {
   id: 1,
@@ -35,6 +36,8 @@ const def = {
 const defError = {
   code: false,
   name: false,
+  ttl_work: false,
+  ttl_work_msn: false,
 };
 
 const DataMesin = ({
@@ -394,13 +397,23 @@ const DataMesin = ({
     let errors = {
       code: !msn.msn_code || msn.msn_code === "",
       name: !msn.msn_name || msn.msn_name === "",
+      ttl_kerja: !msn.ttl_kerja || msn.ttl_kerja === "",
+      ttl_kerja_msn: !msn.ttl_kerja_msn || msn.ttl_kerja_msn === "",
     };
 
-    valid = !errors.code && !errors.name;
+    valid =
+      !errors.code &&
+      !errors.name &&
+      !errors.ttl_kerja &&
+      !errors.ttl_kerja_msn;
 
     setError(errors);
 
-    valid = !errors.code && !errors.name;
+    valid =
+      !errors.code &&
+      !errors.name &&
+      !errors.ttl_kerja &&
+      !errors.ttl_kerja_msn;
 
     return valid;
   };
@@ -506,33 +519,53 @@ const DataMesin = ({
               />
             </div>
           </div>
+          <div className="col-12 text-black">
+            <label className="text-label">Keterangan</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={msn.desc}
+                onChange={(e) => updateMSN({ ...msn, desc: e.target.value })}
+                placeholder="Masukan Keterangan"
+              />
+            </div>
+          </div>
+
+          <div className="col-12 mt-3">
+            <label className="text-label fs-14">
+              <b>Estimasi pekerjaan</b>
+            </label>
+            <Divider></Divider>
+          </div>
+
           <div className="row ml-0 mt-0">
             <div className="col-3">
               <PrimeNumber
+                price
                 label={"Max SDM"}
                 value={msn.max_sdm}
                 onChange={(e) => {
-                  updateMSN({ ...msn, max_sdm: e.target.value });
+                  updateMSN({ ...msn, max_sdm: e.value });
                   // let newError = error;
                   // newError.name = false;
                   // setError(newError);
                 }}
-                placeholder="Masukan Disini"
+                placeholder="0"
                 type="number"
                 // error={error?.name}
               />
             </div>
             <div className="col-3">
               <PrimeNumber
+                price
                 label={"Clean Up"}
                 value={msn.clean_up}
                 onChange={(e) => {
-                  updateMSN({ ...msn, clean_up: e.target.value });
+                  updateMSN({ ...msn, clean_up: e.value });
                   // let newError = error;
                   // newError.code = false;
                   // setError(newError);
                 }}
-                placeholder="Masukan Disini"
+                placeholder="0"
                 type="number"
                 // error={error?.code}
               />
@@ -540,38 +573,40 @@ const DataMesin = ({
 
             <div className="col-3">
               <PrimeNumber
+                price
                 label={"Total Pekerjaan"}
                 value={msn.ttl_kerja}
                 onChange={(e) => {
-                  updateMSN({ ...msn, ttl_kerja: e.target.value });
-                  // let newError = error;
-                  // newError.name = false;
-                  // setError(newError);
+                  updateMSN({ ...msn, ttl_kerja: e.value });
+                  let newError = error;
+                  newError.ttl_kerja = false;
+                  setError(newError);
                 }}
-                placeholder="Masukan Disini"
+                placeholder="0"
                 type="number"
-                // error={error?.name}
+                error={error?.ttl_kerja}
               />
             </div>
             <div className="col-3">
               <PrimeNumber
+                price
                 label={"Total Pekerjaan Mesin"}
                 value={msn.ttl_kerja_msn}
                 onChange={(e) => {
-                  updateMSN({ ...msn, ttl_kerja_msn: e.target.value });
-                  // let newError = error;
-                  // newError.name = false;
-                  // setError(newError);
+                  updateMSN({ ...msn, ttl_kerja_msn: e.value });
+                  let newError = error;
+                  newError.ttl_kerja_msn = false;
+                  setError(newError);
                 }}
-                placeholder="Masukan Disini"
+                placeholder="0 "
                 type="number"
-                // error={error?.name}
+                error={error?.ttl_kerja_msn}
               />
             </div>
           </div>
           <div className="row ml-0 mt-0">
             <div className="col-6">
-              <PrimeNumber
+              <PrimeInput
                 label={"Batas Bawah Toleransi"}
                 value={msn.bts_bwh_toleransi}
                 onChange={(e) => {
@@ -581,13 +616,13 @@ const DataMesin = ({
                   // setError(newError);
                 }}
                 placeholder="Masukan Disini"
-                type="number"
+                // type="number"
                 // error={error?.code}
               />
             </div>
 
             <div className="col-6">
-              <PrimeNumber
+              <PrimeInput
                 label={"Batas Atas Toleransi"}
                 value={msn.bts_atas_toleransi}
                 onChange={(e) => {
@@ -597,22 +632,9 @@ const DataMesin = ({
                   // setError(newError);
                 }}
                 placeholder="Masukan Disini"
-                type="number"
+                // type="number"
                 // error={error?.name}
               />
-            </div>
-          </div>
-
-          <div className="row ml-0 mt-0">
-            <div className="col-12">
-              <label className="text-label">Keterangan</label>
-              <div className="p-inputgroup">
-                <InputTextarea
-                  value={msn.desc}
-                  onChange={(e) => updateMSN({ ...msn, desc: e.target.value })}
-                  placeholder="Masukan Keterangan"
-                />
-              </div>
             </div>
           </div>
         </Dialog>

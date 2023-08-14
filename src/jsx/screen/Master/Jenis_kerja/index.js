@@ -8,8 +8,8 @@ import DataJeniskerja from "./DataJeniskerja";
 
 const data = {
   id: null,
-  jenis_code: null,
-  jenis_name: null,
+  work_type: null,
+  work_name: null,
   mutasi: null,
   desc: null,
 };

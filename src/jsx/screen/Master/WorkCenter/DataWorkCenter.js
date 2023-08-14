@@ -16,10 +16,7 @@ import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
-import {
-  SET_CURRENT_WC,
-  SET_EDIT_WC,
-} from "src/redux/actions";
+// import { SET_CURRENT_WC, SET_EDIT_WC } from "src/redux/actions";
 import { Divider } from "@material-ui/core";
 import ReactToPrint from "react-to-print";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
@@ -28,9 +25,10 @@ import { Timeline } from "primereact/timeline";
 import { tr } from "date-fns/locale";
 import DataLokasi from "../Lokasi/DataLokasi";
 import DataMesin from "../Mesin/DataMesin";
+import { SET_CURRENT_WC, SET_EDIT_WC } from "src/redux/actions";
 
 const def = {
-  id: null,
+  id: 1,
   work_code: null,
   work_name: null,
   loc_id: null,
@@ -42,10 +40,28 @@ const def = {
   biaya_estimasi: null,
   desc: null,
 };
-
-const dum_data = {
-
-}
+const defError = {
+  work_code: false,
+  work_name: false,
+  loc_id: false,
+  machine_id: false,
+  work_type: false,
+  // prod: [
+  //   {
+  //     id: false,
+  //     qty: false,
+  //     aloc: false,
+  //   },
+  // ],
+  // mtrl: [
+  //   {
+  //     id: false,
+  //     qty: false,
+  //     prc: false,
+  //   },
+  // ],
+};
+const dum_data = {};
 
 const DataWorkCenter = ({
   data,
@@ -80,6 +96,7 @@ const DataWorkCenter = ({
   const [workType, setWorkType] = useState(null);
   const profile = useSelector((state) => state.profile.profile);
   const [expandedRows, setExpandedRows] = useState(null);
+  const [error, setError] = useState(defError);
   const printPage = useRef(null);
 
   const dummy = Array.from({ length: 10 });
@@ -125,7 +142,7 @@ const DataWorkCenter = ({
 
   const getWorkType = async () => {
     const config = {
-      ...endpoints.work_type,
+      ...endpoints.Jeniskerja,
       data: {},
     };
     let response = null;
@@ -239,7 +256,7 @@ const DataWorkCenter = ({
       if (response.status) {
         setTimeout(() => {
           setUpdate(false);
-          setShowDelete(false);
+          setDisplayDel(false);
           onSuccessInput(true);
           toast.current.show({
             severity: "info",
@@ -253,7 +270,8 @@ const DataWorkCenter = ({
       console.log(error);
       setTimeout(() => {
         setUpdate(false);
-        setShowDelete(false);
+        setDisplayDel(false);
+        // setShowDelete(false);
         toast.current.show({
           severity: "error",
           summary: "Gagal",
@@ -270,7 +288,7 @@ const DataWorkCenter = ({
       <div className="d-flex">
         <Link
           onClick={() => {
-            setShowDelete(
+            setShowInput(
               dispatch({
                 type: SET_EDIT_WC,
                 payload: true,
@@ -278,12 +296,7 @@ const DataWorkCenter = ({
 
               dispatch({
                 type: SET_CURRENT_WC,
-                payload: {
-                  ...data,
-                  loc_id: data?.loc_id?.id ?? null,
-                  machine_id: data?.machine_id?.id ?? null,
-                  work_type: data?.work_type?.id ?? null,
-                },
+                payload: data,
               })
             );
           }}
@@ -311,7 +324,9 @@ const DataWorkCenter = ({
       <div>
         <PButton
           label="Batal"
-          onClick={() => setDisplayDel(false)}
+          onClick={() => {
+            setDisplayDel(false);
+          }}
           className="p-button-text btn-primary"
         />
         <PButton
@@ -321,7 +336,7 @@ const DataWorkCenter = ({
             delFM();
           }}
           autoFocus
-          loading={loading}
+          loading={update}
         />
       </div>
     );
@@ -342,16 +357,46 @@ const DataWorkCenter = ({
     });
   };
 
+  const isValid = () => {
+    let valid = false;
+    let errors = {
+      code: !work.work_code || work.work_code === "",
+      type: !work.work_type || work.work_type === "",
+      name: !work.work_name || work.work_name === "",
+      mesin: !work.machine_id || work.machine_id === "",
+      loc: !work.loc_id || work.loc_id === "",
+      // mts: !jns_kerja.mutasi || jns_kerja.mutasi === "",
+    };
+
+    valid =
+      !errors.code &&
+      !errors.name &&
+      !errors.type &&
+      !errors.mesin &&
+      !errors.loc;
+
+    setError(errors);
+
+    valid =
+      !errors.code &&
+      !errors.name &&
+      !errors.type &&
+      !errors.mesin &&
+      !errors.loc;
+
+    return valid;
+  };
+
   const onSubmit = () => {
-    // if (isValid()) {
-    if (isEdit) {
-      setUpdate(true);
-      editFM();
-    } else {
-      setUpdate(true);
-      addFM();
+    if (isValid()) {
+      if (isEdit) {
+        setUpdate(true);
+        editFM();
+      } else {
+        setUpdate(true);
+        addFM();
+      }
     }
-    // }
   };
 
   const renderHeader = () => {
@@ -369,7 +414,7 @@ const DataWorkCenter = ({
           label="Tambah"
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
-            setUpdate(false)
+            setUpdate(false);
             setShowInput(
               dispatch({
                 type: SET_EDIT_WC,
@@ -377,7 +422,19 @@ const DataWorkCenter = ({
               }),
               dispatch({
                 type: SET_CURRENT_WC,
-                payload: def,
+                payload: {
+                  ...data,
+                  work_code: null,
+                  work_name: null,
+                  loc_id: null,
+                  machine_id: null,
+                  work_type: null,
+                  work_sdm: null,
+                  work_estimasi: null,
+                  ovh_estimasi: null,
+                  biaya_estimasi: null,
+                  desc: null,
+                },
               })
             );
           }}
@@ -503,7 +560,7 @@ const DataWorkCenter = ({
     machine?.forEach((element) => {
       if (value === element.id) {
         selected = element;
-        console.log(selected);
+        console.log("mesin :",selected);
       }
     });
 
@@ -573,19 +630,19 @@ const DataWorkCenter = ({
           />
           <Column
             header="Lokasi"
-            field={(e) => (e?.machine_id ? e.machine_id?.code : "-")}
+            field={(e) => (e?.loc_id ? e.loc_id?.name : "-")}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
           <Column
             header="Mesin"
-            field={(e) => (e?.machine_id ? e.machine_id?.code : "-")}
+            field={(e) => (e?.machine_id ? e.machine_id?.msn_name : "-")}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
           <Column
             header="Jenis Pekerjaan"
-            field={(e) => (e?.work_type ? checkType(e.work_type)?.jenis_name : "-")}
+            field={(e) => (e?.work_type ? e.work_type?.work_name : "-")}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
@@ -633,6 +690,7 @@ const DataWorkCenter = ({
   };
 
   const renderDialog = () => {
+    console.log("datana:", work.machine_id);
     return (
       <>
         <Toast ref={toast} />
@@ -683,11 +741,10 @@ const DataWorkCenter = ({
               </div>
             </div>
 
-
             <div className="col-4 text-black">
               <label className="text-label">Lokasi</label>
               <CustomDropdown
-                value={work.loc_id && checkLoc(work.loc_id)}
+                value={work.loc_id}
                 onChange={(u) => {
                   updateWc({ ...work, loc_id: u?.id ?? null });
                 }}
@@ -703,7 +760,7 @@ const DataWorkCenter = ({
             <div className="col-4 text-black">
               <label className="text-label">Mesin</label>
               <CustomDropdown
-                value={work.machine_id && checkMch(work.machine_id)}
+                value={work.machine_id  }
                 onChange={(u) => {
                   updateWc({ ...work, machine_id: u?.id ?? null });
                 }}
@@ -719,28 +776,31 @@ const DataWorkCenter = ({
             <div className="col-4 text-black">
               <label className="text-label">Jenis Pekerjaan</label>
               <CustomDropdown
-                value={work.work_type && checkType(work.work_type)}
+                value={work.work_type}
                 onChange={(u) => {
                   updateWc({ ...work, work_type: u?.id ?? null });
                 }}
                 option={workType}
-                detail
-                onDetail={() => {
-                  setShowType(true);
-                }}
-                label={"[name] ([code])"}
+                // detail
+                // onDetail={() => {
+                //   setShowType(true);
+                // }}
+                label={"[work_name] ([work_type])"}
                 placeholder="Pilih Jenis Pekerjaan"
               />
             </div>
 
             <div className="col-12 mt-3">
-              <label className="text-label fs-14"><b>Waktu dan Biaya Pengerjaan</b></label>
+              <label className="text-label fs-14">
+                <b>Waktu dan Biaya Pengerjaan</b>
+              </label>
               <Divider></Divider>
             </div>
 
             <div className="col-3 text-black">
               <label className="text-label">Jumlah SDM</label>
               <PrimeNumber
+                price
                 value={work.work_sdm ? work.work_sdm : null}
                 onChange={(u) => {
                   updateWc({ ...work, work_sdm: u?.value ?? null });
@@ -784,15 +844,15 @@ const DataWorkCenter = ({
           </Row>
         </Dialog>
 
-        <Dialog
+        {/* <Dialog
           header={"Hapus Data"}
           visible={showDelete}
           style={{ width: "30vw" }}
           footer={renderFooterDel("displayDel")}
           onHide={() => {
-            setLoading(false);
+            // setLoading(false);
             setShowDelete(false);
-            onInput(false);
+            // onInput(false);
           }}
         >
           <div className="ml-3 mr-3">
@@ -802,63 +862,63 @@ const DataWorkCenter = ({
             />
             <span>{"Apakah Anda Yakin Ingin Menghapus Data?"}</span>
           </div>
-        </Dialog>
+        </Dialog> */}
 
         <DataLokasi
-        data={location}
-        loading={false}
-        popUp={true}
-        show={showLocat}
-        onHide={() => {
-          setShowLocat(false);
-        }}
-        onInput={(e) => {
-          setShowLocat(!e);
-        }}
-        onSuccessInput={(e) => {
-          getLocation();
-        }}
-        onRowSelect={(e) => {
-          if (doubleClick) {
+          data={location}
+          loading={false}
+          popUp={true}
+          show={showLocat}
+          onHide={() => {
             setShowLocat(false);
-            updateWc({ ...work, loc_id: e?.data?.id ?? null });
-          }
+          }}
+          onInput={(e) => {
+            setShowLocat(!e);
+          }}
+          onSuccessInput={(e) => {
+            getLocation();
+          }}
+          onRowSelect={(e) => {
+            if (doubleClick) {
+              setShowLocat(false);
+              updateWc({ ...work, loc_id: e?.data?.id ?? null });
+            }
 
-          setDoubleClick(true);
+            setDoubleClick(true);
 
-          setTimeout(() => {
-            setDoubleClick(false);
-          }, 2000);
-        }}
-      />
+            setTimeout(() => {
+              setDoubleClick(false);
+            }, 2000);
+          }}
+        />
 
-      <DataMesin
-        data={machine}
-        loading={false}
-        popUp={true}
-        show={showMachine}
-        onHide={() => {
-          setShowMachine(false);
-        }}
-        onInput={(e) => {
-          setShowMachine(!e);
-        }}
-        onSuccessInput={(e) => {
-          getMachine();
-        }}
-        onRowSelect={(e) => {
-          if (doubleClick) {
+        <DataMesin
+          data={machine}
+          loading={false}
+          popUp={true}
+          show={showMachine}
+          onHide={() => {
             setShowMachine(false);
-            updateWc({ ...work, machine_id: e.data?.id ?? null });
-          }
+          }}
+          onInput={(e) => {
+            setShowMachine(!e);
+          }}
+          onSuccessInput={(e) => {
+            getMachine();
+          }}
+          onRowSelect={(e) => {
+            if (doubleClick) {
+              setShowMachine(false);
+              updateWc({ ...work, machine_id: e.data?.id ?? null });
+            }
 
-          setDoubleClick(true);
+            setDoubleClick(true);
 
-          setTimeout(() => {
-            setDoubleClick(false);
-          }, 2000);
-        }}
-      />
+            setTimeout(() => {
+              setDoubleClick(false);
+            }, 2000);
+          }}
+        />
       </>
     );
   };
@@ -888,9 +948,6 @@ const DataWorkCenter = ({
       </>
     );
   }
-
-
-
 };
 
 export default DataWorkCenter;

@@ -25,8 +25,8 @@ import { InputSwitch } from "primereact/inputswitch";
 
 const def = {
   id: 1,
-  jenis_code: null,
-  jenis_name: null,
+  work_type: null,
+  work_name: null,
   mutasi: false,
   desc: null,
 };
@@ -143,7 +143,7 @@ const DataJeniskerja = ({
           toast.current.show({
             severity: "error",
             summary: "Gagal",
-            detail: `Kode ${jns_kerja.jenis_code} Sudah Digunakan`,
+            detail: `Kode ${jns_kerja.work_type} Sudah Digunakan`,
             life: 3000,
           });
         }, 500);
@@ -335,8 +335,8 @@ const DataJeniskerja = ({
                 payload: {
                   ...data,
                   mutasi: false,
-                  jenis_code: null,
-                  jenis_name: null,
+                  work_type: null,
+                  work_name: null,
                   desc: null,
                 },
               })
@@ -413,8 +413,8 @@ const DataJeniskerja = ({
   const isValid = () => {
     let valid = false;
     let errors = {
-      code: !jns_kerja.jenis_code || jns_kerja.jenis_code === "",
-      name: !jns_kerja.jenis_name || jns_kerja.jenis_name === "",
+      code: !jns_kerja.work_type || jns_kerja.work_type === "",
+      name: !jns_kerja.work_name || jns_kerja.work_name === "",
       // mts: !jns_kerja.mutasi || jns_kerja.mutasi === "",
     };
 
@@ -440,7 +440,7 @@ const DataJeniskerja = ({
           rowHover
           header={renderHeader}
           filters={filters1}
-          globalFilterFields={["jenis_code", "jenis_name", "desc"]}
+          globalFilterFields={["work_type", "work_name", "desc"]}
           emptyMessage="Tidak ada data"
           paginator
           paginatorTemplate={template2}
@@ -456,12 +456,12 @@ const DataJeniskerja = ({
             style={{
               minWidth: "8rem",
             }}
-            field={(e) => e.jenis_code}
+            field={(e) => e.work_type}
             body={load && <Skeleton />}
           />
           <Column
             header="Nama Jenis Pekerjaan"
-            field={(e) => e.jenis_name}
+            field={(e) => e.work_name}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
@@ -503,9 +503,9 @@ const DataJeniskerja = ({
             <div className="col-6">
               <PrimeInput
                 label={"Kode Jenis Pekerjaan"}
-                value={jns_kerja?.jenis_code}
+                value={jns_kerja?.work_type}
                 onChange={(e) => {
-                  updateJNSkerja({ ...jns_kerja, jenis_code: e.target.value });
+                  updateJNSkerja({ ...jns_kerja, work_type: e.target.value });
                   let newError = error;
                   newError.code = false;
                   setError(newError);
@@ -518,9 +518,9 @@ const DataJeniskerja = ({
             <div className="col-6">
               <PrimeInput
                 label={"Nama Jenis Pekerjaan"}
-                value={jns_kerja?.jenis_name}
+                value={jns_kerja?.work_name}
                 onChange={(e) => {
-                  updateJNSkerja({ ...jns_kerja, jenis_name: e.target.value });
+                  updateJNSkerja({ ...jns_kerja, work_name: e.target.value });
                   let newError = error;
                   newError.name = false;
                   setError(newError);

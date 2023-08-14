@@ -9,7 +9,7 @@ import { InputSwitch } from "primereact/inputswitch";
 import CustomAccordion from "src/jsx/components/Accordion/Accordion";
 import { useDispatch, useSelector } from "react-redux";
 
-import { SET_CURRENT_FM, SET_CURRENT_WC, SET_PRODUCT } from "src/redux/actions";
+// import { SET_CURRENT_FM, SET_CURRENT_WC, SET_PRODUCT } from "src/redux/actions";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
@@ -110,7 +110,7 @@ const InputWorkCenter = ({ onCancel, onSuccess }) => {
 
   const getWorkType = async () => {
     const config = {
-      ...endpoints.work_type,
+      ...endpoints.Jeniskerja,
       data: {},
     };
     let response = null;
@@ -126,8 +126,8 @@ const InputWorkCenter = ({ onCancel, onSuccess }) => {
 
   const editFM = async () => {
     const config = {
-      ...endpoints.editFormula,
-      endpoint: endpoints.editFormula.endpoint + work.id,
+      ...endpoints.editWorkCenter,
+      endpoint: endpoints.editWorkCenter.endpoint + work.id,
       data: work,
     };
     console.log(config.data);
@@ -153,9 +153,10 @@ const InputWorkCenter = ({ onCancel, onSuccess }) => {
 
   const addFM = async () => {
     const config = {
-      ...endpoints.addFormula,
+      ...endpoints.addWorkCenter,
       data: work,
     };
+    console.log("dataaa");
     console.log(config.data);
     let response = null;
     try {
@@ -226,7 +227,7 @@ const InputWorkCenter = ({ onCancel, onSuccess }) => {
   };
 
   const onSubmit = () => {
-    // if (isValid()) {
+    if (isValid()) {
     if (isEdit) {
       setUpdate(true);
       editFM();
@@ -234,7 +235,7 @@ const InputWorkCenter = ({ onCancel, onSuccess }) => {
       setUpdate(true);
       addFM();
     }
-    // }
+    }
   };
 
   const formatDate = (date) => {
@@ -389,6 +390,7 @@ const InputWorkCenter = ({ onCancel, onSuccess }) => {
 
   const body = () => {
     return (
+      
       <>
         {/* Put content body here */}
         <Toast ref={toast} />
@@ -471,9 +473,9 @@ const InputWorkCenter = ({ onCancel, onSuccess }) => {
               }}
               option={workType}
               detail
-              onDetail={() => {
-                setShowType(true);
-              }}
+              // onDetail={() => {
+              //   setShowType(true);
+              // }}
               label={"[name] ([code])"}
               placeholder="Pilih Jenis Pekerjaan"
             />
@@ -482,6 +484,7 @@ const InputWorkCenter = ({ onCancel, onSuccess }) => {
           <div className="col-3 text-black">
             <label className="text-label">Jumlah SDM</label>
             <PrimeNumber
+              price
               value={work.work_sdm ? work.work_sdm : null}
               onChange={(u) => {
                 updateWc({ ...work, work_sdm: u?.value ?? null });
@@ -567,7 +570,7 @@ const InputWorkCenter = ({ onCancel, onSuccess }) => {
         </Col>
       </Row>
 
-      <DataLokasi
+      {/* <DataLokasi
         data={location}
         loading={false}
         popUp={true}
@@ -593,9 +596,9 @@ const InputWorkCenter = ({ onCancel, onSuccess }) => {
             setDoubleClick(false);
           }, 2000);
         }}
-      />
+      /> */}
 
-      <DataMesin
+      {/* <DataMesin
         data={machine}
         loading={false}
         popUp={true}
@@ -621,7 +624,7 @@ const InputWorkCenter = ({ onCancel, onSuccess }) => {
             setDoubleClick(false);
           }, 2000);
         }}
-      />
+      /> */}
     </>
   );
 };

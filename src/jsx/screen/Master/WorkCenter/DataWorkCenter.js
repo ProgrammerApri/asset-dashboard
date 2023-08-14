@@ -560,7 +560,7 @@ const DataWorkCenter = ({
     machine?.forEach((element) => {
       if (value === element.id) {
         selected = element;
-        console.log("mesin :",selected);
+        console.log("mesin :", selected);
       }
     });
 
@@ -744,7 +744,7 @@ const DataWorkCenter = ({
             <div className="col-4 text-black">
               <label className="text-label">Lokasi</label>
               <CustomDropdown
-                value={work.loc_id}
+                value={work.loc_id && checkLoc(work.loc_id)}
                 onChange={(u) => {
                   updateWc({ ...work, loc_id: u?.id ?? null });
                 }}
@@ -760,7 +760,7 @@ const DataWorkCenter = ({
             <div className="col-4 text-black">
               <label className="text-label">Mesin</label>
               <CustomDropdown
-                value={work.machine_id  }
+                value={work.machine_id && checkMch(work.machine_id)}
                 onChange={(u) => {
                   updateWc({ ...work, machine_id: u?.id ?? null });
                 }}
@@ -776,7 +776,7 @@ const DataWorkCenter = ({
             <div className="col-4 text-black">
               <label className="text-label">Jenis Pekerjaan</label>
               <CustomDropdown
-                value={work.work_type}
+                value={work.work_type && checkType(work.work_type)}
                 onChange={(u) => {
                   updateWc({ ...work, work_type: u?.id ?? null });
                 }}

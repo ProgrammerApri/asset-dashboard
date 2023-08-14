@@ -36,8 +36,8 @@ const def = {
   name: null,
   exp_date: null,
   brand: null,
-  departement: null,
-  group: null,
+  departement: "",
+  group: "",
   type: null,
   codeb: null,
   unit: null,
@@ -127,7 +127,7 @@ const DataProduk = ({
   const [active, setActive] = useState(0);
   const picker = useRef(null);
   const [file, setFile] = useState(null);
-  const [prodcode, setProdcode] = useState(null);
+  const [prodcode, setProdcode] = useState("");
   const [error, setError] = useState(defError);
   const progressBar = useRef(null);
   const [number, setNumber] = useState("");
@@ -1329,11 +1329,11 @@ const DataProduk = ({
                               )
                             : ""
                         }${
-                          currentItem !== null && currentItem?.group
+                          currentItem !== "" && currentItem?.group
                             ? String(checkGroup(currentItem.group)?.code)
                             : ""
                         }${
-                          currentItem !== null && currentItem.ns !== ""
+                          currentItem !== "" && currentItem.ns !== ""
                             ? currentItem.ns === 1
                               ? "S-"
                               : currentItem.ns === 0
@@ -1354,15 +1354,15 @@ const DataProduk = ({
                   <PrimeDropdown
                     label={"Nama Departement"}
                     value={
-                      currentItem !== null
+                      currentItem !== ""
                         ? checkDept(currentItem.departement)
-                        : null
+                        : ""
                     }
                     options={departement}
                     onChange={(e) => {
                       setCurrentItem({
                         ...currentItem,
-                        departement: e.value.id ?? null,
+                        departement: e.value.id ?? "",
                       });
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
@@ -1377,9 +1377,9 @@ const DataProduk = ({
                   <PrimeDropdown
                     label={tr[localStorage.getItem("language")].g_prod}
                     value={
-                      currentItem !== null
+                      currentItem !== ""
                         ? checkGroup(currentItem.group)
-                        : null
+                        : ""
                     }
                     options={group}
                     onChange={(e) => {
@@ -1398,7 +1398,7 @@ const DataProduk = ({
 
                       setCurrentItem({
                         ...currentItem,
-                        group: e?.target?.value?.id ?? null,
+                        group: e?.target?.value?.id ?? "",
                         ns: nsValue,
                       });
 
@@ -1434,7 +1434,7 @@ const DataProduk = ({
                         currentItem?.group &&
                         checkGroup(currentItem?.group)?.code
                       }-${
-                        currentItem !== null && currentItem.ns !== ""
+                        currentItem !== "" && currentItem.ns !== ""
                           ? currentItem.ns === 1
                             ? "S-"
                             : currentItem.ns === 0
@@ -1469,7 +1469,7 @@ const DataProduk = ({
                   <PrimeInput
                     label={tr[localStorage.getItem("language")].type_prod}
                     value={
-                      currentItem !== null && currentItem.ns !== ""
+                      currentItem !== "" && currentItem.ns !== ""
                         ? currentItem.ns === 1
                           ? "Stock"
                           : currentItem.ns === 0
@@ -1641,7 +1641,7 @@ const DataProduk = ({
                     value={currentItem?.weight ?? null}
                     onChange={(a) => {
                       setCurrentItem({
-                        ...currentItem,
+                        ...currentItem,       
                         weight: a.value ?? null,
                       });
                     }}

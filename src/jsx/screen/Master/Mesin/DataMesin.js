@@ -330,7 +330,18 @@ const DataMesin = ({
               }),
               dispatch({
                 type: SET_CURRENT_MSN,
-                payload: data,
+                payload: {
+                  ...data,
+                  msn_code: null,
+                  msn_name: null,
+                  max_sdm: null,
+                  clean_up: null,
+                  ttl_kerja: null,
+                  ttl_kerja_msn: null,
+                  bts_bwh_toleransi: null,
+                  bts_atas_toleransi: null,
+                  desc: null,
+                },
               })
             );
           }}

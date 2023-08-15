@@ -576,34 +576,26 @@ const DataMesin = ({
               />
             </div>
 
-            <div className="col-3">
+            <div className="col-3" hidden>
+              <label> Total Pekerjaan</label>
               <InputText
-                hidden
                 price
-                label={"Total Pekerjaan"}
                 value={msn.ttl_kerja}
                 onChange={(e) => {
                   updateMSN({ ...msn, ttl_kerja: e.value });
-                  // let newError = error;
-                  // newError.ttl_kerja = false;
-                  // setError(newError);
                 }}
                 placeholder="0"
                 type="number"
                 disabled
               />
             </div>
-            <div className="col-3">
+            <div className="col-3" hidden>
+              <label> Total Pekerjaan Mesin</label>
               <InputText
-                hidden
                 price
-                label={"Total Pekerjaan Mesin"}
                 value={msn.ttl_kerja_msn}
                 onChange={(e) => {
                   updateMSN({ ...msn, ttl_kerja_msn: e.value });
-                  // let newError = error;
-                  // newError.ttl_kerja_msn = false;
-                  // setError(newError);
                 }}
                 placeholder="0 "
                 type="number"

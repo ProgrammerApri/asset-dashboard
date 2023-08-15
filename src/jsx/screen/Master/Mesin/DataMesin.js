@@ -577,7 +577,8 @@ const DataMesin = ({
             </div>
 
             <div className="col-3">
-              <PrimeNumber
+              <InputText
+                hidden
                 price
                 label={"Total Pekerjaan"}
                 value={msn.ttl_kerja}
@@ -593,7 +594,8 @@ const DataMesin = ({
               />
             </div>
             <div className="col-3">
-              <PrimeNumber
+              <InputText
+                hidden
                 price
                 label={"Total Pekerjaan Mesin"}
                 value={msn.ttl_kerja_msn}
@@ -606,6 +608,7 @@ const DataMesin = ({
                 placeholder="0 "
                 type="number"
                 disabled
+                onHide
               />
             </div>
           </div>

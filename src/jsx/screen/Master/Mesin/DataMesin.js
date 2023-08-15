@@ -36,8 +36,8 @@ const def = {
 const defError = {
   code: false,
   name: false,
-  ttl_work: false,
-  ttl_work_msn: false,
+  max_sdm: false,
+  clean_up: false,
 };
 
 const DataMesin = ({
@@ -408,23 +408,15 @@ const DataMesin = ({
     let errors = {
       code: !msn.msn_code || msn.msn_code === "",
       name: !msn.msn_name || msn.msn_name === "",
-      ttl_kerja: !msn.ttl_kerja || msn.ttl_kerja === "",
-      ttl_kerja_msn: !msn.ttl_kerja_msn || msn.ttl_kerja_msn === "",
+      max_sdm: !msn.max_sdm || msn.max_sdm === "",
+      clean_up: !msn.clean_up || msn.clean_up === "",
     };
 
-    valid =
-      !errors.code &&
-      !errors.name &&
-      !errors.ttl_kerja &&
-      !errors.ttl_kerja_msn;
+    valid = !errors.code && !errors.name && !errors.max_sdm && !errors.clean_up;
 
     setError(errors);
 
-    valid =
-      !errors.code &&
-      !errors.name &&
-      !errors.ttl_kerja &&
-      !errors.ttl_kerja_msn;
+    valid = !errors.code && !errors.name && !errors.max_sdm && !errors.clean_up;
 
     return valid;
   };
@@ -556,12 +548,13 @@ const DataMesin = ({
                 value={msn.max_sdm}
                 onChange={(e) => {
                   updateMSN({ ...msn, max_sdm: e.value });
-                  // let newError = error;
-                  // newError.name = false;
-                  // setError(newError);
+                  let newError = error;
+                  newError.max_sdm = false;
+                  setError(newError);
                 }}
                 placeholder="0"
                 type="number"
+                error={error?.max_sdm}
                 // error={error?.name}
               />
             </div>
@@ -572,12 +565,13 @@ const DataMesin = ({
                 value={msn.clean_up}
                 onChange={(e) => {
                   updateMSN({ ...msn, clean_up: e.value });
-                  // let newError = error;
-                  // newError.code = false;
-                  // setError(newError);
+                  let newError = error;
+                  newError.clean_up = false;
+                  setError(newError);
                 }}
                 placeholder="0"
                 type="number"
+                error={error?.clean_up}
                 // error={error?.code}
               />
             </div>
@@ -589,13 +583,13 @@ const DataMesin = ({
                 value={msn.ttl_kerja}
                 onChange={(e) => {
                   updateMSN({ ...msn, ttl_kerja: e.value });
-                  let newError = error;
-                  newError.ttl_kerja = false;
-                  setError(newError);
+                  // let newError = error;
+                  // newError.ttl_kerja = false;
+                  // setError(newError);
                 }}
                 placeholder="0"
                 type="number"
-                error={error?.ttl_kerja}
+                disabled
               />
             </div>
             <div className="col-3">
@@ -605,13 +599,13 @@ const DataMesin = ({
                 value={msn.ttl_kerja_msn}
                 onChange={(e) => {
                   updateMSN({ ...msn, ttl_kerja_msn: e.value });
-                  let newError = error;
-                  newError.ttl_kerja_msn = false;
-                  setError(newError);
+                  // let newError = error;
+                  // newError.ttl_kerja_msn = false;
+                  // setError(newError);
                 }}
                 placeholder="0 "
                 type="number"
-                error={error?.ttl_kerja_msn}
+                disabled
               />
             </div>
           </div>

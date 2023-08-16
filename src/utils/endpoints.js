@@ -1928,6 +1928,14 @@ const endpoints = {
     method: "DELETE",
     data: {},
   },
+
+  // Clean Up Monitoring
+  cleanUpMonitoring: {
+    endpoint: "/v1/api/clean-up-monitoring",
+    method: "GET",
+    data: {},
+  },
+
 };
 
 export default endpoints;

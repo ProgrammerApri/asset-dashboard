@@ -228,13 +228,13 @@ const InputWorkCenter = ({ onCancel, onSuccess }) => {
 
   const onSubmit = () => {
     if (isValid()) {
-    if (isEdit) {
-      setUpdate(true);
-      editFM();
-    } else {
-      setUpdate(true);
-      addFM();
-    }
+      if (isEdit) {
+        setUpdate(true);
+        editFM();
+      } else {
+        setUpdate(true);
+        addFM();
+      }
     }
   };
 
@@ -390,7 +390,6 @@ const InputWorkCenter = ({ onCancel, onSuccess }) => {
 
   const body = () => {
     return (
-      
       <>
         {/* Put content body here */}
         <Toast ref={toast} />
@@ -484,7 +483,6 @@ const InputWorkCenter = ({ onCancel, onSuccess }) => {
           <div className="col-3 text-black">
             <label className="text-label">Jumlah SDM</label>
             <PrimeNumber
-              price
               value={work.work_sdm ? work.work_sdm : null}
               onChange={(u) => {
                 updateWc({ ...work, work_sdm: u?.value ?? null });
@@ -534,8 +532,7 @@ const InputWorkCenter = ({ onCancel, onSuccess }) => {
     return (
       <div className="mt-5 flex justify-content-end">
         <div className="justify-content-left col-6">
-          <div className="col-12 mt-0 ml-0 p-0 fs-12 text-left">
-          </div>
+          <div className="col-12 mt-0 ml-0 p-0 fs-12 text-left"></div>
         </div>
 
         <div className="row justify-content-right col-6">
@@ -570,7 +567,7 @@ const InputWorkCenter = ({ onCancel, onSuccess }) => {
         </Col>
       </Row>
 
-      {/* <DataLokasi
+      <DataLokasi
         data={location}
         loading={false}
         popUp={true}
@@ -596,9 +593,9 @@ const InputWorkCenter = ({ onCancel, onSuccess }) => {
             setDoubleClick(false);
           }, 2000);
         }}
-      /> */}
+      />
 
-      {/* <DataMesin
+      <DataMesin
         data={machine}
         loading={false}
         popUp={true}
@@ -624,7 +621,7 @@ const InputWorkCenter = ({ onCancel, onSuccess }) => {
             setDoubleClick(false);
           }, 2000);
         }}
-      /> */}
+      />
     </>
   );
 };

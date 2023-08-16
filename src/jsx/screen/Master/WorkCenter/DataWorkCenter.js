@@ -26,6 +26,7 @@ import { tr } from "date-fns/locale";
 import DataLokasi from "../Lokasi/DataLokasi";
 import DataMesin from "../Mesin/DataMesin";
 import { SET_CURRENT_WC, SET_EDIT_WC } from "src/redux/actions";
+import DataJeniskerja from "../Jenis_kerja/DataJeniskerja";
 
 const def = {
   id: 1,
@@ -40,28 +41,18 @@ const def = {
   biaya_estimasi: null,
   desc: null,
 };
+
 const defError = {
-  work_code: false,
-  work_name: false,
-  loc_id: false,
-  machine_id: false,
-  work_type: false,
-  // prod: [
-  //   {
-  //     id: false,
-  //     qty: false,
-  //     aloc: false,
-  //   },
-  // ],
-  // mtrl: [
-  //   {
-  //     id: false,
-  //     qty: false,
-  //     prc: false,
-  //   },
-  // ],
+  code: false,
+  name: false,
+  mesin: false,
+  loc: false,
+  type: false,
+  sdm: false,
+  work_est: false,
+  ovh_est: false,
+  biaya_est: false,
 };
-const dum_data = {};
 
 const DataWorkCenter = ({
   data,
@@ -77,7 +68,7 @@ const DataWorkCenter = ({
   const [update, setUpdate] = useState(true);
   const [showInput, setShowInput] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
-  const [displayDel, setDisplayDel] = useState(false);
+  const [displayWarn, setDisplayWarn] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
   const [filters1, setFilters1] = useState(null);
@@ -94,14 +85,18 @@ const DataWorkCenter = ({
   const [machine, setMachine] = useState(null);
   const [location, setLocation] = useState(null);
   const [workType, setWorkType] = useState(null);
+  const [cleanUp, setCleanUp] = useState(null);
   const profile = useSelector((state) => state.profile.profile);
   const [expandedRows, setExpandedRows] = useState(null);
   const [error, setError] = useState(defError);
+  const [stateErSdm, setStateErSdm] = useState(0);
+  const [stateErr, setStateErr] = useState(0);
   const printPage = useRef(null);
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
+    getCleanUp();
     getLocation();
     getMachine();
     getWorkType();
@@ -156,6 +151,22 @@ const DataWorkCenter = ({
     } catch (error) {}
   };
 
+  const getCleanUp = async () => {
+    const config = {
+      ...endpoints.cleanUpMonitoring,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setCleanUp(data);
+      }
+    } catch (error) {}
+  };
+
   const editFM = async () => {
     const config = {
       ...endpoints.editWorkCenter,
@@ -171,6 +182,7 @@ const DataWorkCenter = ({
         setTimeout(() => {
           setUpdate(false);
           setShowInput(false);
+          setDisplayWarn(false);
           onSuccessInput(true);
           toast.current.show({
             severity: "info",
@@ -207,6 +219,7 @@ const DataWorkCenter = ({
         setTimeout(() => {
           setUpdate(false);
           setShowInput(false);
+          setDisplayWarn(false);
           onSuccessInput(true);
           toast.current.show({
             severity: "info",
@@ -256,7 +269,7 @@ const DataWorkCenter = ({
       if (response.status) {
         setTimeout(() => {
           setUpdate(false);
-          setDisplayDel(false);
+          setShowDelete(false);
           onSuccessInput(true);
           toast.current.show({
             severity: "info",
@@ -270,7 +283,7 @@ const DataWorkCenter = ({
       console.log(error);
       setTimeout(() => {
         setUpdate(false);
-        setDisplayDel(false);
+        setShowDelete(false);
         // setShowDelete(false);
         toast.current.show({
           severity: "error",
@@ -288,6 +301,7 @@ const DataWorkCenter = ({
       <div className="d-flex">
         <Link
           onClick={() => {
+            setUpdate(false);
             setShowInput(
               dispatch({
                 type: SET_EDIT_WC,
@@ -296,7 +310,12 @@ const DataWorkCenter = ({
 
               dispatch({
                 type: SET_CURRENT_WC,
-                payload: data,
+                payload: {
+                  ...data,
+                  loc_id: data?.loc_id?.id ?? null,
+                  machine_id: data?.machine_id?.id ?? null,
+                  work_type: data?.work_type?.id ?? null,
+                },
               })
             );
           }}
@@ -308,7 +327,7 @@ const DataWorkCenter = ({
         <Link
           onClick={() => {
             // setEdit(true);
-            setDisplayDel(true);
+            setShowDelete(true);
             setCurrentItem(data);
           }}
           className="btn btn-danger shadow btn-xs sharp ml-1"
@@ -325,7 +344,7 @@ const DataWorkCenter = ({
         <PButton
           label="Batal"
           onClick={() => {
-            setDisplayDel(false);
+            setShowDelete(false);
           }}
           className="p-button-text btn-primary"
         />
@@ -334,6 +353,35 @@ const DataWorkCenter = ({
           icon="pi pi-trash"
           onClick={() => {
             delFM();
+          }}
+          autoFocus
+          loading={update}
+        />
+      </div>
+    );
+  };
+
+  const renderFooterWarm = () => {
+    return (
+      <div>
+        <PButton
+          label="Batal"
+          onClick={() => {
+            setDisplayWarn(false);
+          }}
+          className="p-button-text btn-primary"
+        />
+        <PButton
+          label="Lanjut"
+          icon="pi pi-check"
+          onClick={() => {
+            if (isEdit) {
+              setUpdate(true);
+              editFM();
+            } else {
+              setUpdate(true);
+              addFM();
+            }
           }}
           autoFocus
           loading={update}
@@ -361,19 +409,30 @@ const DataWorkCenter = ({
     let valid = false;
     let errors = {
       code: !work.work_code || work.work_code === "",
-      type: !work.work_type || work.work_type === "",
       name: !work.work_name || work.work_name === "",
-      mesin: !work.machine_id || work.machine_id === "",
-      loc: !work.loc_id || work.loc_id === "",
-      // mts: !jns_kerja.mutasi || jns_kerja.mutasi === "",
+      mesin: !work.machine_id,
+      loc: !work.loc_id,
+      type: !work.work_type,
+      sdm: !work.work_sdm || work.work_sdm === "",
+      work_est: !work.work_estimasi || work.work_estimasi === "",
+      ovh_est: !work.ovh_estimasi || work.ovh_estimasi === "",
+      biaya_est: !work.biaya_estimasi || work.biaya_estimasi === "",
     };
 
-    valid =
-      !errors.code &&
-      !errors.name &&
-      !errors.type &&
-      !errors.mesin &&
-      !errors.loc;
+    let total_work = 0;
+    let sisa_clean = 0;
+    cleanUp?.forEach((el) => {
+      if (el?.machine_id?.id === checkMch(work?.machine_id)?.id) {
+        total_work += el?.total_work;
+      }
+    });
+
+    sisa_clean = checkMch(work?.machine_id)?.clean_up - total_work;
+
+    setStateErSdm(work?.work_sdm > checkMch(work?.machine_id)?.max_sdm);
+
+    console.log("================cek");
+    console.log(stateErSdm);
 
     setError(errors);
 
@@ -382,19 +441,27 @@ const DataWorkCenter = ({
       !errors.name &&
       !errors.type &&
       !errors.mesin &&
-      !errors.loc;
+      !errors.loc &&
+      !errors.sdm &&
+      !errors.work_est &&
+      !errors.ovh_est &&
+      !errors.biaya_est;
 
     return valid;
   };
 
   const onSubmit = () => {
     if (isValid()) {
-      if (isEdit) {
-        setUpdate(true);
-        editFM();
+      if (stateErr) {
+        setDisplayWarn(true);
       } else {
-        setUpdate(true);
-        addFM();
+        if (isEdit) {
+          setUpdate(true);
+          editFM();
+        } else {
+          setUpdate(true);
+          addFM();
+        }
       }
     }
   };
@@ -422,19 +489,7 @@ const DataWorkCenter = ({
               }),
               dispatch({
                 type: SET_CURRENT_WC,
-                payload: {
-                  ...data,
-                  work_code: null,
-                  work_name: null,
-                  loc_id: null,
-                  machine_id: null,
-                  work_type: null,
-                  work_sdm: null,
-                  work_estimasi: null,
-                  ovh_estimasi: null,
-                  biaya_estimasi: null,
-                  desc: null,
-                },
+                payload: def,
               })
             );
           }}
@@ -445,7 +500,7 @@ const DataWorkCenter = ({
 
   const renderFooter = () => {
     return (
-      <div className="mt-5 flex justify-content-end">
+      <div className="mt-8 flex justify-content-end">
         <div className="justify-content-left col-6">
           <div className="col-12 mt-0 ml-0 p-0 fs-12 text-left"></div>
         </div>
@@ -468,14 +523,6 @@ const DataWorkCenter = ({
             />
           </div>
         </div>
-      </div>
-    );
-  };
-
-  const rowExpansionTemplate = (data) => {
-    return (
-      <div className="row">
-        <div className="col-12 pb-0"></div>
       </div>
     );
   };
@@ -578,11 +625,52 @@ const DataWorkCenter = ({
     return selected;
   };
 
+  const formatIdr = (value) => {
+    return `${value?.toFixed(2)}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
   const updateWc = (e) => {
     dispatch({
       type: SET_CURRENT_WC,
       payload: e,
     });
+  };
+
+  const rowExpansionTemplate = (data) => {
+    return (
+      <div className="">
+        <DataTable value={data} responsiveLayout="scroll">
+          <Column
+            header={"Jumlah SDM (Org)"}
+            style={{ width: "20rem" }}
+            field={(e) => data?.work_sdm ?? 0}
+          />
+          <Column
+            header={"Estimasi Pengerjaan (Jam)"}
+            style={{ width: "24rem" }}
+            field={(e) => formatIdr(data?.work_estimasi ?? 0)}
+          />
+          <Column
+            header={"Estimasi Overhead"}
+            style={{ width: "15rem" }}
+            field={(e) => formatIdr(data?.ovh_estimasi ?? 0)}
+          />
+          <Column
+            header="Estimasi Biaya Kerja"
+            style={{ width: "15rem" }}
+            field={(e) => formatIdr(data?.biaya_estimasi ?? 0)}
+          />
+          <Column
+            header={"Keterangan"}
+            field={(e) => (data.desc !== null ? data.desc : "-")}
+            // style={{ minWidth: "8rem" }}
+            // body={loading && <Skeleton />}
+          />
+        </DataTable>
+      </div>
+    );
   };
 
   const renderBody = () => {
@@ -612,7 +700,7 @@ const DataWorkCenter = ({
           selectionMode="single"
           onRowSelect={onRowSelect}
         >
-          <Column expander style={{ width: "3em" }} />
+          {/* <Column expander style={{ width: "3em" }} /> */}
 
           <Column
             header="Kode Work Center"
@@ -630,19 +718,29 @@ const DataWorkCenter = ({
           />
           <Column
             header="Lokasi"
-            field={(e) => (e?.loc_id ? e.loc_id?.name : "-")}
+            field={(e) =>
+              e?.loc_id ? `${e.loc_id?.name} (${e.loc_id?.code})` : "-"
+            }
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
           <Column
             header="Mesin"
-            field={(e) => (e?.machine_id ? e.machine_id?.msn_name : "-")}
+            field={(e) =>
+              e?.machine_id
+                ? `${e.machine_id?.msn_name} (${e.machine_id?.msn_code})`
+                : "-"
+            }
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
           <Column
             header="Jenis Pekerjaan"
-            field={(e) => (e?.work_type ? e.work_type?.work_name : "-")}
+            field={(e) =>
+              e?.work_type
+                ? `${e.work_type?.work_name} (${e.work_type?.work_type})`
+                : "-"
+            }
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
@@ -667,30 +765,11 @@ const DataWorkCenter = ({
             body={(e) => (load ? <Skeleton /> : actionBodyTemplate(e))}
           />
         </DataTable>
-
-        <Dialog
-          header={"Hapus Data"}
-          visible={displayDel}
-          style={{ width: "30vw" }}
-          footer={renderFooterDel("displayDel")}
-          onHide={() => {
-            setDisplayDel(false);
-          }}
-        >
-          <div className="ml-3 mr-3">
-            <i
-              className="pi pi-exclamation-triangle mr-3 align-middle"
-              style={{ fontSize: "2rem" }}
-            />
-            <span>Apakah anda yakin ingin menghapus data ?</span>
-          </div>
-        </Dialog>
       </>
     );
   };
 
   const renderDialog = () => {
-    console.log("datana:", work.machine_id);
     return (
       <>
         <Toast ref={toast} />
@@ -704,29 +783,36 @@ const DataWorkCenter = ({
             onInput(false);
           }}
         >
-          <Row className="mb-0">
+          <Row className="mb-8">
             <div className="col-6 text-black">
               <PrimeInput
                 label={"Kode Work Center"}
-                value={work.work_code}
+                value={work?.work_code}
                 onChange={(e) => {
-                  updateWc({ ...work, work_code: e.target.value });
+                  updateWc({ ...work, work_code: e.target?.value ?? null });
+
+                  let newError = error;
+                  newError.code = false;
+                  setError(newError);
                 }}
                 placeholder="Masukan Kode Work Center"
+                error={error?.code}
               />
             </div>
+
             <div className="col-6 text-black">
               <PrimeInput
                 label={"Nama Work Center"}
-                value={work.work_name}
+                value={work?.work_name}
                 onChange={(e) => {
-                  updateWc({ ...work, work_name: e.target.value });
-                  // let newError = error;
-                  // newError.name = false;
-                  // setError(newError);
+                  updateWc({ ...work, work_name: e.target?.value ?? null });
+
+                  let newError = error;
+                  newError.name = false;
+                  setError(newError);
                 }}
                 placeholder="Masukan Nama Work Center"
-                // error={error?.name}
+                error={error?.name}
               />
             </div>
 
@@ -747,6 +833,10 @@ const DataWorkCenter = ({
                 value={work.loc_id && checkLoc(work.loc_id)}
                 onChange={(u) => {
                   updateWc({ ...work, loc_id: u?.id ?? null });
+
+                  let newError = error;
+                  newError.loc = false;
+                  setError(newError);
                 }}
                 option={location}
                 detail
@@ -755,6 +845,8 @@ const DataWorkCenter = ({
                 }}
                 label={"[name] ([code])"}
                 placeholder="Pilih Lokasi"
+                errorMessage={"Lokasi Belum Dipilih !"}
+                error={error?.loc}
               />
             </div>
             <div className="col-4 text-black">
@@ -763,6 +855,10 @@ const DataWorkCenter = ({
                 value={work.machine_id && checkMch(work.machine_id)}
                 onChange={(u) => {
                   updateWc({ ...work, machine_id: u?.id ?? null });
+
+                  let newError = error;
+                  newError.mesin = false;
+                  setError(newError);
                 }}
                 option={machine}
                 detail
@@ -771,6 +867,8 @@ const DataWorkCenter = ({
                 }}
                 label={"[msn_name] ([msn_code])"}
                 placeholder="Pilih Mesin"
+                errorMessage={"Mesin Belum Dipilih !"}
+                error={error?.mesin}
               />
             </div>
             <div className="col-4 text-black">
@@ -779,18 +877,24 @@ const DataWorkCenter = ({
                 value={work.work_type && checkType(work.work_type)}
                 onChange={(u) => {
                   updateWc({ ...work, work_type: u?.id ?? null });
+
+                  let newError = error;
+                  newError.type = false;
+                  setError(newError);
                 }}
                 option={workType}
-                // detail
-                // onDetail={() => {
-                //   setShowType(true);
-                // }}
+                detail
+                onDetail={() => {
+                  setShowType(true);
+                }}
                 label={"[work_name] ([work_type])"}
                 placeholder="Pilih Jenis Pekerjaan"
+                errorMessage={"Tipe Pekerjaan Belum Dipilih !"}
+                error={error?.type}
               />
             </div>
 
-            <div className="col-12 mt-3">
+            <div className="col-12 mt-5">
               <label className="text-label fs-14">
                 <b>Waktu dan Biaya Pengerjaan</b>
               </label>
@@ -800,12 +904,22 @@ const DataWorkCenter = ({
             <div className="col-3 text-black">
               <label className="text-label">Jumlah SDM</label>
               <PrimeNumber
-                price
                 value={work.work_sdm ? work.work_sdm : null}
                 onChange={(u) => {
-                  updateWc({ ...work, work_sdm: u?.value ?? null });
+                  updateWc({
+                    ...work,
+                    work_sdm: Number(u?.target?.value) ?? null,
+                  });
+
+                  let newError = error;
+                  newError.sdm = false;
+                  setError(newError);
                 }}
                 placeholder="0"
+                error={error?.sdm}
+                errorMessage={
+                  stateErSdm ? "Jumlah SDM Melebihi Batas Maksimal !" : null
+                }
               />
             </div>
             <div className="col-3 text-black">
@@ -815,8 +929,15 @@ const DataWorkCenter = ({
                 value={work.work_estimasi ? work.work_estimasi : null}
                 onChange={(u) => {
                   updateWc({ ...work, work_estimasi: u?.value ?? null });
+
+                  setStateErr(u?.value > checkMch(work.machine_id)?.clean_up);
+
+                  let newError = error;
+                  newError.work_est = false;
+                  setError(newError);
                 }}
                 placeholder="0"
+                error={error?.work_est}
               />
             </div>
             <div className="col-3 text-black">
@@ -826,8 +947,13 @@ const DataWorkCenter = ({
                 value={work.ovh_estimasi ? work.ovh_estimasi : null}
                 onChange={(u) => {
                   updateWc({ ...work, ovh_estimasi: u?.value ?? null });
+
+                  let newError = error;
+                  newError.ovh_est = false;
+                  setError(newError);
                 }}
                 placeholder="0"
+                error={error?.ovh_est}
               />
             </div>
             <div className="col-3 text-black">
@@ -837,20 +963,46 @@ const DataWorkCenter = ({
                 value={work.biaya_estimasi ? work.biaya_estimasi : null}
                 onChange={(u) => {
                   updateWc({ ...work, biaya_estimasi: u?.value ?? null });
+
+                  let newError = error;
+                  newError.biaya_est = false;
+                  setError(newError);
                 }}
                 placeholder="0"
+                error={error?.biaya_est}
               />
             </div>
           </Row>
         </Dialog>
 
-        {/* <Dialog
+        <Dialog
+          header={"Warning !!!"}
+          visible={displayWarn}
+          style={{ width: "30vw" }}
+          footer={renderFooterWarm("displayWarn")}
+          onHide={() => {
+            setDisplayWarn(false);
+          }}
+        >
+          <div className="ml-3 mr-3">
+            <i
+              className="pi pi-exclamation-triangle mr-3 align-middle"
+              style={{ fontSize: "2rem" }}
+            />
+            <span>
+              Mesin Sudah Mencapai Batas Clean Up, Apakah Yakin Ingin
+              Melanjutkan ?
+            </span>
+          </div>
+        </Dialog>
+
+        <Dialog
           header={"Hapus Data"}
           visible={showDelete}
           style={{ width: "30vw" }}
           footer={renderFooterDel("displayDel")}
           onHide={() => {
-            // setLoading(false);
+            setUpdate(false);
             setShowDelete(false);
             // onInput(false);
           }}
@@ -862,7 +1014,7 @@ const DataWorkCenter = ({
             />
             <span>{"Apakah Anda Yakin Ingin Menghapus Data?"}</span>
           </div>
-        </Dialog> */}
+        </Dialog>
 
         <DataLokasi
           data={location}
@@ -910,6 +1062,33 @@ const DataWorkCenter = ({
             if (doubleClick) {
               setShowMachine(false);
               updateWc({ ...work, machine_id: e.data?.id ?? null });
+            }
+
+            setDoubleClick(true);
+
+            setTimeout(() => {
+              setDoubleClick(false);
+            }, 2000);
+          }}
+        />
+        <DataJeniskerja
+          data={workType}
+          loading={false}
+          popUp={true}
+          show={showType}
+          onHide={() => {
+            setShowType(false);
+          }}
+          onInput={(e) => {
+            setShowType(!e);
+          }}
+          onSuccessInput={(e) => {
+            getWorkType();
+          }}
+          onRowSelect={(e) => {
+            if (doubleClick) {
+              setShowType(false);
+              updateWc({ ...work, work_type: e.data?.id ?? null });
             }
 
             setDoubleClick(true);

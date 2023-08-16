@@ -57,6 +57,7 @@ const DataMesin = ({
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
   const [displayDel, setDisplayDel] = useState(false);
+  const [displayClean, setDisplayClean] = useState(false);
   const [position, setPosition] = useState("center");
   const [currentItem, setCurrentItem] = useState(def);
   const toast = useRef(null);
@@ -204,6 +205,24 @@ const DataMesin = ({
       <div className="d-flex">
         <Link
           onClick={() => {
+            setDisplayClean(
+              dispatch({
+                type: SET_EDIT_MSN,
+                payload: true,
+              }),
+              dispatch({
+                type: SET_CURRENT_MSN,
+                payload: data,
+              })
+            );
+          }}
+          className="btn btn-info shadow btn-xs sharp ml-1"
+        >
+          <i className="bx bx-refresh mt-1"></i>
+        </Link>
+
+        <Link
+          onClick={() => {
             setDisplayData(
               dispatch({
                 type: SET_EDIT_MSN,
@@ -285,6 +304,29 @@ const DataMesin = ({
           icon="pi pi-trash"
           onClick={() => {
             delDataMesin();
+          }}
+          autoFocus
+          loading={update}
+        />
+      </div>
+    );
+  };
+
+  const renderFooterClean = () => {
+    return (
+      <div>
+        <PButton
+          label="Batal"
+          onClick={() => {
+            setDisplayDel(false);
+          }}
+          className="p-button-text btn-primary"
+        />
+        <PButton
+          label="Clean"
+          icon="pi pi-check"
+          onClick={() => {
+            // editMesin();
           }}
           autoFocus
           loading={update}
@@ -456,6 +498,24 @@ const DataMesin = ({
           <Column
             header="Nama Mesin"
             field={(e) => e.msn_name}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Clean Up"
+            field={(e) => e.clean_up}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Total Kerja"
+            field={(e) => e.ttl_kerja}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Total Kerja Mesin"
+            field={(e) => e.ttl_kerja_msn}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
@@ -654,6 +714,24 @@ const DataMesin = ({
               style={{ fontSize: "2rem" }}
             />
             <span>Apakah anda yakin ingin menghapus data ?</span>
+          </div>
+        </Dialog>
+
+        <Dialog
+          header={"Clean Up Mesin"}
+          visible={displayClean}
+          style={{ width: "30vw" }}
+          footer={renderFooterClean("displayClean")}
+          onHide={() => {
+            setDisplayClean(false);
+          }}
+        >
+          <div className="ml-3 mr-3">
+            <i
+              className="pi pi-exclamation-triangle mr-3 align-middle"
+              style={{ fontSize: "2rem" }}
+            />
+            <span>{`Apakah anda yakin ingin clean up mesin ${msn.msn_code} ?`} </span>
           </div>
         </Dialog>
       </>

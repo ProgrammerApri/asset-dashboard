@@ -1479,6 +1479,12 @@ const endpoints = {
     data: {},
   },
 
+  cleanMesin: {
+    endpoint: "/v1/api/clean-mesin/",
+    method: "PUT",
+    data: {},
+  },
+
   /// Formula
   formula: {
     endpoint: "/v1/api/formula",

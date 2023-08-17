@@ -19,6 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_MSN, SET_EDIT_MSN, SET_MSN } from "src/redux/actions";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 import { Divider } from "primereact/divider";
+import { Tooltip } from "primereact/tooltip";
 
 const def = {
   id: 1,
@@ -199,11 +200,53 @@ const DataMesin = ({
     }
   };
 
+  const cleanMesin = async () => {
+    // setLoading(true);
+    const config = {
+      ...endpoints.cleanMesin,
+      endpoint: endpoints.cleanMesin.endpoint + msn.id,
+      data: msn,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setTimeout(() => {
+          setUpdate(false);
+          setDisplayClean(false);
+          onSuccessInput(true);
+          toast.current.show({
+            severity: "info",
+            summary: "Berhasil",
+            detail: "Mesin Berhasil Clean Up",
+            life: 3000,
+          });
+        }, 500);
+      }
+    } catch (error) {
+      setTimeout(() => {
+        setUpdate(false);
+        toast.current.show({
+          severity: "error",
+          summary: "Gagal",
+          detail: "Gagal Clean Up Mesin",
+          life: 3000,
+        });
+      }, 500);
+    }
+  };
+
   const actionBodyTemplate = (data) => {
     return (
       // <React.Fragment>
       <div className="d-flex">
+        <Tooltip target={".btn"} />
         <Link
+          data-pr-tooltip="Clean Up Mesin"
+          data-pr-position="right"
+          data-pr-my="left center-2"
           onClick={() => {
             setDisplayClean(
               dispatch({
@@ -326,7 +369,8 @@ const DataMesin = ({
           label="Clean"
           icon="pi pi-check"
           onClick={() => {
-            // editMesin();
+            setUpdate(true);
+            cleanMesin();
           }}
           autoFocus
           loading={update}
@@ -463,6 +507,12 @@ const DataMesin = ({
     return valid;
   };
 
+  const formatIdr = (value) => {
+    return `${value?.toFixed(2)}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
   const renderBody = () => {
     return (
       <>
@@ -502,20 +552,20 @@ const DataMesin = ({
             body={load && <Skeleton />}
           />
           <Column
-            header="Clean Up"
-            field={(e) => e.clean_up}
+            header="Clean Up (Jam)"
+            field={(e) => formatIdr(e.clean_up ?? 0)}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
           <Column
-            header="Total Kerja"
-            field={(e) => e.ttl_kerja}
+            header="Total Kerja (Jam)"
+            field={(e) => formatIdr(e.ttl_kerja ?? 0)}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
           <Column
-            header="Total Kerja Mesin"
-            field={(e) => e.ttl_kerja_msn}
+            header="Total Kerja Mesin (Jam)"
+            field={(e) => formatIdr(e.ttl_kerja_msn ?? 0)}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
@@ -731,7 +781,9 @@ const DataMesin = ({
               className="pi pi-exclamation-triangle mr-3 align-middle"
               style={{ fontSize: "2rem" }}
             />
-            <span>{`Apakah anda yakin ingin clean up mesin ${msn.msn_code} ?`} </span>
+            <span>
+              {`Apakah anda yakin ingin clean up mesin ${msn.msn_code} ?`}{" "}
+            </span>
           </div>
         </Dialog>
       </>

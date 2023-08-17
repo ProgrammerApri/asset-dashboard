@@ -24,6 +24,9 @@ import { TabPanel, TabView } from "primereact/tabview";
 import { Divider } from "@material-ui/core";
 import DataPusatBiaya from "../../MasterLainnya/PusatBiaya/DataPusatBiaya";
 import DataLokasi from "../../Master/Lokasi/DataLokasi";
+import { Calendar } from "primereact/calendar";
+import DataWorkCenter from "../../Master/WorkCenter/DataWorkCenter";
+import DataJeniskerja from "../../Master/Jenis_kerja/DataJeniskerja";
 
 const defError = {
   code: false,
@@ -52,8 +55,10 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
   const [date, setDate] = useState(new Date());
   const [showProd, setShowProd] = useState(false);
   const [showSatuan, setShowSatuan] = useState(false);
-  const [showMsn, setShowMsn] = useState(false);
   const [showDept, setShowDept] = useState(false);
+  const [showWorkCen, setShowWorkCen] = useState(false);
+  const [showType, setShowType] = useState(false);
+  const [showMsn, setShowMsn] = useState(false);
   const [showLok, setShowLok] = useState(false);
   const [product, setProduct] = useState(null);
   const [satuan, setSatuan] = useState(null);
@@ -61,8 +66,15 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
   const [formula, setFormula] = useState(null);
   const [dept, setDept] = useState(null);
   const [lokasi, setLokasi] = useState(null);
+  const [workCen, setWorkCen] = useState(null);
+  const [workType, setWorkType] = useState(null);
   const [error, setError] = useState(defError);
   const [active, setActive] = useState(0);
+  const [accor, setAccor] = useState({
+    sequence: true,
+    produk: true,
+    material: false,
+  });
 
   useEffect(() => {
     window.scrollTo({
@@ -71,10 +83,12 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
       behavior: "smooth",
     });
     getFormula();
-    getMesin();
     getProduct();
     getSatuan();
     getDept();
+    getWorkCen();
+    getWorkType();
+    getMesin();
     getLok();
   }, []);
 
@@ -109,24 +123,6 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
           filt.push(elem);
         });
         setFormula(filt);
-      }
-    } catch (error) {}
-  };
-
-  const getMesin = async () => {
-    const config = {
-      ...endpoints.mesin,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-
-      if (response.status) {
-        const { data } = response;
-        setMesin(data);
-        console.log("jsdj");
-        console.log(data);
       }
     } catch (error) {}
   };
@@ -177,6 +173,56 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
       if (response.status) {
         const { data } = response;
         setDept(data);
+      }
+    } catch (error) {}
+  };
+
+  const getWorkCen = async () => {
+    const config = {
+      ...endpoints.work_center,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+
+      if (response.status) {
+        const { data } = response;
+        setWorkCen(data);
+      }
+    } catch (error) {}
+  };
+
+  const getWorkType = async () => {
+    const config = {
+      ...endpoints.Jeniskerja,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+
+      if (response.status) {
+        const { data } = response;
+        setWorkType(data);
+      }
+    } catch (error) {}
+  };
+
+  const getMesin = async () => {
+    const config = {
+      ...endpoints.mesin,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+
+      if (response.status) {
+        const { data } = response;
+        setMesin(data);
+        console.log("jsdj");
+        console.log(data);
       }
     } catch (error) {}
   };
@@ -297,17 +343,6 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
-  const checkLoc = (value) => {
-    let selected = {};
-    lokasi?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-
   const checkFm = (value) => {
     let selected = {};
     formula?.forEach((element) => {
@@ -319,9 +354,42 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
+  const checkWc = (value) => {
+    let selected = {};
+    workCen?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkWork = (value) => {
+    let selected = {};
+    workType?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
   const checkMsn = (value) => {
     let selected = {};
     mesin?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkLoc = (value) => {
+    let selected = {};
+    lokasi?.forEach((element) => {
       if (value === element.id) {
         selected = element;
       }
@@ -466,23 +534,10 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
         {/* Put content body here */}
         <Toast ref={toast} />
 
-        <Row className="mb-4">
-          <div className="col-2 text-black">
-            <PrimeCalendar
-              label={"Tanggal"}
-              value={date}
-              onChange={(e) => {
-                updatePL({ ...plan, date_created: e.target.value });
-              }}
-              dateFormat="dd-mm-yy"
-              showIcon
-              // disabled
-            />
-          </div>
-          <div className="col-10"></div>
-          <div className="col-2 text-black">
+        <Row className="mb-8">
+          <div className="col-3 text-black">
             <PrimeInput
-              label={"Kode Planning"}
+              label={"Kode Routing"}
               value={plan.pcode}
               onChange={(e) => {
                 updatePL({ ...plan, pcode: e.target.value });
@@ -495,9 +550,9 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-2 text-black">
+          <div className="col-3 text-black">
             <PrimeInput
-              label={"Nama Planning"}
+              label={"Nama Routing"}
               value={plan.pname}
               onChange={(e) => {
                 updatePL({ ...plan, pname: e.target.value });
@@ -512,21 +567,17 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
 
           <div className="col-2 text-black">
             <PrimeCalendar
-              label={"Rencana Produksi"}
-              value={new Date(`${plan.date_planing}Z`)}
+              label={"Tanggal"}
+              value={date}
               onChange={(e) => {
-                updatePL({ ...plan, date_planing: e.target.value });
-
-                let newError = error;
-                newError.date = false;
-                setError(newError);
+                updatePL({ ...plan, date_created: e.target.value });
               }}
-              placeholder="Pilih Tanggal"
-              showIcon
               dateFormat="dd-mm-yy"
-              error={error?.date}
+              showIcon
+              // disabled
             />
           </div>
+          <div className="col-4"></div>
 
           <div className="col-3">
             <label className="text-black">Departement</label>
@@ -548,72 +599,19 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
               error={error?.dep}
             />
           </div>
-          <div className="col-2"></div>
-          <div className="col-2 text-black">
-            <PrimeNumber
-              label={"Rencana Pembuatan"}
-              value={plan.total}
-              onChange={(e) => {
-                if (plan.form_id) {
-                  plan.product.forEach((element) => {
-                    element.qty = element.def_qty * Number(e.target.value);
-                  });
-                  plan.material.forEach((elem) => {
-                    elem.qty = elem.def_qty * Number(e.target.value);
-                  });
-                }
 
-                updatePL({ ...plan, total: e.target.value });
-                let newError = error;
-                newError.rp = false;
-                setError(newError);
+          <div className="col-1 text-black">
+            <PrimeNumber
+              label={"Versi Routing"}
+              value={plan.version ?? 0}
+              onChange={(e) => {
+                updatePL({ ...plan, version: e.target.value });
+                // let newError = error;
+                // newError.name = false;
+                // setError(newError);
               }}
               placeholder="0"
-              type="number"
-              min={0}
-              error={error?.rp}
-            />
-          </div>
-
-          <div className="col-2">
-            <label className="text-black">Satuan</label>
-            <div className="p-inputgroup"></div>
-            <CustomDropdown
-              value={plan.unit !== null ? checkUnit(plan.unit) : ""}
-              option={satuan}
-              onChange={(e) => {
-                updatePL({ ...plan, unit: e.id });
-                let newError = error;
-                newError.un = false;
-                setError(newError);
-              }}
-              placeholder="Pilih Satuan"
-              detail
-              onDetail={() => setShowSatuan(true)}
-              label={"[name]"}
-              errorMessage="Satuan Belum Dipilih"
-              error={error?.un}
-            />
-          </div>
-
-          <div className="col-3">
-            <label className="text-black">Lokasi Gudang</label>
-            <div className="p-inputgroup"></div>
-            <CustomDropdown
-              value={plan.loc_id && checkLoc(plan.loc_id)}
-              option={lokasi}
-              onChange={(e) => {
-                updatePL({ ...plan, loc_id: e.id });
-                let newError = error;
-                newError.lok = false;
-                setError(newError);
-              }}
-              placeholder="Pilih Lokasi"
-              detail
-              onDetail={() => setShowLok(true)}
-              label={"[name] - [code]"}
-              errorMessage="Lokasi Belum Dipilih"
-              error={error?.lok}
+              // error={error?.name}
             />
           </div>
 
@@ -626,48 +624,53 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
             <Divider className="mb-2 ml-3 mr-3"></Divider>
           </div>
 
-          {/* <div className="col-7"></div> */}
           <div className="col-3 text-black">
             <label className="text-black">Kode Formula</label>
-            <div className="p-inputgroup"></div>
-            <CustomDropdown
+            <PrimeDropdown
               value={plan.form_id !== null ? checkFm(plan.form_id) : null}
-              option={formula}
+              options={formula}
               onChange={(e) => {
-                e.product.forEach((element) => {
-                  element.def_qty = element.qty;
-                });
-                e.material.forEach((elem) => {
-                  elem.def_qty = elem.qty;
-                });
+                // e?.value?.product.forEach((element) => {
+                //   element.def_qty = element.qty;
+                // });
+                // e?.value?.material.forEach((elem) => {
+                //   elem.def_qty = elem.qty;
+                // });
 
-                if (plan.total) {
-                  e.product.forEach((element) => {
-                    element.qty = element.def_qty * plan.total;
-                  });
-                  e.material.forEach((elem) => {
-                    elem.qty = elem.def_qty * plan.total;
-                  });
-                }
+                // if (plan.total) {
+                //   e?.value?.product.forEach((element) => {
+                //     element.qty = element.def_qty * plan.total;
+                //   });
+                //   e?.value?.material.forEach((elem) => {
+                //     elem.total_use = elem.mat_use * plan.total;
+                //   });
+                // }
 
                 updatePL({
                   ...plan,
-                  form_id: e.id,
-                  product: e.product,
-                  material: e.material,
+                  form_id: e?.value?.id ?? null,
+                  product: e?.value?.id
+                    ? e?.value?.product?.map((v) => {
+                        return { ...v, qty_form: v.qty ?? 0, qty_making: null };
+                      })
+                    : null,
+                  material: e?.value?.id
+                    ? e?.value?.material?.map((v) => {
+                        return { ...v, mat_use: null, total_use: null };
+                      })
+                    : null,
                 });
                 let newError = error;
                 newError.fm = false;
                 setError(newError);
               }}
               placeholder="Pilih Kode Formula"
-              label={"[fcode]"}
+              optionLabel={"fcode"}
               errorMessage="Formula Belum Dipilih"
               error={error?.fm}
+              showClear
             />
           </div>
-
-          <div className="col-7"></div>
 
           <div className="col-3 text-black">
             <PrimeInput
@@ -678,6 +681,8 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
               disabled
             />
           </div>
+          <div className="col-6"></div>
+
           <div className="col-1 text-black">
             <PrimeNumber
               label={"Versi"}
@@ -691,7 +696,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
               disabled
             />
           </div>
-          <div className="col-1 text-black">
+          <div className="col-2 text-black">
             <PrimeNumber
               label={"Revisi"}
               value={plan.form_id !== null ? checkFm(plan.form_id)?.rev : ""}
@@ -704,21 +709,39 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-2 text-black">
-            <label className="text-label">Tanggal Revisi</label>
-            <div className="p-inputgroup">
-              <InputText
-                value={
-                  plan.form_id !== null
-                    ? formatDate(checkFm(plan.form_id)?.date_updated)
-                    : ""
-                }
-                placeholder="Tanggal Revisi"
-                dateFormat="dd-mm-yyyy"
-                disabled
-              />
-            </div>
+            <PrimeNumber
+              price
+              label={"Target Pembuatan"}
+              value={plan.total}
+              onChange={(e) => {
+                updatePL({
+                  ...plan,
+                  total: e.value,
+                  product: plan?.product?.map((v) => {
+                    return {
+                      ...v,
+                      qty_making: e.value * v.qty_form,
+                    };
+                  }),
+                  material: plan?.material?.map((v) => {
+                    return {
+                      ...v,
+                      total_use: e.value * v.mat_use,
+                    };
+                  }),
+                });
+                let newError = error;
+                newError.rp = false;
+                setError(newError);
+              }}
+              placeholder="0"
+              type="number"
+              min={0}
+              error={error?.rp}
+            />
           </div>
-          <div className="col-5 text-black">
+
+          <div className="col-7 text-black">
             <label className="text-label">Keterangan</label>
             <div className="p-inputgroup">
               <InputText
@@ -732,289 +755,537 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
           {/* <div className="col-7"></div> */}
         </Row>
 
-        {plan && plan.form_id !== null && (
+        {plan?.form_id ? (
           <>
-            <TabView
-              className="ml-2"
-              activeIndex={active}
-              onTabChange={(e) => setActive(e.index)}
-            >
-              <TabPanel header="Produk Jadi">
-                <Card>
-                  <Card.Body>
-                    <DataTable
-                      responsiveLayout="none"
-                      value={plan.product?.map((v, i) => {
-                        return {
-                          ...v,
-                          index: i,
-                          // order: v?.order ?? 0,
-                        };
-                      })}
-                      className="display w-150 datatable-wrapper header-white no-border"
-                      showGridlines={false}
-                      emptyMessage={() => <div></div>}
-                    >
-                      <Column
-                        header="Produk"
-                        className="align-text-top"
-                        field={""}
-                        style={{
-                          width: "25rem",
+            <CustomAccordion
+              tittle={"Sequence"}
+              defaultActive={true}
+              active={accor.sequence}
+              onClick={() => {
+                setAccor({
+                  ...accor,
+                  sequence: !accor.sequence,
+                });
+              }}
+              key={1}
+              body={
+                <DataTable
+                  responsiveLayout="none"
+                  value={plan.sequence?.map((v, i) => {
+                    return {
+                      ...v,
+                      index: i,
+                    };
+                  })}
+                  className="display w-150 datatable-wrapper header-white no-border"
+                  showGridlines={false}
+                  emptyMessage={() => <div></div>}
+                >
+                  <Column
+                    header="Tahap Ke"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      width: "10rem",
+                    }}
+                    body={(e) => (
+                      <PrimeNumber
+                        value={e.seq && e.seq}
+                        onChange={(t) => {
+                          let temp = [...plan.sequence];
+                          temp[e.index].seq = t.target.value;
+                          updatePL({ ...plan, sequence: temp });
                         }}
-                        body={(e) => (
-                          <div className="p-inputgroup">
-                            <InputText
-                              value={e.prod_id && checkProd(e.prod_id).name}
-                              placeholder="Nama Produk"
-                              disabled
-                            />
-                          </div>
-                        )}
+                        placeholder="0"
+                        type="number"
+                        min={0}
                       />
+                    )}
+                  />
 
-                      <Column
-                        header="Satuan"
-                        className="align-text-top"
-                        field={""}
-                        style={{
-                          width: "15rem",
+                  <Column
+                    header="Work Center"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      width: "20rem",
+                    }}
+                    body={(e) => (
+                      <CustomDropdown
+                        value={e.wc_id && checkWc(e.wc_id)}
+                        option={workCen}
+                        onChange={(t) => {
+                          let temp = [...plan.sequence];
+                          temp[e.index].wc_id = t?.id ?? null;
+                          temp[e.index].loc_id = t?.loc_id?.id ?? null;
+                          temp[e.index].mch_id = t?.machine_id?.id ?? null;
+                          temp[e.index].work_id = t?.work_type?.id ?? null;
+                          updatePL({ ...plan, sequence: temp });
+
+                          // let newError = error;
+                          // newError.msn[e.index].id = false;
+                          // setError(newError);
                         }}
-                        body={(e) => (
-                          <div className="p-inputgroup">
-                            <InputText
-                              value={e.unit_id && checkUnit(e.unit_id).name}
-                              placeholder="Satuan Produk"
-                              disabled
-                            />
-                          </div>
-                        )}
-                      />
-
-                      <Column
-                        header="Kuantitas"
-                        className="align-text-top"
-                        field={""}
-                        // style={{
-                        //   width: "5rem",
-                        // }}
-                        body={(e) => (
-                          <div className="p-inputgroup">
-                            <InputText
-                              value={e.qty && e.qty}
-                              placeholder="0"
-                              disabled
-                            />
-                          </div>
-                        )}
-                      />
-
-                      <Column
-                        header="Cost Alokasi (%)"
-                        className="align-text-top"
-                        field={""}
-                        // style={{
-                        //   minWidth: "7rem",
-                        // }}
-                        body={(e) => (
-                          <div className="p-inputgroup">
-                            <InputText
-                              value={e.aloc && e.aloc}
-                              placeholder="0"
-                              disabled
-                            />
-                          </div>
-                        )}
-                      />
-                    </DataTable>
-                  </Card.Body>
-                </Card>
-              </TabPanel>
-
-              <TabPanel header="Bahan">
-                <Card>
-                  <Card.Body>
-                    <DataTable
-                      responsiveLayout="none"
-                      value={plan.material?.map((v, i) => {
-                        return {
-                          ...v,
-                          index: i,
-                          // order: v?.order ?? 0,
-                          // price: v?.price ?? 0,
-                        };
-                      })}
-                      className="display w-150 datatable-wrapper header-white no-border"
-                      showGridlines={false}
-                      emptyMessage={() => <div></div>}
-                    >
-                      <Column
-                        header="Bahan"
-                        className="align-text-top"
-                        field={""}
-                        style={{
-                          width: "25rem",
+                        detail
+                        onDetail={() => {
+                          setCurrentIndex(e.index);
+                          setShowWorkCen(true);
                         }}
-                        body={(e) => (
-                          <div className="p-inputgroup">
-                            <InputText
-                              value={e.prod_id && checkProd(e.prod_id).name}
-                              placeholder="Nama Produk"
-                              disabled
-                            />
-                          </div>
-                        )}
+                        label={"[work_name] ([work_code])"}
+                        placeholder="Pilih Work Center"
+                        // errorMessage="Mesin Belum Dipilih"
+                        // error={error?.msn[e.index]?.id}
                       />
+                    )}
+                  />
 
-                      <Column
-                        header="Satuan"
-                        className="align-text-top"
-                        field={""}
-                        style={{
-                          width: "15rem",
+                  <Column
+                    header="Lokasi"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      width: "20rem",
+                    }}
+                    body={(e) => (
+                      <CustomDropdown
+                        value={e.loc_id && checkLoc(e.loc_id)}
+                        option={lokasi}
+                        onChange={(t) => {
+                          let temp = [...plan.sequence];
+                          temp[e.index].loc_id = t?.id ?? null;
+                          updatePL({ ...plan, sequence: temp });
+
+                          // let newError = error;
+                          // newError.msn[e.index].id = false;
+                          // setError(newError);
                         }}
-                        body={(e) => (
-                          <div className="p-inputgroup">
-                            <InputText
-                              value={e.unit_id && checkUnit(e.unit_id).name}
-                              placeholder="Satuan Produk"
-                              disabled
-                            />
-                          </div>
-                        )}
-                      />
-
-                      <Column
-                        header="Kuantitas"
-                        className="align-text-top"
-                        field={""}
-                        // style={{
-                        //   width: "5rem",
-                        // }}
-                        body={(e) => (
-                          <PrimeNumber
-                            value={e.qty ? e.qty : ""}
-                            placeholder="0"
-                            disabled
-                          />
-                        )}
-                      />
-
-                      <Column
-                        header="Harga"
-                        className="align-text-top"
-                        field={""}
-                        // style={{
-                        //   minWidth: "7rem",
-                        // }}
-                        body={(e) => (
-                          <PrimeNumber
-                            price
-                            value={e.price ? e.price : ""}
-                            placeholder="0"
-                            disabled
-                          />
-                        )}
-                      />
-                    </DataTable>
-                  </Card.Body>
-                </Card>
-              </TabPanel>
-
-              <TabPanel header="Mesin">
-                <Card>
-                  <Card.Body>
-                    <DataTable
-                      responsiveLayout="none"
-                      value={plan.mesin?.map((v, i) => {
-                        return {
-                          ...v,
-                          index: i,
-                          // order: v?.order ?? 0,
-                          // price: v?.price ?? 0,
-                        };
-                      })}
-                      className="display w-150 datatable-wrapper header-white no-border"
-                      showGridlines={false}
-                      emptyMessage={() => <div></div>}
-                    >
-                      <Column
-                        header="Kode Mesin"
-                        className="align-text-top"
-                        field={""}
-                        style={{
-                          width: "20rem",
+                        detail
+                        onDetail={() => {
+                          setCurrentIndex(e.index);
+                          setShowLok(true);
                         }}
-                        body={(e) => (
-                          <CustomDropdown
-                            value={e.mch_id && checkMsn(e.mch_id)}
-                            option={mesin}
-                            onChange={(t) => {
-                              let temp = [...plan.mesin];
-                              temp[e.index].mch_id = t.id;
-                              updatePL({ ...plan, mesin: temp });
-
-                              let newError = error;
-                              newError.msn[e.index].id = false;
-                              setError(newError);
-                            }}
-                            detail
-                            onDetail={() => {
-                              setCurrentIndex(e.index);
-                              setShowMsn(true);
-                            }}
-                            label={"[msn_name]"}
-                            placeholder="Pilih Mesin"
-                            errorMessage="Mesin Belum Dipilih"
-                            error={error?.msn[e.index]?.id}
-                          />
-                        )}
+                        label={"[name] ([code])"}
+                        placeholder="Pilih Mesin"
+                        // errorMessage="Mesin Belum Dipilih"
+                        // error={error?.msn[e.index]?.id}
                       />
+                    )}
+                  />
 
-                      <Column
-                        className="align-text-top"
-                        body={(e) =>
-                          e.index === plan.mesin.length - 1 ? (
-                            <Link
-                              onClick={() => {
-                                updatePL({
-                                  ...plan,
-                                  mesin: [
-                                    ...plan.mesin,
-                                    {
-                                      id: 0,
-                                      mch_id: null,
-                                    },
-                                  ],
-                                });
-                              }}
-                              className="btn btn-primary shadow btn-xs sharp ml-1"
-                            >
-                              <i className="fa fa-plus"></i>
-                            </Link>
-                          ) : (
-                            <Link
-                              onClick={() => {
-                                let temp = [...plan.mesin];
-                                temp.splice(e.index, 1);
-                                updatePL({
-                                  ...plan,
-                                  mesin: temp,
-                                });
-                              }}
-                              className="btn btn-danger shadow btn-xs sharp ml-1"
-                            >
-                              <i className="fa fa-trash"></i>
-                            </Link>
-                          )
-                        }
+                  <Column
+                    header="Mesin"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      width: "20rem",
+                    }}
+                    body={(e) => (
+                      <CustomDropdown
+                        value={e.mch_id && checkMsn(e.mch_id)}
+                        option={mesin}
+                        onChange={(t) => {
+                          let temp = [...plan.sequence];
+                          temp[e.index].mch_id = t?.id ?? null;
+                          updatePL({ ...plan, sequence: temp });
+
+                          let newError = error;
+                          newError.msn[e.index].id = false;
+                          setError(newError);
+                        }}
+                        detail
+                        onDetail={() => {
+                          setCurrentIndex(e.index);
+                          setShowMsn(true);
+                        }}
+                        label={"[msn_name] ([msn_code])"}
+                        placeholder="Pilih Mesin"
+                        errorMessage="Mesin Belum Dipilih"
+                        error={error?.msn[e.index]?.id}
                       />
-                    </DataTable>
-                  </Card.Body>
-                </Card>
-              </TabPanel>
-            </TabView>
+                    )}
+                  />
+
+                  <Column
+                    header="Jenis Pekerjaan"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      width: "20rem",
+                    }}
+                    body={(e) => (
+                      <CustomDropdown
+                        value={e.work_id && checkWork(e.work_id)}
+                        option={workType}
+                        onChange={(t) => {
+                          let temp = [...plan.sequence];
+                          temp[e.index].work_id = t?.id ?? null;
+                          updatePL({ ...plan, sequence: temp });
+
+                          // let newError = error;
+                          // newError.msn[e.index].id = false;
+                          // setError(newError);
+                        }}
+                        detail
+                        onDetail={() => {
+                          setCurrentIndex(e.index);
+                          setShowType(true);
+                        }}
+                        label={"[work_name] ([work_type])"}
+                        placeholder="Pilih Pekerjaan"
+                        // errorMessage="Mesin Belum Dipilih"
+                        // error={error?.msn[e.index]?.id}
+                      />
+                    )}
+                  />
+
+                  <Column
+                    header="Tanggal"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "15rem",
+                    }}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <Calendar
+                          value={new Date(`${e.date}Z`)}
+                          onChange={(t) => {
+                            let temp = [...plan.sequence];
+                            temp[e.index].date = t?.value ?? null;
+                            updatePL({ ...plan, sequence: temp });
+                          }}
+                          placeholder="Pilih Tanggal"
+                          dateFormat="dd-mm-yy"
+                          showIcon
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header="Waktu"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      width: "13rem",
+                    }}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <Calendar
+                          value={e.time && e.time}
+                          onChange={(t) => {
+                            let temp = [...plan.sequence];
+                            temp[e.index].time = t?.value ?? null;
+                            updatePL({ ...plan, sequence: temp });
+                          }}
+                          placeholder="Pilih Waktu"
+                          timeOnly
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    className="align-text-top"
+                    body={(e) =>
+                      e.index === plan.sequence.length - 1 ? (
+                        <Link
+                          onClick={() => {
+                            updatePL({
+                              ...plan,
+                              sequence: [
+                                ...plan.sequence,
+                                {
+                                  id: 0,
+                                  seq: null,
+                                  wc_id: null,
+                                  loc_id: null,
+                                  mch_id: null,
+                                  work_id: null,
+                                  date: null,
+                                  time: null,
+                                },
+                              ],
+                            });
+                          }}
+                          className="btn btn-primary shadow btn-xs sharp ml-1"
+                        >
+                          <i className="fa fa-plus"></i>
+                        </Link>
+                      ) : (
+                        <Link
+                          onClick={() => {
+                            let temp = [...plan.sequence];
+                            temp.splice(e.index, 1);
+                            updatePL({
+                              ...plan,
+                              sequence: temp,
+                            });
+                          }}
+                          className="btn btn-danger shadow btn-xs sharp ml-1"
+                        >
+                          <i className="fa fa-trash"></i>
+                        </Link>
+                      )
+                    }
+                  />
+                </DataTable>
+              }
+            />
+
+            <CustomAccordion
+              tittle={"Produk Jadi"}
+              defaultActive={true}
+              active={accor.produk}
+              onClick={() => {
+                setAccor({
+                  ...accor,
+                  produk: !accor.produk,
+                });
+              }}
+              key={1}
+              body={
+                <DataTable
+                  responsiveLayout="none"
+                  value={plan.product?.map((v, i) => {
+                    return {
+                      ...v,
+                      index: i,
+                      // order: v?.order ?? 0,
+                    };
+                  })}
+                  className="display w-150 datatable-wrapper header-white no-border"
+                  showGridlines={false}
+                  emptyMessage={() => <div></div>}
+                >
+                  <Column
+                    header="Produk"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      width: "25rem",
+                    }}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={
+                            e.prod_id
+                              ? `${checkProd(e.prod_id).name} (${
+                                  checkProd(e.prod_id).code
+                                })`
+                              : null
+                          }
+                          placeholder="Nama Produk"
+                          disabled
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header="Satuan"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      width: "15rem",
+                    }}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.unit_id && checkUnit(e.unit_id).name}
+                          placeholder="Satuan Produk"
+                          disabled
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header="Kuantitas Formula"
+                    className="align-text-top"
+                    field={""}
+                    // style={{
+                    //   width: "5rem",
+                    // }}
+                    body={(e) => (
+                      <PrimeNumber
+                        price
+                        value={e.qty_form && e.qty_form}
+                        placeholder="0"
+                        disabled
+                      />
+                    )}
+                  />
+
+                  <Column
+                    header="Kuantitas Pembuatan"
+                    className="align-text-top"
+                    field={""}
+                    // style={{
+                    //   width: "5rem",
+                    // }}
+                    body={(e) => (
+                      <PrimeNumber
+                        price
+                        value={e.qty_making && e.qty_making}
+                        placeholder="0"
+                        disabled
+                      />
+                    )}
+                  />
+
+                  <Column
+                    header="Cost Alokasi (%)"
+                    className="align-text-top"
+                    field={""}
+                    // style={{
+                    //   minWidth: "7rem",
+                    // }}
+                    body={(e) => (
+                      <PrimeNumber
+                        price
+                        value={e.aloc && e.aloc}
+                        placeholder="0"
+                        disabled
+                      />
+                    )}
+                  />
+                </DataTable>
+              }
+            />
+
+            <CustomAccordion
+              tittle={"Bahan"}
+              defaultActive={true}
+              active={accor.material}
+              onClick={() => {
+                setAccor({
+                  ...accor,
+                  material: !accor.material,
+                });
+              }}
+              key={1}
+              body={
+                <DataTable
+                  responsiveLayout="none"
+                  value={plan.material?.map((v, i) => {
+                    return {
+                      ...v,
+                      index: i,
+                    };
+                  })}
+                  className="display w-150 datatable-wrapper header-white no-border"
+                  showGridlines={false}
+                  emptyMessage={() => <div></div>}
+                >
+                  <Column
+                    header="Bahan"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      width: "25rem",
+                    }}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={
+                            e.prod_id
+                              ? `${checkProd(e.prod_id).name} (${
+                                  checkProd(e.prod_id).code
+                                })`
+                              : null
+                          }
+                          placeholder="Nama Produk"
+                          disabled
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header="Satuan"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      width: "15rem",
+                    }}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.unit_id && checkUnit(e.unit_id).name}
+                          placeholder="Satuan Produk"
+                          disabled
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header="Kuantitas"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      width: "10rem",
+                    }}
+                    body={(e) => (
+                      <PrimeNumber
+                        price
+                        value={e.qty ? e.qty : ""}
+                        placeholder="0"
+                        disabled
+                      />
+                    )}
+                  />
+
+                  <Column
+                    header="Kebutuhan Material"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      Width: "10rem",
+                    }}
+                    body={(e) => (
+                      <PrimeNumber
+                        price
+                        value={e.mat_use && e.mat_use}
+                        onChange={(u) => {
+                          let temp = [...plan.material];
+                          temp[e.index].mat_use = u.value;
+                          temp[e.index].total_use = u.value * plan.total;
+                          updatePL({ ...plan, material: temp });
+                        }}
+                        placeholder="0"
+                      />
+                    )}
+                  />
+
+                  <Column
+                    header="Total"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      Width: "10rem",
+                    }}
+                    body={(e) => (
+                      <PrimeNumber
+                        price
+                        value={e.total_use && e.total_use}
+                        onChange={(u) => {
+                          let temp = [...plan.material];
+                          temp[e.index].total_use = u.value;
+                          temp[e.index].mat_use = u.value / plan.total;
+                          updatePL({ ...plan, material: temp });
+                        }}
+                        placeholder="0"
+                      />
+                    )}
+                  />
+                </DataTable>
+              }
+            />
           </>
+        ) : (
+          <></>
         )}
       </>
     );
@@ -1076,36 +1347,6 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
           </>
         </Col>
       </Row>
-
-      <DataMesin
-        data={mesin}
-        loading={false}
-        popUp={true}
-        show={showMsn}
-        onHide={() => {
-          setShowMsn(false);
-        }}
-        onInput={(e) => {
-          setShowMsn(!e);
-        }}
-        onSuccessInput={(e) => {
-          getMesin();
-        }}
-        onRowSelect={(e) => {
-          if (doubleClick) {
-            setShowMsn(false);
-            let temp = [...plan.mesin];
-            temp[currentIndex].mch_id = e.data.id;
-            updatePL({ ...plan, mesin: temp });
-          }
-
-          setDoubleClick(true);
-
-          setTimeout(() => {
-            setDoubleClick(false);
-          }, 2000);
-        }}
-      />
 
       <DataProduk
         data={product}
@@ -1223,6 +1464,99 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
         }}
       />
 
+      <DataWorkCenter
+        data={workCen}
+        loading={false}
+        popUp={true}
+        show={showWorkCen}
+        onHide={() => {
+          setShowWorkCen(false);
+        }}
+        onInput={(e) => {
+          setShowWorkCen(!e);
+        }}
+        onSuccessInput={(e) => {
+          getWorkCen();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowWorkCen(false);
+            let temp = [...plan.sequence];
+            temp[currentIndex].wc_id = e?.data?.id ?? null;
+            temp[currentIndex].loc_id = e?.data?.loc_id?.id ?? null;
+            temp[currentIndex].mch_id = e?.data?.machine_id?.id ?? null;
+            temp[currentIndex].work_id = e?.data?.work_type?.id ?? null;
+            updatePL({ ...plan, sequence: temp });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataJeniskerja
+        data={workType}
+        loading={false}
+        popUp={true}
+        show={showType}
+        onHide={() => {
+          setShowType(false);
+        }}
+        onInput={(e) => {
+          setShowType(!e);
+        }}
+        onSuccessInput={(e) => {
+          getWorkType();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowType(false);
+            let temp = [...plan.sequence];
+            temp[currentIndex].work_id = e?.data?.id ?? null;
+            updatePL({ ...plan, sequence: temp });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataMesin
+        data={mesin}
+        loading={false}
+        popUp={true}
+        show={showMsn}
+        onHide={() => {
+          setShowMsn(false);
+        }}
+        onInput={(e) => {
+          setShowMsn(!e);
+        }}
+        onSuccessInput={(e) => {
+          getMesin();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowMsn(false);
+            let temp = [...plan.sequence];
+            temp[currentIndex].mch_id = e?.data?.id ?? null;
+            updatePL({ ...plan, sequence: temp });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
       <DataLokasi
         data={lokasi}
         loading={false}
@@ -1240,10 +1574,9 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowLok(false);
-            updatePL({
-              ...plan,
-              loc_id: e.data.id,
-            });
+            let temp = [...plan.sequence];
+            temp[currentIndex].loc_id = e?.data?.id ?? null;
+            updatePL({ ...plan, sequence: temp });
           }
 
           setDoubleClick(true);

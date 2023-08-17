@@ -21,11 +21,14 @@ const data = {
   id: null,
   pcode: null,
   pname: null,
+  version: null,
   form_id: null,
   desc: null,
   total: null,
   unit: null,
-  mesin: [],
+  product: [],
+  material: [],
+  sequence: [],
 };
 
 const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
@@ -39,6 +42,7 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
   const dispatch = useDispatch();
+  const profile = useSelector((state) => state.profile.profile);
   const plan = useSelector((state) => state.plan.plan);
   const show = useSelector((state) => state.plan.current);
   const printPage = useRef(null);
@@ -77,7 +81,7 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
   };
 
   const delPL = async (id) => {
-    setLoading(true)
+    setLoading(true);
     const config = {
       ...endpoints.delPlan,
       endpoint: endpoints.delPlan.endpoint + currentItem.id,
@@ -181,37 +185,54 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
               el.prod_id = el.prod_id?.id;
               el.unit_id = el.unit_id?.id;
               el.def_qty = el.qty;
-              el.qty = el.qty * Number(data.total)
+              el.qty = el.qty * Number(data.total);
             });
             let material = data.material;
             material.forEach((el) => {
               el.prod_id = el.prod_id.id;
               el.unit_id = el.unit_id.id;
               el.def_qty = el.qty;
-              el.qty = el.qty * Number(data.total)
+              el.qty = el.qty * Number(data.total);
             });
-            let mesin = data.mesin;
-            mesin.forEach((el) => {
-              el.mch_id = el.mch_id.id;
+            let sequence = data.sequence;
+            sequence.forEach((el) => {
+              el.wc_id = el.wc_id.id ?? null;
+              el.loc_id = el.loc_id.id ?? null;
+              el.mch_id = el.mch_id.id ?? null;
+              el.work_id = el.work_id.id ?? null;
             });
             dispatch({
               type: SET_CURRENT_PL,
               payload: {
                 ...data,
-                dep_id : data?.dep_id?.id ?? null,
-                loc_id : data?.loc_id?.id ?? null,
+                dep_id: data?.dep_id?.id ?? null,
                 form_id: data?.form_id?.id ?? null,
-                unit: data?.unit?.id ?? null,
+                sequence:
+                  sequence.length > 0
+                    ? sequence
+                    : [
+                        {
+                          id: 0,
+                          seq: null,
+                          wc_id: null,
+                          loc_id: null,
+                          mch_id: null,
+                          work_id: null,
+                          date: null,
+                          time: null,
+                        },
+                      ],
                 product:
                   product.length > 0
                     ? product
                     : [
                         {
                           id: 0,
-                          form_id: null,
+                          pl_id: null,
                           prod_id: null,
                           unit_id: null,
-                          qty: null,
+                          qty_form: null,
+                          qty_making: null,
                           aloc: null,
                         },
                       ],
@@ -221,21 +242,12 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
                     : [
                         {
                           id: 0,
-                          form_id: null,
+                          pl_id: null,
                           prod_id: null,
                           unit_id: null,
                           qty: null,
-                          price: null,
-                        },
-                      ],
-                mesin:
-                  mesin.length > 0
-                    ? mesin
-                    : [
-                        {
-                          id: 0,
-                          pl_id: null,
-                          mch_id: null,
+                          mat_use: null,
+                          total_use: null,
                         },
                       ],
               },
@@ -321,32 +333,22 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
               type: SET_CURRENT_PL,
               payload: {
                 ...data,
-                mesin: [
+                dep_id: profile?.previlage?.dep_id ?? null,
+                version: 1,
+                sequence: [
                   {
                     id: 0,
+                    seq: null,
+                    wc_id: null,
+                    loc_id: null,
                     mch_id: null,
+                    work_id: null,
+                    date: null,
+                    time: null,
                   },
                 ],
-                product: [
-                  {
-                    id: 0,
-                    form_id: null,
-                    prod_id: null,
-                    unit_id: null,
-                    qty: null,
-                    aloc: null,
-                  },
-                ],
-                material: [
-                  {
-                    id: 0,
-                    form_id: null,
-                    prod_id: null,
-                    unit_id: null,
-                    qty: null,
-                    price: null,
-                  },
-                ],
+                product: [],
+                material: [],
               },
             });
           }}
@@ -468,7 +470,15 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
             paginatorClassName="justify-content-end mt-3"
           >
             <Column
-              header="Kode Planning"
+              header="Tanggal"
+              style={{
+                minWidth: "8rem",
+              }}
+              field={(e) => formatDate(e.date_created)}
+              body={loading && <Skeleton />}
+            />
+            <Column
+              header="Kode Routing"
               style={{
                 minWidth: "8rem",
               }}
@@ -476,15 +486,15 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
               body={loading && <Skeleton />}
             />
             <Column
-              header="Nama Planning"
+              header="Nama Routing"
               field={(e) => e.pname}
               style={{ minWidth: "10rem" }}
               body={loading && <Skeleton />}
             />
             <Column
-              header="Rencana Tgl Planning"
-              field={(e) => formatDate(e.date_planing)}
-              style={{ minWidth: "12rem" }}
+              header="Versi Routing"
+              field={(e) => e.version}
+              style={{ minWidth: "8rem" }}
               body={loading && <Skeleton />}
             />
             <Column

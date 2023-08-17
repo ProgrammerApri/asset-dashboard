@@ -15,10 +15,11 @@ const PrimeCalendar = ({
   minDate,
   maxDate,
   view,
+  timeOnly,
 }) => {
   return (
     <div>
-      <label className="text-label">{label}</label>
+      {<label className="text-label">{label}</label>}
       <div className="p-inputgroup">
         <Calendar
           value={value}
@@ -32,6 +33,7 @@ const PrimeCalendar = ({
           minDate={minDate}
           maxDate={maxDate}
           view={view}
+          timeOnly={timeOnly}
         />
       </div>
       {error && (

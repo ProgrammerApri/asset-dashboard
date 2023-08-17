@@ -50,8 +50,6 @@ const defError = {
   type: false,
   sdm: false,
   work_est: false,
-  ovh_est: false,
-  biaya_est: false,
 };
 
 const DataWorkCenter = ({
@@ -352,6 +350,7 @@ const DataWorkCenter = ({
           label="Hapus"
           icon="pi pi-trash"
           onClick={() => {
+            setUpdate(true);
             delFM();
           }}
           autoFocus
@@ -415,8 +414,6 @@ const DataWorkCenter = ({
       type: !work.work_type,
       sdm: !work.work_sdm || work.work_sdm === "",
       work_est: !work.work_estimasi || work.work_estimasi === "",
-      ovh_est: !work.ovh_estimasi || work.ovh_estimasi === "",
-      biaya_est: !work.biaya_estimasi || work.biaya_estimasi === "",
     };
 
     let total_work = 0;
@@ -443,9 +440,7 @@ const DataWorkCenter = ({
       !errors.mesin &&
       !errors.loc &&
       !errors.sdm &&
-      !errors.work_est &&
-      !errors.ovh_est &&
-      !errors.biaya_est;
+      !errors.work_est;
 
     return valid;
   };
@@ -948,12 +943,8 @@ const DataWorkCenter = ({
                 onChange={(u) => {
                   updateWc({ ...work, ovh_estimasi: u?.value ?? null });
 
-                  let newError = error;
-                  newError.ovh_est = false;
-                  setError(newError);
                 }}
                 placeholder="0"
-                error={error?.ovh_est}
               />
             </div>
             <div className="col-3 text-black">
@@ -964,12 +955,8 @@ const DataWorkCenter = ({
                 onChange={(u) => {
                   updateWc({ ...work, biaya_estimasi: u?.value ?? null });
 
-                  let newError = error;
-                  newError.biaya_est = false;
-                  setError(newError);
                 }}
                 placeholder="0"
-                error={error?.biaya_est}
               />
             </div>
           </Row>

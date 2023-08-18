@@ -28,6 +28,7 @@ const data = {
   rev: null,
   desc: null,
   active: null,
+  all_total: null,
   product: [],
   material: [],
   req_form: [],

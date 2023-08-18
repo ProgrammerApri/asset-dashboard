@@ -390,6 +390,15 @@ const InputFormula = ({ onCancel, onSuccess }) => {
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
 
+  const getTotalPrice = () => {
+    let total = 0;
+    forml?.material?.forEach((el) => {
+      total += el.total;
+    });
+
+    return total;
+  };
+
   const body = () => {
     return (
       <>
@@ -654,11 +663,11 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                         onChange={(u) => {
                           // looping satuan
                           let sat = [];
-                          satuan.forEach((element) => {
-                            if (element.id === u.unit.id) {
+                          satuan?.forEach((element) => {
+                            if (element?.id === u?.unit?.id) {
                               sat.push(element);
                             } else {
-                              if (element.u_from?.id === u.unit.id) {
+                              if (element?.u_from?.id === u?.unit?.id) {
                                 sat.push(element);
                               }
                             }
@@ -666,8 +675,8 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                           // setSatuan(sat);
 
                           let temp = [...forml.product];
-                          temp[e.index].prod_id = u.id;
-                          temp[e.index].unit_id = u.unit?.id;
+                          temp[e.index].prod_id = u?.id;
+                          temp[e.index].unit_id = u?.unit?.id;
                           updateFM({ ...forml, product: temp });
 
                           let newError = error;
@@ -974,8 +983,13 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                         onChange={(u) => {
                           let temp = [...forml.material];
                           temp[e.index].price = u.value;
-                          temp[e.index].total = u.value * temp[e.index].konv_qty;
-                          updateFM({ ...forml, material: temp });
+                          temp[e.index].total =
+                            u.value * temp[e.index].konv_qty;
+                          updateFM({
+                            ...forml,
+                            material: temp,
+                            all_total: getTotalPrice(),
+                          });
 
                           // let newError = error;
                           // newError.mtrl[e.index].prc = false;
@@ -1003,9 +1017,9 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                         onChange={(u) => {
                           let temp = [...forml.material];
                           temp[e.index].total = u.value;
-                          temp[e.index].price = u.value / temp[e.index].konv_qty;
+                          temp[e.index].price =
+                            u.value / temp[e.index].konv_qty;
                           updateFM({ ...forml, material: temp });
-
                         }}
                         placeholder="0"
                         min={0}
@@ -1066,6 +1080,26 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                     }
                   />
                 </DataTable>
+
+                <div className="col-12 mt-5 d-flex justify-content-end">
+                  <div className="col-2 mt-3">
+                    <label className="text-label text-right">
+                      <b>Total Harga</b>
+                    </label>
+                  </div>
+                  <div className="col-2 mr-7">
+                    <PrimeNumber
+                      price
+                      value={forml.all_total && forml.all_total}
+                      onChange={(u) => {}}
+                      placeholder="0"
+                      min={0}
+                      // error={error?.mtrl[e.index]?.prc}
+                      // disabled
+                    />
+                  </div>
+                </div>
+                {/* <div className="col-1 d-flex justify-content-end"></div> */}
               </Card.Body>
             </Card>
           </TabPanel>

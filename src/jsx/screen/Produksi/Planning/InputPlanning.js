@@ -944,14 +944,18 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                     body={(e) => (
                       <div className="p-inputgroup">
                         <Calendar
-                          value={new Date(`${e.date}Z`)}
+                          value={e.date}
                           onChange={(t) => {
+                            console.log("time");
+                            console.log(t.value);
                             let temp = [...plan.sequence];
                             temp[e.index].date = t?.value ?? null;
                             updatePL({ ...plan, sequence: temp });
                           }}
                           placeholder="Pilih Tanggal"
                           dateFormat="dd-mm-yy"
+                          showTime
+                          hourFormat="12"
                           showIcon
                         />
                       </div>
@@ -959,19 +963,18 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
+                    hidden
                     header="Waktu"
                     className="align-text-top"
                     field={""}
                     style={{
-                      width: "13rem",
+                      width: "15rem",
                     }}
                     body={(e) => (
                       <div className="p-inputgroup">
                         <Calendar
                           value={e.time && e.time}
                           onChange={(t) => {
-                            console.log("time");
-                            console.log(t.value?.getHours());
                             let temp = [...plan.sequence];
                             temp[e.index].time =
                               `${t?.value?.getHours()}:${t?.value?.getMinutes()}` ??
@@ -1066,19 +1069,41 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                       width: "25rem",
                     }}
                     body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={
-                            e.prod_id
-                              ? `${checkProd(e.prod_id).name} (${
-                                  checkProd(e.prod_id).code
-                                })`
-                              : null
-                          }
-                          placeholder="Nama Produk"
-                          disabled
-                        />
-                      </div>
+                      <CustomDropdown
+                        value={e.prod_id && checkProd(e.prod_id)}
+                        option={product}
+                        onChange={(u) => {
+                          // looping satuan
+                          let sat = [];
+                          satuan.forEach((element) => {
+                            if (element?.id === u?.unit?.id) {
+                              sat.push(element);
+                            } else {
+                              if (element?.u_from?.id === u?.unit?.id) {
+                                sat.push(element);
+                              }
+                            }
+                          });
+
+                          let temp = [...plan.product];
+                          temp[e.index].prod_id = u?.id;
+                          temp[e.index].unit_id = u.unit?.id;
+                          updatePL({ ...plan, product: temp });
+
+                          // let newError = error;
+                          // newError.mtrl[e.index].id = false;
+                          // setError(newError);
+                        }}
+                        detail
+                        onDetail={() => {
+                          setCurrentIndex(e.index);
+                          setShowProd(true);
+                        }}
+                        label={"[name] ([code])"}
+                        placeholder="Pilih Produk"
+                        // errorMessage="Bahan Belum Dipilih"
+                        // error={error?.mtrl[e.index]?.id}
+                      />
                     )}
                   />
 
@@ -1090,13 +1115,22 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                       width: "15rem",
                     }}
                     body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.unit_id && checkUnit(e.unit_id).name}
-                          placeholder="Satuan Produk"
-                          disabled
-                        />
-                      </div>
+                      <CustomDropdown
+                        value={e.unit_id && checkUnit(e.unit_id)}
+                        onChange={(u) => {
+                          let temp = [...plan.product];
+                          temp[e.index].unit_id = u?.id;
+                          updatePL({ ...plan, product: temp });
+                        }}
+                        option={satuan}
+                        detail
+                        onDetail={() => {
+                          setCurrentIndex(e.index);
+                          setShowSatuan(true);
+                        }}
+                        label={"[name] ([code])"}
+                        placeholder="Pilih Satuan"
+                      />
                     )}
                   />
 
@@ -1111,6 +1145,12 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                       <PrimeNumber
                         price
                         value={e.qty_form && e.qty_form}
+                        onChange={(t) => {
+                          let temp = [...plan.product];
+                          temp[e.index].qty_form = t?.value ?? null;
+                          temp[e.index].qty_making = t?.value * plan.total;
+                          updatePL({ ...plan, product: temp });
+                        }}
                         placeholder="0"
                         disabled
                       />
@@ -1145,10 +1185,58 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                       <PrimeNumber
                         price
                         value={e.aloc && e.aloc}
+                        onChange={(t) => {
+                          let temp = [...plan.product];
+                          temp[e.index].aloc = t?.value ?? null;
+                          updatePL({ ...plan, product: temp });
+                        }}
                         placeholder="0"
-                        disabled
+                        // disabled
                       />
                     )}
+                  />
+
+                  <Column
+                    className="align-text-top"
+                    body={(e) =>
+                      e.index === plan.product.length - 1 ? (
+                        <Link
+                          onClick={() => {
+                            updatePL({
+                              ...plan,
+                              product: [
+                                ...plan.product,
+                                {
+                                  id: 0,
+                                  prod_id: null,
+                                  unit_id: null,
+                                  qty_form: null,
+                                  qty_making: null,
+                                  aloc: null,
+                                },
+                              ],
+                            });
+                          }}
+                          className="btn btn-primary shadow btn-xs sharp ml-1"
+                        >
+                          <i className="fa fa-plus"></i>
+                        </Link>
+                      ) : (
+                        <Link
+                          onClick={() => {
+                            let temp = [...plan.product];
+                            temp.splice(e.index, 1);
+                            updatePL({
+                              ...plan,
+                              product: temp,
+                            });
+                          }}
+                          className="btn btn-danger shadow btn-xs sharp ml-1"
+                        >
+                          <i className="fa fa-trash"></i>
+                        </Link>
+                      )
+                    }
                   />
                 </DataTable>
               }
@@ -1186,19 +1274,41 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                       width: "25rem",
                     }}
                     body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={
-                            e.prod_id
-                              ? `${checkProd(e.prod_id).name} (${
-                                  checkProd(e.prod_id).code
-                                })`
-                              : null
-                          }
-                          placeholder="Nama Produk"
-                          disabled
-                        />
-                      </div>
+                      <CustomDropdown
+                        value={e.prod_id && checkProd(e.prod_id)}
+                        option={product}
+                        onChange={(u) => {
+                          // looping satuan
+                          let sat = [];
+                          satuan.forEach((element) => {
+                            if (element?.id === u?.unit?.id) {
+                              sat.push(element);
+                            } else {
+                              if (element?.u_from?.id === u?.unit?.id) {
+                                sat.push(element);
+                              }
+                            }
+                          });
+
+                          let temp = [...plan.product];
+                          temp[e.index].prod_id = u?.id;
+                          temp[e.index].unit_id = u.unit?.id;
+                          updatePL({ ...plan, product: temp });
+
+                          // let newError = error;
+                          // newError.mtrl[e.index].id = false;
+                          // setError(newError);
+                        }}
+                        detail
+                        onDetail={() => {
+                          setCurrentIndex(e.index);
+                          setShowProd(true);
+                        }}
+                        label={"[name] ([code])"}
+                        placeholder="Pilih Produk"
+                        // errorMessage="Bahan Belum Dipilih"
+                        // error={error?.mtrl[e.index]?.id}
+                      />
                     )}
                   />
 
@@ -1210,13 +1320,22 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                       width: "15rem",
                     }}
                     body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={e.unit_id && checkUnit(e.unit_id).name}
-                          placeholder="Satuan Produk"
-                          disabled
-                        />
-                      </div>
+                      <CustomDropdown
+                        value={e.unit_id && checkUnit(e.unit_id)}
+                        onChange={(u) => {
+                          let temp = [...plan.material];
+                          temp[e.index].unit_id = u?.id;
+                          updatePL({ ...plan, material: temp });
+                        }}
+                        option={satuan}
+                        detail
+                        onDetail={() => {
+                          setCurrentIndex(e.index);
+                          setShowSatuan(true);
+                        }}
+                        label={"[name] ([code])"}
+                        placeholder="Pilih Satuan"
+                      />
                     )}
                   />
 
@@ -1282,6 +1401,49 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                         placeholder="0"
                       />
                     )}
+                  />
+
+                  <Column
+                    className="align-text-top"
+                    body={(e) =>
+                      e.index === plan.material.length - 1 ? (
+                        <Link
+                          onClick={() => {
+                            updatePL({
+                              ...plan,
+                              material: [
+                                ...plan.material,
+                                {
+                                  id: 0,
+                                  prod_id: null,
+                                  unit_id: null,
+                                  qty: null,
+                                  mat_use: null,
+                                  total_use: null,
+                                },
+                              ],
+                            });
+                          }}
+                          className="btn btn-primary shadow btn-xs sharp ml-1"
+                        >
+                          <i className="fa fa-plus"></i>
+                        </Link>
+                      ) : (
+                        <Link
+                          onClick={() => {
+                            let temp = [...plan.material];
+                            temp.splice(e.index, 1);
+                            updatePL({
+                              ...plan,
+                              material: temp,
+                            });
+                          }}
+                          className="btn btn-danger shadow btn-xs sharp ml-1"
+                        >
+                          <i className="fa fa-trash"></i>
+                        </Link>
+                      )
+                    }
                   />
                 </DataTable>
               }

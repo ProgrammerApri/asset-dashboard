@@ -105,22 +105,9 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
         const { data } = response;
         let filt = [];
         data.forEach((elem) => {
-          let prod = [];
-          elem.product.forEach((el) => {
-            el.prod_id = el.prod_id.id;
-            el.unit_id = el.unit_id.id;
-            prod.push(el);
-          });
-          elem.product = prod;
-
-          let mtrl = [];
-          elem.material.forEach((element) => {
-            element.prod_id = element.prod_id.id;
-            element.unit_id = element.unit_id.id;
-            mtrl.push(element);
-          });
-          elem.material = mtrl;
-          filt.push(elem);
+          if (elem?.active) {
+            filt.push(elem);
+          }
         });
         setFormula(filt);
       }
@@ -273,7 +260,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
   const addPL = async () => {
     const config = {
       ...endpoints.addPlan,
-      data: { ...plan, date_planing: currentDate(plan.date_planing) },
+      data: plan,
     };
     console.log(config.data);
     let response = null;
@@ -399,15 +386,15 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
   };
 
   const onSubmit = () => {
-    if (isValid()) {
-      if (isEdit) {
-        setUpdate(true);
-        editPL();
-      } else {
-        setUpdate(true);
-        addPL();
-      }
+    // if (isValid()) {
+    if (isEdit) {
+      setUpdate(true);
+      editPL();
+    } else {
+      setUpdate(true);
+      addPL();
     }
+    // }
   };
 
   const formatDate = (date) => {
@@ -433,7 +420,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
       now?.getSeconds(),
       now?.getMilliseconds()
     );
-    return newDate.toISOString();
+    return newDate?.toISOString();
   };
 
   const updatePL = (e) => {
@@ -449,18 +436,15 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
     let errors = {
       code: !plan.pcode || plan.pcode === "",
       name: !plan.pname || plan.pname === "",
-      date: !plan.date_planing || plan.date_planing === "",
       rp: !plan.total || plan.total === "",
       dep: !plan.dep_id,
-      lok: !plan.loc_id,
       fm: !plan.form_id,
-      un: !plan.unit,
       msn: [],
     };
 
-    plan?.mesin.forEach((element, i) => {
+    plan?.sequence.forEach((element, i) => {
       if (i > 0) {
-        if (element.mch_id) {
+        if (element.seq) {
           errors.msn[i] = {
             id: !element.mch_id,
           };
@@ -498,10 +482,8 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
       !errors.name &&
       !errors.date &&
       !errors.dep &&
-      !errors.lok &&
       !errors.fm &&
       !errors.rp &&
-      !errors.un &&
       validMesin;
 
     setError(errors);
@@ -568,7 +550,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
           <div className="col-2 text-black">
             <PrimeCalendar
               label={"Tanggal"}
-              value={date}
+              value={new Date(`${plan.date_created}Z`)}
               onChange={(e) => {
                 updatePL({ ...plan, date_created: e.target.value });
               }}
@@ -577,9 +559,9 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
               // disabled
             />
           </div>
-          <div className="col-4"></div>
+          {/* <div className="col-4"></div> */}
 
-          <div className="col-3">
+          <div className="col-3" hidden>
             <label className="text-black">Departement</label>
             <div className="p-inputgroup"></div>
             <CustomDropdown
@@ -651,12 +633,25 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                   form_id: e?.value?.id ?? null,
                   product: e?.value?.id
                     ? e?.value?.product?.map((v) => {
-                        return { ...v, qty_form: v.qty ?? 0, qty_making: null };
+                        return {
+                          ...v,
+                          prod_id: v?.prod_id?.id,
+                          unit_id: v?.unit_id?.id,
+                          qty_form: v.qty ?? 0,
+                          qty_making: null,
+                        };
                       })
                     : null,
                   material: e?.value?.id
                     ? e?.value?.material?.map((v) => {
-                        return { ...v, mat_use: null, total_use: null };
+                        return {
+                          ...v,
+                          prod_id: v?.prod_id?.id,
+                          unit_id: v?.unit_id?.id,
+                          qty: v?.qty ?? 0,
+                          mat_use: null,
+                          total_use: null,
+                        };
                       })
                     : null,
                 });
@@ -726,7 +721,8 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                   material: plan?.material?.map((v) => {
                     return {
                       ...v,
-                      total_use: e.value * v.mat_use,
+                      total_use:
+                        v.mat_use > 0 ? e.value * v.mat_use : e.value * v.qty,
                     };
                   }),
                 });
@@ -782,7 +778,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                   emptyMessage={() => <div></div>}
                 >
                   <Column
-                    header="Tahap Ke"
+                    header="Proses Ke"
                     className="align-text-top"
                     field={""}
                     style={{
@@ -793,7 +789,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                         value={e.seq && e.seq}
                         onChange={(t) => {
                           let temp = [...plan.sequence];
-                          temp[e.index].seq = t.target.value;
+                          temp[e.index].seq = Number(t.target.value);
                           updatePL({ ...plan, sequence: temp });
                         }}
                         placeholder="0"
@@ -974,8 +970,12 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                         <Calendar
                           value={e.time && e.time}
                           onChange={(t) => {
+                            console.log("time");
+                            console.log(t.value?.getHours());
                             let temp = [...plan.sequence];
-                            temp[e.index].time = t?.value ?? null;
+                            temp[e.index].time =
+                              `${t?.value?.getHours()}:${t?.value?.getMinutes()}` ??
+                              null;
                             updatePL({ ...plan, sequence: temp });
                           }}
                           placeholder="Pilih Waktu"
@@ -1251,7 +1251,10 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                         onChange={(u) => {
                           let temp = [...plan.material];
                           temp[e.index].mat_use = u.value;
-                          temp[e.index].total_use = u.value * plan.total;
+                          temp[e.index].total_use =
+                            u.value > 0
+                              ? u.value * plan.total
+                              : temp[e.index].qty * plan.total;
                           updatePL({ ...plan, material: temp });
                         }}
                         placeholder="0"

@@ -74,7 +74,7 @@ const dpt = [
 ];
 
 const metode = [
-  { name: "First In First Out (FIFO)", id: 1 },
+  // { name: "First In First Out (FIFO)", id: 1 },
   { name: "Average", id: 2 },
 ];
 

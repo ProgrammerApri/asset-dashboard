@@ -317,6 +317,7 @@ const DataFormula = ({ onAdd, onEdit, onDetail }) => {
                           konv_qty: null,
                           unit_konv: null,
                           price: null,
+                          total: null,
                         },
                       ],
                 req_form:
@@ -426,6 +427,7 @@ const DataFormula = ({ onAdd, onEdit, onDetail }) => {
                     konv_qty: null,
                     unit_konv: null,
                     price: null,
+                    total: null,
                   },
                 ],
                 req_form: [

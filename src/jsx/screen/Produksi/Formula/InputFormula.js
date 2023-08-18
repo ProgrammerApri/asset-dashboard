@@ -865,8 +865,8 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                           temp[e.index].konv_qty = 0;
                           temp[e.index].unit_konv =
                             checkUnit(temp[e.index].unit_id)?.u_from !== null
-                              ? checkUnit(temp[e.index].unit_id)?.u_from?.code
-                              : checkUnit(temp[e.index].unit_id)?.code;
+                              ? checkUnit(temp[e.index].unit_id)?.u_from?.name
+                              : checkUnit(temp[e.index].unit_id)?.name;
                           updateFM({ ...forml, material: temp });
 
                           let newError = error;
@@ -898,8 +898,8 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                           temp[e.index].unit_id = u.id;
                           temp[e.index].konv_qty = temp[e.index].qty * u?.qty;
                           temp[e.index].unit_konv = u?.u_from
-                            ? u?.u_from?.code
-                            : u?.code;
+                            ? u?.u_from?.name
+                            : u?.name;
                           updateFM({ ...forml, material: temp });
                         }}
                         option={satuan}
@@ -974,16 +974,43 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                         onChange={(u) => {
                           let temp = [...forml.material];
                           temp[e.index].price = u.value;
+                          temp[e.index].total = u.value * temp[e.index].konv_qty;
                           updateFM({ ...forml, material: temp });
 
-                          let newError = error;
-                          newError.mtrl[e.index].prc = false;
-                          setError(newError);
+                          // let newError = error;
+                          // newError.mtrl[e.index].prc = false;
+                          // setError(newError);
                         }}
                         placeholder="0"
                         min={0}
-                        error={error?.mtrl[e.index]?.prc}
-                        disabled
+                        // error={error?.mtrl[e.index]?.prc}
+                        // disabled
+                      />
+                    )}
+                  />
+
+                  <Column
+                    header="Total"
+                    className="align-text-top"
+                    field={""}
+                    // style={{
+                    //   minWidth: "7rem",
+                    // }}
+                    body={(e) => (
+                      <PrimeNumber
+                        price
+                        value={e.total && e.total}
+                        onChange={(u) => {
+                          let temp = [...forml.material];
+                          temp[e.index].total = u.value;
+                          temp[e.index].price = u.value / temp[e.index].konv_qty;
+                          updateFM({ ...forml, material: temp });
+
+                        }}
+                        placeholder="0"
+                        min={0}
+                        // error={error?.mtrl[e.index]?.prc}
+                        // disabled
                       />
                     )}
                   />
@@ -1012,7 +1039,10 @@ const InputFormula = ({ onCancel, onSuccess }) => {
                                   prod_id: null,
                                   unit_id: null,
                                   qty: null,
+                                  konv_qty: null,
+                                  unit_konv: null,
                                   price: null,
+                                  total: null,
                                 },
                               ],
                             });

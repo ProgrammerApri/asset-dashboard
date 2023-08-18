@@ -176,23 +176,19 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
         <Link
           onClick={() => {
             onEdit(data);
-            let product = data.product;
             dispatch({
               type: SET_EDIT_PL,
               payload: true,
             });
+            let product = data.product;
             product.forEach((el) => {
               el.prod_id = el.prod_id?.id;
               el.unit_id = el.unit_id?.id;
-              el.def_qty = el.qty;
-              el.qty = el.qty * Number(data.total);
             });
             let material = data.material;
             material.forEach((el) => {
               el.prod_id = el.prod_id.id;
               el.unit_id = el.unit_id.id;
-              el.def_qty = el.qty;
-              el.qty = el.qty * Number(data.total);
             });
             let sequence = data.sequence;
             sequence.forEach((el) => {
@@ -333,6 +329,7 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
               type: SET_CURRENT_PL,
               payload: {
                 ...data,
+                date_created: new Date(),
                 dep_id: profile?.previlage?.dep_id ?? null,
                 version: 1,
                 sequence: [

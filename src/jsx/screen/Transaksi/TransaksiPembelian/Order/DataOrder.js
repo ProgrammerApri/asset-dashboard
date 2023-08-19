@@ -18,6 +18,8 @@ import ReactToPrint from "react-to-print";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { tr } from "src/data/tr";
 import { Tooltip } from "primereact/tooltip";
+import { Timeline } from "primereact/timeline";
+import { InputTextarea } from "primereact/inputtextarea";
 
 const data = {
   id: null,
@@ -50,6 +52,8 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
   const [update, setUpdate] = useState(false);
   const [displayDel, setDisplayDel] = useState(false);
   const [displayData, setDisplayData] = useState(false);
+  const [displayApprove, setDisplayApprove] = useState(false);
+  const [displayReject, setDisplayReject] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const [currency, setCurrency] = useState(null);
   const toast = useRef(null);
@@ -61,6 +65,8 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
   const dispatch = useDispatch();
   const order = useSelector((state) => state.order.order);
   const show = useSelector((state) => state.order.current);
+  const profile = useSelector((state) => state.profile.profile);
+  const [reject, setReject] = useState(null);
   const [expandedRows, setExpandedRows] = useState(null);
   const printPage = useRef(null);
 
@@ -151,6 +157,113 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
         });
       }, 500);
     }
+  };
+
+
+  const approveGra = async (id) => {
+    setUpdate(true);
+    const config = {
+      ...endpoints.approveGra,
+      endpoint: endpoints.approveGra.endpoint + currentItem.id,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setTimeout(() => {
+          setUpdate(false);
+          setDisplayApprove(false);
+          getOrder(true);
+          toast.current.show({
+            severity: "info",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: "Approve Success",
+            life: 3000,
+          });
+        }, 500);
+      }
+    } catch (error) {
+      console.log(error);
+      setTimeout(() => {
+        setUpdate(false);
+        setDisplayApprove(false);
+        toast.current.show({
+          severity: "error",
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: "Failed to approve",
+          life: 3000,
+        });
+      }, 500);
+    }
+  };
+
+  const rejectGra = async (id) => {
+    setUpdate(true);
+    const config = {
+      ...endpoints.rejectGra,
+      endpoint: endpoints.rejectGra.endpoint + currentItem.id,
+      data: { reason: reject ?? null },
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        setTimeout(() => {
+          setUpdate(false);
+          setDisplayReject(false);
+          getOrder(true);
+          toast.current.show({
+            severity: "info",
+            summary: tr[localStorage.getItem("language")].berhsl,
+            detail: "Approve Success",
+            life: 3000,
+          });
+        }, 500);
+      }
+    } catch (error) {
+      console.log(error);
+      setTimeout(() => {
+        setUpdate(false);
+        setDisplayApprove(false);
+        toast.current.show({
+          severity: "error",
+          summary: tr[localStorage.getItem("language")].gagal,
+          detail: "Failed to approve",
+          life: 3000,
+        });
+      }, 500);
+    }
+  };
+
+  const canApprove = (level, data) => {
+    if (!data.apprv_1 && level === 1 && data.apprv_status === 0) {
+      return true;
+    }
+
+    if (
+      data.apprv_1 &&
+      !data.apprv_2 &&
+      level === 2 &&
+      data.apprv_status === 0
+    ) {
+      return true;
+    }
+
+    if (
+      data.apprv_1 &&
+      data.apprv_2 &&
+      !data.apprv_3 &&
+      level === 3 &&
+      data.apprv_status === 0
+    ) {
+      return true;
+    }
+
+    return false;
   };
 
   const actionBodyTemplate = (data) => {
@@ -292,6 +405,74 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
         >
           <i className="fa fa-trash"></i>
         </Link>
+
+
+        {profile?.previlage?.approver && (
+          <Link
+            data-pr-tooltip="Approve"
+            data-pr-position="right"
+            data-pr-my="left center-2"
+            onClick={() => {
+              if (
+                canApprove(
+                  profile?.approval_settings?.filter(
+                    (v) => v.approval_module === "gra"
+                  )[0]?.approval_level,
+                  data
+                )
+              ) {
+                setEdit(true);
+                setDisplayApprove(true);
+                setCurrentItem(data);
+              }
+            }}
+            className={`btn ${
+              canApprove(
+                profile?.approval_settings?.filter(
+                  (v) => v.approval_module === "gra"
+                )[0]?.approval_level,
+                data
+              )
+                ? ""
+                : "disabled"
+            } btn-info shadow btn-xs sharp ml-1`}
+          >
+            <i className="fa fa-check"></i>
+          </Link>
+        )}
+        {profile?.previlage?.approver && (
+          <Link
+            data-pr-tooltip="Reject"
+            data-pr-position="right"
+            data-pr-my="left center-2"
+            onClick={() => {
+              if (
+                canApprove(
+                  profile?.approval_settings?.filter(
+                    (v) => v.approval_module === "gra"
+                  )[0]?.approval_level,
+                  data
+                )
+              ) {
+                setEdit(true);
+                setDisplayReject(true);
+                setCurrentItem(data);
+              }
+            }}
+            className={`btn ${
+              canApprove(
+                profile.approval_settings.filter(
+                  (v) => v.approval_module === "gra"
+                )[0]?.approval_level,
+                data
+              )
+                ? ""
+                : "disabled"
+            } btn-danger shadow btn-xs sharp ml-1`}
+          >
+            <i className="fa fa-times"></i>
+          </Link>
+        )}
       </div>
       // </React.Fragment>
     );
@@ -313,6 +494,49 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
           }}
           autoFocus
           loading={loading}
+        />
+      </div>
+    );
+  };
+
+
+  const renderFooterReject = () => {
+    return (
+      <div>
+        <PButton
+          label={tr[localStorage.getItem("language")].batal}
+          onClick={() => setDisplayReject(false)}
+          className="p-button-text btn-primary"
+        />
+        <PButton
+          label={"Reject"}
+          icon="pi pi-times"
+          onClick={() => {
+            rejectGra();
+          }}
+          autoFocus
+          loading={update}
+        />
+      </div>
+    );
+  };
+
+  const renderFooterApprove = () => {
+    return (
+      <div>
+        <PButton
+          label={tr[localStorage.getItem("language")].batal}
+          onClick={() => setDisplayApprove(false)}
+          className="p-button-text btn-primary"
+        />
+        <PButton
+          label={"Approve"}
+          icon="pi pi-check"
+          onClick={() => {
+            approveGra();
+          }}
+          autoFocus
+          loading={update}
         />
       </div>
     );
@@ -520,6 +744,48 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
     return total;
   };
 
+  const formatDateTime = (date) => {
+    var d = new Date(`${date}Z`),
+      month = "" + (d.getMonth() + 1),
+      day = "" + d.getDate(),
+      year = "" + d.getFullYear(),
+      hour = "" + d.getHours(),
+      minute = "" + d.getMinutes(),
+      second = "" + d.getSeconds();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+    if (hour.length < 2) hour = "0" + hour;
+    if (minute.length < 2) minute = "0" + minute;
+    if (second.length < 2) second = "0" + second;
+
+    return `${[day, month, year].join("-")} || ${[hour, minute, second].join(
+      ":"
+    )}`;
+  };
+
+  const customizedMarker = (item, index, data) => {
+    console.log(index);
+    return (
+      <span
+        className="flex align-items-center justify-content-center z-1 p-1 border-circle"
+        style={{
+          backgroundColor: !item.approved
+            ? "red"
+            : item.complete
+            ? "#21BF99"
+            : "white",
+          border: !item.approved ? "2px solid red" : "2px solid #21BF99",
+        }}
+      >
+        <i
+          className={!item.approved ? "pi pi-times" : "pi pi-check"}
+          style={{ fontSize: "0.4rem", fontWeight: "bold", color: "white" }}
+        ></i>
+      </span>
+    );
+  };
+
   const rowExpansionTemplate = (data) => {
     let rate = 0;
     currency?.forEach((el) => {
@@ -529,7 +795,38 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
     });
 
     return (
+      
       <div className="">
+         <div className="col-12 pb-0">
+          <Timeline
+            value={data.timeline}
+            layout="horizontal"
+            align="top"
+            marker={(item, index) => customizedMarker(item, index, data)}
+            content={(item) => (
+              <div
+                className=""
+                style={{
+                  minWidth: "12rem",
+                  minHeight: "4.5rem",
+                  // maxHeight: "8rem",
+                }}
+              >
+                <div className="pt-0 mt-0">
+                  <b>{item.label}</b>
+                </div>
+                <div className="fs-12">
+                  {item?.date ? formatDateTime(item?.date) : "-"}
+                </div>
+
+                <div className="fs-12">{item.approved_by}</div>
+
+                <div className="fs-12">{item.reason}</div>
+              </div>
+            )}
+          />
+        </div>
+
         <label className="text-label fs-13 text-black">
           <b>Daftar Produk</b>
         </label>
@@ -793,293 +1090,6 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
         </Col>
       </Row>
 
-      {/* <Dialog
-        header={"Detail Pembelian"}
-        visible={displayData}
-        style={{ width: "40vw" }}
-        footer={renderFooter("displayData")}
-        onHide={() => {
-          setDisplayData(false);
-        }}
-      >
-        <Row className="ml-0 pt-0 fs-12">
-          <div className="col-8">
-            <label className="text-label">Tanggal Pembelian :</label>
-            <span className="ml-1">
-              <b>{formatDate(show.ord_date)}</b>
-            </span>
-          </div>
-
-          <div className="col-4">
-            <label className="text-label">Jatuh Tempo :</label>
-            <span className="ml-1">
-              <b>{formatDate(show.due_date)}</b>
-            </span>
-          </div>
-
-          <Card className="col-12">
-            <div className="row">
-              <div className="col-8">
-                <label className="text-label">No. Pembelian :</label>
-                <span className="ml-1">
-                  <b>{show.ord_code}</b>
-                </span>
-              </div>
-
-              <div className="col-4">
-                <label className="text-label">No. Pesanan :</label>
-                <span className="ml-1">
-                  <b>{show.po_id?.po_code}</b>
-                </span>
-              </div>
-            </div>
-
-            <div className="row">
-              <div className="col-8">
-                <label className="text-label">Supplier</label>
-                <div className="">
-                  <span className="ml-0">
-                    <b>{show.sup_id?.sup_name}</b>
-                  </span>
-                  <br />
-                  <span>{show.sup_id?.sup_address}</span>
-                  <br />
-                  <span>{show.sup_id?.sup_telp1}</span>
-                </div>
-              </div>
-
-              <div className="col-4">
-                <label className="text-label"></label>
-                <div className="p-inputgroup">
-                  <span className="ml-0">
-                    {
-                      <div>
-                        {show.faktur === true ? (
-                          <Badge variant="info light">
-                            <i className="bx bxs-plus-circle text-info mr-1"></i>{" "}
-                            Faktur
-                          </Badge>
-                        ) : (
-                          <Badge variant="warning light">
-                            <i className="bx bxs-minus-circle text-warning mr-1"></i>{" "}
-                            Non Faktur
-                          </Badge>
-                        )}
-                      </div>
-                    }
-                  </span>
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          <Row className="ml-1 mt-0">
-            <DataTable
-              className="display w-150 datatable-wrapper fs-12"
-              value={show?.dprod}
-            >
-              <Column
-                header="Produk"
-                field={(e) => `${e.prod_id?.name} (${e.prod_id?.code})`}
-                style={{ minWidth: "8rem" }}
-                // body={loading && <Skeleton />}
-              />
-              <Column
-                header="Jumlah"
-                field={(e) => e.order}
-                style={{ minWidth: "5rem" }}
-                // body={loading && <Skeleton />}
-              />
-              <Column
-                header="Satuan"
-                field={(e) => e.unit_id?.name}
-                style={{ minWidth: "5rem" }}
-                // body={loading && <Skeleton />}
-              />
-              <Column
-                header="Harga Satuan"
-                field={(e) => e.price}
-                style={{ minWidth: "8rem" }}
-                // body={loading && <Skeleton />}
-              />
-              <Column
-                header="Lokasi"
-                field={(e) => e.location?.name}
-                style={{ minWidth: "8rem" }}
-                // body={loading && <Skeleton />}
-              />
-              <Column
-                header="Total"
-                field={(e) => formatIdr(e.total)}
-                style={{ minWidth: "6rem" }}
-                // body={loading && <Skeleton />}
-              />
-            </DataTable>
-          </Row>
-
-          {order.djasa?.length ? (
-            <Row className="ml-1 mt-5">
-              <>
-                <DataTable
-                  className="display w-150 datatable-wrapper fs-12"
-                  value={show?.djasa.map((v, i) => {
-                    return {
-                      ...v,
-                      index: i,
-                      total: v?.total ?? 0,
-                    };
-                  })}
-                >
-                  <Column
-                    header="Supplier"
-                    field={(e) => e.sup_id?.sup_name}
-                    style={{ minWidth: "15rem" }}
-                    // body={loading && <Skeleton />}
-                  />
-                  <Column
-                    header="Jasa"
-                    field={(e) => e.jasa_id?.name}
-                    style={{ minWidth: "15rem" }}
-                    // body={loading && <Skeleton />}
-                  />
-                  <Column
-                    header="Total"
-                    field={(e) => formatIdr(e.total)}
-                    style={{ minWidth: "10rem" }}
-                    // body={loading && <Skeleton />}
-                  />
-                </DataTable>
-              </>
-              0
-            </Row>
-          ) : (
-            <></>
-          )}
-
-          <Row className="ml-0 mr-0 mb-0 mt-4 justify-content-between fs-12">
-            <div></div>
-            <div className="row justify-content-right col-6 mr-4">
-              <div className="col-12 mb-0">
-                <label className="text-label">
-                  <b>Detail Pembayaran</b>
-                </label>
-                <Divider className="ml-12"></Divider>
-              </div>
-
-              <div className="col-5 mt-2">
-                <label className="text-label">
-                  {show.split_inv ? "Sub Total Barang" : "Subtotal"}
-                </label>
-              </div>
-
-              <div className="col-7 mt-2 text-right">
-                <label className="text-label">
-                  {show.split_inv ? (
-                    <b>
-                      Rp.
-                      {formatIdr(getSubTotalBarang())}
-                    </b>
-                  ) : (
-                    <b>
-                      Rp.
-                      {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
-                    </b>
-                  )}
-                </label>
-              </div>
-
-              <div className="col-5">
-                <label className="text-label">
-                  {show.split_inv ? "DPP Barang" : "DPP"}
-                </label>
-              </div>
-
-              <div className="col-7 text-right">
-                <label className="text-label">
-                  {show.split_inv ? (
-                    <b>
-                      Rp.
-                      {formatIdr(getSubTotalBarang())}
-                    </b>
-                  ) : (
-                    <b>
-                      Rp.
-                      {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
-                    </b>
-                  )}
-                </label>
-              </div>
-
-              <div className="col-5">
-                <label className="text-label">
-                  {show.split_inv ? "Pajak Atas Barang (11%)" : "Pajak (11%)"}
-                </label>
-              </div>
-
-              <div className="col-7 text-right">
-                <label className="text-label">
-                  {show.split_inv ? (
-                    <b>
-                      Rp.
-                      {formatIdr((getSubTotalBarang() * 11) / 100)}
-                    </b>
-                  ) : (
-                    <b>
-                      Rp.{" "}
-                      {formatIdr(
-                        ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
-                      )}
-                    </b>
-                  )}
-                </label>
-              </div>
-
-              <div className="col-5 mt-0">
-                <label className="text-label">Diskon(%)</label>
-              </div>
-
-              <div className="col-7 text-right">
-                <label className="text-label">
-                  <b>Rp. {show.total_disc !== null ? show.total_disc : 0}</b>
-                </label>
-              </div>
-
-              <div className="col-12">
-                <Divider className="ml-12"></Divider>
-              </div>
-
-              <div className="col-5">
-                <label className="text-label">
-                  <b>Total</b>
-                </label>
-              </div>
-
-              <div className="col-7 text-right">
-                <label className="text-label fs-13">
-                  {show.split_inv ? (
-                    <b>
-                      Rp.{" "}
-                      {formatIdr(
-                        getSubTotalBarang() + (getSubTotalBarang() * 11) / 100
-                      )}
-                    </b>
-                  ) : (
-                    <b>
-                      Rp.{" "}
-                      {formatIdr(
-                        getSubTotalBarang() +
-                          getSubTotalJasa() +
-                          ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
-                      )}
-                    </b>
-                  )}
-                </label>
-              </div>
-            </div>
-          </Row>
-        </Row>
-      </Dialog> */}
-
       <Dialog
         header={`${tr[localStorage.getItem("language")].hapus} ${
           tr[localStorage.getItem("language")].pur
@@ -1097,6 +1107,49 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
             style={{ fontSize: "2rem" }}
           />
           <span>{tr[localStorage.getItem("language")].pesan_hapus}</span>
+        </div>
+      </Dialog>
+
+      <Dialog
+        header={`Approve Purchase`}
+        visible={displayApprove}
+        style={{ width: "30vw" }}
+        footer={renderFooterApprove()}
+        onHide={() => {
+          setDisplayApprove(false);
+        }}
+      >
+        <div className="ml-3 mr-3">
+          <i
+            className="pi pi-exclamation-triangle mr-3 align-middle"
+            style={{ fontSize: "2rem" }}
+          />
+          <span>{tr[localStorage.getItem("language")].pesan_approve}</span>
+        </div>
+      </Dialog>
+
+      <Dialog
+        header={`Reject Purchase`}
+        visible={displayReject}
+        style={{ width: "35vw" }}
+        footer={renderFooterReject()}
+        onHide={() => {
+          setDisplayReject(false);
+        }}
+      >
+        <div className="row ml-0 mt-0">
+          <div className="col-12">
+            <label className="text-label">{"Reason"}</label>
+            <div className="p-inputgroup">
+              <InputTextarea
+                value={reject ? `${reject}` : ""}
+                onChange={(e) => {
+                  setReject(e.target.value);
+                }}
+                placeholder={"Reason"}
+              />
+            </div>
+          </div>
         </div>
       </Dialog>
     </>

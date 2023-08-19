@@ -964,6 +964,18 @@ const endpoints = {
     data: {},
   },
 
+  approveGra: {
+    endpoint: "/v1/api/approval/gra/",
+    method: "PUT",
+    data: {},
+  },
+
+  rejectGra: {
+    endpoint: "/v1/api/reject/gra/",
+    method: "PUT",
+    data: {},
+  },
+
   /// Invoice Pembelian
   invoice_pb: {
     endpoint: "/v1/api/invoice-pb",

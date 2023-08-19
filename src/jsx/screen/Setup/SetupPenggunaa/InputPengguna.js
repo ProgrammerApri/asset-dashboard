@@ -44,6 +44,10 @@ const modules = [
     name: "Purchase Order",
   },
   {
+    code: "gra",
+    name: "Good Receipt",
+  },
+  {
     code: "invoice",
     name: "Invoice",
   },

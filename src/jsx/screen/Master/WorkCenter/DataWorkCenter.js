@@ -45,7 +45,7 @@ const def = {
 const defError = {
   code: false,
   name: false,
-  mesin: false,
+  // mesin: false,
   loc: false,
   type: false,
   sdm: false,
@@ -409,7 +409,7 @@ const DataWorkCenter = ({
     let errors = {
       code: !work.work_code || work.work_code === "",
       name: !work.work_name || work.work_name === "",
-      mesin: !work.machine_id,
+      // mesin: !work.machine_id,
       loc: !work.loc_id,
       type: !work.work_type,
       sdm: !work.work_sdm || work.work_sdm === "",
@@ -437,7 +437,7 @@ const DataWorkCenter = ({
       !errors.code &&
       !errors.name &&
       !errors.type &&
-      !errors.mesin &&
+      // !errors.mesin &&
       !errors.loc &&
       !errors.sdm &&
       !errors.work_est;
@@ -851,9 +851,9 @@ const DataWorkCenter = ({
                 onChange={(u) => {
                   updateWc({ ...work, machine_id: u?.id ?? null });
 
-                  let newError = error;
-                  newError.mesin = false;
-                  setError(newError);
+                  // let newError = error;
+                  // newError.mesin = false;
+                  // setError(newError);
                 }}
                 option={machine}
                 detail
@@ -862,8 +862,8 @@ const DataWorkCenter = ({
                 }}
                 label={"[msn_name] ([msn_code])"}
                 placeholder="Pilih Mesin"
-                errorMessage={"Mesin Belum Dipilih !"}
-                error={error?.mesin}
+                // errorMessage={"Mesin Belum Dipilih !"}
+                // error={error?.mesin}
               />
             </div>
             <div className="col-4 text-black">
@@ -942,7 +942,6 @@ const DataWorkCenter = ({
                 value={work.ovh_estimasi ? work.ovh_estimasi : null}
                 onChange={(u) => {
                   updateWc({ ...work, ovh_estimasi: u?.value ?? null });
-
                 }}
                 placeholder="0"
               />
@@ -954,7 +953,6 @@ const DataWorkCenter = ({
                 value={work.biaya_estimasi ? work.biaya_estimasi : null}
                 onChange={(u) => {
                   updateWc({ ...work, biaya_estimasi: u?.value ?? null });
-
                 }}
                 placeholder="0"
               />

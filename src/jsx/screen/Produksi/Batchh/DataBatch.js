@@ -18,12 +18,12 @@ import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleB
 const data = {
   id: null,
   bcode: null,
+  bname: null,
   batch_date: null,
   plan_id: null,
-  dep_id: null,
+  sequence: [],
   product: [],
   material: [],
-  mesin: [],
 };
 
 const DataBatch = ({ onAdd, onEdit, onDetail }) => {
@@ -120,8 +120,17 @@ const DataBatch = ({ onAdd, onEdit, onDetail }) => {
         <Link
           onClick={() => {
             onDetail();
-            let product = data.plan_id.product;
-            let material = data.plan_id.material;
+            let sequence = data.sequence;
+            let product = data.product;
+            let material = data.material;
+
+            sequence?.forEach((el) => {
+              el.wc_id = el.wc_id.id ?? null;
+              el.loc_id = el.loc_id.id ?? null;
+              el.mch_id = el.mch_id.id ?? null;
+              el.work_id = el.work_id.id ?? null;
+            });
+
             product?.forEach((element) => {
               element.qty = element.qty * Number(data.plan_id.total);
             });
@@ -130,50 +139,13 @@ const DataBatch = ({ onAdd, onEdit, onDetail }) => {
               elem.qty = elem.qty * Number(data.plan_id.total);
             });
 
-            let mesin = data.plan_id.mesin;
-            mesin?.forEach((el) => {
-              // el.mch_id = el.mch_id.id;
-            });
             dispatch({
               type: SET_CURRENT_BTC,
               payload: {
                 ...data,
-                product:
-                  product?.length > 0
-                    ? product
-                    : [
-                        {
-                          id: 0,
-                          form_id: null,
-                          prod_id: null,
-                          unit_id: null,
-                          qty: null,
-                          aloc: null,
-                        },
-                      ],
-                material:
-                  material?.length > 0
-                    ? material
-                    : [
-                        {
-                          id: 0,
-                          form_id: null,
-                          prod_id: null,
-                          unit_id: null,
-                          qty: null,
-                          price: null,
-                        },
-                      ],
-                mesin:
-                  mesin?.length > 0
-                    ? mesin
-                    : [
-                        {
-                          id: 0,
-                          pl_id: null,
-                          mch_id: null,
-                        },
-                      ],
+                product: product?.length > 0 ? product : null,
+                material: material?.length > 0 ? material : null,
+                sequence: sequence?.length > 0 ? sequence : null,
               },
             });
           }}
@@ -185,43 +157,69 @@ const DataBatch = ({ onAdd, onEdit, onDetail }) => {
         <Link
           onClick={() => {
             onEdit(data);
-            let product = data.plan_id.product;
             dispatch({
               type: SET_EDIT_BTC,
               payload: true,
             });
+
+            let sequence = data.sequence;
+            sequence?.forEach((el) => {
+              el.wc_id = el.wc_id.id ?? null;
+              el.loc_id = el.loc_id.id ?? null;
+              el.mch_id = el.mch_id.id ?? null;
+              el.work_id = el.work_id.id ?? null;
+            });
+
+            let product = data.product;
             product?.forEach((element) => {
               element.prod_id = element.prod_id?.id;
               element.unit_id = element.unit_id?.id;
               element.qty = element.qty * Number(data.plan_id.total);
             });
-            let material = data.plan_id.material;
+
+            let material = data.material;
             material?.forEach((elem) => {
               elem.prod_id = elem.prod_id.id;
               elem.unit_id = elem.unit_id.id;
               elem.qty = elem.qty * Number(data.plan_id.total);
             });
-            let mesin = data.plan_id.mesin;
-            mesin?.forEach((el) => {
-              el.mch_id = el.mch_id.id;
-            });
+
             dispatch({
               type: SET_CURRENT_BTC,
               payload: {
                 ...data,
                 plan_id: data?.plan_id?.id ?? null,
-                dep_id: data?.dep_id?.id ?? null,
+                sequence:
+                  sequence?.length > 0
+                    ? sequence
+                    : [
+                        {
+                          id: 0,
+                          seq: null,
+                          wc_id: null,
+                          loc_id: null,
+                          mch_id: null,
+                          work_id: null,
+                          datetime_plan: null,
+                          datetime_actual: null,
+                          datetime_end: null,
+                          durasi: null,
+                          proses: null,
+                        },
+                      ],
                 material:
                   material?.length > 0
                     ? material
                     : [
                         {
                           id: 0,
-                          form_id: null,
                           prod_id: null,
                           unit_id: null,
                           qty: null,
+                          mat_use: null,
+                          total_use: null,
                           price: null,
+                          total_price: null,
                         },
                       ],
                 product:
@@ -230,21 +228,15 @@ const DataBatch = ({ onAdd, onEdit, onDetail }) => {
                     : [
                         {
                           id: 0,
-                          form_id: null,
                           prod_id: null,
                           unit_id: null,
-                          qty: null,
+                          qty_making: null,
                           aloc: null,
-                        },
-                      ],
-                mesin:
-                  mesin?.length > 0
-                    ? mesin
-                    : [
-                        {
-                          id: 0,
-                          pl_id: null,
-                          mch_id: null,
+                          qty_receive: null,
+                          qty_reject: null,
+                          loc_reject: null,
+                          wc_mutation: null,
+                          remain: null,
                         },
                       ],
               },
@@ -330,30 +322,45 @@ const DataBatch = ({ onAdd, onEdit, onDetail }) => {
               type: SET_CURRENT_BTC,
               payload: {
                 ...data,
+                sequence: [
+                  {
+                    id: 0,
+                    seq: null,
+                    wc_id: null,
+                    loc_id: null,
+                    mch_id: null,
+                    work_id: null,
+                    datetime_plan: null,
+                    datetime_actual: null,
+                    datetime_end: null,
+                    durasi: null,
+                    proses: null,
+                  },
+                ],
                 product: [
                   {
                     id: 0,
-                    form_id: null,
                     prod_id: null,
                     unit_id: null,
-                    qty: null,
+                    qty_making: null,
                     aloc: null,
+                    qty_receive: null,
+                    qty_reject: null,
+                    loc_reject: null,
+                    wc_mutation: null,
+                    remain: null,
                   },
                 ],
                 material: [
                   {
                     id: 0,
-                    form_id: null,
                     prod_id: null,
                     unit_id: null,
                     qty: null,
+                    mat_use: null,
+                    total_use: null,
                     price: null,
-                  },
-                ],
-                mesin: [
-                  {
-                    id: 0,
-                    mch_id: null,
+                    total_price: null,
                   },
                 ],
               },
@@ -471,7 +478,6 @@ const DataBatch = ({ onAdd, onEdit, onDetail }) => {
                 filters={filters1}
                 globalFilterFields={[
                   "bcode",
-                  "dep_id.ccost_name",
                   "plan_id.pcode",
                 ]}
                 emptyMessage="Tidak ada data"
@@ -483,7 +489,7 @@ const DataBatch = ({ onAdd, onEdit, onDetail }) => {
                 paginatorClassName="justify-content-end mt-3"
               >
                 <Column
-                  header="Tgl Batch"
+                  header="Tanggal"
                   field={(e) => formatDate(e.batch_date)}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
@@ -493,30 +499,38 @@ const DataBatch = ({ onAdd, onEdit, onDetail }) => {
                   style={{
                     minWidth: "8rem",
                   }}
-                  field={(e) => e.bcode}
+                  field={(e) => e.bcode ?? "-"}
                   body={loading && <Skeleton />}
                 />
                 <Column
-                  header="Departemen"
-                  field={(e) => e.dep_id?.ccost_name}
-                  style={{ minWidth: "8rem" }}
-                  body={loading && <Skeleton />}
-                />
-                <Column
-                  header="Tgl Planning"
-                  field={(e) => formatDate(e.plan_id?.date_planing)}
-                  style={{ minWidth: "8rem" }}
+                  header="Nama Batch"
+                  style={{
+                    minWidth: "8rem",
+                  }}
+                  field={(e) => e.bname ?? "-"}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Kode Planning"
-                  field={(e) => e.plan_id?.pcode}
+                  field={(e) => e.plan_id?.pcode ?? "-"}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Nama Planning"
                   field={(e) => e.plan_id?.pname}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Kode Formula"
+                  field={(e) => e.plan_id?.form_id?.fcode ?? "-"}
+                  style={{ minWidth: "8rem" }}
+                  body={loading && <Skeleton />}
+                />
+                <Column
+                  header="Nama Formula"
+                  field={(e) => e.plan_id?.form_id?.fname ?? "-"}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />

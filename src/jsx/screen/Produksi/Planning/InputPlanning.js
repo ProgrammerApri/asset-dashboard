@@ -649,7 +649,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                           prod_id: v?.prod_id?.id,
                           unit_id: v?.unit_id?.id,
                           qty: v?.qty ?? 0,
-                          mat_use: null,
+                          mat_use: v.qty,
                           total_use: null,
                         };
                       })
@@ -765,274 +765,328 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
               }}
               key={1}
               body={
-                <DataTable
-                  responsiveLayout="none"
-                  value={plan.sequence?.map((v, i) => {
-                    return {
-                      ...v,
-                      index: i,
-                    };
-                  })}
-                  className="display w-150 datatable-wrapper header-white no-border"
-                  showGridlines={false}
-                  emptyMessage={() => <div></div>}
-                >
-                  <Column
-                    header="Proses Ke"
-                    className="align-text-top"
-                    field={""}
-                    style={{
-                      width: "10rem",
-                    }}
-                    body={(e) => (
-                      <PrimeNumber
-                        value={e.seq && e.seq}
-                        onChange={(t) => {
-                          let temp = [...plan.sequence];
-                          temp[e.index].seq = Number(t.target.value);
-                          updatePL({ ...plan, sequence: temp });
-                        }}
-                        placeholder="0"
-                        type="number"
-                        min={0}
-                      />
-                    )}
-                  />
-
-                  <Column
-                    header="Work Center"
-                    className="align-text-top"
-                    field={""}
-                    style={{
-                      width: "20rem",
-                    }}
-                    body={(e) => (
-                      <CustomDropdown
-                        value={e.wc_id && checkWc(e.wc_id)}
-                        option={workCen}
-                        onChange={(t) => {
-                          let temp = [...plan.sequence];
-                          temp[e.index].wc_id = t?.id ?? null;
-                          temp[e.index].loc_id = t?.loc_id?.id ?? null;
-                          temp[e.index].mch_id = t?.machine_id?.id ?? null;
-                          temp[e.index].work_id = t?.work_type?.id ?? null;
-                          updatePL({ ...plan, sequence: temp });
-
-                          // let newError = error;
-                          // newError.msn[e.index].id = false;
-                          // setError(newError);
-                        }}
-                        detail
-                        onDetail={() => {
-                          setCurrentIndex(e.index);
-                          setShowWorkCen(true);
-                        }}
-                        label={"[work_name] ([work_code])"}
-                        placeholder="Pilih Work Center"
-                        // errorMessage="Mesin Belum Dipilih"
-                        // error={error?.msn[e.index]?.id}
-                      />
-                    )}
-                  />
-
-                  <Column
-                    header="Lokasi"
-                    className="align-text-top"
-                    field={""}
-                    style={{
-                      width: "20rem",
-                    }}
-                    body={(e) => (
-                      <CustomDropdown
-                        value={e.loc_id && checkLoc(e.loc_id)}
-                        option={lokasi}
-                        onChange={(t) => {
-                          let temp = [...plan.sequence];
-                          temp[e.index].loc_id = t?.id ?? null;
-                          updatePL({ ...plan, sequence: temp });
-
-                          // let newError = error;
-                          // newError.msn[e.index].id = false;
-                          // setError(newError);
-                        }}
-                        detail
-                        onDetail={() => {
-                          setCurrentIndex(e.index);
-                          setShowLok(true);
-                        }}
-                        label={"[name] ([code])"}
-                        placeholder="Pilih Mesin"
-                        // errorMessage="Mesin Belum Dipilih"
-                        // error={error?.msn[e.index]?.id}
-                      />
-                    )}
-                  />
-
-                  <Column
-                    header="Mesin"
-                    className="align-text-top"
-                    field={""}
-                    style={{
-                      width: "20rem",
-                    }}
-                    body={(e) => (
-                      <CustomDropdown
-                        value={e.mch_id && checkMsn(e.mch_id)}
-                        option={mesin}
-                        onChange={(t) => {
-                          let temp = [...plan.sequence];
-                          temp[e.index].mch_id = t?.id ?? null;
-                          updatePL({ ...plan, sequence: temp });
-
-                          let newError = error;
-                          newError.msn[e.index].id = false;
-                          setError(newError);
-                        }}
-                        detail
-                        onDetail={() => {
-                          setCurrentIndex(e.index);
-                          setShowMsn(true);
-                        }}
-                        label={"[msn_name] ([msn_code])"}
-                        placeholder="Pilih Mesin"
-                        errorMessage="Mesin Belum Dipilih"
-                        error={error?.msn[e.index]?.id}
-                      />
-                    )}
-                  />
-
-                  <Column
-                    header="Jenis Pekerjaan"
-                    className="align-text-top"
-                    field={""}
-                    style={{
-                      width: "20rem",
-                    }}
-                    body={(e) => (
-                      <CustomDropdown
-                        value={e.work_id && checkWork(e.work_id)}
-                        option={workType}
-                        onChange={(t) => {
-                          let temp = [...plan.sequence];
-                          temp[e.index].work_id = t?.id ?? null;
-                          updatePL({ ...plan, sequence: temp });
-
-                          // let newError = error;
-                          // newError.msn[e.index].id = false;
-                          // setError(newError);
-                        }}
-                        detail
-                        onDetail={() => {
-                          setCurrentIndex(e.index);
-                          setShowType(true);
-                        }}
-                        label={"[work_name] ([work_type])"}
-                        placeholder="Pilih Pekerjaan"
-                        // errorMessage="Mesin Belum Dipilih"
-                        // error={error?.msn[e.index]?.id}
-                      />
-                    )}
-                  />
-
-                  <Column
-                    header="Tanggal"
-                    className="align-text-top"
-                    field={""}
-                    style={{
-                      minWidth: "15rem",
-                    }}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <Calendar
-                          value={e.date}
-                          onChange={(t) => {
-                            console.log("time");
-                            console.log(t.value);
-                            let temp = [...plan.sequence];
-                            temp[e.index].date = t?.value ?? null;
-                            updatePL({ ...plan, sequence: temp });
-                          }}
-                          placeholder="Pilih Tanggal"
-                          dateFormat="dd-mm-yy"
-                          showTime
-                          hourFormat="12"
-                          showIcon
-                        />
-                      </div>
-                    )}
-                  />
-
-                  <Column
-                    hidden
-                    header="Waktu"
-                    className="align-text-top"
-                    field={""}
-                    style={{
-                      width: "15rem",
-                    }}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <Calendar
-                          value={e.time && e.time}
+                <>
+                  <DataTable
+                    responsiveLayout="none"
+                    value={plan.sequence?.map((v, i) => {
+                      return {
+                        ...v,
+                        index: i,
+                      };
+                    })}
+                    className="display w-150 datatable-wrapper header-white no-border"
+                    showGridlines={false}
+                    emptyMessage={() => <div></div>}
+                  >
+                    <Column
+                      header="Proses Ke"
+                      className="align-text-top"
+                      field={""}
+                      style={{
+                        width: "10rem",
+                      }}
+                      body={(e) => (
+                        <PrimeNumber
+                          value={e.seq && e.seq}
                           onChange={(t) => {
                             let temp = [...plan.sequence];
-                            temp[e.index].time =
-                              `${t?.value?.getHours()}:${t?.value?.getMinutes()}` ??
-                              null;
+                            temp[e.index].seq = Number(t.target.value);
                             updatePL({ ...plan, sequence: temp });
                           }}
-                          placeholder="Pilih Waktu"
-                          timeOnly
+                          placeholder="0"
+                          type="number"
+                          min={0}
                         />
-                      </div>
-                    )}
-                  />
+                      )}
+                    />
 
-                  <Column
-                    className="align-text-top"
-                    body={(e) =>
-                      e.index === plan.sequence.length - 1 ? (
-                        <Link
-                          onClick={() => {
-                            updatePL({
-                              ...plan,
-                              sequence: [
-                                ...plan.sequence,
-                                {
-                                  id: 0,
-                                  seq: null,
-                                  wc_id: null,
-                                  loc_id: null,
-                                  mch_id: null,
-                                  work_id: null,
-                                  date: null,
-                                  time: null,
-                                },
-                              ],
-                            });
-                          }}
-                          className="btn btn-primary shadow btn-xs sharp ml-1"
-                        >
-                          <i className="fa fa-plus"></i>
-                        </Link>
-                      ) : (
-                        <Link
-                          onClick={() => {
+                    <Column
+                      header="Work Center"
+                      className="align-text-top"
+                      field={""}
+                      style={{
+                        width: "20rem",
+                      }}
+                      body={(e) => (
+                        <CustomDropdown
+                          value={e.wc_id && checkWc(e.wc_id)}
+                          option={workCen}
+                          onChange={(t) => {
                             let temp = [...plan.sequence];
-                            temp.splice(e.index, 1);
-                            updatePL({
-                              ...plan,
-                              sequence: temp,
-                            });
+                            temp[e.index].wc_id = t?.id ?? null;
+                            temp[e.index].loc_id = t?.loc_id?.id ?? null;
+                            temp[e.index].mch_id = t?.machine_id?.id ?? null;
+                            temp[e.index].work_id = t?.work_type?.id ?? null;
+                            updatePL({ ...plan, sequence: temp });
+
+                            // let newError = error;
+                            // newError.msn[e.index].id = false;
+                            // setError(newError);
                           }}
-                          className="btn btn-danger shadow btn-xs sharp ml-1"
-                        >
-                          <i className="fa fa-trash"></i>
-                        </Link>
-                      )
-                    }
-                  />
-                </DataTable>
+                          detail
+                          onDetail={() => {
+                            setCurrentIndex(e.index);
+                            setShowWorkCen(true);
+                          }}
+                          label={"[work_name] ([work_code])"}
+                          placeholder="Pilih Work Center"
+                          // errorMessage="Mesin Belum Dipilih"
+                          // error={error?.msn[e.index]?.id}
+                        />
+                      )}
+                    />
+
+                    <Column
+                      header="Lokasi"
+                      className="align-text-top"
+                      field={""}
+                      style={{
+                        width: "20rem",
+                      }}
+                      body={(e) => (
+                        <CustomDropdown
+                          value={e.loc_id && checkLoc(e.loc_id)}
+                          option={lokasi}
+                          onChange={(t) => {
+                            let temp = [...plan.sequence];
+                            temp[e.index].loc_id = t?.id ?? null;
+                            updatePL({ ...plan, sequence: temp });
+
+                            // let newError = error;
+                            // newError.msn[e.index].id = false;
+                            // setError(newError);
+                          }}
+                          detail
+                          onDetail={() => {
+                            setCurrentIndex(e.index);
+                            setShowLok(true);
+                          }}
+                          label={"[name] ([code])"}
+                          placeholder="Pilih Mesin"
+                          // errorMessage="Mesin Belum Dipilih"
+                          // error={error?.msn[e.index]?.id}
+                        />
+                      )}
+                    />
+
+                    <Column
+                      header="Mesin"
+                      className="align-text-top"
+                      field={""}
+                      style={{
+                        width: "20rem",
+                      }}
+                      body={(e) => (
+                        <CustomDropdown
+                          value={e.mch_id && checkMsn(e.mch_id)}
+                          option={mesin}
+                          onChange={(t) => {
+                            let temp = [...plan.sequence];
+                            temp[e.index].mch_id = t?.id ?? null;
+                            updatePL({ ...plan, sequence: temp });
+
+                            let newError = error;
+                            newError.msn[e.index].id = false;
+                            setError(newError);
+                          }}
+                          detail
+                          onDetail={() => {
+                            setCurrentIndex(e.index);
+                            setShowMsn(true);
+                          }}
+                          label={"[msn_name] ([msn_code])"}
+                          placeholder="Pilih Mesin"
+                          errorMessage="Mesin Belum Dipilih"
+                          error={error?.msn[e.index]?.id}
+                        />
+                      )}
+                    />
+
+                    <Column
+                      header="Jenis Pekerjaan"
+                      className="align-text-top"
+                      field={""}
+                      style={{
+                        width: "20rem",
+                      }}
+                      body={(e) => (
+                        <CustomDropdown
+                          value={e.work_id && checkWork(e.work_id)}
+                          option={workType}
+                          onChange={(t) => {
+                            let temp = [...plan.sequence];
+                            temp[e.index].work_id = t?.id ?? null;
+                            updatePL({ ...plan, sequence: temp });
+
+                            // let newError = error;
+                            // newError.msn[e.index].id = false;
+                            // setError(newError);
+                          }}
+                          detail
+                          onDetail={() => {
+                            setCurrentIndex(e.index);
+                            setShowType(true);
+                          }}
+                          label={"[work_name] ([work_type])"}
+                          placeholder="Pilih Pekerjaan"
+                          // errorMessage="Mesin Belum Dipilih"
+                          // error={error?.msn[e.index]?.id}
+                        />
+                      )}
+                    />
+
+                    <Column
+                      header="Mutasi/Non Mutasi"
+                      className="align-text-top"
+                      field={""}
+                      style={{
+                        width: "20rem",
+                      }}
+                      body={(e) => (
+                        <PrimeInput
+                          value={
+                            e.work_id
+                              ? checkWork(e.work_id)?.mutasi == true
+                                ? "Mutasi"
+                                : "Non Mutasi"
+                              : null
+                          }
+                          placeholder="0"
+                          disabled
+                        />
+                      )}
+                    />
+
+                    <Column
+                      header="Tanggal"
+                      className="align-text-top"
+                      field={""}
+                      style={{
+                        minWidth: "15rem",
+                      }}
+                      body={(e) => (
+                        <div className="p-inputgroup">
+                          <Calendar
+                            value={!isEdit ? e.date : new Date(`${e.date}Z`)}
+                            onChange={(t) => {
+                              console.log("time");
+                              console.log(t.value);
+                              let temp = [...plan.sequence];
+                              temp[e.index].date = t?.value ?? null;
+                              updatePL({ ...plan, sequence: temp });
+                            }}
+                            placeholder="Pilih Tanggal"
+                            dateFormat="dd-mm-yy"
+                            showTime
+                            hourFormat="12"
+                            showIcon
+                          />
+                        </div>
+                      )}
+                    />
+
+                    <Column
+                      hidden
+                      header="Waktu"
+                      className="align-text-top"
+                      field={""}
+                      style={{
+                        width: "15rem",
+                      }}
+                      body={(e) => (
+                        <div className="p-inputgroup">
+                          <Calendar
+                            value={e.time && e.time}
+                            onChange={(t) => {
+                              let temp = [...plan.sequence];
+                              temp[e.index].time =
+                                `${t?.value?.getHours()}:${t?.value?.getMinutes()}` ??
+                                null;
+                              updatePL({ ...plan, sequence: temp });
+                            }}
+                            placeholder="Pilih Waktu"
+                            timeOnly
+                          />
+                        </div>
+                      )}
+                    />
+
+                    <Column
+                      className="align-text-top"
+                      body={
+                        (e) => (
+                          // e.index === plan.sequence.length - 1 ? (
+                          //   <Link
+                          //     onClick={() => {
+                          //       updatePL({
+                          //         ...plan,
+                          //         sequence: [
+                          //           ...plan.sequence,
+                          //           {
+                          //             id: 0,
+                          //             seq: null,
+                          //             wc_id: null,
+                          //             loc_id: null,
+                          //             mch_id: null,
+                          //             work_id: null,
+                          //             date: null,
+                          //             time: null,
+                          //           },
+                          //         ],
+                          //       });
+                          //     }}
+                          //     className="btn btn-primary shadow btn-xs sharp ml-1"
+                          //   >
+                          //     <i className="fa fa-plus"></i>
+                          //   </Link>
+                          // ) : (
+                          <Link
+                            onClick={() => {
+                              let temp = [...plan.sequence];
+                              temp.splice(e.index, 1);
+                              updatePL({
+                                ...plan,
+                                sequence: temp,
+                              });
+                            }}
+                            className="btn btn-danger shadow btn-xs sharp ml-1"
+                          >
+                            <i className="fa fa-trash"></i>
+                          </Link>
+                        )
+                        // )
+                      }
+                    />
+                  </DataTable>
+
+                  <div className="col-12 d-flex justify-content-end">
+                    <Link
+                      onClick={() => {
+                        updatePL({
+                          ...plan,
+                          sequence: [
+                            ...plan.sequence,
+                            {
+                              id: 0,
+                              seq: null,
+                              wc_id: null,
+                              loc_id: null,
+                              mch_id: null,
+                              work_id: null,
+                              date: null,
+                              time: null,
+                            },
+                          ],
+                        });
+                      }}
+                      className="btn btn-primary shadow btn-s sharp ml-1 mt-3"
+                    >
+                      <span className="align-middle mx-1">
+                        <i className="fa fa-plus"></i> {"Tambah"}
+                      </span>
+                    </Link>
+                  </div>
+                </>
               }
             />
 
@@ -1340,7 +1394,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Kuantitas"
+                    header="Kuantitas Formula"
                     className="align-text-top"
                     field={""}
                     style={{

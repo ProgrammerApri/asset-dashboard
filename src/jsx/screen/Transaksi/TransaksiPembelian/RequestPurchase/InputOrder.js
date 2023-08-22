@@ -893,7 +893,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
             />
           </div>
 
-          {/* <div className="col-6">
+          <div className="col-6">
             <label className="text-label">
               {tr[localStorage.getItem("language")].supplier}
             </label>
@@ -913,7 +913,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
               errorMessage="Supplier Belum Dipilih"
               error={error?.sup}
             />
-          </div> */}
+          </div>
 
           <div className="col-6">
             <label className="text-label">

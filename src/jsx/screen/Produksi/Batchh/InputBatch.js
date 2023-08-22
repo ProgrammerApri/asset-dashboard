@@ -413,13 +413,13 @@ const InputBatch = ({ onCancel, onSuccess }) => {
   const currentDate = (date) => {
     let now = new Date();
     let newDate = new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate(),
-      now.getHours(),
-      now.getMinutes(),
-      now.getSeconds(),
-      now.getMilliseconds()
+      date?.getFullYear(),
+      date?.getMonth(),
+      date?.getDate(),
+      now?.getHours(),
+      now?.getMinutes(),
+      now?.getSeconds(),
+      now?.getMilliseconds()
     );
     return newDate.toISOString();
   };
@@ -538,10 +538,10 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                       mch_id: v?.mch_id?.id ?? null,
                       work_id: v?.work_id?.id ?? null,
                       datetime_plan: v?.date ?? null,
-                      datetime_actual: null,
-                      datetime_end: null,
-                      durasi: null,
-                      proses: null,
+                      datetime_actual: v?.datetime_actual,
+                      datetime_end: v?.datetime_end,
+                      durasi: v?.durasi,
+                      proses: v?.proses ?? null,
                     };
                   }),
                   product: e?.value?.product?.map((v) => {
@@ -604,7 +604,8 @@ const InputBatch = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-2 text-black">
-            <PrimeInput
+            <PrimeNumber
+              price
               label={"Target Pembuatan"}
               value={btc.plan_id !== null ? checkPlan(btc.plan_id)?.total : ""}
               placeholder="0"
@@ -942,7 +943,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                 className="align-text-top"
                 field={""}
                 style={{
-                  minWidth: "10rem",
+                  minWidth: "7rem",
                 }}
                 body={(e) => (
                   <PrimeNumber
@@ -1067,7 +1068,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                 className="align-text-top"
                 field={""}
                 style={{
-                  minWidth: "20rem",
+                  minWidth: "15rem",
                 }}
                 body={(e) => (
                   <CustomDropdown
@@ -1096,22 +1097,16 @@ const InputBatch = ({ onCancel, onSuccess }) => {
               />
 
               <Column
-                header="Mutasi/Non Mutasi"
+                header="Mutasi"
                 className="align-text-top"
                 field={""}
                 style={{
-                  minWidth: "10rem",
+                  minWidth: "5em",
                 }}
                 body={(e) => (
-                  <PrimeInput
-                    value={
-                      e.work_id
-                        ? checkWork(e.work_id)?.mutasi == true
-                          ? "Mutasi"
-                          : "Non Mutasi"
-                        : null
-                    }
-                    placeholder="0"
+                  <Checkbox
+                    className="ml-2"
+                    checked={e.work_id ? checkWork(e.work_id)?.mutasi : null}
                     disabled
                   />
                 )}
@@ -1128,7 +1123,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                   <div className="p-inputgroup">
                     <Calendar
                       value={
-                        isEdit || btc?.plan_id
+                        isEdit || e.datetime_plan !== null
                           ? new Date(`${e.datetime_plan}Z`)
                           : e.datetime_plan
                       }
@@ -1158,9 +1153,9 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                   <div className="p-inputgroup">
                     <Calendar
                       value={
-                        !isEdit
-                          ? e.datetime_actual
-                          : new Date(`${e.datetime_actual}Z`)
+                        isEdit || e.datetime_actual !== null
+                          ? new Date(`${e.datetime_actual}Z`)
+                          : e.datetime_actual
                       }
                       onChange={(t) => {
                         let temp = [...btc.sequence];
@@ -1187,9 +1182,9 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                   <div className="p-inputgroup">
                     <Calendar
                       value={
-                        !isEdit
-                          ? e.datetime_end
-                          : new Date(`${e.datetime_end}Z`)
+                        isEdit || e.datetime_end !== null
+                          ? new Date(`${e.datetime_end}Z`)
+                          : e.datetime_end
                       }
                       onChange={(t) => {
                         let temp = [...btc.sequence];
@@ -1614,199 +1609,230 @@ const InputBatch = ({ onCancel, onSuccess }) => {
           }}
           key={1}
           body={
-            <DataTable
-              responsiveLayout="scroll"
-              value={btc.material?.map((v, i) => {
-                return {
-                  ...v,
-                  index: i,
-                };
-              })}
-              className="display w-150 datatable-wrapper header-white no-border"
-              showGridlines={false}
-              emptyMessage={() => <div></div>}
-            >
-              <Column
-                header="Bahan"
-                className="align-text-top"
-                field={""}
-                style={{
-                  minWidth: "25rem",
-                }}
-                body={(e) => (
-                  <CustomDropdown
-                    value={e.prod_id && checkProd(e.prod_id)}
-                    option={product}
-                    onChange={(u) => {
-                      // looping satuan
-                      let sat = [];
-                      satuan.forEach((element) => {
-                        if (element?.id === u?.unit?.id) {
-                          sat.push(element);
-                        } else {
-                          if (element?.u_from?.id === u?.unit?.id) {
+            <>
+              <DataTable
+                responsiveLayout="scroll"
+                value={btc.material?.map((v, i) => {
+                  return {
+                    ...v,
+                    index: i,
+                  };
+                })}
+                className="display w-150 datatable-wrapper header-white no-border"
+                showGridlines={false}
+                emptyMessage={() => <div></div>}
+              >
+                <Column
+                  header="Bahan"
+                  className="align-text-top"
+                  field={""}
+                  style={{
+                    minWidth: "25rem",
+                  }}
+                  body={(e) => (
+                    <CustomDropdown
+                      value={e.prod_id && checkProd(e.prod_id)}
+                      option={product}
+                      onChange={(u) => {
+                        // looping satuan
+                        let sat = [];
+                        satuan.forEach((element) => {
+                          if (element?.id === u?.unit?.id) {
                             sat.push(element);
+                          } else {
+                            if (element?.u_from?.id === u?.unit?.id) {
+                              sat.push(element);
+                            }
                           }
-                        }
-                      });
-
-                      let temp = [...btc.product];
-                      temp[e.index].prod_id = u?.id;
-                      temp[e.index].unit_id = u.unit?.id;
-                      updateBTC({ ...btc, product: temp });
-
-                      // let newError = error;
-                      // newError.mtrl[e.index].id = false;
-                      // setError(newError);
-                    }}
-                    detail
-                    onDetail={() => {
-                      setCurrentIndex(e.index);
-                      setShowProd(true);
-                    }}
-                    label={"[name] ([code])"}
-                    placeholder="Pilih Produk"
-                    // errorMessage="Bahan Belum Dipilih"
-                    // error={error?.mtrl[e.index]?.id}
-                  />
-                )}
-              />
-
-              <Column
-                header="Satuan"
-                className="align-text-top"
-                field={""}
-                style={{
-                  minWidth: "15rem",
-                }}
-                body={(e) => (
-                  <CustomDropdown
-                    value={e.unit_id && checkUnit(e.unit_id)}
-                    onChange={(u) => {
-                      let temp = [...btc.material];
-                      temp[e.index].unit_id = u?.id;
-                      updateBTC({ ...btc, material: temp });
-                    }}
-                    option={satuan}
-                    detail
-                    onDetail={() => {
-                      setCurrentIndex(e.index);
-                      setShowSatuan(true);
-                    }}
-                    label={"[name] ([code])"}
-                    placeholder="Pilih Satuan"
-                  />
-                )}
-              />
-
-              <Column
-                header="Kuantitas Formula"
-                className="align-text-top"
-                field={""}
-                style={{
-                  minWidth: "10rem",
-                }}
-                body={(e) => (
-                  <PrimeNumber
-                    price
-                    value={e.qty ? e.qty : ""}
-                    placeholder="0"
-                    disabled
-                  />
-                )}
-              />
-
-              <Column
-                header="Kebutuhan Material"
-                className="align-text-top"
-                field={""}
-                style={{
-                  minWidth: "10rem",
-                }}
-                body={(e) => (
-                  <PrimeNumber
-                    price
-                    value={e.mat_use && e.mat_use}
-                    onChange={(u) => {
-                      let temp = [...btc.material];
-                      temp[e.index].mat_use = u.value;
-                      temp[e.index].total_use =
-                        u.value > 0
-                          ? u.value * checkPlan(btc.plan_id)?.total
-                          : temp[e.index].qty * checkPlan(btc.plan_id)?.total;
-                      updateBTC({ ...btc, material: temp });
-                    }}
-                    placeholder="0"
-                  />
-                )}
-              />
-
-              <Column
-                header="Total"
-                className="align-text-top"
-                field={""}
-                style={{
-                  minWidth: "10rem",
-                }}
-                body={(e) => (
-                  <PrimeNumber
-                    price
-                    value={e.total_use && e.total_use}
-                    onChange={(u) => {
-                      let temp = [...btc.material];
-                      temp[e.index].total_use = u.value;
-                      temp[e.index].mat_use =
-                        u.value / checkPlan(btc.plan_id)?.total;
-                      updateBTC({ ...btc, material: temp });
-                    }}
-                    placeholder="0"
-                  />
-                )}
-              />
-
-              <Column
-                className="align-text-top"
-                body={(e) =>
-                  e.index === btc.material.length - 1 ? (
-                    <Link
-                      onClick={() => {
-                        updateBTC({
-                          ...btc,
-                          material: [
-                            ...btc.material,
-                            {
-                              id: 0,
-                              prod_id: null,
-                              unit_id: null,
-                              qty: null,
-                              mat_use: null,
-                              total_use: null,
-                            },
-                          ],
                         });
+
+                        let temp = [...btc.product];
+                        temp[e.index].prod_id = u?.id;
+                        temp[e.index].unit_id = u.unit?.id;
+                        updateBTC({ ...btc, product: temp });
+
+                        // let newError = error;
+                        // newError.mtrl[e.index].id = false;
+                        // setError(newError);
                       }}
-                      className="btn btn-primary shadow btn-xs sharp ml-1"
-                    >
-                      <i className="fa fa-plus"></i>
-                    </Link>
-                  ) : (
-                    <Link
-                      onClick={() => {
+                      detail
+                      onDetail={() => {
+                        setCurrentIndex(e.index);
+                        setShowProd(true);
+                      }}
+                      label={"[name] ([code])"}
+                      placeholder="Pilih Produk"
+                      // errorMessage="Bahan Belum Dipilih"
+                      // error={error?.mtrl[e.index]?.id}
+                    />
+                  )}
+                />
+
+                <Column
+                  header="Satuan"
+                  className="align-text-top"
+                  field={""}
+                  style={{
+                    minWidth: "15rem",
+                  }}
+                  body={(e) => (
+                    <CustomDropdown
+                      value={e.unit_id && checkUnit(e.unit_id)}
+                      onChange={(u) => {
                         let temp = [...btc.material];
-                        temp.splice(e.index, 1);
-                        updateBTC({
-                          ...btc,
-                          material: temp,
-                        });
+                        temp[e.index].unit_id = u?.id;
+                        updateBTC({ ...btc, material: temp });
                       }}
-                      className="btn btn-danger shadow btn-xs sharp ml-1"
-                    >
-                      <i className="fa fa-trash"></i>
-                    </Link>
-                  )
-                }
-              />
-            </DataTable>
+                      option={satuan}
+                      detail
+                      onDetail={() => {
+                        setCurrentIndex(e.index);
+                        setShowSatuan(true);
+                      }}
+                      label={"[name] ([code])"}
+                      placeholder="Pilih Satuan"
+                    />
+                  )}
+                />
+
+                <Column
+                  header="Kuantitas Formula"
+                  className="align-text-top"
+                  field={""}
+                  style={{
+                    minWidth: "10rem",
+                  }}
+                  body={(e) => (
+                    <PrimeNumber
+                      price
+                      value={e.qty ? e.qty : ""}
+                      placeholder="0"
+                      disabled
+                    />
+                  )}
+                />
+
+                <Column
+                  header="Kebutuhan Material"
+                  className="align-text-top"
+                  field={""}
+                  style={{
+                    minWidth: "10rem",
+                  }}
+                  body={(e) => (
+                    <PrimeNumber
+                      price
+                      value={e.mat_use && e.mat_use}
+                      onChange={(u) => {
+                        let temp = [...btc.material];
+                        temp[e.index].mat_use = u.value;
+                        temp[e.index].total_use =
+                          u.value > 0
+                            ? u.value * checkPlan(btc.plan_id)?.total
+                            : temp[e.index].qty * checkPlan(btc.plan_id)?.total;
+                        updateBTC({ ...btc, material: temp });
+                      }}
+                      placeholder="0"
+                    />
+                  )}
+                />
+
+                <Column
+                  header="Total"
+                  className="align-text-top"
+                  field={""}
+                  style={{
+                    minWidth: "10rem",
+                  }}
+                  body={(e) => (
+                    <PrimeNumber
+                      price
+                      value={e.total_use && e.total_use}
+                      onChange={(u) => {
+                        let temp = [...btc.material];
+                        temp[e.index].total_use = u.value;
+                        temp[e.index].mat_use =
+                          u.value / checkPlan(btc.plan_id)?.total;
+                        updateBTC({ ...btc, material: temp });
+                      }}
+                      placeholder="0"
+                    />
+                  )}
+                />
+
+                <Column
+                  className="align-text-top"
+                  body={
+                    (e) => (
+                      // e.index === btc.material.length - 1 ? (
+                      //   <Link
+                      //     onClick={() => {
+                      //       updateBTC({
+                      //         ...btc,
+                      //         material: [
+                      //           ...btc.material,
+                      //           {
+                      //             id: 0,
+                      //             prod_id: null,
+                      //             unit_id: null,
+                      //             qty: null,
+                      //             mat_use: null,
+                      //             total_use: null,
+                      //           },
+                      //         ],
+                      //       });
+                      //     }}
+                      //     className="btn btn-primary shadow btn-xs sharp ml-1"
+                      //   >
+                      //     <i className="fa fa-plus"></i>
+                      //   </Link>
+                      // ) : (
+                      <Link
+                        onClick={() => {
+                          let temp = [...btc.material];
+                          temp.splice(e.index, 1);
+                          updateBTC({
+                            ...btc,
+                            material: temp,
+                          });
+                        }}
+                        className="btn btn-danger shadow btn-xs sharp ml-1"
+                      >
+                        <i className="fa fa-trash"></i>
+                      </Link>
+                    )
+                    // )
+                  }
+                />
+              </DataTable>
+
+              <div className="col-12 d-flex justify-content-end">
+                <Link
+                  onClick={() => {
+                    setUpdate(false);
+                    updateBTC({
+                      ...btc,
+                      material: [
+                        ...btc.material,
+                        {
+                          id: 0,
+                          prod_id: null,
+                          unit_id: null,
+                          qty: null,
+                          mat_use: null,
+                          total_use: null,
+                        },
+                      ],
+                    });
+                  }}
+                  className="btn btn-primary shadow btn-s sharp ml-1 mt-3"
+                >
+                  <span className="align-middle mx-1">
+                    <i className="fa fa-plus"></i> {"Tambah"}
+                  </span>
+                </Link>
+              </div>
+            </>
           }
         />
         <div className="row mb-5">

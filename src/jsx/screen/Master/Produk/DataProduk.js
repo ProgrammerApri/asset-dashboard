@@ -74,7 +74,7 @@ const dpt = [
 ];
 
 const metode = [
-  { name: "First In First Out (FIFO)", id: 1 },
+  // { name: "First In First Out (FIFO)", id: 1 },
   { name: "Average", id: 2 },
 ];
 
@@ -1743,6 +1743,23 @@ const DataProduk = ({
                 <div className="col-4">
                   <label className="text-label">
                     {tr[localStorage.getItem("language")].barcode}
+                  </label>
+                  <div className="p-inputgroup">
+                    <InputText
+                      value={`${currentItem?.barcode ?? ""}`}
+                      onChange={(e) =>
+                        setCurrentItem({
+                          ...currentItem,
+                          barcode: e.target.value,
+                        })
+                      }
+                      placeholder={tr[localStorage.getItem("language")].masuk}
+                    />
+                  </div>
+                </div>
+                <div className="col-4">
+                  <label className="text-label">
+                    {"Kode Maklon"}
                   </label>
                   <div className="p-inputgroup">
                     <InputText

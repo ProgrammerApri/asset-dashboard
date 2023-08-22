@@ -21,6 +21,7 @@ const data = {
   bname: null,
   batch_date: null,
   plan_id: null,
+  desc: null,
   sequence: [],
   product: [],
   material: [],
@@ -174,14 +175,13 @@ const DataBatch = ({ onAdd, onEdit, onDetail }) => {
             product?.forEach((element) => {
               element.prod_id = element.prod_id?.id;
               element.unit_id = element.unit_id?.id;
-              element.qty = element.qty * Number(data.plan_id.total);
+              element.loc_reject = element.loc_reject?.id;
             });
 
             let material = data.material;
             material?.forEach((elem) => {
               elem.prod_id = elem.prod_id.id;
               elem.unit_id = elem.unit_id.id;
-              elem.qty = elem.qty * Number(data.plan_id.total);
             });
 
             dispatch({

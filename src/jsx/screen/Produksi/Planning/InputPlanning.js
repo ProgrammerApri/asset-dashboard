@@ -27,6 +27,7 @@ import DataLokasi from "../../Master/Lokasi/DataLokasi";
 import { Calendar } from "primereact/calendar";
 import DataWorkCenter from "../../Master/WorkCenter/DataWorkCenter";
 import DataJeniskerja from "../../Master/Jenis_kerja/DataJeniskerja";
+import { Checkbox } from "primereact/checkbox";
 
 const defError = {
   code: false,
@@ -537,7 +538,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
               label={"Nama Routing"}
               value={plan.pname}
               onChange={(e) => {
-                updatePL({ ...plan, pname: e.target.value });
+                updatePL({ ...plan, pname: e.target.value, dep_id: null });
                 let newError = error;
                 newError.name = false;
                 setError(newError);
@@ -612,21 +613,6 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
               value={plan.form_id !== null ? checkFm(plan.form_id) : null}
               options={formula}
               onChange={(e) => {
-                // e?.value?.product.forEach((element) => {
-                //   element.def_qty = element.qty;
-                // });
-                // e?.value?.material.forEach((elem) => {
-                //   elem.def_qty = elem.qty;
-                // });
-
-                // if (plan.total) {
-                //   e?.value?.product.forEach((element) => {
-                //     element.qty = element.def_qty * plan.total;
-                //   });
-                //   e?.value?.material.forEach((elem) => {
-                //     elem.total_use = elem.mat_use * plan.total;
-                //   });
-                // }
 
                 updatePL({
                   ...plan,
@@ -651,6 +637,8 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                           qty: v?.qty ?? 0,
                           mat_use: v.qty,
                           total_use: null,
+                          price: v?.price ?? 0,
+                          total_price: v?.total ?? 0,
                         };
                       })
                     : null,
@@ -796,6 +784,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                           placeholder="0"
                           type="number"
                           min={0}
+                          disabled
                         />
                       )}
                     />
@@ -936,22 +925,18 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                     />
 
                     <Column
-                      header="Mutasi/Non Mutasi"
+                      header="Mutasi"
                       className="align-text-top"
                       field={""}
                       style={{
-                        width: "20rem",
+                        minWidth: "5em",
                       }}
                       body={(e) => (
-                        <PrimeInput
-                          value={
-                            e.work_id
-                              ? checkWork(e.work_id)?.mutasi == true
-                                ? "Mutasi"
-                                : "Non Mutasi"
-                              : null
+                        <Checkbox
+                          className="ml-2"
+                          checked={
+                            e.work_id ? checkWork(e.work_id)?.mutasi : null
                           }
-                          placeholder="0"
                           disabled
                         />
                       )}
@@ -1062,19 +1047,28 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                   <div className="col-12 d-flex justify-content-end">
                     <Link
                       onClick={() => {
+                        let seq = 0;
+                        plan?.sequence?.forEach((element) => {
+                          seq = Number(element.seq);
+                        });
+
                         updatePL({
                           ...plan,
                           sequence: [
                             ...plan.sequence,
                             {
                               id: 0,
-                              seq: null,
+                              seq: seq + 1,
                               wc_id: null,
                               loc_id: null,
                               mch_id: null,
                               work_id: null,
                               date: null,
                               time: null,
+                              datetime_actual: null,
+                              datetime_end: null,
+                              durasi: null,
+                              proses: null,
                             },
                           ],
                         });

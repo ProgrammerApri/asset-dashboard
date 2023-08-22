@@ -790,6 +790,11 @@ const endpoints = {
   },
 
   /// Request Puechase
+  codePurchase: {
+    endpoint: "/v1/api/rp/code",
+    method: "GET",
+    data: {},
+  },
 
   rPurchase: {
     endpoint: "/v1/api/rp",

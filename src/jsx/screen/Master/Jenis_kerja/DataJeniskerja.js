@@ -428,6 +428,7 @@ const DataJeniskerja = ({
   };
 
   const renderBody = () => {
+    console.log("datana",data);
     return (
       <>
         <Toast ref={toast} />
@@ -468,6 +469,12 @@ const DataJeniskerja = ({
           <Column
             header="Keterangan"
             field={(e) => (e?.desc !== "" ? e.desc : "-")}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header="Mutasi"
+            field={(e) => e.mutasi}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />

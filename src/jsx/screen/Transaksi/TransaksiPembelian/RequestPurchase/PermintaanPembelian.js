@@ -100,24 +100,52 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
       }, 500);
     }
   };
-  // const getCoderp = async () => {
-  //   const config = {
-  //     ...endpoints.codeRp,
-  //     data: {},
-  //   };
-  //   console.log(config.data);
-  //   let response = null;
-  //   try {
-  //     response = await request(null, config);
-  //     console.log(response);
-  //     if (response.status) {
-  //       const { data } = response;
-  //       console.log(data);
-  //       setLastNumber(data);
-  //     }
-  //   } catch (error) {}
-  // };
-
+  const getCoderp = async () => {
+    setLoading(true);
+    const config = {
+      ...endpoints.codePurchase,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const kode = response.data;
+        dispatch({
+          type: SET_CURRENT_RP,
+          payload: {
+            ...data,
+            req_code:  kode || "",         
+            req_dep: profile.previlage?.dep_id ?? null,
+            rprod: [
+              {
+                id: 0,
+                prod_id: null,
+                unit_id: null,
+                request: null,
+              },
+            ],
+            rjasa: [
+              {
+                id: 0,
+                jasa_id: null,
+                unit_id: null,
+                request: null,
+              },
+            ],
+          },
+        });
+      }
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
 
   const approveRp = async (id) => {
     setUpdate(true);
@@ -337,6 +365,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
               type: SET_CURRENT_RP,
               payload: {
                 ...data,
+                req_code: data?.req_code ?? null,
                 req_dep: data?.req_dep?.id ?? null,
                 ref_sup: data?.ref_sup?.id ?? null,
                 rprod:
@@ -534,7 +563,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
   };
 
   const renderHeader = () => {
-    console.log("data",data);
+    console.log("data", SET_CURRENT_RP);
     return (
       <div className="flex justify-content-between">
         <span className="p-input-icon-left">
@@ -550,35 +579,10 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
-            // getCoderp()
+            getCoderp();
             dispatch({
               type: SET_EDIT,
               payload: false,
-            });
-
-            dispatch({
-              type: SET_CURRENT_RP,
-              payload: {
-                ...data,
-                // req_code: lastNumber ?? null,
-                req_dep: profile.previlage?.dep_id ?? null,
-                rprod: [
-                  {
-                    id: 0,
-                    prod_id: null,
-                    unit_id: null,
-                    request: null,
-                  },
-                ],
-                rjasa: [
-                  {
-                    id: 0,
-                    jasa_id: null,
-                    unit_id: null,
-                    request: null,
-                  },
-                ],
-              },
             });
           }}
         />
@@ -898,10 +902,12 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
           body={(e) =>
             loading ? (
               <Skeleton />
-            ) : (
-              e.po_code ? <Badge variant="success light">
+            ) : e.po_code ? (
+              <Badge variant="success light">
                 <i className="bx bx-check-double text-success"></i>
-              </Badge> : <Badge variant="danger light">
+              </Badge>
+            ) : (
+              <Badge variant="danger light">
                 <i className="bx bx-x text-danger"></i>
               </Badge>
             )
@@ -914,10 +920,12 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
           body={(e) =>
             loading ? (
               <Skeleton />
-            ) : (
-              e.gra_code ? <Badge variant="success light">
+            ) : e.gra_code ? (
+              <Badge variant="success light">
                 <i className="bx bx-check-double text-success"></i>
-              </Badge> : <Badge variant="danger light">
+              </Badge>
+            ) : (
+              <Badge variant="danger light">
                 <i className="bx bx-x text-danger"></i>
               </Badge>
             )
@@ -1059,7 +1067,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
           setDisplayDat(false);
         }}
       >
-       <DrawTimeline/>
+        <DrawTimeline />
       </Dialog>
 
       <Dialog

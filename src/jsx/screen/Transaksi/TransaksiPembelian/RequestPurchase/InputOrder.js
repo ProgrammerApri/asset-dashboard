@@ -247,6 +247,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
       if (response.status) {
         const { data } = response;
         setSupplier(data);
+        console.log("hey", data);
       }
     } catch (error) {}
   };
@@ -451,7 +452,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
           <div className="col-4">
             <PrimeInput
               label={tr[localStorage.getItem("language")].kd_req}
-              value={rp.req_code}
+              value={rp.req_code }
               onChange={(e) => {
                 updateRp({ ...rp, req_code: e.target.value });
                 let newError = error;
@@ -468,7 +469,8 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
               }}
               placeholder={tr[localStorage.getItem("language")].masuk}
               error={error?.code}
-              // disabled
+              // disabled={rp.req_code !== null && rp.req_code !== undefined && rp.req_code !== ''}
+ 
             />
           </div>
 
@@ -586,7 +588,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                 </div>
               </div>
 
-              {rp.rprod.map((v, i) => {
+              {rp.rprod?.map((v, i) => {
                 return (
                   <div className="row col-12 mr-0 ml-0 mt-0">
                     <div className="col-4">
@@ -761,7 +763,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                 </div>
               </div>
 
-              {rp.rjasa.map((v, i) => {
+              {rp.rjasa?.map((v, i) => {
                 return (
                   <div className="row col-12 mr-0 ml-0 mb-0">
                     <div className="col-4">
@@ -891,7 +893,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
             />
           </div>
 
-          <div className="col-6">
+          {/* <div className="col-6">
             <label className="text-label">
               {tr[localStorage.getItem("language")].supplier}
             </label>
@@ -911,7 +913,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
               errorMessage="Supplier Belum Dipilih"
               error={error?.sup}
             />
-          </div>
+          </div> */}
 
           <div className="col-6">
             <label className="text-label">

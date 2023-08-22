@@ -435,7 +435,7 @@ const Number = () => {
             <div
               style={{ width: "10px", marginLeft: "5px", marginRight: "10px" }}
             ></div>
-            <div className="flex-column" >
+            <div className="flex-column">
               <label>Reset Bulan </label>
               <div className="input-switch-container">
                 <InputSwitch
@@ -510,29 +510,46 @@ const Number = () => {
 
   const renderAktiva = () => {
     return (
-      <Card>
-        <Card.Header className="p-3">
-          <div className="ml-3" style={{ fontSize: "16px" }}>
-            Mau mengaktifkan Penomoran Otomatis ?
-          </div>
-          <InputSwitch
-            checked={checked}
-            onChange={(e) => setChecked(e.value)}
-          />
-        </Card.Header>
-        <Toast ref={toast} />
-        <Row style={{ display: checked ? "flex" : "none" }}>
-          <Col className="col-lg-12 col-sm-12 col-xs-12">
-            {renderPurchase()}
-            {renderPenjualan()}
-            {renderPersediaan()}
-            {renderMemorial()}
-            {renderKasBankKeluar()}
-            {renderKasBankMasuk()}
-            {renderProduksi()}
-          </Col>
-        </Row>
-      </Card>
+      <Accordion
+        className=" col-lg-12 col-sm-12 col-xs-12"
+        defaultActiveKey="1"
+      >
+        <div className="accordion__item" key={0}>
+          <Accordion.Toggle
+            as={Card.Text}
+            eventKey={`0`}
+            className={`accordion__header ${accor.aktiva ? "collapsed" : ""}`}
+            onClick={() => {
+              setAccor({
+                ...accor,
+                aktiva: !accor.aktiva,
+              });
+            }}
+          >
+            <span className="accordion__header--text">
+              Mau mengaktifkan Penomoran Otomatis ?
+            </span>
+            <span className="accordion__header--indicator indicator_bordered"></span>
+          </Accordion.Toggle>
+          <Accordion.Collapse eventKey={"0"}>
+            <div className="accordion__body--text">
+              <>
+                <div className="d-flex col-12 align-items-center">
+                  <InputSwitch
+                    className="mr-3"
+                    inputId="email"
+                    checked={checked}
+                    onChange={(e) => setChecked(e.value)}
+                  />
+                  <label className="mr-3 mt-1" htmlFor="email">
+                    {"Aktifkan fitur penomoran otomatis"}
+                  </label>
+                </div>
+              </>
+            </div>
+          </Accordion.Collapse>
+        </div>
+      </Accordion>
     );
   };
 
@@ -825,15 +842,23 @@ const Number = () => {
       <Toast ref={toast} />
       <Row>
         <Col className="col-lg-12 col-sm-12 col-xs-12">{renderAktiva()}</Col>
-        {/* <Col className="col-lg-12 col-sm-12 col-xs-12">
-          {renderPurchase()}
-          {renderPenjualan()}
-          {renderPersediaan()}
-          {renderMemorial()}
-          {renderKasBankKeluar()}
-          {renderKasBankMasuk()}
-          {renderProduksi()}
-        </Col> */}
+        <Col className="col-lg-12 col-sm-12 col-xs-12">
+          <div className="row">
+            <div className="col-12">
+              {checked && (
+                <>
+                  {renderPurchase()}
+                  {renderPenjualan()}
+                  {renderPersediaan()}
+                  {renderMemorial()}
+                  {renderKasBankKeluar()}
+                  {renderKasBankMasuk()}
+                  {renderProduksi()}
+                </>
+              )}
+            </div>
+          </div>
+        </Col>
       </Row>
     </>
   );

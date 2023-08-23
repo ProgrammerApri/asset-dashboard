@@ -11,6 +11,7 @@ const data = {
   work_type: null,
   work_name: null,
   mutasi: null,
+  maklon: false,
   desc: null,
 };
 

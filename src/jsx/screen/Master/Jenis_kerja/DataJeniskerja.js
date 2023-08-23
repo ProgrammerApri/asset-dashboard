@@ -22,12 +22,14 @@ import {
 } from "src/redux/actions";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import { InputSwitch } from "primereact/inputswitch";
+import { Badge } from "primereact/badge";
 
 const def = {
   id: 1,
   work_type: null,
   work_name: null,
   mutasi: false,
+  maklon: false,
   desc: null,
 };
 
@@ -335,6 +337,7 @@ const DataJeniskerja = ({
                 payload: {
                   ...data,
                   mutasi: false,
+                  maklon: false,
                   work_type: null,
                   work_name: null,
                   desc: null,
@@ -418,17 +421,16 @@ const DataJeniskerja = ({
       // mts: !jns_kerja.mutasi || jns_kerja.mutasi === "",
     };
 
-    valid = !errors.code && !errors.name ;
+    valid = !errors.code && !errors.name;
 
     setError(errors);
 
-    valid = !errors.code && !errors.name ;
+    valid = !errors.code && !errors.name;
 
     return valid;
   };
 
   const renderBody = () => {
-    console.log("datana",data);
     return (
       <>
         <Toast ref={toast} />
@@ -474,9 +476,27 @@ const DataJeniskerja = ({
           />
           <Column
             header="Mutasi"
-            field={(e) => e.mutasi}
+            field={(e) => e.mutasi ?? ""}
             style={{ minWidth: "8rem" }}
-            body={load && <Skeleton />}
+            body={(e) =>
+              load ? (
+                <Skeleton />
+              ) : (
+                <div>{e.mutasi === false ? "No" : "Yes"}</div>
+              )
+            }
+          />
+          <Column
+            header="Maklon"
+            field={(e) => e.maklon ?? ""}
+            style={{ minWidth: "8rem" }}
+            body={(e) =>
+              load ? (
+                <Skeleton />
+              ) : (
+                <div>{e.maklon === false ? "No" : "Yes"}</div>
+              )
+            }
           />
           <Column
             header="Action"
@@ -547,6 +567,25 @@ const DataJeniskerja = ({
                     updateJNSkerja({
                       ...jns_kerja,
                       mutasi: e.target.value,
+                    });
+                  }}
+                  // optionLabel="name"
+                  // placeholder="Pilih Disini"
+                  // error={error?.mts}
+                />
+              </div>
+            </div>
+            <div className="flex col-2 align-items-center mt-4">
+              <label className="ml-0 mt-1 fs-12 text-black">
+                <b>{"Maklon"}</b>
+              </label>
+              <div className="col-6">
+                <InputSwitch
+                  checked={jns_kerja?.maklon ?? false}
+                  onChange={(e) => {
+                    updateJNSkerja({
+                      ...jns_kerja,
+                      maklon: e.target.value,
                     });
                   }}
                   // optionLabel="name"

@@ -48,6 +48,7 @@ const def = {
   b_price: null,
   s_price: null,
   barcode: null,
+  maklon_code: null,
   metode: null,
   max_stock: null,
   min_stock: null,
@@ -889,6 +890,7 @@ const DataProduk = ({
             b_price: null,
             s_price: null,
             barcode: null,
+            maklon_code: null,
             metode: 1,
             max_stock: null,
             min_stock: null,
@@ -1763,11 +1765,11 @@ const DataProduk = ({
                   </label>
                   <div className="p-inputgroup">
                     <InputText
-                      value={`${currentItem?.barcode ?? ""}`}
+                      value={`${currentItem?.maklon_code ?? ""}`}
                       onChange={(e) =>
                         setCurrentItem({
                           ...currentItem,
-                          barcode: e.target.value,
+                          maklon_code: e.target.value,
                         })
                       }
                       placeholder={tr[localStorage.getItem("language")].masuk}

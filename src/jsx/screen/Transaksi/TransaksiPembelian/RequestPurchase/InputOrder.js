@@ -880,7 +880,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
         />
 
         <div className="row mb-0">
-          {/* <div className="d-flex col-12 align-items-center mt-4">
+          <div className="d-flex col-12 align-items-center mt-4">
             <label className="ml-0 mt-1">
               {tr[localStorage.getItem("language")].ref_tambh}
             </label>
@@ -891,9 +891,9 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                 updateRp({ ...rp, refrence: e.target.value });
               }}
             />
-          </div> */}
+          </div>
 
-          {/* <div className="col-6">
+          <div className="col-6">
             <label className="text-label">
               {tr[localStorage.getItem("language")].supplier}
             </label>
@@ -913,9 +913,9 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
               errorMessage="Supplier Belum Dipilih"
               error={error?.sup}
             />
-          </div> */}
+          </div>
 
-          {/* <div className="col-6">
+          <div className="col-6">
             <label className="text-label">
               {tr[localStorage.getItem("language")].ket}
             </label>
@@ -927,7 +927,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                 disabled={rp && !rp.refrence}
               />
             </div>
-          </div> */}
+          </div>
         </div>
       </>
     );

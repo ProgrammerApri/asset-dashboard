@@ -898,31 +898,31 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
     let acc_ap = checkSupp(order?.sup_id)?.supplier?.sup_hutang !== null;
 
-    if (!acc_ap) {
-      toast.current.show({
-        severity: "error",
-        summary: "Tidak Dapat Menyimpan Data",
-        detail: `Akun Distribusi Gl Supplier Belum Diisi`,
-        life: 6000,
-      });
-    }
+    // if (!acc_ap) {
+    //   toast.current.show({
+    //     severity: "error",
+    //     summary: "Tidak Dapat Menyimpan Data",
+    //     detail: `Akun Distribusi Gl Supplier Belum Diisi`,
+    //     life: 6000,
+    //   });
+    // }
 
-    if (acc_prd === null) {
-      toast.current.show({
-        severity: "error",
-        summary: "Tidak Dapat Menyimpan Data",
-        detail: `Akun Distribusi GL Produk Belum Diisi`,
-        life: 6000,
-      });
+    // if (acc_prd === null) {
+    //   toast.current.show({
+    //     severity: "error",
+    //     summary: "Tidak Dapat Menyimpan Data",
+    //     detail: `Akun Distribusi GL Produk Belum Diisi`,
+    //     life: 6000,
+    //   });
 
-      //   errors?.prod.forEach((element, i) => {
-      //     if (order.prod[i]?.acc_prd === null) {
-      //       element.id = true;
-      //     }
-      // console.log("=============");
-      // console.log(order.prod[i].prod_id);
-      //   });
-    }
+    //   //   errors?.prod.forEach((element, i) => {
+    //   //     if (order.prod[i]?.acc_prd === null) {
+    //   //       element.id = true;
+    //   //     }
+    //   // console.log("=============");
+    //   // console.log(order.prod[i].prod_id);
+    //   //   });
+    // }
 
     let acc_err = acc_prd !== null;
 
@@ -930,10 +930,10 @@ const InputOrder = ({ onCancel, onSuccess }) => {
       !errors.code &&
       !errors.date &&
       !errors.sup &&
-      acc_ap &&
+      // acc_ap &&
       // !errors.rul &&
-      (validProduct === order.dprod.length || validJasa) &&
-      acc_err;
+      (validProduct === order.dprod.length || validJasa)
+      // acc_err;
 
     setError(errors);
     console.log("======err=======");

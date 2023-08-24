@@ -44,12 +44,12 @@ export default function GroupReport() {
       to: "persediaan",
     },
 
-    {
-      tittle: "Laporan Produksi",
-      icon: "bx-archive",
-      total: 4,
-      to: "produksi",
-    },
+    // {
+    //   tittle: "Laporan Produksi",
+    //   icon: "bx-archive",
+    //   total: 4,
+    //   to: "produksi",
+    // },
   ]);
 
   const renderSubMenu = () => {

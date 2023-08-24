@@ -1049,10 +1049,7 @@ const DataSupplier = ({
                 <div className="col-4 mt-0">
                   <PrimeInput
                     label={tr[localStorage.getItem("language")].kd_pem}
-                    value={`${
-                      currentItem?.supplier.sup_code ??
-                      (currentItem?.supplier.sup_code || `${generateCode()}`)
-                    } `}
+                    value={currentItem?.supplier?.sup_code}
                     onChange={(e) => {
                       setCurrentItem({
                         ...currentItem,
@@ -1067,7 +1064,7 @@ const DataSupplier = ({
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[0]?.code}
-                    disabled
+                    // disabled
                   />
                 </div>
                 <div className="col-4">

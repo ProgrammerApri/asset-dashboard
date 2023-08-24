@@ -1128,10 +1128,7 @@ const DataCustomer = ({
                 <div className="col-6">
                   <PrimeInput
                     label={tr[localStorage.getItem("language")].kd_pel}
-                    value={`${
-                      currentItem?.customer.cus_code ??
-                      (currentItem?.customer.cus_code || `${generateCode()}`)
-                    } `}
+                    value={currentItem?.customer?.cus_code}
                     onChange={(e) => {
                       setCurrentItem({
                         ...currentItem,
@@ -1146,7 +1143,7 @@ const DataCustomer = ({
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[0]?.code}
-                    disabled
+                    // disabled
                   />
                 </div>
                 <div className="col-6">

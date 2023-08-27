@@ -579,12 +579,12 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
-            // getCoderp();
+            getCoderp();
             dispatch({
               type: SET_CURRENT_RP,
               payload: {
                 ...data,
-                // req_code:  kode || "",         
+                req_code: null,
                 req_dep: profile.previlage?.dep_id ?? null,
                 rprod: [
                   {

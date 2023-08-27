@@ -72,6 +72,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
   const [ppn, setPpn] = useState(null);
   const [currency, setCurrency] = useState(null);
   const [rp, setRequest] = useState(null);
+  const [numb, setNumb] = useState(null);
   const [histori, setHistori] = useState(null);
   const [filtHis, setFiltHis] = useState([]);
   const [showSupplier, setShowSupplier] = useState(false);
@@ -111,6 +112,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
     getSupplier();
     getRulesPay();
     getPpn();
+    getStatus();
     getRp();
     getProduct(po.ns);
     getJasa();
@@ -167,6 +169,29 @@ const InputPO = ({ onCancel, onSuccess }) => {
         setPusatBiaya(data);
       }
     } catch (error) {}
+  };
+
+  console.log("status:", numb);
+  const getStatus = async () => {
+    const config = {
+      ...endpoints.getStatusPO,
+      data: {},
+    };
+
+    console.log("Data sebelum request:", config.data);
+
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log("Response:", response);
+      if (response.status) {
+        const { data } = response;
+
+        setNumb(data);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   const getRulesPay = async () => {
@@ -321,6 +346,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
           }
         });
         setRequest(filt);
+        console.log("repo :", filt);
       }
     } catch (error) {
       console.log(error);
@@ -340,7 +366,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
         const { data } = response;
         dispatch({
           type: SET_PRODUCT,
-          payload: data.filter((v) => v?.group?.stock ? v?.group?.stok === !ns : true),
+          payload: data.filter((v) =>
+            v?.group?.stock ? v?.group?.stok === !ns : true
+          ),
         });
         // setProduct(data);
         console.log("jsdj");
@@ -847,6 +875,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
               }}
               placeholder={tr[localStorage.getItem("language")].masuk}
               error={error?.code}
+              disabled={numb}
             />
           </div>
 
@@ -2025,9 +2054,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                         option={supplier}
                         onChange={(t) => {
                           let temp = [...po.pjasa];
-                          temp[e.index].sup_id = t.value.supplier.id;
+                          temp[e.index].sup_id = t.supplier.id;
                           updatePo({ ...po, pjasa: temp });
-                          console.log(temp);
+                          console.log("hello !!!!",temp);
                         }}
                         label={"[supplier.sup_name]"}
                         placeholder={tr[localStorage.getItem("language")].pilih}

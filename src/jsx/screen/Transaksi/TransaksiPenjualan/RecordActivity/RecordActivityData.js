@@ -102,6 +102,47 @@ const RecordActivityData = ({ onAdd, onEdit }) => {
       }, 500);
     }
   };
+  const getCoderp = async () => {
+    // setLoading(true);
+    const config = {
+      ...endpoints.recordActCode,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const kode = response.data;
+        onAdd();
+        dispatch({
+          type: SET_CURRENT_RECACTIVITY,
+          payload: {
+            ...data,
+            ra_code: kode,
+            ra_date: new Date(),
+            ra_dep: profile.previlage?.dep_id ?? null,
+            product: [
+              {
+                id: 0,
+                prod_id: null,
+                unit_id: null,
+              },
+            ],
+          },
+        });
+      }
+
+      // setLoading(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      // setLoading(false);
+    }
+  };
+
+
 
   const approveRec = async (id) => {
     setUpdate(true);
@@ -500,6 +541,7 @@ const RecordActivityData = ({ onAdd, onEdit }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
+            getCoderp()
             dispatch({
               type: SET_EDIT,
               payload: false,

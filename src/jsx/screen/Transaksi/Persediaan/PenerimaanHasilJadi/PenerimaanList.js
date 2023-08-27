@@ -13,7 +13,12 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_CURRENT_PHJ, SET_CURRENT_PO, SET_EDIT_PHJ, SET_PHJ } from "src/redux/actions";
+import {
+  SET_CURRENT_PHJ,
+  SET_CURRENT_PO,
+  SET_EDIT_PHJ,
+  SET_PHJ,
+} from "src/redux/actions";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 
 const data = {
@@ -56,6 +61,46 @@ const PenerimaanList = ({ onAdd }) => {
     setPh(data.data);
   }, []);
 
+  const getCoderp = async () => {
+    setLoading(true);
+    const config = {
+      ...endpoints.getcode_phj,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const kode = response.data;
+        onAdd();
+        dispatch({
+          type: SET_CURRENT_PHJ,
+          payload: {
+            ...data,
+            phj_code: kode,
+            product: [
+              {
+                id: 0,
+                prod_id: null,
+                unit_id: null,
+                location: null,
+                order: null,
+              },
+            ],
+          },
+        });
+      }
+
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const renderHeader = () => {
     return (
       <div className="flex justify-content-between">
@@ -72,6 +117,7 @@ const PenerimaanList = ({ onAdd }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
+            getCoderp();
             dispatch({
               type: SET_EDIT_PHJ,
               payload: false,

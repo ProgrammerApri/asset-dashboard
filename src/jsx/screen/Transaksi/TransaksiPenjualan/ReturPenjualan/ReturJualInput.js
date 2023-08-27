@@ -43,6 +43,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
   const [comp, setComp] = useState(null);
   const [customer, setCustomer] = useState(null);
   const [ppn, setPpn] = useState(null);
+  const [numb, setNumb] = useState(null);
   const [sale, setSale] = useState(null);
   const [showSupplier, setShowSupplier] = useState(false);
   const [showSatuan, setShowSatuan] = useState(false);
@@ -64,6 +65,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
     getComp();
     getCustomer();
     getPpn();
+    getStatus()
     getSale();
     getProduct();
     getSatuan();
@@ -121,6 +123,30 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
     }
 
     return valid;
+  };
+
+
+
+  const getStatus = async () => {
+    const config = {
+      ...endpoints.getstatus_retursl,
+      data: {},
+    };
+
+    console.log("Data sebelum request:", config.data);
+
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log("Response:", response);
+      if (response.status) {
+        const { data } = response;
+
+        setNumb(data);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   const getComp = async () => {
@@ -506,6 +532,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
               }}
               placeholder={tr[localStorage.getItem("language")].masuk}
               error={error?.code}
+              disabled={numb}
             />
           </div>
 

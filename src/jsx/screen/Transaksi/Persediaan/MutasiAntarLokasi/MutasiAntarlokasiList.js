@@ -108,6 +108,46 @@ const MutasiAntarList = ({ onAdd, onEdit, onDetail, onSuccess, onCancel }) => {
     }
   };
 
+  const getCoderp = async () => {
+    setLoading(true);
+    const config = {
+      ...endpoints.getcode_mutasi,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const kode = response.data;
+        onAdd();
+        dispatch({
+          type: SET_CURRENT_LM,
+          payload: {
+            ...data,
+            mtsi_code: kode,
+            mutasi: [
+              {
+                id: 0,
+                prod_id: null,
+                unit_id: null,
+                qty: null,
+                qty_terima: null,
+              },
+            ],
+          },
+        });
+      }
+
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const getSetup = async (isUpdate = false) => {
     setLoading(true);
     const config = {
@@ -324,6 +364,7 @@ const MutasiAntarList = ({ onAdd, onEdit, onDetail, onSuccess, onCancel }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
+            getCoderp()
             dispatch({
               type: SET_EDIT_LM,
               payload: false,

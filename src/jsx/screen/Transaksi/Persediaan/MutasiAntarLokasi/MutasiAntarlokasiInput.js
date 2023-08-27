@@ -55,6 +55,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
   const [showLok, setShowLok] = useState(false);
   const [showLoks, setShowLoks] = useState(false);
   const [product, setProduct] = useState(null);
+  const [numb, setNumb] = useState(null);
   const [proj, setProj] = useState(null);
   const [satuan, setSatuan] = useState(null);
   const [lokasi, setLokasi] = useState(null);
@@ -70,6 +71,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
     });
     getPusatBiaya();
     getLokasi();
+    getStatus();
     getProj();
     getSatuan();
     if (isEdit) {
@@ -155,6 +157,27 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
         setPusatBiaya(data);
       }
     } catch (error) {}
+  };
+  const getStatus = async () => {
+    const config = {
+      ...endpoints.getstatus_mutasi,
+      data: {},
+    };
+
+    console.log("Data sebelum request:", config.data);
+
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log("Response:", response);
+      if (response.status) {
+        const { data } = response;
+
+        setNumb(data);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   const getLokasi = async () => {
@@ -468,7 +491,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
               }}
               placeholder="Masukan Kode Referensi"
               error={error?.code}
-              disabled={isEdit}
+              disabled={numb || isEdit}
             />
           </div>
 

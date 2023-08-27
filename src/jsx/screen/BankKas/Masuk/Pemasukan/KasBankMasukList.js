@@ -100,6 +100,60 @@ const KasBankInList = ({ onAdd, onEdit }) => {
     }
   };
 
+  const getCoderp = async () => {
+    // setLoading(true);
+    const config = {
+      ...endpoints.incomeCode,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const kode = response.data;
+        onAdd();
+        dispatch({
+          type: SET_CURRENT_INC,
+          payload: {
+            ...data,
+            inc_code:kode,
+            inc_type: 1,
+            acq_pay: 1,
+            acq: [
+              // {
+              //   id: null,
+              //   exp_id: null,
+              //   fk_id: null,
+              //   value: null,
+              //   payment: null,
+              // },
+            ],
+            inc: [
+              {
+                id: null,
+                acc_code: null,
+                dbcr: null,
+                value: null,
+                desc: null,
+              },
+            ],
+
+            det_dp: [],
+          },
+        });
+      }
+
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
   const getCustomer = async () => {
     setLoading(true);
     const config = {
@@ -206,6 +260,7 @@ const KasBankInList = ({ onAdd, onEdit }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
+            getCoderp()
             dispatch({
               type: SET_EDIT_INC,
               payload: false,

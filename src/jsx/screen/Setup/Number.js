@@ -3,7 +3,7 @@ import { DataTable } from "primereact/datatable";
 import { InputText } from "primereact/inputtext";
 import { Toast, ast } from "primereact/toast";
 import React, { useEffect, useRef, useState } from "react";
-import { Accordion, Card, Col, Row } from "react-bootstrap";
+import { Accordion, Badge, Card, Col, Row } from "react-bootstrap";
 import { FilterMatchMode } from "primereact/api";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { Button, Button as PButton } from "primereact/button";
@@ -46,14 +46,14 @@ const Number = () => {
   const [loading, setLoading] = useState(true);
   const [isEdit, setEdit] = useState(false);
   const [rows2, setRows2] = useState(20);
-  const [checked, setChecked] = useState(false);
+  const [checked, setChecked] = useState(true);
   const [year, setYear] = useState(new Date().getFullYear());
   const toast = useRef(null);
   const [buttonValue, setButtonValue] = useState(false); // Atau nilai default yang sesuai
   const dispatch = useDispatch();
   const [bulan, setBulan] = useState(false); // State untuk nilai Checkbox
   const [filters1, setFilters1] = useState(null);
-  const [middle, setMiddle] = useState(new Date().getMonth() + 1);
+  const [middle, setMiddle] = useState(new Date().getMonth());
   const monthsInRomanNumerals = [
     "I",
     "II",
@@ -145,7 +145,6 @@ const Number = () => {
       if (response.status) {
         setTimeout(() => {
           setLoading(false);
-          // onInput(false);
           toast.current?.show({
             severity: "info",
             summary: tr[localStorage.getItem("language")].berhsl,
@@ -219,7 +218,6 @@ const Number = () => {
     aktif
   ) => {
     if (isEdit) {
-      // Lakukan sesuatu untuk mode edit
     } else {
       addAuto(
         modul,
@@ -235,6 +233,7 @@ const Number = () => {
       );
     }
   };
+
 
   const handlePrefixChange = (modul, newPrefix) => {
     setCurrentRP((prevRP) =>
@@ -331,6 +330,7 @@ const Number = () => {
     const isButtonActive = currentRP.some(
       (el) => el.modul === modul && el.aktif
     );
+    console.log("loguwe", isButtonActive);
 
     return (
       <div className="col-12">
@@ -436,18 +436,19 @@ const Number = () => {
               style={{ width: "10px", marginLeft: "5px", marginRight: "10px" }}
             ></div>
             <div className="flex-column">
-              <label>Reset Bulan </label>
+              <label>Reset Number Per Bulan </label>
               <div className="input-switch-container">
                 <InputSwitch
                   checked={currentRP.some(
                     (el) => el.modul === modul && el.res_bulan
                   )}
                   onChange={(e) => handleres_bulananChange(modul, e.value)}
-                  // disabled={isButtonActive}
-                  isVisible={isButtonActive}
+                  disabled={isButtonActive}
+                  // isVisible={isButtonActive}
                 />
               </div>
             </div>
+
             <div
               style={{ width: "10px", marginLeft: "5px", marginRight: "10px" }}
             ></div>
@@ -458,15 +459,30 @@ const Number = () => {
               >
                 <label>Format Kode </label>
                 <div style={{ display: "flex", alignItems: "center" }}>
-                  <InputText
-                    value={generateCodePreview(
-                      currentRP.find((el) => el.modul === modul)
-                    )}
-                    // onChange={(e) => onchange_format_kode(e.target.value)}
-                    placeholder="Penyesuaian kode"
-                    style={{ width: "200px", marginRight: "100px" }}
-                    disabled // Disable if tahun is not checked
-                  />
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <InputText
+                      value={generateCodePreview(
+                        currentRP.find((el) => el.modul === modul)
+                      )}
+                      // onChange={(e) => onchange_format_kode(e.target.value)}
+                      placeholder="Penyesuaian kode"
+                      style={{ width: "200px", marginRight: "50px" }}
+                      disabled // Disable if tahun is not checked
+                    />
+                    <div style={{ width: "100px" }}>
+                      <span
+                        className={`badge ${
+                          isButtonActive ? "badge-success" : "badge-danger"
+                        } light`}
+                        style={{
+                          fontSize: "10px",
+                        }}
+                      >
+                        {isButtonActive ? "Aktif" : "Tidak Aktif"}
+                      </span>
+                    </div>
+                  </div>
+
                   <Button
                     label={tr[localStorage.getItem("language")].update}
                     icon="pi pi-check"
@@ -512,7 +528,7 @@ const Number = () => {
     return (
       <Accordion
         className=" col-lg-12 col-sm-12 col-xs-12"
-        defaultActiveKey="1"
+        defaultActiveKey="0"
       >
         <div className="accordion__item" key={0}>
           <Accordion.Toggle
@@ -535,15 +551,17 @@ const Number = () => {
             <div className="accordion__body--text">
               <>
                 <div className="d-flex col-12 align-items-center">
-                  <InputSwitch
-                    className="mr-3"
-                    inputId="email"
-                    checked={checked}
-                    onChange={(e) => setChecked(e.value)}
-                  />
-                  <label className="mr-3 mt-1" htmlFor="email">
-                    {"Aktifkan fitur penomoran otomatis"}
-                  </label>
+                  <Col className="mr-0 ml-0 ">
+                    <InputSwitch
+                      className="mr-3"
+                      inputId="email"
+                      checked={checked}
+                      onChange={(e) => setChecked(e.value)}
+                    />
+                    <label className="mr-3 mt-1" htmlFor="email">
+                      {"Aktifkan fitur penomoran otomatis"}
+                    </label>
+                  </Col>
                 </div>
               </>
             </div>
@@ -585,7 +603,7 @@ const Number = () => {
                 {renderInputtext("Purchase Order", "po")}
                 {renderInputtext("Purchase", "gra")}
                 {renderInputtext("Purchase Invoice", "ip")}
-                {renderInputtext("Purchase Return", "fk")}
+                {renderInputtext("Purchase Return", "pr")}
               </Col>
             </div>
           </Accordion.Collapse>

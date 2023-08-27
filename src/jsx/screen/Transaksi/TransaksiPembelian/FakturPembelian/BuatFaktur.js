@@ -36,6 +36,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
   const [product, setProduct] = useState(null);
   const [jasa, setJasa] = useState(null);
   const [satuan, setSatuan] = useState(null);
+  const [numb, setNumb] = useState(false);
   const [lokasi, setLokasi] = useState(null);
   const [fkCode, setFkCode] = useState(null);
   const [currency, setCur] = useState(null);
@@ -67,6 +68,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
     getPpn();
     getProduct();
     getJasa();
+    getStatus();
     getSatuan();
     getLoct();
     getCur();
@@ -86,6 +88,28 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
         setFkCode(data);
       }
     } catch (error) {}
+  };
+
+  const getStatus = async () => {
+    const config = {
+      ...endpoints.getstatus_fakturpb,
+      data: {},
+    };
+
+    console.log("Data sebelum request:", config.data);
+
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log("Response:", response);
+      if (response.status) {
+        const { data } = response;
+
+        setNumb(data);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   const getSetup = async () => {
@@ -243,7 +267,6 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
-
   const getCur = async () => {
     const config = {
       ...endpoints.currency,
@@ -257,8 +280,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
         const { data } = response;
         setCur(data);
       }
-    } catch (error) {;
-    }
+    } catch (error) {}
   };
 
   const editinv = async () => {
@@ -359,7 +381,6 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
 
     return selected;
   };
-
 
   const checkSupp = (value) => {
     let selected = {};
@@ -484,7 +505,6 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
 
-
   const isValid = () => {
     let valid = false;
     let errors = {
@@ -528,6 +548,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
               }}
               placeholder={tr[localStorage.getItem("language")].masuk}
               error={error?.code}
+              disabled={numb}
             />
           </div>
 

@@ -76,6 +76,7 @@ const InputRA = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
   const [product, setProd] = useState(null);
   const [satuan, setSatuan] = useState(null);
   const [customer, setCustomer] = useState(null);
+  const [numb, setNumb] = useState(null);
   const [doubleClick, setDoubleClick] = useState(false);
   const recAct = useSelector((state) => state.recAct.current);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -95,9 +96,33 @@ const InputRA = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
     getPusatBiaya();
     getProduk();
     getSatuan();
+    getStatus()
     getCustomer();
     getSetup();
   }, []);
+
+
+  const getStatus = async () => {
+    const config = {
+      ...endpoints.recordActStatus,
+      data: {},
+    };
+
+    console.log("Data sebelum request:", config.data);
+
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log("Response:", response);
+      if (response.status) {
+        const { data } = response;
+
+        setNumb(data);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
   const getPusatBiaya = async () => {
     const config = {
@@ -458,6 +483,7 @@ const InputRA = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
               }}
               placeholder={tr[localStorage.getItem("language")].masuk}
               error={error?.code}
+              disabled={numb}
             />
           </div>
 

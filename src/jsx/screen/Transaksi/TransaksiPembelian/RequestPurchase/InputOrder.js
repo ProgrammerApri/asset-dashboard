@@ -73,6 +73,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
   const product = useSelector((state) => state.product.list);
   const [satuan, setSatuan] = useState(null);
   const [supplier, setSupplier] = useState(null);
+  const [numb, setNumb] = useState(null);
   const [doubleClick, setDoubleClick] = useState(false);
   const [lastNumber, setLastNumber] = useState("");
   const rp = useSelector((state) => state.rp.current);
@@ -94,6 +95,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
     getPusatBiaya();
     getProduk();
     getJasa();
+    getStatus();
     getSatuan();
     getSupplier();
     getSetup();
@@ -116,6 +118,29 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
       }
     } catch (error) {}
   };
+
+  const getStatus = async () => {
+    const config = {
+      ...endpoints.getStatusRP,
+      data: {},
+    };
+
+    console.log("Data sebelum request:", config.data);
+
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log("Response:", response);
+      if (response.status) {
+        const { data } = response;
+
+        setNumb(data);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
 
   const editRp = async () => {
     const config = {
@@ -469,6 +494,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
               }}
               placeholder={tr[localStorage.getItem("language")].masuk}
               error={error?.code}
+              disabled={numb}
               // disabled={rp.req_code !== null && rp.req_code !== undefined && rp.req_code !== ''}
  
             />

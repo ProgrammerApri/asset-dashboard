@@ -23,6 +23,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 
 const data = {
   id: null,
+  modul: null,
   ord_code: null,
   ord_date: null,
   no_doc: null,
@@ -78,6 +79,72 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
     initFilters1();
   }, []);
 
+  const getCodeOrder = async (isUpdate = false) => {
+    // setLoading(true);
+    const config = {
+      ...endpoints.getcode_order,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const kode = response.data;
+        console.log("gra",kode);
+        onAdd();
+        dispatch({
+          type: SET_CURRENT_ODR,
+          payload: {
+            ...data,
+            ord_code: kode,
+            split_inv: false,
+            dprod: [
+              {
+                id: 0,
+                do_id: null,
+                // preq_id: null,
+                // pprod_id: null,
+                prod_id: null,
+                unit_id: null,
+                location: null,
+                req: null,
+                order: null,
+                remain: null,
+                price: null,
+                disc: null,
+                nett_price: null,
+                total_fc: null,
+                total: null,
+              },
+            ],
+            djasa: [
+              {
+                id: 0,
+                do_id: null,
+                jasa_id: null,
+                sup_id: null,
+                unit_id: null,
+                order: null,
+                price: null,
+                disc: null,
+                total_fc: null,
+                total: null,
+              },
+            ],
+          },
+        });
+      }
+    } catch (error) {}
+    if (isUpdate) {
+      // setLoading(false);
+    } else {
+      // setTimeout(() => {
+      // setLoading(false);
+      // }, 500);
+    }
+  };
   const getOrder = async (isUpdate = false) => {
     setLoading(true);
     const config = {
@@ -90,9 +157,14 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
       response = await request(null, config);
       console.log(response);
       if (response.status) {
-        const { data } = response;
-        console.log(data);
-        dispatch({ type: SET_ODR, payload: data });
+        // if (response.status) {
+          const { data } = response;
+  
+          console.log("data Dibawah");
+          console.log(data);
+          const filteredData = data.filter((item) => item.modul !== "gra");
+
+        dispatch({ type: SET_ODR, payload: filteredData });
       }
     } catch (error) {}
     if (isUpdate) {
@@ -158,7 +230,6 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
       }, 500);
     }
   };
-
 
   const approveGra = async (id) => {
     setUpdate(true);
@@ -406,7 +477,6 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
           <i className="fa fa-trash"></i>
         </Link>
 
-
         {profile?.previlage?.approver && (
           <Link
             data-pr-tooltip="Approve"
@@ -499,7 +569,6 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
     );
   };
 
-
   const renderFooterReject = () => {
     return (
       <div>
@@ -573,6 +642,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
+            getCodeOrder();
             dispatch({
               type: SET_EDIT_ODR,
               payload: false,
@@ -795,9 +865,8 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
     });
 
     return (
-      
       <div className="">
-         <div className="col-12 pb-0">
+        <div className="col-12 pb-0">
           <Timeline
             value={data.timeline}
             layout="horizontal"

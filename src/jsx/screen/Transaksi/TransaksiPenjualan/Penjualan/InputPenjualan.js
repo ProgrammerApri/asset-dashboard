@@ -78,6 +78,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
   const [customer, setCustomer] = useState(null);
   const [subCus, setSubCus] = useState(null);
   const [supplier, setSupplier] = useState(null);
+  const [numb, setNumb] = useState(null);
   const [rulesPay, setRulesPay] = useState(null);
   const [ppn, setPpn] = useState(null);
   const [salesman, setSalesman] = useState(null);
@@ -120,6 +121,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     getRulesPay();
     getPpn();
     getCur();
+    getStatus();
     getSO();
     getProduct();
     getJasa();
@@ -301,6 +303,28 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     }
 
     return valid;
+  };
+
+  const getStatus = async () => {
+    const config = {
+      ...endpoints.status_sale,
+      data: {},
+    };
+
+    console.log("Data sebelum request:", config.data);
+
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log("Response:", response);
+      if (response.status) {
+        const { data } = response;
+
+        setNumb(data);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   const getComp = async () => {
@@ -1016,6 +1040,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
               }}
               placeholder={tr[localStorage.getItem("language")].masuk}
               error={error?.code}
+              disabled={numb}
             />
           </div>
 

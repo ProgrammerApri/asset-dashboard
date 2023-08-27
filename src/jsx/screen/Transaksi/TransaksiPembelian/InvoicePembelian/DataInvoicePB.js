@@ -27,6 +27,7 @@ import endpoints from "../../../../../utils/endpoints";
 
 const data = {
   id: null,
+  modul: null,
   inv_code: null,
   inv_date: null,
   inv_tax: null,
@@ -117,6 +118,35 @@ const DataInvoicePB = ({ onAdd, onDetail }) => {
     } catch (error) {}
   };
 
+  const getInvCode = async () => {
+    setLoading(true);
+    const config = {
+      ...endpoints.getcode_invoice,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const kode = response.data;
+        onAdd();
+        dispatch({
+          type: SET_CURRENT_INV,
+          payload: {
+            ...data,
+            inv_code: kode,
+            product: [],
+            jasa: [],
+          },
+        });
+      }
+    } catch (error) {}
+  };
+
+
+
   const getSetup = async (isUpdate = false) => {
     setLoading(true);
     const config = {
@@ -183,6 +213,9 @@ const DataInvoicePB = ({ onAdd, onDetail }) => {
       }, 500);
     }
   };
+
+
+
 
   const actionBodyTemplate = (data) => {
     return (
@@ -318,6 +351,7 @@ const DataInvoicePB = ({ onAdd, onDetail }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
+            getInvCode()
             dispatch({
               type: SET_EDIT_INV,
               payload: false,

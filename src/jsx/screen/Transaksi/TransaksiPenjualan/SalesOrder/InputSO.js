@@ -79,6 +79,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
   const [lokasi, setLokasi] = useState(null);
   const [supplier, setSupplier] = useState(null);
   const [rulesPay, setRulesPay] = useState(null);
+  const [numb, setNumb] = useState(true);
   const [ppn, setPpn] = useState(null);
   const [currency, setCurr] = useState(null);
   const [customer, setCustomer] = useState(null);
@@ -99,6 +100,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
     getComp();
     getJasa();
     getProduk();
+    getStatus();
     getSupplier();
     getSatuan();
     getRulesPay();
@@ -252,6 +254,29 @@ const InputSO = ({ onCancel, onSuccess }) => {
       }, 500);
     }
   };
+
+  const getStatus = async () => {
+    const config = {
+      ...endpoints.getStatusSO,
+      data: {},
+    };
+
+    console.log( config.data);
+
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log("Response:", response);
+      if (response.status) {
+        const { data } = response;
+
+        setNumb(data);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
 
   const addSO = async () => {
     const config = {
@@ -738,6 +763,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
               }}
               placeholder={tr[localStorage.getItem("language")].masuk}
               error={error?.code}
+              disabled={numb}
             />
           </div>
 

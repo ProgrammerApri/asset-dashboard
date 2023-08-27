@@ -25,6 +25,7 @@ import { tr } from "../../../../../data/tr";
 
 const data = {
   id: null,
+  modul: null,
   ret_code: null,
   ret_date: null,
   fk_id: null,
@@ -85,6 +86,34 @@ const ReturBeliList = ({ onAdd, onEdit, onDetail }) => {
       }, 500);
     }
   };
+
+
+  const getReturCode = async () => {
+    // setLoading(true);
+    const config = {
+      ...endpoints.getcode_returpb,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const kode = response.data;
+        onAdd();
+        dispatch({
+          type: SET_CURRENT_PR,
+          payload: {
+            ...data,
+            ret_code: kode,
+            product: [],
+          },
+        });
+      }
+    } catch (error) {}
+  };
+
 
   const getSetup = async (isUpdate = false) => {
     setLoading(true);
@@ -158,6 +187,7 @@ const ReturBeliList = ({ onAdd, onEdit, onDetail }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
+            getReturCode()
             dispatch({
               type: SET_EDIT_PR,
               payload: false,

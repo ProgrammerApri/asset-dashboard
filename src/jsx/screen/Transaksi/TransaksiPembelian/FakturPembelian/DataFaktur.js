@@ -27,6 +27,7 @@ import { Tooltip } from "primereact/tooltip";
 
 const data = {
   id: null,
+  modul: null,
   fk_code: null,
   fk_date: null,
   sup_id: null,
@@ -102,6 +103,36 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
       }, 500);
     }
   };
+
+
+  const getFktCode = async () => {
+    setLoading(true);
+    const config = {
+      ...endpoints.getcode_fakturpb,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const kode = response.data;
+        onAdd();
+        dispatch({
+          type: SET_CURRENT_PB_FK,
+          payload: {
+            ...data,
+            fk_code: kode,
+            product: [],
+            jasa: [],
+          },
+        });
+      }
+    } catch (error) {}
+  };
+
+
 
   const getSupplier = async () => {
     const config = {
@@ -350,6 +381,7 @@ const DataFaktur = ({ onAdd, onDetail, onDetailF }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
+            getFktCode()
             dispatch({
               type: SET_EDIT_PB_FK,
               payload: false,

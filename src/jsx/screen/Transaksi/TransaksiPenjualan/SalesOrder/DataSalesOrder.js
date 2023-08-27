@@ -21,6 +21,7 @@ import { Tooltip } from "primereact/tooltip";
 
 const data = {
   id: null,
+  modul: null,
   so_code: null,
   so_date: null,
   pel_id: null,
@@ -79,7 +80,9 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        dispatch({ type: SET_SO, payload: data });
+        const filteredData = data.filter((item) => item.modul !== "so");
+
+        dispatch({ type: SET_SO, payload: filteredData });
       }
     } catch (error) {}
     if (isUpdate) {
@@ -89,6 +92,60 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
         setLoading(false);
       }, 500);
     }
+  };
+
+  const getSoCode = async () => {
+    // setLoading(true);
+    const config = {
+      ...endpoints.getcode_SO,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const kode = response.data;
+        onAdd();
+        dispatch({
+          type: SET_CURRENT_SO,
+          payload: {
+            ...data,
+            so_code: kode,
+            sprod: [
+              {
+                id: 0,
+                prod_id: null,
+                unit_id: null,
+                location: null,
+                request: null,
+                order: null,
+                remain: null,
+                price: null,
+                disc: null,
+                nett_price: null,
+                total_fc: null,
+                total: null,
+              },
+            ],
+            sjasa: [
+              {
+                id: 0,
+                jasa_id: null,
+                sup_id: null,
+                unit_id: null,
+                qty: null,
+                price: null,
+                disc: null,
+                total_fc: null,
+                total: null,
+              },
+            ],
+          },
+        });
+      }
+    } catch (error) {}
   };
 
   const delSO = async (id) => {
@@ -434,6 +491,7 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
+            getSoCode();
             dispatch({
               type: SET_EDIT_SO,
               payload: false,
@@ -610,7 +668,7 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
                 />
                 <Column
                   header={tr[localStorage.getItem("language")].customer}
-                  field={(e) => e.pel_id.cus_name}
+                  field={(e) => e.pel_id?.cus_name}
                   style={{ minWidth: "10rem" }}
                   body={loading && <Skeleton />}
                 />

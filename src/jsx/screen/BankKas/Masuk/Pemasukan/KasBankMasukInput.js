@@ -69,6 +69,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
   const [customer, setCustomer] = useState(null);
   const [allCus, setAllCus] = useState(null);
   const [arcard, setAR] = useState(null);
+  const [numb, setNumb] = useState(null);
   const [dept, setDept] = useState(null);
   const [proj, setProj] = useState(null);
   const [showSupplier, setShowSupplier] = useState(false);
@@ -121,6 +122,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
     getProj();
     getAcc();
     getSisa();
+    getStatus()
     getSo();
     getCur();
   }, []);
@@ -159,6 +161,29 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
         // setSisa(sisa);
       }
     } catch (error) {}
+  };
+
+
+  const getStatus = async () => {
+    const config = {
+      ...endpoints.incomeStatus,
+      data: {},
+    };
+
+    console.log("Data sebelum request:", config.data);
+
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log("Response:", response);
+      if (response.status) {
+        const { data } = response;
+
+        setNumb(data);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   const getCustomer = async () => {
@@ -557,6 +582,8 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
               }}
               placeholder="Masukan Kode Referensi"
               error={error?.code}
+              disabled={numb}
+
             />
           </div>
 

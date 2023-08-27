@@ -59,6 +59,48 @@ const PemakaianList = ({ onAdd }) => {
     setPb(data.data);
   }, []);
 
+  const getCoderp = async () => {
+    setLoading(true);
+    const config = {
+      ...endpoints.getcode_pbb,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const kode = response.data;
+        console.log("pbbbbb",kode);
+        onAdd();
+        dispatch({
+          type: SET_CURRENT_PB,
+          payload: {
+            ...data,
+            pb_code: kode,
+            product: [
+              {
+                id: 0,
+                prod_id: null,
+                unit_id: null,
+                end: null,
+                location: null,
+                order: null,
+              },
+            ],
+          },
+        });
+      }
+
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const renderHeader = () => {
     return (
       <div className="flex justify-content-between">
@@ -75,6 +117,7 @@ const PemakaianList = ({ onAdd }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
+            getCoderp();
             dispatch({
               type: SET_EDIT_PB,
               payload: false,

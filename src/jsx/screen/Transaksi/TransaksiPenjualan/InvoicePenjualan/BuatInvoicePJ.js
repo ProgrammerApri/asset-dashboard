@@ -31,6 +31,7 @@ const BuatInvoicePJ = ({ onCancel, onSuccess }) => {
   const [order, setOrder] = useState(null);
   const [customer, setCustomer] = useState(null);
   const [supplier, setSupplier] = useState(null);
+  const [numb, setNumb] = useState(null);
   const [pajak, setPajak] = useState(null);
   const [product, setProduct] = useState(null);
   const [jasa, setJasa] = useState(null);
@@ -144,6 +145,31 @@ const BuatInvoicePJ = ({ onCancel, onSuccess }) => {
       }
     } catch (error) {}
   };
+
+
+  const getStatus = async () => {
+    const config = {
+      ...endpoints.status_invoicepj,
+      data: {},
+    };
+
+    console.log("Data sebelum request:", config.data);
+
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log("Response:", response);
+      if (response.status) {
+        const { data } = response;
+
+        setNumb(data);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+
 
   const getSupplier = async () => {
     const config = {
@@ -559,6 +585,7 @@ const BuatInvoicePJ = ({ onCancel, onSuccess }) => {
               }}
               placeholder={tr[localStorage.getItem("language")].masuk}
               error={error?.code}
+              disabled={numb}
             />
           </div>
 

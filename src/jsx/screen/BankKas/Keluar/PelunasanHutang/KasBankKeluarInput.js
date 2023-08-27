@@ -67,6 +67,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
   const [supplier, setSupplier] = useState(null);
   const [allSup, setAllSup] = useState(null);
   const [faktur, setFaktur] = useState(null);
+  const [numb, setNumb] = useState(null);
   const [apcard, setAP] = useState(null);
   const [dept, setDept] = useState(null);
   const [proj, setProj] = useState(null);
@@ -119,6 +120,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
     getSupplier();
     getBatch();
     getProj();
+    getStatus();
     getDept();
     getAccount();
     getCurrency();
@@ -338,6 +340,30 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
       console.log(error);
     }
   };
+
+  const getStatus = async () => {
+    const config = {
+      ...endpoints.expenseStatus,
+      data: {},
+    };
+
+    console.log("Data sebelum request:", config.data);
+
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log("Response:", response);
+      if (response.status) {
+        const { data } = response;
+
+        setNumb(data);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+
 
   const getFaktur = async () => {
     const config = {
@@ -794,6 +820,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
               }}
               placeholder="Masukan Kode Referensi"
               error={error?.code}
+              disabled={numb}
             />
           </div>
 

@@ -394,19 +394,19 @@ const Detail = ({ onCancel }) => {
 
                     <div className="col-6 fs-12 ml-0 text-right">
                       <span className="ml-0 fs-14">
-                        <b>{show?.sup_id.sup_name}</b>
+                        <b>{show?.sup_id?.sup_name}</b>
                       </span>
                       <br></br>
                       <span className="ml-0">
-                        Cp : <b>{show?.sup_id.sup_cp}</b>
+                        Cp : <b>{show?.sup_id?.sup_cp}</b>
                       </span>
                       <br></br>
                       <span className="ml-0">
-                        {show?.sup_id.sup_address},
-                        {kota(show?.sup_id.sup_kota)?.city_name}
+                        {show?.sup_id?.sup_address},
+                        {kota(show?.sup_id?.sup_kota)?.city_name}
                       </span>
                       <br></br>
-                      <span className="ml-0">{show?.sup_id.sup_kpos}</span>
+                      <span className="ml-0">{show?.sup_id?.sup_kpos}</span>
                       <br></br>
                       <span className="ml-0">
                         (+62)

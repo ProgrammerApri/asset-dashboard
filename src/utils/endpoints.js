@@ -548,6 +548,30 @@ const endpoints = {
     method: "DELETE",
     data: {},
   },
+  // Rak
+
+  getRak: {
+    endpoint: "/v1/api/rak",
+    method: "GET",
+    data: {},
+  },
+
+  addRak: {
+    endpoint: "/v1/api/rak",
+    method: "POST",
+    data: {},
+  },
+
+  editRak: {
+    endpoint: "/v1/api/rak/",
+    method: "PUT",
+    data: {},
+  },
+  delRak: {
+    endpoint: "/v1/api/rak/",
+    method: "DELETE",
+    data: {},
+  },
 
   //report setup
   reportPnl: {
@@ -790,6 +814,12 @@ const endpoints = {
   },
 
   /// Request Puechase
+  getStatusRP: {
+    endpoint: "/v1/api/rp/status",
+    method: "GET",
+    data: {},
+  },
+
   codePurchase: {
     endpoint: "/v1/api/rp/code",
     method: "GET",
@@ -833,6 +863,18 @@ const endpoints = {
   },
 
   /// PO
+
+  getStatusPO: {
+    endpoint: "/v1/api/po/status",
+    method: "GET",
+    data: {},
+  },
+  kodepo: {
+    endpoint: "/v1/api/po/code",
+    method: "GET",
+    data: {},
+  },
+
   po: {
     endpoint: "/v1/api/po",
     method: "GET",
@@ -907,6 +949,16 @@ const endpoints = {
   },
 
   /// Record Activity
+  recordActCode: {
+    endpoint: "/v1/api/record-activity/code",
+    method: "GET",
+    data: {},
+  },
+  recordActStatus: {
+    endpoint: "/v1/api/record-activity/status",
+    method: "GET",
+    data: {},
+  },
   recordAct: {
     endpoint: "/v1/api/record-activity",
     method: "GET",
@@ -944,7 +996,127 @@ const endpoints = {
     data: {},
   },
 
+  /// so
+  getStatusSO: {
+    endpoint: "/v1/api/so/status",
+    method: "GET",
+    data: {},
+  },
+
+  getcode_SO: {
+    endpoint: "/v1/api/so/code",
+    method: "GET",
+    data: {},
+  },
   /// DP
+  getStatusGRA: {
+    endpoint: "/v1/api/order/status",
+    method: "GET",
+    data: {},
+  },
+
+  getcode_invoice: {
+    endpoint: "/v1/api/invoicepb/code",
+    method: "GET",
+    data: {},
+  },
+
+  getcode_retursl: {
+    endpoint: "/v1/api/retursale/code",
+    method: "GET",
+    data: {},
+  },
+
+  getstatus_retursl: {
+    endpoint: "/v1/api/retursale/status",
+    method: "GET",
+    data: {},
+  },
+
+  getcode_koreksi_per: {
+    endpoint: "/v1/api/koreksi-persediaan/code",
+    method: "GET",
+    data: {},
+  },
+
+  getstatus_koreksi_per: {
+    endpoint: "/v1/api/koreksi-persediaan/status",
+    method: "GET",
+    data: {},
+  },
+
+  getcode_mutasi: {
+    endpoint: "/v1/api/mutasi/code",
+    method: "GET",
+    data: {},
+  },
+
+  getstatus_mutasi: {
+    endpoint: "/v1/api/mutasi/status",
+    method: "GET",
+    data: {},
+  },
+
+  getcode_memorial: {
+    endpoint: "/v1/api/memorial/code",
+    method: "GET",
+    data: {},
+  },
+
+  getstatus_memorial: {
+    endpoint: "/v1/api/memorial/status",
+    method: "GET",
+    data: {},
+  },
+
+  getcode_pbb: {
+    endpoint: "/v1/api/pbb/code",
+    method: "GET",
+    data: {},
+  },
+
+  getstatus_pbb: {
+    endpoint: "/v1/api/pbb/status",
+    method: "GET",
+    data: {},
+  },
+
+  getcode_phj: {
+    endpoint: "/v1/api/phj/code",
+    method: "GET",
+    data: {},
+  },
+
+  getstatus_phj: {
+    endpoint: "/v1/api/phj/status",
+    method: "GET",
+    data: {},
+  },
+
+  getcode_returpb: {
+    endpoint: "/v1/api/returpb/code",
+    method: "GET",
+    data: {},
+  },
+
+  getstatus_returpb: {
+    endpoint: "/v1/api/returpb/status",
+    method: "GET",
+    data: {},
+  },
+
+  getstatus_invoice: {
+    endpoint: "/v1/api/invoice-pb/status",
+    method: "GET",
+    data: {},
+  },
+
+  getcode_order: {
+    endpoint: "/v1/api/order/code",
+    method: "GET",
+    data: {},
+  },
+
   order: {
     endpoint: "/v1/api/order",
     method: "GET",
@@ -1063,6 +1235,16 @@ const endpoints = {
   },
 
   /// Penjualan
+  status_sale: {
+    endpoint: "/v1/api/sale/status",
+    method: "GET",
+    data: {},
+  },
+  code_sale: {
+    endpoint: "/v1/api/sale/code",
+    method: "GET",
+    data: {},
+  },
   sale: {
     endpoint: "/v1/api/sales",
     method: "GET",
@@ -1088,6 +1270,19 @@ const endpoints = {
   },
 
   /// Invoice Penjualan
+ 
+  status_invoicepj: {
+    endpoint: "/v1/api/invoice-pj/status",
+    method: "GET",
+    data: {},
+  },
+
+  code_invoicepj: {
+    endpoint: "/v1/api/invoice-pj/code",
+    method: "GET",
+    data: {},
+  },
+
   invoice_pj: {
     endpoint: "/v1/api/invoice-pj",
     method: "GET",
@@ -1113,6 +1308,17 @@ const endpoints = {
   },
 
   /// Faktur Penjualan
+  getfaktur_pj: {
+    endpoint: "/v1/api/fakturpj/status",
+    method: "GET",
+    data: {},
+  },
+  getfaktur_pjcode: {
+    endpoint: "/v1/api/fakturpj/code",
+    method: "GET",
+    data: {},
+  },
+
   faktur_pj: {
     endpoint: "/v1/api/faktur-pj",
     method: "GET",
@@ -1138,6 +1344,18 @@ const endpoints = {
   },
 
   /// Expense
+  expenseStatus: {
+    endpoint: "/v1/api/pengeluaran/status",
+    method: "GET",
+    data: {},
+  },
+  
+  expenseCode: {
+    endpoint: "/v1/api/pengeluaran/code",
+    method: "GET",
+    data: {},
+  },
+  
   expense: {
     endpoint: "/v1/api/expense",
     method: "GET",
@@ -1169,6 +1387,16 @@ const endpoints = {
   },
 
   /// Income
+  incomeCode: {
+    endpoint: "/v1/api/pemasukan-uang-masuk/code",
+    method: "GET",
+    data: {},
+  },
+  incomeStatus: {
+    endpoint: "/v1/api/pemasukan-uang-masuk/status",
+    method: "GET",
+    data: {},
+  },
   income: {
     endpoint: "/v1/api/income",
     method: "GET",
@@ -1434,6 +1662,7 @@ const endpoints = {
     data: {},
   },
 
+ 
   addNumber: {
     endpoint: "/v1/api/numb",
     method: "POST",
@@ -1702,6 +1931,18 @@ const endpoints = {
   },
 
   // Koreksi Hutang
+  korHutCode: {
+    endpoint: "/v1/api/koreksi-hutang/code",
+    method: "GET",
+    data: {},
+  },
+
+  korHutStatus: {
+    endpoint: "/v1/api/koreksi-hutang/status",
+    method: "GET",
+    data: {},
+  },
+
   korHut: {
     endpoint: "/v1/api/koreksi-hut",
     method: "GET",
@@ -1727,8 +1968,33 @@ const endpoints = {
   },
 
   // Koreksi Piutang
+  korPiuCode: {
+    endpoint: "/v1/api/koreksi-piutang/code",
+    method: "GET",
+    data: {},
+  },
+  korPiuStatus: {
+    endpoint: "/v1/api/koreksi-piutang/status",
+    method: "GET",
+    data: {},
+  },
   korPiu: {
     endpoint: "/v1/api/koreksi-piu",
+    method: "GET",
+    data: {},
+  },
+  getKorper: {
+    endpoint: "/v1/api/koreksi-persediaan/code",
+    method: "GET",
+    data: {},
+  },
+  getKorper_status: {
+    endpoint: "/v1/api/koreksi-persediaan/status",
+    method: "GET",
+    data: {},
+  },
+  korPer: {
+    endpoint: "/v1/api/koreksi-sto",
     method: "GET",
     data: {},
   },

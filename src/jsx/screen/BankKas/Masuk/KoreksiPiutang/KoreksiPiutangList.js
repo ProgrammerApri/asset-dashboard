@@ -46,6 +46,44 @@ const KoreksiARList = ({ onAdd, onEdit }) => {
     getKoreksi();
   }, []);
 
+  const getCoderp = async () => {
+    // setLoading(true);
+    const config = {
+      ...endpoints.korPiuCode,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const kode = response.data;
+        onAdd();
+        dispatch({
+          type: SET_CURRENT_KP,
+          payload: {
+            ...data,
+            code: kode,
+            date: null,
+            cus_id: null,
+            acc_lwn: null,
+            type_kor: null,
+            value: null,
+            due_date: null,
+            desc: null,
+          },
+        });
+      }
+
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const getKoreksi = async (isUpdate = false) => {
     setLoading(true);
     const config = {
@@ -126,6 +164,7 @@ const KoreksiARList = ({ onAdd, onEdit }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
+            getCoderp();
             dispatch({
               type: SET_EDIT_KP,
               payload: false,

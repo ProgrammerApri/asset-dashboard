@@ -69,6 +69,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
   const product = useSelector((state) => state.product.list);
   const [jasa, setJasa] = useState(null);
   const [satuan, setSatuan] = useState(null);
+  const [numb, setNumb] = useState(null);
   const [lokasi, setLokasi] = useState(null);
   const [currency, setCur] = useState(null);
   const [setup, setSetup] = useState(null);
@@ -119,6 +120,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     getJasa();
     getSatuan();
     getPjk();
+    getStatus();
     getPO();
     getLoc();
     getCur();
@@ -152,6 +154,29 @@ const InputOrder = ({ onCancel, onSuccess }) => {
       }, 500);
     }
   };
+
+  const getStatus = async () => {
+    const config = {
+      ...endpoints.getStatusGRA,
+      data: {},
+    };
+
+    console.log("Data sebelum request:", config.data);
+
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log("Response:", response);
+      if (response.status) {
+        const { data } = response;
+
+        setNumb(data);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
 
   const addODR = async () => {
     const config = {
@@ -970,6 +995,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
               }}
               placeholder={tr[localStorage.getItem("language")].masuk}
               error={error?.code}
+              disabled={numb}
             />
           </div>
 

@@ -37,6 +37,7 @@ const BuatInvoicePB = ({ onCancel, onSuccess }) => {
   const [pajak, setPajak] = useState(null);
   const [product, setProduct] = useState(null);
   const [jasa, setJasa] = useState(null);
+  const [numb, setNumb] = useState(null);
   const [satuan, setSatuan] = useState(null);
   const [lokasi, setLokasi] = useState(null);
   const [currency, setCur] = useState(null);
@@ -66,6 +67,7 @@ const BuatInvoicePB = ({ onCancel, onSuccess }) => {
     getORD();
     getSupplier();
     getPpn();
+    getStatus()
     getProduct();
     getJasa();
     getSatuan();
@@ -133,6 +135,27 @@ const BuatInvoicePB = ({ onCancel, onSuccess }) => {
     } catch (error) {
       console.log("------");
       console.log(error);
+    }
+  };
+  const getStatus = async () => {
+    const config = {
+      ...endpoints.getstatus_invoice,
+      data: {},
+    };
+
+    console.log("Data sebelum request:", config.data);
+
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log("Response:", response);
+      if (response.status) {
+        const { data } = response;
+
+        setNumb(data);
+      }
+    } catch (error) {
+      console.error("Error:", error);
     }
   };
 
@@ -552,6 +575,7 @@ const BuatInvoicePB = ({ onCancel, onSuccess }) => {
               }}
               placeholder={tr[localStorage.getItem("language")].masuk}
               error={error?.code}
+              disabled={numb}
             />
           </div>
 

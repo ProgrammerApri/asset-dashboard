@@ -21,6 +21,7 @@ import { Tooltip } from "primereact/tooltip";
 
 const data = {
   id: null,
+  modul: null,
   ord_code: null,
   ord_date: null,
   no_doc: null,
@@ -86,8 +87,9 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        console.log(data);
-        dispatch({ type: SET_SL, payload: data });
+        console.log(data); const filteredData = data.filter((item) => item.modul !== "sale");
+
+        dispatch({ type: SET_SL, payload: filteredData });
       }
     } catch (error) {}
     if (isUpdate) {
@@ -98,6 +100,65 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
       }, 500);
     }
   };
+
+  const getSaleCode = async () => {
+    // setLoading(true);
+    const config = {
+      ...endpoints.code_sale,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const kode = response.data;
+        onAdd();
+        dispatch({
+          type: SET_CURRENT_SL,
+          payload: {
+            ...data,
+            ord_code:kode,
+            surat_jalan: 2,
+            jprod: [
+              {
+                id: 0,
+                pj_id: null,
+                prod_id: null,
+                unit_id: null,
+                location: null,
+                stock: null,
+                req: null,
+                order: null,
+                remain: null,
+                price: null,
+                disc: null,
+                nett_price: null,
+                total_fc: null,
+                total: null,
+              },
+            ],
+            jjasa: [
+              {
+                id: 0,
+                pj_id: null,
+                jasa_id: null,
+                sup_id: null,
+                unit_id: null,
+                order: null,
+                price: null,
+                disc: null,
+                total_fc: null,
+                total: null,
+              },
+            ],
+          },
+        });
+      }
+    } catch (error) {}
+  };
+
 
   const getCur = async () => {
     const config = {
@@ -315,6 +376,7 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
+            getSaleCode()
             dispatch({
               type: SET_EDIT_SL,
               payload: false,

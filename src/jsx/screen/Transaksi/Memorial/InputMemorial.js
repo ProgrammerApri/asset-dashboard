@@ -51,6 +51,7 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
   const [showDep, setShowDep] = useState(false);
   const [account, setAccount] = useState(null);
   const [dept, setDept] = useState(null);
+  const [numb, setNumb] = useState(null);
   const [currency, setCurrency] = useState(null);
   const [active, setActive] = useState(0);
   const [state, setState] = useState(0);
@@ -67,6 +68,7 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
     });
     getAcc();
     getSetup();
+    getStatus();
     getDept();
     getCurrency();
   }, []);
@@ -94,6 +96,27 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
         setAccount(filt);
       }
     } catch (error) {}
+  };
+  const getStatus = async () => {
+    const config = {
+      ...endpoints.getstatus_memorial,
+      data: {},
+    };
+
+    console.log("Data sebelum request:", config.data);
+
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log("Response:", response);
+      if (response.status) {
+        const { data } = response;
+
+        setNumb(data);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   const getSetup = async () => {
@@ -467,6 +490,7 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
               }}
               placeholder={tr[localStorage.getItem("language")].masuk}
               error={error?.code}
+              disabled={numb}
             />
           </div>
           <div className="col-2 text-black fs-13">
@@ -489,7 +513,9 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-5 text-black fs-13">
-            <label className="text-label">{tr[localStorage.getItem("language")].ket}</label>
+            <label className="text-label">
+              {tr[localStorage.getItem("language")].ket}
+            </label>
             <div className="p-inputgroup">
               <InputText
                 value={memorial.desc}
@@ -558,7 +584,9 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
                           valueTemplate={valTemp}
                           filter
                           filterBy={"account.acc_name"}
-                          placeholder={tr[localStorage.getItem("language")].pilih}
+                          placeholder={
+                            tr[localStorage.getItem("language")].pilih
+                          }
                           errorMessage="Akun Belum Dipilih"
                           error={error?.akn[e.index]?.id}
                         />
@@ -583,7 +611,9 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
                             setShowDep(true);
                           }}
                           label={"[ccost_name] ([ccost_code])"}
-                          placeholder={tr[localStorage.getItem("language")].pilih}
+                          placeholder={
+                            tr[localStorage.getItem("language")].pilih
+                          }
                         />
                       )}
                     />

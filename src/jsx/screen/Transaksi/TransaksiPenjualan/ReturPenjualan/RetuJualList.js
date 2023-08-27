@@ -70,6 +70,39 @@ const ReturJualList = ({ onAdd, onDetail, onEdit }) => {
     }
   };
 
+  const getCoderp = async () => {
+    // setLoading(true);
+    const config = {
+      ...endpoints.getcode_retursl,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const kode = response.data;
+        onAdd();
+        dispatch({
+          type: SET_CURRENT_SR,
+          payload: {
+            ...data,
+            ret_code:kode,
+            product: [],
+          },
+        });
+      }
+
+      // setLoading(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      // setLoading(false);
+    }
+  };
+
+
   const delRet = async (id) => {
     const config = {
       ...endpoints.delSR,
@@ -124,6 +157,7 @@ const ReturJualList = ({ onAdd, onDetail, onEdit }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
+            getCoderp()
             dispatch({
               type: SET_EDIT_SR,
               payload: false,

@@ -51,6 +51,7 @@ const PenerimaanInput = ({ onCancel, onSuccess }) => {
   const [satuan, setSatuan] = useState(null);
   const [lokasi, setLokasi] = useState(null);
   const [pb, setPb] = useState(null);
+  const [numb, setNumb] = useState(null);
   const [accor, setAccor] = useState({
     produk: true,
   });
@@ -63,6 +64,7 @@ const PenerimaanInput = ({ onCancel, onSuccess }) => {
     });
     getLokasi();
     getPB();
+    getStatus();
     getProduct();
     getSatuan();
   }, []);
@@ -123,6 +125,28 @@ const PenerimaanInput = ({ onCancel, onSuccess }) => {
     }
 
     return valid;
+  };
+
+  const getStatus = async () => {
+    const config = {
+      ...endpoints.getstatus_phj,
+      data: {},
+    };
+
+    console.log("Data sebelum request:", config.data);
+
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log("Response:", response);
+      if (response.status) {
+        const { data } = response;
+
+        setNumb(data);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   const getLokasi = async () => {
@@ -387,6 +411,7 @@ const PenerimaanInput = ({ onCancel, onSuccess }) => {
               }}
               placeholder="Masukan Kode Referensi"
               error={error?.code}
+              disabled={numb}
             />
           </div>
 
@@ -617,7 +642,7 @@ const PenerimaanInput = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
-                className="align-text-top"
+                  className="align-text-top"
                   body={(e) =>
                     e.index === phj.product.length - 1 ? (
                       <Link

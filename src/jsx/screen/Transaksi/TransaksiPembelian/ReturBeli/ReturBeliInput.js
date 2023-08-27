@@ -45,6 +45,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
   const isEdit = useSelector((state) => state.pr.editPr);
   const dispatch = useDispatch();
   const [isRp, setRp] = useState(true);
+  const [numb, setNumb] = useState(null);
   const [supplier, setSupplier] = useState(null);
   const [ppn, setPpn] = useState(null);
   const [currency, setCurrency] = useState(null);
@@ -71,6 +72,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
     getPpn();
     getAp();
     getFK();
+    getStatus()
     getInv();
     getProduct();
     getSatuan();
@@ -130,6 +132,31 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
 
     return valid;
   };
+
+
+
+  const getStatus = async () => {
+    const config = {
+      ...endpoints.getstatus_returpb,
+      data: {},
+    };
+
+    console.log("Data sebelum request:", config.data);
+
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log("Response:", response);
+      if (response.status) {
+        const { data } = response;
+
+        setNumb(data);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
 
   const getSupplier = async () => {
     const config = {
@@ -559,7 +586,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
               }}
               placeholder={tr[localStorage.getItem("language")].masuk}
               error={error?.code}
-              disabled={isEdit}
+              disabled={isEdit || numb}
             />
           </div>
 

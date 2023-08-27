@@ -38,6 +38,7 @@ const BuatFakturPJ = ({ onCancel, onSuccess }) => {
   const [pajak, setPajak] = useState(null);
   const [product, setProduct] = useState(null);
   const [jasa, setJasa] = useState(null);
+  const [numb, setNumb] = useState(null);
   const [satuan, setSatuan] = useState(null);
   const [lokasi, setLokasi] = useState(null);
   const [currency, setCur] = useState(null);
@@ -69,6 +70,7 @@ const BuatFakturPJ = ({ onCancel, onSuccess }) => {
     getSetup();
     getSupplier();
     getPpn();
+    getStatus()
     getProduct();
     getJasa();
     getSatuan();
@@ -94,6 +96,29 @@ const BuatFakturPJ = ({ onCancel, onSuccess }) => {
       }
     } catch (error) {}
   };
+
+  const getStatus = async () => {
+    const config = {
+      ...endpoints.getfaktur_pj,
+      data: {},
+    };
+
+    console.log("Data sebelum request:", config.data);
+
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log("Response:", response);
+      if (response.status) {
+        const { data } = response;
+
+        setNumb(data);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
 
   const getInv = async () => {
     const config = {
@@ -567,6 +592,7 @@ const BuatFakturPJ = ({ onCancel, onSuccess }) => {
               }}
               placeholder={tr[localStorage.getItem("language")].masuk}
               error={error?.code}
+              disabled={numb}
             />
           </div>
 

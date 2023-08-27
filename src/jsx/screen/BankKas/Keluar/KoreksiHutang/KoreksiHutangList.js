@@ -77,6 +77,45 @@ const KoreksiAPList = ({ onAdd, onEdit }) => {
     }
   };
 
+  const getCoderp = async () => {
+    // setLoading(true);
+    const config = {
+      ...endpoints.korHutCode,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const kode = response.data;
+        onAdd();
+        dispatch({
+          type: SET_CURRENT_KH,
+          payload: {
+            ...data,
+            code: kode,
+            date: null,
+            sup_id: null,
+            acc_lwn: null,
+            tipe: null,
+            value: null,
+            due_date: null,
+            desc: null,
+          },
+        });
+      }
+
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
   const delKor = async (id) => {
     const config = {
       ...endpoints.delKorHut,
@@ -131,6 +170,7 @@ const KoreksiAPList = ({ onAdd, onEdit }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
+            getCoderp()
             dispatch({
               type: SET_EDIT_KH,
               payload: false,

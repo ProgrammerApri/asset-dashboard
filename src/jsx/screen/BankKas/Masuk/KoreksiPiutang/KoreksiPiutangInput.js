@@ -40,6 +40,7 @@ const KoreksiARInput = ({ onCancel, onSuccess }) => {
   const kp = useSelector((state) => state.kp.current);
   const isEdit = useSelector((state) => state.kp.editKp);
   const dispatch = useDispatch();
+  const [numb, setNumb] = useState(null);
   const [ar, setAr] = useState(null);
   const [customer, setCustomer] = useState(null);
   const [acc, setAcc] = useState(null);
@@ -55,9 +56,34 @@ const KoreksiARInput = ({ onCancel, onSuccess }) => {
     });
     getAr();
     getAcc();
+    getStatus()
     getCur();
   }, []);
 
+  const getStatus = async () => {
+    const config = {
+      ...endpoints.korHutStatus,
+      data: {},
+    };
+
+    console.log("Data sebelum request:", config.data);
+
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log("Response:", response);
+      if (response.status) {
+        const { data } = response;
+
+        setNumb(data);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+
+  
   const getAr = async () => {
     const config = {
       ...endpoints.arcard,
@@ -278,6 +304,7 @@ const KoreksiARInput = ({ onCancel, onSuccess }) => {
               }}
               placeholder="Nomer Referensi"
               error={error?.code}
+              disabled={numb}
             />
           </div>
 

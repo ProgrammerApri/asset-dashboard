@@ -21,7 +21,9 @@ import { Timeline } from "primereact/timeline";
 
 const data = {
   id: null,
+  modul: null,
   po_code: null,
+  ref_sup: null,
   po_date: null,
   preq_id: null,
   sup_id: null,
@@ -73,7 +75,10 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
 
   const getPO = async (isUpdate = false) => {
     setLoading(true);
-    const config = endpoints.po;
+    const config = {
+      ...endpoints.po,
+      data: {},
+    };
     console.log(config.data);
     let response = null;
     try {
@@ -81,8 +86,13 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
+
+        console.log("data Dibawah");
         console.log(data);
-        setPO(data);
+        const filteredData = data.filter((item) => item.modul !== "po");
+
+        // dispatch({ type: SET_RP, payload: filteredData });
+        setPO(filteredData);
       }
     } catch (error) {}
     if (isUpdate) {
@@ -94,6 +104,35 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
     }
   };
 
+  const getCodePO = async () => {
+    setLoading(true);
+    const config = {
+      ...endpoints.kodepo,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const kode = response.data;
+        onAdd();
+        dispatch({
+          type: SET_CURRENT_PO,
+          payload: {
+            ...data,
+            po_code: kode ,
+            ref_sup: false,
+            pprod: [],
+            pjasa: [],
+            psup: [],
+          },
+        });
+      }
+    } catch (error) {}
+  };
+  
   const getComp = async (isUpdate = false) => {
     setLoading(true);
     const config = {
@@ -929,6 +968,8 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
           label={tr[localStorage.getItem("language")].tambh}
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
+            getCodePO();
+            getPO();
             onAdd();
             dispatch({
               type: SET_EDIT_PO,
@@ -938,6 +979,7 @@ const PesananPO = ({ onAdd, onEdit, onDetail }) => {
               type: SET_CURRENT_PO,
               payload: {
                 ...data,
+                po_code: null ,
                 ref_sup: false,
                 pprod: [],
                 pjasa: [],

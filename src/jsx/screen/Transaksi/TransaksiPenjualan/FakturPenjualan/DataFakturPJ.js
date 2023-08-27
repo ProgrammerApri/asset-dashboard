@@ -104,6 +104,56 @@ const DataFakturPJ = ({ onAdd, onDetail, onDetailF }) => {
       }, 500);
     }
   };
+  const getFkCode = async () => {
+    setLoading(true);
+    const config = {
+      ...endpoints.getfaktur_pjcode,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const kode = response.data;
+        onAdd();
+        dispatch({
+          type: SET_CURRENT_FK,
+          payload: {
+            ...data,
+            fk_code: kode,
+            detail: [
+              {
+                id: 0,
+                fk_id: 0,
+                inv_id: null,
+                sale_id: null,
+                inv_date: null,
+                total_pay: null,
+              },
+            ],
+            det: [
+              {
+                id: 0,
+                fk_id: 0,
+                inv_id: null,
+                inv_date: null,
+                total_pay: null,
+              },
+            ],
+          },
+        });
+      }
+
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   const getCustomer = async () => {
     const config = {
@@ -244,7 +294,7 @@ const DataFakturPJ = ({ onAdd, onDetail, onDetailF }) => {
               },
             });
             console.log("===========dt");
-            console.log(data); 
+            console.log(data);
           }}
           className="btn btn-info shadow btn-xs sharp ml-1 mt-1"
         >
@@ -342,6 +392,7 @@ const DataFakturPJ = ({ onAdd, onDetail, onDetailF }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
+            getFkCode();
             dispatch({
               type: SET_EDIT_FK,
               payload: false,

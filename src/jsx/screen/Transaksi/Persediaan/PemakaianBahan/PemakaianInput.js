@@ -49,6 +49,7 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
   const [showLok, setShowLok] = useState(false);
   const [product, setProduct] = useState(null);
   const [satuan, setSatuan] = useState(null);
+  const [numb, setNumb] = useState(null);
   const [lokasi, setLokasi] = useState(null);
   const [acc, setAcc] = useState(null);
   const [accor, setAccor] = useState({
@@ -64,8 +65,33 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
     getLokasi();
     getProduct();
     getAcc();
+    getStatus()
     getSatuan();
   }, []);
+
+  const getStatus = async () => {
+    const config = {
+      ...endpoints.getstatus_pbb,
+      data: {},
+    };
+
+    console.log("Data sebelum request:", config.data);
+
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log("Response:", response);
+      if (response.status) {
+        const { data } = response;
+
+        setNumb(data);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+
 
   const isValid = () => {
     let valid = false;
@@ -374,6 +400,7 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
               }}
               placeholder="Masukan Kode Referensi"
               error={error?.code}
+              disabled={numb}
             />
           </div>
 

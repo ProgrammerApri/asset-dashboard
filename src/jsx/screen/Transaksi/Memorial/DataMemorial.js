@@ -52,6 +52,49 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
     getAcc();
   }, []);
 
+  const getCoderp = async () => {
+    setLoading(true);
+    const config = {
+      ...endpoints.getcode_memorial,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const kode = response.data;
+        onAdd();
+        dispatch({
+          type: SET_CURRENT_MM,
+          payload: {
+            ...data,
+            code:kode,
+            memo: [
+              {
+                id: 0,
+                acc_id: null,
+                dep_id: null,
+                currency: null,
+                dbcr: null,
+                amnt: null,
+                amnh: 0,
+                desc: null,
+              },
+            ],
+          },
+        });
+      }
+
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const getMemorial = async (isUpdate = false) => {
     setLoading(true);
     const config = {
@@ -284,6 +327,7 @@ const DataMemorial = ({ onAdd, onEdit, onDetail }) => {
               icon={<i class="bx bx-plus px-2"></i>}
               onClick={() => {
                 onAdd();
+                getCoderp()
                 dispatch({
                   type: SET_EDIT_MM,
                   payload: false,

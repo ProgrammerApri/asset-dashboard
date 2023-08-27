@@ -24,6 +24,7 @@ import "./chart.css";
 import Nav from "./layouts/nav";
 import Footer from "./layouts/Footer";
 import ProduksiInv from "./screen/ProduksiInv";
+import DataRak from "./screen/Master/Rak/DataRak";
 
 /// Deshboard
 const Home = React.lazy(() => import("./screen/Dashboard/Home"));
@@ -166,6 +167,7 @@ const Markup = ({ width }) => {
     { url: "jasa", component: Jasa },
 
     { url: "data-mesin", component: DataMesin },
+    { url: "rak", component: DataRak },
 
     // Setup
     { url: "setup", component: Setup },

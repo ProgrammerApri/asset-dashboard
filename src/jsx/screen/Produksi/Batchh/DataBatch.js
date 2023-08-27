@@ -165,23 +165,24 @@ const DataBatch = ({ onAdd, onEdit, onDetail }) => {
 
             let sequence = data.sequence;
             sequence?.forEach((el) => {
-              el.wc_id = el.wc_id.id ?? null;
-              el.loc_id = el.loc_id.id ?? null;
-              el.mch_id = el.mch_id.id ?? null;
-              el.work_id = el.work_id.id ?? null;
+              el.wc_id = el?.wc_id?.id ?? null;
+              el.loc_id = el?.loc_id?.id ?? null;
+              el.mch_id = el?.mch_id?.id ?? null;
+              el.work_id = el?.work_id?.id ?? null;
+              el.sup_id = el?.sup_id?.id ?? null;
             });
 
             let product = data.product;
             product?.forEach((element) => {
               element.prod_id = element.prod_id?.id;
               element.unit_id = element.unit_id?.id;
-              element.loc_reject = element.loc_reject?.id;
+              element.loc_reject = element?.loc_reject?.id;
             });
 
             let material = data.material;
             material?.forEach((elem) => {
-              elem.prod_id = elem.prod_id.id;
-              elem.unit_id = elem.unit_id.id;
+              elem.prod_id = elem?.prod_id?.id ?? null;
+              elem.unit_id = elem?.unit_id?.id ?? null;
             });
 
             dispatch({
@@ -200,6 +201,7 @@ const DataBatch = ({ onAdd, onEdit, onDetail }) => {
                           loc_id: null,
                           mch_id: null,
                           work_id: null,
+                          sup_id: null,
                           datetime_plan: null,
                           datetime_actual: null,
                           datetime_end: null,
@@ -330,6 +332,7 @@ const DataBatch = ({ onAdd, onEdit, onDetail }) => {
                     loc_id: null,
                     mch_id: null,
                     work_id: null,
+                    sup_id: null,
                     datetime_plan: null,
                     datetime_actual: null,
                     datetime_end: null,

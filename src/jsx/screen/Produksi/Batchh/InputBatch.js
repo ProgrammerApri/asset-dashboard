@@ -23,6 +23,7 @@ import { Calendar } from "primereact/calendar";
 import { Link } from "react-router-dom";
 import { Checkbox } from "primereact/checkbox";
 import { SelectButton } from "primereact/selectbutton";
+import DataSupplier from "../../Mitra/Pemasok/DataPemasok";
 
 const defError = {
   code: false,
@@ -47,6 +48,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
   const dispatch = useDispatch();
   const [planning, setPlanning] = useState(null);
   const [dept, setDept] = useState(null);
+  const [supplier, setSup] = useState(null);
   const [product, setProduct] = useState(null);
   const [satuan, setSatuan] = useState(null);
   const [formula, setFormula] = useState(null);
@@ -55,6 +57,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
   const [workCen, setWorkCen] = useState(null);
   const [workType, setWorkType] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [showSup, setShowSup] = useState(false);
   const [showProd, setShowProd] = useState(false);
   const [showSatuan, setShowSatuan] = useState(false);
   const [showWorkCen, setShowWorkCen] = useState(false);
@@ -74,6 +77,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
       left: 0,
       behavior: "smooth",
     });
+    getSupplier();
     getProduct();
     getSatuan();
     getFormula();
@@ -84,6 +88,26 @@ const InputBatch = ({ onCancel, onSuccess }) => {
     getWorkCen();
     getWorkType();
   }, []);
+
+  const getSupplier = async () => {
+    const config = {
+      ...endpoints.supplier,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+
+      if (response.status) {
+        const { data } = response;
+        let sup = [];
+        data?.forEach((element) => {
+          sup.push(element.supplier);
+        });
+        setSup(data);
+      }
+    } catch (error) {}
+  };
 
   const getProduct = async () => {
     const config = {
@@ -297,6 +321,18 @@ const InputBatch = ({ onCancel, onSuccess }) => {
     }
   };
 
+  const checkSup = (value) => {
+    let selected = {};
+    supplier?.forEach((element) => {
+      if (value === element?.supplier?.id) {
+        selected = element;
+        console.log(selected);
+      }
+    });
+
+    return selected;
+  };
+
   const checkProd = (value) => {
     let selected = {};
     product?.forEach((element) => {
@@ -464,6 +500,25 @@ const InputBatch = ({ onCancel, onSuccess }) => {
   };
 
   const body = () => {
+    let date_act = null;
+    let date_end = null;
+    let step = null;
+    let status = null;
+    let maklon = null;
+
+    btc?.plan_id?.sequence?.forEach((el) => {
+      date_act = el?.datetime_actual;
+      date_end = el?.datetime_end;
+      step = el?.seq;
+      status = el?.proses;
+    });
+
+    btc?.sequence?.forEach((elem) => {
+      maklon = checkWork(elem?.work_id)?.maklon;
+    });
+
+    console.log("jdhfd");
+    console.log(maklon);
     return (
       <>
         {/* Put content body here */}
@@ -537,6 +592,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                       loc_id: v.loc_id?.id ?? null,
                       mch_id: v?.mch_id?.id ?? null,
                       work_id: v?.work_id?.id ?? null,
+                      sup_id: null,
                       datetime_plan: v?.date ?? null,
                       datetime_actual: v?.datetime_actual,
                       datetime_end: v?.datetime_end,
@@ -681,577 +737,356 @@ const InputBatch = ({ onCancel, onSuccess }) => {
           )}
         </Row>
 
-        {/* {btc && btc.plan_id !== null && (
+        {btc && btc.plan_id !== null ? (
           <>
-            <TabView
-              className="ml-2"
-              activeIndex={active}
-              onTabChange={(e) => setActive(e.index)}
-            >
-              <TabPanel header="Produk Jadi">
-                <Card>
-                  <Card.Body>
-                    <DataTable
-                      responsiveLayout="none"
-                      value={btc.product?.map((v, i) => {
-                        return {
-                          ...v,
-                          index: i,
-                          // order: v?.order ?? 0,
-                        };
-                      })}
-                      className="display w-150 datatable-wrapper header-white no-border"
-                      showGridlines={false}
-                      emptyMessage={() => <div></div>}
-                    >
-                      <Column
-                        header="Produk"
-                        className="align-text-top"
-                        field={""}
-                        style={{
-                          width: "20rem",
+            <CustomAccordion
+              tittle={"Sequence"}
+              defaultActive={true}
+              active={accor.sequence}
+              onClick={() => {
+                setAccor({
+                  ...accor,
+                  sequence: !accor.sequence,
+                });
+              }}
+              key={1}
+              body={
+                <DataTable
+                  responsiveLayout="scroll"
+                  value={btc.sequence?.map((v, i) => {
+                    return {
+                      ...v,
+                      index: i,
+                    };
+                  })}
+                  className="display w-150 datatable-wrapper header-white no-border"
+                  showGridlines={false}
+                  emptyMessage={() => <div></div>}
+                >
+                  <Column
+                    header="Proses Ke"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "7rem",
+                    }}
+                    body={(e) => (
+                      <PrimeNumber
+                        value={e.seq && e.seq}
+                        onChange={(t) => {}}
+                        placeholder="0"
+                        type="number"
+                        min={0}
+                        disabled
+                      />
+                    )}
+                  />
+
+                  <Column
+                    header="Work Center"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "15rem",
+                    }}
+                    body={(e) => (
+                      <PrimeInput
+                        value={
+                          e.wc_id
+                            ? `${checkWc(e.wc_id)?.work_name} (${
+                                checkWc(e.wc_id)?.work_code
+                              })`
+                            : "-"
+                        }
+                        onChange={(t) => {}}
+                        placeholder="Work Center"
+                        disabled
+                      />
+                    )}
+                  />
+
+                  <Column
+                    header="Lokasi"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "15rem",
+                    }}
+                    body={(e) => (
+                      <PrimeInput
+                        value={
+                          e.loc_id
+                            ? `${checkLoc(e.loc_id)?.name} (${
+                                checkLoc(e.loc_id)?.code
+                              })`
+                            : "-"
+                        }
+                        onChange={(t) => {}}
+                        placeholder="Lokasi"
+                        disabled
+                      />
+                    )}
+                  />
+
+                  <Column
+                    header="Mesin"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "15rem",
+                    }}
+                    body={(e) => (
+                      <PrimeInput
+                        value={
+                          e.mch_id
+                            ? `${checkMsn(e.mch_id)?.msn_name} (${
+                                checkMsn(e.mch_id)?.msn_code
+                              })`
+                            : "-"
+                        }
+                        onChange={(t) => {}}
+                        placeholder="Mesin"
+                        disabled
+                      />
+                    )}
+                  />
+
+                  <Column
+                    header="Jenis Pekerjaan"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "15rem",
+                    }}
+                    body={(e) => (
+                      <PrimeInput
+                        value={
+                          e.work_id
+                            ? `${checkWork(e.work_id)?.work_name} (${
+                                checkWork(e.work_id)?.work_type
+                              })`
+                            : "-"
+                        }
+                        onChange={(t) => {}}
+                        placeholder="Jenis Pekerjaan"
+                        disabled
+                      />
+                    )}
+                  />
+
+                  <Column
+                    header="Mutasi"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "5em",
+                    }}
+                    body={(e) => (
+                      <Checkbox
+                        className="ml-2"
+                        checked={
+                          e.work_id ? checkWork(e.work_id)?.mutasi : null
+                        }
+                        disabled
+                      />
+                    )}
+                  />
+
+                  <Column
+                    header="Maklon"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "5em",
+                    }}
+                    body={(e) => (
+                      <Checkbox
+                        className="ml-2"
+                        checked={
+                          e.work_id ? checkWork(e.work_id)?.maklon : null
+                        }
+                        disabled
+                      />
+                    )}
+                  />
+
+                  <Column
+                    // hidden={maklon === false || maklon === null}
+                    header="Supplier"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "15rem",
+                    }}
+                    body={(e) => (
+                      <CustomDropdown
+                        value={e.sup_id && checkSup(e.sup_id)}
+                        option={supplier}
+                        onChange={(u) => {
+                          let temp = [...btc.sequence];
+                          temp[e.index].sup_id = u?.supplier?.id;
+                          updateBTC({ ...btc, sequence: temp });
                         }}
-                        body={(e) => (
-                          <div className="p-inputgroup">
-                            <InputText
-                              value={e.prod_id && checkProd(e.prod_id).name}
-                              placeholder="Nama Produk"
-                              disabled
-                            />
-                          </div>
-                        )}
-                      />
-
-                      <Column
-                        header="Satuan"
-                        className="align-text-top"
-                        field={""}
-                        style={{
-                          width: "15rem",
+                        detail
+                        onDetail={() => {
+                          setCurrentIndex(e.index);
+                          setShowSup(true);
                         }}
-                        body={(e) => (
-                          <div className="p-inputgroup">
-                            <InputText
-                              value={e.unit_id && checkUnit(e.unit_id).name}
-                              placeholder="Satuan Produk"
-                              disabled
-                            />
-                          </div>
-                        )}
+                        label={"[supplier.sup_name] ([supplier.sup_code])"}
+                        placeholder="Pilih Supplier"
+                        disabled={
+                          checkWork(e.work_id)?.maklon == false ||
+                          checkWork(e.work_id)?.maklon == null
+                        }
                       />
+                    )}
+                  />
 
-                      <Column
-                        header="Kuantitas"
-                        className="align-text-top"
-                        field={""}
-                        // style={{
-                        //   width: "5rem",
-                        // }}
-                        body={(e) => (
-                          <div className="p-inputgroup">
-                            <InputText
-                              value={e.qty && e.qty}
-                              placeholder="0"
-                              disabled
-                            />
-                          </div>
-                        )}
-                      />
+                  <Column
+                    header="Tanggal Plan"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "15rem",
+                    }}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <Calendar
+                          value={
+                            isEdit || e.datetime_plan !== null
+                              ? new Date(`${e.datetime_plan}Z`)
+                              : e.datetime_plan
+                          }
+                          onChange={(t) => {
+                            let temp = [...btc.sequence];
+                            temp[e.index].datetime_plan = t?.value ?? null;
+                            updateBTC({ ...btc, sequence: temp });
+                          }}
+                          placeholder="Pilih Tanggal"
+                          dateFormat="dd-mm-yy"
+                          showTime
+                          hourFormat="12"
+                          // showIcon
+                          disabled
+                        />
+                      </div>
+                    )}
+                  />
 
-                      <Column
-                        header="Cost Alokasi (%)"
-                        className="align-text-top"
-                        field={""}
-                        // style={{
-                        //   minWidth: "7rem",
-                        // }}
-                        body={(e) => (
-                          <div className="p-inputgroup">
-                            <InputText
-                              value={e.aloc && e.aloc}
-                              placeholder="0"
-                              disabled
-                            />
-                          </div>
-                        )}
-                      />
-                    </DataTable>
-                  </Card.Body>
-                </Card>
-              </TabPanel>
+                  <Column
+                    header="Tanggal Actual"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "15rem",
+                    }}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <Calendar
+                          value={
+                            isEdit || date_act !== null
+                              ? new Date(`${e.datetime_actual}Z`)
+                              : e.datetime_actual
+                          }
+                          onChange={(t) => {
+                            let temp = [...btc.sequence];
+                            temp[e.index].datetime_actual = t?.value ?? null;
+                            updateBTC({ ...btc, sequence: temp });
+                          }}
+                          placeholder="Pilih Tanggal"
+                          dateFormat="dd-mm-yy"
+                          showTime
+                          hourFormat="12"
+                          showIcon
+                          disabled={e.proses === 0}
+                        />
+                      </div>
+                    )}
+                  />
+                  <Column
+                    header="Tanggal Selesai"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "15rem",
+                    }}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <Calendar
+                          value={
+                            isEdit || date_end !== null
+                              ? new Date(`${e.datetime_end}Z`)
+                              : e.datetime_end
+                          }
+                          onChange={(t) => {
+                            let temp = [...btc.sequence];
+                            temp[e.index].datetime_end = t?.value ?? null;
+                            updateBTC({ ...btc, sequence: temp });
+                          }}
+                          placeholder="Pilih Tanggal"
+                          dateFormat="dd-mm-yy"
+                          showTime
+                          hourFormat="12"
+                          showIcon
+                          disabled={e.proses === 0}
+                        />
+                      </div>
+                    )}
+                  />
 
-              <TabPanel header="Bahan">
-                <Card>
-                  <Card.Body>
-                    <DataTable
-                      responsiveLayout="none"
-                      value={btc.material?.map((v, i) => {
-                        return {
-                          ...v,
-                          index: i,
-                          // order: v?.order ?? 0,
-                          // price: v?.price ?? 0,
-                        };
-                      })}
-                      className="display w-150 datatable-wrapper header-white no-border"
-                      showGridlines={false}
-                      emptyMessage={() => <div></div>}
-                    >
-                      <Column
-                        header="Bahan"
-                        className="align-text-top"
-                        field={""}
-                        style={{
-                          width: "20rem",
+                  <Column
+                    header="Durasi (Jam)"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "10rem",
+                    }}
+                    body={(e) => (
+                      <PrimeNumber
+                        price
+                        value={e.durasi && e.durasi}
+                        onChange={(t) => {
+                          let temp = [...btc.sequence];
+                          temp[e.index].durasi = t?.value ?? null;
+                          updateBTC({ ...btc, sequence: temp });
                         }}
-                        body={(e) => (
-                          <div className="p-inputgroup">
-                            <InputText
-                              value={e.prod_id && checkProd(e.prod_id).name}
-                              placeholder="Nama Produk"
-                              disabled
-                            />
-                          </div>
-                        )}
+                        placeholder="0"
+                        disabled={e.proses === 0}
                       />
-
-                      <Column
-                        header="Satuan"
-                        className="align-text-top"
-                        field={""}
-                        style={{
-                          width: "15rem",
-                        }}
-                        body={(e) => (
-                          <div className="p-inputgroup">
-                            <InputText
-                              value={e.unit_id && checkUnit(e.unit_id).name}
-                              placeholder="Satuan Produk"
-                              disabled
-                            />
-                          </div>
-                        )}
-                      />
-
-                      <Column
-                        header="Kuantitas"
-                        className="align-text-top"
-                        field={""}
-                        // style={{
-                        //   width: "5rem",
-                        // }}
-                        body={(e) => (
-                          <PrimeNumber
-                            value={e.qty ? e.qty : ""}
-                            placeholder="0"
-                            disabled
-                          />
-                        )}
-                      />
-
-                      <Column
-                        header="Harga"
-                        className="align-text-top"
-                        field={""}
-                        // style={{
-                        //   minWidth: "7rem",
-                        // }}
-                        body={(e) => (
-                          <PrimeNumber
-                            price
-                            value={e.price ? e.price : ""}
-                            placeholder="0"
-                            disabled
-                          />
-                        )}
-                      />
-                    </DataTable>
-                  </Card.Body>
-                </Card>
-              </TabPanel>
-
-              <TabPanel header="Mesin">
-                <Card>
-                  <Card.Body>
-                    <DataTable
-                      responsiveLayout="none"
-                      value={btc.mesin?.map((v, i) => {
-                        return {
-                          ...v,
-                          index: i,
-                          // order: v?.order ?? 0,
-                          // price: v?.price ?? 0,
-                        };
-                      })}
-                      className="display w-150 datatable-wrapper header-white no-border"
-                      showGridlines={false}
-                      emptyMessage={() => <div></div>}
-                    >
-                      <Column
-                        header="Kode Mesin"
-                        className="align-text-top"
-                        field={""}
-                        style={{
-                          width: "20rem",
-                        }}
-                        body={(e) => (
-                          <div className="p-inputgroup">
-                            <InputText
-                              value={e.mch_id && checkMsn(e.mch_id).msn_name}
-                              placeholder="Nama Mesin"
-                              disabled
-                            />
-                          </div>
-                        )}
-                      />
-
-                      <Column className="align-text-top" body={null} />
-                    </DataTable>
-                  </Card.Body>
-                </Card>
-              </TabPanel>
-            </TabView>
-          </>
-        )} */}
-
-        <CustomAccordion
-          tittle={"Sequence"}
-          defaultActive={true}
-          active={accor.sequence}
-          onClick={() => {
-            setAccor({
-              ...accor,
-              sequence: !accor.sequence,
-            });
-          }}
-          key={1}
-          body={
-            <DataTable
-              responsiveLayout="scroll"
-              value={btc.sequence?.map((v, i) => {
-                return {
-                  ...v,
-                  index: i,
-                };
-              })}
-              className="display w-150 datatable-wrapper header-white no-border"
-              showGridlines={false}
-              emptyMessage={() => <div></div>}
-            >
-              <Column
-                header="Proses Ke"
-                className="align-text-top"
-                field={""}
-                style={{
-                  minWidth: "7rem",
-                }}
-                body={(e) => (
-                  <PrimeNumber
-                    value={e.seq && e.seq}
-                    onChange={(t) => {
-                      let temp = [...btc.sequence];
-                      temp[e.index].seq = Number(t.target.value);
-                      updateBTC({ ...btc, sequence: temp });
-                    }}
-                    placeholder="0"
-                    type="number"
-                    min={0}
-                    disabled
+                    )}
                   />
-                )}
-              />
 
-              <Column
-                header="Work Center"
-                className="align-text-top"
-                field={""}
-                style={{
-                  minWidth: "20rem",
-                }}
-                body={(e) => (
-                  <CustomDropdown
-                    value={e.wc_id && checkWc(e.wc_id)}
-                    option={workCen}
-                    onChange={(t) => {
-                      let temp = [...btc.sequence];
-                      temp[e.index].wc_id = t?.id ?? null;
-                      temp[e.index].loc_id = t?.loc_id?.id ?? null;
-                      temp[e.index].mch_id = t?.machine_id?.id ?? null;
-                      temp[e.index].work_id = t?.work_type?.id ?? null;
-                      updateBTC({ ...btc, sequence: temp });
-
-                      // let newError = error;
-                      // newError.msn[e.index].id = false;
-                      // setError(newError);
+                  <Column
+                    header="Status Proses"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "15rem",
                     }}
-                    detail
-                    onDetail={() => {
-                      setCurrentIndex(e.index);
-                      setShowWorkCen(true);
-                    }}
-                    label={"[work_name] ([work_code])"}
-                    placeholder="Pilih Work Center"
-                    // errorMessage="Mesin Belum Dipilih"
-                    // error={error?.msn[e.index]?.id}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <SelectButton
+                          value={
+                            e.proses !== null && e.proses !== ""
+                              ? e.proses === 0
+                                ? { name: "Done", code: 0 }
+                                : { name: "Panding", code: 1 }
+                              : null
+                          }
+                          options={proses}
+                          onChange={(t) => {
+                            let temp = [...btc.sequence];
+                            temp[e.index].proses = t?.value?.code ?? null;
+                            updateBTC({ ...btc, sequence: temp });
+                          }}
+                          optionLabel="name"
+                          // disabled={e.proses === 0}
+                        />
+                      </div>
+                    )}
                   />
-                )}
-              />
 
-              <Column
-                header="Lokasi"
-                className="align-text-top"
-                field={""}
-                style={{
-                  minWidth: "20rem",
-                }}
-                body={(e) => (
-                  <CustomDropdown
-                    value={e.loc_id && checkLoc(e.loc_id)}
-                    option={lokasi}
-                    onChange={(t) => {
-                      let temp = [...btc.sequence];
-                      temp[e.index].loc_id = t?.id ?? null;
-                      updateBTC({ ...btc, sequence: temp });
-
-                      // let newError = error;
-                      // newError.msn[e.index].id = false;
-                      // setError(newError);
-                    }}
-                    detail
-                    onDetail={() => {
-                      setCurrentIndex(e.index);
-                      setShowLok(true);
-                    }}
-                    label={"[name] ([code])"}
-                    placeholder="Pilih Lokasi"
-                    // errorMessage="Mesin Belum Dipilih"
-                    // error={error?.msn[e.index]?.id}
-                  />
-                )}
-              />
-
-              <Column
-                header="Mesin"
-                className="align-text-top"
-                field={""}
-                style={{
-                  minWidth: "20rem",
-                }}
-                body={(e) => (
-                  <CustomDropdown
-                    value={e.mch_id && checkMsn(e.mch_id)}
-                    option={mesin}
-                    onChange={(t) => {
-                      let temp = [...btc.sequence];
-                      temp[e.index].mch_id = t?.id ?? null;
-                      updateBTC({ ...btc, sequence: temp });
-
-                      // let newError = error;
-                      // newError.msn[e.index].id = false;
-                      // setError(newError);
-                    }}
-                    detail
-                    onDetail={() => {
-                      setCurrentIndex(e.index);
-                      setShowMsn(true);
-                    }}
-                    label={"[msn_name] ([msn_code])"}
-                    placeholder="Pilih Mesin"
-                    // errorMessage="Mesin Belum Dipilih"
-                    // error={error?.msn[e.index]?.id}
-                  />
-                )}
-              />
-
-              <Column
-                header="Jenis Pekerjaan"
-                className="align-text-top"
-                field={""}
-                style={{
-                  minWidth: "15rem",
-                }}
-                body={(e) => (
-                  <CustomDropdown
-                    value={e.work_id && checkWork(e.work_id)}
-                    option={workType}
-                    onChange={(t) => {
-                      let temp = [...btc.sequence];
-                      temp[e.index].work_id = t?.id ?? null;
-                      updateBTC({ ...btc, sequence: temp });
-
-                      // let newError = error;
-                      // newError.msn[e.index].id = false;
-                      // setError(newError);
-                    }}
-                    detail
-                    onDetail={() => {
-                      setCurrentIndex(e.index);
-                      setShowType(true);
-                    }}
-                    label={"[work_name] ([work_type])"}
-                    placeholder="Pilih Pekerjaan"
-                    // errorMessage="Mesin Belum Dipilih"
-                    // error={error?.msn[e.index]?.id}
-                  />
-                )}
-              />
-
-              <Column
-                header="Mutasi"
-                className="align-text-top"
-                field={""}
-                style={{
-                  minWidth: "5em",
-                }}
-                body={(e) => (
-                  <Checkbox
-                    className="ml-2"
-                    checked={e.work_id ? checkWork(e.work_id)?.mutasi : null}
-                    disabled
-                  />
-                )}
-              />
-
-              <Column
-                header="Tanggal Plan"
-                className="align-text-top"
-                field={""}
-                style={{
-                  minWidth: "15rem",
-                }}
-                body={(e) => (
-                  <div className="p-inputgroup">
-                    <Calendar
-                      value={
-                        isEdit || e.datetime_plan !== null
-                          ? new Date(`${e.datetime_plan}Z`)
-                          : e.datetime_plan
-                      }
-                      onChange={(t) => {
-                        let temp = [...btc.sequence];
-                        temp[e.index].datetime_plan = t?.value ?? null;
-                        updateBTC({ ...btc, sequence: temp });
-                      }}
-                      placeholder="Pilih Tanggal"
-                      dateFormat="dd-mm-yy"
-                      showTime
-                      hourFormat="12"
-                      showIcon
-                    />
-                  </div>
-                )}
-              />
-
-              <Column
-                header="Tanggal Actual"
-                className="align-text-top"
-                field={""}
-                style={{
-                  minWidth: "15rem",
-                }}
-                body={(e) => (
-                  <div className="p-inputgroup">
-                    <Calendar
-                      value={
-                        isEdit || e.datetime_actual !== null
-                          ? new Date(`${e.datetime_actual}Z`)
-                          : e.datetime_actual
-                      }
-                      onChange={(t) => {
-                        let temp = [...btc.sequence];
-                        temp[e.index].datetime_actual = t?.value ?? null;
-                        updateBTC({ ...btc, sequence: temp });
-                      }}
-                      placeholder="Pilih Tanggal"
-                      dateFormat="dd-mm-yy"
-                      showTime
-                      hourFormat="12"
-                      showIcon
-                    />
-                  </div>
-                )}
-              />
-              <Column
-                header="Tanggal Selesai"
-                className="align-text-top"
-                field={""}
-                style={{
-                  minWidth: "15rem",
-                }}
-                body={(e) => (
-                  <div className="p-inputgroup">
-                    <Calendar
-                      value={
-                        isEdit || e.datetime_end !== null
-                          ? new Date(`${e.datetime_end}Z`)
-                          : e.datetime_end
-                      }
-                      onChange={(t) => {
-                        let temp = [...btc.sequence];
-                        temp[e.index].datetime_end = t?.value ?? null;
-                        updateBTC({ ...btc, sequence: temp });
-                      }}
-                      placeholder="Pilih Tanggal"
-                      dateFormat="dd-mm-yy"
-                      showTime
-                      hourFormat="12"
-                      showIcon
-                    />
-                  </div>
-                )}
-              />
-
-              <Column
-                header="Durasi (Jam)"
-                className="align-text-top"
-                field={""}
-                style={{
-                  minWidth: "10rem",
-                }}
-                body={(e) => (
-                  <PrimeNumber
-                    price
-                    value={e.durasi && e.durasi}
-                    onChange={(t) => {
-                      let temp = [...btc.sequence];
-                      temp[e.index].durasi = t?.value ?? null;
-                      updateBTC({ ...btc, sequence: temp });
-                    }}
-                    placeholder="0"
-                  />
-                )}
-              />
-
-              <Column
-                header="Status Proses"
-                className="align-text-top"
-                field={""}
-                style={{
-                  minWidth: "15rem",
-                }}
-                body={(e) => (
-                  <div className="p-inputgroup">
-                    <SelectButton
-                      value={
-                        e.proses !== null && e.proses !== ""
-                          ? e.proses === 0
-                            ? { name: "Done", code: 0 }
-                            : { name: "Panding", code: 1 }
-                          : null
-                      }
-                      options={proses}
-                      onChange={(t) => {
-                        let temp = [...btc.sequence];
-                        temp[e.index].proses = t?.value?.code ?? null;
-                        updateBTC({ ...btc, sequence: temp });
-                      }}
-                      optionLabel="name"
-                    />
-                  </div>
-                )}
-              />
-
-              {/* <Column
+                  {/* <Column
                 className="align-text-top"
                 body={(e) =>
                   e.index === plan.sequence.length - 1 ? (
@@ -1295,263 +1130,275 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                   )
                 }
               /> */}
-            </DataTable>
-          }
-        />
+                </DataTable>
+              }
+            />
 
-        <CustomAccordion
-          tittle={"Produk Jadi"}
-          defaultActive={true}
-          active={accor.produk}
-          onClick={() => {
-            setAccor({
-              ...accor,
-              produk: !accor.produk,
-            });
-          }}
-          key={1}
-          body={
-            <DataTable
-              responsiveLayout="scroll"
-              value={btc.product?.map((v, i) => {
-                return {
-                  ...v,
-                  index: i,
-                  // order: v?.order ?? 0,
-                };
-              })}
-              className="display w-150 datatable-wrapper header-white no-border"
-              showGridlines={false}
-              emptyMessage={() => <div></div>}
-            >
-              <Column
-                header="Produk"
-                className="align-text-top"
-                field={""}
-                style={{
-                  minWidth: "25rem",
-                }}
-                body={(e) => (
-                  <CustomDropdown
-                    value={e.prod_id && checkProd(e.prod_id)}
-                    option={product}
-                    onChange={(u) => {
-                      // looping satuan
-                      let sat = [];
-                      satuan?.forEach((element) => {
-                        if (element?.id === u?.unit?.id) {
-                          sat.push(element);
-                        } else {
-                          if (element?.u_from?.id === u?.unit?.id) {
-                            sat.push(element);
-                          }
+            <CustomAccordion
+              tittle={"Produk Jadi"}
+              defaultActive={true}
+              active={accor.produk}
+              onClick={() => {
+                setAccor({
+                  ...accor,
+                  produk: !accor.produk,
+                });
+              }}
+              key={1}
+              body={
+                <DataTable
+                  responsiveLayout="scroll"
+                  value={btc.product?.map((v, i) => {
+                    return {
+                      ...v,
+                      index: i,
+                      // order: v?.order ?? 0,
+                    };
+                  })}
+                  className="display w-150 datatable-wrapper header-white no-border"
+                  showGridlines={false}
+                  emptyMessage={() => <div></div>}
+                >
+                  <Column
+                    header="Produk"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "25rem",
+                    }}
+                    body={(e) => (
+                      <PrimeInput
+                        value={
+                          e.prod_id
+                            ? `${checkProd(e.prod_id)?.name} (${
+                                checkProd(e.prod_id)?.code
+                              })`
+                            : "-"
                         }
-                      });
-
-                      let temp = [...btc.product];
-                      temp[e.index].prod_id = u?.id;
-                      temp[e.index].unit_id = u.unit?.id;
-                      updateBTC({ ...btc, product: temp });
-
-                      // let newError = error;
-                      // newError.mtrl[e.index].id = false;
-                      // setError(newError);
-                    }}
-                    detail
-                    onDetail={() => {
-                      setCurrentIndex(e.index);
-                      setShowProd(true);
-                    }}
-                    label={"[name] ([code])"}
-                    placeholder="Pilih Produk"
-                    // errorMessage="Bahan Belum Dipilih"
-                    // error={error?.mtrl[e.index]?.id}
+                        // option={product}
+                        onChange={(u) => {
+                          // // looping satuan
+                          // let sat = [];
+                          // satuan?.forEach((element) => {
+                          //   if (element?.id === u?.unit?.id) {
+                          //     sat.push(element);
+                          //   } else {
+                          //     if (element?.u_from?.id === u?.unit?.id) {
+                          //       sat.push(element);
+                          //     }
+                          //   }
+                          // });
+                          // let temp = [...btc.product];
+                          // temp[e.index].prod_id = u?.id;
+                          // temp[e.index].unit_id = u.unit?.id;
+                          // updateBTC({ ...btc, product: temp });
+                          // let newError = error;
+                          // newError.mtrl[e.index].id = false;
+                          // setError(newError);
+                        }}
+                        // detail
+                        // onDetail={() => {
+                        //   setCurrentIndex(e.index);
+                        //   setShowProd(true);
+                        // }}
+                        // label={"[name] ([code])"}
+                        placeholder="Produk"
+                        // errorMessage="Bahan Belum Dipilih"
+                        // error={error?.mtrl[e.index]?.id}
+                        disabled
+                      />
+                    )}
                   />
-                )}
-              />
 
-              <Column
-                header="Satuan"
-                className="align-text-top"
-                field={""}
-                style={{
-                  minWidth: "15rem",
-                }}
-                body={(e) => (
-                  <CustomDropdown
-                    value={e.unit_id && checkUnit(e.unit_id)}
-                    onChange={(u) => {
-                      let temp = [...btc.product];
-                      temp[e.index].unit_id = u?.id;
-                      updateBTC({ ...btc, product: temp });
+                  <Column
+                    header="Satuan"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "15rem",
                     }}
-                    option={satuan}
-                    detail
-                    onDetail={() => {
-                      setCurrentIndex(e.index);
-                      setShowSatuan(true);
+                    body={(e) => (
+                      <PrimeInput
+                        value={
+                          e.unit_id
+                            ? `${checkUnit(e.unit_id)?.name} (${
+                                checkUnit(e.unit_id)?.code
+                              })`
+                            : "-"
+                        }
+                        onChange={(u) => {
+                          // let temp = [...btc.product];
+                          // temp[e.index].unit_id = u?.id;
+                          // updateBTC({ ...btc, product: temp });
+                        }}
+                        // option={satuan}
+                        // detail
+                        // onDetail={() => {
+                        //   setCurrentIndex(e.index);
+                        //   setShowSatuan(true);
+                        // }}
+                        // label={"[name] ([code])"}
+                        placeholder="Satuan"
+                        disabled
+                      />
+                    )}
+                  />
+
+                  <Column
+                    header="Kuantitas Pembuatan"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "10rem",
                     }}
-                    label={"[name] ([code])"}
-                    placeholder="Pilih Satuan"
+                    body={(e) => (
+                      <PrimeNumber
+                        price
+                        value={e.qty_making && e.qty_making}
+                        placeholder="0"
+                        disabled
+                      />
+                    )}
                   />
-                )}
-              />
 
-              <Column
-                header="Kuantitas Pembuatan"
-                className="align-text-top"
-                field={""}
-                style={{
-                  minWidth: "10rem",
-                }}
-                body={(e) => (
-                  <PrimeNumber
-                    price
-                    value={e.qty_making && e.qty_making}
-                    placeholder="0"
-                    disabled
-                  />
-                )}
-              />
-
-              <Column
-                header="Cost Alokasi (%)"
-                className="align-text-top"
-                field={""}
-                style={{
-                  minWidth: "10rem",
-                }}
-                body={(e) => (
-                  <PrimeNumber
-                    price
-                    value={e.aloc && e.aloc}
-                    onChange={(t) => {
-                      let temp = [...btc.product];
-                      temp[e.index].aloc = t?.value ?? null;
-                      updateBTC({ ...btc, product: temp });
+                  <Column
+                    header="Cost Alokasi (%)"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "10rem",
                     }}
-                    placeholder="0"
-                    // disabled
+                    body={(e) => (
+                      <PrimeNumber
+                        price
+                        value={e.aloc && e.aloc}
+                        onChange={(t) => {
+                          let temp = [...btc.product];
+                          temp[e.index].aloc = t?.value ?? null;
+                          updateBTC({ ...btc, product: temp });
+                        }}
+                        placeholder="0"
+                        // disabled
+                      />
+                    )}
                   />
-                )}
-              />
 
-              <Column
-                header="Terima Hasil"
-                className="align-text-top"
-                field={""}
-                style={{
-                  minWidth: "10rem",
-                }}
-                body={(e) => (
-                  <PrimeNumber
-                    price
-                    value={e.qty_receive && e.qty_receive}
-                    onChange={(t) => {
-                      let temp = [...btc.product];
-                      temp[e.index].qty_receive = t?.value ?? null;
-                      updateBTC({ ...btc, product: temp });
+                  <Column
+                    header="Terima Hasil"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "10rem",
                     }}
-                    placeholder="0"
+                    body={(e) => (
+                      <PrimeNumber
+                        price
+                        value={e.qty_receive && e.qty_receive}
+                        onChange={(t) => {
+                          let temp = [...btc.product];
+                          temp[e.index].qty_receive = t?.value ?? null;
+                          updateBTC({ ...btc, product: temp });
+                        }}
+                        placeholder="0"
+                      />
+                    )}
                   />
-                )}
-              />
 
-              <Column
-                header="Reject"
-                className="align-text-top"
-                field={""}
-                style={{
-                  minWidth: "10rem",
-                }}
-                body={(e) => (
-                  <PrimeNumber
-                    price
-                    value={e.qty_reject && e.qty_reject}
-                    onChange={(t) => {
-                      let temp = [...btc.product];
-                      temp[e.index].qty_reject = t?.value ?? null;
-                      updateBTC({ ...btc, product: temp });
+                  <Column
+                    header="Reject"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "10rem",
                     }}
-                    placeholder="0"
+                    body={(e) => (
+                      <PrimeNumber
+                        price
+                        value={e.qty_reject && e.qty_reject}
+                        onChange={(t) => {
+                          let temp = [...btc.product];
+                          temp[e.index].qty_reject = t?.value ?? null;
+                          updateBTC({ ...btc, product: temp });
+                        }}
+                        placeholder="0"
+                      />
+                    )}
                   />
-                )}
-              />
 
-              <Column
-                header="Lokasi Reject"
-                className="align-text-top"
-                field={""}
-                style={{
-                  minWidth: "20rem",
-                }}
-                body={(e) => (
-                  <CustomDropdown
-                    value={e.loc_reject && checkLoc(e.loc_reject)}
-                    option={lokasi}
-                    onChange={(t) => {
-                      let temp = [...btc.product];
-                      temp[e.index].loc_reject = t?.id ?? null;
-                      updateBTC({ ...btc, product: temp });
-
-                      // let newError = error;
-                      // newError.msn[e.index].id = false;
-                      // setError(newError);
+                  <Column
+                    header="Lokasi Reject"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "20rem",
                     }}
-                    detail
-                    onDetail={() => {
-                      setCurrentIndex(e.index);
-                      setShowLok(true);
+                    body={(e) => (
+                      <CustomDropdown
+                        value={e.loc_reject && checkLoc(e.loc_reject)}
+                        option={lokasi}
+                        onChange={(t) => {
+                          let temp = [...btc.product];
+                          temp[e.index].loc_reject = t?.id ?? null;
+                          updateBTC({ ...btc, product: temp });
+
+                          // let newError = error;
+                          // newError.msn[e.index].id = false;
+                          // setError(newError);
+                        }}
+                        detail
+                        onDetail={() => {
+                          setCurrentIndex(e.index);
+                          setShowLok(true);
+                        }}
+                        label={"[name] ([code])"}
+                        placeholder="Pilih Lokasi"
+                        // errorMessage="Mesin Belum Dipilih"
+                        // error={error?.msn[e.index]?.id}
+                      />
+                    )}
+                  />
+
+                  <Column
+                    header="Mutasi WC"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "10rem",
                     }}
-                    label={"[name] ([code])"}
-                    placeholder="Pilih Lokasi"
-                    // errorMessage="Mesin Belum Dipilih"
-                    // error={error?.msn[e.index]?.id}
+                    body={(e) => (
+                      <PrimeNumber
+                        price
+                        value={e.wc_mutation && e.wc_mutation}
+                        onChange={(t) => {
+                          let temp = [...btc.product];
+                          temp[e.index].wc_mutation = t?.value ?? null;
+                          temp[e.index].remain =
+                            temp[e.index].qty_receive - t?.value ?? null;
+                          updateBTC({ ...btc, product: temp });
+                        }}
+                        placeholder="0"
+                      />
+                    )}
                   />
-                )}
-              />
 
-              <Column
-                header="Mutasi WC"
-                className="align-text-top"
-                field={""}
-                style={{
-                  minWidth: "10rem",
-                }}
-                body={(e) => (
-                  <PrimeNumber
-                    price
-                    value={e.wc_mutation && e.wc_mutation}
-                    onChange={(t) => {
-                      let temp = [...btc.product];
-                      temp[e.index].wc_mutation = t?.value ?? null;
-                      temp[e.index].remain =
-                        temp[e.index].qty_receive - t?.value ?? null;
-                      updateBTC({ ...btc, product: temp });
+                  <Column
+                    header="Sisa"
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "10rem",
                     }}
-                    placeholder="0"
+                    body={(e) => (
+                      <PrimeNumber
+                        price
+                        value={e.remain && e.remain}
+                        placeholder="0"
+                        disabled
+                      />
+                    )}
                   />
-                )}
-              />
 
-              <Column
-                header="Sisa"
-                className="align-text-top"
-                field={""}
-                style={{
-                  minWidth: "10rem",
-                }}
-                body={(e) => (
-                  <PrimeNumber
-                    price
-                    value={e.remain && e.remain}
-                    placeholder="0"
-                    disabled
-                  />
-                )}
-              />
-
-              {/* <Column
+                  {/* <Column
                 className="align-text-top"
                 body={(e) =>
                   e.index === plan.product.length - 1 ? (
@@ -1593,251 +1440,217 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                   )
                 }
               /> */}
-            </DataTable>
-          }
-        />
+                </DataTable>
+              }
+            />
 
-        <CustomAccordion
-          tittle={"Bahan"}
-          defaultActive={true}
-          active={accor.material}
-          onClick={() => {
-            setAccor({
-              ...accor,
-              material: !accor.material,
-            });
-          }}
-          key={1}
-          body={
-            <>
-              <DataTable
-                responsiveLayout="scroll"
-                value={btc.material?.map((v, i) => {
-                  return {
-                    ...v,
-                    index: i,
-                  };
-                })}
-                className="display w-150 datatable-wrapper header-white no-border"
-                showGridlines={false}
-                emptyMessage={() => <div></div>}
-              >
-                <Column
-                  header="Bahan"
-                  className="align-text-top"
-                  field={""}
-                  style={{
-                    minWidth: "25rem",
-                  }}
-                  body={(e) => (
-                    <CustomDropdown
-                      value={e.prod_id && checkProd(e.prod_id)}
-                      option={product}
-                      onChange={(u) => {
-                        // looping satuan
-                        let sat = [];
-                        satuan.forEach((element) => {
-                          if (element?.id === u?.unit?.id) {
-                            sat.push(element);
-                          } else {
-                            if (element?.u_from?.id === u?.unit?.id) {
-                              sat.push(element);
-                            }
+            <CustomAccordion
+              tittle={"Bahan"}
+              defaultActive={true}
+              active={accor.material}
+              onClick={() => {
+                setAccor({
+                  ...accor,
+                  material: !accor.material,
+                });
+              }}
+              key={1}
+              body={
+                <>
+                  <DataTable
+                    responsiveLayout="scroll"
+                    value={btc.material?.map((v, i) => {
+                      return {
+                        ...v,
+                        index: i,
+                      };
+                    })}
+                    className="display w-150 datatable-wrapper header-white no-border"
+                    showGridlines={false}
+                    emptyMessage={() => <div></div>}
+                  >
+                    <Column
+                      header="Bahan"
+                      className="align-text-top"
+                      field={""}
+                      style={{
+                        minWidth: "25rem",
+                      }}
+                      body={(e) => (
+                        <PrimeInput
+                          value={
+                            e.prod_id
+                              ? `${checkProd(e.prod_id)?.name} (${
+                                  checkProd(e.prod_id)?.code
+                                })`
+                              : "-"
                           }
-                        });
+                          // option={product}
+                          // onChange={(u) => {
+                          //   // looping satuan
+                          //   let sat = [];
+                          //   satuan.forEach((element) => {
+                          //     if (element?.id === u?.unit?.id) {
+                          //       sat.push(element);
+                          //     } else {
+                          //       if (element?.u_from?.id === u?.unit?.id) {
+                          //         sat.push(element);
+                          //       }
+                          //     }
+                          //   });
 
-                        let temp = [...btc.product];
-                        temp[e.index].prod_id = u?.id;
-                        temp[e.index].unit_id = u.unit?.id;
-                        updateBTC({ ...btc, product: temp });
+                          //   let temp = [...btc.product];
+                          //   temp[e.index].prod_id = u?.id;
+                          //   temp[e.index].unit_id = u.unit?.id;
+                          //   updateBTC({ ...btc, product: temp });
 
-                        // let newError = error;
-                        // newError.mtrl[e.index].id = false;
-                        // setError(newError);
-                      }}
-                      detail
-                      onDetail={() => {
-                        setCurrentIndex(e.index);
-                        setShowProd(true);
-                      }}
-                      label={"[name] ([code])"}
-                      placeholder="Pilih Produk"
-                      // errorMessage="Bahan Belum Dipilih"
-                      // error={error?.mtrl[e.index]?.id}
+                          //   // let newError = error;
+                          //   // newError.mtrl[e.index].id = false;
+                          //   // setError(newError);
+                          // }}
+                          // detail
+                          // onDetail={() => {
+                          //   setCurrentIndex(e.index);
+                          //   setShowProd(true);
+                          // }}
+                          // label={"[name] ([code])"}
+                          placeholder="Bahan"
+                          disabled
+                          // errorMessage="Bahan Belum Dipilih"
+                          // error={error?.mtrl[e.index]?.id}
+                        />
+                      )}
                     />
-                  )}
-                />
 
-                <Column
-                  header="Satuan"
-                  className="align-text-top"
-                  field={""}
-                  style={{
-                    minWidth: "15rem",
-                  }}
-                  body={(e) => (
-                    <CustomDropdown
-                      value={e.unit_id && checkUnit(e.unit_id)}
-                      onChange={(u) => {
-                        let temp = [...btc.material];
-                        temp[e.index].unit_id = u?.id;
-                        updateBTC({ ...btc, material: temp });
+                    <Column
+                      header="Satuan"
+                      className="align-text-top"
+                      field={""}
+                      style={{
+                        minWidth: "15rem",
                       }}
-                      option={satuan}
-                      detail
-                      onDetail={() => {
-                        setCurrentIndex(e.index);
-                        setShowSatuan(true);
+                      body={(e) => (
+                        <PrimeInput
+                          value={
+                            e.unit_id
+                              ? `${checkUnit(e.unit_id)?.name} (${
+                                  checkUnit(e.unit_id)?.code
+                                })`
+                              : "-"
+                          }
+                          // onChange={(u) => {
+                          //   let temp = [...btc.material];
+                          //   temp[e.index].unit_id = u?.id;
+                          //   updateBTC({ ...btc, material: temp });
+                          // }}
+                          // option={satuan}
+                          // detail
+                          // onDetail={() => {
+                          //   setCurrentIndex(e.index);
+                          //   setShowSatuan(true);
+                          // }}
+                          // label={"[name] ([code])"}
+                          placeholder="Satuan"
+                          disabled
+                        />
+                      )}
+                    />
+
+                    <Column
+                      header="Kuantitas Formula"
+                      className="align-text-top"
+                      field={""}
+                      style={{
+                        minWidth: "10rem",
                       }}
-                      label={"[name] ([code])"}
-                      placeholder="Pilih Satuan"
+                      body={(e) => (
+                        <PrimeNumber
+                          price
+                          value={e.qty ? e.qty : ""}
+                          placeholder="0"
+                          disabled
+                        />
+                      )}
                     />
-                  )}
-                />
 
-                <Column
-                  header="Kuantitas Formula"
-                  className="align-text-top"
-                  field={""}
-                  style={{
-                    minWidth: "10rem",
-                  }}
-                  body={(e) => (
-                    <PrimeNumber
-                      price
-                      value={e.qty ? e.qty : ""}
-                      placeholder="0"
-                      disabled
-                    />
-                  )}
-                />
-
-                <Column
-                  header="Kebutuhan Material"
-                  className="align-text-top"
-                  field={""}
-                  style={{
-                    minWidth: "10rem",
-                  }}
-                  body={(e) => (
-                    <PrimeNumber
-                      price
-                      value={e.mat_use && e.mat_use}
-                      onChange={(u) => {
-                        let temp = [...btc.material];
-                        temp[e.index].mat_use = u.value;
-                        temp[e.index].total_use =
-                          u.value > 0
-                            ? u.value * checkPlan(btc.plan_id)?.total
-                            : temp[e.index].qty * checkPlan(btc.plan_id)?.total;
-                        updateBTC({ ...btc, material: temp });
+                    <Column
+                      header="Kebutuhan Material"
+                      className="align-text-top"
+                      field={""}
+                      style={{
+                        minWidth: "10rem",
                       }}
-                      placeholder="0"
+                      body={(e) => (
+                        <PrimeNumber
+                          price
+                          value={e.mat_use && e.mat_use}
+                          onChange={(u) => {
+                            let temp = [...btc.material];
+                            temp[e.index].mat_use = u.value;
+                            temp[e.index].total_use =
+                              u.value > 0
+                                ? u.value * checkPlan(btc.plan_id)?.total
+                                : temp[e.index].qty *
+                                  checkPlan(btc.plan_id)?.total;
+                            updateBTC({ ...btc, material: temp });
+                          }}
+                          placeholder="0"
+                        />
+                      )}
                     />
-                  )}
-                />
 
-                <Column
-                  header="Total"
-                  className="align-text-top"
-                  field={""}
-                  style={{
-                    minWidth: "10rem",
-                  }}
-                  body={(e) => (
-                    <PrimeNumber
-                      price
-                      value={e.total_use && e.total_use}
-                      onChange={(u) => {
-                        let temp = [...btc.material];
-                        temp[e.index].total_use = u.value;
-                        temp[e.index].mat_use =
-                          u.value / checkPlan(btc.plan_id)?.total;
-                        updateBTC({ ...btc, material: temp });
+                    <Column
+                      header="Total"
+                      className="align-text-top"
+                      field={""}
+                      style={{
+                        minWidth: "10rem",
                       }}
-                      placeholder="0"
+                      body={(e) => (
+                        <PrimeNumber
+                          price
+                          value={e.total_use && e.total_use}
+                          onChange={(u) => {
+                            let temp = [...btc.material];
+                            temp[e.index].total_use = u.value;
+                            temp[e.index].mat_use =
+                              u.value / checkPlan(btc.plan_id)?.total;
+                            updateBTC({ ...btc, material: temp });
+                          }}
+                          placeholder="0"
+                        />
+                      )}
                     />
-                  )}
-                />
 
-                <Column
-                  className="align-text-top"
-                  body={
-                    (e) => (
-                      // e.index === btc.material.length - 1 ? (
-                      //   <Link
-                      //     onClick={() => {
-                      //       updateBTC({
-                      //         ...btc,
-                      //         material: [
-                      //           ...btc.material,
-                      //           {
-                      //             id: 0,
-                      //             prod_id: null,
-                      //             unit_id: null,
-                      //             qty: null,
-                      //             mat_use: null,
-                      //             total_use: null,
-                      //           },
-                      //         ],
-                      //       });
-                      //     }}
-                      //     className="btn btn-primary shadow btn-xs sharp ml-1"
-                      //   >
-                      //     <i className="fa fa-plus"></i>
-                      //   </Link>
-                      // ) : (
-                      <Link
-                        onClick={() => {
-                          let temp = [...btc.material];
-                          temp.splice(e.index, 1);
-                          updateBTC({
-                            ...btc,
-                            material: temp,
-                          });
-                        }}
-                        className="btn btn-danger shadow btn-xs sharp ml-1"
-                      >
-                        <i className="fa fa-trash"></i>
-                      </Link>
-                    )
-                    // )
-                  }
-                />
-              </DataTable>
-
-              <div className="col-12 d-flex justify-content-end">
-                <Link
-                  onClick={() => {
-                    setUpdate(false);
-                    updateBTC({
-                      ...btc,
-                      material: [
-                        ...btc.material,
-                        {
-                          id: 0,
-                          prod_id: null,
-                          unit_id: null,
-                          qty: null,
-                          mat_use: null,
-                          total_use: null,
-                        },
-                      ],
-                    });
-                  }}
-                  className="btn btn-primary shadow btn-s sharp ml-1 mt-3"
-                >
-                  <span className="align-middle mx-1">
-                    <i className="fa fa-plus"></i> {"Tambah"}
-                  </span>
-                </Link>
-              </div>
-            </>
-          }
-        />
-        <div className="row mb-5">
-          <span className="mb-5"></span>
-        </div>
+                    <Column
+                      className="align-text-top"
+                      body={(e) => (
+                        <Link
+                          onClick={() => {
+                            let temp = [...btc.material];
+                            temp.splice(e.index, 1);
+                            updateBTC({
+                              ...btc,
+                              material: temp,
+                            });
+                          }}
+                          className="btn btn-danger shadow btn-xs sharp ml-1"
+                        >
+                          <i className="fa fa-trash"></i>
+                        </Link>
+                      )}
+                    />
+                  </DataTable>
+                </>
+              }
+            />
+            <div className="row mb-5">
+              <span className="mb-5"></span>
+            </div>
+          </>
+        ) : (
+          <></>
+        )}
       </>
     );
   };
@@ -1902,6 +1715,37 @@ const InputBatch = ({ onCancel, onSuccess }) => {
           </Card>
         </Col>
       </Row>
+
+      <DataSupplier
+        data={supplier}
+        loading={false}
+        popUp={true}
+        show={showSup}
+        onHide={() => {
+          setShowSup(false);
+        }}
+        onInput={(e) => {
+          setShowSup(!e);
+        }}
+        onSuccessInput={(e) => {
+          getSupplier();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowSup(false);
+            let temp = [...btc.sequence];
+            temp[currentIndex].sup_id = e.data?.supplier?.id;
+
+            updateBTC({ ...btc, sequence: temp });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
 
       <DataProduk
         data={product}

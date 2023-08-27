@@ -482,7 +482,9 @@ const DataJeniskerja = ({
               load ? (
                 <Skeleton />
               ) : (
-                <div>{e.mutasi === false ? "No" : "Yes"}</div>
+                <div>
+                  {e.mutasi === false ? "No" : e.mutasi === true ? "Yes" : "-"}
+                </div>
               )
             }
           />
@@ -494,7 +496,9 @@ const DataJeniskerja = ({
               load ? (
                 <Skeleton />
               ) : (
-                <div>{e.maklon === false ? "No" : "Yes"}</div>
+                <div>
+                  {e.maklon === false ? "No" : e?.maklon == true ? "Yes" : "-"}
+                </div>
               )
             }
           />

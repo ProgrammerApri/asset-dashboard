@@ -16,6 +16,8 @@ const data = {
     sup_address: null,
     sup_kota: null,
     sup_kpos: null,
+    sup_pkp: null,
+    sup_maklon: null,
     sup_telp1: null,
     sup_telp2: null,
     sup_fax: null,
@@ -25,6 +27,7 @@ const data = {
     sup_hutang: null,
     sup_uang_muka: null,
     sup_limit: null,
+    sup_serialnumber: null,
   },
 
   currency: {
@@ -62,6 +65,7 @@ const Supplier = ({ edit, del }) => {
     getSupplier();
     getAP();
   }, []);
+  
 
   const getSupplier = async (isUpdate = false) => {
     setLoading(true);

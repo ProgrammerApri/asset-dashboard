@@ -182,20 +182,21 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
             });
             let product = data.product;
             product.forEach((el) => {
-              el.prod_id = el.prod_id?.id;
-              el.unit_id = el.unit_id?.id;
+              el.prod_id = el?.prod_id?.id ?? null;
+              el.unit_id = el?.unit_id?.id ?? null;
             });
             let material = data.material;
             material.forEach((el) => {
-              el.prod_id = el.prod_id.id;
-              el.unit_id = el.unit_id.id;
+              el.prod_id = el?.prod_id?.id ?? null;
+              el.unit_id = el?.unit_id?.id ?? null;
             });
             let sequence = data.sequence;
             sequence.forEach((el) => {
-              el.wc_id = el.wc_id.id ?? null;
-              el.loc_id = el.loc_id.id ?? null;
-              el.mch_id = el.mch_id.id ?? null;
-              el.work_id = el.work_id.id ?? null;
+              el.wc_id = el?.wc_id?.id ?? null;
+              el.loc_id = el?.loc_id?.id ?? null;
+              el.mch_id = el?.mch_id?.id ?? null;
+              el.work_id = el?.work_id?.id ?? null;
+              el.sup_id = el?.sup_id?.id ?? null;
             });
             dispatch({
               type: SET_CURRENT_PL,
@@ -214,6 +215,7 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
                           loc_id: null,
                           mch_id: null,
                           work_id: null,
+                          sup_id: null,
                           date: null,
                           time: null,
                           datetime_actual: null,
@@ -346,6 +348,7 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
                     loc_id: null,
                     mch_id: null,
                     work_id: null,
+                    sup_id: null,
                     date: null,
                     time: null,
                     datetime_actual: null,

@@ -571,6 +571,7 @@ const DataJeniskerja = ({
                     updateJNSkerja({
                       ...jns_kerja,
                       mutasi: e.target.value,
+                      maklon: !e.target.value ? false : false,
                     });
                   }}
                   // optionLabel="name"
@@ -592,9 +593,7 @@ const DataJeniskerja = ({
                       maklon: e.target.value,
                     });
                   }}
-                  // optionLabel="name"
-                  // placeholder="Pilih Disini"
-                  // error={error?.mts}
+                  disabled={jns_kerja?.mutasi === false}
                 />
               </div>
             </div>

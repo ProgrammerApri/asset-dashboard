@@ -45,7 +45,7 @@ const modules = [
   },
   {
     code: "gra",
-    name: "Good Receipt",
+    name: "Purchase",
   },
   {
     code: "invoice",
@@ -53,7 +53,7 @@ const modules = [
   },
   {
     code: "ra",
-    name: "Request Production",
+    name: "Record Activity",
   },
   {
     code: "so",

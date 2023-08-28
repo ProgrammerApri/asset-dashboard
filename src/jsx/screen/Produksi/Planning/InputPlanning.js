@@ -28,6 +28,7 @@ import { Calendar } from "primereact/calendar";
 import DataWorkCenter from "../../Master/WorkCenter/DataWorkCenter";
 import DataJeniskerja from "../../Master/Jenis_kerja/DataJeniskerja";
 import { Checkbox } from "primereact/checkbox";
+import DataSupplier from "../../Mitra/Pemasok/DataPemasok";
 
 const defError = {
   code: false,
@@ -61,6 +62,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
   const [showType, setShowType] = useState(false);
   const [showMsn, setShowMsn] = useState(false);
   const [showLok, setShowLok] = useState(false);
+  const [showSup, setShowSup] = useState(false);
   const [product, setProduct] = useState(null);
   const [satuan, setSatuan] = useState(null);
   const [mesin, setMesin] = useState(null);
@@ -69,6 +71,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
   const [lokasi, setLokasi] = useState(null);
   const [workCen, setWorkCen] = useState(null);
   const [workType, setWorkType] = useState(null);
+  const [supplier, setSup] = useState(null);
   const [error, setError] = useState(defError);
   const [active, setActive] = useState(0);
   const [accor, setAccor] = useState({
@@ -91,6 +94,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
     getWorkType();
     getMesin();
     getLok();
+    getSupplier();
   }, []);
 
   const getFormula = async () => {
@@ -227,6 +231,26 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
       if (response.status) {
         const { data } = response;
         setLokasi(data);
+      }
+    } catch (error) {}
+  };
+
+  const getSupplier = async () => {
+    const config = {
+      ...endpoints.supplier,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+
+      if (response.status) {
+        const { data } = response;
+        let sup = [];
+        data?.forEach((element) => {
+          sup.push(element.supplier);
+        });
+        setSup(data);
       }
     } catch (error) {}
   };
@@ -380,6 +404,18 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
     lokasi?.forEach((element) => {
       if (value === element.id) {
         selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkSup = (value) => {
+    let selected = {};
+    supplier?.forEach((element) => {
+      if (value === element?.supplier?.id) {
+        selected = element;
+        console.log(selected);
       }
     });
 
@@ -613,7 +649,6 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
               value={plan.form_id !== null ? checkFm(plan.form_id) : null}
               options={formula}
               onChange={(e) => {
-
                 updatePL({
                   ...plan,
                   form_id: e?.value?.id ?? null,
@@ -833,27 +868,16 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                         width: "20rem",
                       }}
                       body={(e) => (
-                        <CustomDropdown
-                          value={e.loc_id && checkLoc(e.loc_id)}
-                          option={lokasi}
-                          onChange={(t) => {
-                            let temp = [...plan.sequence];
-                            temp[e.index].loc_id = t?.id ?? null;
-                            updatePL({ ...plan, sequence: temp });
-
-                            // let newError = error;
-                            // newError.msn[e.index].id = false;
-                            // setError(newError);
-                          }}
-                          detail
-                          onDetail={() => {
-                            setCurrentIndex(e.index);
-                            setShowLok(true);
-                          }}
-                          label={"[name] ([code])"}
-                          placeholder="Pilih Mesin"
-                          // errorMessage="Mesin Belum Dipilih"
-                          // error={error?.msn[e.index]?.id}
+                        <PrimeInput
+                          value={
+                            e.loc_id
+                              ? `${checkLoc(e.loc_id)?.name} (${
+                                  checkLoc(e.loc_id)?.code
+                                })`
+                              : "-"
+                          }
+                          placeholder="Mesin"
+                          disabled
                         />
                       )}
                     />
@@ -866,27 +890,16 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                         width: "20rem",
                       }}
                       body={(e) => (
-                        <CustomDropdown
-                          value={e.mch_id && checkMsn(e.mch_id)}
-                          option={mesin}
-                          onChange={(t) => {
-                            let temp = [...plan.sequence];
-                            temp[e.index].mch_id = t?.id ?? null;
-                            updatePL({ ...plan, sequence: temp });
-
-                            let newError = error;
-                            newError.msn[e.index].id = false;
-                            setError(newError);
-                          }}
-                          detail
-                          onDetail={() => {
-                            setCurrentIndex(e.index);
-                            setShowMsn(true);
-                          }}
-                          label={"[msn_name] ([msn_code])"}
-                          placeholder="Pilih Mesin"
-                          errorMessage="Mesin Belum Dipilih"
-                          error={error?.msn[e.index]?.id}
+                        <PrimeInput
+                          value={
+                            e.mch_id
+                              ? `${checkMsn(e.mch_id)?.msn_name} (${
+                                  checkMsn(e.mch_id)?.msn_code
+                                })`
+                              : "-"
+                          }
+                          placeholder="Mesin"
+                          disabled
                         />
                       )}
                     />
@@ -899,27 +912,16 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                         width: "20rem",
                       }}
                       body={(e) => (
-                        <CustomDropdown
-                          value={e.work_id && checkWork(e.work_id)}
-                          option={workType}
-                          onChange={(t) => {
-                            let temp = [...plan.sequence];
-                            temp[e.index].work_id = t?.id ?? null;
-                            updatePL({ ...plan, sequence: temp });
-
-                            // let newError = error;
-                            // newError.msn[e.index].id = false;
-                            // setError(newError);
-                          }}
-                          detail
-                          onDetail={() => {
-                            setCurrentIndex(e.index);
-                            setShowType(true);
-                          }}
-                          label={"[work_name] ([work_type])"}
-                          placeholder="Pilih Pekerjaan"
-                          // errorMessage="Mesin Belum Dipilih"
-                          // error={error?.msn[e.index]?.id}
+                        <PrimeInput
+                          value={
+                            e.work_id
+                              ? `${checkWork(e.work_id)?.work_name} (${
+                                  checkWork(e.work_id)?.work_type
+                                })`
+                              : "-"
+                          }
+                          placeholder="Jenis Pekerjaan"
+                          disabled
                         />
                       )}
                     />
@@ -938,6 +940,55 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                             e.work_id ? checkWork(e.work_id)?.mutasi : null
                           }
                           disabled
+                        />
+                      )}
+                    />
+
+                    <Column
+                      header="Maklon"
+                      className="align-text-top"
+                      field={""}
+                      style={{
+                        minWidth: "5em",
+                      }}
+                      body={(e) => (
+                        <Checkbox
+                          className="ml-2"
+                          checked={
+                            e.work_id ? checkWork(e.work_id)?.maklon : null
+                          }
+                          disabled
+                        />
+                      )}
+                    />
+
+                    <Column
+                      header="Supplier"
+                      className="align-text-top"
+                      field={""}
+                      style={{
+                        minWidth: "15rem",
+                      }}
+                      body={(e) => (
+                        <CustomDropdown
+                          value={e.sup_id && checkSup(e.sup_id)}
+                          option={supplier}
+                          onChange={(u) => {
+                            let temp = [...plan.sequence];
+                            temp[e.index].sup_id = u?.supplier?.id;
+                            updatePL({ ...plan, sequence: temp });
+                          }}
+                          detail
+                          onDetail={() => {
+                            setCurrentIndex(e.index);
+                            setShowSup(true);
+                          }}
+                          label={"[supplier.sup_name] ([supplier.sup_code])"}
+                          placeholder="Pilih Supplier"
+                          disabled={
+                            checkWork(e.work_id)?.maklon == false ||
+                            checkWork(e.work_id)?.maklon == null
+                          }
                         />
                       )}
                     />
@@ -998,49 +1049,21 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
 
                     <Column
                       className="align-text-top"
-                      body={
-                        (e) => (
-                          // e.index === plan.sequence.length - 1 ? (
-                          //   <Link
-                          //     onClick={() => {
-                          //       updatePL({
-                          //         ...plan,
-                          //         sequence: [
-                          //           ...plan.sequence,
-                          //           {
-                          //             id: 0,
-                          //             seq: null,
-                          //             wc_id: null,
-                          //             loc_id: null,
-                          //             mch_id: null,
-                          //             work_id: null,
-                          //             date: null,
-                          //             time: null,
-                          //           },
-                          //         ],
-                          //       });
-                          //     }}
-                          //     className="btn btn-primary shadow btn-xs sharp ml-1"
-                          //   >
-                          //     <i className="fa fa-plus"></i>
-                          //   </Link>
-                          // ) : (
-                          <Link
-                            onClick={() => {
-                              let temp = [...plan.sequence];
-                              temp.splice(e.index, 1);
-                              updatePL({
-                                ...plan,
-                                sequence: temp,
-                              });
-                            }}
-                            className="btn btn-danger shadow btn-xs sharp ml-1"
-                          >
-                            <i className="fa fa-trash"></i>
-                          </Link>
-                        )
-                        // )
-                      }
+                      body={(e) => (
+                        <Link
+                          onClick={() => {
+                            let temp = [...plan.sequence];
+                            temp.splice(e.index, 1);
+                            updatePL({
+                              ...plan,
+                              sequence: temp,
+                            });
+                          }}
+                          className="btn btn-danger shadow btn-xs sharp ml-1"
+                        >
+                          <i className="fa fa-trash"></i>
+                        </Link>
+                      )}
                     />
                   </DataTable>
 
@@ -1063,6 +1086,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                               loc_id: null,
                               mch_id: null,
                               work_id: null,
+                              sup_id: null,
                               date: null,
                               time: null,
                               datetime_actual: null,
@@ -1789,6 +1813,37 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
             setShowLok(false);
             let temp = [...plan.sequence];
             temp[currentIndex].loc_id = e?.data?.id ?? null;
+            updatePL({ ...plan, sequence: temp });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataSupplier
+        data={supplier}
+        loading={false}
+        popUp={true}
+        show={showSup}
+        onHide={() => {
+          setShowSup(false);
+        }}
+        onInput={(e) => {
+          setShowSup(!e);
+        }}
+        onSuccessInput={(e) => {
+          getSupplier();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowSup(false);
+            let temp = [...plan.sequence];
+            temp[currentIndex].sup_id = e.data?.supplier?.id;
+
             updatePL({ ...plan, sequence: temp });
           }
 

@@ -1069,29 +1069,9 @@ const endpoints = {
     data: {},
   },
 
-  getcode_pbb: {
-    endpoint: "/v1/api/pbb/code",
-    method: "GET",
-    data: {},
-  },
 
-  getstatus_pbb: {
-    endpoint: "/v1/api/pbb/status",
-    method: "GET",
-    data: {},
-  },
 
-  getcode_phj: {
-    endpoint: "/v1/api/phj/code",
-    method: "GET",
-    data: {},
-  },
-
-  getstatus_phj: {
-    endpoint: "/v1/api/phj/status",
-    method: "GET",
-    data: {},
-  },
+ 
 
   getcode_returpb: {
     endpoint: "/v1/api/returpb/code",
@@ -1606,6 +1586,19 @@ const endpoints = {
   },
 
   /// Penerimaan Hasil Jadi
+  getcode_phj: {
+    endpoint: "/v1/api/phj/code",
+    method: "GET",
+    data: {},
+  },
+
+  getstatus_phj: {
+    endpoint: "/v1/api/phj/status",
+    method: "GET",
+    data: {},
+  },
+
+
   phj: {
     endpoint: "/v1/api/phj",
     method: "GET",
@@ -1631,6 +1624,18 @@ const endpoints = {
   },
 
   /// Pembebanan
+  getcode_pbb: {
+    endpoint: "/v1/api/pbb/code",
+    method: "GET",
+    data: {},
+  },
+
+  getstatus_pbb: {
+    endpoint: "/v1/api/pbb/status",
+    method: "GET",
+    data: {},
+  },
+
   pbb: {
     endpoint: "/v1/api/pbb",
     method: "GET",
@@ -1732,6 +1737,16 @@ const endpoints = {
   },
 
   /// Formula
+  formula_code: {
+    endpoint: "/v1/api/formula/code",
+    method: "GET",
+    data: {},
+  },
+  formula_status: {
+    endpoint: "/v1/api/formula/status",
+    method: "GET",
+    data: {},
+  },
   formula: {
     endpoint: "/v1/api/formula",
     method: "GET",
@@ -1757,6 +1772,16 @@ const endpoints = {
   },
 
   /// Planning
+  planning_code: {
+    endpoint: "/v1/api/planning/code",
+    method: "GET",
+    data: {},
+  },
+  planning_status: {
+    endpoint: "/v1/api/planning/status",
+    method: "GET",
+    data: {},
+  },
   planning: {
     endpoint: "/v1/api/planning",
     method: "GET",
@@ -1782,6 +1807,16 @@ const endpoints = {
   },
 
   /// Batch
+  batch_code: {
+    endpoint: "/v1/api/batch/code",
+    method: "GET",
+    data: {},
+  },
+  batch_status: {
+    endpoint: "/v1/api/batch/status",
+    method: "GET",
+    data: {},
+  },
   batch: {
     endpoint: "/v1/api/batch",
     method: "GET",
@@ -1806,7 +1841,7 @@ const endpoints = {
     data: {},
   },
 
-  // /// Pembebanan
+  // memorial
   memorial: {
     endpoint: "/v1/api/memorial",
     method: "GET",

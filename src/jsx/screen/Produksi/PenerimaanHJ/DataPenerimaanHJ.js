@@ -72,6 +72,57 @@ const DataPenerimaanHJ = ({ onAdd, onEdit, onDetail }) => {
     }
   };
 
+  const getCoderp = async () => {
+    // setLoading(true);
+    const config = {
+      ...endpoints.getcode_phj,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const kode = response.data;
+        onAdd();
+        dispatch({
+          type: SET_CURRENT_PHJ,
+          payload: {
+            ...data,
+            phj_code: kode,
+            product: [
+              {
+                id: 0,
+                form_id: 0,
+                prod_id: null,
+                unit_id: null,
+                qty: null,
+              },
+            ],
+            reject: [
+              {
+                id: 0,
+                form_id: 0,
+                prod_id: null,
+                unit_id: null,
+                qty: null,
+              },
+            ],
+          },
+        });
+      }
+
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+
   const getDept = async (isUpdate = false) => {
     setLoading(true);
     const config = {
@@ -305,6 +356,7 @@ const DataPenerimaanHJ = ({ onAdd, onEdit, onDetail }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
+            getCoderp()
             dispatch({
               type: SET_EDIT_PHJ,
               payload: false,

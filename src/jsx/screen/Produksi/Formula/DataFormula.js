@@ -58,6 +58,70 @@ const DataFormula = ({ onAdd, onEdit, onDetail }) => {
     initFilters1();
   }, []);
 
+  const getFormula_code = async (isUpdate = false) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.formula_code,
+      data: forml,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const kode = response.data;
+        onAdd();
+        dispatch({
+          type: SET_CURRENT_FM,
+          payload: {
+            ...data,
+            active: false,
+            fcode: kode,
+            version: 1,
+            product: [
+              {
+                id: 0,
+                form_id: 0,
+                prod_id: null,
+                unit_id: null,
+                qty: null,
+                aloc: 100,
+              },
+            ],
+            material: [
+              {
+                id: 0,
+                form_id: 0,
+                prod_id: null,
+                unit_id: null,
+                qty: null,
+                konv_qty: null,
+                unit_konv: null,
+                price: null,
+                total: null,
+              },
+            ],
+            req_form: [
+              {
+                id: 0,
+                form_id: null,
+                prod_id: null,
+                unit_id: null,
+              },
+            ],
+          },
+        });
+      }
+    } catch (error) {}
+    if (isUpdate) {
+      setLoading(false);
+    } else {
+      setTimeout(() => {
+        setLoading(false);
+      }, 500);
+    }
+  };
   const getFormula = async (isUpdate = false) => {
     setLoading(true);
     const config = {
@@ -398,6 +462,7 @@ const DataFormula = ({ onAdd, onEdit, onDetail }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
+            getFormula_code()
             dispatch({
               type: SET_EDIT_FM,
               payload: false,

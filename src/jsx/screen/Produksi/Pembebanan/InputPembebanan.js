@@ -40,6 +40,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const toast = useRef(null);
   const [active, setActive] = useState(0);
+  const [numb, setNumb] = useState(null);
   const [doubleClick, setDoubleClick] = useState(false);
   const pbb = useSelector((state) => state.pbb.current);
   const isEdit = useSelector((state) => state.pbb.editPBB);
@@ -58,6 +59,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
       behavior: "smooth",
     });
     getAcc();
+    getStatus();
     getBatch();
   }, []);
 
@@ -80,6 +82,28 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
         setAccount(data);
       }
     } catch (error) {}
+  };
+
+  const getStatus = async () => {
+    const config = {
+      ...endpoints.getstatus_pbb,
+      data: {},
+    };
+
+    console.log("Data sebelum request:", config.data);
+
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log("Response:", response);
+      if (response.status) {
+        const { data } = response;
+
+        setNumb(data);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   const getBatch = async () => {
@@ -329,7 +353,6 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
     return <span>{props.placeholder}</span>;
   };
 
-
   const body = () => {
     return (
       <>
@@ -347,6 +370,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
               }}
               placeholder="Masukan Kode"
               error={error?.code}
+              disabled={numb}
             />
           </div>
 

@@ -54,6 +54,7 @@ const InputFormula = ({ onCancel, onSuccess }) => {
   const [showProd, setShowProd] = useState(false);
   const [showSatuan, setShowSatuan] = useState(false);
   const [reqForm, setReqForm] = useState(null);
+  const [numb, setNumb] = useState(null);
   const product = useSelector((state) => state.product.list);
   const [satuan, setSatuan] = useState(null);
   const [active, setActive] = useState(0);
@@ -69,6 +70,7 @@ const InputFormula = ({ onCancel, onSuccess }) => {
       behavior: "smooth",
     });
     getReq();
+    getStatus()
     getProduct();
     getSatuan();
   }, []);
@@ -91,7 +93,27 @@ const InputFormula = ({ onCancel, onSuccess }) => {
       }
     } catch (error) {}
   };
+  const getStatus = async () => {
+    const config = {
+      ...endpoints.formula_status,
+      data: {},
+    };
 
+    console.log("Data sebelum request:", config.data);
+
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log("Response:", response);
+      if (response.status) {
+        const { data } = response;
+
+        setNumb(data);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
   const getProduct = async () => {
     const config = {
       ...endpoints.product,
@@ -418,6 +440,7 @@ const InputFormula = ({ onCancel, onSuccess }) => {
               }}
               placeholder="Masukan Kode Formula"
               error={error?.code}
+              disabled={numb}
             />
           </div>
           <div className="col-4 text-black">

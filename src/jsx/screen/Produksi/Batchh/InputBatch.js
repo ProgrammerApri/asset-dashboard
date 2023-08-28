@@ -59,6 +59,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showSup, setShowSup] = useState(false);
   const [showProd, setShowProd] = useState(false);
+  const [numb, setNumb] = useState(null);
   const [showSatuan, setShowSatuan] = useState(false);
   const [showWorkCen, setShowWorkCen] = useState(false);
   const [showType, setShowType] = useState(false);
@@ -80,6 +81,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
     getSupplier();
     getProduct();
     getSatuan();
+    getStatus()
     getFormula();
     getPlanning();
     getDept();
@@ -107,6 +109,27 @@ const InputBatch = ({ onCancel, onSuccess }) => {
         setSup(data);
       }
     } catch (error) {}
+  };
+
+  const getStatus = async () => {
+    const config = {
+      ...endpoints.batch_status,
+      data: {},
+    };
+
+
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log("Response:", response);
+      if (response.status) {
+        const { data } = response;
+
+        setNumb(data);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   const getProduct = async () => {
@@ -537,6 +560,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
               }}
               placeholder="Masukan Kode Batch"
               error={error?.code}
+              disabled={numb}
             />
           </div>
           <div className="col-2 text-black">

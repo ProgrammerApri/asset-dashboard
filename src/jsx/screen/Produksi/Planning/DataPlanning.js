@@ -54,6 +54,64 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
     initFilters1();
   }, []);
 
+
+  const getPlan_code = async (isUpdate = false) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.planning_code,
+      data: plan,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+
+      if (response.status) {
+        const kode = response.data;
+        onAdd();
+        dispatch({
+          type: SET_CURRENT_PL,
+          payload: {
+            ...data,
+            pcode: kode,
+            date_created: new Date(),
+            dep_id: profile?.previlage?.dep_id ?? null,
+            version: 1,
+            sequence: [
+              {
+                id: 0,
+                seq: 1,
+                wc_id: null,
+                loc_id: null,
+                mch_id: null,
+                work_id: null,
+                date: null,
+                time: null,
+                datetime_actual: null,
+                datetime_end: null,
+                durasi: null,
+                proses: null,
+              },
+            ],
+            product: [],
+            material: [],
+          },
+        });
+      }
+    } catch (error) {}
+    if (isUpdate) {
+      setLoading(false);
+    } else {
+      setTimeout(() => {
+        setLoading(false);
+      }, 500);
+    }
+  };
+
+
+
+
   const getPlan = async (isUpdate = false) => {
     setLoading(true);
     const config = {
@@ -329,6 +387,7 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
+            getPlan_code()
             dispatch({
               type: SET_EDIT_PL,
               payload: false,

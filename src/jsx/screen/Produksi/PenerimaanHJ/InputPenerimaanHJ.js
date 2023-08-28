@@ -40,6 +40,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
   const [batch, setBatch] = useState(null);
   const [error, setError] = useState(defError);
   const [update, setUpdate] = useState(false);
+  const [numb, setNumb] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [doubleClick, setDoubleClick] = useState(false);
   const phj = useSelector((state) => state.phj.current);
@@ -60,6 +61,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
     });
     getProduct();
     getSatuan();
+    getStatus()
     getBatch();
     getDept();
   }, []);
@@ -81,6 +83,29 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
       }
     } catch (error) {}
   };
+  const getStatus = async () => {
+    const config = {
+      ...endpoints.getstatus_phj,
+      data: {},
+    };
+
+    console.log("Data sebelum request:", config.data);
+
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log("Response:", response);
+      if (response.status) {
+        const { data } = response;
+
+        setNumb(data);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+
 
   const getSatuan = async () => {
     const config = {
@@ -351,6 +376,7 @@ const InputPenerimaanHJ = ({ onCancel, onSuccess }) => {
               }}
               placeholder="Masukan Kode"
               error={error?.code}
+              disabled={numb}
             />
           </div>
 

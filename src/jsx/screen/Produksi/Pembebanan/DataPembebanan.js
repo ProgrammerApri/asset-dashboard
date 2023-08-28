@@ -82,6 +82,54 @@ const DataPembebanan = ({ onAdd, onEdit, onDetail }) => {
     }
   };
 
+  const getCoderp = async () => {
+    // setLoading(true);
+    const config = {
+      ...endpoints.getcode_pbb,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const kode = response.data;
+        onAdd();
+        dispatch({
+          type: SET_CURRENT_PBB,
+          payload: {
+            ...data,
+            pbb_code: kode,
+            uph: [
+              {
+                id: 0,
+                pbb_id: 0,
+                acc_id: null,
+              },
+            ],
+            ovh: [
+              {
+                id: 0,
+                pbb_id: 0,
+                acc_id: null,
+              },
+            ],
+          },
+        });
+      }
+
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+
+
   const getDept = async () => {
     const config = {
       ...endpoints.pusatBiaya,
@@ -298,6 +346,7 @@ const DataPembebanan = ({ onAdd, onEdit, onDetail }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
+            getCoderp()
             dispatch({
               type: SET_EDIT_PBB,
               payload: false,

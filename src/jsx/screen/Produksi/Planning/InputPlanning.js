@@ -67,6 +67,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
   const [satuan, setSatuan] = useState(null);
   const [mesin, setMesin] = useState(null);
   const [formula, setFormula] = useState(null);
+  const [numb, setNumb] = useState(null);
   const [dept, setDept] = useState(null);
   const [lokasi, setLokasi] = useState(null);
   const [workCen, setWorkCen] = useState(null);
@@ -90,6 +91,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
     getProduct();
     getSatuan();
     getDept();
+    getStatus()
     getWorkCen();
     getWorkType();
     getMesin();
@@ -118,6 +120,28 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
       }
     } catch (error) {}
   };
+  const getStatus = async () => {
+    const config = {
+      ...endpoints.planning_status,
+      data: {},
+    };
+
+    console.log("Data sebelum request:", config.data);
+
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log("Response:", response);
+      if (response.status) {
+        const { data } = response;
+
+        setNumb(data);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
 
   const getProduct = async () => {
     const config = {
@@ -566,6 +590,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
               }}
               placeholder="Masukan Kode"
               error={error?.code}
+              disabled={numb}
             />
           </div>
 

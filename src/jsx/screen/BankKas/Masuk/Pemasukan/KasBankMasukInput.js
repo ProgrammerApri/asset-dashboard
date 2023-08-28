@@ -706,7 +706,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                   />
                 ) : (
                   <PrimeDropdown
-                    value={inc.acq_cus && cus(inc.acq_cus)}
+                    value={inc.acq_cus && cus(inc.acq_cus).cus_name}
                     options={customer}
                     onChange={(e) => {
                       let dp = 0;
@@ -1759,9 +1759,11 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
                 <label className="text-label">Pelanggan</label>
                 <div className="p-inputgroup"></div>
                 <PrimeDropdown
-                  value={inc?.dp_cus && cus(inc?.dp_cus)}
+                  value={inc?.dp_cus && cus(inc?.dp_cus).cus_name}
                   options={allCus}
                   onChange={(e) => {
+
+                    console.log("data:");
                     let filt = [];
                     so?.forEach((element) => {
                       if (!element?.sub_addr) {

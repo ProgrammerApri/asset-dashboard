@@ -49,6 +49,79 @@ const DataBatch = ({ onAdd, onEdit, onDetail }) => {
     initFilters1();
   }, []);
 
+  const getBatch_code = async (isUpdate = false) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.batch_code,
+      data: btc,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const kode = response.data;
+        onAdd();
+        dispatch({
+          type: SET_CURRENT_BTC,
+          payload: {
+            ...data,
+            bcode:kode,
+            sequence: [
+              {
+                id: 0,
+                seq: null,
+                wc_id: null,
+                loc_id: null,
+                mch_id: null,
+                work_id: null,
+                sup_id: null,
+                datetime_plan: null,
+                datetime_actual: null,
+                datetime_end: null,
+                durasi: null,
+                proses: null,
+              },
+            ],
+            product: [
+              {
+                id: 0,
+                prod_id: null,
+                unit_id: null,
+                qty_making: null,
+                aloc: null,
+                qty_receive: null,
+                qty_reject: null,
+                loc_reject: null,
+                wc_mutation: null,
+                remain: null,
+              },
+            ],
+            material: [
+              {
+                id: 0,
+                prod_id: null,
+                unit_id: null,
+                qty: null,
+                mat_use: null,
+                total_use: null,
+                price: null,
+                total_price: null,
+              },
+            ],
+          },
+        });
+      }
+    } catch (error) {}
+    if (isUpdate) {
+      setLoading(false);
+    } else {
+      setTimeout(() => {
+        setLoading(false);
+      }, 500);
+    }
+  };
   const getBatch = async (isUpdate = false) => {
     setLoading(true);
     const config = {
@@ -316,6 +389,7 @@ const DataBatch = ({ onAdd, onEdit, onDetail }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
+            getBatch_code()
             dispatch({
               type: SET_EDIT_BTC,
               payload: false,

@@ -19,6 +19,8 @@ const data = {
     cus_telp1: null,
     cus_telp2: null,
     cus_email: null,
+    cus_kode_country: null,
+    cus_country: null,
     cus_fax: null,
     cus_cp: null,
     cus_curren: null,

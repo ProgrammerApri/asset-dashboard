@@ -35,6 +35,10 @@ const def = {
     sup_ppn: null,
     sup_pkp: false,
     sup_maklon: false,
+    sup_aktif: false,
+    sup_email: null,
+    sup_no_cp1: null,
+    sup_no_cp2: null,
     sup_kode_country: null,
     sup_npwp: null,
     sup_country: null,
@@ -50,7 +54,6 @@ const def = {
     sup_hutang: null,
     sup_uang_muka: null,
     sup_limit: null,
-    // sup_serialNumber: 0,
   },
 
   currency: {
@@ -113,9 +116,7 @@ const DataSupplier = ({
   const [accHut, setAccHut] = useState(null);
   const [accUm, setAccUm] = useState(null);
   const [accAll, setAccAll] = useState(null);
-  const [checked, setChecked] = useState({
-    supplier: { sup_country: { code: "" } },
-  });
+
   const [comp, setComp] = useState(null);
   const [pajak, setPajak] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -133,7 +134,6 @@ const DataSupplier = ({
   const [active, setActive] = useState(0);
   const [error, setError] = useState(defError);
   const [number, setNumber] = useState(0);
-  // const [lastSerialNumber, setLastSerialNumber] = useState("");
 
   useEffect(() => {
     getJpem();
@@ -163,13 +163,7 @@ const DataSupplier = ({
     { name: "United States", code: "US" },
   ];
 
-  // const generateCode = () => {
-  //   const countryCode = checked?.supplier?.sup_country?.code || "";
-  //   const jpelCode = currentItem?.jpem?.jpem_code || "";
-  //   return checked?.supplier?.sup_country?.code
-  //     ? `${countryCode}${jpelCode}/${lastSerialNumber}`
-  //     : `${countryCode}${jpelCode}/${lastSerialNumber}`;
-  // };
+ 
 
   const getSup = async () => {
     setLoading(true);
@@ -351,15 +345,19 @@ const DataSupplier = ({
       ...endpoints.editSupplier,
       endpoint: endpoints.editSupplier.endpoint + currentItem.supplier.id,
       data: {
-        sup_code: generateCodePreview(),
+        sup_code: currentItem?.supplier?.sup_code ?? null,
         sup_name: currentItem?.supplier?.sup_name ?? null,
         sup_jpem: currentItem?.jpem?.id ?? null,
         sup_ppn: currentItem?.supplier?.sup_ppn ?? null,
         sup_pkp: currentItem?.supplier?.sup_pkp ?? null,
+        sup_aktif: currentItem?.supplier?.sup_aktif ?? null,
         sup_maklon: currentItem?.supplier?.sup_maklon ?? null,
         sup_kode_country: currentItem?.supplier?.sup_kode_country ?? null,
         sup_npwp: currentItem?.supplier?.sup_npwp ?? null,
-        sup_country: currentItem?.supplier?.sup_country.name ?? null,
+        sup_email: currentItem?.supplier?.sup_email ?? null,
+        sup_no_cp1: currentItem?.supplier?.sup_no_cp1 ?? null,
+        sup_no_cp2: currentItem?.supplier?.sup_no_cp2 ?? null,
+        sup_country: currentItem?.supplier?.sup_country ?? null,
         sup_address: currentItem?.supplier?.sup_address ?? null,
         sup_kota: currentItem?.supplier?.sup_kota ?? null,
         sup_kpos: currentItem?.supplier?.sup_kpos ?? null,
@@ -415,10 +413,14 @@ const DataSupplier = ({
         sup_jpem: currentItem?.jpem?.id ?? null,
         sup_ppn: currentItem?.supplier?.sup_ppn ?? null,
         sup_pkp: currentItem?.supplier?.sup_pkp ?? null,
+        sup_aktif: currentItem?.supplier?.sup_aktif ?? null,
+        sup_email: currentItem?.supplier?.sup_email ?? null,
+        sup_no_cp1: currentItem?.supplier?.sup_no_cp1 ?? null,
+        sup_no_cp2: currentItem?.supplier?.sup_no_cp2 ?? null,
         sup_maklon: currentItem?.supplier?.sup_maklon ?? null,
         sup_kode_country: currentItem?.supplier?.sup_kode_country ?? null,
         sup_npwp: currentItem?.supplier?.sup_npwp ?? null,
-        sup_country: currentItem?.supplier?.sup_country.name ?? null,
+        sup_country: currentItem?.supplier?.sup_country ?? null,
         sup_address: currentItem?.supplier?.sup_address ?? null,
         sup_kota: currentItem?.supplier?.sup_kota ?? null,
         sup_kpos: currentItem?.supplier?.sup_kpos ?? null,
@@ -431,7 +433,6 @@ const DataSupplier = ({
         sup_hutang: currentItem?.supplier?.sup_hutang ?? null,
         sup_uang_muka: currentItem?.supplier?.sup_uang_muka ?? null,
         sup_limit: currentItem?.supplier?.sup_limit ?? null,
-        // sup_serialNumber: lastSerialNumber ?? null,
       },
     };
     console.log(config.data);
@@ -789,7 +790,7 @@ const DataSupplier = ({
     let code = [];
 
     if (currentItem?.supplier?.sup_kode_country) {
-      code.push(currentItem?.supplier?.sup_country?.code);
+      code.push(checkCountry(currentItem?.supplier?.sup_country).code);
     }
     if (currentItem?.jpem) {
       code.push(currentItem.jpem.jpem_code);
@@ -839,6 +840,18 @@ const DataSupplier = ({
     document.documentElement.scrollTop = 0;
   };
 
+  const checkCountry = (value) => {
+    let selected = {};
+    countries?.forEach((element) => {
+      if (element.name === `${value}`) {
+        selected = element;
+      }
+
+      // console.log("negara",element.name);
+    });
+    console.log(currentItem);
+    return selected;
+  };
   const handleScroll = () => {
     const scrollButton = document.getElementById("myBtn");
     if (scrollButton) {
@@ -1030,6 +1043,7 @@ const DataSupplier = ({
   };
 
   const renderDialog = () => {
+    console.log("hellloo", currentItem?.supplier?.sup_country ?? null);
     return (
       <>
         <Toast ref={toast} />
@@ -1057,9 +1071,13 @@ const DataSupplier = ({
                 <div className="col-4 mt-0">
                   <PrimeInput
                     label={tr[localStorage.getItem("language")].kd_pem}
-                    value={generateCodePreview(currentItem?.supplier?.sup_code)}
+                    value={
+                      !isEdit
+                        ? generateCodePreview(currentItem?.supplier?.sup_code)
+                        : currentItem?.supplier?.sup_code
+                    }
                     placeholder={tr[localStorage.getItem("language")].masuk}
-                    error={error[0]?.code}
+                    // error={error[0]?.code}
                     disabled
                   />
                 </div>
@@ -1196,7 +1214,7 @@ const DataSupplier = ({
                     <b>{"PKP"}</b>
                   </label>
                 </div>
-                <div className="d-flex col-4 align-items-center mt-0">
+                <div className="d-flex col-2 align-items-center mt-0">
                   <InputSwitch
                     className="ml-0 mt-1"
                     checked={
@@ -1219,19 +1237,36 @@ const DataSupplier = ({
                     <b>{"Maklon"}</b>
                   </label>
                 </div>
+                <div className="d-flex col-4 align-items-center mt-0">
+                  <InputSwitch
+                    className="ml-0 mt-1"
+                    checked={
+                      currentItem !== null
+                        ? currentItem.supplier.sup_aktif
+                        : null
+                    }
+                    onChange={(e) => {
+                      setCurrentItem({
+                        ...currentItem,
+                        supplier: {
+                          ...currentItem.supplier,
+                          sup_aktif: e.value,
+                        },
+                      });
+                    }}
+                    // disabled
+                  />
+                  <label className="ml-3 mt-2">
+                    <b>{"Supplier Aktif"}</b>
+                  </label>
+                </div>
               </div>
 
               <div className="row ml-0 mt-0">
                 <div
                   style={{ width: "px", marginLeft: "px", marginRight: "px" }}
                 ></div>
-                {/* <div className="col-3">
-                  <label>Serial Number</label>
-                  <PrimeInput
-                    value={`0000${currentItem?.jpem?.id ?? ""}`}
-                    disabled
-                  />
-                </div> */}
+                
               </div>
 
               <div className="col-12 p-0">
@@ -1262,13 +1297,19 @@ const DataSupplier = ({
 
                       <div className="justify-content-center flex-grow-1 ml-2">
                         <Dropdown
-                          value={currentItem?.supplier?.sup_country}
+                          value={
+                            currentItem &&
+                            currentItem?.supplier?.sup_country !== null
+                              ? checkCountry(currentItem?.supplier?.sup_country)
+                              : null
+                          }
                           onChange={(e) => {
+                            // console.log("jjjjj", e.value.name);
                             setCurrentItem({
                               ...currentItem,
                               supplier: {
                                 ...currentItem.supplier,
-                                sup_country: e.value,
+                                sup_country: e.value.name,
                               },
                             });
                           }}
@@ -1299,22 +1340,22 @@ const DataSupplier = ({
                           sup_address: e.target.value,
                         },
                       });
-                      const generatedCode = `${
-                        currentItem?.supplier?.sup_code ??
-                        (currentItem?.supplier?.sup_code ||
-                          `${currentItem?.supplier?.sup_country?.code ?? ""}${
-                            currentItem?.jpem?.jpem_code
-                          }
-                          /${number}`) + ``
-                      }`;
-                      setCurrentItem({
-                        ...currentItem,
-                        supplier: {
-                          ...currentItem.supplier,
-                          sup_code: generatedCode,
-                          sup_address: e.target.value,
-                        },
-                      });
+                      // const generatedCode = `${
+                      //   currentItem?.supplier?.sup_code ??
+                      //   (currentItem?.supplier?.sup_code ||
+                      //     `${currentItem?.supplier?.sup_country?.code ?? ""}${
+                      //       currentItem?.jpem?.jpem_code
+                      //     }
+                      //     /${number}`) + ``
+                      // }`;
+                      // setCurrentItem({
+                      //   ...currentItem,
+                      //   supplier: {
+                      //     ...currentItem.supplier,
+                      //     sup_code: generatedCode,
+                      //     sup_address: e.target.value,
+                      //   },
+                      // });
                       let newError = error;
                       newError[0].addrs = false;
                       setError(newError);
@@ -1412,6 +1453,30 @@ const DataSupplier = ({
               headerTemplate={renderTabHeader}
             >
               <div className="row ml-0 mt-0">
+                <div className="col-12 mt-0">
+                  <PrimeInput
+                    label={`${tr[localStorage.getItem("language")].email}`}
+                    value={
+                      currentItem !== null
+                        ? `${currentItem?.supplier?.sup_email ?? ""}`
+                        : ""
+                    }
+                    onChange={(e) => {
+                      setCurrentItem({
+                        ...currentItem,
+                        supplier: {
+                          ...currentItem.supplier,
+                          sup_email: e.target.value,
+                        },
+                      });
+                      // let newError = error;
+                      // newError[1].phone = false;
+                      // setError(newError);
+                    }}
+                    placeholder={tr[localStorage.getItem("language")].masuk}
+                    // error={error[1]?.phone}
+                  />
+                </div>
                 <div className="col-6 mt-0">
                   <PrimeInput
                     label={`${tr[localStorage.getItem("language")].telp} 1`}
@@ -1508,6 +1573,53 @@ const DataSupplier = ({
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[1]?.cp}
                   />
+                </div>
+              </div>
+              <div className="row ml-0 mt-0">
+                <div className="col-6 mt-0">
+                  <label className="text-label">Nomor Contact Person 1</label>
+                  <div className="p-inputgroup">
+                    <InputText
+                      value={
+                        currentItem !== null
+                          ? `${currentItem?.supplier?.sup_no_cp1 ?? ""}`
+                          : ""
+                      }
+                      onChange={(e) =>
+                        setCurrentItem({
+                          ...currentItem,
+                          supplier: {
+                            ...currentItem.supplier,
+                            sup_no_cp1 : e.target.value,
+                          },
+                        })
+                      }
+                      placeholder={tr[localStorage.getItem("language")].masuk}
+                    />
+                  </div>
+                </div>
+
+                <div className="col-6">
+                <label className="text-label">Nomor Contact Person 2</label>
+                  <div className="p-inputgroup">
+                    <InputText
+                      value={
+                        currentItem !== null
+                          ? `${currentItem?.supplier?.sup_no_cp2 ?? ""}`
+                          : ""
+                      }
+                      onChange={(e) =>
+                        setCurrentItem({
+                          ...currentItem,
+                          supplier: {
+                            ...currentItem.supplier,
+                            sup_no_cp2: e.target.value,
+                          },
+                        })
+                      }
+                      placeholder={tr[localStorage.getItem("language")].masuk}
+                    />
+                  </div>
                 </div>
               </div>
             </TabPanel>

@@ -40,6 +40,7 @@ const def = {
     cus_npwp: null,
     cus_pkp: null,
     cus_country: null,
+    cus_kode_country: null,
     cus_address: null,
     cus_kota: null,
     cus_kpos: null,
@@ -56,7 +57,6 @@ const def = {
     cus_limit: null,
     sub_cus: false,
     cus_id: null,
-    cus_serialNumber: 0,
   },
 
   jpel: {
@@ -151,7 +151,7 @@ const DataCustomer = ({
   const [showPajak, setShowPajak] = useState(false);
   const [doubleClick, setDoubleClick] = useState(false);
   const [error, setError] = useState(defError);
-  const [lastSerialNumber, setLastSerialNumber] = useState("");
+  const [number, setNumber] = useState(0);
 
   useEffect(() => {
     getSetup();
@@ -169,26 +169,18 @@ const DataCustomer = ({
   }, []);
 
   const countries = [
-    { name: "Australia", code: "AU-", id: 1 },
-    { name: "Brazil", code: "BR-", id: 2 },
-    { name: "China", code: "CN-", id: 3 },
-    { name: "Egypt", code: "EG-", id: 4 },
-    { name: "France", code: "FR-", id: 5 },
-    { name: "Germany", code: "DE-", id: 6 },
-    { name: "India", code: "IN-", id: 7 },
-    { name: "Indonesia", code: "IND-", id: 8 },
-    { name: "Japan", code: "JP-", id: 9 },
-    { name: "Spain", code: "ES-", id: 10 },
-    { name: "United States", code: "US-", id: 11 },
+    { name: "Australia", code: "AU" },
+    { name: "Brazil", code: "BR" },
+    { name: "China", code: "CN" },
+    { name: "Egypt", code: "EG" },
+    { name: "France", code: "FR" },
+    { name: "Germany", code: "DE" },
+    { name: "India", code: "IN" },
+    { name: "Indonesia", code: "IND" },
+    { name: "Japan", code: "JP" },
+    { name: "Spain", code: "ES" },
+    { name: "United States", code: "US" },
   ];
-
-  const generateCode = () => {
-    const countryCode = checked?.customer?.cus_country?.code || "";
-    const jpelCode = currentItem?.jpel?.jpel_code || "";
-    return checked?.customer?.cus_country?.code
-      ? `${countryCode}${jpelCode}/${lastSerialNumber}`
-      : `${countryCode}${jpelCode}/${lastSerialNumber}`;
-  };
 
   const getCustomer = async () => {
     setLoading(true);
@@ -205,7 +197,7 @@ const DataCustomer = ({
 
       if (response.status) {
         const { data } = response;
-        setLastSerialNumber(data);
+        setNumber(data);
       }
       setLoading(false);
     } catch (error) {
@@ -409,6 +401,7 @@ const DataCustomer = ({
         cus_npwp: currentItem?.customer?.cus_npwp ?? null,
         cus_pkp: currentItem?.customer?.cus_pkp ?? null,
         cus_country: currentItem?.customer?.cus_country ?? null,
+        cus_kode_country: currentItem?.customer?.cus_kode_country ?? null,
         cus_address: currentItem?.customer?.cus_address ?? null,
         cus_kota: currentItem?.customer?.cus_kota ?? null,
         cus_kpos: currentItem?.customer?.cus_kpos ?? null,
@@ -424,7 +417,6 @@ const DataCustomer = ({
         sub_cus: currentItem?.customer?.sub_cus ?? null,
         cus_id: currentItem?.customer?.cus_id ?? null,
         cus_curren: currentItem?.customer?.cus_curren ?? null,
-        cus_serialNumber: currentItem?.customer?.cus_serialNumber ?? null,
       },
     };
     console.log(config.data);
@@ -464,14 +456,15 @@ const DataCustomer = ({
       ...endpoints.addCustomer,
       data: {
         ...currentItem,
-        cus_code: currentItem?.customer?.cus_code ?? null,
+        cus_code: generateCodePreview(),
         cus_name: currentItem?.customer?.cus_name ?? null,
         cus_jpel: currentItem?.jpel?.id ?? null,
         cus_sub_area: currentItem?.subArea?.id ?? null,
         cus_pjk: currentItem?.customer?.cus_pjk ?? null,
         cus_npwp: currentItem?.customer?.cus_npwp ?? null,
         cus_pkp: currentItem?.customer?.cus_pkp ?? null,
-        cus_country: currentItem?.customer?.cus_country.name ?? null,
+        cus_country: currentItem?.customer?.cus_country ?? null,
+        cus_kode_country: currentItem?.customer?.cus_kode_country ?? null,
         cus_address: currentItem?.customer?.cus_address ?? null,
         cus_kota: currentItem?.customer?.cus_kota ?? null,
         cus_kpos: currentItem?.customer?.cus_kpos ?? null,
@@ -487,7 +480,6 @@ const DataCustomer = ({
         cus_limit: currentItem?.customer?.cus_limit ?? null,
         sub_cus: currentItem?.customer?.sub_cus ?? null,
         cus_id: currentItem?.customer?.cus_id ?? null,
-        cus_serialNumber: lastSerialNumber ?? null,
       },
     };
     console.log(config.data);
@@ -872,6 +864,34 @@ const DataCustomer = ({
     });
     return selected;
   };
+  const checkCountry = (value) => {
+    let selected = {};
+    countries?.forEach((element) => {
+      if (element.name === `${value}`) {
+        selected = element;
+      }
+
+      console.log("negara", element.code);
+    });
+    console.log(currentItem);
+    return selected;
+  };
+
+  const generateCodePreview = () => {
+   
+    let code = [];
+
+    if (currentItem?.customer?.cus_kode_country) {
+      code.push(checkCountry(currentItem?.customer?.cus_country).code);
+    }
+    if (currentItem?.jpel) {
+      code.push(currentItem.jpel.jpel_code);
+    }
+
+    code.push(number);
+
+    return code.join("/");
+  };
 
   const kota = (value) => {
     let selected = {};
@@ -955,17 +975,7 @@ const DataCustomer = ({
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
 
-  const chekcountry = (value) => {
-    let selected = {};
-    countries?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-        console.log(selected);
-      }
-    });
-
-    return selected;
-  };
+ 
 
   const checkCurrency = (value) => {
     let selected = {};
@@ -1128,22 +1138,26 @@ const DataCustomer = ({
                 <div className="col-6">
                   <PrimeInput
                     label={tr[localStorage.getItem("language")].kd_pel}
-                    value={currentItem?.customer?.cus_code}
-                    onChange={(e) => {
-                      setCurrentItem({
-                        ...currentItem,
-                        customer: {
-                          ...currentItem.customer,
-                          cus_code: e.target.value,
-                        },
-                      });
-                      let newError = error;
-                      newError[0].code = false;
-                      setError(newError);
-                    }}
+                    value={
+                      !isEdit
+                        ? generateCodePreview(currentItem?.customer?.cus_code)
+                        : currentItem?.customer?.cus_code
+                    }
+                    // onChange={(e) => {
+                    //   setCurrentItem({
+                    //     ...currentItem,
+                    //     customer: {
+                    //       ...currentItem.customer,
+                    //       cus_code: e.target.value,
+                    //     },
+                    //   });
+                    //   let newError = error;
+                    //   newError[0].code = false;
+                    //   setError(newError);
+                    // }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
-                    error={error[0]?.code}
-                    // disabled
+                    // error={error[0]?.code}
+                    disabled
                   />
                 </div>
                 <div className="col-6">
@@ -1373,33 +1387,32 @@ const DataCustomer = ({
                   <div className="d-flex align-items-center">
                     <Checkbox
                       className="mr-2"
-                      checked={!!checked?.customer?.cus_country?.code}
+                      checked={currentItem?.customer?.cus_kode_country}
                       onChange={(e) => {
-                        const newChecked = {
-                          ...checked,
+                        setCurrentItem({
+                          ...currentItem,
                           customer: {
-                            ...checked.customer,
-                            cus_country: {
-                              ...checked.customer.cus_country,
-                              code: e.target.checked
-                                ? currentItem?.customer?.cus_country?.code
-                                : "",
-                            },
+                            ...currentItem.customer,
+                            cus_kode_country: e.target.checked,
                           },
-                        };
-                        setChecked(newChecked);
+                        });
                       }}
                     />
                     <div className="justify-content-center flex-grow-1 ml-2">
                       <Dropdown
-                        value={currentItem?.customer?.cus_country ?? null}
+                        value={
+                          currentItem &&
+                          currentItem?.customer?.cus_country !== null
+                            ? checkCountry(currentItem?.customer?.cus_country)
+                            : null
+                        }
                         onChange={(e) => {
                           console.log("Selected country:", e.value.name);
                           setCurrentItem({
                             ...currentItem,
                             customer: {
                               ...currentItem.customer,
-                              cus_country: e.value,
+                              cus_country: e.value.name,
                             },
                           });
                         }}
@@ -1418,7 +1431,11 @@ const DataCustomer = ({
                 <div className="col-12">
                   <PrimeInput
                     label={tr[localStorage.getItem("language")].alamat}
-                    value={`${currentItem?.customer?.cus_address ?? ""}`}
+                    value={
+                      currentItem !== null
+                        ? `${currentItem?.customer?.cus_address ?? ""}`
+                        : ""
+                    }
                     onChange={(e) => {
                       setCurrentItem({
                         ...currentItem,
@@ -1430,22 +1447,16 @@ const DataCustomer = ({
                       let newError = error;
                       newError[0].addrs = false;
                       setError(newError);
-                      const generatedCode = `${
-                        currentItem?.customer?.cus_code ??
-                        (currentItem?.customer?.cus_code ||
-                          `${checked?.customer?.cus_country?.code ?? ""}${
-                            currentItem?.jpel?.jpel_code
-                          }/${lastSerialNumber}`) + ``
-                      }`;
-                      console.log("generat", currentItem);
-                      setCurrentItem({
-                        ...currentItem,
-                        customer: {
-                          ...currentItem.customer,
-                          cus_code: generatedCode,
-                          cus_address: e.target.value,
-                        },
-                      });
+
+                      // console.log("generat", currentItem);
+                      // setCurrentItem({
+                      //   ...currentItem,
+                      //   customer: {
+                      //     ...currentItem.customer,
+                      //     cus_code: generatedCode,
+                      //     cus_address: e.target.value,
+                      //   },
+                      // });
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[0]?.addrs}

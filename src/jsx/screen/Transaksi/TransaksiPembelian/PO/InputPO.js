@@ -90,6 +90,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
   const [error, setError] = useState(defError);
   const picker = useRef(null);
   const [file, setFile] = useState(null);
+  const [selectedProducts, setSelectedProducts] = useState(null);
   const [accor, setAccor] = useState({
     produk: true,
     jasa: false,
@@ -941,6 +942,15 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   },
                 ];
 
+                let sup = [
+                  {
+                    sup_id: 0,
+                    prod_id: prod,
+                    price: prc,
+                    image: null,
+                  },
+                ];
+
                 updatePo({
                   ...po,
                   preq_id: e.value.id,
@@ -952,6 +962,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   pprod: e.value.rprod ?? null,
                   pjasa: e.value.rjasa ?? null,
                   psup: psup,
+                  sup: sup,
                 });
 
                 let newError = error;
@@ -1117,270 +1128,323 @@ const InputPO = ({ onCancel, onSuccess }) => {
             <>
               {po?.psup?.length ? (
                 <>
-                  <Col className="ml-0 mr-0 p-0">
-                    <DataTable
-                      responsiveLayout="none"
-                      // value={[
-                      //   {
-                      //     sup_id: null,
-                      //     prod_id: ["produk 1", "produk 2", "produk 3"],
-                      //     price: [1000, 200, 0],
-                      //   },
-                      // ]}
-                      value={po.psup?.map((v, i) => {
-                        return {
-                          ...v,
-                          index: i,
-                          price: v?.price ?? 0,
-                        };
-                      })}
-                      className="display w-150 datatable-wrapper header-white no-border"
-                      showGridlines={false}
-                      emptyMessage={() => <div></div>}
-                    >
-                      <Column
-                        header={tr[localStorage.getItem("language")].supplier}
-                        className="align-text-top"
-                        field={""}
-                        // style={{
-                        //   minWidth: "12rem",
-                        // }}
-                        body={(e) => (
-                          <div className="flex">
-                            <div className="col-2 ml-0 p-2">
-                              <RadioButton
-                                inputId="binary"
-                                checked={po && po.check}
-                                onChange={(e) => {
-                                  let temp = [...po.pprod];
+                  <div className="col-12 p-0">
+                    <CustomAccordion
+                      tittle={"Referensi Supplier"}
+                      defaultActive={true}
+                      active={accor.sup}
+                      onClick={() => {
+                        setAccor({
+                          ...accor,
+                          sup: !accor.sup,
+                        });
+                      }}
+                      key={1}
+                      body={
+                        <>
+                          <DataTable
+                            responsiveLayout="none"
+                            selection={selectedProducts}
+                            onSelectionChange={(e) => {
+                              setSelectedProducts(e.value);
 
-                                  po.psup?.forEach((element, i) => {
-                                    temp[e.index]?.prod_id.forEach((elem) => {
-                                      if (elem === element.prod_id) {
-                                        temp[e.index].price = element.price[i];
-                                      }
-                                      console.log("ckckc");
-                                      console.log(elem);
-                                    });
-                                  });
+                              console.log("=================selec");
+                              console.log(e.value);
 
-                                  updatePo({
-                                    ...po,
-                                    check: e.target.value,
-                                    pprod: temp,
-                                  });
-                                }}
-                              />
-                            </div>
-                            <div className="col-10 ml-0 p-0">
-                              <CustomDropdown
-                                value={e.sup_id && supp(e.sup_id)}
-                                option={supplier}
-                                onChange={(t) => {
-                                  let temp = [...po.psup];
-                                  temp[e.index].sup_id = t.supplier?.id;
+                              updatePo({
+                                ...po,
+                                psup: e?.value?.map((v) => {
+                                  return {
+                                    ...v,
+                                    sup_id: v?.sup_id ?? null,
+                                    prod_id: v?.prod_id ?? null,
+                                    price: v?.price ?? 0,
+                                    image: v?.image ?? null,
+                                  };
+                                }),
+                              });
+                            }}
+                            value={po?.sup?.map((v, i) => {
+                              return {
+                                ...v,
+                                index: i,
+                              };
+                            })}
+                            className="display w-150 datatable-wrapper header-white no-border"
+                            showGridlines={false}
+                            emptyMessage={() => <div></div>}
+                          >
+                            <Column
+                              className="align-text-top"
+                              selectionMode={"single"}
+                              headerStyle={{ width: "2rem" }}
+                              exportable={false}
+                            />
+                            <Column
+                              header={
+                                tr[localStorage.getItem("language")].supplier
+                              }
+                              className="align-text-top"
+                              field={""}
+                              style={{
+                                minWidth: "20rem",
+                              }}
+                              body={(e) => (
+                                // <div className="flex">
+                                //   <div className="col-2 ml-0 p-2">
+                                //     <RadioButton
+                                //       inputId="binary"
+                                //       checked={po && po.check}
+                                //       onChange={(e) => {
+                                //         let temp = [...po.pprod];
 
-                                  histori?.forEach((element) => {
-                                    if (element.supplier.id === t.supplier.id) {
-                                      temp[e.index]?.prod_id?.forEach(
-                                        (elem, i) => {
-                                          if (elem === element.product.id) {
-                                            temp[e.index].price[i] =
-                                              element.price;
-                                          }
-                                        }
-                                      );
-                                    }
-                                  });
-                                  updatePo({ ...po, psup: temp });
-                                }}
-                                placeholder={
-                                  tr[localStorage.getItem("language")].pilih
-                                }
-                                label={"[supplier.sup_name]"}
-                                detail
-                                onDetail={() => {
-                                  setCurrentIndex(e.index);
-                                  setShowSupp(true);
-                                }}
-                              />
-                            </div>
-                          </div>
-                        )}
-                      />
+                                //         po.psup?.forEach((element, i) => {
+                                //           temp[e.index]?.prod_id.forEach(
+                                //             (elem) => {
+                                //               if (elem === element.prod_id) {
+                                //                 temp[e.index].price =
+                                //                   element.price[i];
+                                //               }
+                                //               console.log("ckckc");
+                                //               console.log(elem);
+                                //             }
+                                //           );
+                                //         });
 
-                      <Column
-                        header={tr[localStorage.getItem("language")].nm_prod}
-                        className="align-text-top"
-                        field={""}
-                        // style={{
-                        //   minWidth: "7rem",
-                        // }}
-                        body={(e) =>
-                          //  console.log(e)
-                          e?.prod_id?.map((val, i) => {
-                            return (
-                              <div
-                                className={`p-inputgroup${
-                                  i > 0 ? " mt-2" : ""
-                                }`}
-                              >
-                                <InputText
-                                  value={val && checkProd(val).name}
-                                  onChange={(t) => {}}
-                                  placeholder={
-                                    tr[localStorage.getItem("language")].nm_prod
-                                  }
-                                  disabled
-                                />
-                              </div>
-                            );
-                          })
-                        }
-                      />
-
-                      <Column
-                        header={tr[localStorage.getItem("language")].price}
-                        className="align-text-top"
-                        field={""}
-                        // style={{
-                        //   minWidth: "10rem",
-                        // }}
-                        body={(e) =>
-                          e.price?.map((val, i) => {
-                            return (
-                              <div
-                                className={`p-inputgroup${
-                                  i > 0 ? " mt-2" : ""
-                                }`}
-                              >
-                                <InputText
-                                  value={val ? val : ""}
+                                //         updatePo({
+                                //           ...po,
+                                //           check: e.target.value,
+                                //           pprod: temp,
+                                //         });
+                                //       }}
+                                //     />
+                                //   </div>
+                                //   {/* <div className="col-10 ml-0 p-0"> */}
+                                <CustomDropdown
+                                  value={e.sup_id && supp(e.sup_id)}
+                                  option={supplier}
                                   onChange={(t) => {
                                     let temp = [...po.psup];
-                                    temp[e.index].price[i] = t.target.value;
+                                    temp[e.index].sup_id = t.supplier?.id;
 
+                                    histori?.forEach((element) => {
+                                      if (
+                                        element.supplier.id === t.supplier.id
+                                      ) {
+                                        temp[e.index]?.prod_id?.forEach(
+                                          (elem, i) => {
+                                            if (elem === element.product.id) {
+                                              temp[e.index].price[i] =
+                                                element.price;
+                                            }
+                                          }
+                                        );
+                                      }
+                                    });
                                     updatePo({ ...po, psup: temp });
                                   }}
-                                  min={0}
-                                  placeholder="0"
-                                  type="number"
-                                  // disabled
-                                />
-                              </div>
-                            );
-                          })
-                        }
-                      />
-
-                      <Column
-                        header=""
-                        style={{ width: "4rem" }}
-                        body={(e) => (
-                          <div>
-                            <Tooltip
-                              target=".upload"
-                              mouseTrack
-                              mouseTrackLeft={10}
-                            />
-                            <input
-                              type="file"
-                              id="file"
-                              ref={picker}
-                              accept="image/*"
-                              style={{ display: "none" }}
-                              onChange={(e) => {
-                                console.log("ceeekk");
-                                console.log(e);
-                                setFile(e.target.files[0]);
-                              }}
-                            />
-
-                            <Card.Body
-                              className="flex align-items-center justify-content-center p-0"
-                              data-pr-tooltip="Upload File"
-                              onClick={() => {
-                                picker.current.click();
-                              }}
-                              style={{
-                                cursor: "pointer",
-                              }}
-                            >
-                              {file ? (
-                                <img
-                                  style={{ width: "115px", height: "95px" }}
-                                  src={URL.createObjectURL(file)}
-                                  alt=""
-                                />
-                              ) : e.image && e.image !== "" ? (
-                                <img
-                                  style={{ width: "115px", height: "95px" }}
-                                  src={e.image}
-                                  alt=""
-                                />
-                              ) : (
-                                <i
-                                  className="pi pi-image p-4"
-                                  style={{
-                                    fontSize: "3em",
-                                    borderRadius: "10%",
-                                    backgroundColor: "var(--surface-d)",
-                                    color: "var(--surface-g)",
+                                  placeholder={
+                                    tr[localStorage.getItem("language")].pilih
+                                  }
+                                  label={"[supplier.sup_name]"}
+                                  detail
+                                  onDetail={() => {
+                                    setCurrentIndex(e.index);
+                                    setShowSupp(true);
                                   }}
-                                ></i>
+                                />
+                                // {/* </div> */}
+                                // </div>
                               )}
-                            </Card.Body>
-                          </div>
-                        )}
-                      />
+                            />
 
-                      <Column
-                        body={(e) =>
-                          e.index === po.psup.length - 1 ? (
-                            <Link
-                              onClick={() => {
-                                let prod = [];
-                                let prc = [];
-                                po?.pprod?.forEach((element) => {
-                                  prod.push(element.prod_id);
-                                  prc.push(0);
-                                });
-                                updatePo({
-                                  ...po,
-                                  psup: [
-                                    ...po.psup,
-                                    {
-                                      sup_id: 0,
-                                      prod_id: prod,
-                                      price: prc,
-                                      image: null,
-                                    },
-                                  ],
-                                });
-                              }}
-                              className="btn btn-primary shadow btn-xs sharp ml-1"
-                            >
-                              <i className="fa fa-plus"></i>
-                            </Link>
-                          ) : (
-                            <Link
-                              onClick={() => {
-                                let temp = [...po.psup];
-                                temp.splice(e.index, 1);
-                                updatePo({
-                                  ...po,
-                                  psup: temp,
-                                });
-                              }}
-                              className="btn btn-danger shadow btn-xs sharp ml-1"
-                            >
-                              <i className="fa fa-trash"></i>
-                            </Link>
-                          )
-                        }
-                      />
-                    </DataTable>
-                  </Col>
+                            <Column
+                              header={
+                                tr[localStorage.getItem("language")].nm_prod
+                              }
+                              className="align-text-top"
+                              field={""}
+                              // style={{
+                              //   minWidth: "7rem",
+                              // }}
+                              body={(e) =>
+                                //  console.log(e)
+                                e?.prod_id?.map((val, i) => {
+                                  return (
+                                    <div
+                                      className={`p-inputgroup${
+                                        i > 0 ? " mt-2" : ""
+                                      }`}
+                                    >
+                                      <InputText
+                                        value={val && checkProd(val).name}
+                                        onChange={(t) => {}}
+                                        placeholder={
+                                          tr[localStorage.getItem("language")]
+                                            .nm_prod
+                                        }
+                                        disabled
+                                      />
+                                    </div>
+                                  );
+                                })
+                              }
+                            />
+
+                            <Column
+                              header={
+                                tr[localStorage.getItem("language")].price
+                              }
+                              className="align-text-top"
+                              field={""}
+                              // style={{
+                              //   minWidth: "10rem",
+                              // }}
+                              body={(e) =>
+                                e.price?.map((val, i) => {
+                                  return (
+                                    <div
+                                      className={`p-inputgroup${
+                                        i > 0 ? " mt-2" : ""
+                                      }`}
+                                    >
+                                      <InputText
+                                        value={val ? val : ""}
+                                        onChange={(t) => {
+                                          let temp = [...po.psup];
+                                          temp[e.index].price[i] =
+                                            t.target.value;
+
+                                          updatePo({ ...po, psup: temp });
+                                        }}
+                                        min={0}
+                                        placeholder="0"
+                                        type="number"
+                                        // disabled
+                                      />
+                                    </div>
+                                  );
+                                })
+                              }
+                            />
+
+                            <Column
+                              header=""
+                              style={{ width: "4rem" }}
+                              body={(e) => (
+                                <div>
+                                  <Tooltip
+                                    target=".upload"
+                                    mouseTrack
+                                    mouseTrackLeft={10}
+                                  />
+                                  <input
+                                    type="file"
+                                    id="file"
+                                    ref={picker}
+                                    accept="image/*"
+                                    style={{ display: "none" }}
+                                    onChange={(e) => {
+                                      console.log("ceeekk");
+                                      console.log(e);
+                                      setFile(e.target.files[0]);
+                                    }}
+                                  />
+
+                                  <Card.Body
+                                    className="flex align-items-center justify-content-center p-0"
+                                    data-pr-tooltip="Upload File"
+                                    onClick={() => {
+                                      picker.current.click();
+                                    }}
+                                    style={{
+                                      cursor: "pointer",
+                                    }}
+                                  >
+                                    {file ? (
+                                      <img
+                                        style={{
+                                          width: "115px",
+                                          height: "95px",
+                                        }}
+                                        src={URL.createObjectURL(file)}
+                                        alt=""
+                                      />
+                                    ) : e.image && e.image !== "" ? (
+                                      <img
+                                        style={{
+                                          width: "115px",
+                                          height: "95px",
+                                        }}
+                                        src={e.image}
+                                        alt=""
+                                      />
+                                    ) : (
+                                      <i
+                                        className="pi pi-image p-4"
+                                        style={{
+                                          fontSize: "3em",
+                                          borderRadius: "10%",
+                                          backgroundColor: "var(--surface-d)",
+                                          color: "var(--surface-g)",
+                                        }}
+                                      ></i>
+                                    )}
+                                  </Card.Body>
+                                </div>
+                              )}
+                            />
+
+                            <Column
+                              body={(e) =>
+                                e.index === po.psup.length - 1 ? (
+                                  <Link
+                                    onClick={() => {
+                                      let prod = [];
+                                      let prc = [];
+                                      po?.pprod?.forEach((element) => {
+                                        prod.push(element.prod_id);
+                                        prc.push(0);
+                                      });
+                                      updatePo({
+                                        ...po,
+                                        psup: [
+                                          ...po.psup,
+                                          {
+                                            sup_id: 0,
+                                            prod_id: prod,
+                                            price: prc,
+                                            image: null,
+                                          },
+                                        ],
+                                      });
+                                    }}
+                                    className="btn btn-primary shadow btn-xs sharp ml-1"
+                                  >
+                                    <i className="fa fa-plus"></i>
+                                  </Link>
+                                ) : (
+                                  <Link
+                                    onClick={() => {
+                                      let temp = [...po.psup];
+                                      temp.splice(e.index, 1);
+                                      updatePo({
+                                        ...po,
+                                        psup: temp,
+                                      });
+                                    }}
+                                    className="btn btn-danger shadow btn-xs sharp ml-1"
+                                  >
+                                    <i className="fa fa-trash"></i>
+                                  </Link>
+                                )
+                              }
+                            />
+                          </DataTable>
+                        </>
+                      }
+                    />
+                  </div>
                 </>
               ) : (
                 <></>

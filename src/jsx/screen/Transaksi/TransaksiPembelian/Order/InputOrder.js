@@ -177,7 +177,6 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     }
   };
 
-
   const addODR = async () => {
     const config = {
       ...endpoints.addODR,
@@ -957,8 +956,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
       !errors.sup &&
       // acc_ap &&
       // !errors.rul &&
-      (validProduct === order.dprod.length || validJasa)
-      // acc_err;
+      (validProduct === order.dprod.length || validJasa);
+    // acc_err;
 
     setError(errors);
     console.log("======err=======");
@@ -1518,6 +1517,11 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                           let temp = [...order.dprod];
                           temp[e.index].prod_id = u?.id;
                           temp[e.index].unit_id = u?.unit?.id;
+                          temp[e.index].konv_qty = 0;
+                          temp[e.index].unit_konv =
+                            checkUnit(temp[e.index].unit_id)?.u_from !== null
+                              ? checkUnit(temp[e.index].unit_id)?.u_from?.code
+                              : checkUnit(temp[e.index].unit_id)?.code;
                           updateORD({ ...order, dprod: temp });
 
                           let newError = error;
@@ -1534,34 +1538,6 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                         disabled={order.po_id !== null && !isEdit}
                         errorMessage="Produk Belum Dipilih"
                         error={error?.prod[e.index]?.id}
-                      />
-                    )}
-                  />
-
-                  <Column
-                    header={tr[localStorage.getItem("language")].satuan}
-                    className="align-text-top"
-                    style={{
-                      minWidth: "7rem",
-                    }}
-                    field={""}
-                    body={(e) => (
-                      <CustomDropdown
-                        value={e.unit_id && checkUnit(e.unit_id)}
-                        onChange={(u) => {
-                          let temp = [...order.dprod];
-                          temp[e.index].unit_id = u.id;
-                          updateORD({ ...order, dprod: temp });
-                        }}
-                        option={satuan}
-                        detail
-                        onDetail={() => {
-                          setCurrentIndex(e.index);
-                          setShowSatuan(true);
-                        }}
-                        label={"[name]"}
-                        placeholder={tr[localStorage.getItem("language")].pilih}
-                        disabled={order.po_id !== null && !isEdit}
                       />
                     )}
                   />
@@ -1601,6 +1577,37 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
+                    header={tr[localStorage.getItem("language")].satuan}
+                    className="align-text-top"
+                    style={{
+                      minWidth: "7rem",
+                    }}
+                    field={""}
+                    body={(e) => (
+                      <CustomDropdown
+                        value={e.unit_id && checkUnit(e.unit_id)}
+                        onChange={(u) => {
+                          let temp = [...order.dprod];
+                          temp[e.index].unit_id = u.id;
+                          temp[e.index].konv_qty = temp[e.index].order * u?.qty;
+                          temp[e.index].unit_konv =
+                            u?.u_from !== null ? u?.u_from?.code : u?.code;
+                          updateORD({ ...order, dprod: temp });
+                        }}
+                        option={satuan}
+                        detail
+                        onDetail={() => {
+                          setCurrentIndex(e.index);
+                          setShowSatuan(true);
+                        }}
+                        label={"[name]"}
+                        placeholder={tr[localStorage.getItem("language")].pilih}
+                        disabled={order.po_id !== null && !isEdit}
+                      />
+                    )}
+                  />
+
+                  <Column
                     hidden={order?.po_id == null}
                     header={tr[localStorage.getItem("language")].ord}
                     className="align-text-top"
@@ -1633,7 +1640,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                     field={""}
                     body={(e) => (
                       <PrimeNumber
-                        prc
+                        price
                         value={e.order && e.order}
                         onChange={(u) => {
                           let temp = [...order.dprod];
@@ -1645,6 +1652,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                             temp[e.index].order = val;
 
                             temp[e.index].order = Number(u.value);
+                            temp[e.index].konv_qty =
+                              u?.value * checkUnit(temp[e.index].unit_id)?.qty;
 
                             if (
                               order.sup_id !== null &&
@@ -1652,7 +1661,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                                 null
                             ) {
                               temp[e.index].total_fc =
-                                temp[e.index].order * temp[e.index].price;
+                                temp[e.index].konv_qty * temp[e.index].price;
 
                               temp[e.index].total =
                                 temp[e.index].total_fc * curConv();
@@ -1661,21 +1670,23 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                                 temp[e.index].order = e.req;
                               }
                               temp[e.index].total_fc =
-                                temp[e.index].order * temp[e.index].price;
+                                temp[e.index].konv_qty * temp[e.index].price;
                             } else {
                               temp[e.index].total =
-                                temp[e.index].order * temp[e.index].price;
+                                temp[e.index].konv_qty * temp[e.index].price;
 
                               if (temp[e.index].order > e.req) {
                                 temp[e.index].order = e.req;
                                 temp[e.index].total =
-                                  temp[e.index].order * temp[e.index].price;
+                                  temp[e.index].konv_qty * temp[e.index].price;
                               }
                             }
 
                             temp[e.index].remain = result;
                           } else {
                             temp[e.index].order = Number(u.value);
+                            temp[e.index].konv_qty =
+                              u.value * checkUnit(temp[e.index].unit_id)?.qty;
 
                             if (
                               order.sup_id !== null &&
@@ -1683,13 +1694,13 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                                 null
                             ) {
                               temp[e.index].total_fc =
-                                temp[e.index].order * temp[e.index].price;
+                                temp[e.index].konv_qty * temp[e.index].price;
 
                               temp[e.index].total =
                                 temp[e.index].total_fc * curConv();
                             } else {
                               temp[e.index].total =
-                                temp[e.index].order * temp[e.index].price;
+                                temp[e.index].konv_qty * temp[e.index].price;
                             }
                           }
 
@@ -1741,107 +1752,75 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
+                    header={"Konversi Qty"}
+                    className="align-text-top"
+                    style={{
+                      minWidth: "8rem",
+                    }}
+                    field={""}
+                    body={(e) => (
+                      <>
+                        <label className="ml-1">{`${formatIdr(
+                          e?.konv_qty ?? 0
+                        )} (${e?.unit_konv ?? ""})`}</label>
+                      </>
+                    )}
+                  />
+
+                  <Column
                     header={tr[localStorage.getItem("language")].price}
                     className="align-text-top"
                     style={{
                       minWidth: "10rem",
                     }}
                     field={""}
-                    body={(e) =>
-                      order.sup_id !== null &&
-                      checkSupp(order.sup_id)?.supplier?.sup_curren !== null ? (
-                        <PrimeNumber
-                          price
-                          value={e.price && e.price}
-                          onChange={(u) => {
-                            let temp = [...order.dprod];
-                            temp[e.index].price = u?.value;
-                            if (
-                              order.sup_id !== null &&
-                              checkSupp(order.sup_id)?.supplier?.sup_curren !==
-                                null
-                            ) {
-                              temp[e.index].total_fc =
-                                temp[e.index].order * temp[e.index].price;
+                    body={(e) => (
+                      <PrimeNumber
+                        price
+                        value={e.price && e.price}
+                        onChange={(u) => {
+                          let temp = [...order.dprod];
+                          temp[e.index].price = u?.value;
+                          if (
+                            order.sup_id !== null &&
+                            checkSupp(order.sup_id)?.supplier?.sup_curren !==
+                              null
+                          ) {
+                            temp[e.index].total_fc =
+                              temp[e.index].order * temp[e.index].price;
 
-                              temp[e.index].total =
-                                temp[e.index].total_fc * curConv();
+                            temp[e.index].total =
+                              temp[e.index].total_fc * curConv();
 
-                              temp[e.index].idr = u?.value * curConv();
-                            } else {
-                              temp[e.index].total =
-                                temp[e.index].order * temp[e.index].price;
-                            }
+                            temp[e.index].idr = u?.value * curConv();
+                          } else {
+                            temp[e.index].total =
+                              temp[e.index].order * temp[e.index].price;
+                          }
 
-                            updateORD({
-                              ...order,
-                              dprod: temp,
-                              total_b: getSubTotalBarang() + getSubTotalJasa(),
-                              total_bayar:
-                                getSubTotalBarang() +
-                                getSubTotalJasa() +
-                                ((getSubTotalBarang() + getSubTotalJasa()) *
-                                  ppn()) /
-                                  100,
-                            });
+                          updateORD({
+                            ...order,
+                            dprod: temp,
+                            total_b: getSubTotalBarang() + getSubTotalJasa(),
+                            total_bayar:
+                              getSubTotalBarang() +
+                              getSubTotalJasa() +
+                              ((getSubTotalBarang() + getSubTotalJasa()) *
+                                ppn()) /
+                                100,
+                          });
 
-                            let newError = error;
-                            newError.prod[e.index].prc = false;
-                            setError(newError);
-                          }}
-                          placeholder="0"
-                          type="number"
-                          min={0}
-                          disabled={!isEdit && order.po_id !== null}
-                          error={error?.prod[e.index]?.prc}
-                        />
-                      ) : (
-                        <PrimeNumber
-                          price
-                          value={e.price && e.price}
-                          onChange={(u) => {
-                            let temp = [...order.dprod];
-                            temp[e.index].price = u.value;
-                            if (
-                              order.sup_id !== null &&
-                              checkSupp(order.sup_id)?.supplier?.sup_curren !==
-                                null
-                            ) {
-                              temp[e.index].total_fc =
-                                temp[e.index].order * temp[e.index].price;
-
-                              temp[e.index].total =
-                                temp[e.index].total_fc * curConv();
-                            } else {
-                              temp[e.index].total =
-                                temp[e.index].order * temp[e.index].price;
-                            }
-
-                            updateORD({
-                              ...order,
-                              dprod: temp,
-                              total_b: getSubTotalBarang() + getSubTotalJasa(),
-                              total_bayar:
-                                getSubTotalBarang() +
-                                getSubTotalJasa() +
-                                ((getSubTotalBarang() + getSubTotalJasa()) *
-                                  ppn()) /
-                                  100,
-                            });
-
-                            let newError = error;
-                            newError.prod[e.index].prc = false;
-                            setError(newError);
-                          }}
-                          placeholder="0"
-                          type="number"
-                          mode="decimal"
-                          min={0}
-                          disabled={!isEdit && order.po_id !== null}
-                          error={error?.prod[e.index]?.prc}
-                        />
-                      )
-                    }
+                          let newError = error;
+                          newError.prod[e.index].prc = false;
+                          setError(newError);
+                        }}
+                        placeholder="0"
+                        type="number"
+                        min={0}
+                        disabled={!isEdit && order.po_id !== null}
+                        error={error?.prod[e.index]?.prc}
+                      />
+                    )}
                   />
 
                   <Column
@@ -1978,57 +1957,18 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                       minWidth: "2rem",
                     }}
                     field={""}
-                    body={(e) =>
-                      e.index === order.dprod.length - 1 ? (
-                        <Link
-                          onClick={() => {
-                            let newError = error;
-                            newError.prod.push({
-                              id: false,
-                              lok: false,
-                              jum: false,
-                              prc: false,
-                            });
-                            setError(newError);
-
-                            updateORD({
-                              ...order,
-                              dprod: [
-                                ...order.dprod,
-                                {
-                                  id: 0,
-                                  prod_id: null,
-                                  unit_id: null,
-                                  request: null,
-                                  order: null,
-                                  remain: null,
-                                  price: null,
-                                  disc: null,
-                                  nett_price: null,
-                                  total_fc: 0,
-                                  total: null,
-                                },
-                              ],
-                            });
-                          }}
-                          className="btn btn-primary shadow btn-xs sharp"
-                          hidden={order.po_id !== null}
-                        >
-                          <i className="fa fa-plus"></i>
-                        </Link>
-                      ) : (
-                        <Link
-                          onClick={() => {
-                            let temp = [...order.dprod];
-                            temp.splice(e.index, 1);
-                            updateORD({ ...order, dprod: temp });
-                          }}
-                          className="btn btn-danger shadow btn-xs sharp"
-                        >
-                          <i className="fa fa-trash"></i>
-                        </Link>
-                      )
-                    }
+                    body={(e) => (
+                      <Link
+                        onClick={() => {
+                          let temp = [...order.dprod];
+                          temp.splice(e.index, 1);
+                          updateORD({ ...order, dprod: temp });
+                        }}
+                        className="btn btn-danger shadow btn-xs sharp"
+                      >
+                        <i className="fa fa-trash"></i>
+                      </Link>
+                    )}
                   />
                 </DataTable>
               </div>
@@ -2050,6 +1990,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                           request: null,
                           order: null,
                           remain: null,
+                          konv_qty: null,
+                          unit_konv: null,
                           price: null,
                           disc: null,
                           nett_price: null,

@@ -4,7 +4,7 @@ import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button, TabPane } from "react-bootstrap";
-import { Row, Col, Card } from "react-bootstrap";
+import { Row, Col, Card, Badge } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { Dialog } from "primereact/dialog";
@@ -16,7 +16,6 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { InputNumber } from "primereact/inputnumber";
 import { Divider, Icon } from "@material-ui/core";
 import { TabPanel, TabView } from "primereact/tabview";
-import { Badge } from "primereact/badge";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
@@ -162,8 +161,6 @@ const DataSupplier = ({
     { name: "Spain", code: "ES" },
     { name: "United States", code: "US" },
   ];
-
- 
 
   const getSup = async () => {
     setLoading(true);
@@ -998,7 +995,7 @@ const DataSupplier = ({
             body={load && <Skeleton />}
           />
           <Column
-            header={tr[localStorage.getItem("language")].telp}
+            header={tr[localStorage.getItem("language")].telp_kantor}
             field={(e) => e.supplier?.sup_telp1 ?? "-"}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
@@ -1012,6 +1009,30 @@ const DataSupplier = ({
             }
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
+          />
+          <Column
+            header={"Status Supplier"}
+            field={(e) => e.supplier?.sup_aktif}
+            style={{ minWidth: "8rem" }}
+            body={(e) =>
+              load ? (
+                <Skeleton />
+              ) : (
+                <div>
+                  {e.supplier?.sup_aktif === true ? (
+                    <Badge variant="success light">
+                      <i className="bx bx-check text-success mr-1 mt-1"></i>{" "}
+                      Aktif
+                    </Badge>
+                  ) : (
+                    <Badge variant="danger light">
+                      <i className="bx bx-x text-danger mr-1 mt-1"></i>{" "}
+                      Tidak Aktif
+                    </Badge>
+                  )}
+                </div>
+              )
+            }
           />
           <Column
             header="Action"
@@ -1054,7 +1075,7 @@ const DataSupplier = ({
               : tr[localStorage.getItem("language")].add_data
           }
           visible={showInput}
-          style={{ width: "50vw" }}
+          style={{ width: "50vw", height: "65vh" }}
           footer={renderFooter()}
           onHide={() => {
             onHideInput();
@@ -1266,7 +1287,6 @@ const DataSupplier = ({
                 <div
                   style={{ width: "px", marginLeft: "px", marginRight: "px" }}
                 ></div>
-                
               </div>
 
               <div className="col-12 p-0">
@@ -1293,6 +1313,10 @@ const DataSupplier = ({
                             },
                           });
                         }}
+                        disabled={
+                          currentItem &&
+                          currentItem?.supplier?.sup_country === null
+                        }
                       />
 
                       <div className="justify-content-center flex-grow-1 ml-2">
@@ -1304,7 +1328,6 @@ const DataSupplier = ({
                               : null
                           }
                           onChange={(e) => {
-                            // console.log("jjjjj", e.value.name);
                             setCurrentItem({
                               ...currentItem,
                               supplier: {
@@ -1368,10 +1391,13 @@ const DataSupplier = ({
 
               <div className="row ml-0 mt-0">
                 <div className="col-6">
-                  {currentItem?.supplier?.sup_country?.code === "IND" ? (
+                  {checkCountry(currentItem?.supplier?.sup_country)?.code === "IND" ? (
                     <PrimeDropdown
                       label={tr[localStorage.getItem("language")].kota}
-                      value={currentItem?.supplier?.sup_kota ?? null}
+                      value={ currentItem &&
+                        currentItem?.supplier?.sup_kota !== null
+                          ? kota(currentItem?.supplier?.sup_kota)
+                          : null}
                       options={city}
                       onChange={(e) => {
                         setCurrentItem({
@@ -1440,7 +1466,7 @@ const DataSupplier = ({
                         })
                       }
                       placeholder={tr[localStorage.getItem("language")].masuk}
-                      disabled={currentItem?.supplier?.sup_kota !== null}
+                      // disabled={currentItem?.supplier?.sup_kota !== null}
                       type="number"
                     />
                   </div>
@@ -1453,9 +1479,10 @@ const DataSupplier = ({
               headerTemplate={renderTabHeader}
             >
               <div className="row ml-0 mt-0">
-                <div className="col-12 mt-0">
+                <div className="col-12 mb-3">
                   <PrimeInput
-                    label={`${tr[localStorage.getItem("language")].email}`}
+                    label={tr[localStorage.getItem("language")].email}
+                    isEmail
                     value={
                       currentItem !== null
                         ? `${currentItem?.supplier?.sup_email ?? ""}`
@@ -1469,17 +1496,15 @@ const DataSupplier = ({
                           sup_email: e.target.value,
                         },
                       });
-                      // let newError = error;
-                      // newError[1].phone = false;
-                      // setError(newError);
                     }}
-                    placeholder={tr[localStorage.getItem("language")].masuk}
-                    // error={error[1]?.phone}
+                    placeholder="Cth. ar@gmail.com"
                   />
                 </div>
                 <div className="col-6 mt-0">
                   <PrimeInput
-                    label={`${tr[localStorage.getItem("language")].telp} 1`}
+                    label={`${
+                      tr[localStorage.getItem("language")].telp_kantor
+                    } 1`}
                     value={
                       currentItem !== null
                         ? `${currentItem?.supplier?.sup_telp1 ?? ""}`
@@ -1504,7 +1529,9 @@ const DataSupplier = ({
 
                 <div className="col-6">
                   <PrimeInput
-                    label={`${tr[localStorage.getItem("language")].telp} 2`}
+                    label={`${
+                      tr[localStorage.getItem("language")].telp_kantor
+                    } 2`}
                     value={
                       currentItem !== null
                         ? `${currentItem?.supplier?.sup_telp2 ?? ""}`
@@ -1528,7 +1555,7 @@ const DataSupplier = ({
 
               <div className="row ml-0 mt-0">
                 <div className="col-6 mt-0">
-                  <label className="text-label">Fax</label>
+                  <label className="text-label">Nomor Fax</label>
                   <div className="p-inputgroup">
                     <InputText
                       value={
@@ -1552,7 +1579,7 @@ const DataSupplier = ({
 
                 <div className="col-6">
                   <PrimeInput
-                    label={tr[localStorage.getItem("language")].cp}
+                    label={"Contact Person"}
                     value={
                       currentItem !== null
                         ? `${currentItem?.supplier?.sup_cp ?? ""}`
@@ -1590,7 +1617,7 @@ const DataSupplier = ({
                           ...currentItem,
                           supplier: {
                             ...currentItem.supplier,
-                            sup_no_cp1 : e.target.value,
+                            sup_no_cp1: e.target.value,
                           },
                         })
                       }
@@ -1600,7 +1627,7 @@ const DataSupplier = ({
                 </div>
 
                 <div className="col-6">
-                <label className="text-label">Nomor Contact Person 2</label>
+                  <label className="text-label">Nomor Contact Person 2</label>
                   <div className="p-inputgroup">
                     <InputText
                       value={

@@ -29,6 +29,7 @@ import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 import { InputTextarea } from "primereact/inputtextarea";
 import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
 import { current } from "@reduxjs/toolkit";
+import { InputSwitch } from "primereact/inputswitch";
 
 const def = {
   id: null,
@@ -39,6 +40,7 @@ const def = {
   departement: "",
   group: "",
   type: null,
+  konsinyasi: false,
   codeb: null,
   unit: null,
   weight: null,
@@ -108,6 +110,7 @@ const DataProduk = ({
 }) => {
   const product = useSelector((state) => state.product);
   const [prdCode, setPrdCode] = useState(null);
+  const [stcard, setStcard] = useState(null);
   const [group, setGroup] = useState(null);
   const [nomor, setNomor] = useState(null);
   const [departement, setDept] = useState(null);
@@ -149,6 +152,7 @@ const DataProduk = ({
     initFilters1();
     getCodeProd();
     getGroup();
+    getStcard();
     getDept();
     getUnit();
     getSupplier();
@@ -208,6 +212,28 @@ const DataProduk = ({
       }
     } catch (error) {}
   };
+
+  const getStcard = async (isUpdate = false) => {
+    const config = {
+      ...endpoints.st_card,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setStcard(data);
+      }
+    } catch (error) {}
+    if (isUpdate) {
+    } else {
+    }
+  };
+
   const getDept = async (isUpdate = false) => {
     const config = {
       ...endpoints.pusatBiaya,
@@ -995,6 +1021,7 @@ const DataProduk = ({
 
     return [day, month, year].join("-");
   };
+
   const scrollToTop = () => {
     // Menggulir halaman ke bagian atas
     document.body.scrollTop = 0;
@@ -1147,6 +1174,7 @@ const DataProduk = ({
 
     return selected;
   };
+
   const checkDept = (value) => {
     let selected = {};
     departement?.forEach((element) => {
@@ -1178,6 +1206,24 @@ const DataProduk = ({
     }
 
     return <span>{props.placeholder}</span>;
+  };
+
+  const getStock = () => {
+    let stock = 0;
+    product?.list?.forEach((element) => {
+      stcard?.forEach((elem) => {
+        if (element?.id === elem?.prod_id?.id) {
+          if (elem?.trx_dbcr === "d") {
+            stock += elem?.trx_qty;
+          } else {
+            stock -= elem?.trx_qty;
+          }
+        }
+      });
+      // console.log("hhhh", deptement);
+    });
+
+    return stock;
   };
 
   const renderBody = () => {
@@ -1286,8 +1332,9 @@ const DataProduk = ({
       </>
     );
   };
+
   const renderDialog = () => {
-    console.log("data :",currentItem);
+    console.log("data :", currentItem);
     return (
       <>
         <Toast ref={toast} />
@@ -1302,7 +1349,7 @@ const DataProduk = ({
                 }`
           }
           visible={displayData}
-          style={{ width: "50vw" }}
+          style={{ width: "50vw", height: "65vh" }}
           footer={renderFooter()}
           onHide={() => {
             setEdit(false);
@@ -1379,9 +1426,7 @@ const DataProduk = ({
                   <PrimeDropdown
                     label={tr[localStorage.getItem("language")].g_prod}
                     value={
-                      currentItem !== ""
-                        ? checkGroup(currentItem.group)
-                        : ""
+                      currentItem !== "" ? checkGroup(currentItem.group) : ""
                     }
                     options={group}
                     onChange={(e) => {
@@ -1490,34 +1535,21 @@ const DataProduk = ({
                   />
                 </div>
               </div>
-              <div className="row mr-0 ml-0">
-                <div className="col-4">
-                  <PrimeCalendar
-                    label={tr[localStorage.getItem("language")].tgl_exp}
-                    // value={new Date(`${currentItem?.exp_date }Z`)}
-                    value={currentItem?.exp_date ? new Date(currentItem.exp_date) : null}
-        
-                    onChange={(e) => {
-                      let result = new Date(e.value);
-
-                      result.setDate(result.getDate() + e.day);
-                      console.log(result);
-
-                      setCurrentItem({
-                        ...currentItem,
-                        exp_date: e.value,
-                      });
-                      let newError = error;
-                      newError[0].exp_date = false;
-                      setError(newError);
-                    }}
-                    placeholder={tr[localStorage.getItem("language")].pilih_tgl}
-                    error={error[0]?.exp_date}
-                    showIcon
-                    dateFormat="dd-mm-yy"
-                  />
-                </div>
-              </div>{" "}
+              <div className="d-flex col-4 align-items-center mt-3">
+                <InputSwitch
+                  className="ml-0 mt-1"
+                  checked={currentItem !== null ? currentItem.konsinyasi : null}
+                  onChange={(e) => {
+                    setCurrentItem({
+                      ...currentItem,
+                      konsinyasi: e.value,
+                    });
+                  }}
+                />
+                <label className="ml-3 mt-2">
+                  <b>{"Produk Konsinyasi"}</b>
+                </label>
+              </div>
               <div className="col-12 p-0">
                 <div className="mt-4 ml-3 mr-3 fs-16 mb-1">
                   <b>{tr[localStorage.getItem("language")].supplier}</b>
@@ -1643,7 +1675,7 @@ const DataProduk = ({
                     value={currentItem?.weight ?? null}
                     onChange={(a) => {
                       setCurrentItem({
-                        ...currentItem,       
+                        ...currentItem,
                         weight: a.value ?? null,
                       });
                     }}
@@ -1760,9 +1792,7 @@ const DataProduk = ({
                   </div>
                 </div>
                 <div className="col-4">
-                  <label className="text-label">
-                    {"Kode Maklon"}
-                  </label>
+                  <label className="text-label">{"Kode Maklon"}</label>
                   <div className="p-inputgroup">
                     <InputText
                       value={`${currentItem?.maklon_code ?? ""}`}
@@ -1801,6 +1831,35 @@ const DataProduk = ({
                     placeholder={tr[localStorage.getItem("language")].pilih}
                     errorMessage="Metode HPP Belum Dipilih"
                     error={error[1]?.hpp}
+                  />
+                </div>
+                <div className="col-4">
+                  <PrimeCalendar
+                    label={tr[localStorage.getItem("language")].tgl_exp}
+                    // value={new Date(`${currentItem?.exp_date }Z`)}
+                    value={
+                      currentItem?.exp_date
+                        ? new Date(currentItem.exp_date)
+                        : null
+                    }
+                    onChange={(e) => {
+                      let result = new Date(e.value);
+
+                      result.setDate(result.getDate() + e.day);
+                      console.log(result);
+
+                      setCurrentItem({
+                        ...currentItem,
+                        exp_date: e.value,
+                      });
+                      let newError = error;
+                      newError[0].exp_date = false;
+                      setError(newError);
+                    }}
+                    placeholder={tr[localStorage.getItem("language")].pilih_tgl}
+                    error={error[0]?.exp_date}
+                    showIcon
+                    dateFormat="dd-mm-yy"
                   />
                 </div>
               </div>

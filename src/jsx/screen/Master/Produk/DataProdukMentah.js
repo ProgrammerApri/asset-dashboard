@@ -39,6 +39,7 @@ const def = {
   departement: null,
   group: null,
   type: null,
+  konsinyasi: null,
   codeb: null,
   unit: null,
   weight: null,

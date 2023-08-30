@@ -1501,6 +1501,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                         value={e.prod_id && checkProd(e.prod_id)}
                         option={product}
                         onChange={(u) => {
+
+                      
                           // looping satuan
                           let sat = [];
                           satuan.forEach((element) => {
@@ -1523,6 +1525,10 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                               ? checkUnit(temp[e.index].unit_id)?.u_from?.code
                               : checkUnit(temp[e.index].unit_id)?.code;
                           updateORD({ ...order, dprod: temp });
+                          console.log("Unit_konv",temp[e.index].unit_konv =
+                      checkUnit(temp[e.index].unit_id)?.u_from !== null
+                        ? checkUnit(temp[e.index].unit_id)?.u_from?.code
+                        : checkUnit(temp[e.index].unit_id)?.code)
 
                           let newError = error;
                           newError.prod[e.index].id = false;

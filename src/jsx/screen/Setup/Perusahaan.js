@@ -41,6 +41,7 @@ const data = {
   discount: false,
   tiered: false,
   rp: false,
+  status_number_otomatis: false,
   over_po: false,
   cutoff: null,
   year_co: null,

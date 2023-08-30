@@ -34,6 +34,7 @@ const data = {
   dep_id: null,
   proj_id: null,
   sup_id: null,
+  unit_konv: null,
   top: null,
   due_date: null,
   split_order: null,
@@ -44,6 +45,7 @@ const data = {
   total_bayar: null,
   ns: false,
   same_sup: false,
+  note: null,
   dprod: [],
   djasa: [],
 };
@@ -100,6 +102,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
             ...data,
             ord_code: kode,
             split_inv: false,
+            unit_konv: null,
             dprod: [
               {
                 id: 0,

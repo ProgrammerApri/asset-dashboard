@@ -444,7 +444,7 @@ const ReturBeliList = ({ onAdd, onEdit, onDetail }) => {
                 <Column
                   header={"Kode Invoice"}
                   style={{ minWidth: "8rem" }}
-                  field={(e) => e.inv_id.inv_code}
+                  field={(e) => e.inv_id?.inv_code}
                   body={loading && <Skeleton />}
                 />
                 <Column

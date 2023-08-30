@@ -39,6 +39,7 @@ const def = [
     number: "",
     modul: "",
     aktif: false,
+    status_aktif: false,
   },
 ];
 
@@ -46,7 +47,7 @@ const Number = () => {
   const [loading, setLoading] = useState(true);
   const [isEdit, setEdit] = useState(false);
   const [rows2, setRows2] = useState(20);
-  const [checked, setChecked] = useState(true);
+  // const [checked, setChecked] = useState(true);
   const [year, setYear] = useState(new Date().getFullYear());
   const toast = useRef(null);
   const [buttonValue, setButtonValue] = useState(false); // Atau nilai default yang sesuai
@@ -72,6 +73,7 @@ const Number = () => {
   const romanNumeral = monthsInRomanNumerals[middle];
   const rpauto = useSelector((state) => state.rpauto.currentauto);
   const [currentRP, setCurrentRP] = useState([]);
+  const [currentData, setCurrentData] = useState(null);
   const dummy = Array.from({ length: 10 });
   const [accor, setAccor] = useState({
     aktiva: true,
@@ -88,9 +90,92 @@ const Number = () => {
 
   useEffect(() => {
     getAuto();
+    getCompany();
     getPusatBiaya();
     initFilters1();
   }, []);
+
+  const postCompany = async (logo, isUpdate = false, data) => {
+    let config = {};
+    if (isUpdate) {
+      if (data) {
+        config = {
+          ...endpoints.updateCompany,
+          endpoint: endpoints.updateCompany.endpoint + currentData.id,
+          data: data,
+        };
+      } else {
+        config = {
+          ...endpoints.updateCompany,
+          endpoint: endpoints.updateCompany.endpoint + currentData.id,
+          data: {
+            ...currentData,
+            cp_logo: logo !== "" ? logo : currentData.cp_logo,
+          },
+        };
+      }
+    } else {
+      if (data) {
+        config = {
+          ...endpoints.addCompany,
+          data: data,
+        };
+      } else {
+        config = {
+          ...endpoints.addCompany,
+          data: { ...currentData, cp_logo: logo },
+        };
+      }
+    }
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        getCompany(false);
+        toast.current.show({
+          severity: "info",
+          summary: "Berhasil",
+          detail: "Data berhasil diperbarui",
+          life: 3000,
+        });
+      }
+    } catch (error) {
+      toast.current.show({
+        severity: "error",
+        summary: "Gagal",
+        detail: "Gagal memperbarui data",
+        life: 3000,
+      });
+    }
+  };
+
+  const getCompany = async (needLoading = true) => {
+    if (needLoading) {
+      setLoading(true);
+    } else {
+      setLoading(false);
+    }
+    const config = endpoints.getCompany;
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        if (
+          Object.keys(response.data).length === 0 &&
+          response.data.constructor === Object
+        ) {
+          setCurrentData(data);
+        } else {
+          setCurrentData(response.data);
+        }
+        setLoading(false);
+      }
+    } catch (error) {
+      setLoading(false);
+    }
+  };
 
   const getPusatBiaya = async () => {
     const config = {
@@ -111,29 +196,30 @@ const Number = () => {
   };
 
   const addAuto = async (
-    modul,
     prefix,
     bulan,
     tahun,
     dep_prefix,
     res_bulan,
-
     number,
     format_kode,
-    aktif
+    modul,
+    aktif,
+    status_aktif
   ) => {
     const config = {
       ...endpoints.addNumber,
       data: {
-        prefix: prefix || null,
-        format_kode: format_kode || null,
-        dep_prefix: dep_prefix || null,
-        res_bulan: res_bulan || null,
-        bulan: bulan || null,
-        tahun: tahun || null,
-        number: number || null,
-        modul: modul || null,
+        prefix: prefix ?? null,
+        format_kode: format_kode ?? null,
+        dep_prefix: dep_prefix ?? null,
+        res_bulan: res_bulan ?? null,
+        bulan: bulan ?? null,
+        tahun: tahun ?? null,
+        number: number ?? null,
+        modul: modul ?? null,
         aktif: aktif ? false : true,
+        status_aktif: status_aktif ?? false,
       },
     };
     console.log("post");
@@ -206,34 +292,41 @@ const Number = () => {
   };
 
   const onSubmit = (
-    modul,
     prefix,
     bulan,
     tahun,
     dep_prefix,
     res_bulan,
-
     number,
     format_kode,
-    aktif
+    modul,
+    aktif,
+    status_aktif
   ) => {
     if (isEdit) {
     } else {
       addAuto(
-        modul,
         prefix,
         bulan,
         tahun,
         dep_prefix,
         res_bulan,
-
         number,
         format_kode,
-        aktif
+        modul,
+        aktif,
+        status_aktif
       );
     }
   };
 
+  const submitUpdate = (data) => {
+    if (currentData?.id === 0) {
+      postCompany("", data);
+    } else {
+      postCompany("", true, data);
+    }
+  };
 
   const handlePrefixChange = (modul, newPrefix) => {
     setCurrentRP((prevRP) =>
@@ -263,6 +356,12 @@ const Number = () => {
   const handleBulanChange = (modul, newBulan) => {
     setCurrentRP((prevRP) =>
       prevRP.map((el) => (el.modul === modul ? { ...el, bulan: newBulan } : el))
+    );
+  };
+
+  const handleStatusChange = (status_aktif) => {
+    setCurrentRP((prevRP) =>
+      prevRP.map((el) => ({ ...el, status_aktif: status_aktif }))
     );
   };
 
@@ -330,8 +429,6 @@ const Number = () => {
     const isButtonActive = currentRP.some(
       (el) => el.modul === modul && el.aktif
     );
-    console.log("loguwe", isButtonActive);
-
     return (
       <div className="col-12">
         <>
@@ -491,7 +588,6 @@ const Number = () => {
                         (el) => el.modul === modul && el.aktif
                       );
                       onSubmit(
-                        modul,
                         currentRP.find((el) => el.modul === modul)?.prefix ||
                           "",
                         currentRP.some((el) => el.modul === modul && el.bulan),
@@ -507,7 +603,9 @@ const Number = () => {
                         generateCodePreview(
                           currentRP.find((el) => el.modul === modul)
                         ),
-                        currentRP.some((el) => el.modul === modul && el.aktif)
+                        modul,
+                        currentRP.some((el) => el.modul === modul && el.aktif),
+                        currentRP.some((el) => el.status_aktif)
                       );
 
                       console.log("kirim 1", aktifValue);
@@ -524,52 +622,117 @@ const Number = () => {
     );
   };
 
-  const renderAktiva = () => {
+  const renderLoading = (width) => {
     return (
-      <Accordion
-        className=" col-lg-12 col-sm-12 col-xs-12"
-        defaultActiveKey="0"
-      >
-        <div className="accordion__item" key={0}>
+      <div className="d-flex col-12 align-items-center">
+        <Skeleton
+          className="mr-3"
+          height="30px"
+          width="50px"
+          borderRadius="20px"
+        />
+        <Skeleton className="mr-3" width={width ? width : "250px"} />
+      </div>
+    );
+  };
+
+  const renderSettings = () => {
+    console.log("status", currentData && currentData.rp);
+    return (
+      <Accordion className="acordion" defaultActiveKey="0">
+        <div className="accordion__item" key={1}>
           <Accordion.Toggle
             as={Card.Text}
             eventKey={`0`}
-            className={`accordion__header ${accor.aktiva ? "collapsed" : ""}`}
+            className={`accordion__header ${accor.main ? "collapsed" : ""}`}
             onClick={() => {
               setAccor({
                 ...accor,
-                aktiva: !accor.aktiva,
+                main: !accor.main,
               });
             }}
           >
             <span className="accordion__header--text">
-              Mau mengaktifkan Penomoran Otomatis ?
+              Fitur Kode Transaksi Otomatis
             </span>
             <span className="accordion__header--indicator indicator_bordered"></span>
           </Accordion.Toggle>
           <Accordion.Collapse eventKey={"0"}>
             <div className="accordion__body--text">
-              <>
-                <div className="d-flex col-12 align-items-center">
-                  <Col className="mr-0 ml-0 ">
+              {loading ? (
+                <>
+                  {renderLoading()}
+                  {renderLoading("400px")}
+                </>
+              ) : (
+                <>
+                  <div className="d-flex col-12 align-items-center">
                     <InputSwitch
                       className="mr-3"
                       inputId="email"
-                      checked={checked}
-                      onChange={(e) => setChecked(e.value)}
+                      checked={currentData && currentData.rp}
+                      onChange={(e) => {
+                        setCurrentData({ ...currentData, rp: e.value });
+                        submitUpdate({ ...currentData, rp: e.value });
+                      }}
                     />
                     <label className="mr-3 mt-1" htmlFor="email">
-                      {"Aktifkan fitur penomoran otomatis"}
+                      {"Aktifkan Fitur Kode Transaksi Otomatis "}
                     </label>
-                  </Col>
-                </div>
-              </>
+                  </div>
+                </>
+              )}
             </div>
           </Accordion.Collapse>
         </div>
       </Accordion>
     );
   };
+
+  // const renderAktiva = (modul) => {
+  //   return (
+  //     <Accordion className="col-lg-12 col-sm-12 col-xs-12" defaultActiveKey="0">
+  //       <div className="accordion__item" key={0}>
+  //         <Accordion.Toggle
+  //           as={Card.Text}
+  //           eventKey="0"
+  //           className={`accordion__header ${accor.aktiva ? "collapsed" : ""}`}
+  //           onClick={() => {
+  //             setAccor((prevAccor) => ({
+  //               ...prevAccor,
+  //               aktiva: !prevAccor.aktiva,
+  //             }));
+  //           }}
+  //         >
+  //           <span className="accordion__header--text">
+  //             Mau mengaktifkan Penomoran Otomatis?
+  //           </span>
+  //           <span className="accordion__header--indicator indicator_bordered"></span>
+  //         </Accordion.Toggle>
+  //         <Accordion.Collapse eventKey="0">
+  //           <div className="accordion__body--text">
+  //             <div className="d-flex col-12 align-items-center">
+  //               <Col className="mr-0 ml-0 ">
+  //                 {renderInput("Aktifkan fitur penomoran otomatis")}
+
+  //                 {/* <InputSwitch
+  //                   className="mr-3"
+  //                   checked={!currentRP?.some(
+  //                     (el) => el.modul === modul && el.status_aktif
+  //                   )}
+  //                   onChange={(e) => handleStatusChange(modul, e.value)}
+  //                 />
+  //                 <label className="mr-3 mt-1" htmlFor="email">
+  //                   Aktifkan fitur penomoran otomatis
+  //                 </label> */}
+  //               </Col>
+  //             </div>
+  //           </div>
+  //         </Accordion.Collapse>
+  //       </div>
+  //     </Accordion>
+  //   );
+  // };
 
   const renderPurchase = () => {
     return (
@@ -599,7 +762,7 @@ const Number = () => {
           <Accordion.Collapse eventKey={"0"}>
             <div className="accordion__body--text">
               <Col className="mr-0 ml-0 ">
-                {renderInputtext("Purchase Request", "rp")}
+                {renderInputtext("Purchase Request", "rp", false)}
                 {renderInputtext("Purchase Order", "po")}
                 {renderInputtext("Purchase", "gra")}
                 {renderInputtext("Purchase Invoice", "ip")}
@@ -859,11 +1022,11 @@ const Number = () => {
     <>
       <Toast ref={toast} />
       <Row>
-        <Col className="col-lg-12 col-sm-12 col-xs-12">{renderAktiva()}</Col>
-        <Col className="col-lg-12 col-sm-12 col-xs-12">
-          <div className="row">
-            <div className="col-12">
-              {checked && (
+        <Col className="col-lg-12 col-sm-12 col-xs-12">{renderSettings()}</Col>
+        {currentData?.rp == true ? (
+          <Col className="col-lg-12 col-sm-12 col-xs-12">
+            <div className="row">
+              <div className="col-12">
                 <>
                   {renderPurchase()}
                   {renderPenjualan()}
@@ -873,10 +1036,12 @@ const Number = () => {
                   {renderKasBankMasuk()}
                   {renderProduksi()}
                 </>
-              )}
+              </div>
             </div>
-          </div>
-        </Col>
+          </Col>
+        ) : (
+          <></>
+        )}
       </Row>
     </>
   );

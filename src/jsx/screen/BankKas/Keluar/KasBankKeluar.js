@@ -19,7 +19,7 @@ const KasBankKeluar = () => {
         setTrigger((current) => current + 1);
       }}
     >
-      <TabPanel header="Pengeluaran">
+      <TabPanel header="Pengeluaran & Pembayaran">
         <PelunasanHutang trigger={trigger}/>
       </TabPanel>
       <TabPanel header="Pencairan Giro Keluar">

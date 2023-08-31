@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_CURRENT_SO } from "src/redux/actions";
-import { request, endpoints } from "src/utils";
+import { request } from "src/utils";
 import { Row, Col, Card } from "react-bootstrap";
 import { Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
@@ -23,11 +23,15 @@ import DataJasa from "src/jsx/screen/Master/Jasa/DataJasa";
 import DataCustomer from "src/jsx/screen/Mitra/Pelanggan/DataCustomer";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import DataLokasi from "src/jsx/screen/Master/Lokasi/DataLokasi";
-import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
+// import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
 import PrimeInput from "src/jsx/components/PrimeInput/PrimeInput";
 import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 import { InputNumber } from "primereact/inputnumber";
-import { tr } from "src/data/tr";
+import PrimeCalendar from "../../../../components/PrimeCalendar/PrimeCalendar";
+import { tr } from "../../../../../data/tr";
+import endpoints from "../../../../../utils/endpoints";
+import DataProject from "../../../MasterLainnya/Project/DataProject";
+import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 
 const defError = {
   code: false,
@@ -63,28 +67,31 @@ const InputSO = ({ onCancel, onSuccess }) => {
   const isEdit = useSelector((state) => state.so.editso);
   const [isRp, setRp] = useState(true);
   const [isRpJasa, setRpJasa] = useState(true);
-  const [comp, setComp] = useState(null);
   const [jasa, setJasa] = useState(null);
+  const [project, setProj] = useState(null);
   const [showProduk, setShowProduk] = useState(false);
   const [showJasa, setShowJasa] = useState(false);
+  const [showProj, setShowProj] = useState(false);
   const [showSatuan, setShowSatuan] = useState(false);
   const [showSupplier, setShowSupplier] = useState(false);
   const [showCustomer, setShowCustomer] = useState(false);
   const [showPpn, setShowPpn] = useState(false);
+  const [setup, setSetup] = useState(null);
   const [showLok, setShowLok] = useState(false);
   const [showRulesPay, setShowRulesPay] = useState(false);
   const [showSubCus, setShowSub] = useState(false);
   const [product, setProduk] = useState(null);
   const [satuan, setSatuan] = useState(null);
   const [lokasi, setLokasi] = useState(null);
+  const [rak, setRak] = useState(null);
   const [supplier, setSupplier] = useState(null);
   const [rulesPay, setRulesPay] = useState(null);
-  const [numb, setNumb] = useState(true);
   const [ppn, setPpn] = useState(null);
-  const [currency, setCurr] = useState(null);
   const [customer, setCustomer] = useState(null);
   const [subCus, setSubCus] = useState(null);
   const [sto, setSto] = useState(null);
+  const [stcard, setStCard] = useState(null);
+  const [currency, setCur] = useState(null);
   const [error, setError] = useState(defError);
   const [accor, setAccor] = useState({
     produk: true,
@@ -97,19 +104,22 @@ const InputSO = ({ onCancel, onSuccess }) => {
       left: 0,
       behavior: "smooth",
     });
-    getComp();
     getJasa();
+    getProj();
+    getSetup();
     getProduk();
-    getStatus();
     getSupplier();
     getSatuan();
     getRulesPay();
     getPpn();
-    getCurr();
     getCustomer();
     getSubCus();
     getloct();
-    getSto();
+    getStoLoc();
+    getStCard();
+    if (isEdit) {
+      getRak();
+    }
   }, []);
 
   const isValid = () => {
@@ -124,6 +134,10 @@ const InputSO = ({ onCancel, onSuccess }) => {
       prod: [],
       jasa: [],
     };
+
+    let ord = 0;
+    let sto = 0;
+    let sto_no_hpok = 0;
 
     so?.sprod.forEach((element, i) => {
       if (i > 0) {
@@ -150,7 +164,24 @@ const InputSO = ({ onCancel, onSuccess }) => {
           jum: !element.order || element.order === "" || element.order === "0",
         };
       }
+
+      // ord += element.
+
+      stcard?.forEach((el) => {
+        if (
+          element?.prod_id === el?.prod_id?.id &&
+          element?.location === el?.loc_id?.id &&
+          el.trx_dbcr === "d"
+        ) {
+          if (el.trx_hpok === 0) {
+            sto_no_hpok += el.trx_qty;
+          }
+        }
+      });
     });
+
+    console.log("sto_no_hpok");
+    console.log(sto_no_hpok);
 
     so?.sjasa.forEach((element, i) => {
       if (i > 0) {
@@ -207,13 +238,25 @@ const InputSO = ({ onCancel, onSuccess }) => {
       });
     }
 
+    if (sto_no_hpok > 0) {
+      toast.current.show({
+        severity: "error",
+        summary: tr[localStorage.getItem("language")].tidak_dapat_hapus_data,
+        detail: `Persediaan Produk Belum Ada Harga Pokok`,
+        life: 6000,
+      });
+    }
+
+    let val_err = sto_no_hpok > 0;
+
     valid =
       !errors.code &&
       !errors.date &&
       !errors.pel &&
       !errors.rul &&
       !errors.tgl &&
-      (validProduct || validJasa);
+      (validProduct || validJasa) &&
+      !val_err;
 
     setError(errors);
 
@@ -255,29 +298,6 @@ const InputSO = ({ onCancel, onSuccess }) => {
     }
   };
 
-  const getStatus = async () => {
-    const config = {
-      ...endpoints.getStatusSO,
-      data: {},
-    };
-
-    console.log( config.data);
-
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log("Response:", response);
-      if (response.status) {
-        const { data } = response;
-
-        setNumb(data);
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
-
   const addSO = async () => {
     const config = {
       ...endpoints.addSO,
@@ -299,7 +319,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
           toast.current.show({
             severity: "error",
             summary: tr[localStorage.getItem("language")].gagal,
-            detail: `Kode ${so.so_code} Sudah Digunakan`,
+            detail: `Code ${so.so_code} already used`,
             life: 3000,
           });
         }, 500);
@@ -329,7 +349,23 @@ const InputSO = ({ onCancel, onSuccess }) => {
     }
   };
 
-  const getComp = async (id, e) => {
+  const getStCard = async () => {
+    const config = {
+      ...endpoints.stcard,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setStCard(data);
+      }
+    } catch (error) {}
+  };
+
+  const getSetup = async () => {
     const config = {
       ...endpoints.getCompany,
       data: {},
@@ -340,23 +376,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        setComp(data);
-      }
-    } catch (error) {}
-  };
-
-  const getSto = async (id, e) => {
-    const config = {
-      ...endpoints.sto,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setSto(data);
+        setSetup(data);
       }
     } catch (error) {}
   };
@@ -377,6 +397,22 @@ const InputSO = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
+  const getStoLoc = async (id, e) => {
+    const config = {
+      ...endpoints.sto,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setSto(data);
+      }
+    } catch (error) {}
+  };
+
   const getJasa = async () => {
     const config = {
       ...endpoints.jasa,
@@ -389,6 +425,22 @@ const InputSO = ({ onCancel, onSuccess }) => {
       if (response.status) {
         const { data } = response;
         setJasa(data);
+      }
+    } catch (error) {}
+  };
+
+  const getProj = async () => {
+    const config = {
+      ...endpoints.project,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setProj(data);
       }
     } catch (error) {}
   };
@@ -421,6 +473,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
       if (response.status) {
         const { data } = response;
         setSupplier(data);
+        // setSetup(data)
       }
     } catch (error) {}
   };
@@ -461,24 +514,6 @@ const InputSO = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
-  const getCurr = async () => {
-    const config = {
-      ...endpoints.currency,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setCurr(data);
-      }
-    } catch (error) {}
-  };
-
   const getloct = async () => {
     const config = {
       ...endpoints.lokasi,
@@ -493,6 +528,32 @@ const InputSO = ({ onCancel, onSuccess }) => {
         const { data } = response;
         console.log(data);
         setLokasi(data);
+      }
+    } catch (error) {}
+  };
+
+  const getRak = async () => {
+    const config = {
+      ...endpoints.getRak,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        let filt = [];
+
+        data?.forEach((element) => {
+          so?.sprod?.forEach((elem) => {
+            if (element?.lokasi_rak === elem?.location) {
+              filt.push(element);
+            }
+          });
+        });
+        setRak(filt);
       }
     } catch (error) {}
   };
@@ -517,6 +578,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
         });
         console.log(data);
         setCustomer(filt);
+        getCur();
       }
     } catch (error) {}
   };
@@ -545,6 +607,33 @@ const InputSO = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
+  const getCur = async () => {
+    const config = {
+      ...endpoints.currency,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setCur(data);
+      }
+    } catch (error) {}
+  };
+
+  const checkCur = (value) => {
+    let selected = {};
+    currency?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
   const checkUnit = (value) => {
     let selected = {};
     satuan?.forEach((element) => {
@@ -571,6 +660,17 @@ const InputSO = ({ onCancel, onSuccess }) => {
     let selected = {};
     jasa?.forEach((element) => {
       if (value === element.jasa.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkProj = (value) => {
+    let selected = {};
+    project?.forEach((element) => {
+      if (value === element.id) {
         selected = element;
       }
     });
@@ -611,20 +711,19 @@ const InputSO = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
-  const checkCur = (value) => {
+  const checkLoc = (value) => {
     let selected = {};
-    currency?.forEach((element) => {
+    lokasi?.forEach((element) => {
       if (value === element.id) {
         selected = element;
       }
     });
-
     return selected;
   };
 
-  const checkLoc = (value) => {
+  const checkRak = (value) => {
     let selected = {};
-    lokasi?.forEach((element) => {
+    rak?.forEach((element) => {
       if (value === element.id) {
         selected = element;
       }
@@ -666,41 +765,6 @@ const InputSO = ({ onCancel, onSuccess }) => {
     return [year, month, day].join("-");
   };
 
-  const pjk = (value) => {
-    let nil = 0;
-    ppn?.forEach((elem) => {
-      if (checkCus(so.pel_id)?.cus_pjk === elem.id) {
-        nil = elem.nilai;
-      }
-    });
-
-    return nil;
-  };
-
-  const curConv = () => {
-    let cur = 0;
-    currency?.forEach((elem) => {
-      if (checkCus(so.pel_id)?.cus_curren === elem.id) {
-        cur = elem.rate;
-      }
-    });
-
-    return cur;
-  };
-
-  const curConvSup = () => {
-    let cur_sup = 0;
-    so?.sjasa.forEach((element) => {
-      currency?.forEach((elem) => {
-        if (checkSupp(element.sup_id)?.supplier?.sup_curren === elem.id) {
-          cur_sup = elem.rate;
-        }
-      });
-    });
-
-    return cur_sup;
-  };
-
   const updateSo = (e) => {
     dispatch({
       type: SET_CURRENT_SO,
@@ -738,14 +802,49 @@ const InputSO = ({ onCancel, onSuccess }) => {
     return total;
   };
 
+  const pjk = (value) => {
+    let nil = 0;
+    ppn?.forEach((elem) => {
+      if (checkCus(so.pel_id)?.cus_pjk === elem.id) {
+        nil = elem.nilai;
+      }
+    });
+
+    return nil;
+  };
+
+  const curConv = () => {
+    let cur = 0;
+    currency?.forEach((elem) => {
+      if (checkCus(so.pel_id)?.cus_curren === elem.id) {
+        cur = elem.rate;
+      }
+    });
+
+    return cur;
+  };
+
+  const curConvSup = () => {
+    let cur_sup = 0;
+    so?.sjasa.forEach((element) => {
+      currency?.forEach((elem) => {
+        if (checkSupp(element.sup_id)?.supplier?.sup_curren === elem.id) {
+          cur_sup = elem.rate;
+        }
+      });
+    });
+
+    return cur_sup;
+  };
+
   const formatIdr = (value) => {
-    return `${value}`
+    return `${value?.toFixed(2)}`
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
 
   const body = () => {
-    let date = new Date(comp?.year_co, comp?.cutoff - 1, 31);
+    let date = new Date(setup?.year_co, setup?.cutoff - 1, 31);
     return (
       <>
         <Toast ref={toast} />
@@ -763,7 +862,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
               }}
               placeholder={tr[localStorage.getItem("language")].masuk}
               error={error?.code}
-              disabled={numb}
+              disabled={isEdit}
             />
           </div>
 
@@ -788,7 +887,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
           <div className="col-12 mt-3">
             <span className="fs-13">
-              <b>{tr[localStorage.getItem("language")].customer}</b>
+              <b>{tr[localStorage.getItem("language")].inf_pelanggan}</b>
             </span>
             {/* </div>
           <div className="col-12"> */}
@@ -806,6 +905,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 updateSo({
                   ...so,
                   pel_id: e.id,
+                  // ppn_type: so.pel_id?.cus_pjk,
                 });
 
                 let newError = error;
@@ -837,7 +937,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
           <div className="col-2">
             <PrimeInput
               label={tr[localStorage.getItem("language")].telp}
-              isNumber
+              // isNumber
               value={so.pel_id !== null ? checkCus(so.pel_id)?.cus_telp1 : ""}
               placeholder={tr[localStorage.getItem("language")].telp}
               disabled
@@ -845,15 +945,14 @@ const InputSO = ({ onCancel, onSuccess }) => {
           </div>
 
           <div className="col-2">
-            <label>{tr[localStorage.getItem("language")].type_pjk}</label>
+            <label>{tr[localStorage.getItem("language")].pajak}</label>
             <div className="p-inputgroup">
               <InputText
                 value={
-                  so.pel_id !== null
+                  checkCus(so.pel_id)?.cus_pjk
                     ? checkPpn(checkCus(so.pel_id)?.cus_pjk).name
-                    : null
+                    : ""
                 }
-                onChange={(e) => {}}
                 placeholder={tr[localStorage.getItem("language")].type_pjk}
                 disabled
               />
@@ -865,9 +964,11 @@ const InputSO = ({ onCancel, onSuccess }) => {
             <div className="p-inputgroup">
               <InputText
                 value={
-                  checkCus(so.pel_id)?.cus_curren !== null
-                    ? checkCur(checkCus(so.pel_id)?.cus_curren).code
-                    : "IDR"
+                  so.pel_id
+                    ? checkCus(so.pel_id)?.cus_curren !== null
+                      ? checkCur(checkCus(so.pel_id)?.cus_curren).code
+                      : "IDR"
+                    : ""
                 }
                 placeholder={tr[localStorage.getItem("language")].currency}
                 disabled
@@ -877,7 +978,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
           <div className="col-12 mt-3">
             <span className="fs-13">
-              <b>{tr[localStorage.getItem("language")].bayar}</b>
+              <b>{tr[localStorage.getItem("language")].inf_bayar}</b>
             </span>
             {/* </div>
           <div className="col-12"> */}
@@ -899,6 +1000,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
               showIcon
               dateFormat="dd-mm-yy"
               error={error?.tgl}
+              minDate={date}
             />
           </div>
 
@@ -928,7 +1030,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-2">
+          <div className="col-3">
             <label>{tr[localStorage.getItem("language")].due}</label>
             <div className="p-inputgroup mt-0">
               <Calendar
@@ -939,6 +1041,22 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 dateFormat="dd-mm-yy"
               />
             </div>
+          </div>
+
+          <div className="col-3">
+            <label>{tr[localStorage.getItem("language")].proj}</label>
+            <div className="p-inputgroup mt-0"></div>
+            <CustomDropdown
+              value={so.proj_id && checkProj(so.proj_id)}
+              option={project}
+              onChange={(e) => {
+                updateSo({ ...so, proj_id: e.id });
+              }}
+              label={"[proj_code] ([proj_name])"}
+              placeholder={tr[localStorage.getItem("language")].pilih}
+              detail
+              onDetail={() => setShowProj(true)}
+            />
           </div>
 
           <div className="d-flex col-12 align-items-center mt-4">
@@ -1012,9 +1130,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
         </Row>
 
         <CustomAccordion
-          tittle={`${tr[localStorage.getItem("language")].ord} ${
-            tr[localStorage.getItem("language")].prod
-          }`}
+          tittle={tr[localStorage.getItem("language")].prod}
           defaultActive={true}
           active={accor.produk}
           onClick={() => {
@@ -1025,429 +1141,605 @@ const InputSO = ({ onCancel, onSuccess }) => {
           }}
           key={1}
           body={
-            <>
-              <DataTable
-                responsiveLayout="none"
-                value={so.sprod?.map((v, i) => {
-                  return {
-                    ...v,
-                    index: i,
-                    // order: v?.order ?? 0,
-                    // price: v?.price ?? 0,
-                    // disc: v?.disc ?? 0,
-                    // total: v?.total ?? 0,
-                  };
-                })}
-                className="display w-150 datatable-wrapper header-white no-border"
-                showGridlines={false}
-                emptyMessage={() => <div></div>}
-              >
-                <Column
-                  header={tr[localStorage.getItem("language")].prod}
-                  className="align-text-top"
-                  field={""}
-                  body={(e) => (
-                    <CustomDropdown
-                      value={e.prod_id && checkProd(e.prod_id)}
-                      option={product}
-                      onChange={(u) => {
-                        let sat = [];
-                        satuan.forEach((element) => {
-                          if (element.id === u.unit.id) {
-                            sat.push(element);
-                          } else {
-                            if (element.u_from?.id === u.unit.id) {
+            <Row>
+              <div className="col-12">
+                <DataTable
+                  responsiveLayout="scroll"
+                  value={so.sprod?.map((v, i) => {
+                    return {
+                      ...v,
+                      index: i,
+                    };
+                  })}
+                  className="display w-150 datatable-wrapper header-white no-border"
+                  showGridlines={false}
+                  emptyMessage={() => <div></div>}
+                >
+                  <Column
+                    header={tr[localStorage.getItem("language")].prod}
+                    className="align-text-top"
+                    style={{
+                      minWidth: "12rem",
+                    }}
+                    field={""}
+                    body={(e) => (
+                      <CustomDropdown
+                        value={e.prod_id && checkProd(e.prod_id)}
+                        option={product}
+                        onChange={(u) => {
+                          let sat = [];
+                          let st = 0;
+
+                          satuan.forEach((element) => {
+                            if (element.id === u.unit.id) {
                               sat.push(element);
+                            } else {
+                              if (element.u_from?.id === u.unit.id) {
+                                sat.push(element);
+                              }
                             }
-                          }
-                        });
-                        // setSatuan(sat);
-
-                        let temp = [...so.sprod];
-                        temp[e.index].prod_id = u.id;
-                        temp[e.index].unit_id = u.unit?.id;
-                        updateSo({ ...so, sprod: temp });
-
-                        let newError = error;
-                        newError.prod[e.index].id = false;
-                        setError(newError);
-                      }}
-                      placeholder={tr[localStorage.getItem("language")].pilih}
-                      label={"[name]"}
-                      detail
-                      onDetail={() => {
-                        setCurrentIndex(e.index);
-                        setShowProduk(true);
-                      }}
-                      errorMessage="Produk Belum Dipilih"
-                      error={error?.prod[e.index]?.id}
-                    />
-                  )}
-                />
-
-                <Column
-                  header={tr[localStorage.getItem("language")].gudang}
-                  className="align-text-top"
-                  field={""}
-                  body={(e) => (
-                    <CustomDropdown
-                      value={e.location && checkLoc(e.location)}
-                      onChange={(u) => {
-                        let st = 0;
-
-                        sto.forEach((element) => {
-                          if (
-                            element.loc_id === u.id &&
-                            element.id === so?.sprod[e.index].prod_id
-                          ) {
-                            st = element.stock;
-                          }
-                        });
-
-                        let temp = [...so.sprod];
-                        temp[e.index].location = u.id;
-                        temp[e.index].stock = st;
-                        updateSo({ ...so, sprod: temp });
-
-                        let newError = error;
-                        newError.prod[e.index].lok = false;
-                        setError(newError);
-                      }}
-                      option={lokasi}
-                      label={"[name]"}
-                      placeholder={tr[localStorage.getItem("language")].pilih}
-                      detail
-                      onDetail={() => {
-                        setCurrentIndex(e.index);
-                        setShowLok(true);
-                      }}
-                      errorMessage="Lokasi Belum Dipilih"
-                      error={error?.prod[e.index]?.lok}
-                    />
-                  )}
-                />
-
-                <Column
-                  header={tr[localStorage.getItem("language")].stok}
-                  className="align-text-top"
-                  style={{
-                    width: "7rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <PrimeNumber
-                      prc
-                      value={e?.stock ?? 0}
-                      placeholder="0"
-                      type="number"
-                      min={0}
-                      disabled
-                    />
-                  )}
-                />
-
-                <Column
-                  header={tr[localStorage.getItem("language")].qty}
-                  className="align-text-top"
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <PrimeNumber
-                        prc
-                        value={e.order && e.order}
-                        onChange={(u) => {
-                          let temp = [...so.sprod];
-                          temp[e.index].order = Number(u.value);
-                          if (checkCus(so.pel_id)?.cus_curren !== null) {
-                            temp[e.index].total_fc =
-                              temp[e.index].order * temp[e.index].price;
-
-                            temp[e.index].total =
-                              temp[e.index].total_fc * curConv();
-                          } else {
-                            temp[e.index].total =
-                              temp[e.index].order * temp[e.index].price;
-                          }
-
-                          if (temp[e.index].order > temp[e.index].stock) {
-                            // temp[e.index].order = checkProd(e?.prod_id)?.stock;
-
-                            toast.current.show({
-                              severity: "warn",
-                              summary: "Warning",
-                              detail: "Pesanan Melebihi Stok !!",
-                              life: 3000,
-                            });
-                          }
-                          updateSo({
-                            ...so,
-                            sprod: temp,
-                            total_bayar:
-                              getSubTotalBarang() +
-                              getSubTotalJasa() +
-                              ((getSubTotalBarang() + getSubTotalJasa()) *
-                                pjk()) /
-                                100,
                           });
-                          console.log(temp);
-                          let newError = error;
-                          newError.prod[e.index].jum = false;
-                          setError(newError);
-                        }}
-                        placeholder="0"
-                        type="number"
-                        min={0}
-                        error={error?.prod[e.index]?.jum}
-                      />
-                    </div>
-                  )}
-                />
+                          // setSatuan(sat);
 
-                <Column
-                  header={tr[localStorage.getItem("language")].sat}
-                  className="align-text-top"
-                  field={""}
-                  body={(e) => (
-                    <CustomDropdown
-                      value={e.unit_id && checkUnit(e.unit_id)}
-                      onChange={(u) => {
-                        let temp = [...so.sprod];
-                        temp[e.index].unit_id = u.id;
-                        updateSo({ ...so, sprod: temp });
-                      }}
-                      option={satuan}
-                      label={"[name]"}
-                      detail
-                      onDetail={() => {
-                        setCurrentIndex(e.index);
-                        setShowSatuan(true);
-                      }}
-                      placeholder={tr[localStorage.getItem("language")].pilih}
-                    />
-                  )}
-                />
-
-                <Column
-                  header={tr[localStorage.getItem("language")].price}
-                  className="align-text-top"
-                  field={""}
-                  body={(e) =>
-                    checkCus(so.pel_id)?.cus_curren !== null ? (
-                      <PrimeNumber
-                        value={e.price && e.price}
-                        onChange={(u) => {
-                          let temp = [...so.sprod];
-                          temp[e.index].price = u.target.value;
-                          if (checkCus(so.pel_id)?.cus_curren !== null) {
-                            temp[e.index].total_fc =
-                              temp[e.index].order * temp[e.index].price;
-
-                            temp[e.index].total =
-                              temp[e.index].total_fc * curConv();
-                          } else {
-                            temp[e.index].total =
-                              temp[e.index].order * temp[e.index].price;
-                          }
-
-                          updateSo({
-                            ...so,
-                            sprod: temp,
-                            total_bayar:
-                              getSubTotalBarang() +
-                              getSubTotalJasa() +
-                              ((getSubTotalBarang() + getSubTotalJasa()) *
-                                pjk()) /
-                                100,
+                          sto.forEach((element) => {
+                            if (
+                              element?.loc_id === so?.sprod[e.index].location &&
+                              element?.id === u?.id
+                            ) {
+                              st = element.stock;
+                            }
                           });
 
-                          console.log(temp);
+                          let temp = [...so.sprod];
+                          temp[e.index].prod_id = u.id;
+                          temp[e.index].unit_id = u.unit.id;
+                          temp[e.index].konv_qty = 0;
+                          temp[e.index].unit_konv =
+                            checkUnit(temp[e.index].unit_id)?.u_from !== null
+                              ? checkUnit(temp[e.index].unit_id)?.u_from?.code
+                              : checkUnit(temp[e.index].unit_id)?.code;
+                          temp[e.index].stock = st;
+
+                          updateSo({ ...so, sprod: temp });
+
                           let newError = error;
-                          newError.prod[e.index].prc = false;
+                          newError.prod[e.index].id = false;
                           setError(newError);
                         }}
-                        placeholder="0"
-                        min={0}
-                        error={error?.prod[e.index]?.prc}
+                        placeholder={tr[localStorage.getItem("language")].pilih}
+                        label={"[name] ([code])"}
+                        detail
+                        onDetail={() => {
+                          setCurrentIndex(e.index);
+                          setShowProduk(true);
+                        }}
+                        errorMessage={
+                          tr[localStorage.getItem("language")].prod_belum
+                        }
+                        error={error?.prod[e.index]?.id}
                       />
-                    ) : (
+                    )}
+                  />
+
+                  <Column
+                    header={tr[localStorage.getItem("language")].gudang}
+                    className="align-text-top"
+                    style={{
+                      minWidth: "10rem",
+                    }}
+                    field={""}
+                    body={(e) => (
+                      <CustomDropdown
+                        value={e.location && checkLoc(e.location)}
+                        onChange={(u) => {
+                          let st = 0;
+
+                          sto.forEach((element) => {
+                            if (
+                              element.loc_id === u.id &&
+                              element.id === so?.sprod[e.index].prod_id
+                            ) {
+                              st = element.stock;
+                            }
+                          });
+
+                          let temp = [...so.sprod];
+                          temp[e.index].location = u.id;
+                          temp[e.index].stock = st;
+
+                          // if (temp[e.index].order > checkProd(u.id)?.stock) {
+                          //   temp[e.index].order = checkProd(u.id)?.stock;
+                          // }
+                          updateSo({ ...so, sprod: temp });
+
+                          getRak();
+
+                          let newError = error;
+                          newError.prod[e.index].lok = false;
+                          setError(newError);
+                        }}
+                        option={lokasi}
+                        label={"[name] ([code])"}
+                        placeholder={tr[localStorage.getItem("language")].pilih}
+                        detail
+                        onDetail={() => {
+                          setCurrentIndex(e.index);
+                          setShowLok(true);
+                        }}
+                        errorMessage={
+                          tr[localStorage.getItem("language")].lokasi_belum
+                        }
+                        error={error?.prod[e.index]?.lok}
+                      />
+                    )}
+                  />
+
+                  <Column
+                    header={"Rak Aktif"}
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "6rem",
+                    }}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputSwitch
+                          className="ml-0"
+                          checked={e.rak_aktif ?? false}
+                          onChange={(u) => {
+                            let temp = [...so.sprod];
+                            temp[e.index].rak_aktif = u?.value;
+                            temp[e.index].rak_id = null;
+                            updateSo({ ...so, sprod: temp });
+                          }}
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header={"Rak"}
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "10rem",
+                    }}
+                    body={(e) => (
+                      <PrimeDropdown
+                        value={e.rak_id && checkRak(e.rak_id)}
+                        onChange={(u) => {
+                          // let st = 0;
+
+                          // sto?.forEach((element) => {
+                          //   if (
+                          //     element.loc_id === u.id &&
+                          //     element.id === sale?.jprod[e.index].prod_id
+                          //   ) {
+                          //     st = element.stock;
+                          //   }
+                          // });
+
+                          let temp = [...so.sprod];
+                          temp[e.index].rak_id = u?.value?.id ?? null;
+                          // temp[e.index].stock = st;
+                          updateSo({ ...so, sprod: temp });
+
+                          // let newError = error;
+                          // newError.prod[e.index].lok = false;
+                          // setError(newError);
+                        }}
+                        options={rak}
+                        optionLabel={"rak_name"}
+                        filter
+                        filterBy={"rak_name"}
+                        placeholder={tr[localStorage.getItem("language")].pilih}
+                        showClear
+                        disabled={!e.rak_aktif}
+                      />
+                    )}
+                  />
+
+                  <Column
+                    header={tr[localStorage.getItem("language")].stok}
+                    className="align-text-top"
+                    style={{
+                      minWidth: "9rem",
+                    }}
+                    field={""}
+                    body={(e) => (
                       <PrimeNumber
                         price
-                        value={e.price && e.price}
-                        onChange={(u) => {
-                          let temp = [...so.sprod];
-                          temp[e.index].price = u.value;
-                          if (checkCus(so.pel_id)?.cus_curren !== null) {
-                            temp[e.index].total_fc =
-                              temp[e.index].order * temp[e.index].price;
-
-                            temp[e.index].total =
-                              temp[e.index].total_fc * curConv();
-                          } else {
-                            temp[e.index].total =
-                              temp[e.index].order * temp[e.index].price;
-                          }
-
-                          updateSo({
-                            ...so,
-                            sprod: temp,
-                            total_bayar:
-                              getSubTotalBarang() +
-                              getSubTotalJasa() +
-                              ((getSubTotalBarang() + getSubTotalJasa()) *
-                                pjk()) /
-                                100,
-                          });
-
-                          let newError = error;
-                          newError.prod[e.index].prc = false;
-                          setError(newError);
-                        }}
-                        placeholder="0"
-                        min={0}
-                        error={error?.prod[e.index]?.prc}
-                      />
-                    )
-                  }
-                />
-
-                <Column
-                  header={tr[localStorage.getItem("language")].disc}
-                  className="align-text-top"
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputText
-                        value={e.disc && e.disc}
-                        onChange={(u) => {
-                          let temp = [...so.sprod];
-                          temp[e.index].disc = u.target.value;
-                          updateSo({
-                            ...so,
-                            sprod: temp,
-                            total_bayar:
-                              getSubTotalBarang() +
-                              getSubTotalJasa() +
-                              ((getSubTotalBarang() + getSubTotalJasa()) *
-                                pjk()) /
-                                100,
-                          });
-                          console.log(temp);
-                        }}
+                        value={e?.stock ?? 0}
                         placeholder="0"
                         type="number"
                         min={0}
-                      />
-                      <span className="p-inputgroup-addon">%</span>
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header={tr[localStorage.getItem("language")].net_prc}
-                  className="align-text-top"
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputNumber
-                        value={e.nett_price && e.nett_price}
-                        onChange={(u) => {
-                          let temp = [...so.sprod];
-                          temp[e.index].nett_price = u.value;
-                          updateSo({
-                            ...so,
-                            sprod: temp,
-                            total_bayar:
-                              getSubTotalBarang() +
-                              getSubTotalJasa() +
-                              ((getSubTotalBarang() + getSubTotalJasa()) *
-                                pjk()) /
-                                100,
-                          });
-                          console.log(temp);
-                        }}
-                        placeholder="0"
-                        min={0}
-                      />
-                    </div>
-                  )}
-                />
-
-                <Column
-                  header="FC"
-                  className="align-text-top"
-                  style={{
-                    minWidth: "7rem",
-                  }}
-                  field={""}
-                  body={(e) => (
-                    <div className="p-inputgroup">
-                      <InputNumber
-                        value={
-                          e.nett_price && e.nett_price !== 0
-                            ? e.nett_price
-                            : e.total_fc - (e.total_fc * e.disc) / 100
-                        }
-                        onChange={(u) => {}}
-                        placeholder="0"
                         disabled
                       />
-                    </div>
-                  )}
-                />
+                    )}
+                  />
 
-                <Column
-                  header={tr[localStorage.getItem("language")].total}
-                  className="align-text-top"
-                  body={(e) => (
-                    <label className="text-nowrap">
-                      <b>
-                        Rp.{" "}
-                        {`${
-                          e.nett_price && e.nett_price !== 0
-                            ? e.nett_price
-                            : e.total - (e.total * e.disc) / 100
-                        }`.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.")}
-                      </b>
-                    </label>
-                  )}
-                />
+                  <Column
+                    header={tr[localStorage.getItem("language")].qty}
+                    className="align-text-top"
+                    style={{
+                      minWidth: "9rem",
+                    }}
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <PrimeNumber
+                          price
+                          value={e.order && e.order}
+                          onChange={(u) => {
+                            let temp = [...so.sprod];
+                            temp[e.index].order = u.value;
+                            temp[e.index].konv_qty =
+                              u.value * checkUnit(temp[e.index].unit_id)?.qty;
 
-                <Column
-                  header=""
-                  className="align-text-top"
-                  field={""}
-                  body={(e) =>
-                    e.index === so.sprod.length - 1 ? (
-                      <Link
-                        onClick={() => {
-                          let newError = error;
-                          newError.prod.push({ jum: false, prc: false });
-                          setError(newError);
+                            if (checkCus(so.pel_id)?.cus_curren !== null) {
+                              if (
+                                checkUnit(temp[e.index].unit_id)?.u_from !==
+                                null
+                              ) {
+                                temp[e.index].total_fc =
+                                  temp[e.index].konv_qty * temp[e.index].price;
 
-                          updateSo({
-                            ...so,
-                            sprod: [
-                              ...so.sprod,
-                              {
-                                id: 0,
-                                prod_id: null,
-                                unit_id: null,
-                                location: null,
-                                order: null,
-                                price: null,
-                                disc: null,
-                                nett_price: null,
-                                total_fc: null,
-                                total: null,
-                              },
-                            ],
-                          });
+                                temp[e.index].total =
+                                  temp[e.index].total_fc * curConv();
+                              } else {
+                                temp[e.index].total_fc =
+                                  temp[e.index].order * temp[e.index].price;
+
+                                temp[e.index].total =
+                                  temp[e.index].total_fc * curConv();
+                              }
+                            } else {
+                              if (
+                                checkUnit(temp[e.index].unit_id)?.u_from !==
+                                null
+                              ) {
+                                temp[e.index].total =
+                                  temp[e.index].konv_qty * temp[e.index].price;
+                              } else {
+                                temp[e.index].total =
+                                  temp[e.index].order * temp[e.index].price;
+                              }
+                            }
+
+                            if (temp[e.index].order > temp[e.index].stock) {
+                              // temp[e.index].order = checkProd(e?.prod_id)?.stock;
+
+                              toast.current.show({
+                                severity: "warn",
+                                summary: "Warning",
+                                detail:
+                                  tr[localStorage.getItem("language")].info_sto,
+                                life: 3000,
+                              });
+                            }
+                            updateSo({
+                              ...so,
+                              sprod: temp,
+                              total_bayar:
+                                getSubTotalBarang() +
+                                getSubTotalJasa() +
+                                ((getSubTotalBarang() + getSubTotalJasa()) *
+                                  pjk()) /
+                                  100,
+                            });
+                            console.log(temp);
+                            let newError = error;
+                            newError.prod[e.index].jum = false;
+                            setError(newError);
+                          }}
+                          placeholder="0"
+                          type="number"
+                          min={0}
+                          error={error?.prod[e.index]?.jum}
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header={tr[localStorage.getItem("language")].satuan}
+                    className="align-text-top"
+                    style={{
+                      minWidth: "10rem",
+                    }}
+                    field={""}
+                    body={(e) => (
+                      <CustomDropdown
+                        value={e.unit_id && checkUnit(e.unit_id)}
+                        onChange={(u) => {
+                          let temp = [...so.sprod];
+                          temp[e.index].unit_id = u.id;
+                          temp[e.index].konv_qty = temp[e.index].order * u?.qty;
+                          temp[e.index].unit_konv = u?.u_from?.code;
+                          temp[e.index].price = null;
+                          temp[e.index].total = null;
+                          updateSo({ ...so, sprod: temp });
                         }}
-                        className="btn btn-primary shadow btn-xs sharp"
-                      >
-                        <i className="fa fa-plus"></i>
-                      </Link>
-                    ) : (
+                        option={satuan}
+                        label={"[name]"}
+                        detail
+                        onDetail={() => {
+                          setCurrentIndex(e.index);
+                          setShowSatuan(true);
+                        }}
+                        placeholder={tr[localStorage.getItem("language")].pilih}
+                      />
+                    )}
+                  />
+
+                  <Column
+                    header={"Konversi Qty"}
+                    className="align-text-top"
+                    style={{
+                      minWidth: "8rem",
+                    }}
+                    field={""}
+                    body={(e) => (
+                      <>
+                        <label className="ml-1">{`${formatIdr(
+                          e?.konv_qty ?? 0
+                        )} (${e?.unit_konv ?? ""})`}</label>
+                      </>
+                    )}
+                  />
+
+                  <Column
+                    header={tr[localStorage.getItem("language")].price}
+                    className="align-text-top"
+                    style={{
+                      minWidth: "8rem",
+                    }}
+                    field={""}
+                    body={
+                      (e) => (
+                        // checkCus(so.pel_id)?.cus_curren !== null ? (
+                        //   <PrimeNumber
+                        //     value={e.price && e.price}
+                        //     onChange={(u) => {
+                        //       let temp = [...so.sprod];
+                        //       temp[e.index].price = u.target.value;
+                        //       if (checkCus(so.pel_id)?.cus_curren !== null) {
+                        //         temp[e.index].total_fc =
+                        //           temp[e.index].order * temp[e.index].price;
+
+                        //         temp[e.index].total =
+                        //           temp[e.index].total_fc * curConv();
+                        //       } else {
+                        //         temp[e.index].total =
+                        //           temp[e.index].order * temp[e.index].price;
+                        //       }
+
+                        //       updateSo({
+                        //         ...so,
+                        //         sprod: temp,
+                        //         total_bayar:
+                        //           getSubTotalBarang() +
+                        //           getSubTotalJasa() +
+                        //           ((getSubTotalBarang() + getSubTotalJasa()) *
+                        //             pjk()) /
+                        //             100,
+                        //       });
+
+                        //       console.log(temp);
+                        //       let newError = error;
+                        //       newError.prod[e.index].prc = false;
+                        //       setError(newError);
+                        //     }}
+                        //     placeholder="0"
+                        //     min={0}
+                        //     error={error?.prod[e.index]?.prc}
+                        //   />
+                        // ) : (
+                        <PrimeNumber
+                          price
+                          value={e.price && e.price}
+                          onChange={(u) => {
+                            let temp = [...so.sprod];
+                            temp[e.index].price = u.value;
+                            if (
+                              so?.pel_id &&
+                              checkCus(so.pel_id)?.cus_curren !== null
+                            ) {
+                              if (
+                                checkUnit(temp[e.index].unit_id)?.u_from !==
+                                null
+                              ) {
+                                temp[e.index].total_fc =
+                                  temp[e.index].konv_qty * temp[e.index].price;
+
+                                temp[e.index].total =
+                                  temp[e.index].total_fc * curConv();
+                              } else {
+                                temp[e.index].total_fc =
+                                  temp[e.index].order * temp[e.index].price;
+
+                                temp[e.index].total =
+                                  temp[e.index].total_fc * curConv();
+                              }
+                              temp[e.index].price_idr =
+                                temp[e.index].price * curConv();
+                            } else {
+                              if (
+                                checkUnit(temp[e.index].unit_id)?.u_from !==
+                                null
+                              ) {
+                                temp[e.index].total =
+                                  temp[e.index].konv_qty * u.value;
+                              } else {
+                                temp[e.index].total =
+                                  temp[e.index].order * u.value;
+                              }
+                            }
+
+                            updateSo({
+                              ...so,
+                              sprod: temp,
+                              total_bayar:
+                                getSubTotalBarang() +
+                                getSubTotalJasa() +
+                                ((getSubTotalBarang() + getSubTotalJasa()) *
+                                  pjk()) /
+                                  100,
+                            });
+
+                            let newError = error;
+                            newError.prod[e.index].prc = false;
+                            setError(newError);
+                          }}
+                          placeholder="0"
+                          min={0}
+                          error={error?.prod[e.index]?.prc}
+                        />
+                      )
+                      // )
+                    }
+                  />
+
+                  <Column
+                    hidden={checkCus(so.pel_id)?.cus_curren == null}
+                    header={`${
+                      tr[localStorage.getItem("language")].price
+                    } (IDR)`}
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "10rem",
+                    }}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <PrimeNumber
+                          price
+                          value={e.price_idr ? e.price_idr : null}
+                          placeholder="0"
+                          type="number"
+                          disabled
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header={tr[localStorage.getItem("language")].disc}
+                    className="align-text-top"
+                    style={{
+                      minWidth: "9rem",
+                    }}
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputText
+                          value={e.disc && e.disc}
+                          onChange={(u) => {
+                            let temp = [...so.sprod];
+                            temp[e.index].disc = u.target.value;
+                            updateSo({
+                              ...so,
+                              sprod: temp,
+                              total_bayar:
+                                getSubTotalBarang() +
+                                getSubTotalJasa() +
+                                ((getSubTotalBarang() + getSubTotalJasa()) *
+                                  pjk()) /
+                                  100,
+                            });
+                            console.log(temp);
+                          }}
+                          placeholder="0"
+                          type="number"
+                          min={0}
+                        />
+                        <span className="p-inputgroup-addon">%</span>
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header={tr[localStorage.getItem("language")].net_prc}
+                    className="align-text-top"
+                    style={{
+                      minWidth: "8rem",
+                    }}
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputNumber
+                          value={e.nett_price && e.nett_price}
+                          onChange={(u) => {
+                            let temp = [...so.sprod];
+                            temp[e.index].nett_price = u.value;
+                            updateSo({
+                              ...so,
+                              sprod: temp,
+                              total_bayar:
+                                getSubTotalBarang() +
+                                getSubTotalJasa() +
+                                ((getSubTotalBarang() + getSubTotalJasa()) *
+                                  pjk()) /
+                                  100,
+                            });
+                            console.log(temp);
+                          }}
+                          placeholder="0"
+                          min={0}
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    hidden={
+                      so?.pel_id == null &&
+                      checkCus(so.pel_id)?.customer?.cus_curren == null
+                    }
+                    header="FC"
+                    className="align-text-top"
+                    style={{
+                      minWidth: "7rem",
+                    }}
+                    field={""}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputNumber
+                          value={
+                            e.nett_price && e.nett_price !== 0
+                              ? e.nett_price
+                              : e.total_fc - (e.total_fc * e.disc) / 100
+                          }
+                          onChange={(u) => {}}
+                          placeholder="0"
+                          disabled
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header={tr[localStorage.getItem("language")].total}
+                    className="align-text-top"
+                    body={(e) => (
+                      <label className="text-nowrap">
+                        <b>
+                          Rp.{" "}
+                          {formatIdr(
+                            e.nett_price && e.nett_price !== 0
+                              ? e.nett_price
+                              : e.total - (e.total * e.disc) / 100
+                          )}
+                        </b>
+                      </label>
+                    )}
+                  />
+
+                  <Column
+                    header=""
+                    className="align-text-top"
+                    field={""}
+                    body={(e) => (
                       <Link
                         onClick={() => {
                           let temp = [...so.sprod];
@@ -1458,18 +1750,53 @@ const InputSO = ({ onCancel, onSuccess }) => {
                       >
                         <i className="fa fa-trash"></i>
                       </Link>
-                    )
-                  }
-                />
-              </DataTable>
-            </>
+                    )}
+                  />
+                </DataTable>
+              </div>
+              <div className="col-12 d-flex justify-content-end">
+                <Link
+                  onClick={() => {
+                    let newError = error;
+                    newError.prod.push({ jum: false, prc: false });
+                    setError(newError);
+
+                    updateSo({
+                      ...so,
+                      sprod: [
+                        ...so.sprod,
+                        {
+                          id: 0,
+                          prod_id: null,
+                          unit_id: null,
+                          request: null,
+                          order: null,
+                          remain: null,
+                          konv_qty: 0,
+                          unit_konv: null,
+                          price: null,
+                          price_idr: 0,
+                          disc: null,
+                          nett_price: null,
+                          total_fc: 0,
+                          total: null,
+                        },
+                      ],
+                    });
+                  }}
+                  className="btn btn-primary shadow btn-s sharp ml-1 mt-3"
+                >
+                  <span className="align-middle mx-1 mt-3">
+                    <i className="fa fa-plus"></i> {"Tambah"}
+                  </span>
+                </Link>
+              </div>
+            </Row>
           }
         />
 
         <CustomAccordion
-          tittle={`${tr[localStorage.getItem("language")].ord} ${
-            tr[localStorage.getItem("language")].jasa
-          }`}
+          tittle={tr[localStorage.getItem("language")].jasa}
           defaultActive={false}
           active={accor.jasa}
           onClick={() => {
@@ -1498,8 +1825,12 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 emptyMessage={() => <div></div>}
               >
                 <Column
-                  header={tr[localStorage.getItem("language")].supplier}
+                  hidden
+                  header={tr[localStorage.getItem("language")].pemasok}
                   className="align-text-top"
+                  style={{
+                    minWidth: "13rem",
+                  }}
                   field={""}
                   body={(e) => (
                     <CustomDropdown
@@ -1508,6 +1839,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
                       onChange={(u) => {
                         let temp = [...so.sjasa];
                         temp[e.index].sup_id = u.supplier.id;
+                        temp[e.index].price = null;
+                        temp[e.index].total_fc = 0;
+                        temp[e.index].total = 0;
                         updateSo({ ...so, sjasa: temp });
                       }}
                       label={"[supplier.sup_name]"}
@@ -1522,37 +1856,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
-                  header={tr[localStorage.getItem("language")].jasa}
-                  className="align-text-top"
-                  field={""}
-                  body={(e) => (
-                    <CustomDropdown
-                      value={e.jasa_id && checkJasa(e.jasa_id)}
-                      option={jasa}
-                      onChange={(u) => {
-                        console.log(e.value);
-                        let temp = [...so.sjasa];
-                        temp[e.index].jasa_id = u.jasa.id;
-                        updateSo({ ...so, sjasa: temp });
-
-                        let newError = error;
-                        newError.jasa[e.index].id = false;
-                        setError(newError);
-                      }}
-                      label={"[jasa.name]"}
-                      placeholder={tr[localStorage.getItem("language")].pilih}
-                      detail
-                      onDetail={() => {
-                        setCurrentIndex(e.index);
-                        setShowJasa(true);
-                      }}
-                      errorMessage="Jasa Belum Dipilih"
-                      error={error?.jasa[e.index]?.id}
-                    />
-                  )}
-                />
-
-                <Column
+                  hidden
                   header={tr[localStorage.getItem("language")].currency}
                   className="align-text-top"
                   style={{
@@ -1582,11 +1886,47 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
+                  header={tr[localStorage.getItem("language")].jasa}
+                  className="align-text-top"
+                  style={{
+                    minWidth: "15rem",
+                  }}
+                  field={""}
+                  body={(e) => (
+                    <CustomDropdown
+                      value={e.jasa_id && checkJasa(e.jasa_id)}
+                      option={jasa}
+                      onChange={(u) => {
+                        console.log(e.value);
+                        let temp = [...so.sjasa];
+                        temp[e.index].jasa_id = u.jasa.id;
+                        updateSo({ ...so, sjasa: temp });
+
+                        let newError = error;
+                        newError.jasa[e.index].id = false;
+                        setError(newError);
+                      }}
+                      label={"[jasa.name]"}
+                      placeholder={tr[localStorage.getItem("language")].pilih}
+                      detail
+                      onDetail={() => {
+                        setCurrentIndex(e.index);
+                        setShowJasa(true);
+                      }}
+                      errorMessage={
+                        tr[localStorage.getItem("language")].jasa_belum
+                      }
+                      error={error?.jasa[e.index]?.id}
+                    />
+                  )}
+                />
+
+                <Column
                   header={tr[localStorage.getItem("language")].qty}
                   className="align-text-top"
                   field={""}
                   style={{
-                    width: "8rem",
+                    minWidth: "8rem",
                   }}
                   body={(e) => (
                     <PrimeNumber
@@ -1594,14 +1934,12 @@ const InputSO = ({ onCancel, onSuccess }) => {
                       onChange={(u) => {
                         let temp = [...so.sjasa];
                         temp[e.index].qty = u.target.value;
-                        if (
-                          checkSupp(e.sup_id)?.supplier?.sup_curren !== null
-                        ) {
+                        if (checkCus(so.pel_id)?.cus_curren !== null) {
                           temp[e.index].total_fc =
                             temp[e.index].qty * temp[e.index].price;
 
                           temp[e.index].total =
-                            temp[e.index].total_fc * curConvSup();
+                            temp[e.index].total_fc * curConv();
                         } else {
                           temp[e.index].total =
                             temp[e.index].qty * temp[e.index].price;
@@ -1632,10 +1970,10 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
-                  header={tr[localStorage.getItem("language")].sat}
+                  header={tr[localStorage.getItem("language")].satuan}
                   className="align-text-top"
                   style={{
-                    width: "13rem",
+                    minWidth: "13rem",
                   }}
                   field={""}
                   body={(e) => (
@@ -1663,24 +2001,22 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   header={tr[localStorage.getItem("language")].price}
                   className="align-text-top"
                   style={{
-                    width: "25rem",
+                    minWidth: "10rem",
                   }}
                   field={""}
                   body={(e) =>
-                    checkSupp(e.sup_id)?.supplier?.sup_curren !== null ? (
+                    checkCus(so.pel_id)?.cus_curren !== null ? (
                       <PrimeNumber
                         value={e.price && e.price}
                         onChange={(u) => {
                           let temp = [...so.sjasa];
                           temp[e.index].price = Number(u.target.value);
-                          if (
-                            checkSupp(e.sup_id)?.supplier?.sup_curren !== null
-                          ) {
+                          if (checkCus(so.pel_id)?.cus_curren !== null) {
                             temp[e.index].total_fc =
                               temp[e.index].qty * temp[e.index].price;
 
                             temp[e.index].total =
-                              temp[e.index].total_fc * curConvSup();
+                              temp[e.index].total_fc * curConv();
                           } else {
                             temp[e.index].total =
                               temp[e.index].qty * temp[e.index].price;
@@ -1713,14 +2049,12 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         onChange={(u) => {
                           let temp = [...so.sjasa];
                           temp[e.index].price = u.value;
-                          if (
-                            checkSupp(e.sup_id)?.supplier?.sup_curren !== null
-                          ) {
+                          if (checkCus(so.pel_id)?.cus_curren !== null) {
                             temp[e.index].total_fc =
                               temp[e.index].qty * temp[e.index].price;
 
                             temp[e.index].total =
-                              temp[e.index].total_fc * curConvSup();
+                              temp[e.index].total_fc * curConv();
                           } else {
                             temp[e.index].total =
                               temp[e.index].qty * temp[e.index].price;
@@ -1754,7 +2088,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   header={tr[localStorage.getItem("language")].disc}
                   className="align-text-top"
                   style={{
-                    width: "13rem",
+                    minWidth: "11rem",
                   }}
                   field={""}
                   body={(e) => (
@@ -1842,8 +2176,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
                                 unit_id: null,
                                 qty: null,
                                 price: null,
+                                price_idr: 0,
                                 disc: null,
-                                total_fc: null,
+                                total_fc: 0,
                                 total: null,
                               },
                             ],
@@ -1945,7 +2280,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                 {so.split_inv
                   ? `${
                       tr[localStorage.getItem("language")].pjk_barang
-                    } (${pjk()}%)`
+                    } ${pjk()}%`
                   : tr[localStorage.getItem("language")].pajak}
               </label>
             </div>
@@ -2092,7 +2427,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
                 <div className="col-6">
                   <label className="text-black fs-14">
-                    {tr[localStorage.getItem("language")].pjk_jasa} (2%)
+                    {`${tr[localStorage.getItem("language")].pjk_jasa} (2%)`}
                   </label>
                 </div>
 
@@ -2233,7 +2568,10 @@ const InputSO = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowRulesPay(false);
-            updateSo({ ...so, top: e.data.id });
+            let result = new Date(`${so.req_date}Z`);
+            result.setDate(result.getDate() + e?.data?.day);
+
+            updateSo({ ...so, top: e?.data?.id, due_date: result });
           }
 
           setDoubleClick(true);
@@ -2484,6 +2822,33 @@ const InputSO = ({ onCancel, onSuccess }) => {
           if (doubleClick) {
             setShowSub(false);
             updateSo({ ...so, sub_id: e.data.id });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+      <DataProject
+        data={project}
+        loading={false}
+        popUp={true}
+        show={showProj}
+        onHide={() => {
+          setShowProj(false);
+        }}
+        onInput={(e) => {
+          setShowProj(!e);
+        }}
+        onSuccessInput={(e) => {
+          getProj();
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowProj(false);
+            updateSo({ ...so, proj_id: e.data.id });
           }
 
           setDoubleClick(true);

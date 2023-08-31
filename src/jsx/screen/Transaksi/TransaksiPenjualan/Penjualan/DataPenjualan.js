@@ -29,6 +29,7 @@ const data = {
   so_id: null,
   invoice: null,
   pel_id: null,
+  proj_id: null,
   ppn_type: null,
   sub_addr: null,
   sub_id: null,
@@ -250,27 +251,33 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
 
             let jprod = data.jprod;
             jprod.forEach((el) => {
-              el.prod_id = el.prod_id.id;
-              el.unit_id = el.unit_id.id;
-              // el.location = el.location?.id;
+              el.prod_id = el?.prod_id?.id ?? null;
+              el.unit_id = el?.unit_id?.id ?? null;
+              el.location = el.location?.id ?? null;
             });
             let jjasa = data.jjasa;
             jjasa.forEach((el) => {
-              el.jasa_id = el.jasa_id.id;
-              el.unit_id = el.unit_id.id;
+              el.jasa_id = el?.jasa_id?.id ?? null;
+              el.unit_id = el?.unit_id?.id ?? null;
             });
 
             if (!jprod.length) {
               jprod.push({
                 id: 0,
+                pj_id: 0,
                 prod_id: null,
                 unit_id: null,
                 location: null,
+                rak_aktif: null,
+                rak_id: null,
                 order: null,
+                konv_qty: 0,
+                unit_konv: null,
                 price: null,
+                price_idr: 0,
                 disc: null,
                 nett_price: null,
-                total_fc: null,
+                total_fc: 0,
                 total: null,
               });
             }
@@ -296,6 +303,7 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
                 ...data,
                 // so_id: data?.so_id?.id,
                 pel_id: data?.pel_id?.id ?? null,
+                proj_id: data?.proj_id?.id ?? null,
                 slsm_id: data?.slsm_id?.id ?? null,
                 top: data?.top?.id,
                 jprod: jprod,
@@ -389,18 +397,20 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
                 jprod: [
                   {
                     id: 0,
-                    pj_id: null,
+                    pj_id: 0,
                     prod_id: null,
                     unit_id: null,
                     location: null,
-                    stock: null,
-                    req: null,
+                    rak_aktif: null,
+                    rak_id: null,
                     order: null,
-                    remain: null,
+                    konv_qty: 0,
+                    unit_konv: null,
                     price: null,
+                    price_idr: 0,
                     disc: null,
                     nett_price: null,
-                    total_fc: null,
+                    total_fc: 0,
                     total: null,
                   },
                 ],

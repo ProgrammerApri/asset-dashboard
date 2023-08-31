@@ -17,7 +17,7 @@ const Masuk = () => {
         setTrigger((current) => current + 1);
       }}
     >
-      <TabPanel header="Pemasukan">
+      <TabPanel header="Pemasukan & Pembayaran">
         <Pemasukan trigger={trigger}/>
       </TabPanel>
       <TabPanel header="Pencairan Giro Masuk">

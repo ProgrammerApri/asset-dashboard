@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { request, endpoints } from "src/utils";
+import { request } from "src/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -16,12 +16,12 @@ import { SET_CURRENT_SO, SET_EDIT_SO, SET_SO } from "src/redux/actions";
 import ReactToPrint from "react-to-print";
 import { Divider } from "@material-ui/core";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
-import { tr } from "src/data/tr";
+import { tr } from "../../../../../data/tr";
 import { Tooltip } from "primereact/tooltip";
+import endpoints from "../../../../../utils/endpoints";
 
 const data = {
   id: null,
-  modul: null,
   so_code: null,
   so_date: null,
   pel_id: null,
@@ -31,6 +31,7 @@ const data = {
   top: null,
   req_date: null,
   due_date: false,
+  proj_id: null,
   split_inv: null,
   prod_disc: null,
   jasa_disc: null,
@@ -48,6 +49,9 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
   const [displayData, setDisplayData] = useState(false);
   const [confirm, setDisplayConfirm] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
+  const [setup, setSetup] = useState(null);
+  const [currency, setCurrency] = useState(null);
+  const [lokasi, setLokasi] = useState(null);
   const toast = useRef(null);
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
@@ -56,13 +60,16 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
   const [rows2, setRows2] = useState(20);
   const dispatch = useDispatch();
   const So = useSelector((state) => state.so.so);
-  const closeSo = useSelector((state) => state.so.current);
+  const show = useSelector((state) => state.so.current);
   const printPage = useRef(null);
+  const [expandedRows, setExpandedRows] = useState(null);
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
     getSO();
+    getCur();
+    getLokasi();
     initFilters1();
   }, []);
 
@@ -80,9 +87,8 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        const filteredData = data.filter((item) => item.modul !== "so");
-
-        dispatch({ type: SET_SO, payload: filteredData });
+        dispatch({ type: SET_SO, payload: data });
+        getSetup();
       }
     } catch (error) {}
     if (isUpdate) {
@@ -94,10 +100,10 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
     }
   };
 
-  const getSoCode = async () => {
-    // setLoading(true);
+  const getSetup = async (isUpdate = false) => {
+    setLoading(true);
     const config = {
-      ...endpoints.getcode_SO,
+      ...endpoints.getCompany,
       data: {},
     };
     console.log(config.data);
@@ -106,44 +112,40 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
       response = await request(null, config);
       console.log(response);
       if (response.status) {
-        const kode = response.data;
-        onAdd();
-        dispatch({
-          type: SET_CURRENT_SO,
-          payload: {
-            ...data,
-            so_code: kode,
-            sprod: [
-              {
-                id: 0,
-                prod_id: null,
-                unit_id: null,
-                location: null,
-                request: null,
-                order: null,
-                remain: null,
-                price: null,
-                disc: null,
-                nett_price: null,
-                total_fc: null,
-                total: null,
-              },
-            ],
-            sjasa: [
-              {
-                id: 0,
-                jasa_id: null,
-                sup_id: null,
-                unit_id: null,
-                qty: null,
-                price: null,
-                disc: null,
-                total_fc: null,
-                total: null,
-              },
-            ],
-          },
-        });
+        const { data } = response;
+        setSetup(data);
+      }
+    } catch (error) {}
+  };
+
+  const getCur = async () => {
+    const config = {
+      ...endpoints.currency,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setCurrency(data);
+      }
+    } catch (error) {}
+  };
+
+  const getLokasi = async () => {
+    const config = {
+      ...endpoints.lokasi,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setLokasi(data);
       }
     } catch (error) {}
   };
@@ -165,7 +167,7 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
           getSO(true);
           toast.current.show({
             severity: "info",
-            summary: tr[localStorage.getItem("language")].berhsl,
+            summary: tr[localStorage.getItem("language")].berhasil,
             detail: tr[localStorage.getItem("language")].del_berhasil,
             life: 3000,
           });
@@ -189,8 +191,8 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
   const closeSO = async () => {
     const config = {
       ...endpoints.closeSO,
-      endpoint: endpoints.closeSO.endpoint + closeSo.id,
-      data: closeSo,
+      endpoint: endpoints.closeSO.endpoint + show.id,
+      data: show,
     };
     console.log(config.data);
     let response = null;
@@ -204,7 +206,7 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
           getSO(true);
           toast.current.show({
             severity: "info",
-            summary: tr[localStorage.getItem("language")].berhsl,
+            summary: tr[localStorage.getItem("language")].berhasil,
             detail: tr[localStorage.getItem("language")].pesan_berhasil,
             life: 3000,
           });
@@ -227,7 +229,12 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
     return (
       // <React.Fragment>
       <div className="d-flex">
+        <Tooltip target=".btn" />
         <Link
+          data-pr-tooltip="Lihat Detail SO"
+          data-pr-position="right"
+          data-pr-at="right+5 top"
+          data-pr-my="left center-2"
           onClick={() => {
             onDetail();
             let sprod = data.sprod;
@@ -236,41 +243,8 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
               type: SET_CURRENT_SO,
               payload: {
                 ...data,
-                sprod:
-                  sprod.length > 0
-                    ? sprod
-                    : [
-                        {
-                          id: 0,
-                          prod_id: null,
-                          unit_id: null,
-                          location: null,
-                          request: null,
-                          order: null,
-                          remain: null,
-                          price: null,
-                          disc: null,
-                          nett_price: null,
-                          total_fc: null,
-                          total: null,
-                        },
-                      ],
-                sjasa:
-                  sjasa.length > 0
-                    ? sjasa
-                    : [
-                        {
-                          id: 0,
-                          jasa_id: null,
-                          sup_id: null,
-                          unit_id: null,
-                          qty: null,
-                          price: null,
-                          disc: null,
-                          total_fc: null,
-                          total: null,
-                        },
-                      ],
+                sprod: sprod.length > 0 ? sprod : null,
+                sjasa: sjasa.length > 0 ? sjasa : null,
               },
             });
           }}
@@ -280,6 +254,10 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
         </Link>
 
         <Link
+          data-pr-tooltip="Edit SO"
+          data-pr-position="right"
+          data-pr-at="right+5 top"
+          data-pr-my="left center-2"
           onClick={() => {
             onEdit(data);
             let sprod = data.sprod;
@@ -294,7 +272,7 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
             let sjasa = data.sjasa;
             sjasa.forEach((el) => {
               el.jasa_id = el.jasa_id.id;
-              el.unit_id = el.unit_id.id;
+              el.unit_id = el.unit_id?.id ?? null;
             });
             dispatch({
               type: SET_CURRENT_SO,
@@ -303,6 +281,7 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
                 pel_id: data?.pel_id?.id ?? null,
                 sub_id: data?.sub_id?.id ?? null,
                 top: data?.top?.id ?? null,
+                proj_id: data?.proj_id?.id ?? null,
                 sprod:
                   sprod.length > 0
                     ? sprod
@@ -312,13 +291,18 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
                           prod_id: null,
                           unit_id: null,
                           location: null,
+                          rak_aktif: null,
+                          rak_id: null,
                           request: null,
                           order: null,
                           remain: null,
+                          konv_qty: 0,
+                          unit_konv: null,
                           price: null,
+                          price_idr: 0,
                           disc: null,
                           nett_price: null,
-                          total_fc: null,
+                          total_fc: 0,
                           total: null,
                         },
                       ],
@@ -333,8 +317,9 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
                           unit_id: null,
                           qty: null,
                           price: null,
+                          price_idr: 0,
                           disc: null,
-                          total_fc: null,
+                          total_fc: 0,
                           total: null,
                         },
                       ],
@@ -342,13 +327,12 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
             });
           }}
           className={`btn ${
-            data.status !== 2 ? "" : "disabled"
+            data.status === 0 ? "" : "disabled"
           } btn-primary shadow btn-xs sharp ml-1`}
         >
           <i className="fa fa-pencil"></i>
         </Link>
 
-        <Tooltip target=".btn" />
         <Link
           data-pr-tooltip="Close SO"
           data-pr-position="right"
@@ -362,13 +346,13 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
               payload: true,
             });
             sprod.forEach((el) => {
-              el.prod_id = el.prod_id.id;
-              el.unit_id = el.unit_id.id;
+              el.prod_id = el?.prod_id?.id ?? null;
+              el.unit_id = el?.unit_id?.id ?? null;
             });
             let sjasa = data.sjasa;
             sjasa.forEach((el) => {
-              el.jasa_id = el.jasa_id.id;
-              el.unit_id = el.unit_id.id;
+              el.jasa_id = el.jasa_id?.id ?? null;
+              el.unit_id = el.unit_id?.id ?? null;
             });
             dispatch({
               type: SET_CURRENT_SO,
@@ -386,13 +370,17 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
                           prod_id: null,
                           unit_id: null,
                           location: null,
+                          rak_aktif: null,
+                          rak_id: null,
                           request: null,
                           order: null,
+                          konv_qty: 0,
+                          unit_konv: null,
                           remain: null,
                           price: null,
+                          price_idr: 0,
                           disc: null,
                           nett_price: null,
-                          total_fc: null,
                           total: null,
                         },
                       ],
@@ -407,8 +395,8 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
                           unit_id: null,
                           qty: null,
                           price: null,
+                          price_idr: 0,
                           disc: null,
-                          total_fc: null,
                           total: null,
                         },
                       ],
@@ -416,20 +404,24 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
             });
           }}
           className={`btn ${
-            data.status !== 2 ? "" : "disabled"
+            data.status === 0 ? "" : "disabled"
           } btn-warning shadow btn-xs sharp ml-1`}
         >
           <i className="bx bx-x mt-1"></i>
         </Link>
 
         <Link
+          data-pr-tooltip="Hapus SO"
+          data-pr-position="right"
+          data-pr-at="right+5 top"
+          data-pr-my="left center-2"
           onClick={() => {
             setEdit(true);
             setDisplayDel(true);
             setCurrentItem(data);
           }}
           className={`btn ${
-            data.status !== 2 ? "" : "disabled"
+            data.status === 0 ? "" : "disabled"
           } btn-danger shadow btn-xs sharp ml-1`}
         >
           <i className="fa fa-trash"></i>
@@ -443,18 +435,19 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
     return (
       <div>
         <PButton
-          label="Batal"
+          label={tr[localStorage.getItem("language")].batal}
           onClick={() => setDisplayDel(false)}
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Hapus"
+          label={tr[localStorage.getItem("language")].hapus}
           icon="pi pi-trash"
           onClick={() => {
+            setLoading(true);
             delSO();
           }}
           autoFocus
-          loading={update}
+          loading={loading}
         />
       </div>
     );
@@ -491,7 +484,6 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
-            getSoCode();
             dispatch({
               type: SET_EDIT_SO,
               payload: false,
@@ -500,19 +492,27 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
               type: SET_CURRENT_SO,
               payload: {
                 ...data,
+                sub_addr: false,
+                split_inv: false,
                 sprod: [
                   {
                     id: 0,
                     prod_id: null,
                     unit_id: null,
                     location: null,
+                    rak_aktif: null,
+                    rak_id: null,
                     request: null,
+                    stock: null,
                     order: null,
                     remain: null,
+                    konv_qty: 0,
+                    unit_konv: null,
                     price: null,
+                    price_idr: 0,
                     disc: null,
                     nett_price: null,
-                    total_fc: null,
+                    total_fc: 0,
                     total: null,
                   },
                 ],
@@ -524,14 +524,41 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
                     unit_id: null,
                     qty: null,
                     price: null,
+                    price_idr: 0,
                     disc: null,
-                    total_fc: null,
+                    total_fc: 0,
                     total: null,
                   },
                 ],
               },
             });
           }}
+          disabled={setup?.cutoff === null && setup?.year_co === null}
+        />
+      </div>
+    );
+  };
+
+  const renderFooter = () => {
+    return (
+      <div>
+        <PButton
+          label={tr[localStorage.getItem("language")].batal}
+          onClick={() => setDisplayData(false)}
+          className="p-button-text btn-primary"
+        />
+        <ReactToPrint
+          trigger={() => {
+            return (
+              <PButton variant="primary" onClick={() => {}}>
+                Print{" "}
+                <span className="btn-icon-right">
+                  <i class="bx bxs-printer"></i>
+                </span>
+              </PButton>
+            );
+          }}
+          content={() => printPage.current}
         />
       </div>
     );
@@ -546,7 +573,7 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
           className="p-button-text btn-primary"
         />
         <PButton
-          label="Ya"
+          label={tr[localStorage.getItem("language")].ya}
           icon="pi pi-check"
           onClick={() => {
             setUpdate(true);
@@ -565,7 +592,10 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
       const dropdownOptions = [
         { label: 20, value: 20 },
         { label: 50, value: 50 },
-        { label: "Semua", value: options.totalRecords },
+        {
+          label: tr[localStorage.getItem("language")].hal,
+          value: options.totalRecords,
+        },
       ];
 
       return (
@@ -574,7 +604,7 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
             className="mx-1"
             style={{ color: "var(--text-color)", userSelect: "none" }}
           >
-            Data per halaman:{" "}
+            {tr[localStorage.getItem("language")].page}{" "}
           </span>
           <Dropdown
             value={options.value}
@@ -594,7 +624,8 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
             textAlign: "center",
           }}
         >
-          {options.first} - {options.last} dari {options.totalRecords}
+          {options.first} - {options.last}{" "}
+          {tr[localStorage.getItem("language")].dari} {options.totalRecords}
         </span>
       );
     },
@@ -618,9 +649,163 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
   };
 
   const formatIdr = (value) => {
-    return `${value}`
+    return `${value?.toFixed(2)}`
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
+  const getSubTotalBarang = () => {
+    let total = 0;
+    show?.sprod?.forEach((el) => {
+      if (el.nett_price && el.nett_price > 0) {
+        total += parseInt(el.nett_price);
+      } else {
+        total += el.total - (el.total * el.disc) / 100;
+      }
+    });
+
+    return total;
+  };
+
+  const getSubTotalJasa = () => {
+    let total = 0;
+    show?.sjasa?.forEach((el) => {
+      total += el.total - (el.total * el.disc) / 100;
+    });
+
+    return total;
+  };
+
+  const formatTh = (value) => {
+    return `${value?.toFixed(2)}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
+  const checkLoc = (value) => {
+    let selected = {};
+    lokasi?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const rowExpansionTemplate = (data) => {
+    let cur_rate = 0;
+    let cur_name = null;
+
+    currency?.forEach((element) => {
+      if (data?.pel_id?.cus_curren === element.id) {
+        cur_rate = element?.rate;
+        cur_name = element?.code;
+      }
+    });
+
+    return (
+      <div className="">
+        <label className="text-label fs-13 text-black">
+          <b>{tr[localStorage.getItem("language")].dft_prod}</b>
+        </label>
+
+        <DataTable value={data?.sprod} responsiveLayout="scroll">
+          <Column
+            header= {tr[localStorage.getItem("language")].prod}
+            field={(e) => `${e.prod_id?.name} (${e.prod_id?.code})`}
+            style={{ minWidth: "19rem" }}
+            // body={loading && <Skeleton />}
+          />
+          <Column
+            header={tr[localStorage.getItem("language")].gudang}
+            field={(e) => checkLoc(e.location)?.name}
+            style={{ minWidth: "9rem" }}
+            // body={loading && <Skeleton />}
+          />
+          <Column
+            header={tr[localStorage.getItem("language")].jumlah}
+            field={(e) => formatTh(e.order)}
+            style={{ minWidth: "6rem" }}
+            // body={loading && <Skeleton />}
+          />
+          <Column
+            header={tr[localStorage.getItem("language")].satuan}
+            field={(e) => e.unit_id?.name}
+            style={{ minWidth: "7rem" }}
+            // body={loading && <Skeleton />}
+          />
+          <Column
+            header="Konversi Unit"
+            field={(e) => `${formatTh(e.konv_qty)} (${e.unit_konv})`}
+            style={{ minWidth: "7rem" }}
+            // body={loading && <Skeleton />}
+          />
+          <Column
+            header={tr[localStorage.getItem("language")].price}
+            field={(e) =>
+              data?.pel_id?.cus_curren
+                ? `${cur_name} ${formatIdr(e.price)}`
+                : `Rp. ${formatIdr(e.price)}`
+            }
+            style={{ minWidth: "8rem" }}
+            // body={loading && <Skeleton />}
+          />
+          <Column
+            hidden={data?.pel_id?.cus_curren == null}
+            header="Harga Satuan (IDR)"
+            field={(e) =>
+              data?.pel_id?.cus_curren
+                ? `Rp. ${formatIdr(e.price * cur_rate)}`
+                : `Rp. ${formatIdr(e.price)}`
+            }
+            style={{ minWidth: "10rem" }}
+            // body={loading && <Skeleton />}
+          />
+          <Column
+            header="Total"
+            field={(e) =>
+              data?.pel_id?.cus_curren
+                ? `${cur_name}. ${formatIdr(
+                    e.nett_price ? e.nett_price : e.price * e.order
+                  )}`
+                : `Rp. ${formatIdr(e.total)}`
+            }
+            style={{ minWidth: "10rem" }}
+            // body={loading && <Skeleton />}
+          />
+        </DataTable>
+
+        {data?.jjasa?.length ? (
+          <>
+            <label className="text-label fs-13 text-black">
+              <b>{tr[localStorage.getItem("language")].dft_jasa}</b>
+            </label>
+
+            <DataTable value={data?.sjasa} responsiveLayout="scroll">
+              <Column
+                header= {tr[localStorage.getItem("language")].jasa}
+                field={(e) => e.jasa_id?.name}
+                style={{ minWidth: "27rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header={data?.pel_id?.cus_curren ? "Total" : "Total (IDR)"}
+                field={(e) =>
+                  data?.pel_id?.cus_curren
+                    ? `${cur_name} ${formatIdr(e.total_fc)}`
+                    : `Rp. ${formatIdr(e.total)}`
+                }
+                style={{ minWidth: "15rem" }}
+                // body={loading && <Skeleton />}
+              />
+            </DataTable>
+          </>
+        ) : (
+          <></>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -634,16 +819,12 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
                 responsiveLayout="scroll"
                 value={loading ? dummy : So}
                 className="display w-150 datatable-wrapper"
-                showGridlines
+                // showGridlines
                 dataKey="id"
                 rowHover
                 header={renderHeader}
                 filters={filters1}
-                globalFilterFields={[
-                  "so.so_code",
-                  "so.so_date",
-                  "pel_id.cus_name",
-                ]}
+                globalFilterFields={["so_code", "so_date", "pel_id.cus_name"]}
                 emptyMessage={tr[localStorage.getItem("language")].empty_data}
                 paginator
                 paginatorTemplate={template2}
@@ -651,7 +832,12 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
                 rows={rows2}
                 onPage={onCustomPage2}
                 paginatorClassName="justify-content-end mt-3"
+                expandedRows={expandedRows}
+                onRowToggle={(e) => setExpandedRows(e.data)}
+                rowExpansionTemplate={rowExpansionTemplate}
               >
+                <Column expander style={{ width: "3em" }} />
+
                 <Column
                   header={tr[localStorage.getItem("language")].tgl}
                   style={{
@@ -668,7 +854,7 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
                 />
                 <Column
                   header={tr[localStorage.getItem("language")].customer}
-                  field={(e) => e.pel_id?.cus_name}
+                  field={(e) => e.pel_id.cus_name}
                   style={{ minWidth: "10rem" }}
                   body={loading && <Skeleton />}
                 />
@@ -687,14 +873,20 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
                       <Skeleton />
                     ) : (
                       <div>
-                        {e.status !== 2 ? (
+                        {e.status === 0 ? (
                           <Badge variant="success light">
-                            <i className="bx bx-check text-success mr-1"></i>{" "}
+                            <i className="bx bx-check text-success mr-1 mt-1"></i>{" "}
                             Open
+                          </Badge>
+                        ) : e.status === 1 ? (
+                          <Badge variant="info light">
+                            <i className="bx bxs-circle text-info mr-1 mt-1"></i>{" "}
+                            There Is Trans
                           </Badge>
                         ) : (
                           <Badge variant="danger light">
-                            <i className="bx bx-x text-danger mr-1"></i> Close
+                            <i className="bx bx-x text-danger mr-1 mt-1"></i>{" "}
+                            Close
                           </Badge>
                         )}
                       </div>
@@ -715,9 +907,7 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
       </Row>
 
       <Dialog
-        header={`${tr[localStorage.getItem("language")].close} ${
-          tr[localStorage.getItem("language")].sal_ord
-        }`}
+        header={tr[localStorage.getItem("language")].cls_so}
         visible={confirm}
         style={{ width: "30vw" }}
         footer={footerClose("confirm")}
@@ -735,9 +925,256 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
       </Dialog>
 
       <Dialog
-        header={`${tr[localStorage.getItem("language")].hapus} ${
-          tr[localStorage.getItem("language")].sal_ord
-        }`}
+        header={"Detail Pembelian"}
+        visible={displayData}
+        style={{ width: "40vw" }}
+        footer={renderFooter("displayData")}
+        onHide={() => {
+          setDisplayData(false);
+        }}
+      >
+        <Row className="ml-0 pt-0 fs-12">
+          <div className="col-8">
+            <label className="text-label">Tanggal Pembelian :</label>
+            <span className="ml-1">
+              <b>{formatDate(show.so_date)}</b>
+            </span>
+          </div>
+
+          <div className="col-4">
+            <label className="text-label">Jatuh Tempo :</label>
+            <span className="ml-1">
+              <b>{formatDate(show.due_date)}</b>
+            </span>
+          </div>
+
+          <Card className="col-12">
+            <div className="row">
+              <div className="col-8">
+                <label className="text-label">No. Pesanan :</label>
+                <span className="ml-1">
+                  <b>{show.so_code}</b>
+                </span>
+              </div>
+
+              <div className="col-4">
+                <label className="text-label">{ tr[localStorage.getItem("language")].customer}</label>
+                <div className="">
+                  <span className="ml-0">
+                    <b>{show.pel_id?.cus_name}</b>
+                  </span>
+                  <br />
+                  <span>{show.pel_id?.cus_address}</span>
+                  <br />
+                  <span>{show.pel_id?.cus_telp1}</span>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          <Row className="ml-1 mt-0">
+            <DataTable
+              className="display w-150 datatable-wrapper fs-12"
+              value={show?.sprod}
+            >
+              <Column
+                header= {tr[localStorage.getItem("language")].prod}
+                field={(e) => `${e.prod_id?.name} (${e.prod_id?.code})`}
+                style={{ minWidth: "10rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header={tr[localStorage.getItem("language")].jumlah}
+                field={(e) => e.order}
+                style={{ minWidth: "6rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header={tr[localStorage.getItem("language")].satuan}
+                field={(e) => e.unit_id?.name}
+                style={{ minWidth: "6rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header={tr[localStorage.getItem("language")].price}
+                field={(e) => formatIdr(e.price)}
+                style={{ minWidth: "10rem" }}
+                // body={loading && <Skeleton />}
+              />
+              <Column
+                header="Total"
+                field={(e) => formatIdr(e.total)}
+                style={{ minWidth: "8rem" }}
+                // body={loading && <Skeleton />}
+              />
+            </DataTable>
+          </Row>
+
+          {So.sjasa?.length ? (
+            <Row className="ml-1 mt-5">
+              <>
+                <DataTable
+                  className="display w-150 datatable-wrapper fs-12"
+                  value={show?.sjasa.map((v, i) => {
+                    return {
+                      ...v,
+                      index: i,
+                      total: v?.total ?? 0,
+                    };
+                  })}
+                >
+                  <Column
+                    header={ tr[localStorage.getItem("language")].pemasok}
+                    field={(e) => e.sup_id?.sup_name}
+                    style={{ minWidth: "15rem" }}
+                    // body={loading && <Skeleton />}
+                  />
+                  <Column
+                    header= {tr[localStorage.getItem("language")].jasa}
+                    field={(e) => e.jasa_id?.name}
+                    style={{ minWidth: "15rem" }}
+                    // body={loading && <Skeleton />}
+                  />
+                  <Column
+                    header="Total"
+                    field={(e) => formatIdr(e.total)}
+                    style={{ minWidth: "10rem" }}
+                    // body={loading && <Skeleton />}
+                  />
+                </DataTable>
+              </>
+              0
+            </Row>
+          ) : (
+            <></>
+          )}
+
+          <Row className="ml-0 mr-0 mb-0 mt-4 justify-content-between fs-12">
+            <div></div>
+            <div className="row justify-content-right col-6 mr-4">
+              <div className="col-12 mb-0">
+                <label className="text-label">
+                  <b>{tr[localStorage.getItem("language")].det_bayar}</b>
+                </label>
+                <Divider className="ml-12"></Divider>
+              </div>
+
+              <div className="col-5 mt-2">
+                <label className="text-label">
+                  {show.split_inv ? "Sub Total Barang" : "Subtotal"}
+                </label>
+              </div>
+
+              <div className="col-7 mt-2 text-right">
+                <label className="text-label">
+                  {show.split_inv ? (
+                    <b>
+                      Rp.
+                      {formatIdr(getSubTotalBarang())}
+                    </b>
+                  ) : (
+                    <b>
+                      Rp.
+                      {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
+                    </b>
+                  )}
+                </label>
+              </div>
+
+              <div className="col-5">
+                <label className="text-label">
+                  {show.split_inv ? "DPP Barang" : "DPP"}
+                </label>
+              </div>
+
+              <div className="col-7 text-right">
+                <label className="text-label">
+                  {show.split_inv ? (
+                    <b>
+                      Rp.
+                      {formatIdr(getSubTotalBarang())}
+                    </b>
+                  ) : (
+                    <b>
+                      Rp.
+                      {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
+                    </b>
+                  )}
+                </label>
+              </div>
+
+              <div className="col-5">
+                <label className="text-label">
+                  {show.split_inv ? tr[localStorage.getItem("language")].pjk_barang_11 : tr[localStorage.getItem("language")].pajak_11}
+                </label>
+              </div>
+
+              <div className="col-7 text-right">
+                <label className="text-label">
+                  {show.split_inv ? (
+                    <b>
+                      Rp.
+                      {formatIdr((getSubTotalBarang() * 11) / 100)}
+                    </b>
+                  ) : (
+                    <b>
+                      Rp.{" "}
+                      {formatIdr(
+                        ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
+                      )}
+                    </b>
+                  )}
+                </label>
+              </div>
+
+              <div className="col-5 mt-0">
+                <label className="text-label">{tr[localStorage.getItem("language")].disc_per}</label>
+              </div>
+
+              <div className="col-7 text-right">
+                <label className="text-label">
+                  <b>{show.total_disc !== null ? show.total_disc : 0}</b>
+                </label>
+              </div>
+
+              <div className="col-12">
+                <Divider className="ml-12"></Divider>
+              </div>
+
+              <div className="col-5">
+                <label className="text-label">
+                  <b>Total</b>
+                </label>
+              </div>
+
+              <div className="col-7">
+                <label className="text-label fs-13">
+                  {show.split_inv ? (
+                    <b>
+                      Rp.{" "}
+                      {formatIdr(
+                        getSubTotalBarang() + (getSubTotalBarang() * 11) / 100
+                      )}
+                    </b>
+                  ) : (
+                    <b>
+                      Rp.{" "}
+                      {formatIdr(
+                        getSubTotalBarang() +
+                          getSubTotalJasa() +
+                          ((getSubTotalBarang() + getSubTotalJasa()) * 11) / 100
+                      )}
+                    </b>
+                  )}
+                </label>
+              </div>
+            </div>
+          </Row>
+        </Row>
+      </Dialog>
+
+      <Dialog
+        header={tr[localStorage.getItem("language")].hapus_data}
         visible={displayDel}
         style={{ width: "30vw" }}
         footer={renderFooterDel("displayDel")}

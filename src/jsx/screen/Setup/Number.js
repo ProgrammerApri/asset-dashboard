@@ -73,7 +73,7 @@ const Number = () => {
   const romanNumeral = monthsInRomanNumerals[middle];
   const rpauto = useSelector((state) => state.rpauto.currentauto);
   const [currentRP, setCurrentRP] = useState([]);
-  const [currentData, setCurrentData] = useState(null);
+  const [currentData, setCurrentData] = useState(false);
   const dummy = Array.from({ length: 10 });
   const [accor, setAccor] = useState({
     aktiva: true,
@@ -637,7 +637,7 @@ const Number = () => {
   };
 
   const renderSettings = () => {
-    console.log("status", currentData && currentData.rp);
+    console.log("status", currentData && currentData.status_number_otomatis);
     return (
       <Accordion className="acordion" defaultActiveKey="0">
         <div className="accordion__item" key={1}>
@@ -670,10 +670,10 @@ const Number = () => {
                     <InputSwitch
                       className="mr-3"
                       inputId="email"
-                      checked={currentData && currentData.rp}
+                      checked={currentData && currentData.status_number_otomatis}
                       onChange={(e) => {
-                        setCurrentData({ ...currentData, rp: e.value });
-                        submitUpdate({ ...currentData, rp: e.value });
+                        setCurrentData({ ...currentData, status_number_otomatis: e.value });
+                        submitUpdate({ ...currentData, status_number_otomatis: e.value });
                       }}
                     />
                     <label className="mr-3 mt-1" htmlFor="email">
@@ -1023,7 +1023,7 @@ const Number = () => {
       <Toast ref={toast} />
       <Row>
         <Col className="col-lg-12 col-sm-12 col-xs-12">{renderSettings()}</Col>
-        {currentData?.rp == true ? (
+        {currentData?.status_number_otomatis == true ? (
           <Col className="col-lg-12 col-sm-12 col-xs-12">
             <div className="row">
               <div className="col-12">

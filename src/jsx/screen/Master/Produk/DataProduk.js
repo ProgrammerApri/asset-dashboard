@@ -61,7 +61,7 @@ const def = {
   ns: null,
   ket: null,
   suplier: null,
-  serialNumber: null,
+  // serialNumber: null,
 };
 
 const type = [
@@ -131,17 +131,18 @@ const DataProduk = ({
   const [active, setActive] = useState(0);
   const picker = useRef(null);
   const [file, setFile] = useState(null);
-  const [prodcode, setProdcode] = useState("");
+  // const [prodcode, setProdcode] = useState("");
   const [error, setError] = useState(defError);
   const progressBar = useRef(null);
-  const [number, setNumber] = useState("");
+  const [number, setNumber] = useState(0);
   const [progress, setProgress] = useState(0);
   const [detail, setDetail] = useState(null);
   const [showDetail, setShowDetail] = useState(false);
   const [expandedRows, setExpandedRows] = useState(null);
   const [loading, setLoading] = useState(true);
+  const profile = useSelector((state) => state.profile.profile);
   const dispatch = useDispatch();
-  const [lastSerialNumber, setLastSerialNumber] = useState("");
+  // const [lastSerialNumber, setLastSerialNumber] = useState("");
   const [isFetchingCode, setIsFetchingCode] = useState(false);
 
   useEffect(() => {
@@ -272,27 +273,25 @@ const DataProduk = ({
   // };
 
   const getCodeProd = async () => {
-    if (isFetchingCode) {
-      return;
-    }
-
-    setIsFetchingCode(true);
+    setLoading(true);
     const config = {
       ...endpoints.product_generate_code,
+      data: {},
     };
-
     try {
       console.log(config.data);
       let response = await request(null, config);
-      console.log("codeeeee");
+      console.log("code suplier");
       console.log(response);
+
       if (response.status) {
         const { data } = response;
-        setProdcode(data);
+        setNumber(data);
       }
     } catch (error) {
+      console.error(error);
     } finally {
-      setIsFetchingCode(false);
+      setLoading(false);
     }
   };
 
@@ -352,12 +351,37 @@ const DataProduk = ({
     } catch (error) {}
   };
 
+  const dept = (value) => {
+    let selected = {};
+    departement?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+      console.log("nama::", element.id);
+    });
+
+    return selected;
+  };
+
+  const generateCodePreview = () => {
+    let code = [];
+
+    if (currentItem?.group) {
+      code.push(checkGroup(currentItem.group).code);
+    }
+    code.push(checkDept(profile.previlage?.dep_id).ccost_code);
+    code.push(number);
+
+    return code.join("/");
+  };
+
   const editProduk = async (image) => {
     const config = {
       ...endpoints.editProduct,
       endpoint: endpoints.editProduct.endpoint + currentItem.id,
       data: {
         ...currentItem,
+        code: generateCodePreview(),
         image: image,
       },
     };
@@ -399,7 +423,8 @@ const DataProduk = ({
       ...endpoints.addProduct,
       data: {
         ...currentItem,
-        serialNumber: prodcode,
+        code: generateCodePreview(),
+        departement: profile.previlage?.dep_id,
         image: image,
       },
     };
@@ -547,11 +572,9 @@ const DataProduk = ({
         {/* {edit &&  */}
         <Link
           onClick={() => {
-            console.log("data");
             console.log(data);
             let suplier = data.suplier;
 
-            console.log("supplier", data.supplier);
             suplier?.forEach((element) => {
               element.sup_id = element.sup_id?.id ?? null;
             });
@@ -758,7 +781,7 @@ const DataProduk = ({
                   await getCodeProd();
                   setCurrentItem({
                     ...def,
-                    serialNumber: prodcode,
+                    // serialNumber: prodcode,
                     suplier: [
                       {
                         id: 0,
@@ -767,11 +790,6 @@ const DataProduk = ({
                       },
                     ],
                   });
-
-                  console.log(
-                    "Data yang ditampilkan di serialNumber:",
-                    prodcode
-                  );
 
                   setDisplayData(true);
                   onInput(true);
@@ -907,7 +925,7 @@ const DataProduk = ({
             name: el.name,
             exp_date: el.exp_date,
             departement: el.departement,
-            serialNumber: el.serialNumber,
+            // serialNumber: el.serialNumber,
             group: el.group_id,
             unit: el.unit_id,
             type: null,
@@ -1178,7 +1196,6 @@ const DataProduk = ({
   const checkDept = (value) => {
     let selected = {};
     departement?.forEach((element) => {
-      // console.log("hhhh", deptement);
       if (value === element?.id) {
         selected = element;
         console.log(selected);
@@ -1334,7 +1351,7 @@ const DataProduk = ({
   };
 
   const renderDialog = () => {
-    console.log("data :", currentItem);
+    console.log("data :", profile.previlage?.dep_id);
     return (
       <>
         <Toast ref={toast} />
@@ -1369,57 +1386,33 @@ const DataProduk = ({
                   <PrimeInput
                     label={tr[localStorage.getItem("language")].kd_prod}
                     value={
-                      currentItem?.code ??
-                      (currentItem?.code ||
-                        `${
-                          currentItem?.departement
-                            ? String(
-                                checkDept(currentItem.departement)?.ccost_code
-                              )
-                            : ""
-                        }${
-                          currentItem !== "" && currentItem?.group
-                            ? String(checkGroup(currentItem.group)?.code)
-                            : ""
-                        }${
-                          currentItem !== "" && currentItem.ns !== ""
-                            ? currentItem.ns === 1
-                              ? "S-"
-                              : currentItem.ns === 0
-                              ? "NS-"
-                              : currentItem.ns === 2
-                              ? "A-"
-                              : ""
-                            : ""
-                        }${prodcode}`) + ``
+                      !isEdit
+                        ? generateCodePreview(currentItem?.code)
+                        : currentItem?.code
                     }
                     placeholder={tr[localStorage.getItem("language")].masuk}
-                    error={error[0]?.code}
+                    // error={error[0]?.code}
                     disabled
                   />
                 </div>
 
-                <div className="col-4">
+                <div className="col-4" hidden>
                   <PrimeDropdown
                     label={"Nama Departement"}
-                    value={
-                      currentItem !== ""
-                        ? checkDept(currentItem.departement)
-                        : ""
-                    }
-                    options={departement}
-                    onChange={(e) => {
-                      setCurrentItem({
-                        ...currentItem,
-                        departement: e.value.id ?? "",
-                      });
-                    }}
-                    placeholder={tr[localStorage.getItem("language")].masuk}
-                    optionLabel="ccost_name"
-                    filter
-                    filterBy="ccost_name"
-                    errorMessage="Grup Produk Belum Dipilih"
-                    disabled={isEdit}
+                    value={profile.previlage?.dep_id}
+                    // options={departement}
+                    // onChange={(e) => {
+                    //   setCurrentItem({
+                    //     ...currentItem,
+                    //     departement: e.value.id ?? "",
+                    //   });
+                    // }}
+                    // placeholder={tr[localStorage.getItem("language")].masuk}
+                    // optionLabel="ccost_name"
+                    // filter
+                    // filterBy="ccost_name"
+                    // errorMessage="Grup Produk Belum Dipilih"
+                    // disabled={isEdit}
                   />
                 </div>
                 <div className="col-4">
@@ -1474,27 +1467,9 @@ const DataProduk = ({
                       let newError = error;
                       newError[0].name = false;
                       setError(newError);
-                      const generatedCode = `${
-                        currentItem?.departement &&
-                        checkDept(currentItem.departement)?.ccost_code
-                      }-${
-                        currentItem?.group &&
-                        checkGroup(currentItem?.group)?.code
-                      }-${
-                        currentItem !== "" && currentItem.ns !== ""
-                          ? currentItem.ns === 1
-                            ? "S-"
-                            : currentItem.ns === 0
-                            ? "NS-"
-                            : currentItem.ns === 2
-                            ? "A-"
-                            : ""
-                          : ""
-                      }${prodcode}`;
-                      console.log("generat", generatedCode);
+
                       setCurrentItem({
                         ...currentItem,
-                        code: generatedCode,
                         name: e.target.value,
                       });
                     }}

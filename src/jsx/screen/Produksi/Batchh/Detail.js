@@ -249,7 +249,11 @@ const Detail = ({ onCancel }) => {
                 <label className="text-label">Departemen</label>
                 <br></br>
                 <span className="ml-0 fs-14">
-                  <b>{`${show?.dep_id?.ccost_name} (${show?.dep_id?.ccost_code})`}</b>
+                  <b>
+                    {show?.dep_id
+                      ? `${show.dep_id.ccost_name} (${show.dep_id.ccost_code})`
+                      : ""}
+                  </b>
                 </span>
               </div>
 
@@ -310,7 +314,6 @@ const Detail = ({ onCancel }) => {
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
-
 
   const body = () => {
     return (
@@ -408,12 +411,13 @@ const Detail = ({ onCancel }) => {
                       <br></br>
                       <span className="ml-0">
                         Tanggal Rencana :{" "}
-                        <b>{formatDate(show?.plan_id?.date_planing)}</b>
+                        <b>{show?.plan_id?.date_planing || ""}</b>
                       </span>
+
                       <br></br>
                       <span className="ml-0">
                         Rencana Produksi :{" "}
-                        <b>{`${show?.plan_id?.total} (${show?.plan_id.unit.name})`}</b>
+                        <b>{`${show?.plan_id?.total} (${show?.product[0]?.unit_id?.name})`}</b>
                       </span>
                       <br></br>
                       <br></br>
@@ -436,10 +440,11 @@ const Detail = ({ onCancel }) => {
                     <>
                       <DataTable
                         value={show.product?.map((v, i) => {
+                          console.log("produk", v);
                           return {
                             ...v,
                             index: i,
-                            qty: v?.qty ?? 0,
+                            qty_form: v?.qty_making ?? 0,
                           };
                         })}
                         responsiveLayout="scroll"
@@ -458,7 +463,7 @@ const Detail = ({ onCancel }) => {
                         />
                         <Column
                           header="Jumlah"
-                          field={(e) => e.qty}
+                          field={(e) => e.qty_form}
                           style={{ minWidth: "6rem" }}
                           // body={loading && <Skeleton />}
                         />

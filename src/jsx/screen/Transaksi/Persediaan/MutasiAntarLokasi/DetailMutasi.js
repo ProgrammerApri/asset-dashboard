@@ -455,6 +455,7 @@ const DetailMutasi = ({ onCancel }) => {
                 <Row className="ml-1 mt-0">
                   <DataTable
                     value={show.mutasi?.map((v, i) => {
+                      console.log("mutasi data", v);
                       return {
                         ...v,
                         index: i,
@@ -487,7 +488,7 @@ const DetailMutasi = ({ onCancel }) => {
                     />
                     <Column
                       header="Kuantitas Diterima"
-                      field={(e) => formatIdr(e.qty_terima)}
+                      field={(e) => formatIdr(e.qty)}
                       style={{ minWidth: "13rem" }}
                       // body={loading && <Skeleton />}
                     />

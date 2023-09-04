@@ -45,7 +45,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
   const isEdit = useSelector((state) => state.pr.editPr);
   const dispatch = useDispatch();
   const [isRp, setRp] = useState(true);
-  const [numb, setNumb] = useState(null);
+  const [numb, setNumb] = useState(true);
   const [supplier, setSupplier] = useState(null);
   const [ppn, setPpn] = useState(null);
   const [currency, setCurrency] = useState(null);
@@ -152,7 +152,7 @@ const ReturBeliInput = ({ onCancel, onSuccess }) => {
 
         setNumb(data);
       }
-    } catch (error) {
+    } catch (error) {setNumb(false);
       console.error("Error:", error);
     }
   };

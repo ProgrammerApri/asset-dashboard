@@ -62,7 +62,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
   const [showLok, setShowLok] = useState(false);
   const [product, setProduct] = useState(null);
   const [proj, setProj] = useState(null);
-  const [numb, setNumb] = useState(null);
+  const [numb, setNumb] = useState(true);
   const [satuan, setSatuan] = useState(null);
   const [lokasi, setLokasi] = useState(null);
   const [acc, setAcc] = useState(null);
@@ -161,7 +161,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
 
         setNumb(data);
       }
-    } catch (error) {
+    } catch (error) {setNumb(false);
       console.error("Error:", error);
     }
   };
@@ -304,6 +304,7 @@ const KoreksiPersediaanInput = ({ onCancel, onSuccess }) => {
     };
     
     let response = null;
+    console.log("res we", ic);
     try {
       response = await request(null, config);
       

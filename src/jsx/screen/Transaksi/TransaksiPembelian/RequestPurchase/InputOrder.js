@@ -73,7 +73,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
   const product = useSelector((state) => state.product.list);
   const [satuan, setSatuan] = useState(null);
   const [supplier, setSupplier] = useState(null);
-  const [numb, setNumb] = useState(null);
+  const [numb, setNumb] = useState(true);
   const [doubleClick, setDoubleClick] = useState(false);
   const [lastNumber, setLastNumber] = useState("");
   const rp = useSelector((state) => state.rp.current);
@@ -136,7 +136,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
 
         setNumb(data);
       }
-    } catch (error) {
+    } catch (error) {setNumb(false);
       console.error("Error:", error);
     }
   };

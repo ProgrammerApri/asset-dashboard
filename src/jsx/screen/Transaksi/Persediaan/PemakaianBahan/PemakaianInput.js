@@ -49,7 +49,7 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
   const [showLok, setShowLok] = useState(false);
   const [product, setProduct] = useState(null);
   const [satuan, setSatuan] = useState(null);
-  const [numb, setNumb] = useState(null);
+  const [numb, setNumb] = useState(true);
   const [lokasi, setLokasi] = useState(null);
   const [acc, setAcc] = useState(null);
   const [accor, setAccor] = useState({
@@ -86,7 +86,7 @@ const PemakaianInput = ({ onCancel, onSuccess }) => {
 
         setNumb(data);
       }
-    } catch (error) {
+    } catch (error) {setNumb(false);
       console.error("Error:", error);
     }
   };

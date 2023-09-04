@@ -31,7 +31,7 @@ const BuatInvoicePJ = ({ onCancel, onSuccess }) => {
   const [order, setOrder] = useState(null);
   const [customer, setCustomer] = useState(null);
   const [supplier, setSupplier] = useState(null);
-  const [numb, setNumb] = useState(null);
+  const [numb, setNumb] = useState(true);
   const [pajak, setPajak] = useState(null);
   const [product, setProduct] = useState(null);
   const [jasa, setJasa] = useState(null);
@@ -164,7 +164,7 @@ const BuatInvoicePJ = ({ onCancel, onSuccess }) => {
 
         setNumb(data);
       }
-    } catch (error) {
+    } catch (error) {setNumb(false);
       console.error("Error:", error);
     }
   };

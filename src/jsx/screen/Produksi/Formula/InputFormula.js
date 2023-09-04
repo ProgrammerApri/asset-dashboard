@@ -54,7 +54,7 @@ const InputFormula = ({ onCancel, onSuccess }) => {
   const [showProd, setShowProd] = useState(false);
   const [showSatuan, setShowSatuan] = useState(false);
   const [reqForm, setReqForm] = useState(null);
-  const [numb, setNumb] = useState(null);
+  const [numb, setNumb] = useState(true);
   const product = useSelector((state) => state.product.list);
   const [satuan, setSatuan] = useState(null);
   const [active, setActive] = useState(0);
@@ -110,7 +110,7 @@ const InputFormula = ({ onCancel, onSuccess }) => {
 
         setNumb(data);
       }
-    } catch (error) {
+    } catch (error) {setNumb(false);
       console.error("Error:", error);
     }
   };

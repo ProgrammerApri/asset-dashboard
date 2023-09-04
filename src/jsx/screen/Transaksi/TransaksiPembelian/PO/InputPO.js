@@ -72,7 +72,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
   const [ppn, setPpn] = useState(null);
   const [currency, setCurrency] = useState(null);
   const [rp, setRequest] = useState(null);
-  const [numb, setNumb] = useState(null);
+  const [numb, setNumb] = useState(true);
   const [histori, setHistori] = useState(null);
   const [filtHis, setFiltHis] = useState([]);
   const [showSupplier, setShowSupplier] = useState(false);
@@ -190,7 +190,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
         setNumb(data);
       }
-    } catch (error) {
+    } catch (error) {setNumb(false);
       console.error("Error:", error);
     }
   };
@@ -261,8 +261,10 @@ const InputPO = ({ onCancel, onSuccess }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
+
         let filt = [];
         data.forEach((elem) => {
+
           if (isEdit) {
             let prod = [];
             elem.rprod.forEach((el) => {
@@ -347,12 +349,13 @@ const InputPO = ({ onCancel, onSuccess }) => {
           }
         });
         setRequest(filt);
-        console.log("repo :", filt);
       }
     } catch (error) {
       console.log(error);
     }
   };
+
+  console.log("data RP:",rp);
 
   const getProduct = async (ns) => {
     const config = {

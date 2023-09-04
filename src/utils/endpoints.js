@@ -1033,17 +1033,6 @@ const endpoints = {
     data: {},
   },
 
-  getcode_koreksi_per: {
-    endpoint: "/v1/api/koreksi-persediaan/code",
-    method: "GET",
-    data: {},
-  },
-
-  getstatus_koreksi_per: {
-    endpoint: "/v1/api/koreksi-persediaan/status",
-    method: "GET",
-    data: {},
-  },
 
   getcode_mutasi: {
     endpoint: "/v1/api/mutasi/code",
@@ -1706,6 +1695,16 @@ const endpoints = {
   },
 
   /// Mesin
+  code_mesin: {
+    endpoint: "/v1/api/mesin/code",
+    method: "GET",
+    data: {},
+  },
+  status_mesin: {
+    endpoint: "/v1/api/mesin/status",
+    method: "GET",
+    data: {},
+  },
   mesin: {
     endpoint: "/v1/api/mesin",
     method: "GET",
@@ -2028,7 +2027,22 @@ const endpoints = {
     method: "GET",
     data: {},
   },
-  korPer: {
+  addKorSto: {
+    endpoint: "/v1/api/koreksi-sto",
+    method: "POST",
+    data: {},
+  },
+  editKorSto: {
+    endpoint: "/v1/api/koreksi-sto/",
+    method: "PUT",
+    data: {},
+  },
+  delKorSto: {
+    endpoint: "/v1/api/koreksi-sto/",
+    method: "DELETE",
+    data: {},
+  },
+  getKorSto: {
     endpoint: "/v1/api/koreksi-sto",
     method: "GET",
     data: {},

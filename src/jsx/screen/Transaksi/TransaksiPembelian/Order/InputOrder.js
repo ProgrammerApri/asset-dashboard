@@ -69,7 +69,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
   const product = useSelector((state) => state.product.list);
   const [jasa, setJasa] = useState(null);
   const [satuan, setSatuan] = useState(null);
-  const [numb, setNumb] = useState(null);
+  const [numb, setNumb] = useState(true);
   const [lokasi, setLokasi] = useState(null);
   const [currency, setCur] = useState(null);
   const [setup, setSetup] = useState(null);
@@ -160,19 +160,17 @@ const InputOrder = ({ onCancel, onSuccess }) => {
       ...endpoints.getStatusGRA,
       data: {},
     };
-
     console.log("Data sebelum request:", config.data);
-
     let response = null;
     try {
       response = await request(null, config);
       console.log("Response:", response);
       if (response.status) {
         const { data } = response;
-
         setNumb(data);
       }
     } catch (error) {
+      setNumb(false);
       console.error("Error:", error);
     }
   };
@@ -1501,8 +1499,6 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                         value={e.prod_id && checkProd(e.prod_id)}
                         option={product}
                         onChange={(u) => {
-
-                      
                           // looping satuan
                           let sat = [];
                           satuan.forEach((element) => {
@@ -1525,11 +1521,6 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                               ? checkUnit(temp[e.index].unit_id)?.u_from?.code
                               : checkUnit(temp[e.index].unit_id)?.code;
                           updateORD({ ...order, dprod: temp });
-                          console.log("Unit_konv",temp[e.index].unit_konv =
-                      checkUnit(temp[e.index].unit_id)?.u_from !== null
-                        ? checkUnit(temp[e.index].unit_id)?.u_from?.code
-                        : checkUnit(temp[e.index].unit_id)?.code)
-
                           let newError = error;
                           newError.prod[e.index].id = false;
                           setError(newError);

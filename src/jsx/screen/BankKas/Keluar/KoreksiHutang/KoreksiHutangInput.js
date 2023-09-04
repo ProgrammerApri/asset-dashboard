@@ -41,7 +41,7 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
   const isEdit = useSelector((state) => state.kh.editKh);
   const dispatch = useDispatch();
   const [supplier, setSupplier] = useState(null);
-  const [numb, setNumb] = useState(null);
+  const [numb, setNumb] = useState(true);
   const [apcard, setApcard] = useState(null);
   const [curr, setCurrency] = useState(null);
   const [rp, setRequest] = useState(null);
@@ -122,7 +122,7 @@ const KoreksiAPInput = ({ onCancel, onSuccess }) => {
 
         setNumb(data);
       }
-    } catch (error) {
+    } catch (error) {setNumb(false);
       console.error("Error:", error);
     }
   };

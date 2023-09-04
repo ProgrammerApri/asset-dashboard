@@ -329,34 +329,88 @@ const Number = () => {
   };
 
   const handlePrefixChange = (modul, newPrefix) => {
-    setCurrentRP((prevRP) =>
-      prevRP.map((el) =>
-        el.modul === modul
-          ? {
-              ...el,
-              prefix: newPrefix,
-            }
-          : el
-      )
-    );
+    if (currentRP.some((e) => e.modul === modul)) {
+      setCurrentRP((prevRP) =>
+        prevRP.map((el) =>
+          el.modul === modul
+            ? {
+                ...el,
+                prefix: newPrefix,
+              }
+            : el
+        )
+      );
+    } else {
+      setCurrentRP([
+        ...currentRP,
+        ...[
+          {
+            prefix: newPrefix,
+            modul: modul,
+          },
+        ],
+      ]);
+    }
   };
+
   const handleDepPrefixChange = (modul, newDepPrefix) => {
-    setCurrentRP((prevRP) =>
-      prevRP.map((el) =>
-        el.modul === modul ? { ...el, dep_prefix: newDepPrefix } : el
-      )
-    );
+    if (currentRP.some((e) => e.modul === modul)) {
+      setCurrentRP((prevRP) =>
+        prevRP.map((el) =>
+          el.modul === modul ? { ...el, dep_prefix: newDepPrefix } : el
+        )
+      );
+    } else {
+      setCurrentRP([
+        ...currentRP,
+        ...[
+          {
+            dep_prefix: newDepPrefix,
+            modul: modul,
+          },
+        ],
+      ]);
+    }
   };
+
   const handleTahunChange = (modul, newTahun) => {
-    setCurrentRP((prevRP) =>
-      prevRP.map((el) => (el.modul === modul ? { ...el, tahun: newTahun } : el))
-    );
+    if (currentRP.some((e) => e.modul === modul)) {
+      setCurrentRP((prevRP) =>
+        prevRP.map((el) =>
+          el.modul === modul ? { ...el, tahun: newTahun } : el
+        )
+      );
+    } else {
+      setCurrentRP([
+        ...currentRP,
+        ...[
+          {
+            tahun: newTahun,
+            modul: modul,
+          },
+        ],
+      ]);
+    }
   };
 
   const handleBulanChange = (modul, newBulan) => {
-    setCurrentRP((prevRP) =>
-      prevRP.map((el) => (el.modul === modul ? { ...el, bulan: newBulan } : el))
-    );
+    if (currentRP.some((e) => e.modul === modul)) {
+      setCurrentRP((prevRP) =>
+        prevRP.map((el) =>
+          el.modul === modul ? { ...el, bulan: newBulan } : el
+        )
+      );
+    } else {
+      setCurrentRP([
+        ...currentRP,
+        ...[
+          {
+            bulan: newBulan,
+            modul: modul,
+          },
+        ],
+      ]);
+    }
   };
 
   const handleStatusChange = (status_aktif) => {
@@ -366,11 +420,23 @@ const Number = () => {
   };
 
   const handleres_bulananChange = (modul, newres_bulanan) => {
-    setCurrentRP((prevRP) =>
-      prevRP.map((el) =>
-        el.modul === modul ? { ...el, res_bulan: newres_bulanan } : el
-      )
-    );
+    if (currentRP.some((e) => e.modul === modul)) {
+      setCurrentRP((prevRP) =>
+        prevRP.map((el) =>
+          el.modul === modul ? { ...el, res_bulan: newres_bulanan } : el
+        )
+      );
+    } else {
+      setCurrentRP([
+        ...currentRP,
+        ...[
+          {
+            res_bulan: newres_bulanan,
+            modul: modul,
+          },
+        ],
+      ]);
+    }
   };
 
   const handleNumberChange = (modul, newNumber) => {
@@ -382,11 +448,23 @@ const Number = () => {
     const leadingZeroes = "0".repeat(leadingZeroesCount);
     const finalNumber = leadingZeroes + formattedNumber;
 
-    setCurrentRP((prevRP) =>
-      prevRP.map((el) =>
-        el.modul === modul ? { ...el, number: finalNumber } : el
-      )
-    );
+    if (currentRP.some((e) => e.modul === modul)) {
+      setCurrentRP((prevRP) =>
+        prevRP.map((el) =>
+          el.modul === modul ? { ...el, number: finalNumber } : el
+        )
+      );
+    } else {
+      setCurrentRP([
+        ...currentRP,
+        ...[
+          {
+            number: finalNumber,
+            modul: modul,
+          },
+        ],
+      ]);
+    }
   };
 
   const dept = (value) => {
@@ -670,10 +748,18 @@ const Number = () => {
                     <InputSwitch
                       className="mr-3"
                       inputId="email"
-                      checked={currentData && currentData.status_number_otomatis}
+                      checked={
+                        currentData && currentData.status_number_otomatis
+                      }
                       onChange={(e) => {
-                        setCurrentData({ ...currentData, status_number_otomatis: e.value });
-                        submitUpdate({ ...currentData, status_number_otomatis: e.value });
+                        setCurrentData({
+                          ...currentData,
+                          status_number_otomatis: e.value,
+                        });
+                        submitUpdate({
+                          ...currentData,
+                          status_number_otomatis: e.value,
+                        });
                       }}
                     />
                     <label className="mr-3 mt-1" htmlFor="email">

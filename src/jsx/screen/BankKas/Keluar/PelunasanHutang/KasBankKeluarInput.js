@@ -67,7 +67,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
   const [supplier, setSupplier] = useState(null);
   const [allSup, setAllSup] = useState(null);
   const [faktur, setFaktur] = useState(null);
-  const [numb, setNumb] = useState(null);
+  const [numb, setNumb] = useState(true);
   const [apcard, setAP] = useState(null);
   const [dept, setDept] = useState(null);
   const [proj, setProj] = useState(null);
@@ -358,7 +358,7 @@ const KasBankOutInput = ({ onCancel, onSuccess }) => {
 
         setNumb(data);
       }
-    } catch (error) {
+    } catch (error) {setNumb(false);
       console.error("Error:", error);
     }
   };

@@ -78,9 +78,9 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
   const [customer, setCustomer] = useState(null);
   const [project, setProject] = useState(null);
   const [subCus, setSubCus] = useState(null);
-  const [supplier, setSupplier] = useState(null);
-  const [numb, setNumb] = useState(null);
+  const [numb, setNumb] = useState(true);
   const [rulesPay, setRulesPay] = useState(null);
+  const [supplier, setSupplier] = useState(null);
   const [ppn, setPpn] = useState(null);
   const [salesman, setSalesman] = useState(null);
   const [so, setSO] = useState(null);
@@ -329,7 +329,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
 
         setNumb(data);
       }
-    } catch (error) {
+    } catch (error) {setNumb(false);
       console.error("Error:", error);
     }
   };

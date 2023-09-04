@@ -51,7 +51,7 @@ const PenerimaanInput = ({ onCancel, onSuccess }) => {
   const [satuan, setSatuan] = useState(null);
   const [lokasi, setLokasi] = useState(null);
   const [pb, setPb] = useState(null);
-  const [numb, setNumb] = useState(null);
+  const [numb, setNumb] = useState(true);
   const [accor, setAccor] = useState({
     produk: true,
   });
@@ -144,7 +144,7 @@ const PenerimaanInput = ({ onCancel, onSuccess }) => {
 
         setNumb(data);
       }
-    } catch (error) {
+    } catch (error) {setNumb(false);
       console.error("Error:", error);
     }
   };

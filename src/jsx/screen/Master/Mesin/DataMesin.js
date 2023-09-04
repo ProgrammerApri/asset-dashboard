@@ -55,6 +55,7 @@ const DataMesin = ({
   const isEdit = useSelector((state) => state.msn.editMsn);
   const [isEditt, setEdit] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [numb, setNumb] = useState(true);
   const [update, setUpdate] = useState(false);
   const [displayData, setDisplayData] = useState(false);
   const [displayDel, setDisplayDel] = useState(false);
@@ -71,6 +72,7 @@ const DataMesin = ({
 
   useEffect(() => {
     initFilters1();
+    getStatus()
   }, []);
 
   const editMesin = async () => {
@@ -160,6 +162,30 @@ const DataMesin = ({
       }
     }
   };
+  const getStatus = async () => {
+    const config = {
+      ...endpoints.status_mesin,
+      data: {},
+    };
+
+    console.log( config.data);
+
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log("Response:", response);
+      if (response.status) {
+        const { data } = response;
+
+        setNumb(data);
+      }
+    } catch (error) {
+
+      setNumb(false);
+      console.error("Error:", error);
+    }
+  };
+
 
   const delDataMesin = async (id) => {
     setLoading(true);
@@ -614,6 +640,8 @@ const DataMesin = ({
                 }}
                 placeholder="Masukan Kode Mesin"
                 error={error?.code}
+
+              disabled={numb}
               />
             </div>
 

@@ -1,10 +1,9 @@
-import { SET_CURRENT_IC, SET_EDIT_IC, SET_IC } from "../actions";
-
+import { SET_CURRENT_IC, SET_IC, SET_EDIT_IC } from "../actions";
 
 const initialState = {
   ic: [],
   current: {},
-  editIc: false
+  editIc: false,
 };
 
 const ICReducer = (state = initialState, { type, payload }) => {
@@ -19,11 +18,11 @@ const ICReducer = (state = initialState, { type, payload }) => {
         ...state,
         ic: payload,
       };
-      case SET_EDIT_IC:
-        return {
-          ...state,
-          editIc: payload,
-        };
+    case SET_EDIT_IC:
+      return {
+        ...state,
+        editIc: payload,
+      };
 
     default:
       return state;

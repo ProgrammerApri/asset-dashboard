@@ -76,7 +76,7 @@ const InputRA = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
   const [product, setProd] = useState(null);
   const [satuan, setSatuan] = useState(null);
   const [customer, setCustomer] = useState(null);
-  const [numb, setNumb] = useState(null);
+  const [numb, setNumb] = useState(true);
   const [doubleClick, setDoubleClick] = useState(false);
   const recAct = useSelector((state) => state.recAct.current);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -119,7 +119,7 @@ const InputRA = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
 
         setNumb(data);
       }
-    } catch (error) {
+    } catch (error) {setNumb(false);
       console.error("Error:", error);
     }
   };

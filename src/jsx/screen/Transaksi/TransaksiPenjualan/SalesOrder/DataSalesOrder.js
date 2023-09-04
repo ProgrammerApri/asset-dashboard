@@ -100,6 +100,71 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
     }
   };
 
+  const getSoCode = async () => {
+    // setLoading(true);
+    const config = {
+      ...endpoints.getcode_SO,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const kode = response.data;
+        onAdd();
+        dispatch({
+          type: SET_CURRENT_SO,
+          payload: {
+            ...data,
+            so_code:kode,
+            sub_addr: false,
+            split_inv: false,
+            sprod: [
+              {
+                id: 0,
+                prod_id: null,
+                unit_id: null,
+                location: null,
+                rak_aktif: null,
+                rak_id: null,
+                request: null,
+                stock: null,
+                order: null,
+                remain: null,
+                konv_qty: 0,
+                unit_konv: null,
+                price: null,
+                price_idr: 0,
+                disc: null,
+                nett_price: null,
+                total_fc: 0,
+                total: null,
+              },
+            ],
+            sjasa: [
+              {
+                id: 0,
+                jasa_id: null,
+                sup_id: null,
+                unit_id: null,
+                qty: null,
+                price: null,
+                price_idr: 0,
+                disc: null,
+                total_fc: 0,
+                total: null,
+              },
+            ],
+          },
+        });
+      }
+    } catch (error) {}
+  };
+
+
+
   const getSetup = async (isUpdate = false) => {
     setLoading(true);
     const config = {
@@ -484,6 +549,7 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
+            getSoCode()
             dispatch({
               type: SET_EDIT_SO,
               payload: false,

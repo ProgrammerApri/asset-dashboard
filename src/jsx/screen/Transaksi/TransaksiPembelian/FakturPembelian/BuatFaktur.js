@@ -107,7 +107,7 @@ const BuatFaktur = ({ onCancel, onSuccess }) => {
 
         setNumb(data);
       }
-    } catch (error) {
+    } catch (error) {setNumb(false);
       console.error("Error:", error);
     }
   };

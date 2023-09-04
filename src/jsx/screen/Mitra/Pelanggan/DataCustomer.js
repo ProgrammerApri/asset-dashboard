@@ -878,7 +878,6 @@ const DataCustomer = ({
   };
 
   const generateCodePreview = () => {
-   
     let code = [];
 
     if (currentItem?.customer?.cus_kode_country) {
@@ -974,8 +973,6 @@ const DataCustomer = ({
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
-
- 
 
   const checkCurrency = (value) => {
     let selected = {};
@@ -1381,54 +1378,54 @@ const DataCustomer = ({
                 <Divider className="mb-2 ml-3 mr-3"></Divider>
               </div>
 
-              <div className="col-12">
-                <div className="d-flex flex-column">
-                  <label className="text-label">Negara</label>
-                  <div className="d-flex align-items-center">
-                    <Checkbox
-                      className="mr-2"
-                      checked={currentItem?.customer?.cus_kode_country}
-                      onChange={(e) => {
-                        setCurrentItem({
-                          ...currentItem,
-                          customer: {
-                            ...currentItem.customer,
-                            cus_kode_country: e.target.checked,
-                          },
-                        });
-                      }}
-                    />
-                    <div className="justify-content-center flex-grow-1 ml-2">
-                      <Dropdown
-                        value={
-                          currentItem &&
-                          currentItem?.customer?.cus_country !== null
-                            ? checkCountry(currentItem?.customer?.cus_country)
-                            : null
-                        }
+              <div className="row ml-0 mt-0">
+                <div className="col-6 ">
+                  <div className="d-flex flex-column">
+                    <label className="text-label">Negara</label>
+                    <div className="d-flex align-items-center">
+                      <Checkbox
+                        className="mr-2"
+                        checked={currentItem?.customer?.cus_kode_country}
                         onChange={(e) => {
-                          console.log("Selected country:", e.value.name);
                           setCurrentItem({
                             ...currentItem,
                             customer: {
                               ...currentItem.customer,
-                              cus_country: e.value.name,
+                              cus_kode_country: e.target.checked,
                             },
                           });
                         }}
-                        options={countries}
-                        optionLabel="name"
-                        placeholder="Select a Country"
-                        filter
-                        className="w-full"
                       />
+                      <div className="justify-content-center flex-grow-1 ml-2">
+                        <Dropdown
+                          value={
+                            currentItem &&
+                            currentItem?.customer?.cus_country !== null
+                              ? checkCountry(currentItem?.customer?.cus_country)
+                              : null
+                          }
+                          onChange={(e) => {
+                            console.log("Selected country:", e.value.name);
+                            setCurrentItem({
+                              ...currentItem,
+                              customer: {
+                                ...currentItem.customer,
+                                cus_country: e.value.name,
+                              },
+                            });
+                          }}
+                          options={countries}
+                          optionLabel="name"
+                          placeholder="Select a Country"
+                          filter
+                          className="w-full"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="row mr-0 ml-0">
-                <div className="col-12">
+                <div className="col-6">
                   <PrimeInput
                     label={tr[localStorage.getItem("language")].alamat}
                     value={

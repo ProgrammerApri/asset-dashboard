@@ -51,7 +51,7 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
   const [showDep, setShowDep] = useState(false);
   const [account, setAccount] = useState(null);
   const [dept, setDept] = useState(null);
-  const [numb, setNumb] = useState(null);
+  const [numb, setNumb] = useState(true);
   const [currency, setCurrency] = useState(null);
   const [active, setActive] = useState(0);
   const [state, setState] = useState(0);
@@ -114,7 +114,7 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
 
         setNumb(data);
       }
-    } catch (error) {
+    } catch (error) {setNumb(false);
       console.error("Error:", error);
     }
   };

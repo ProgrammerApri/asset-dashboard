@@ -48,10 +48,47 @@ const KoreksiPersediaanList = ({ onAdd, onEdit }) => {
     getKorSto();
   }, []);
 
+
+  const getKorCode = async () => {
+    // setLoading(true);
+    const config = {
+      ...endpoints.getKorper,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const kode = response.data;
+        onAdd();
+        dispatch({
+          type: SET_CURRENT_IC,
+          payload: {
+            ...data,
+            code:kode,
+            kprod: [
+              {
+                id: 0,
+                prod_id: null,
+                unit_id: null,
+                dbcr: null,
+                location: null,
+                qty: null,
+              },
+            ],
+          },
+        });
+      }
+    } catch (error) {}
+  };
+
+
   const getKorSto = async (isUpdate = false) => {
     setLoading(true);
     const config = {
-      ...endpoints.korPer,
+      ...endpoints.getKorSto,
       data: {},
     };
     console.log(config.data);
@@ -74,47 +111,6 @@ const KoreksiPersediaanList = ({ onAdd, onEdit }) => {
     }
   };
 
-  const getCoderp = async () => {
-    setLoading(true);
-    const config = {
-      ...endpoints.getKorper,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const kode = response.data;
-        onAdd();
-        dispatch({
-          type: SET_CURRENT_IC,
-          payload: {
-            ...data,
-            code: kode,
-            kprod: [
-              {
-                id: 0,
-                prod_id: null,
-                unit_id: null,
-                dbcr: null,
-                location: null,
-                qty: null,
-              },
-            ],
-          },
-        });
-      }
-
-      setLoading(false);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const renderHeader = () => {
     return (
       <div className="flex justify-content-between">
@@ -131,7 +127,7 @@ const KoreksiPersediaanList = ({ onAdd, onEdit }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
-            getCoderp();
+            getKorCode()
             dispatch({
               type: SET_EDIT_IC,
               payload: false,

@@ -39,7 +39,6 @@ const def = [
     number: "",
     modul: "",
     aktif: false,
-    status_aktif: false,
   },
 ];
 
@@ -204,8 +203,7 @@ const Number = () => {
     number,
     format_kode,
     modul,
-    aktif,
-    status_aktif
+    aktif
   ) => {
     const config = {
       ...endpoints.addNumber,
@@ -219,7 +217,6 @@ const Number = () => {
         number: number ?? null,
         modul: modul ?? null,
         aktif: aktif ? false : true,
-        status_aktif: status_aktif ?? false,
       },
     };
     console.log("post");
@@ -300,8 +297,7 @@ const Number = () => {
     number,
     format_kode,
     modul,
-    aktif,
-    status_aktif
+    aktif
   ) => {
     if (isEdit) {
     } else {
@@ -314,8 +310,7 @@ const Number = () => {
         number,
         format_kode,
         modul,
-        aktif,
-        status_aktif
+        aktif
       );
     }
   };
@@ -356,12 +351,6 @@ const Number = () => {
   const handleBulanChange = (modul, newBulan) => {
     setCurrentRP((prevRP) =>
       prevRP.map((el) => (el.modul === modul ? { ...el, bulan: newBulan } : el))
-    );
-  };
-
-  const handleStatusChange = (status_aktif) => {
-    setCurrentRP((prevRP) =>
-      prevRP.map((el) => ({ ...el, status_aktif: status_aktif }))
     );
   };
 
@@ -426,6 +415,7 @@ const Number = () => {
   };
 
   const renderInputtext = (label, modul = "") => {
+    console.log("dododol",  modul );
     const isButtonActive = currentRP.some(
       (el) => el.modul === modul && el.aktif
     );
@@ -604,8 +594,7 @@ const Number = () => {
                           currentRP.find((el) => el.modul === modul)
                         ),
                         modul,
-                        currentRP.some((el) => el.modul === modul && el.aktif),
-                        currentRP.some((el) => el.status_aktif)
+                        currentRP.some((el) => el.modul === modul && el.aktif)
                       );
 
                       console.log("kirim 1", aktifValue);
@@ -637,7 +626,6 @@ const Number = () => {
   };
 
   const renderSettings = () => {
-    console.log("status", currentData && currentData.status_number_otomatis);
     return (
       <Accordion className="acordion" defaultActiveKey="0">
         <div className="accordion__item" key={1}>
@@ -670,10 +658,18 @@ const Number = () => {
                     <InputSwitch
                       className="mr-3"
                       inputId="email"
-                      checked={currentData && currentData.status_number_otomatis}
+                      checked={
+                        currentData && currentData.status_number_otomatis
+                      }
                       onChange={(e) => {
-                        setCurrentData({ ...currentData, status_number_otomatis: e.value });
-                        submitUpdate({ ...currentData, status_number_otomatis: e.value });
+                        setCurrentData({
+                          ...currentData,
+                          status_number_otomatis: e.value,
+                        });
+                        submitUpdate({
+                          ...currentData,
+                          status_number_otomatis: e.value,
+                        });
                       }}
                     />
                     <label className="mr-3 mt-1" htmlFor="email">
@@ -689,52 +685,9 @@ const Number = () => {
     );
   };
 
-  // const renderAktiva = (modul) => {
-  //   return (
-  //     <Accordion className="col-lg-12 col-sm-12 col-xs-12" defaultActiveKey="0">
-  //       <div className="accordion__item" key={0}>
-  //         <Accordion.Toggle
-  //           as={Card.Text}
-  //           eventKey="0"
-  //           className={`accordion__header ${accor.aktiva ? "collapsed" : ""}`}
-  //           onClick={() => {
-  //             setAccor((prevAccor) => ({
-  //               ...prevAccor,
-  //               aktiva: !prevAccor.aktiva,
-  //             }));
-  //           }}
-  //         >
-  //           <span className="accordion__header--text">
-  //             Mau mengaktifkan Penomoran Otomatis?
-  //           </span>
-  //           <span className="accordion__header--indicator indicator_bordered"></span>
-  //         </Accordion.Toggle>
-  //         <Accordion.Collapse eventKey="0">
-  //           <div className="accordion__body--text">
-  //             <div className="d-flex col-12 align-items-center">
-  //               <Col className="mr-0 ml-0 ">
-  //                 {renderInput("Aktifkan fitur penomoran otomatis")}
-
-  //                 {/* <InputSwitch
-  //                   className="mr-3"
-  //                   checked={!currentRP?.some(
-  //                     (el) => el.modul === modul && el.status_aktif
-  //                   )}
-  //                   onChange={(e) => handleStatusChange(modul, e.value)}
-  //                 />
-  //                 <label className="mr-3 mt-1" htmlFor="email">
-  //                   Aktifkan fitur penomoran otomatis
-  //                 </label> */}
-  //               </Col>
-  //             </div>
-  //           </div>
-  //         </Accordion.Collapse>
-  //       </div>
-  //     </Accordion>
-  //   );
-  // };
-
   const renderPurchase = () => {
+    console.log("asem",
+    renderInputtext());
     return (
       <Accordion
         className=" col-lg-12 col-sm-12 col-xs-12"
@@ -762,7 +715,7 @@ const Number = () => {
           <Accordion.Collapse eventKey={"0"}>
             <div className="accordion__body--text">
               <Col className="mr-0 ml-0 ">
-                {renderInputtext("Purchase Request", "rp", false)}
+                {renderInputtext("Purchase Request", "rp")}
                 {renderInputtext("Purchase Order", "po")}
                 {renderInputtext("Purchase", "gra")}
                 {renderInputtext("Purchase Invoice", "ip")}

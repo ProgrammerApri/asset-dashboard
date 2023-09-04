@@ -67,7 +67,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
   const [satuan, setSatuan] = useState(null);
   const [mesin, setMesin] = useState(null);
   const [formula, setFormula] = useState(null);
-  const [numb, setNumb] = useState(null);
+  const [numb, setNumb] = useState(true);
   const [dept, setDept] = useState(null);
   const [lokasi, setLokasi] = useState(null);
   const [workCen, setWorkCen] = useState(null);
@@ -116,10 +116,12 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
             filt.push(elem);
           }
         });
-        setFormula(filt);
+        setFormula(data);
       }
     } catch (error) {}
   };
+  
+  console.log("data formula",formula);
   const getStatus = async () => {
     const config = {
       ...endpoints.planning_status,
@@ -137,7 +139,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
 
         setNumb(data);
       }
-    } catch (error) {
+    } catch (error) {setNumb(false);
       console.error("Error:", error);
     }
   };
@@ -572,6 +574,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
   };
 
   const body = () => {
+    console.log("formula",plan.form_id !== null);
     return (
       <>
         {/* Put content body here */}

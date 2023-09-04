@@ -69,7 +69,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
   const [customer, setCustomer] = useState(null);
   const [allCus, setAllCus] = useState(null);
   const [arcard, setAR] = useState(null);
-  const [numb, setNumb] = useState(null);
+  const [numb, setNumb] = useState(true);
   const [dept, setDept] = useState(null);
   const [proj, setProj] = useState(null);
   const [showSupplier, setShowSupplier] = useState(false);
@@ -181,7 +181,7 @@ const KasBankInInput = ({ onCancel, onSuccess }) => {
 
         setNumb(data);
       }
-    } catch (error) {
+    } catch (error) {setNumb(false);
       console.error("Error:", error);
     }
   };

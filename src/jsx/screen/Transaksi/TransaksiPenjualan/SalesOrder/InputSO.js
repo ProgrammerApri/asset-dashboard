@@ -90,6 +90,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
   const [customer, setCustomer] = useState(null);
   const [subCus, setSubCus] = useState(null);
   const [sto, setSto] = useState(null);
+  const [numb, setNumb] = useState(true);
   const [stcard, setStCard] = useState(null);
   const [currency, setCur] = useState(null);
   const [error, setError] = useState(defError);
@@ -110,6 +111,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
     getProduk();
     getSupplier();
     getSatuan();
+    getStatus();
     getRulesPay();
     getPpn();
     getCustomer();
@@ -269,6 +271,29 @@ const InputSO = ({ onCancel, onSuccess }) => {
     }
 
     return valid;
+  };
+  const getStatus = async () => {
+    const config = {
+      ...endpoints.getStatusSO,
+      data: {},
+    };
+
+    console.log( config.data);
+
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log("Response:", response);
+      if (response.status) {
+        const { data } = response;
+
+        setNumb(data);
+      }
+    } catch (error) {
+
+      setNumb(false);
+      console.error("Error:", error);
+    }
   };
 
   const editSO = async () => {
@@ -862,7 +887,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
               }}
               placeholder={tr[localStorage.getItem("language")].masuk}
               error={error?.code}
-              disabled={isEdit}
+              disabled={numb}
             />
           </div>
 

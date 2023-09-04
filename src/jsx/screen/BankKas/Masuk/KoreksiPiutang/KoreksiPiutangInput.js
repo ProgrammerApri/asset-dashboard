@@ -40,7 +40,7 @@ const KoreksiARInput = ({ onCancel, onSuccess }) => {
   const kp = useSelector((state) => state.kp.current);
   const isEdit = useSelector((state) => state.kp.editKp);
   const dispatch = useDispatch();
-  const [numb, setNumb] = useState(null);
+  const [numb, setNumb] = useState(true);
   const [ar, setAr] = useState(null);
   const [customer, setCustomer] = useState(null);
   const [acc, setAcc] = useState(null);
@@ -77,7 +77,7 @@ const KoreksiARInput = ({ onCancel, onSuccess }) => {
 
         setNumb(data);
       }
-    } catch (error) {
+    } catch (error) {setNumb(false);
       console.error("Error:", error);
     }
   };

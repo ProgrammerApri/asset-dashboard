@@ -55,7 +55,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
   const [showLok, setShowLok] = useState(false);
   const [showLoks, setShowLoks] = useState(false);
   const [product, setProduct] = useState(null);
-  const [numb, setNumb] = useState(null);
+  const [numb, setNumb] = useState(true);
   const [proj, setProj] = useState(null);
   const [satuan, setSatuan] = useState(null);
   const [lokasi, setLokasi] = useState(null);
@@ -175,7 +175,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
 
         setNumb(data);
       }
-    } catch (error) {
+    } catch (error) {setNumb(false);
       console.error("Error:", error);
     }
   };

@@ -59,7 +59,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showSup, setShowSup] = useState(false);
   const [showProd, setShowProd] = useState(false);
-  const [numb, setNumb] = useState(null);
+  const [numb, setNumb] = useState(true);
   const [showSatuan, setShowSatuan] = useState(false);
   const [showWorkCen, setShowWorkCen] = useState(false);
   const [showType, setShowType] = useState(false);
@@ -127,7 +127,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
 
         setNumb(data);
       }
-    } catch (error) {
+    } catch (error) {setNumb(false);
       console.error("Error:", error);
     }
   };

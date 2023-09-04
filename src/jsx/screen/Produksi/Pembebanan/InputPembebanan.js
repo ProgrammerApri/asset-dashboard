@@ -40,7 +40,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const toast = useRef(null);
   const [active, setActive] = useState(0);
-  const [numb, setNumb] = useState(null);
+  const [numb, setNumb] = useState(true);
   const [doubleClick, setDoubleClick] = useState(false);
   const pbb = useSelector((state) => state.pbb.current);
   const isEdit = useSelector((state) => state.pbb.editPBB);
@@ -101,7 +101,7 @@ const InputPembebanan = ({ onCancel, onSuccess }) => {
 
         setNumb(data);
       }
-    } catch (error) {
+    } catch (error) {setNumb(false);
       console.error("Error:", error);
     }
   };

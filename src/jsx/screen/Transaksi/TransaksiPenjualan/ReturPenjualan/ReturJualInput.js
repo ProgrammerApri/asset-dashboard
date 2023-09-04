@@ -43,7 +43,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
   const [comp, setComp] = useState(null);
   const [customer, setCustomer] = useState(null);
   const [ppn, setPpn] = useState(null);
-  const [numb, setNumb] = useState(null);
+  const [numb, setNumb] = useState(true);
   const [sale, setSale] = useState(null);
   const [showSupplier, setShowSupplier] = useState(false);
   const [showSatuan, setShowSatuan] = useState(false);
@@ -144,7 +144,7 @@ const ReturJualInput = ({ onCancel, onSuccess }) => {
 
         setNumb(data);
       }
-    } catch (error) {
+    } catch (error) {setNumb(false);
       console.error("Error:", error);
     }
   };

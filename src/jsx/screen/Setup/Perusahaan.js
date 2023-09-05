@@ -43,6 +43,7 @@ const data = {
   rp: false,
   status_number_otomatis: false,
   over_po: false,
+  rak_option: false,
   cutoff: null,
   year_co: null,
 };
@@ -413,7 +414,11 @@ const Perusahaan = () => {
                       <div className="col-12 mb-3">
                         <img
                           className="cp-logo"
-                          src={ApiConfig.baseUrl +endpoints.getImage.endpoint + currentData.cp_logo}
+                          src={
+                            ApiConfig.baseUrl +
+                            endpoints.getImage.endpoint +
+                            currentData.cp_logo
+                          }
                           alt=""
                         />
                       </div>
@@ -476,7 +481,9 @@ const Perusahaan = () => {
                   }}
                 >
                   <span className="accordion__header--icon"></span>
-                  <span className="accordion__header--text">Approval</span>
+                  <span className="accordion__header--text">
+                    Setting Transaksi
+                  </span>
                   <span className="accordion__header--indicator indicator_bordered"></span>
                 </Accordion.Toggle>
                 <Accordion.Collapse eventKey={"0"}>
@@ -538,6 +545,24 @@ const Perusahaan = () => {
                       />
                       <label className="mr-3 mt-1" htmlFor="email">
                         {"Approval Pembayaran"}
+                      </label>
+                    </div>
+
+                    <div className="d-flex col-12 align-items-center">
+                      <InputSwitch
+                        className="mr-3"
+                        inputId="email"
+                        checked={currentData && currentData.rak_option}
+                        onChange={(e) => {
+                          setCurrentData({
+                            ...currentData,
+                            rak_option: e.value,
+                          });
+                          submitUpdate(false, { ...currentData, rak_option: e.value });
+                        }}
+                      />
+                      <label className="mr-3 mt-1" htmlFor="email">
+                        {"Aktifkan Rak Untuk Semua Transaksi"}
                       </label>
                     </div>
                   </div>

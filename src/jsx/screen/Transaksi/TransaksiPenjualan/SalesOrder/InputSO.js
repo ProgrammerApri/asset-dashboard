@@ -1299,6 +1299,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
+                    hidden
                     header={"Rak Aktif"}
                     className="align-text-top"
                     field={""}
@@ -1323,6 +1324,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
+                  hidden={!setup?.rak_option}
                     header={"Rak"}
                     className="align-text-top"
                     field={""}
@@ -1359,7 +1361,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                         filterBy={"rak_name"}
                         placeholder={tr[localStorage.getItem("language")].pilih}
                         showClear
-                        disabled={!e.rak_aktif}
+                        // disabled={!e.rak_aktif}
                       />
                     )}
                   />

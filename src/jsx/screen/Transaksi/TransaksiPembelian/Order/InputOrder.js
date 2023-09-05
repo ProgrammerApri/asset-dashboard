@@ -240,8 +240,9 @@ const InputOrder = ({ onCancel, onSuccess }) => {
           if (isEdit) {
             let prod = [];
             elem.pprod.forEach((el) => {
-              el.prod_id = el.prod_id.id;
-              el.unit_id = el.unit_id.id;
+              el.prod_id = el.prod_id?.id ?? null;
+              el.unit_id = el.unit_id?.id ?? null;
+              el.rak_id = el.rak_id?.id ?? null;
               prod.push({
                 ...el,
                 r_remain: el.remain,
@@ -285,6 +286,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                 if (el.remain > 0) {
                   el.prod_id = el.prod_id.id;
                   el.unit_id = el.unit_id.id;
+                  el.rak_id = el.rak_id.id;
                   prod.push({
                     ...el,
                     r_remain: el.remain,
@@ -1169,6 +1171,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                             total: 0,
                             total_fc: 0,
                             location: null,
+                            rak_opt: v?.rak_opt ?? false,
+                            rak_id: v?.rak_id ?? null,
                           };
                         })
                       : [
@@ -1184,6 +1188,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                             total_fc: 0,
                             total: null,
                             location: null,
+                            rak_opt: null,
+                            rak_id: null,
                           },
                         ],
                     djasa: e.value?.id
@@ -1639,6 +1645,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
+                    hidden
                     header={"Rak Aktif"}
                     className="align-text-top"
                     field={""}
@@ -1663,6 +1670,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
+                  hidden={!setup?.rak_option}
                     header={"Rak"}
                     className="align-text-top"
                     field={""}
@@ -1699,7 +1707,6 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                         filterBy={"rak_name"}
                         placeholder={tr[localStorage.getItem("language")].pilih}
                         showClear
-                        disabled={!e.rak_opt}
                       />
                     )}
                   />
@@ -1745,7 +1752,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                     field={""}
                     body={(e) => (
                       <PrimeNumber
-                        prc
+                        price
                         value={e.req && e.req}
                         onChange={(u) => {
                           let temp = [...order.dprod];
@@ -1869,7 +1876,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                     body={(e) => (
                       <div className="p-inputgroup">
                         <PrimeNumber
-                          prc
+                          price
                           value={e.remain ? e.remain : ""}
                           placeholder="0"
                           type="number"

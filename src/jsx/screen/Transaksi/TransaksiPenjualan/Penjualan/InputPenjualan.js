@@ -329,7 +329,8 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
 
         setNumb(data);
       }
-    } catch (error) {setNumb(false);
+    } catch (error) {
+      setNumb(false);
       console.error("Error:", error);
     }
   };
@@ -1734,6 +1735,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
+                    hidden
                     header={"Rak Aktif"}
                     className="align-text-top"
                     field={""}
@@ -1758,6 +1760,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
+                  hidden={!setup?.rak_option}
                     header={"Rak"}
                     className="align-text-top"
                     field={""}
@@ -1794,7 +1797,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         filterBy={"rak_name"}
                         placeholder={tr[localStorage.getItem("language")].pilih}
                         showClear
-                        disabled={sale.so_id || !e.rak_aktif}
+                        // disabled={sale.so_id || !e.rak_aktif}
                       />
                     )}
                   />

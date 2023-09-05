@@ -136,11 +136,11 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
 
         setNumb(data);
       }
-    } catch (error) {setNumb(false);
+    } catch (error) {
+      setNumb(false);
       console.error("Error:", error);
     }
   };
-
 
   const editRp = async () => {
     const config = {
@@ -360,6 +360,12 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
     return [year, month, day].join("-");
   };
 
+  const formatIdr = (value) => {
+    return `${value?.toFixed(2)}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
   const updateRp = (e) => {
     dispatch({
       type: SET_CURRENT_RP,
@@ -477,7 +483,7 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
           <div className="col-4">
             <PrimeInput
               label={tr[localStorage.getItem("language")].kd_req}
-              value={rp.req_code }
+              value={rp.req_code}
               onChange={(e) => {
                 updateRp({ ...rp, req_code: e.target.value });
                 let newError = error;
@@ -496,7 +502,6 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
               error={error?.code}
               disabled={numb}
               // disabled={rp.req_code !== null && rp.req_code !== undefined && rp.req_code !== ''}
- 
             />
           </div>
 
@@ -597,16 +602,20 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                   </label>
                 </div>
 
-                <div className="col-3">
+                <div className="col-2">
                   <label className="text-label">
                     {tr[localStorage.getItem("language")].qty}
                   </label>
                 </div>
 
-                <div className="col-4">
+                <div className="col-3">
                   <label className="text-label">
                     {tr[localStorage.getItem("language")].satuan}
                   </label>
+                </div>
+
+                <div className="col-2">
+                  <label className="text-label">{"Konversi Qty"}</label>
                 </div>
 
                 <div className="col-12">
@@ -643,6 +652,11 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                           let temp = [...rp.rprod];
                           temp[i].prod_id = e.id;
                           temp[i].unit_id = e.unit?.id;
+                          temp[i].konv_qty = 0;
+                          temp[i].unit_konv =
+                            checkUnit(temp[i].unit_id)?.u_from !== null
+                              ? checkUnit(temp[i].unit_id)?.u_from?.code
+                              : checkUnit(temp[i].unit_id)?.code;
                           updateRp({ ...rp, rprod: temp });
 
                           let newError = error;
@@ -656,14 +670,16 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                       />
                     </div>
 
-                    <div className="col-3">
-                      <PrimeInput
-                        number
+                    <div className="col-2">
+                      <PrimeNumber
+                        price
                         value={v.request && v.request}
                         onChange={(e) => {
                           console.log(e);
                           let temp = [...rp.rprod];
                           temp[i].request = e.value;
+                          temp[i].konv_qty =
+                            e?.value * checkUnit(temp[i].unit_id)?.qty;
                           updateRp({ ...rp, rprod: temp });
 
                           let newError = error;
@@ -672,12 +688,12 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                         }}
                         placeholder="0"
                         // type="number"
-                        useGrouping
+                        // useGrouping
                         error={error?.prod[i]?.jum}
                       />
                     </div>
 
-                    <div className="col-4">
+                    <div className="col-3">
                       <CustomDropdown
                         value={v.unit_id && checkUnit(v.unit_id)}
                         option={satuan}
@@ -686,14 +702,24 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                           setCurrentIndex(i);
                           setShowSatuan(true);
                         }}
-                        onChange={(e) => {
+                        onChange={(t) => {
                           let temp = [...rp.rprod];
-                          temp[i].unit_id = e.id;
+                          temp[i].unit_id = t?.id ?? null;
+                          temp[i].konv_qty =
+                            temp[i].request * t?.qty;
+                          temp[i].unit_konv =
+                            t?.u_from !== null ? t?.u_from?.code : t?.code;
                           updateRp({ ...rp, rprod: temp });
                         }}
                         label={"[name]"}
                         placeholder={tr[localStorage.getItem("language")].pilih}
                       />
+                    </div>
+
+                    <div className="col-2">
+                      <label className="ml-1 mt-2">{`${formatIdr(
+                        v?.konv_qty ?? 0
+                      )} (${v?.unit_konv ?? ""})`}</label>
                     </div>
 
                     <div className="col-1 d-flex ml-0 mr-0">
@@ -710,6 +736,8 @@ const InputOrder = ({ onCancel, onSuccess, onFail, onFailAdd }) => {
                                     prod_id: null,
                                     unit_id: null,
                                     request: null,
+                                    konv_qty: null,
+                                    unit_konv: null,
                                     non_stok: i.non_stok,
                                   },
                                 ],

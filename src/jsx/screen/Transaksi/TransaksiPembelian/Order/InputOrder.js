@@ -13,7 +13,12 @@ import { InputSwitch } from "primereact/inputswitch";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import CustomAccordion from "src/jsx/components/Accordion/Accordion";
-import { SET_CURRENT_ODR, SET_PRODUCT } from "src/redux/actions";
+import {
+  SET_CURRENT_ODR,
+  SET_FILT_RAK,
+  SET_PRODUCT,
+  SET_RAK,
+} from "src/redux/actions";
 import DataSupplier from "src/jsx/screen/Mitra/Pemasok/DataPemasok";
 import DataRulesPay from "src/jsx/screen/MasterLainnya/RulesPay/DataRulesPay";
 import DataProduk from "src/jsx/screen/Master/Produk/DataProduk";
@@ -72,6 +77,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
   const [numb, setNumb] = useState(true);
   const [lokasi, setLokasi] = useState(null);
   const [currency, setCur] = useState(null);
+  // const rak = useSelector((state) => state.rak.rak);
+  const [rak, setRak] = useState(null);
   const [setup, setSetup] = useState(null);
   const [grupP, setGrupP] = useState(null);
   const [apCard, setApCard] = useState(null);
@@ -126,6 +133,9 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     getCur();
     getSetup();
     getApCard();
+    // if (isEdit) {
+    getRak();
+    // }
   }, []);
 
   const editODR = async () => {
@@ -152,26 +162,6 @@ const InputOrder = ({ onCancel, onSuccess }) => {
           life: 3000,
         });
       }, 500);
-    }
-  };
-
-  const getStatus = async () => {
-    const config = {
-      ...endpoints.getStatusGRA,
-      data: {},
-    };
-    console.log("Data sebelum request:", config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log("Response:", response);
-      if (response.status) {
-        const { data } = response;
-        setNumb(data);
-      }
-    } catch (error) {
-      setNumb(false);
-      console.error("Error:", error);
     }
   };
 
@@ -211,6 +201,26 @@ const InputOrder = ({ onCancel, onSuccess }) => {
           });
         }, 500);
       }
+    }
+  };
+
+  const getStatus = async () => {
+    const config = {
+      ...endpoints.getStatusGRA,
+      data: {},
+    };
+    console.log("Data sebelum request:", config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log("Response:", response);
+      if (response.status) {
+        const { data } = response;
+        setNumb(data);
+      }
+    } catch (error) {
+      setNumb(false);
+      console.error("Error:", error);
     }
   };
 
@@ -507,6 +517,38 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
+  const getRak = async (loc) => {
+    const config = {
+      ...endpoints.getRak,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        let filt = [];
+
+        data?.forEach((element) => {
+          if (element?.lokasi_rak === loc) {
+            filt.push(element);
+          }
+        });
+
+        setRak(data);
+        // dispatch({
+        //   type: SET_RAK,
+        //   payload: data,
+        // });
+        // dispatch({
+        //   type: SET_FILT_RAK,
+        //   payload: data.filter((v) => v.lokasi_rak === loc),
+        // });
+      }
+    } catch (error) {}
+  };
+
   const getSetup = async () => {
     const config = {
       ...endpoints.getCompany,
@@ -645,6 +687,17 @@ const InputOrder = ({ onCancel, onSuccess }) => {
   const checkLoc = (value) => {
     let selected = {};
     lokasi?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkRak = (value) => {
+    let selected = {};
+    rak?.forEach((element) => {
       if (value === element.id) {
         selected = element;
       }
@@ -1550,8 +1603,20 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                       <CustomDropdown
                         value={e.location && checkLoc(e.location)}
                         onChange={(u) => {
+                          let filtRak = [];
                           let temp = [...order.dprod];
                           temp[e.index].location = u.id;
+
+                          // rak?.forEach((element) => {
+                          //   if (element?.lokasi_rak === temp[e.index].location) {
+                          //     filtRak.push(element);
+                          //   }
+                          // console.log("lsjdsk");
+                          // console.log(element?.lokasi_rak );
+                          // });
+
+                          // getRak(u.id);
+
                           updateORD({ ...order, dprod: temp });
 
                           let newError = error;
@@ -1569,6 +1634,72 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                         }}
                         errorMessage="Lokasi Belum Dipilih"
                         error={error?.prod[e.index]?.lok}
+                      />
+                    )}
+                  />
+
+                  <Column
+                    header={"Rak Aktif"}
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "6rem",
+                    }}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputSwitch
+                          className="ml-0"
+                          checked={e.rak_opt ?? false}
+                          onChange={(u) => {
+                            let temp = [...order.dprod];
+                            temp[e.index].rak_opt = u?.value;
+                            temp[e.index].rak_id = null;
+                            updateORD({ ...order, dprod: temp });
+                          }}
+                          disabled={e?.location == null}
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header={"Rak"}
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "10rem",
+                    }}
+                    body={(e) => (
+                      <PrimeDropdown
+                        value={e.rak_id && checkRak(e.rak_id)}
+                        onChange={(u) => {
+                          // let st = 0;
+
+                          // sto?.forEach((element) => {
+                          //   if (
+                          //     element.loc_id === u.id &&
+                          //     element.id === sale?.jprod[e.index].prod_id
+                          //   ) {
+                          //     st = element.stock;
+                          //   }
+                          // });
+
+                          let temp = [...order.dprod];
+                          temp[e.index].rak_id = u?.value?.id ?? null;
+                          // temp[e.index].stock = st;
+                          updateORD({ ...order, dprod: temp });
+
+                          // let newError = error;
+                          // newError.prod[e.index].lok = false;
+                          // setError(newError);
+                        }}
+                        options={rak}
+                        optionLabel={"rak_name"}
+                        filter
+                        filterBy={"rak_name"}
+                        placeholder={tr[localStorage.getItem("language")].pilih}
+                        showClear
+                        disabled={!e.rak_opt}
                       />
                     )}
                   />
@@ -1784,7 +1915,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                               null
                           ) {
                             temp[e.index].total_fc =
-                              temp[e.index].order * temp[e.index].price;
+                              temp[e.index].konv_qty * temp[e.index].price;
 
                             temp[e.index].total =
                               temp[e.index].total_fc * curConv();
@@ -1792,7 +1923,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                             temp[e.index].idr = u?.value * curConv();
                           } else {
                             temp[e.index].total =
-                              temp[e.index].order * temp[e.index].price;
+                              temp[e.index].konv_qty * temp[e.index].price;
                           }
 
                           updateORD({
@@ -1984,6 +2115,9 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                           id: 0,
                           prod_id: null,
                           unit_id: null,
+                          location: null,
+                          rak_opt: null,
+                          rak_id: null,
                           request: null,
                           order: null,
                           remain: null,

@@ -1118,7 +1118,7 @@ const DataCustomer = ({
               : tr[localStorage.getItem("language")].add_data
           }
           visible={showInput}
-          style={{ width: "50vw" }}
+          style={{ width: "50vw", height: "40vw" }}
           footer={renderFooter()}
           onHide={() => {
             onHideInput();
@@ -1227,6 +1227,9 @@ const DataCustomer = ({
                     />
                   </div>
                 </div>
+              </div>
+
+              <div className="row mr-0 ml-0">
                 <div className="col-6">
                   <PrimeDropdown
                     label={tr[localStorage.getItem("language")].currency}
@@ -1252,9 +1255,7 @@ const DataCustomer = ({
                     placeholder={tr[localStorage.getItem("language")].pilih}
                   />
                 </div>
-              </div>
 
-              <div className="row mr-0 ml-0">
                 <div className="col-4">
                   <PrimeNumber
                     label={"NPWP"}
@@ -1953,7 +1954,7 @@ const DataCustomer = ({
           header={"Data Customer"}
           visible={show}
           footer={() => <div></div>}
-          style={{ width: "60vw" }}
+          style={{ width: "50vw", height: "40vw" }}
           onHide={onHide}
         >
           <Row className="ml-0 mr-0">

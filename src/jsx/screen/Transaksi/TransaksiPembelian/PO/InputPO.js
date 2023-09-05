@@ -268,8 +268,8 @@ const InputPO = ({ onCancel, onSuccess }) => {
           if (isEdit) {
             let prod = [];
             elem.rprod.forEach((el) => {
-              el.prod_id = el.prod_id.id;
-              el.unit_id = el.unit_id.id;
+              el.prod_id = el.prod_id?.id ?? null;
+              el.unit_id = el.unit_id?.id ?? null;
               prod.push({
                 ...el,
                 r_remain: el.remain,
@@ -279,6 +279,8 @@ const InputPO = ({ onCancel, onSuccess }) => {
               po.pprod.forEach((e, i) => {
                 if (el.id == e.rprod_id) {
                   temp[i].request = el.request;
+                  temp[i].konv_qty = el.konv_qty;
+                  temp[i].unit_konv = el.unit_konv;
                   temp[i].r_remain = el.remain + e.order;
                   temp[i].remain = el.remain;
                   updatePo({ ...po, pprod: temp });
@@ -724,6 +726,11 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
   const formatIdr = (value) => {
     return `${value}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+  const formatIdrToFixed = (value) => {
+    return `${value?.toFixed(2)}`
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
@@ -1193,36 +1200,6 @@ const InputPO = ({ onCancel, onSuccess }) => {
                                 minWidth: "20rem",
                               }}
                               body={(e) => (
-                                // <div className="flex">
-                                //   <div className="col-2 ml-0 p-2">
-                                //     <RadioButton
-                                //       inputId="binary"
-                                //       checked={po && po.check}
-                                //       onChange={(e) => {
-                                //         let temp = [...po.pprod];
-
-                                //         po.psup?.forEach((element, i) => {
-                                //           temp[e.index]?.prod_id.forEach(
-                                //             (elem) => {
-                                //               if (elem === element.prod_id) {
-                                //                 temp[e.index].price =
-                                //                   element.price[i];
-                                //               }
-                                //               console.log("ckckc");
-                                //               console.log(elem);
-                                //             }
-                                //           );
-                                //         });
-
-                                //         updatePo({
-                                //           ...po,
-                                //           check: e.target.value,
-                                //           pprod: temp,
-                                //         });
-                                //       }}
-                                //     />
-                                //   </div>
-                                //   {/* <div className="col-10 ml-0 p-0"> */}
                                 <CustomDropdown
                                   value={e.sup_id && supp(e.sup_id)}
                                   option={supplier}
@@ -1256,8 +1233,6 @@ const InputPO = ({ onCancel, onSuccess }) => {
                                     setShowSupp(true);
                                   }}
                                 />
-                                // {/* </div> */}
-                                // </div>
                               )}
                             />
 
@@ -1563,10 +1538,6 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     return {
                       ...v,
                       index: i,
-                      // order: v?.order ?? 0,
-                      // price: v?.price ?? 0,
-                      // disc: v?.disc ?? 0,
-                      // total: v?.total ?? 0,
                     };
                   })}
                   className="display w-150 datatable-wrapper header-white no-border"
@@ -1600,10 +1571,15 @@ const InputPO = ({ onCancel, onSuccess }) => {
                           let temp = [...po.pprod];
                           temp[e.index].prod_id = t.id;
                           temp[e.index].unit_id = t.unit?.id;
+                          temp[e.index].konv_qty = 0;
+                          temp[e.index].unit_konv =
+                            checkUnit(temp[e.index].unit_id)?.u_from !== null
+                              ? checkUnit(temp[e.index].unit_id)?.u_from?.code
+                              : checkUnit(temp[e.index].unit_id)?.code;
                           updatePo({ ...po, pprod: temp });
                         }}
                         placeholder={tr[localStorage.getItem("language")].pilih}
-                        label={"[name]"}
+                        label={"[name] ([code])"}
                         detail
                         onDetail={() => {
                           setCurrentIndex(e.index);
@@ -1642,33 +1618,6 @@ const InputPO = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header={tr[localStorage.getItem("language")].sat}
-                    className="align-text-top"
-                    field={""}
-                    // style={{
-                    //   width: "8rem",
-                    // }}
-                    body={(e) => (
-                      <CustomDropdown
-                        value={e.unit_id && checkUnit(e.unit_id)}
-                        onChange={(t) => {
-                          let temp = [...po.pprod];
-                          temp[e.index].unit_id = t.id;
-                          updatePo({ ...po, pprod: temp });
-                        }}
-                        option={satuan}
-                        label={"[name]"}
-                        placeholder={tr[localStorage.getItem("language")].pilih}
-                        detail
-                        onDetail={() => {
-                          setCurrentIndex(e.index);
-                          setShowSatuan(true);
-                        }}
-                      />
-                    )}
-                  />
-
-                  <Column
                     header={tr[localStorage.getItem("language")].req}
                     className="align-text-top"
                     field={""}
@@ -1678,11 +1627,11 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     body={(e) => (
                       <div className="p-inputgroup">
                         <PrimeNumber
-                          prc
+                          price
                           value={e.request ? e.request : ""}
                           onChange={(t) => {
                             let temp = [...po.pprod];
-                            temp[e.index].request = t.target.value;
+                            temp[e.index].request = t?.value;
                             updatePo({ ...po, pprod: temp });
                             console.log(temp);
                           }}
@@ -1702,7 +1651,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     // }}
                     body={(e) => (
                       <PrimeNumber
-                        prc
+                        price
                         value={e.order ? e.order : null}
                         onChange={(t) => {
                           let temp = [...po.pprod];
@@ -1710,16 +1659,18 @@ const InputPO = ({ onCancel, onSuccess }) => {
                           let result =
                             temp[e.index].order - val + temp[e.index].remain;
                           temp[e.index].order = val;
+                          temp[e.index].konv_qty =
+                            t?.value * checkUnit(temp[e.index].unit_id)?.qty;
 
                           if (supp(po.sup_id)?.supplier?.sup_curren !== null) {
                             temp[e.index].total_fc =
-                              temp[e.index].order * temp[e.index].price;
+                              temp[e.index].konv_qty * temp[e.index].price;
 
                             temp[e.index].total =
                               temp[e.index].total_fc * curConv();
                           } else {
                             temp[e.index].total =
-                              temp[e.index].order * temp[e.index].price;
+                              temp[e.index].konv_qty * temp[e.index].price;
                           }
                           temp[e.index].remain = result;
                           updatePo({
@@ -1756,13 +1707,61 @@ const InputPO = ({ onCancel, onSuccess }) => {
                     body={(e) => (
                       <div className="p-inputgroup">
                         <PrimeNumber
-                          prc
+                          price
                           value={e.remain ? e.remain : ""}
                           placeholder="0"
                           type="number"
                           disabled
                         />
                       </div>
+                    )}
+                  />
+
+                  <Column
+                    header={tr[localStorage.getItem("language")].sat}
+                    className="align-text-top"
+                    field={""}
+                    // style={{
+                    //   width: "8rem",
+                    // }}
+                    body={(e) => (
+                      <CustomDropdown
+                        value={e.unit_id && checkUnit(e.unit_id)}
+                        onChange={(t) => {
+                          let temp = [...po.pprod];
+                          temp[e.index].unit_id = t.id;
+                          temp[e.index].konv_qty = temp[e.index].order * t?.qty;
+                          temp[e.index].unit_konv =
+                            t?.u_from !== null ? t?.u_from?.code : t?.code;
+                          temp[e.index].price = null;
+                          temp[e.index].total = null;
+                          updatePo({ ...po, pprod: temp });
+                        }}
+                        option={satuan}
+                        label={"[name] ([code])"}
+                        placeholder={tr[localStorage.getItem("language")].pilih}
+                        detail
+                        onDetail={() => {
+                          setCurrentIndex(e.index);
+                          setShowSatuan(true);
+                        }}
+                      />
+                    )}
+                  />
+
+                  <Column
+                    header={"Konversi Qty"}
+                    className="align-text-top"
+                    style={{
+                      minWidth: "8rem",
+                    }}
+                    field={""}
+                    body={(e) => (
+                      <>
+                        <label className="ml-1">{`${formatIdrToFixed(
+                          e?.konv_qty ?? 0
+                        )} (${e?.unit_konv ?? ""})`}</label>
+                      </>
                     )}
                   />
 
@@ -1784,7 +1783,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                               supp(po.sup_id)?.supplier?.sup_curren !== null
                             ) {
                               temp[e.index].total_fc =
-                                temp[e.index].order * temp[e.index].price;
+                                temp[e.index].konv_qty * temp[e.index].price;
 
                               temp[e.index].total =
                                 temp[e.index].total_fc * curConv();
@@ -1792,7 +1791,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                               temp[e.index].idr = t.target.value * curConv();
                             } else {
                               temp[e.index].total =
-                                temp[e.index].order * temp[e.index].price;
+                                temp[e.index].konv_qty * temp[e.index].price;
                             }
                             updatePo({
                               ...po,
@@ -1826,13 +1825,13 @@ const InputPO = ({ onCancel, onSuccess }) => {
                               supp(po.sup_id)?.supplier?.sup_curren !== null
                             ) {
                               temp[e.index].total_fc =
-                                temp[e.index].order * temp[e.index].price;
+                                temp[e.index].konv_qty * temp[e.index].price;
 
                               temp[e.index].total =
                                 temp[e.index].total_fc * curConv();
                             } else {
                               temp[e.index].total =
-                                temp[e.index].order * temp[e.index].price;
+                                temp[e.index].konv_qty * temp[e.index].price;
                             }
                             updatePo({
                               ...po,
@@ -2013,6 +2012,8 @@ const InputPO = ({ onCancel, onSuccess }) => {
                                   rprod_id: null,
                                   unit_id: null,
                                   order: null,
+                                  konv_qty: null,
+                                  unit_konv: null,
                                   price: null,
                                   disc: null,
                                   nett_price: null,

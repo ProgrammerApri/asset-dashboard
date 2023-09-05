@@ -1672,7 +1672,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                           setError(newError);
                         }}
                         placeholder={tr[localStorage.getItem("language")].pilih}
-                        label={"[name]"}
+                        label={"[name] ([code])"}
                         detail
                         onDetail={() => {
                           setCurrentIndex(e.index);
@@ -1719,7 +1719,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                           setError(newError);
                         }}
                         option={lokasi}
-                        label={"[name]"}
+                        label={"[name] ([code])"}
                         placeholder={tr[localStorage.getItem("language")].pilih}
                         detail
                         onDetail={() => {
@@ -1751,7 +1751,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                             temp[e.index].rak_id = null;
                             updateSL({ ...sale, jprod: temp });
                           }}
-                          disabled={sale?.so_id}
+                          disabled={sale?.so_id || e?.location == null}
                         />
                       </div>
                     )}

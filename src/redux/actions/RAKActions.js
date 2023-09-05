@@ -1,5 +1,6 @@
 export const SET_CURRENT_RAK = "rak.SET_CURRENT_RAK"
 export const SET_RAK = "rak.SET_RAK"
+export const SET_FILT_RAK = "rak.SET_FILT_RAK"
 export const RESET_CURRENT_RAK= "rak.RESET_CURRENT_RAK"
 export const UPDATE_CURRENT_RAK = "rak.UPDATE_CURRENT_RAK"
 export const SET_EDIT_RAK = "rak.SET_EDIT_RAK"

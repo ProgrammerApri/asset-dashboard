@@ -135,9 +135,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     getStoLoc();
     getSetup();
     getArCard();
-    if (isEdit) {
-      getRak();
-    }
+    getRak();
   }, []);
 
   const isValid = () => {
@@ -673,15 +671,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
 
       if (response.status) {
         const { data } = response;
-        let filt = [];
-        data?.forEach((element) => {
-          sale?.jprod?.forEach((elem) => {
-            if (element?.lokasi_rak === elem?.location) {
-              filt.push(element);
-            }
-          });
-        });
-        setRak(filt);
+        setRak(data);
       }
     } catch (error) {}
   };
@@ -1713,8 +1703,6 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                           temp[e.index].stock = st;
                           updateSL({ ...sale, jprod: temp });
 
-                          getRak();
-
                           let newError = error;
                           newError.prod[e.index].lok = false;
                           setError(newError);
@@ -1760,7 +1748,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                  hidden={!setup?.rak_option}
+                    hidden={!setup?.rak_option}
                     header={"Rak"}
                     className="align-text-top"
                     field={""}
@@ -1791,7 +1779,9 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                           // newError.prod[e.index].lok = false;
                           // setError(newError);
                         }}
-                        options={rak}
+                        options={rak.filter(
+                          (el) => el?.lokasi_rak == e.location
+                        )}
                         optionLabel={"rak_name"}
                         filter
                         filterBy={"rak_name"}

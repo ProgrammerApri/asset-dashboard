@@ -885,7 +885,7 @@ const DataSalesOrder = ({ onAdd, onEdit, onDetail }) => {
                 responsiveLayout="scroll"
                 value={loading ? dummy : So}
                 className="display w-150 datatable-wrapper"
-                // showGridlines
+                showGridlines
                 dataKey="id"
                 rowHover
                 header={renderHeader}

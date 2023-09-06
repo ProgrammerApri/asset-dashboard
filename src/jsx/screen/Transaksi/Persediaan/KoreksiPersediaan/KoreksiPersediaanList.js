@@ -217,7 +217,7 @@ const KoreksiPersediaanList = ({ onAdd, onEdit }) => {
     setLoading(true);
     const config = {
       ...endpoints.delKorSto,
-      endpoint: endpoints.delKorHut.endpoint + currentItem.id,
+      endpoint: endpoints.delKorSto.endpoint + currentItem.id,
     };
     console.log(config.data);
     let response = null;

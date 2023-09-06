@@ -29,7 +29,9 @@ const data = {
   mtsi_code: null,
   mtsi_date: null,
   loc_from: null,
+  rak_from: null,
   loc_to: null,
+  rak_to: null,
   dep_id: null,
   prj_id: null,
   doc: null,
@@ -53,6 +55,7 @@ const MutasiAntarList = ({ onAdd, onEdit, onDetail, onSuccess, onCancel }) => {
   const [pusatBiaya, setPusatBiaya] = useState(null);
   const [proj, setProj] = useState(null);
   const [lokasi, setLokasi] = useState(null);
+  const [rak, setRak] = useState(null);
   const [loading, setLoading] = useState(true);
   const [filters1, setFilters1] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
@@ -73,6 +76,7 @@ const MutasiAntarList = ({ onAdd, onEdit, onDetail, onSuccess, onCancel }) => {
     getSatuan();
     getPusatBiaya();
     getLokasi();
+    getRak();
     getProj();
   }, []);
 
@@ -229,6 +233,23 @@ const MutasiAntarList = ({ onAdd, onEdit, onDetail, onSuccess, onCancel }) => {
         const { data } = response;
 
         setLokasi(data);
+      }
+    } catch (error) {}
+  };
+
+  const getRak = async () => {
+    const config = {
+      ...endpoints.getRak,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+
+        setRak(data);
       }
     } catch (error) {}
   };
@@ -434,7 +455,9 @@ const MutasiAntarList = ({ onAdd, onEdit, onDetail, onSuccess, onCancel }) => {
               payload: {
                 ...data,
                 loc_from: data?.loc_from?.id ?? null,
+                rak_from: data?.rak_from?.id ?? null,
                 loc_to: data?.loc_to?.id ?? null,
+                rak_to: data?.rak_to?.id ?? null,
                 dep_id: data?.dep_id?.id ?? null,
                 prj_id: data?.prj_id?.id ?? null,
                 approve: false,
@@ -453,9 +476,7 @@ const MutasiAntarList = ({ onAdd, onEdit, onDetail, onSuccess, onCancel }) => {
               },
             });
           }}
-          className={`btn ${
-            data.post === false ? "" : "disabled"
-          } btn-primary shadow btn-xs sharp ml-1`}
+          className={`btn btn-primary shadow btn-xs sharp ml-1`}
         >
           <i className="fa fa-pencil"></i>
         </Link>
@@ -466,9 +487,7 @@ const MutasiAntarList = ({ onAdd, onEdit, onDetail, onSuccess, onCancel }) => {
             setDisplayDel(true);
             setCurrentItem(data);
           }}
-          className={`btn ${
-            data.post === false ? "" : "disabled"
-          } btn-danger shadow btn-xs sharp ml-1`}
+          className={`btn btn-danger shadow btn-xs sharp ml-1`}
         >
           <i className="fa fa-trash"></i>
         </Link>
@@ -496,7 +515,9 @@ const MutasiAntarList = ({ onAdd, onEdit, onDetail, onSuccess, onCancel }) => {
                 payload: {
                   ...data,
                   loc_from: data?.loc_from?.id ?? null,
+                  rak_from: data?.rak_from?.id ?? null,
                   loc_to: data?.loc_to?.id ?? null,
+                  rak_to: data?.rak_to?.id ?? null,
                   dep_id: data?.dep_id?.id ?? null,
                   prj_id: data?.prj_id?.id ?? null,
                   approve: true,
@@ -694,6 +715,17 @@ const MutasiAntarList = ({ onAdd, onEdit, onDetail, onSuccess, onCancel }) => {
     return selected;
   };
 
+  const checkRak = (value) => {
+    let selected = {};
+    rak?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
   const updateLM = (e) => {
     dispatch({
       type: SET_CURRENT_LM,
@@ -877,6 +909,20 @@ const MutasiAntarList = ({ onAdd, onEdit, onDetail, onSuccess, onCancel }) => {
           </div>
 
           <div className="col-3">
+            <label className="text-label">Rak Asal</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={checkRak(lm?.rak_from)?.rak_name ?? "-"}
+                // onChange={(e) =>
+                //   updateLM({ ...lm, mtsi_code: e.target.value })
+                // }
+                placeholder="Rak Asal"
+                disabled
+              />
+            </div>
+          </div>
+
+          <div className="col-3">
             <label className="text-label">Lokasi Tujuan</label>
             <div className="p-inputgroup">
               <InputText
@@ -890,6 +936,22 @@ const MutasiAntarList = ({ onAdd, onEdit, onDetail, onSuccess, onCancel }) => {
             </div>
           </div>
 
+          <div className="col-3">
+            <label className="text-label">Rak Tujuan</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={checkRak(lm.rak_to)?.rak_name ?? "-"}
+                // onChange={(e) =>
+                //   setCurrentItem({ ...currentItem, jpel_name: e.target.value })
+                // }
+                placeholder="Rak Tujuan"
+                disabled
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="row mr-0 ml-0">
           <div className="col-3">
             <label className="text-label">Departemen</label>
             <div className="p-inputgroup">

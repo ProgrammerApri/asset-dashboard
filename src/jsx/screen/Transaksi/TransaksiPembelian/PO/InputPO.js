@@ -190,7 +190,8 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
         setNumb(data);
       }
-    } catch (error) {setNumb(false);
+    } catch (error) {
+      setNumb(false);
       console.error("Error:", error);
     }
   };
@@ -264,7 +265,6 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
         let filt = [];
         data.forEach((elem) => {
-
           if (isEdit) {
             let prod = [];
             elem.rprod.forEach((el) => {
@@ -357,7 +357,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
     }
   };
 
-  console.log("data RP:",rp);
+  console.log("data RP:", rp);
 
   const getProduct = async (ns) => {
     const config = {
@@ -474,12 +474,12 @@ const InputPO = ({ onCancel, onSuccess }) => {
     });
     let ref_supp = [];
     d?.psup.forEach((el) => {
-      el.prod_id.forEach((ek, i) => {
-        ref_supp.push({
-          sup_id: el.sup_id,
+      el?.prod_id?.forEach((ek, i) => {
+        ref_supp?.push({
+          sup_id: el?.sup_id,
           po_id: null,
           prod_id: ek,
-          price: el.price[i],
+          price: el?.price[i],
           image: "",
         });
       });
@@ -558,7 +558,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
   const supp = (value) => {
     let selected = {};
     supplier?.forEach((element) => {
-      if (value === element.supplier.id) {
+      if (value === element?.supplier?.id) {
         selected = element;
       }
     });
@@ -773,18 +773,18 @@ const InputPO = ({ onCancel, onSuccess }) => {
 
     po?.pjasa?.forEach((element, i) => {
       if (i > 0) {
-        if (element.order || element.price) {
+        if (element?.order || element?.price) {
           errors.jasa[i] = {
             jum:
-              !element.order || element.order === "" || element.order === "0",
+              !element?.order || element?.order === "" || element?.order === "0",
             prc:
-              !element.price || element.price === "" || element.price === "0",
+              !element?.price || element?.price === "" || element?.price === "0",
           };
         }
       } else {
         errors.jasa[i] = {
-          jum: !element.order || element.order === "" || element.order === "0",
-          prc: !element.price || element.price === "" || element.price === "0",
+          jum: !element?.order || element?.order === "" || element?.order === "0",
+          prc: !element?.price || element?.price === "" || element?.price === "0",
         };
       }
     });
@@ -1129,7 +1129,35 @@ const InputPO = ({ onCancel, onSuccess }) => {
                 newError.sup = false;
                 setError(newError);
 
-                updatePo({ ...po, ref_sup: e.target.value });
+                let prod = [];
+                let prc = [];
+                po?.pprod?.forEach((element) => {
+                  prod.push(element.prod_id);
+                  prc.push(0);
+                });
+                let psup = [
+                  {
+                    sup_id: 0,
+                    prod_id: prod,
+                    price: prc,
+                    image: null,
+                  },
+                ];
+
+                updatePo({
+                  ...po,
+                  ref_sup: e.target.value,
+                  psup: e?.target?.value
+                    ? psup
+                    : [
+                        {
+                          sup_id: 0,
+                          prod_id: null,
+                          price: null,
+                          image: null,
+                        },
+                      ],
+                });
               }}
             />
           </div>
@@ -1138,291 +1166,269 @@ const InputPO = ({ onCancel, onSuccess }) => {
             <>
               {po?.psup?.length ? (
                 <>
-                  <div className="col-12 p-0">
-                    <CustomAccordion
-                      tittle={"Referensi Supplier"}
-                      defaultActive={true}
-                      active={accor.sup}
-                      onClick={() => {
-                        setAccor({
-                          ...accor,
-                          sup: !accor.sup,
-                        });
-                      }}
-                      key={1}
-                      body={
-                        <>
-                          <DataTable
-                            responsiveLayout="none"
-                            selection={selectedProducts}
-                            onSelectionChange={(e) => {
-                              setSelectedProducts(e.value);
+                  <Col className="ml-0 mr-0 p-0">
+                    <DataTable
+                      responsiveLayout="none"
+                      // value={[
+                      //   {
+                      //     sup_id: null,
+                      //     prod_id: ["produk 1", "produk 2", "produk 3"],
+                      //     price: [1000, 200, 0],
+                      //   },
+                      // ]}
+                      value={po.psup?.map((v, i) => {
+                        return {
+                          ...v,
+                          index: i,
+                          price: v?.price ?? 0,
+                        };
+                      })}
+                      className="display w-150 datatable-wrapper header-white no-border"
+                      showGridlines={false}
+                      emptyMessage={() => <div></div>}
+                    >
+                      <Column
+                        header={tr[localStorage.getItem("language")].supplier}
+                        className="align-text-top"
+                        field={""}
+                        style={{
+                          minWidth: "10rem",
+                        }}
+                        body={(e) => (
+                          // <div className="flex">
+                          //   <div className="col-2 ml-0 p-2">
+                          //     <RadioButton
+                          //       inputId="binary"
+                          //       checked={po && po.check}
+                          //       onChange={(e) => {
+                          //         let temp = [...po.pprod];
 
-                              console.log("=================selec");
-                              console.log(e.value);
+                          //         po.psup?.forEach((element, i) => {
+                          //           temp[e.index]?.prod_id.forEach((elem) => {
+                          //             if (elem === element.prod_id) {
+                          //               temp[e.index].price = element.price[i];
+                          //             }
+                          //             console.log("ckckc");
+                          //             console.log(elem);
+                          //           });
+                          //         });
 
-                              updatePo({
-                                ...po,
-                                psup: e?.value?.map((v) => {
-                                  return {
-                                    ...v,
-                                    sup_id: v?.sup_id ?? null,
-                                    prod_id: v?.prod_id ?? null,
-                                    price: v?.price ?? 0,
-                                    image: v?.image ?? null,
-                                  };
-                                }),
+                          //         updatePo({
+                          //           ...po,
+                          //           check: e.target.value,
+                          //           pprod: temp,
+                          //         });
+                          //       }}
+                          //     />
+                          //   </div>
+
+                          // <div className="col-10 ml-0 p-0">
+                          <CustomDropdown
+                            value={e.sup_id && supp(e.sup_id)}
+                            option={supplier}
+                            onChange={(t) => {
+                              let temp = [...po.psup];
+                              temp[e.index].sup_id = t?.supplier?.id;
+
+                              histori?.forEach((element) => {
+                                if (element.supplier.id === t.id) {
+                                  temp[e.index]?.prod_id?.forEach((elem, i) => {
+                                    if (elem === element.product.id) {
+                                      temp[e.index].price[i] = element.price;
+                                    }
+                                  });
+                                }
                               });
+                              updatePo({ ...po, psup: temp });
                             }}
-                            value={po?.sup?.map((v, i) => {
-                              return {
-                                ...v,
-                                index: i,
-                              };
-                            })}
-                            className="display w-150 datatable-wrapper header-white no-border"
-                            showGridlines={false}
-                            emptyMessage={() => <div></div>}
-                          >
-                            <Column
-                              className="align-text-top"
-                              selectionMode={"single"}
-                              headerStyle={{ width: "2rem" }}
-                              exportable={false}
-                            />
-                            <Column
-                              header={
-                                tr[localStorage.getItem("language")].supplier
-                              }
-                              className="align-text-top"
-                              field={""}
-                              style={{
-                                minWidth: "20rem",
-                              }}
-                              body={(e) => (
-                                <CustomDropdown
-                                  value={e.sup_id && supp(e.sup_id)}
-                                  option={supplier}
+                            placeholder={
+                              tr[localStorage.getItem("language")].pilih
+                            }
+                            label={"[supplier.sup_name] ([supplier.sup_code])"}
+                            detail
+                            onDetail={() => {
+                              setCurrentIndex(e.index);
+                              setShowSupp(true);
+                            }}
+                          />
+                          // </div>
+
+                          // </div>
+                        )}
+                      />
+
+                      <Column
+                        header={tr[localStorage.getItem("language")].nm_prod}
+                        className="align-text-top"
+                        field={""}
+                        // style={{
+                        //   minWidth: "7rem",
+                        // }}
+                        body={(e) =>
+                          //  console.log(e)
+                          e?.prod_id?.map((val, i) => {
+                            return (
+                              <div
+                                className={`p-inputgroup${
+                                  i > 0 ? " mt-2" : ""
+                                }`}
+                              >
+                                <InputText
+                                  value={val && checkProd(val).name}
+                                  onChange={(t) => {}}
+                                  placeholder={
+                                    tr[localStorage.getItem("language")].nm_prod
+                                  }
+                                  disabled
+                                />
+                              </div>
+                            );
+                          })
+                        }
+                      />
+
+                      <Column
+                        header={tr[localStorage.getItem("language")].harga}
+                        className="align-text-top"
+                        field={""}
+                        // style={{
+                        //   minWidth: "10rem",
+                        // }}
+                        body={(e) =>
+                          e?.price?.map((val, i) => {
+                            return (
+                              <div
+                                className={`p-inputgroup${
+                                  i > 0 ? " mt-2" : ""
+                                }`}
+                              >
+                                <InputText
+                                  value={val ? val : ""}
                                   onChange={(t) => {
                                     let temp = [...po.psup];
-                                    temp[e.index].sup_id = t.supplier?.id;
+                                    temp[e.index].price[i] = t.target.value;
 
-                                    histori?.forEach((element) => {
-                                      if (
-                                        element.supplier.id === t.supplier.id
-                                      ) {
-                                        temp[e.index]?.prod_id?.forEach(
-                                          (elem, i) => {
-                                            if (elem === element.product.id) {
-                                              temp[e.index].price[i] =
-                                                element.price;
-                                            }
-                                          }
-                                        );
-                                      }
-                                    });
                                     updatePo({ ...po, psup: temp });
                                   }}
-                                  placeholder={
-                                    tr[localStorage.getItem("language")].pilih
-                                  }
-                                  label={"[supplier.sup_name]"}
-                                  detail
-                                  onDetail={() => {
-                                    setCurrentIndex(e.index);
-                                    setShowSupp(true);
-                                  }}
+                                  min={0}
+                                  placeholder="0"
+                                  type="number"
+                                  // disabled
                                 />
+                              </div>
+                            );
+                          })
+                        }
+                      />
+
+                      <Column
+                        header=""
+                        style={{ width: "4rem" }}
+                        body={(e) => (
+                          <div>
+                            <Tooltip
+                              target=".upload"
+                              mouseTrack
+                              mouseTrackLeft={10}
+                            />
+                            <input
+                              type="file"
+                              id="file"
+                              ref={picker}
+                              accept="image/*"
+                              style={{ display: "none" }}
+                              onChange={(e) => {
+                                console.log("ceeekk");
+                                console.log(e);
+                                setFile(e.target.files[0]);
+                              }}
+                            />
+
+                            <Card.Body
+                              className="flex align-items-center justify-content-center p-0"
+                              data-pr-tooltip="Upload File"
+                              onClick={() => {
+                                picker.current.click();
+                              }}
+                              style={{
+                                cursor: "pointer",
+                              }}
+                            >
+                              {file ? (
+                                <img
+                                  style={{ width: "115px", height: "95px" }}
+                                  src={URL.createObjectURL(file)}
+                                  alt=""
+                                />
+                              ) : e.image && e.image !== "" ? (
+                                <img
+                                  style={{ width: "115px", height: "95px" }}
+                                  src={e.image}
+                                  alt=""
+                                />
+                              ) : (
+                                <i
+                                  className="pi pi-image p-4"
+                                  style={{
+                                    fontSize: "3em",
+                                    borderRadius: "10%",
+                                    backgroundColor: "var(--surface-d)",
+                                    color: "var(--surface-g)",
+                                  }}
+                                ></i>
                               )}
-                            />
+                            </Card.Body>
+                          </div>
+                        )}
+                      />
 
-                            <Column
-                              header={
-                                tr[localStorage.getItem("language")].nm_prod
-                              }
-                              className="align-text-top"
-                              field={""}
-                              // style={{
-                              //   minWidth: "7rem",
-                              // }}
-                              body={(e) =>
-                                //  console.log(e)
-                                e?.prod_id?.map((val, i) => {
-                                  return (
-                                    <div
-                                      className={`p-inputgroup${
-                                        i > 0 ? " mt-2" : ""
-                                      }`}
-                                    >
-                                      <InputText
-                                        value={val && checkProd(val).name}
-                                        onChange={(t) => {}}
-                                        placeholder={
-                                          tr[localStorage.getItem("language")]
-                                            .nm_prod
-                                        }
-                                        disabled
-                                      />
-                                    </div>
-                                  );
-                                })
-                              }
-                            />
-
-                            <Column
-                              header={
-                                tr[localStorage.getItem("language")].price
-                              }
-                              className="align-text-top"
-                              field={""}
-                              // style={{
-                              //   minWidth: "10rem",
-                              // }}
-                              body={(e) =>
-                                e.price?.map((val, i) => {
-                                  return (
-                                    <div
-                                      className={`p-inputgroup${
-                                        i > 0 ? " mt-2" : ""
-                                      }`}
-                                    >
-                                      <InputText
-                                        value={val ? val : ""}
-                                        onChange={(t) => {
-                                          let temp = [...po.psup];
-                                          temp[e.index].price[i] =
-                                            t.target.value;
-
-                                          updatePo({ ...po, psup: temp });
-                                        }}
-                                        min={0}
-                                        placeholder="0"
-                                        type="number"
-                                        // disabled
-                                      />
-                                    </div>
-                                  );
-                                })
-                              }
-                            />
-
-                            <Column
-                              header=""
-                              style={{ width: "4rem" }}
-                              body={(e) => (
-                                <div>
-                                  <Tooltip
-                                    target=".upload"
-                                    mouseTrack
-                                    mouseTrackLeft={10}
-                                  />
-                                  <input
-                                    type="file"
-                                    id="file"
-                                    ref={picker}
-                                    accept="image/*"
-                                    style={{ display: "none" }}
-                                    onChange={(e) => {
-                                      console.log("ceeekk");
-                                      console.log(e);
-                                      setFile(e.target.files[0]);
-                                    }}
-                                  />
-
-                                  <Card.Body
-                                    className="flex align-items-center justify-content-center p-0"
-                                    data-pr-tooltip="Upload File"
-                                    onClick={() => {
-                                      picker.current.click();
-                                    }}
-                                    style={{
-                                      cursor: "pointer",
-                                    }}
-                                  >
-                                    {file ? (
-                                      <img
-                                        style={{
-                                          width: "115px",
-                                          height: "95px",
-                                        }}
-                                        src={URL.createObjectURL(file)}
-                                        alt=""
-                                      />
-                                    ) : e.image && e.image !== "" ? (
-                                      <img
-                                        style={{
-                                          width: "115px",
-                                          height: "95px",
-                                        }}
-                                        src={e.image}
-                                        alt=""
-                                      />
-                                    ) : (
-                                      <i
-                                        className="pi pi-image p-4"
-                                        style={{
-                                          fontSize: "3em",
-                                          borderRadius: "10%",
-                                          backgroundColor: "var(--surface-d)",
-                                          color: "var(--surface-g)",
-                                        }}
-                                      ></i>
-                                    )}
-                                  </Card.Body>
-                                </div>
-                              )}
-                            />
-
-                            <Column
-                              body={(e) =>
-                                e.index === po.psup.length - 1 ? (
-                                  <Link
-                                    onClick={() => {
-                                      let prod = [];
-                                      let prc = [];
-                                      po?.pprod?.forEach((element) => {
-                                        prod.push(element.prod_id);
-                                        prc.push(0);
-                                      });
-                                      updatePo({
-                                        ...po,
-                                        psup: [
-                                          ...po.psup,
-                                          {
-                                            sup_id: 0,
-                                            prod_id: prod,
-                                            price: prc,
-                                            image: null,
-                                          },
-                                        ],
-                                      });
-                                    }}
-                                    className="btn btn-primary shadow btn-xs sharp ml-1"
-                                  >
-                                    <i className="fa fa-plus"></i>
-                                  </Link>
-                                ) : (
-                                  <Link
-                                    onClick={() => {
-                                      let temp = [...po.psup];
-                                      temp.splice(e.index, 1);
-                                      updatePo({
-                                        ...po,
-                                        psup: temp,
-                                      });
-                                    }}
-                                    className="btn btn-danger shadow btn-xs sharp ml-1"
-                                  >
-                                    <i className="fa fa-trash"></i>
-                                  </Link>
-                                )
-                              }
-                            />
-                          </DataTable>
-                        </>
-                      }
-                    />
-                  </div>
+                      <Column
+                        body={(e) =>
+                          e.index === po.psup.length - 1 ? (
+                            <Link
+                              onClick={() => {
+                                let prod = [];
+                                let prc = [];
+                                po?.pprod?.forEach((element) => {
+                                  prod.push(element.prod_id);
+                                  prc.push(0);
+                                });
+                                updatePo({
+                                  ...po,
+                                  psup: [
+                                    ...po.psup,
+                                    {
+                                      sup_id: 0,
+                                      prod_id: prod,
+                                      price: prc,
+                                      image: null,
+                                    },
+                                  ],
+                                });
+                              }}
+                              className="btn btn-primary shadow btn-xs sharp ml-1"
+                            >
+                              <i className="fa fa-plus"></i>
+                            </Link>
+                          ) : (
+                            <Link
+                              onClick={() => {
+                                let temp = [...po.psup];
+                                temp.splice(e.index, 1);
+                                updatePo({
+                                  ...po,
+                                  psup: temp,
+                                });
+                              }}
+                              className="btn btn-danger shadow btn-xs sharp ml-1"
+                            >
+                              <i className="fa fa-trash"></i>
+                            </Link>
+                          )
+                        }
+                      />
+                    </DataTable>
+                  </Col>
                 </>
               ) : (
                 <></>
@@ -1684,10 +1690,10 @@ const InputPO = ({ onCancel, onSuccess }) => {
                                 100,
                           });
 
-                          let newError = error;
-                          newError.prod[e.index].jum = false;
-                          newError.prod.push({ jum: false });
-                          setError(newError);
+                          // let newError = error;
+                          // newError.prod[e.index].jum = false;
+                          // // newError.prod.push({ jum: false });
+                          // setError(newError);
                         }}
                         min={0}
                         placeholder="0"
@@ -1804,9 +1810,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                                   100,
                             });
 
-                            let newError = error;
-                            newError.prod[e.index].prc = false;
-                            setError(newError);
+                            // let newError = error;
+                            // newError.prod[e.index].prc = false;
+                            // setError(newError);
                           }}
                           min={0}
                           placeholder="0"
@@ -1844,9 +1850,9 @@ const InputPO = ({ onCancel, onSuccess }) => {
                                   100,
                             });
 
-                            let newError = error;
-                            newError.prod[e.index].prc = false;
-                            setError(newError);
+                            // let newError = error;
+                            // newError.prod[e.index].prc = false;
+                            // setError(newError);
                           }}
                           min={0}
                           placeholder="0"
@@ -2124,7 +2130,7 @@ const InputPO = ({ onCancel, onSuccess }) => {
                           let temp = [...po.pjasa];
                           temp[e.index].sup_id = t.supplier.id;
                           updatePo({ ...po, pjasa: temp });
-                          console.log("hello !!!!",temp);
+                          console.log("hello !!!!", temp);
                         }}
                         label={"[supplier.sup_name]"}
                         placeholder={tr[localStorage.getItem("language")].pilih}

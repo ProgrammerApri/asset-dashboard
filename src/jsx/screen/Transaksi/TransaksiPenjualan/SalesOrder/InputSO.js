@@ -83,6 +83,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
   const [product, setProduk] = useState(null);
   const [satuan, setSatuan] = useState(null);
   const [lokasi, setLokasi] = useState(null);
+  const [allRak, setAllRak] = useState(null);
   const [rak, setRak] = useState(null);
   const [supplier, setSupplier] = useState(null);
   const [rulesPay, setRulesPay] = useState(null);
@@ -119,9 +120,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
     getloct();
     getStoLoc();
     getStCard();
-    if (isEdit) {
-      getRak();
-    }
+    // if (isEdit) {
+    getRak();
+    // }
   }, []);
 
   const isValid = () => {
@@ -556,7 +557,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
-  const getRak = async () => {
+  const getRak = async (loc) => {
     const config = {
       ...endpoints.getRak,
       data: {},
@@ -571,13 +572,13 @@ const InputSO = ({ onCancel, onSuccess }) => {
         let filt = [];
 
         data?.forEach((element) => {
-          so?.sprod?.forEach((elem) => {
-            if (element?.lokasi_rak === elem?.location) {
-              filt.push(element);
-            }
-          });
+          if (element?.lokasi_rak === loc) {
+            filt.push(element);
+          }
         });
-        setRak(filt);
+
+        setRak(data);
+        setAllRak(data);
       }
     } catch (error) {}
   };
@@ -747,7 +748,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
   const checkRak = (value) => {
     let selected = {};
-    rak?.forEach((element) => {
+    allRak?.forEach((element) => {
       if (value === element.id) {
         selected = element;
       }
@@ -1276,7 +1277,11 @@ const InputSO = ({ onCancel, onSuccess }) => {
                           // }
                           updateSo({ ...so, sprod: temp });
 
-                          getRak();
+                          // if (temp[e.index].rak_id == null) {
+                          //   getRak(u?.id);
+                          // } else {
+                          //   getRak(false);
+                          // }
 
                           let newError = error;
                           newError.prod[e.index].lok = false;
@@ -1324,7 +1329,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                  hidden={!setup?.rak_option}
+                    hidden={!setup?.rak_option}
                     header={"Rak"}
                     className="align-text-top"
                     field={""}
@@ -1350,12 +1355,10 @@ const InputSO = ({ onCancel, onSuccess }) => {
                           temp[e.index].rak_id = u?.value?.id ?? null;
                           // temp[e.index].stock = st;
                           updateSo({ ...so, sprod: temp });
-
-                          // let newError = error;
-                          // newError.prod[e.index].lok = false;
-                          // setError(newError);
                         }}
-                        options={rak}
+                        options={rak.filter(
+                          (el) => el.lokasi_rak === e.location
+                        )}
                         optionLabel={"rak_name"}
                         filter
                         filterBy={"rak_name"}

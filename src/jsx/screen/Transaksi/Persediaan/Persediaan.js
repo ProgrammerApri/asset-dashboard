@@ -25,12 +25,12 @@ const Persediaan = () => {
       <TabPanel header="Koreksi Persediaan">
         <KoreksiStok trigger={trigger} />
       </TabPanel>
-      <TabPanel header="Pemakaian Bahan Baku">
+      {/* <TabPanel header="Pemakaian Bahan Baku">
         <PemakaianBahan trigger={trigger} />
       </TabPanel>
       <TabPanel header="Penerimaan Hasil Jadi">
         <PenerimaanHasil trigger={trigger} />
-      </TabPanel>
+      </TabPanel> */}
     </TabView>
   );
 };

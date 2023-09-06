@@ -133,9 +133,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     getCur();
     getSetup();
     getApCard();
-    // if (isEdit) {
     getRak();
-    // }
   }, []);
 
   const editODR = async () => {
@@ -206,22 +204,23 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
   const getStatus = async () => {
     const config = {
-      ...endpoints.getStatusGRA,
+      ...endpoints.getNumber,
       data: {},
     };
-    console.log("Data sebelum request:", config.data);
     let response = null;
     try {
       response = await request(null, config);
-      console.log("Response:", response);
       if (response.status) {
         const { data } = response;
-        setNumb(data);
+        let status = null;
+        data?.forEach((element) => {
+          if (element?.modul === "gra") {
+            status.push(element?.aktif);
+          }
+        });
+        setNumb(status);
       }
-    } catch (error) {
-      setNumb(false);
-      console.error("Error:", error);
-    }
+    } catch (error) {}
   };
 
   const getPO = async () => {
@@ -539,14 +538,6 @@ const InputOrder = ({ onCancel, onSuccess }) => {
         });
 
         setRak(data);
-        // dispatch({
-        //   type: SET_RAK,
-        //   payload: data,
-        // });
-        // dispatch({
-        //   type: SET_FILT_RAK,
-        //   payload: data.filter((v) => v.lokasi_rak === loc),
-        // });
       }
     } catch (error) {}
   };
@@ -1316,7 +1307,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
               placeholder={tr[localStorage.getItem("language")].pilih}
               detail
               onDetail={() => setShowSupplier(true)}
-              label={"[supplier.sup_name]"}
+              label={"[supplier.sup_name] ([supplier.sup_code])"}
               disabled={order && order.po_id !== null}
               errorMessage="Supplier Belum Dipilih"
               error={error?.sup}
@@ -1609,19 +1600,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                       <CustomDropdown
                         value={e.location && checkLoc(e.location)}
                         onChange={(u) => {
-                          let filtRak = [];
                           let temp = [...order.dprod];
                           temp[e.index].location = u.id;
-
-                          // rak?.forEach((element) => {
-                          //   if (element?.lokasi_rak === temp[e.index].location) {
-                          //     filtRak.push(element);
-                          //   }
-                          // console.log("lsjdsk");
-                          // console.log(element?.lokasi_rak );
-                          // });
-
-                          // getRak(u.id);
 
                           updateORD({ ...order, dprod: temp });
 
@@ -1631,7 +1611,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                           setError(newError);
                         }}
                         option={lokasi}
-                        label={"[name]"}
+                        label={"[name] ([code])"}
                         placeholder={tr[localStorage.getItem("language")].pilih}
                         detail
                         onDetail={() => {
@@ -1670,7 +1650,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                  hidden={!setup?.rak_option}
+                    hidden={!setup?.rak_option}
                     header={"Rak"}
                     className="align-text-top"
                     field={""}
@@ -1696,12 +1676,10 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                           temp[e.index].rak_id = u?.value?.id ?? null;
                           // temp[e.index].stock = st;
                           updateORD({ ...order, dprod: temp });
-
-                          // let newError = error;
-                          // newError.prod[e.index].lok = false;
-                          // setError(newError);
                         }}
-                        options={rak}
+                        options={rak?.filter(
+                          (el) => el?.lokasi_rak === e.location
+                        )}
                         optionLabel={"rak_name"}
                         filter
                         filterBy={"rak_name"}

@@ -588,7 +588,7 @@ const DataRak = ({
     return (
       <>
         <Dialog
-          header={"Data Jenis Pekerjaan"}
+          header={"Data Rak"}
           visible={show}
           footer={() => <div></div>}
           style={{ width: "60vw" }}

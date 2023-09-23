@@ -86,6 +86,7 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
                 loc_id: null,
                 mch_id: null,
                 work_id: null,
+                sup_id: null,
                 date: null,
                 time: null,
                 datetime_actual: null,
@@ -108,9 +109,6 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
       }, 500);
     }
   };
-
-
-
 
   const getPlan = async (isUpdate = false) => {
     setLoading(true);
@@ -254,7 +252,7 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
               el.loc_id = el?.loc_id?.id ?? null;
               el.mch_id = el?.mch_id?.id ?? null;
               el.work_id = el?.work_id?.id ?? null;
-              el.sup_id = el?.sup_id?.id ?? null;
+              el.sup_id = el?.sup_id ?? null;
             });
             dispatch({
               type: SET_CURRENT_PL,

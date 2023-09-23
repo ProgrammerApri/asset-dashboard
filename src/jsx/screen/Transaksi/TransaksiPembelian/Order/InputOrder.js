@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { request } from "src/utils";
 import { Row, Col, Card } from "react-bootstrap";
-import { Button as PButton } from "primereact/button";
+import { Button, Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
@@ -1230,6 +1230,13 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             )}
           </div>
 
+          <div className="col-12 mt-3">
+            <span className="fs-14">
+              <b>{"Departemen & Pemasok"}</b>
+            </span>
+            <Divider className="mt-1"></Divider>
+          </div>
+
           <div className="col-3">
             <label className="text-label">
               {tr[localStorage.getItem("language")].dep}
@@ -1267,13 +1274,6 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-3 mt-0">
-            {/* <span className="fs-14">
-              <b>Informasi Supplier</b>
-            </span> */}
-            {/* <Divider className="mt-1"></Divider> */}
-          </div>
-
           <div className="col-3">
             <label className="text-label">
               {tr[localStorage.getItem("language")].supplier}
@@ -1286,6 +1286,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                 updateORD({
                   ...order,
                   sup_id: e.supplier.id,
+                  kurs: checkCur(e.supplier.sup_curren)?.rate ?? null,
                   dprod: order.dprod.map((v) => ({
                     ...v,
                     price: null,
@@ -1313,6 +1314,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
               error={error?.sup}
             />
           </div>
+
+          <div className="col-3 mt-0"></div>
 
           <div className="col-3">
             <label className="text-label">
@@ -1346,6 +1349,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
               disabled
             />
           </div>
+
+          <div className="col-1 mt-0"></div>
 
           <div className="col-2">
             <label className="text-label">
@@ -1381,6 +1386,30 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                 }
                 placeholder={tr[localStorage.getItem("language")].currency}
                 disabled
+              />
+            </div>
+          </div>
+          <div
+            className="col-2"
+            hidden={order?.sup_id == null || order?.kurs == null}
+          >
+            <label className="text-label">{"Kurs"}</label>
+            <div className="p-inputgroup">
+              <PrimeNumber
+                price
+                value={order.sup_id !== null ? order?.kurs : ""}
+                onChange={(e) => {
+                  updateORD({
+                    ...order,
+                    kurs: e?.value ?? null,
+                    dprod: order?.dprod?.map((v) => ({
+                      ...v,
+                      idr: v?.price * e?.value,
+                      total: v?.total_fc * e?.value,
+                    })),
+                  });
+                }}
+                placeholder={"Kurs"}
               />
             </div>
           </div>
@@ -1658,34 +1687,27 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                       minWidth: "10rem",
                     }}
                     body={(e) => (
-                      <PrimeDropdown
-                        value={e.rak_id && checkRak(e.rak_id)}
-                        onChange={(u) => {
-                          // let st = 0;
+                      <>
+                        <PrimeDropdown
+                          value={e.rak_id && checkRak(e.rak_id)}
+                          onChange={(u) => {
+                            let temp = [...order.dprod];
+                            temp[e.index].rak_id = u?.value?.id ?? null;
 
-                          // sto?.forEach((element) => {
-                          //   if (
-                          //     element.loc_id === u.id &&
-                          //     element.id === sale?.jprod[e.index].prod_id
-                          //   ) {
-                          //     st = element.stock;
-                          //   }
-                          // });
-
-                          let temp = [...order.dprod];
-                          temp[e.index].rak_id = u?.value?.id ?? null;
-                          // temp[e.index].stock = st;
-                          updateORD({ ...order, dprod: temp });
-                        }}
-                        options={rak?.filter(
-                          (el) => el?.lokasi_rak === e.location
-                        )}
-                        optionLabel={"rak_name"}
-                        filter
-                        filterBy={"rak_name"}
-                        placeholder={tr[localStorage.getItem("language")].pilih}
-                        showClear
-                      />
+                            updateORD({ ...order, dprod: temp });
+                          }}
+                          options={rak?.filter(
+                            (el) => el?.lokasi_rak === e.location
+                          )}
+                          optionLabel={"rak_name"}
+                          filter
+                          filterBy={"rak_name"}
+                          placeholder={
+                            tr[localStorage.getItem("language")].pilih
+                          }
+                          showClear
+                        />
+                      </>
                     )}
                   />
 
@@ -1777,7 +1799,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                                 temp[e.index].konv_qty * temp[e.index].price;
 
                               temp[e.index].total =
-                                temp[e.index].total_fc * curConv();
+                                temp[e.index].total_fc * order?.kurs;
 
                               if (temp[e.index].order > e.req) {
                                 temp[e.index].order = e.req;
@@ -1810,7 +1832,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                                 temp[e.index].konv_qty * temp[e.index].price;
 
                               temp[e.index].total =
-                                temp[e.index].total_fc * curConv();
+                                temp[e.index].total_fc * order?.kurs;
                             } else {
                               temp[e.index].total =
                                 temp[e.index].konv_qty * temp[e.index].price;
@@ -1903,12 +1925,14 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                               temp[e.index].konv_qty * temp[e.index].price;
 
                             temp[e.index].total =
-                              temp[e.index].total_fc * curConv();
+                              temp[e.index].total_fc * order?.kurs;
 
-                            temp[e.index].idr = u?.value * curConv();
+                            temp[e.index].idr = u?.value * order?.kurs;
                           } else {
                             temp[e.index].total =
                               temp[e.index].konv_qty * temp[e.index].price;
+
+                            temp[e.index].idr = u?.value;
                           }
 
                           updateORD({

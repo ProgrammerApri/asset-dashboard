@@ -34,7 +34,7 @@ const data = {
   dep_id: null,
   proj_id: null,
   sup_id: null,
-  unit_konv: null,
+  kurs: null,
   top: null,
   due_date: null,
   split_order: null,
@@ -443,6 +443,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
                           konv_qty: null,
                           unit_konv: null,
                           price: null,
+                          idr: null,
                           disc: null,
                           nett_price: null,
                           total: null,
@@ -678,6 +679,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
                     konv_qty: null,
                     unit_konv: null,
                     price: null,
+                    idr: null,
                     disc: null,
                     nett_price: null,
                     total_fc: null,
@@ -949,7 +951,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
             header="Harga Satuan (IDR)"
             field={(e) =>
               data.sup_id?.sup_curren
-                ? `Rp. ${formatIdr(e.price * rate)}`
+                ? `Rp. ${formatIdr(e.price * data?.kurs)}`
                 : `Rp. ${formatIdr(e.price)}`
             }
             style={{ minWidth: "10rem" }}

@@ -199,10 +199,11 @@ const DataBatch = ({ onAdd, onEdit, onDetail }) => {
             let material = data.material;
 
             sequence?.forEach((el) => {
-              el.wc_id = el.wc_id.id ?? null;
-              el.loc_id = el.loc_id.id ?? null;
-              el.mch_id = el.mch_id.id ?? null;
-              el.work_id = el.work_id.id ?? null;
+              el.wc_id = el?.wc_id ?? null;
+              el.loc_id = el?.loc_id ?? null;
+              el.mch_id = el?.mch_id ?? null;
+              el.work_id = el?.work_id ?? null;
+              el.sup_id = el?.sup_id ?? null;
             });
 
             product?.forEach((element) => {

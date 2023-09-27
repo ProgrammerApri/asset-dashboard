@@ -1188,8 +1188,6 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                 tr[localStorage.getItem("language")].ord
               }`}</b>
             </span>
-            {/* </div>
-          <div className="col-12"> */}
             <Divider className="mt-2"></Divider>
           </div>
 
@@ -1291,6 +1289,13 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
 
           <div className="col-9"></div>
 
+          <div className="col-12 mt-3">
+            <span className="fs-14">
+              <b>Pelanggan</b>
+            </span>
+            <Divider className="mt-2"></Divider>
+          </div>
+
           <div className="col-3">
             <label className="text-label">
               {tr[localStorage.getItem("language")].customer}
@@ -1309,7 +1314,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
               placeholder={tr[localStorage.getItem("language")].pilih}
               detail
               onDetail={() => setShowCustomer(true)}
-              label={"[customer.cus_name]"}
+              label={"[customer.cus_name] ([customer.cus_code])"}
               errorMessage="Pelanggan Belum Dipilih"
               error={error?.pel}
               disabled={sale && sale.so_id}
@@ -1652,8 +1657,8 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                           temp[e.index].konv_qty = 0;
                           temp[e.index].unit_konv =
                             checkUnit(temp[e.index].unit_id)?.u_from !== null
-                              ? checkUnit(temp[e.index].unit_id)?.u_from?.code
-                              : checkUnit(temp[e.index].unit_id)?.code;
+                              ? checkUnit(temp[e.index].unit_id)?.u_from?.name
+                              : checkUnit(temp[e.index].unit_id)?.name;
 
                           temp[e.index].stock = st;
                           updateSL({ ...sale, jprod: temp });
@@ -1848,6 +1853,8 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         value={e.order && e.order}
                         onChange={(u) => {
                           let temp = [...sale.jprod];
+                            console.log("qty_unit");
+                            console.log(checkUnit(temp[e.index].unit_id)?.qty);
                           if (sale.so_id) {
                             let val =
                               u.value > e.r_remain ? e.r_remain : u?.value;
@@ -1905,8 +1912,6 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                             temp[e.index].konv_qty =
                               u.value * checkUnit(temp[e.index].unit_id)?.qty;
 
-                            // console.log("qty_unit");
-                            // console.log(checkUnit(temp[e.index].unit_id)?.qty);
 
                             if (
                               sale.pel_id &&
@@ -2015,7 +2020,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                           temp[e.index].unit_id = t.id;
                           temp[e.index].konv_qty = temp[e.index].order * t?.qty;
                           temp[e.index].unit_konv =
-                            t?.u_from !== null ? t?.u_from?.code : t?.code;
+                            t?.u_from !== null ? t?.u_from?.name : t?.name;
                           temp[e.index].price = null;
                           temp[e.index].total = null;
                           updateSL({ ...sale, jprod: temp });

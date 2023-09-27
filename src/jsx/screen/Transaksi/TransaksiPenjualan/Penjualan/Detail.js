@@ -11,6 +11,7 @@ import { Divider } from "@material-ui/core";
 import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 import ReactToPrint from "react-to-print";
 import Wrapper from "src/jsx/components/CustomeWrapper/Wrapper";
+import { tr } from "../../../../../data/tr";
 
 const Detail = ({ onCancel }) => {
   const dispatch = useDispatch();
@@ -193,7 +194,9 @@ const Detail = ({ onCancel }) => {
               </div>
 
               <div className="">
-                <label className="text-label">Pelanggan</label>
+                <label className="text-label">
+                  {tr[localStorage.getItem("language")].customer}
+                </label>
                 <br></br>
                 <span className="ml-0 fs-14">
                   <b>{`${show?.pel_id?.cus_name} (${show?.pel_id?.cus_code})`}</b>
@@ -267,7 +270,7 @@ const Detail = ({ onCancel }) => {
                     // disabled={show?.apprv === false}
                   /> */}
                   <Button
-                    label="Batal"
+                    label={tr[localStorage.getItem("language")].batal}
                     onClick={onCancel}
                     className="p-button-info"
                     icon="pi pi-times"
@@ -302,7 +305,7 @@ const Detail = ({ onCancel }) => {
   };
 
   const formatTh = (value) => {
-    return `${value}`
+    return `${value?.toFixed(2)}`
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
@@ -396,15 +399,11 @@ const Detail = ({ onCancel }) => {
     return (
       <>
         <Row className="ml-0 pt-0 justify-content-center" ref={printPage}>
-          {/* <Card>
-            <Card.Body> */}
           <Wrapper
-            // tittle={"Informasi PO"}
             body={
               <>
                 <Row className="ml-0 mr-0 mb-0 mt-0 justify-content-between">
-                  {/* <div></div> */}
-                  <div className="row justify-content-left col-6 ml-0">
+                  <div className="row justify-content-left col-2 ml-0">
                     <div className="col-12 ml-0 text-left">
                       <img
                         style={{
@@ -414,114 +413,196 @@ const Detail = ({ onCancel }) => {
                         src={comp?.cp_logo}
                         alt=""
                       />
-                      {/* <br></br> */}
                     </div>
                   </div>
 
-                  <div className="row justify-content-right col-6 ml-0">
-                    <div className="col-6 fs-12 ml-0 text-right"></div>
-
-                    <div className="col-6 fs-12 ml-0 mt-3 text-right">
+                  <div className="row justify-content-left col-10 ml-0">
+                    <div className="col-6 fs-12 ml-0 mb-0 text-left">
                       <br></br>
-                      <label className="text-label ml-0 mt-0 fs-14">
+                      <label className="text-label ml-0 mt-0 fs-18">
                         <b>{comp?.cp_name}</b>
                       </label>
                       <br></br>
-                      <span className="ml-0">{comp?.cp_addr}</span>
+                      <span className="ml-0 fs-13">{comp?.cp_addr}</span>
                       <br></br>
-                      <span className="ml-0">{comp?.cp_email}</span>
                       <br></br>
-                      <span className="ml-0">{comp?.cp_telp}</span>
+                      <span className="ml-0 fs-13">
+                        Email : {comp?.cp_email ?? "-"}
+                      </span>
+                      <br></br>
+                      <span className="ml-0 mt-2 fs-13">
+                        Telp : {comp?.cp_telp}
+                      </span>
                     </div>
                   </div>
                 </Row>
 
                 <Divider></Divider>
 
-                <Row className="ml-0 mr-0 mb-0 mt-1 justify-content-between fs-12">
-                  <div className="row justify-content-left col-6">
-                    <div className="col-12 mt-0 fs-14 text-left">
-                      <label className="text-label">
-                        <b>Invoice Penjualan</b>
+                <Row className="ml-1 mr-0 mb-0 mt-2 justify-content-between fs-12">
+                  {/* <div className="row justify-content-left col-12"> */}
+                  {/* <div className="col-8 mt-0 fs-16 text-right">
+                      <label className="text-label mr-7">
+                        <b>SALES INVOICE</b>
                       </label>
-                    </div>
-                  </div>
+                    </div> */}
 
-                  <div className="row justify-content-right col-6">
-                    <div className="col-12 mt-0 fs-12 text-right">
-                      <label className="text-label">Tanggal Invoice : </label>
-                      <span className="ml-1">
-                        <b>{formatDate(show.ord_date)}</b>
-                      </span>
+                  <DataTable
+                    className="display w-150 datatable-wrapper fs-12 header-white report p-0"
+                    emptyMessage={
+                      <div className="ml-0 p-0 text-left">
+                        <br />
+                        <label className="text-label fs-15">
+                          <b>SALES INVOICE</b>
+                        </label>
+                      </div>
+                    }
+                  >
+                    <Column
+                      header={
+                        <div className="row">
+                          <div className="ml-3 p-0">
+                            <label className="text-label">Kepada Yth.</label>
+                            <br></br>
+                            <span className="ml-0 fs-14">
+                              <b>{show?.pel_id.cus_name}</b>
+                            </span>
+                            <br></br>
+                            <br></br>
+                            <span className="ml-0">
+                              {show?.pel_id.cus_address}
+                            </span>
+                            <br></br>
+                            <br></br>
+                            <br></br>
+                            <span className="ml-0">
+                              Phone : {show?.pel_id?.cus_telp1}
+                            </span>
+                            <br></br>
+                            <span className="ml-0">
+                              Email : <b>{show?.pel_id.cus_email}</b>
+                            </span>
+                            <br />
+                            <br />
+                          </div>
+                        </div>
+                      }
+                      style={{ width: "65rem" }}
+                    />
+
+                    <Column
+                      header={
+                        <div className="row">
+                          <div className="ml-3 p-0">
+                            <span className="ml-0">
+                              No. Invoice : <b>{show?.ord_code}</b>
+                            </span>
+                            <br></br>
+                            <br></br>
+                            <span className="ml-0">
+                              Tgl Invoice : <b>{formatDate(show?.ord_date)}</b>
+                            </span>
+                            <br></br>
+                            <br></br>
+                            <span className="ml-0">
+                              No. Pesanan :{" "}
+                              <b>{show?.so_id ? show?.so_id?.so_code : "-"}</b>
+                            </span>
+                            <br></br>
+                            <br></br>
+                            <span className="ml-0">
+                              Jatuh Tempo : <b>{formatDate(show?.due_date)}</b>
+                            </span>
+                            <br></br>
+                            <br></br>
+                            <br></br>
+                            <br></br>
+                          </div>
+                        </div>
+                      }
+                      style={{ width: "35rem" }}
+                    />
+                  </DataTable>
+
+                  {/* <Card className="col-12 p-0">
+                      <div className="col-12 fs-12 ml-0 text-left">
+                        <label className="text-label">
+                          <b>Kepada Yth.</b>
+                        </label>
+                        <br></br>
+                        <br></br>
+                        <span className="ml-0 fs-14">
+                          <b>{show?.pel_id.cus_name}</b>
+                        </span>
+                        <br></br>
+                        <br></br>
+                        <span className="ml-0">{show?.pel_id.cus_address}</span>
+                        <br></br>
+                        <span className="ml-0">
+                          {kota(show?.pel_id.cus_kota)?.city_name},{" "}
+                          {show?.pel_id.cus_kpos}
+                        </span>
+                        <br></br>
+                        <span className="ml-0">
+                          Telp : {show?.pel_id?.cus_telp1}
+                        </span>
+                        <br></br>
+                        <br></br>
+                        <span className="ml-0">
+                          Cp : <b>{show?.pel_id.cus_cp}</b>
+                        </span>
+                        <br></br>
+                        <br></br>
+                        <span className="ml-0">
+                          NPWP : <b>{show?.pel_id.cus_npwp}</b>
+                        </span>
+                      </div>
+                    </Card> */}
+                  {/* </div> */}
+
+                  {/* <div className="row justify-content-left col-4">
+                    <div className="col-12 mb-3 fs-13 text-left">
+                      <label className="text-label"></label>
                     </div>
-                  </div>
+
+                    <Card className="col-12 p-0">
+                      <div className="col-12 fs-12 ml-0 text-left">
+                        <label className="text-label">
+                          <b>
+                            {tr[localStorage.getItem("language")].inf_invoice}
+                          </b>
+                        </label>
+                        <br></br>
+                        <br></br>
+                        <br></br>
+                        <br></br>
+                        <span className="ml-0">
+                          No. Invoice : <b>{show?.ord_code}</b>
+                        </span>
+                        <br></br>
+                        <br></br>
+                        <span className="ml-0">
+                          Tgl Invoice : <b>{formatDate(show?.ord_date)}</b>
+                        </span>
+                        <br></br>
+                        <br></br>
+                        <span className="ml-0">
+                          No. Pesanan :{" "}
+                          <b>{show?.so_id ? show?.so_id?.so_code : "-"}</b>
+                        </span>
+                        <br></br>
+                        <br></br>
+                        <span className="ml-0">
+                          Jatuh Tempo : <b>{formatDate(show?.due_date)}</b>
+                        </span>
+                      </div>
+                    </Card>
+                  </div> */}
                 </Row>
-
-                <Card className="col-12 mt-0">
-                  <div className="row col-12">
-                    <div className="col-8 fs-12 ml-0">
-                      <label className="text-label">
-                        <b>Informasi Penjualan</b>
-                      </label>
-                    </div>
-
-                    <div className="col-4 fs-12 ml-0 text-right">
-                      <label className="text-label">
-                        <b>Informasi Pembeli</b>
-                      </label>
-                    </div>
-
-                    <div className="col-8 fs-12 ml-0">
-                      <span className="ml-0 fs-14">
-                        <b>{show?.ord_code}</b>
-                      </span>
-                      <br></br>
-                      <br></br>
-                      <span className="ml-0">
-                        No. Penjualan : <b>{show?.ord_code}</b>
-                      </span>
-                      <br></br>
-                      <br></br>
-                      <span className="ml-0">
-                        No. Pesanan :{" "}
-                        <b>{show?.so_id ? show?.so_id?.so_code : "-"}</b>
-                      </span>
-                      <br></br>
-                      <br></br>
-                      <span className="ml-0">
-                        Jatuh Tempo : <b>{formatDate(show?.due_date)}</b>
-                      </span>
-                    </div>
-
-                    <div className="col-4 fs-12 ml-0 text-right">
-                      <span className="ml-0 fs-14">
-                        <b>{show?.pel_id.cus_name}</b>
-                      </span>
-                      <br></br>
-                      <br></br>
-                      <span className="ml-0">
-                        Cp : <b>{show?.pel_id.cus_cp}</b>
-                      </span>
-                      <br></br>
-                      <br></br>
-                      <span className="ml-0">{show?.pel_id.cus_address}</span>
-                      <br></br>
-                      <span className="ml-0">
-                        {kota(show?.pel_id.cus_kota)?.city_name},{" "}
-                        {show?.pel_id.cus_kpos}
-                      </span>
-                      <br></br>
-                      <span className="ml-0">
-                        {/* (+62) */}
-                        {show?.pel_id?.cus_telp1}
-                      </span>
-                    </div>
-                  </div>
-                </Card>
 
                 <Row className="ml-1 mt-0">
                   <label className="text-label fs-13">
-                    <b>Daftar Produk</b>
+                    <b>{tr[localStorage.getItem("language")].dft_prod}</b>
                   </label>
 
                   <DataTable
@@ -534,37 +615,37 @@ const Detail = ({ onCancel }) => {
                       };
                     })}
                     responsiveLayout="scroll"
-                    className="display w-150 datatable-wrapper fs-12"
+                    className="display w-150 datatable-wrapper fs-12 header-white report"
                     // showGridlines
                     dataKey="id"
                     rowHover
                   >
                     <Column
-                      header="Produk"
+                      header={tr[localStorage.getItem("language")].prod}
                       field={(e) => `${e.prod_id?.name} (${e.prod_id?.code})`}
-                      style={{ minWidth: "19rem" }}
+                      style={{ minWidth: "22rem" }}
                       // body={loading && <Skeleton />}
                     />
                     <Column
-                      header="Gudang"
-                      field={(e) => e.location?.name}
-                      style={{ minWidth: "9rem" }}
-                      // body={loading && <Skeleton />}
-                    />
-                    <Column
-                      header="Jumlah"
+                      header={tr[localStorage.getItem("language")].qty}
                       field={(e) => formatTh(e.order)}
                       style={{ minWidth: "8rem" }}
                       // body={loading && <Skeleton />}
                     />
                     <Column
-                      header="Satuan"
+                      header={tr[localStorage.getItem("language")].satuan}
                       field={(e) => e.unit_id?.name}
                       style={{ minWidth: "7rem" }}
                       // body={loading && <Skeleton />}
                     />
                     <Column
-                      header="Harga Satuan"
+                      header={"Konversi Unit"}
+                      field={(e) => `${e.konv_qty} ${e.unit_konv}`}
+                      style={{ minWidth: "7rem" }}
+                      // body={loading && <Skeleton />}
+                    />
+                    <Column
+                      header={tr[localStorage.getItem("language")].price}
                       field={(e) => `Rp. ${formatIdr(e.price)}`}
                       style={{ minWidth: "9rem" }}
                       // body={loading && <Skeleton />}
@@ -572,17 +653,17 @@ const Detail = ({ onCancel }) => {
                     <Column
                       header="Total"
                       field={(e) => `Rp. ${formatIdr(e.total)}`}
-                      style={{ minWidth: "9rem" }}
+                      style={{ minWidth: "10rem" }}
                       // body={loading && <Skeleton />}
                     />
                   </DataTable>
                 </Row>
 
                 {show?.jjasa?.length ? (
-                  <Row className="ml-1 mt-4">
+                  <Row className="ml-1 mt-3">
                     <>
                       <label className="text-label fs-13">
-                        <b>daftar Jasa</b>
+                        <b>{tr[localStorage.getItem("language")].dft_jasa}</b>
                       </label>
 
                       <DataTable
@@ -594,31 +675,21 @@ const Detail = ({ onCancel }) => {
                           };
                         })}
                         responsiveLayout="scroll"
-                        className="display w-150 datatable-wrapper fs-12"
+                        className="display w-150 datatable-wrapper fs-12 header-white report"
                         // showGridlines
                         dataKey="id"
                         rowHover
                       >
                         <Column
-                          header="Supplier"
-                          field={(e) =>
-                            `${sup(e.sup_id)?.supplier?.sup_name} (${
-                              sup(e.sup_id)?.supplier?.sup_code
-                            })`
-                          }
-                          style={{ minWidth: "27rem" }}
-                          // body={loading && <Skeleton />}
-                        />
-                        <Column
-                          header="Jasa"
+                          header={tr[localStorage.getItem("language")].jasa}
                           field={(e) => e.jasa_id?.name}
-                          style={{ minWidth: "23rem" }}
+                          style={{ minWidth: "53rem" }}
                           // body={loading && <Skeleton />}
                         />
                         <Column
                           header="Total"
                           field={(e) => `Rp. ${formatIdr(e.total)}`}
-                          style={{ minWidth: "13rem" }}
+                          style={{ minWidth: "10rem" }}
                           // body={loading && <Skeleton />}
                         />
                       </DataTable>
@@ -628,17 +699,40 @@ const Detail = ({ onCancel }) => {
                   <></>
                 )}
 
-                <Row className="ml-0 mr-0 mb-0 mt-8 justify-content-between fs-12">
-                  <div></div>
+                <Row className="ml-0 mr-0 mb-0 mt-3 justify-content-between fs-12">
+                  <div className="row justify-content-left col-5">
+                    <div className="col-12 mt-4">
+                      <span>Please Transfer Your Payment To :</span>
+                      <br></br>
+                      <br></br>
+                      <span>Account Name : {comp?.cp_akun_name ?? "-"}</span>
+                      <br />
+                      <br />
+                      <span>Bank Name : {comp?.cp_bank_name ?? "-"}</span>
+                      <br />
+                      <br />
+                      <span>Bank Branch : {comp?.cp_branch ?? "-"}</span>
+                      <br />
+                      <br />
+                      <span>Bank Address : {comp?.cp_bank_addr ?? "-"}</span>
+                      <br />
+                      <br />
+                      <span>
+                        Account Number : <b>{comp?.cp_no_rek ?? "-"}</b>
+                      </span>
+                      <br />
+                      <br />
+                    </div>
+                  </div>
                   <div className="row justify-content-right col-6 mr-4">
                     <div className="col-12 mb-0">
-                      <label className="text-label fs-13">
+                      <label className="text-label fs-12">
                         <b>Detail Tagihan</b>
                       </label>
-                      <Divider className="ml-12"></Divider>
+                      <Divider className="ml-12 mt-1"></Divider>
                     </div>
 
-                    <div className="col-5 mt-2 ">
+                    <div className="col-5 mt-0 ">
                       <label className="text-label">
                         {show?.sale_id?.split_inv
                           ? "Sub Total Barang"
@@ -646,7 +740,7 @@ const Detail = ({ onCancel }) => {
                       </label>
                     </div>
 
-                    <div className="col-7 mt-2  text-right">
+                    <div className="col-7 mt-0  text-right">
                       <label className="text-label">
                         {show?.sale_id?.split_inv ? (
                           <b>
@@ -662,58 +756,52 @@ const Detail = ({ onCancel }) => {
                       </label>
                     </div>
 
-                    <div className="col-5">
-                      <label className="text-label">
-                        {show?.sale_id?.split_inv ? "DPP Barang" : "DPP"}
-                      </label>
-                    </div>
+                    {show.pel_id?.cus_pjk ? (
+                      <>
+                        <div className="col-5">
+                          <label className="text-label">
+                            {show?.split_inv
+                              ? "DPP Barang"
+                              : "Dasar Pengenaan Pajak"}
+                          </label>
+                        </div>
 
-                    <div className="col-7 text-right">
-                      <label className="text-label">
-                        {show?.sale_id?.split_inv ? (
-                          <b>
-                            Rp.
-                            {formatIdr(getSubTotalBarang())}
-                          </b>
-                        ) : (
-                          <b>
-                            Rp.
-                            {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
-                          </b>
-                        )}
-                      </label>
-                    </div>
-
-                    <div className="col-5">
-                      <label className="text-label">
-                        {show?.sale_id?.split_inv
-                          ? "Pajak Atas Barang"`(${pjk()}%)`
-                          : "Pajak"}
-                      </label>
-                    </div>
-
-                    <div className="col-7 text-right">
-                      <label className="text-label">
-                        {show?.sale_id?.split_inv ? (
-                          <b>
-                            Rp.
-                            {formatIdr((getSubTotalBarang() * pjk()) / 100)}
-                          </b>
-                        ) : (
-                          <b>
-                            Rp.{" "}
-                            {formatIdr(
-                              ((getSubTotalBarang() + getSubTotalJasa()) *
-                                pjk()) /
-                                100
+                        <div className="col-7 text-right">
+                          <label className="text-label">
+                            {show?.split_inv ? (
+                              <b>
+                                Rp.
+                                {formatIdr(getSubTotalBarang())}
+                              </b>
+                            ) : show?.tax_prod && show?.tax_jasa ? (
+                              <b>
+                                Rp.
+                                {formatIdr(
+                                  getSubTotalBarang() + getSubTotalJasa()
+                                )}
+                              </b>
+                            ) : show?.tax_prod ? (
+                              <b>
+                                Rp.
+                                {formatIdr(getSubTotalBarang())}
+                              </b>
+                            ) : show?.tax_jasa ? (
+                              <b>
+                                Rp.
+                                {formatIdr(getSubTotalJasa())}
+                              </b>
+                            ) : (
+                              <b>Rp. {formatIdr(0)}</b>
                             )}
-                          </b>
-                        )}
-                      </label>
-                    </div>
+                          </label>
+                        </div>
+                      </>
+                    ) : (
+                      <></>
+                    )}
 
                     <div className="col-5 mt-0">
-                      <label className="text-label">Diskon(%)</label>
+                      <label className="text-label">{"Diskon (%)"}</label>
                     </div>
 
                     <div className="col-7 text-right">
@@ -733,13 +821,74 @@ const Detail = ({ onCancel }) => {
 
                     <div className="col-5">
                       <label className="text-label fs-13">
-                        <b>Total Tagihan</b>
+                        <b>Total</b>
                       </label>
                     </div>
 
                     <div className="col-7 text-right">
                       <label className="text-label fs-13">
-                        {show?.sale_id?.split_inv ? (
+                        {show?.split_inv ? (
+                          <b>Rp. {formatIdr(getSubTotalBarang())}</b>
+                        ) : (
+                          <b>
+                            Rp.{" "}
+                            {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
+                          </b>
+                        )}
+                      </label>
+                    </div>
+
+                    <div className="col-5">
+                      <label className="text-label">
+                        {show?.split_inv
+                          ? "Pajak Atas Barang"`(${pjk()}%)`
+                          : `Pajak (${pjk()}%)`}
+                      </label>
+                    </div>
+
+                    <div className="col-7 text-right">
+                      <label className="text-label">
+                        {show?.split_inv ? (
+                          <b>
+                            Rp.
+                            {formatIdr((getSubTotalBarang() * pjk()) / 100)}
+                          </b>
+                        ) : show?.tax_prod && show?.tax_jasa ? (
+                          <b>
+                            Rp.{" "}
+                            {formatIdr(
+                              ((getSubTotalBarang() + getSubTotalJasa()) *
+                                pjk()) /
+                                100
+                            )}
+                          </b>
+                        ) : show?.tax_prod ? (
+                          <b>
+                            Rp. {formatIdr((getSubTotalBarang() * pjk()) / 100)}
+                          </b>
+                        ) : show?.tax_jasa ? (
+                          <b>
+                            Rp. {formatIdr((getSubTotalJasa() * pjk()) / 100)}
+                          </b>
+                        ) : (
+                          <b>Rp. {formatIdr(0)}</b>
+                        )}
+                      </label>
+                    </div>
+
+                    <div className="col-12">
+                      <Divider className="ml-12"></Divider>
+                    </div>
+
+                    <div className="col-5">
+                      <label className="text-label fs-13">
+                        <b>Grand Total</b>
+                      </label>
+                    </div>
+
+                    <div className="col-7 text-right">
+                      <label className="text-label fs-13">
+                        {show?.split_inv ? (
                           <b>
                             Rp.{" "}
                             {formatIdr(
@@ -747,7 +896,7 @@ const Detail = ({ onCancel }) => {
                                 (getSubTotalBarang() * pjk()) / 100
                             )}
                           </b>
-                        ) : (
+                        ) : show.tax_prod && show.tax_jasa ? (
                           <b>
                             Rp.{" "}
                             {formatIdr(
@@ -758,94 +907,308 @@ const Detail = ({ onCancel }) => {
                                   100
                             )}
                           </b>
+                        ) : show.tax_prod ? (
+                          <b>
+                            Rp.{" "}
+                            {formatIdr(
+                              getSubTotalBarang() +
+                                getSubTotalJasa() +
+                                (getSubTotalBarang() * pjk()) / 100
+                            )}
+                          </b>
+                        ) : show.tax_jasa ? (
+                          <b>
+                            Rp.{" "}
+                            {formatIdr(
+                              getSubTotalBarang() +
+                                getSubTotalJasa() +
+                                (getSubTotalJasa() * pjk()) / 100
+                            )}
+                          </b>
+                        ) : (
+                          <b>
+                            Rp.{" "}
+                            {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
+                          </b>
                         )}
                       </label>
                     </div>
 
-                    <div className="col-5 mt-0">
-                      <label className="text-label">{"Uang Muka"}</label>
-                    </div>
-
-                    <div className="col-7 text-right">
-                      <label className="text-label">
-                        <b>Rp. {formatIdr(getUangMuka())}</b>
-                      </label>
-                    </div>
-
-                    <div className="col-5 mt-0">
-                      <label className="text-label">{"Sudah Dibayar"}</label>
-                    </div>
-
-                    <div className="col-7 text-right">
-                      <label className="text-label">
-                        <b>Rp. {formatIdr(getPelunasan())}</b>
-                      </label>
-                    </div>
-
-                    <div className="col-12">
-                      <Divider className="ml-12"></Divider>
-                    </div>
-
                     <div className="col-5">
                       <label className="text-label fs-13">
-                        <b>{"Sisa Tagihan"}</b>
+                        <b></b>
                       </label>
                     </div>
 
-                    <div className="col-7 text-right">
+                    <div className="col-7 text-center mt-4 ml-0">
                       <label className="text-label fs-13">
-                        <b>
-                          Rp.{" "}
-                          {formatIdr(
-                            getSubTotalBarang() +
-                              getSubTotalJasa() +
-                              ((getSubTotalBarang() + getSubTotalJasa()) *
-                                pjk()) /
-                                100 -
-                              getUangMuka() -
-                              getPelunasan()
-                          )}
-                        </b>
+                        <b>Disiapkan & Dicek Oleh</b>
                       </label>
+                      <br></br>
+                      <br></br>
+                      <br></br>
+                      <br></br>
+                      <br></br>
+                      <br></br>
+                      <br></br>
+                      <br></br>
 
-                      <br></br>
-                      <br></br>
-                      {getSubTotalBarang() +
-                        getSubTotalJasa() +
-                        ((getSubTotalBarang() + getSubTotalJasa()) * pjk()) /
-                          100 -
-                        getUangMuka() -
-                        getPelunasan() ===
-                      0 ? (
-                        <Badge
-                          variant="primary light"
-                          style={{ width: "7rem", height: "2rem" }}
-                        >
-                          <span className="fs-15 mb-0 mr-3">
-                            <i className="bx bx-check text-primary ml-2 mt-0"></i>{" "}
-                            Lunas
-                          </span>
-                        </Badge>
-                      ) : (
-                        <Badge
-                          variant="warning light"
-                          style={{ width: "7rem", height: "2rem" }}
-                        >
-                          <span className="fs-15 mb-0 mr-3">
-                            <i className="bx bxs-circle text-warning ml-2 mt-0"></i>{" "}
-                            Open
-                          </span>
-                        </Badge>
-                      )}
+                      <Divider className=""></Divider>
                     </div>
+                  </div>
+                </Row>
+              </>
+            }
+          />
+        </Row>
 
-                    <div className="col-12 text-right mt-8">
-                      <label className="text-label fs-13">
-                        <b>Semarang, {formatDate(date)}</b>
+        <Row className="mt-4 p-0 ml-0 justify-content-center" ref={printPage}>
+          <Wrapper
+            body={
+              <>
+                <Row className="ml-0 mr-0 mb-0 mt-0 justify-content-between">
+                  <div className="row justify-content-left col-2 ml-0">
+                    <div className="col-12 ml-0 text-left">
+                      <img
+                        style={{
+                          height: "150px",
+                          width: "150px",
+                        }}
+                        src={comp?.cp_logo}
+                        alt=""
+                      />
+                    </div>
+                  </div>
+
+                  <div className="row justify-content-left col-10 ml-0">
+                    <div className="col-6 fs-12 ml-0 mb-0 text-left">
+                      <br></br>
+                      <label className="text-label ml-0 mt-0 fs-18">
+                        <b>{comp?.cp_name}</b>
                       </label>
                       <br></br>
-                      <label className="text-label fs-13 mr-7 mt-6">
-                        {comp?.cp_coper}
+                      <span className="ml-0 fs-13">{comp?.cp_addr}</span>
+                      <br></br>
+                      <br></br>
+                      <span className="ml-0 fs-13">
+                        Email : {comp?.cp_email ?? "-"}
+                      </span>
+                      <br></br>
+                      <span className="ml-0 mt-2 fs-13">
+                        Telp : {comp?.cp_telp}
+                      </span>
+                    </div>
+                  </div>
+                </Row>
+
+                <Divider></Divider>
+
+                <Row className="ml-1 mr-0 mb-0 mt-2 justify-content-between fs-12">
+                  {/* <div className="row justify-content-left col-12"> */}
+                  {/* <div className="col-8 mt-0 fs-16 text-right">
+                      <label className="text-label mr-7">
+                        <b>SALES INVOICE</b>
+                      </label>
+                    </div> */}
+
+                  <DataTable
+                    className="display w-150 datatable-wrapper fs-12 header-white report p-0"
+                    emptyMessage={
+                      <div className="ml-0 p-0 text-left">
+                        <br />
+                        <label className="text-label fs-15">
+                          <b>PACKING LIST</b>
+                        </label>
+                      </div>
+                    }
+                  >
+                    <Column
+                      header={
+                        <div className="row">
+                          <div className="ml-3 p-0">
+                            <label className="text-label">Kepada Yth.</label>
+                            <br></br>
+                            <span className="ml-0 fs-14">
+                              <b>{show?.pel_id.cus_name}</b>
+                            </span>
+                            <br></br>
+                            <br></br>
+                            <span className="ml-0">
+                              {show?.pel_id.cus_address}
+                            </span>
+                            <br></br>
+                            <br></br>
+                            <br></br>
+                            <span className="ml-0">
+                              Phone : {show?.pel_id?.cus_telp1}
+                            </span>
+                            <br></br>
+                            <span className="ml-0">
+                              Email : <b>{show?.pel_id.cus_email}</b>
+                            </span>
+                            <br />
+                            <br />
+                          </div>
+                        </div>
+                      }
+                      style={{ width: "65rem" }}
+                    />
+
+                    <Column
+                      header={
+                        <div className="row">
+                          <div className="ml-3 p-0">
+                            <span className="ml-0">
+                              No. Invoice : <b>{show?.ord_code}</b>
+                            </span>
+                            <br></br>
+                            <br></br>
+                            <span className="ml-0">
+                              Tgl Invoice : <b>{formatDate(show?.ord_date)}</b>
+                            </span>
+                            <br></br>
+                            <br></br>
+                            <span className="ml-0">
+                              No. Pesanan :{" "}
+                              <b>{show?.so_id ? show?.so_id?.so_code : "-"}</b>
+                            </span>
+                            <br></br>
+                            <br></br>
+                            <span className="ml-0">
+                              Jatuh Tempo : <b>{formatDate(show?.due_date)}</b>
+                            </span>
+                            <br></br>
+                            <br></br>
+                            <br></br>
+                            <br></br>
+                          </div>
+                        </div>
+                      }
+                      style={{ width: "35rem" }}
+                    />
+                  </DataTable>
+                </Row>
+
+                <Row className="ml-1 mt-0">
+                  <label className="text-label">
+                    <b>{tr[localStorage.getItem("language")].dft_prod}</b>
+                  </label>
+
+                  <DataTable
+                    value={show?.jprod?.map((v, i) => {
+                      return {
+                        ...v,
+                        index: i,
+                        price: v?.price ?? 0,
+                        total: v?.total ?? 0,
+                      };
+                    })}
+                    responsiveLayout="scroll"
+                    className="display w-150 datatable-wrapper fs-12 header-white report"
+                    // showGridlines
+                    dataKey="id"
+                    rowHover
+                  >
+                    <Column
+                      header="Description of Goods"
+                      field={(e) => `${e.prod_id?.name} (${e.prod_id?.code})`}
+                      style={{ minWidth: "32rem" }}
+                      // body={loading && <Skeleton />}
+                    />
+                    <Column
+                      header="Quantity"
+                      field={(e) => formatTh(e.order)}
+                      style={{ minWidth: "6rem" }}
+                      // body={loading && <Skeleton />}
+                    />
+                    <Column
+                      header="Qty Konversion"
+                      field={(e) => `${formatTh(e.konv_qty)} ${e?.unit_konv}`}
+                      style={{ minWidth: "7rem" }}
+                      // body={loading && <Skeleton />}
+                    />
+                    <Column
+                      header="Net Weight (Kgs)"
+                      field={(e) => formatTh(e.order)}
+                      style={{ minWidth: "6rem" }}
+                      // body={loading && <Skeleton />}
+                    />
+                    <Column
+                      header="Total Weight (Kgs)"
+                      field={(e) => formatTh(e.order)}
+                      style={{ minWidth: "7rem" }}
+                      // body={loading && <Skeleton />}
+                    />
+                  </DataTable>
+                </Row>
+
+                <Row className="ml-0 mr-0 mb-0 mt-0 justify-content-between fs-12">
+                  <div className="row justify-content-left col-4"></div>
+                  <div className="row justify-content-left col-8">
+                    <div className="col-12 mt-0">
+                      <label className="text-label">
+                        <b>Grand Total</b>
+                        <b className="ml-5"></b>
+                        <b className="ml-8">{formatTh(0)}</b>
+                        <b className="ml-4"></b>
+                        <b className="ml-8">{formatTh(0)}</b>
+                        <b className="ml-5"></b>
+                        <b className="ml-8">{formatTh(0)}</b>
+                      </label>
+                      <Divider></Divider>
+                    </div>
+                  </div>
+                </Row>
+
+                <Row className="ml-0 mr-0 mb-0 mt-3 justify-content-between fs-12">
+                  <div className="row justify-content-left col-7">
+                    <div className="col-12 mt-4">
+                      <span>Please Transfer Your Payment To :</span>
+                      <br></br>
+                      <br></br>
+                      <span>Account Name : {comp?.cp_akun_name ?? "-"}</span>
+                      <br />
+                      <br />
+                      <span>Bank Name : {comp?.cp_bank_name ?? "-"}</span>
+                      <br />
+                      <br />
+                      <span>Bank Branch : {comp?.cp_branch ?? "-"}</span>
+                      <br />
+                      <br />
+                      <span>Bank Address : {comp?.cp_bank_addr ?? "-"}</span>
+                      <br />
+                      <br />
+                      <span>
+                        Account Number : <b>{comp?.cp_no_rek ?? "-"}</b>
+                      </span>
+                      <br />
+                      <br />
+                    </div>
+                  </div>
+                  <div className="row justify-content-right col-5 mr-0">
+                    {/* <div className="col-12 mb-0">
+                      <label className="text-label fs-12">
+                        <b>Detail Tagihan</b>
+                      </label>
+                      <Divider className="ml-12 mt-1"></Divider>
+                    </div> */}
+
+                    <div className="col-6 text-center mt-4 ml-8">
+                      <label className="text-label fs-13">
+                        <b>{comp?.cp_name}</b>
+                      </label>
+                      <br></br>
+                      <br></br>
+                      <label className="text-label fs-13 mt-8">
+                        HENRY KRISTIONO
+                      </label>
+
+                      {/* <div className="col-12"> */}
+                      <Divider className=""></Divider>
+                      {/* </div> */}
+
+                      <label className="text-label fs-13 mt-1">
+                        GENERAL MANAGER
                       </label>
                     </div>
                   </div>
@@ -853,8 +1216,6 @@ const Detail = ({ onCancel }) => {
               </>
             }
           />
-          {/* </Card.Body>
-          </Card> */}
         </Row>
       </>
     );

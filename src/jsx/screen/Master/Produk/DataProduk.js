@@ -1245,6 +1245,8 @@ const DataProduk = ({
     return stock;
   };
 
+  console.log("stcard we",stcard);
+
   const renderBody = () => {
     return (
       <>

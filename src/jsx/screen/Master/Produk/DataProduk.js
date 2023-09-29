@@ -30,6 +30,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
 import { current } from "@reduxjs/toolkit";
 import { InputSwitch } from "primereact/inputswitch";
+import { el } from "date-fns/locale";
 
 const def = {
   id: null,
@@ -1227,25 +1228,31 @@ const DataProduk = ({
     return <span>{props.placeholder}</span>;
   };
 
-  const getStock = () => {
+  const formatTh = (value) => {
+    return `${value?.toFixed(2)}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
+  const getStock = (id) => {
     let stock = 0;
-    product?.list?.forEach((element) => {
-      stcard?.forEach((elem) => {
-        if (element?.id === elem?.prod_id?.id) {
-          if (elem?.trx_dbcr === "d") {
-            stock += elem?.trx_qty;
-          } else {
-            stock -= elem?.trx_qty;
-          }
+    // product?.list?.forEach((element) => {
+    stcard?.forEach((elem) => {
+      if (id === elem?.prod_id?.id) {
+        if (elem?.trx_dbcr === "d") {
+          stock += elem?.trx_qty;
+        } else {
+          stock -= elem?.trx_qty;
         }
-      });
+      }
+      // });
       // console.log("hhhh", deptement);
     });
 
     return stock;
   };
 
-  console.log("stcard we",stcard);
+  console.log("stcard we", stcard);
 
   const renderBody = () => {
     return (
@@ -1291,14 +1298,14 @@ const DataProduk = ({
             field={(e) => e?.code ?? ""}
             body={load && <Skeleton />}
           />
-          <Column
+          {/* <Column
             header={tr[localStorage.getItem("language")].barcode}
             style={{
               minWidth: "8rem",
             }}
             field={(e) => e?.barcode ?? "-"}
             body={load && <Skeleton />}
-          />
+          /> */}
           <Column
             header={tr[localStorage.getItem("language")].nm_prod}
             field={(e) => e.name}
@@ -1335,7 +1342,7 @@ const DataProduk = ({
           />
           <Column
             header={tr[localStorage.getItem("language")].stok}
-            field={(e) => e?.max_stock ?? "-"}
+            field={(e) => formatTh(getStock(e?.id))}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />

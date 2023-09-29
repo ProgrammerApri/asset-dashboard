@@ -6,16 +6,13 @@ import KartuStock from "./KartuStock";
 import MutasiStock from "./MutasiStock";
 import PembelianPerProduk from "../LaporanPembelian/PembelianPerProduk";
 import ReportGRA from "../LaporanPembelian/Gra";
-import KartuStockRingkasan from "./KartuStock_ringkasan";
+import KartuStockRingkasan from "./KartuStockRingkasan";
+import KartuStockHPP from "./KartuStockHPP";
+// import KartuStockRingkasan from "./KartuStock_ringkasan";
 
 const LaporanPersediaan = (self) => {
   const [active, setActive] = useState(0);
   const [subMenu, setSubMenu] = useState([
-    {
-      tittle: "Mutasi Antar Lokasi",
-      icon: "bx-spreadsheet",
-      component: <MutasiStock />,
-    },
     {
       tittle: "Kartu Stock Ringkasan",
       icon: "bx-spreadsheet",
@@ -27,9 +24,19 @@ const LaporanPersediaan = (self) => {
       component: <KartuStock />,
     },
     {
+      tittle: "Kartu Saldo Persediaan",
+      icon: "bx-spreadsheet",
+      component: <KartuStockHPP />,
+    },
+    {
       tittle: "Pembelian Per Produk",
       icon: "bx-receipt",
       component: <PembelianPerProduk />,
+    },
+    {
+      tittle: "Mutasi Antar Lokasi",
+      icon: "bx-spreadsheet",
+      component: <MutasiStock />,
     },
   
 

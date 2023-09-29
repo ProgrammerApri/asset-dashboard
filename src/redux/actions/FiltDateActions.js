@@ -1,0 +1,4 @@
+export const SET_FILTDATE_KSRING = "filtDate.SET_FILTDATE_KSRING"
+export const SET_FILTDATE_KSRIN = "filtDate.SET_FILTDATE_KSRIN"
+export const SET_FILTDATE_KSSAL = "filtDate.SET_FILTDATE_KSSAL"
+export const SET_FILTDATE_HUT = "filtDate.SET_FILTDATE_HUT"

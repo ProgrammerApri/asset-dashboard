@@ -1,4 +1,5 @@
 import { combineReducers } from "redux";
+import fi from "./INVReducer";
 import INVReducer from "./INVReducer";
 import POReducer from "./POReducer";
 import ProductReducer from "./ProductReducer";
@@ -36,6 +37,7 @@ import RecActReducer from "./RecActReducer";
 import WorkCenterReducer from "./WorkCenterReducer";
 import JENISKERJAReducer from "./JENISKERJAReducer";
 import RAKReducer from "./RAKReducer";
+import FiltDateReducer from "./FiltDateReducer";
 // import PBNReducer from "./PBNReducer";
 
 
@@ -80,6 +82,7 @@ const rootReducer = combineReducers({
   wc: WorkCenterReducer,
   jns_kerja: JENISKERJAReducer,
   rak: RAKReducer,
+  filtDate: FiltDateReducer,
 });
 
 export default rootReducer;

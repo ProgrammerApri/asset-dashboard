@@ -695,7 +695,7 @@ export const  tr = {
     supply_awal: "Persediaan Awal",
     supply_bdp_ahir: "Persediaan BDP Akhir",
     supply_bdp_awal: "Persediaan BDP Awal",
-    supply_prod_jadi: "Persediaan Produk Jadi",
+    supply_prod_jadi: "Persediaan Produk Jadi",  
     syarat: "Syarat Pembayaran",
     tambh_acc: "Tambah Data",
     tambh: "Tambah",

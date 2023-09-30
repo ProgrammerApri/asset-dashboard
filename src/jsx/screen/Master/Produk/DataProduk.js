@@ -384,7 +384,7 @@ const DataProduk = ({
       endpoint: endpoints.editProduct.endpoint + currentItem.id,
       data: {
         ...currentItem,
-        code: generateCodePreview(),
+        // code: generateCodePreview(),
         image: image,
       },
     };
@@ -784,7 +784,7 @@ const DataProduk = ({
                   await getCodeProd();
                   setCurrentItem({
                     ...def,
-                    // serialNumber: prodcode,
+                    code: generateCodePreview(),
                     suplier: [
                       {
                         id: 0,
@@ -1236,7 +1236,6 @@ const DataProduk = ({
 
   const getStock = (id) => {
     let stock = 0;
-    // product?.list?.forEach((element) => {
     stcard?.forEach((elem) => {
       if (id === elem?.prod_id?.id) {
         if (elem?.trx_dbcr === "d") {
@@ -1245,14 +1244,10 @@ const DataProduk = ({
           stock -= elem?.trx_qty;
         }
       }
-      // });
-      // console.log("hhhh", deptement);
     });
 
     return stock;
   };
-
-  console.log("stcard we", stcard);
 
   const renderBody = () => {
     return (
@@ -1412,11 +1407,7 @@ const DataProduk = ({
                 <div className="col-4 ">
                   <PrimeInput
                     label={tr[localStorage.getItem("language")].kd_prod}
-                    value={
-                      !isEdit
-                        ? generateCodePreview(currentItem?.code)
-                        : currentItem?.code
-                    }
+                    value={currentItem?.code}
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     // error={error[0]?.code}
                     disabled

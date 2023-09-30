@@ -46,6 +46,8 @@ const data = {
   ns: false,
   same_sup: false,
   note: null,
+  freight: null,
+  insurance: null,
   dprod: [],
   djasa: [],
 };
@@ -94,7 +96,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
       console.log(response);
       if (response.status) {
         const kode = response.data;
-        console.log("gra",kode);
+        console.log("gra", kode);
         onAdd();
         dispatch({
           type: SET_CURRENT_ODR,
@@ -163,11 +165,11 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
       console.log(response);
       if (response.status) {
         // if (response.status) {
-          const { data } = response;
-  
-          console.log("data Dibawah");
-          console.log(data);
-          const filteredData = data.filter((item) => item.modul !== "gra");
+        const { data } = response;
+
+        console.log("data Dibawah");
+        console.log(data);
+        const filteredData = data.filter((item) => item.modul !== "gra");
 
         dispatch({ type: SET_ODR, payload: filteredData });
       }

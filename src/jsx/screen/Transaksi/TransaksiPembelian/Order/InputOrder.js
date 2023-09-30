@@ -97,6 +97,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
   const [isRp, setRp] = useState(true);
   const [isRpJasa, setRpJasa] = useState(true);
   const [error, setError] = useState(defError);
+  const [idrVer, setIdrVer] = useState(false);
   const dispatch = useDispatch();
   const [accor, setAccor] = useState({
     produk: true,
@@ -732,19 +733,11 @@ const InputOrder = ({ onCancel, onSuccess }) => {
   const getSubTotalBarang = () => {
     let total = 0;
     order?.dprod?.forEach((el) => {
-      // if (checkSupp(order.sup_id)?.supplier?.sup_curren !== null) {
-      //   if (el.nett_price && el.nett_price > 0) {
-      //     total += parseInt(el.nett_price);
-      //   } else {
-      //     total += el.total_fc - (el.total_fc * el.disc) / 100;
-      //   }
-      // } else {
       if (el.nett_price && el.nett_price > 0) {
         total += parseInt(el.nett_price);
       } else {
         total += el.total - (el.total * el.disc) / 100;
       }
-      // }
     });
 
     return total;
@@ -753,17 +746,32 @@ const InputOrder = ({ onCancel, onSuccess }) => {
   const getSubTotalJasa = () => {
     let total = 0;
     order?.djasa?.forEach((el) => {
-      // if (
-      //   checkSupp(order.sup_id)?.supplier?.sup_curren !== null ||
-      //   checkSupp(el.sup_id)?.supplier?.sup_curren
-      // ) {
-      //   total += el.total_fc - (el.total_fc * el.disc) / 100;
-      // } else {
       total += el.total - (el.total * el.disc) / 100;
-      // }
     });
 
     return total;
+  };
+
+  const getSubTotalBarangFc = () => {
+    let totalfc = 0;
+    order?.dprod?.forEach((el) => {
+      if (el.nett_price && el.nett_price > 0) {
+        totalfc += parseInt(el.nett_price);
+      } else {
+        totalfc += el.total_fc - (el.total_fc * el.disc) / 100;
+      }
+    });
+
+    return totalfc;
+  };
+
+  const getSubTotalJasaFc = () => {
+    let totalfc = 0;
+    order?.djasa?.forEach((el) => {
+      totalfc += el.total_fc - (el.total_fc * el.disc) / 100;
+    });
+
+    return totalfc;
   };
 
   const getUangMuka = () => {
@@ -1597,8 +1605,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                           temp[e.index].konv_qty = 0;
                           temp[e.index].unit_konv =
                             checkUnit(temp[e.index].unit_id)?.u_from !== null
-                              ? checkUnit(temp[e.index].unit_id)?.u_from?.code
-                              : checkUnit(temp[e.index].unit_id)?.code;
+                              ? checkUnit(temp[e.index].unit_id)?.u_from?.name
+                              : checkUnit(temp[e.index].unit_id)?.name;
                           updateORD({ ...order, dprod: temp });
                           let newError = error;
                           newError.prod[e.index].id = false;
@@ -1726,7 +1734,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                           temp[e.index].unit_id = u.id;
                           temp[e.index].konv_qty = temp[e.index].order * u?.qty;
                           temp[e.index].unit_konv =
-                            u?.u_from !== null ? u?.u_from?.code : u?.code;
+                            u?.u_from !== null ? u?.u_from?.name : u?.name;
                           updateORD({ ...order, dprod: temp });
                         }}
                         option={satuan}
@@ -2050,20 +2058,19 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                     }}
                     field={""}
                     body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={
-                            e.nett_price && e.nett_price !== 0
-                              ? e.nett_price
-                              : e.total_fc - (e.total_fc * e.disc) / 100
-                          }
-                          onChange={(u) => {}}
-                          placeholder="0"
-                          type="number"
-                          min={0}
-                          disabled
-                        />
-                      </div>
+                      <PrimeNumber
+                        price
+                        value={
+                          e.nett_price && e.nett_price !== 0
+                            ? e.nett_price
+                            : e.total_fc - (e.total_fc * e.disc) / 100
+                        }
+                        onChange={(u) => {}}
+                        placeholder="0"
+                        type="number"
+                        min={0}
+                        disabled
+                      />
                     )}
                   />
 
@@ -2703,29 +2710,47 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             </div>
             <div className="row mt-4">
               {order.djasa?.length > 0 && order.dprod?.length > 0 && (
-                <div className="d-flex col-12 align-items-center">
-                  <label className="mt-1">{"Pisah Faktur"}</label>
-                  <InputSwitch
-                    className="ml-4"
-                    checked={order.split_inv}
-                    onChange={(e) => {
-                      if (e.value) {
-                        updateORD({
-                          ...order,
-                          split_inv: e.value,
-                          total_disc: null,
-                        });
-                      } else {
-                        updateORD({
-                          ...order,
-                          split_inv: e.value,
-                          prod_disc: null,
-                          jasa_disc: null,
-                        });
-                      }
-                    }}
-                  />
-                </div>
+                <>
+                  <div className="d-flex col-6 align-items-center">
+                    <label className="mt-1">{"Pisah Faktur"}</label>
+                    <InputSwitch
+                      className="ml-4"
+                      checked={order.split_inv}
+                      onChange={(e) => {
+                        if (e.value) {
+                          updateORD({
+                            ...order,
+                            split_inv: e.value,
+                            total_disc: null,
+                          });
+                        } else {
+                          updateORD({
+                            ...order,
+                            split_inv: e.value,
+                            prod_disc: null,
+                            jasa_disc: null,
+                          });
+                        }
+                      }}
+                    />
+                  </div>
+
+                  {order?.sup_id !== null &&
+                  checkSupp(order.sup_id)?.supplier?.sup_curren !== null ? (
+                    <div className="d-flex col-6 align-items-center">
+                      <label className="mt-1">{"Versi IDR"}</label>
+                      <InputSwitch
+                        className="ml-4"
+                        checked={idrVer}
+                        onChange={(e) => {
+                          setIdrVer(e?.value);
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <></>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -2742,15 +2767,24 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             <div className="col-6">
               <label className="text-label">
                 {order.split_inv ? (
-                  checkSupp(order.sup_id)?.supplier?.sup_curren !== null ? (
-                    <b>Rp. {formatIdr(getSubTotalBarang())}</b>
+                  checkSupp(order.sup_id)?.supplier?.sup_curren !== null &&
+                  !idrVer ? (
+                    <b>{`${
+                      checkCur(checkSupp(order.sup_id)?.supplier?.sup_curren)
+                        .code
+                    }. ${formatIdr(getSubTotalBarangFc())}`}</b>
                   ) : (
                     <b>Rp. {formatIdr(getSubTotalBarang())}</b>
                   )
-                ) : checkSupp(order.sup_id)?.supplier?.sup_curren !== null ? (
+                ) : checkSupp(order.sup_id)?.supplier?.sup_curren !== null &&
+                  !idrVer ? (
                   <b>
-                    {" "}
-                    Rp. {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
+                    {`${
+                      checkCur(checkSupp(order.sup_id)?.supplier?.sup_curren)
+                        .code
+                    }. ${formatIdr(
+                      getSubTotalBarangFc() + getSubTotalJasaFc()
+                    )}`}
                   </b>
                 ) : (
                   <b>
@@ -2769,14 +2803,24 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             <div className="col-6">
               <label className="text-label">
                 {order.split_inv ? (
-                  checkSupp(order.sup_id)?.supplier?.sup_curren !== null ? (
-                    <b>Rp. {formatIdr(getSubTotalBarang())}</b>
+                  checkSupp(order.sup_id)?.supplier?.sup_curren !== null &&
+                  !idrVer ? (
+                    <b>{`${
+                      checkCur(checkSupp(order.sup_id)?.supplier?.sup_curren)
+                        .code
+                    }. ${formatIdr(getSubTotalBarangFc())}`}</b>
                   ) : (
                     <b>Rp. {formatIdr(getSubTotalBarang())}</b>
                   )
-                ) : checkSupp(order.sup_id)?.supplier?.sup_curren !== null ? (
+                ) : checkSupp(order.sup_id)?.supplier?.sup_curren !== null &&
+                  !idrVer ? (
                   <b>
-                    Rp. {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
+                    {`${
+                      checkCur(checkSupp(order.sup_id)?.supplier?.sup_curren)
+                        .code
+                    }. ${formatIdr(
+                      getSubTotalBarangFc() + getSubTotalJasaFc()
+                    )}`}
                   </b>
                 ) : (
                   <b>
@@ -2799,17 +2843,27 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             <div className="col-6">
               <label className="text-label">
                 {order.split_inv ? (
-                  checkSupp(order.sup_id)?.supplier?.sup_curren !== null ? (
-                    <b>Rp. {formatIdr((getSubTotalBarang() * ppn()) / 100)}</b>
+                  checkSupp(order.sup_id)?.supplier?.sup_curren !== null &&
+                  !idrVer ? (
+                    <b>
+                      {`${
+                        checkCur(checkSupp(order.sup_id)?.supplier?.sup_curren)
+                          .code
+                      }. ${formatIdr((getSubTotalBarangFc() * ppn()) / 100)}`}
+                    </b>
                   ) : (
                     <b>Rp. {formatIdr((getSubTotalBarang() * ppn()) / 100)}</b>
                   )
-                ) : checkSupp(order.sup_id)?.supplier?.sup_curren !== null ? (
+                ) : checkSupp(order.sup_id)?.supplier?.sup_curren !== null &&
+                  !idrVer ? (
                   <b>
-                    Rp.
-                    {formatIdr(
-                      ((getSubTotalBarang() + getSubTotalJasa()) * ppn()) / 100
-                    )}
+                    {`${
+                      checkCur(checkSupp(order.sup_id)?.supplier?.sup_curren)
+                        .code
+                    }. ${formatIdr(
+                      ((getSubTotalBarangFc() + getSubTotalJasaFc()) * ppn()) /
+                        100
+                    )}`}
                   </b>
                 ) : (
                   <b>
@@ -2883,6 +2937,100 @@ const InputOrder = ({ onCancel, onSuccess }) => {
               </div>
             </div>
 
+            {order.sup_id &&
+            checkSupp(order.sup_id)?.supplier?.sup_curren !== null ? (
+              <>
+                <div className="col-6">
+                  <label className="text-label">
+                    <b>{`Freight Charge (${
+                      checkCur(checkSupp(order.sup_id)?.supplier?.sup_curren)
+                        .code
+                    })`}</b>
+                  </label>
+                </div>
+
+                <div className="col-3">
+                  <label className="text-label">
+                    <PrimeNumber
+                      price
+                      value={order.freight && order.freight}
+                      onChange={(u) => {
+                        updateORD({
+                          ...order,
+                          freight: u.value,
+                          total_b: getSubTotalBarang() + getSubTotalJasa(),
+                          total_bayar:
+                            getSubTotalBarang() +
+                            getSubTotalJasa() +
+                            u.value * order?.kurs +
+                            order?.insurance * order?.kurs +
+                            ((getSubTotalBarang() + getSubTotalJasa()) *
+                              ppn()) /
+                              100,
+                        });
+                      }}
+                      placeholder="0"
+                      type="number"
+                      min={0}
+                    />
+                  </label>
+                </div>
+
+                <div className="col-3 mt-3">
+                  <label className="text-label">
+                    <b>IDR. {formatIdr(order?.freight * order?.kurs)}</b>
+                  </label>
+                </div>
+
+                <div className="col-6">
+                  <label className="text-label">
+                    <b>
+                      {`Insurance (${
+                        checkCur(checkSupp(order.sup_id)?.supplier?.sup_curren)
+                          .code
+                      })
+                      `}
+                    </b>
+                  </label>
+                </div>
+
+                <div className="col-3">
+                  <label className="text-label">
+                    <PrimeNumber
+                      price
+                      value={order.insurance && order.insurance}
+                      onChange={(u) => {
+                        updateORD({
+                          ...order,
+                          insurance: u.value,
+                          total_b: getSubTotalBarang() + getSubTotalJasa(),
+                          total_bayar:
+                            getSubTotalBarang() +
+                            getSubTotalJasa() +
+                            u?.value * order?.kurs +
+                            order?.freight * order?.kurs +
+                            ((getSubTotalBarang() + getSubTotalJasa()) *
+                              ppn()) /
+                              100,
+                        });
+                      }}
+                      placeholder="0"
+                      type="number"
+                      min={0}
+                    />
+                  </label>
+                </div>
+
+                <div className="col-3 mt-3">
+                  <label className="text-label">
+                    <b>IDR. {formatIdr(order?.insurance * order?.kurs)}</b>
+                  </label>
+                </div>
+              </>
+            ) : (
+              <></>
+            )}
+
             <div className="col-12">
               <Divider className="ml-12"></Divider>
             </div>
@@ -2898,32 +3046,44 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             <div className="col-6">
               <label className="text-label fs-14">
                 {order.split_inv ? (
-                  checkSupp(order.sup_id)?.supplier?.sup_curren !== null ? (
+                  checkSupp(order.sup_id)?.supplier?.sup_curren !== null &&
+                  !idrVer ? (
                     <b>
-                      Rp.
-                      {formatIdr(
-                        getSubTotalBarang() +
-                          (getSubTotalBarang() * ppn()) / 100
-                      )}
+                      {`${
+                        checkCur(checkSupp(order.sup_id)?.supplier?.sup_curren)
+                          .code
+                      }. ${formatIdr(
+                        getSubTotalBarangFc() +
+                          order?.freight +
+                          order?.insurance +
+                          (getSubTotalBarangFc() * ppn()) / 100
+                      )}`}
                     </b>
                   ) : (
                     <b>
                       Rp.{" "}
                       {formatIdr(
                         getSubTotalBarang() +
+                          order?.freight * order?.kurs +
+                          order?.insurance * order?.kurs +
                           (getSubTotalBarang() * ppn()) / 100
                       )}
                     </b>
                   )
-                ) : checkSupp(order.sup_id)?.supplier?.sup_curren !== null ? (
+                ) : checkSupp(order.sup_id)?.supplier?.sup_curren !== null &&
+                  !idrVer ? (
                   <b>
-                    Rp.
-                    {formatIdr(
-                      getSubTotalBarang() +
-                        getSubTotalJasa() +
-                        ((getSubTotalBarang() + getSubTotalJasa()) * ppn()) /
+                    {`${
+                      checkCur(checkSupp(order.sup_id)?.supplier?.sup_curren)
+                        .code
+                    }. ${formatIdr(
+                      getSubTotalBarangFc() +
+                        getSubTotalJasaFc() +
+                        order?.freight +
+                        order?.insurance +
+                        ((getSubTotalBarangFc() + getSubTotalJasa()) * ppn()) /
                           100
-                    )}
+                    )}`}
                   </b>
                 ) : (
                   <b>
@@ -2931,6 +3091,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                     {formatIdr(
                       getSubTotalBarang() +
                         getSubTotalJasa() +
+                        order?.freight * order?.kurs +
+                        order?.insurance * order?.kurs +
                         ((getSubTotalBarang() + getSubTotalJasa()) * ppn()) /
                           100
                     )}
@@ -2949,7 +3111,14 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
             <div className="col-6">
               <label className="text-label fs-14">
-                <b>Rp. {formatIdr(getUangMuka())}</b>
+                {checkSupp(order.sup_id)?.supplier?.sup_curren !== null &&
+                !idrVer ? (
+                  <b>{`${
+                    checkCur(checkSupp(order.sup_id)?.supplier?.sup_curren).code
+                  }. ${formatIdr(getUangMuka())}`}</b>
+                ) : (
+                  <b>Rp. {formatIdr(getUangMuka())}</b>
+                )}
               </label>
             </div>
 
@@ -2961,16 +3130,37 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
             <div className="col-6">
               <label className="text-label fs-14">
-                <b>
-                  Rp.{" "}
-                  {formatIdr(
-                    getSubTotalBarang() +
-                      getSubTotalJasa() +
-                      ((getSubTotalBarang() + getSubTotalJasa()) * ppn()) /
-                        100 -
-                      getUangMuka()
-                  )}
-                </b>
+                {checkSupp(order.sup_id)?.supplier?.sup_curren !== null &&
+                !idrVer ? (
+                  <b>
+                    {`${
+                      checkCur(checkSupp(order.sup_id)?.supplier?.sup_curren)
+                        .code
+                    }. ${formatIdr(
+                      getSubTotalBarangFc() +
+                        getSubTotalJasaFc() +
+                        order?.freight +
+                        order?.insurance +
+                        ((getSubTotalBarangFc() + getSubTotalJasaFc()) *
+                          ppn()) /
+                          100 -
+                        getUangMuka()
+                    )}`}
+                  </b>
+                ) : (
+                  <b>
+                    Rp.{" "}
+                    {formatIdr(
+                      getSubTotalBarang() +
+                        getSubTotalJasa() +
+                        order?.freight * order?.kurs +
+                        order?.insurance * order?.kurs +
+                        ((getSubTotalBarang() + getSubTotalJasa()) * ppn()) /
+                          100 -
+                        getUangMuka()
+                    )}
+                  </b>
+                )}
               </label>
             </div>
 

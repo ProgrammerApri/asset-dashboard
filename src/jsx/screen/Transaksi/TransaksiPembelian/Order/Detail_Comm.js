@@ -4,7 +4,6 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 import { Card, Col, Row, Badge } from "react-bootstrap";
-import { SET_CURRENT_INV, SET_INV, SET_SL } from "src/redux/actions";
 import { useDispatch, useSelector } from "react-redux";
 import { InputText } from "primereact/inputtext";
 import { Divider } from "@material-ui/core";
@@ -14,17 +13,19 @@ import Wrapper from "src/jsx/components/CustomeWrapper/Wrapper";
 import { tr } from "../../../../../data/tr";
 
 const Detail = ({ onCancel }) => {
+  const show = useSelector((state) => state.order.current);
   const dispatch = useDispatch();
-  const sale = useSelector((state) => state.sl.sl);
-  const show = useSelector((state) => state.sl.current);
-  const [comp, setComp] = useState(null);
-  const [city, setCity] = useState(null);
-  const [loc, setLok] = useState(null);
-  const [ppn, setPpn] = useState(null);
-  const [supp, setSupp] = useState(null);
-  const [date, setDate] = useState(new Date());
-  const [arCard, setArCard] = useState(null);
   const printPage = useRef(null);
+  const [comp, setComp] = useState(null);
+  const [order, setOrder] = useState(null);
+  const [city, setCity] = useState(null);
+  const [supplier, setSupplier] = useState(null);
+  const [currency, setCurrency] = useState(null);
+  const [ppn, setPpn] = useState(null);
+  const [jas, setJas] = useState(null);
+  const [prod, setProd] = useState(null);
+  const [unit, setUnit] = useState(null);
+  const [apCard, setApCard] = useState(null);
 
   useEffect(() => {
     window.scrollTo({
@@ -32,19 +33,71 @@ const Detail = ({ onCancel }) => {
       left: 0,
       behavior: "smooth",
     });
-    getSale();
-    getCity();
-    getComp();
-    getLok();
-    getPpn();
+    getORD();
     getSupplier();
-    getAr();
+    getCur();
+    getProduct();
+    getJasa();
+    getSatuan();
+    getComp();
+    getCity();
+    getPpn();
+    getApCard();
   }, []);
 
-  const getSale = async () => {
+  const getORD = async () => {
     const config = {
-      ...endpoints.po,
-      data: sale,
+      ...endpoints.order,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setOrder(data);
+      }
+    } catch (error) {
+    }
+  };
+
+  const getSupplier = async () => {
+    const config = {
+      ...endpoints.supplier,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setSupplier(data);
+      }
+    } catch (error) {}
+  };
+
+  const getCur = async () => {
+    const config = {
+      ...endpoints.currency,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setCurrency(data);
+      }
+    } catch (error) {}
+  };
+
+  const getProduct = async () => {
+    const config = {
+      ...endpoints.product,
+      data: {},
     };
     console.log(config.data);
     let response = null;
@@ -54,7 +107,43 @@ const Detail = ({ onCancel }) => {
       if (response.status) {
         const { data } = response;
         console.log(data);
-        dispatch({ type: SET_SL, payload: data });
+        setProd(data);
+      }
+    } catch (error) {}
+  };
+
+  const getJasa = async () => {
+    const config = {
+      ...endpoints.jasa,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setJas(data);
+      }
+    } catch (error) {}
+  };
+
+  const getSatuan = async () => {
+    const config = {
+      ...endpoints.getSatuan,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        console.log(data);
+        setUnit(data);
       }
     } catch (error) {}
   };
@@ -95,24 +184,6 @@ const Detail = ({ onCancel }) => {
     } catch (error) {}
   };
 
-  const getLok = async () => {
-    const config = {
-      ...endpoints.lokasi,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setLok(data);
-      }
-    } catch (error) {}
-  };
-
   const getPpn = async () => {
     const config = {
       ...endpoints.pajak,
@@ -131,37 +202,51 @@ const Detail = ({ onCancel }) => {
     } catch (error) {}
   };
 
-  const getSupplier = async () => {
+  const jasa = (value) => {
+    let selected = {};
+    jas?.forEach((element) => {
+      if (value === element.jasa.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const supp = (value) => {
+    let selected = {};
+    supplier?.forEach((element) => {
+      if (value === element.supplier.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const getApCard = async () => {
     const config = {
-      ...endpoints.supplier,
-      data: {},
+      ...endpoints.apcard,
     };
-    console.log(config.data);
     let response = null;
     try {
       response = await request(null, config);
       console.log(response);
       if (response.status) {
         const { data } = response;
-        console.log(data);
-        setSupp(data);
+        setApCard(data);
       }
     } catch (error) {}
   };
 
-  const getAr = async () => {
-    const config = {
-      ...endpoints.arcard,
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setArCard(data);
+  const kota = (value) => {
+    let selected = {};
+    city?.forEach((element) => {
+      if (element.city_id === `${value}`) {
+        selected = element;
       }
-    } catch (error) {}
+    });
+    return selected;
   };
 
   const renderHeader = () => {
@@ -176,7 +261,11 @@ const Detail = ({ onCancel }) => {
                     height: "50px",
                     width: "50px",
                   }}
-                  src={comp?.cp_logo}
+                  src={
+                    ApiConfig.baseUrl +
+                    endpoints.getImage.endpoint +
+                    comp?.cp_logo
+                  }
                   alt=""
                 />
                 <br></br>
@@ -194,33 +283,39 @@ const Detail = ({ onCancel }) => {
               </div>
 
               <div className="">
-                <label className="text-label">
-                  {tr[localStorage.getItem("language")].customer}
-                </label>
+                <label className="text-label">Supplier</label>
                 <br></br>
                 <span className="ml-0 fs-14">
-                  <b>{`${show?.pel_id?.cus_name} (${show?.pel_id?.cus_code})`}</b>
+                  <b>{`${show?.sup_id?.sup_name} (${show?.sup_id?.sup_code})`}</b>
                 </span>
               </div>
 
               <div className="">
-                <label className="text-label">Salesman</label>
+                <label className="text-label ml-2"></label>
                 <br></br>
-                <span className="ml-0 fs-14">
-                  <b>
-                    {show?.slsm_id
-                      ? `${show?.slsm_id?.sales_name} (${show?.slsm_id?.sales_code})`
-                      : "-"}
-                  </b>
-                </span>
+                {
+                  <div>
+                    {show?.faktur === true ? (
+                      <Badge variant="info light" className="fs-13">
+                        <i className="bx bxs-plus-circle text-info mr-0 fs-14"></i>{" "}
+                        Faktur
+                      </Badge>
+                    ) : (
+                      <Badge variant="warning light" className="fs-14">
+                        <i className="bx bxs-minus-circle text-warning mr-0 fs-14"></i>{" "}
+                        Non Faktur
+                      </Badge>
+                    )}
+                  </div>
+                }
               </div>
 
               <div className="">
-                <label className="text-label ml-2">Status Tagihan</label>
+                <label className="text-label ml-3 fs-12">Status Tagihan</label>
                 <br></br>
                 {getSubTotalBarang() +
                   getSubTotalJasa() +
-                  ((getSubTotalBarang() + getSubTotalJasa()) * pjk()) / 100 -
+                  ((getSubTotalBarang() + getSubTotalJasa()) * pajk()) / 100 -
                   getUangMuka() -
                   getPelunasan() ===
                 0 ? (
@@ -228,7 +323,7 @@ const Detail = ({ onCancel }) => {
                     variant="primary light"
                     style={{ width: "7rem", height: "2rem" }}
                   >
-                    <span className="fs-15 mb-0 mr-3">
+                    <span className="fs-14 mb-0 mr-3">
                       <i className="bx bx-check text-primary ml-2 mt-0"></i>{" "}
                       Lunas
                     </span>
@@ -238,7 +333,7 @@ const Detail = ({ onCancel }) => {
                     variant="warning light"
                     style={{ width: "7rem", height: "2rem" }}
                   >
-                    <span className="fs-15 mb-0 mr-3">
+                    <span className="fs-14 mb-0 mr-3">
                       <i className="bx bxs-circle text-warning ml-2 mt-0"></i>{" "}
                       Open
                     </span>
@@ -270,7 +365,7 @@ const Detail = ({ onCancel }) => {
                     // disabled={show?.apprv === false}
                   /> */}
                   <Button
-                    label={tr[localStorage.getItem("language")].batal}
+                    label="Batal"
                     onClick={onCancel}
                     className="p-button-info"
                     icon="pi pi-times"
@@ -283,8 +378,6 @@ const Detail = ({ onCancel }) => {
       </Row>
     );
   };
-
-  const renderFooter = () => {};
 
   const formatDate = (date) => {
     var d = new Date(`${date}Z`),
@@ -305,14 +398,14 @@ const Detail = ({ onCancel }) => {
   };
 
   const formatTh = (value) => {
-    return `${value?.toFixed(2)}`
+    return `${value}`
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
 
   const getSubTotalBarang = () => {
     let total = 0;
-    show?.jprod?.forEach((el) => {
+    show?.dprod?.forEach((el) => {
       if (el.nett_price && el.nett_price > 0) {
         total += parseInt(el.nett_price);
       } else {
@@ -325,17 +418,37 @@ const Detail = ({ onCancel }) => {
 
   const getSubTotalJasa = () => {
     let total = 0;
-    show?.jjasa?.forEach((el) => {
+    show?.djasa?.forEach((el) => {
       total += el.total - (el.total * el.disc) / 100;
     });
 
     return total;
   };
 
+  const pajk = (value) => {
+    let nil = 0;
+    ppn?.forEach((elem) => {
+      if (show.sup_id?.sup_ppn === elem.id) {
+        nil = elem.nilai;
+      }
+    });
+    return nil;
+  };
+
+  const getCurRate = (value) => {
+    let rate = 0;
+    currency?.forEach((elem) => {
+      if (show.sup_id?.sup_curren === elem.id) {
+        rate = elem.rate;
+      }
+    });
+    return rate;
+  };
+
   const getUangMuka = () => {
     let dp = 0;
-    arCard?.forEach((element) => {
-      if (show?.so_id?.id === element.so_id?.id && element.trx_type === "DP") {
+    apCard?.forEach((element) => {
+      if (show?.po_id?.id === element.po_id?.id && element.trx_type === "DP") {
         dp += element.trx_amnh;
       }
     });
@@ -345,8 +458,8 @@ const Detail = ({ onCancel }) => {
 
   const getPelunasan = () => {
     let bayar = 0;
-    arCard?.forEach((element) => {
-      if (show?.id === element.bkt_id?.id && element.pay_type === "J4") {
+    apCard?.forEach((element) => {
+      if (show?.id === element.ord_id?.id && element.pay_type === "H4") {
         bayar += element.acq_amnh;
       }
     });
@@ -354,52 +467,11 @@ const Detail = ({ onCancel }) => {
     return bayar;
   };
 
-  const pjk = (value) => {
-    let nil = 0;
-    ppn?.forEach((elem) => {
-      if (show?.pel_id.cus_pjk === elem.id) {
-        nil = elem.nilai;
-      }
-    });
-
-    return nil;
-  };
-
-  const kota = (value) => {
-    let selected = {};
-    city?.forEach((element) => {
-      if (element.city_id === `${value}`) {
-        selected = element;
-      }
-    });
-    return selected;
-  };
-
-  const lok = (value) => {
-    let selected = {};
-    loc?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-    return selected;
-  };
-
-  const sup = (value) => {
-    let selected = {};
-    supp?.forEach((element) => {
-      if (value === element.supplier.id) {
-        selected = element;
-      }
-    });
-    return selected;
-  };
-
   const body = () => {
     let total_qty = 0;
     let total_qty_konv = 0;
 
-    show?.jprod?.forEach(el => {
+    show?.dprod?.forEach(el => {
       total_qty += el?.order
       total_qty_konv += el?.konv_qty
     });

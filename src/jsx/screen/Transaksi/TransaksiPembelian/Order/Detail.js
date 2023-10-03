@@ -10,7 +10,7 @@ import { InputText } from "primereact/inputtext";
 import { Divider } from "@material-ui/core";
 import ReactToPrint from "react-to-print";
 import Wrapper from "src/jsx/components/CustomeWrapper/Wrapper";
-import { ApiConfig } from "src/data/config";
+import { tr } from "../../../../../data/tr";
 
 const Detail = ({ onCancel }) => {
   const show = useSelector((state) => state.order.current);
@@ -20,7 +20,6 @@ const Detail = ({ onCancel }) => {
   const [order, setOrder] = useState(null);
   const [city, setCity] = useState(null);
   const [supplier, setSupplier] = useState(null);
-  const [currency, setCurrency] = useState(null);
   const [ppn, setPpn] = useState(null);
   const [jas, setJas] = useState(null);
   const [prod, setProd] = useState(null);
@@ -37,7 +36,6 @@ const Detail = ({ onCancel }) => {
     });
     getORD();
     getSupplier();
-    getCur();
     getProduct();
     getJasa();
     getSatuan();
@@ -78,22 +76,6 @@ const Detail = ({ onCancel }) => {
       if (response.status) {
         const { data } = response;
         setSupplier(data);
-      }
-    } catch (error) {}
-  };
-
-  const getCur = async () => {
-    const config = {
-      ...endpoints.currency,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setCurrency(data);
       }
     } catch (error) {}
   };
@@ -271,11 +253,7 @@ const Detail = ({ onCancel }) => {
                     height: "50px",
                     width: "50px",
                   }}
-                  src={
-                    ApiConfig.baseUrl +
-                    endpoints.getImage.endpoint +
-                    comp?.cp_logo
-                  }
+                  src={comp?.cp_logo}
                   alt=""
                 />
                 <br></br>
@@ -375,7 +353,7 @@ const Detail = ({ onCancel }) => {
                     // disabled={show?.apprv === false}
                   /> */}
                   <Button
-                    label="Batal"
+                    label={tr[localStorage.getItem("language")].batal}
                     onClick={onCancel}
                     className="p-button-info"
                     icon="pi pi-times"
@@ -408,7 +386,7 @@ const Detail = ({ onCancel }) => {
   };
 
   const formatTh = (value) => {
-    return `${value}`
+    return `${value?.toFixed(2)}`
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
@@ -445,23 +423,18 @@ const Detail = ({ onCancel }) => {
     return nil;
   };
 
-  const getCurRate = (value) => {
-    let rate = 0;
-    currency?.forEach((elem) => {
-      if (show.sup_id?.sup_curren === elem.id) {
-        rate = elem.rate;
-      }
-    });
-    return rate;
-  };
-
   const getUangMuka = () => {
     let dp = 0;
-    apCard?.forEach((element) => {
-      if (show?.po_id?.id === element.po_id?.id && element.trx_type === "DP") {
-        dp += element.trx_amnh;
-      }
-    });
+    if (show?.po_id) {
+      apCard?.forEach((element) => {
+        if (
+          show?.po_id?.id === element.po_id?.id &&
+          element.trx_type === "DP"
+        ) {
+          dp += element.trx_amnh;
+        }
+      });
+    }
 
     return dp;
   };
@@ -495,11 +468,7 @@ const Detail = ({ onCancel }) => {
                           height: "150px",
                           width: "150px",
                         }}
-                        src={
-                          ApiConfig.baseUrl +
-                          endpoints.getImage.endpoint +
-                          comp?.cp_logo
-                        }
+                        src={comp?.cp_logo}
                         alt=""
                       />
                       {/* <br></br> */}
@@ -549,13 +518,13 @@ const Detail = ({ onCancel }) => {
                   <div className="row col-12">
                     <div className="col-8 fs-12 ml-0">
                       <label className="text-label">
-                        <b>Informasi Pembelian</b>
+                        <b>{ tr[localStorage.getItem("language")].inf_pembelian}</b>
                       </label>
                     </div>
 
                     <div className="col-4 fs-12 ml-0 text-right">
                       <label className="text-label">
-                        <b>Informasi Supplier</b>
+                        <b>{ tr[localStorage.getItem("language")].inf_pemasok}</b>
                       </label>
                     </div>
 
@@ -627,11 +596,9 @@ const Detail = ({ onCancel }) => {
                 </Card>
 
                 <Row className="ml-1 mt-2">
-                  <div className="col-12">
-                    <label className="text-label fs-13">
-                      <b>Daftar Produk</b>
-                    </label>
-                  </div>
+                  <label className="text-label fs-13">
+                    <b>{tr[localStorage.getItem("language")].dft_prod}</b>
+                  </label>
 
                   <DataTable
                     value={show.dprod?.map((v, i) => {
@@ -643,54 +610,43 @@ const Detail = ({ onCancel }) => {
                       };
                     })}
                     responsiveLayout="scroll"
-                    className="display w-150 datatable-wrapper fs-12 ml-2"
+                    className="display w-150 datatable-wrapper fs-12"
                     // showGridlines
                     dataKey="id"
                     rowHover
                   >
                     <Column
-                      header="Produk"
+                      header= {tr[localStorage.getItem("language")].prod}
                       field={(e) => `${e.prod_id?.name} (${e.prod_id?.code})`}
-                      style={{ minWidth: "17rem" }}
+                      style={{ minWidth: "19rem" }}
                       // body={loading && <Skeleton />}
                     />
                     <Column
-                      header="Gudang"
+                      header={tr[localStorage.getItem("language")].gudang}
                       field={(e) => e.location?.name}
                       style={{ minWidth: "9rem" }}
                       // body={loading && <Skeleton />}
                     />
                     <Column
-                      header="Jumlah"
+                      header={tr[localStorage.getItem("language")].jumlah}
                       field={(e) => formatTh(e.order)}
                       style={{ minWidth: "6rem" }}
                       // body={loading && <Skeleton />}
                     />
                     <Column
-                      header="Satuan"
-                      field={(e) => e.unit_id?.code}
-                      style={{ minWidth: "5rem" }}
+                      header={tr[localStorage.getItem("language")].satuan}
+                      field={(e) => e.unit_id?.name}
+                      style={{ minWidth: "7rem" }}
                       // body={loading && <Skeleton />}
                     />
                     <Column
-                      hidden={show?.sup_id?.sup_curren === null}
-                      header="Harga Satuan"
-                      field={(e) => formatIdr(e.price)}
-                      style={{ minWidth: "6rem" }}
-                      // body={loading && <Skeleton />}
-                    />
-                    <Column
-                      header="Harga Satuan (IDR)"
-                      field={(e) =>
-                        show?.sup_id?.sup_curren
-                          ? `Rp. ${formatIdr(e.price * getCurRate())}`
-                          : `Rp. ${formatIdr(e.price)}`
-                      }
+                      header={tr[localStorage.getItem("language")].price}
+                      field={(e) => `Rp. ${formatIdr(e.price)}`}
                       style={{ minWidth: "10rem" }}
                       // body={loading && <Skeleton />}
                     />
                     <Column
-                      header="Total (IDR)"
+                      header="Total"
                       field={(e) => `Rp. ${formatIdr(e.total)}`}
                       style={{ minWidth: "10rem" }}
                       // body={loading && <Skeleton />}
@@ -702,7 +658,7 @@ const Detail = ({ onCancel }) => {
                   <Row className="ml-1 mt-6">
                     <>
                       <label className="text-label fs-13">
-                        <b>Daftar Jasa</b>
+                        <b>{tr[localStorage.getItem("language")].dft_jasa}</b>
                       </label>
 
                       <DataTable
@@ -720,7 +676,7 @@ const Detail = ({ onCancel }) => {
                         rowHover
                       >
                         <Column
-                          header="Supplier"
+                          header={ tr[localStorage.getItem("language")].pemasok}
                           field={(e) =>
                             e.sup_id
                               ? `${e.sup_id?.supplier?.sup_name} (${e.sup_id?.supplier?.sup_code})`
@@ -730,7 +686,7 @@ const Detail = ({ onCancel }) => {
                           // body={loading && <Skeleton />}
                         />
                         <Column
-                          header="Jasa"
+                          header= {tr[localStorage.getItem("language")].jasa}
                           field={(e) => e.jasa_id?.name}
                           style={{ minWidth: "27rem" }}
                           // body={loading && <Skeleton />}
@@ -748,7 +704,7 @@ const Detail = ({ onCancel }) => {
                   <></>
                 )}
 
-                <Row className="ml-0 mr-0 mb-0 mt-8 justify-content-between fs-12">
+                <Row className="ml-0 mr-0 mb-0 mt-4 justify-content-between fs-12">
                   <div></div>
                   <div className="row justify-content-right col-6 mr-4">
                     <div className="col-12 mb-0">
@@ -806,7 +762,7 @@ const Detail = ({ onCancel }) => {
                       <label className="text-label">
                         {show.split_inv
                           ? "Pajak Atas Barang"`(${pajk()}%)`
-                          : "Pajak"}
+                          : tr[localStorage.getItem("language")].pajak}
                       </label>
                     </div>
 
@@ -831,7 +787,7 @@ const Detail = ({ onCancel }) => {
                     </div>
 
                     <div className="col-5 mt-0">
-                      <label className="text-label">Diskon(%)</label>
+                      <label className="text-label">{tr[localStorage.getItem("language")].disc_per}</label>
                     </div>
 
                     <div className="col-7 text-right">
@@ -881,7 +837,7 @@ const Detail = ({ onCancel }) => {
                     </div>
 
                     <div className="col-5 mt-0">
-                      <label className="text-label">{"Uang Muka"}</label>
+                      <label className="text-label">{tr[localStorage.getItem("language")].uangmuka}</label>
                     </div>
 
                     <div className="col-7 text-right">

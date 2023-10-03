@@ -323,6 +323,8 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
                           prod_id: null,
                           unit_id: null,
                           request: null,
+                          konv_qty: null,
+                          unit_konv: null,
                         },
                       ],
                 rjasa:
@@ -353,13 +355,13 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
               payload: true,
             });
             rprod.forEach((el) => {
-              el.prod_id = el.prod_id.id;
-              el.unit_id = el.unit_id.id;
+              el.prod_id = el.prod_id?.id ?? null;
+              el.unit_id = el.unit_id?.id ?? null;
             });
             let rjasa = data.rjasa;
             rjasa.forEach((el) => {
-              el.jasa_id = el.jasa_id.id;
-              el.unit_id = el.unit_id.id;
+              el.jasa_id = el.jasa_id?.id ?? null;
+              el.unit_id = el.unit_id?.id ?? null;
             });
             dispatch({
               type: SET_CURRENT_RP,
@@ -377,6 +379,8 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
                           prod_id: null,
                           unit_id: null,
                           request: null,
+                          konv_qty: null,
+                          unit_konv: null,
                         },
                       ],
                 rjasa:
@@ -592,6 +596,8 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
                     prod_id: null,
                     unit_id: null,
                     request: null,
+                    konv_qty: null,
+                    unit_konv: null,
                   },
                 ],
                 rjasa: [

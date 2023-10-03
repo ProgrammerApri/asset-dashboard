@@ -28,6 +28,7 @@ const data = {
   tiered: false,
   rp: false,
   over_po: false,
+  // rak_option: false,
   rp1: null,
   rp2: null,
   rp3: null,
@@ -225,7 +226,7 @@ const Pembelian = () => {
               {loading ? (
                 <>
                   {renderLoading()}
-                  {renderLoading("400px")}
+                  {renderLoading()}
                 </>
               ) : (
                 <>

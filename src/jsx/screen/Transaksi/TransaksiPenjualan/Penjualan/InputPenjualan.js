@@ -135,9 +135,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
     getStoLoc();
     getSetup();
     getArCard();
-    if (isEdit) {
-      getRak();
-    }
+    getRak();
   }, []);
 
   const isValid = () => {
@@ -329,7 +327,8 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
 
         setNumb(data);
       }
-    } catch (error) {setNumb(false);
+    } catch (error) {
+      setNumb(false);
       console.error("Error:", error);
     }
   };
@@ -672,15 +671,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
 
       if (response.status) {
         const { data } = response;
-        let filt = [];
-        data?.forEach((element) => {
-          sale?.jprod?.forEach((elem) => {
-            if (element?.lokasi_rak === elem?.location) {
-              filt.push(element);
-            }
-          });
-        });
-        setRak(filt);
+        setRak(data);
       }
     } catch (error) {}
   };
@@ -1197,8 +1188,6 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                 tr[localStorage.getItem("language")].ord
               }`}</b>
             </span>
-            {/* </div>
-          <div className="col-12"> */}
             <Divider className="mt-2"></Divider>
           </div>
 
@@ -1300,6 +1289,13 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
 
           <div className="col-9"></div>
 
+          <div className="col-12 mt-3">
+            <span className="fs-14">
+              <b>Pelanggan</b>
+            </span>
+            <Divider className="mt-2"></Divider>
+          </div>
+
           <div className="col-3">
             <label className="text-label">
               {tr[localStorage.getItem("language")].customer}
@@ -1318,7 +1314,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
               placeholder={tr[localStorage.getItem("language")].pilih}
               detail
               onDetail={() => setShowCustomer(true)}
-              label={"[customer.cus_name]"}
+              label={"[customer.cus_name] ([customer.cus_code])"}
               errorMessage="Pelanggan Belum Dipilih"
               error={error?.pel}
               disabled={sale && sale.so_id}
@@ -1661,8 +1657,8 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                           temp[e.index].konv_qty = 0;
                           temp[e.index].unit_konv =
                             checkUnit(temp[e.index].unit_id)?.u_from !== null
-                              ? checkUnit(temp[e.index].unit_id)?.u_from?.code
-                              : checkUnit(temp[e.index].unit_id)?.code;
+                              ? checkUnit(temp[e.index].unit_id)?.u_from?.name
+                              : checkUnit(temp[e.index].unit_id)?.name;
 
                           temp[e.index].stock = st;
                           updateSL({ ...sale, jprod: temp });
@@ -1672,7 +1668,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                           setError(newError);
                         }}
                         placeholder={tr[localStorage.getItem("language")].pilih}
-                        label={"[name]"}
+                        label={"[name] ([code])"}
                         detail
                         onDetail={() => {
                           setCurrentIndex(e.index);
@@ -1712,14 +1708,12 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                           temp[e.index].stock = st;
                           updateSL({ ...sale, jprod: temp });
 
-                          getRak();
-
                           let newError = error;
                           newError.prod[e.index].lok = false;
                           setError(newError);
                         }}
                         option={lokasi}
-                        label={"[name]"}
+                        label={"[name] ([code])"}
                         placeholder={tr[localStorage.getItem("language")].pilih}
                         detail
                         onDetail={() => {
@@ -1734,6 +1728,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
+                    hidden
                     header={"Rak Aktif"}
                     className="align-text-top"
                     field={""}
@@ -1751,13 +1746,14 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                             temp[e.index].rak_id = null;
                             updateSL({ ...sale, jprod: temp });
                           }}
-                          disabled={sale?.so_id}
+                          disabled={sale?.so_id || e?.location == null}
                         />
                       </div>
                     )}
                   />
 
                   <Column
+                    hidden={!setup?.rak_option}
                     header={"Rak"}
                     className="align-text-top"
                     field={""}
@@ -1788,13 +1784,15 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                           // newError.prod[e.index].lok = false;
                           // setError(newError);
                         }}
-                        options={rak}
+                        options={rak.filter(
+                          (el) => el?.lokasi_rak == e.location
+                        )}
                         optionLabel={"rak_name"}
                         filter
                         filterBy={"rak_name"}
                         placeholder={tr[localStorage.getItem("language")].pilih}
                         showClear
-                        disabled={sale.so_id || !e.rak_aktif}
+                        // disabled={sale.so_id || !e.rak_aktif}
                       />
                     )}
                   />
@@ -1855,6 +1853,8 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         value={e.order && e.order}
                         onChange={(u) => {
                           let temp = [...sale.jprod];
+                            console.log("qty_unit");
+                            console.log(checkUnit(temp[e.index].unit_id)?.qty);
                           if (sale.so_id) {
                             let val =
                               u.value > e.r_remain ? e.r_remain : u?.value;
@@ -1912,8 +1912,6 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                             temp[e.index].konv_qty =
                               u.value * checkUnit(temp[e.index].unit_id)?.qty;
 
-                            // console.log("qty_unit");
-                            // console.log(checkUnit(temp[e.index].unit_id)?.qty);
 
                             if (
                               sale.pel_id &&
@@ -2022,7 +2020,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                           temp[e.index].unit_id = t.id;
                           temp[e.index].konv_qty = temp[e.index].order * t?.qty;
                           temp[e.index].unit_konv =
-                            t?.u_from !== null ? t?.u_from?.code : t?.code;
+                            t?.u_from !== null ? t?.u_from?.name : t?.name;
                           temp[e.index].price = null;
                           temp[e.index].total = null;
                           updateSL({ ...sale, jprod: temp });

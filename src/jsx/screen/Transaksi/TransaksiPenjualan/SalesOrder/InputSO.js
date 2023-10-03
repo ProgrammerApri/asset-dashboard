@@ -83,6 +83,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
   const [product, setProduk] = useState(null);
   const [satuan, setSatuan] = useState(null);
   const [lokasi, setLokasi] = useState(null);
+  const [allRak, setAllRak] = useState(null);
   const [rak, setRak] = useState(null);
   const [supplier, setSupplier] = useState(null);
   const [rulesPay, setRulesPay] = useState(null);
@@ -119,9 +120,9 @@ const InputSO = ({ onCancel, onSuccess }) => {
     getloct();
     getStoLoc();
     getStCard();
-    if (isEdit) {
-      getRak();
-    }
+    // if (isEdit) {
+    getRak();
+    // }
   }, []);
 
   const isValid = () => {
@@ -278,7 +279,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
       data: {},
     };
 
-    console.log( config.data);
+    console.log(config.data);
 
     let response = null;
     try {
@@ -290,7 +291,6 @@ const InputSO = ({ onCancel, onSuccess }) => {
         setNumb(data);
       }
     } catch (error) {
-
       setNumb(false);
       console.error("Error:", error);
     }
@@ -557,7 +557,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
-  const getRak = async () => {
+  const getRak = async (loc) => {
     const config = {
       ...endpoints.getRak,
       data: {},
@@ -572,13 +572,13 @@ const InputSO = ({ onCancel, onSuccess }) => {
         let filt = [];
 
         data?.forEach((element) => {
-          so?.sprod?.forEach((elem) => {
-            if (element?.lokasi_rak === elem?.location) {
-              filt.push(element);
-            }
-          });
+          if (element?.lokasi_rak === loc) {
+            filt.push(element);
+          }
         });
-        setRak(filt);
+
+        setRak(data);
+        setAllRak(data);
       }
     } catch (error) {}
   };
@@ -748,7 +748,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
 
   const checkRak = (value) => {
     let selected = {};
-    rak?.forEach((element) => {
+    allRak?.forEach((element) => {
       if (value === element.id) {
         selected = element;
       }
@@ -1277,7 +1277,11 @@ const InputSO = ({ onCancel, onSuccess }) => {
                           // }
                           updateSo({ ...so, sprod: temp });
 
-                          getRak();
+                          // if (temp[e.index].rak_id == null) {
+                          //   getRak(u?.id);
+                          // } else {
+                          //   getRak(false);
+                          // }
 
                           let newError = error;
                           newError.prod[e.index].lok = false;
@@ -1300,6 +1304,7 @@ const InputSO = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
+                    hidden
                     header={"Rak Aktif"}
                     className="align-text-top"
                     field={""}
@@ -1317,12 +1322,14 @@ const InputSO = ({ onCancel, onSuccess }) => {
                             temp[e.index].rak_id = null;
                             updateSo({ ...so, sprod: temp });
                           }}
+                          disabled={e.location == null}
                         />
                       </div>
                     )}
                   />
 
                   <Column
+                    hidden={!setup?.rak_option}
                     header={"Rak"}
                     className="align-text-top"
                     field={""}
@@ -1348,18 +1355,16 @@ const InputSO = ({ onCancel, onSuccess }) => {
                           temp[e.index].rak_id = u?.value?.id ?? null;
                           // temp[e.index].stock = st;
                           updateSo({ ...so, sprod: temp });
-
-                          // let newError = error;
-                          // newError.prod[e.index].lok = false;
-                          // setError(newError);
                         }}
-                        options={rak}
+                        options={rak.filter(
+                          (el) => el.lokasi_rak === e.location
+                        )}
                         optionLabel={"rak_name"}
                         filter
                         filterBy={"rak_name"}
                         placeholder={tr[localStorage.getItem("language")].pilih}
                         showClear
-                        disabled={!e.rak_aktif}
+                        // disabled={!e.rak_aktif}
                       />
                     )}
                   />
@@ -1520,109 +1525,66 @@ const InputSO = ({ onCancel, onSuccess }) => {
                       minWidth: "8rem",
                     }}
                     field={""}
-                    body={
-                      (e) => (
-                        // checkCus(so.pel_id)?.cus_curren !== null ? (
-                        //   <PrimeNumber
-                        //     value={e.price && e.price}
-                        //     onChange={(u) => {
-                        //       let temp = [...so.sprod];
-                        //       temp[e.index].price = u.target.value;
-                        //       if (checkCus(so.pel_id)?.cus_curren !== null) {
-                        //         temp[e.index].total_fc =
-                        //           temp[e.index].order * temp[e.index].price;
-
-                        //         temp[e.index].total =
-                        //           temp[e.index].total_fc * curConv();
-                        //       } else {
-                        //         temp[e.index].total =
-                        //           temp[e.index].order * temp[e.index].price;
-                        //       }
-
-                        //       updateSo({
-                        //         ...so,
-                        //         sprod: temp,
-                        //         total_bayar:
-                        //           getSubTotalBarang() +
-                        //           getSubTotalJasa() +
-                        //           ((getSubTotalBarang() + getSubTotalJasa()) *
-                        //             pjk()) /
-                        //             100,
-                        //       });
-
-                        //       console.log(temp);
-                        //       let newError = error;
-                        //       newError.prod[e.index].prc = false;
-                        //       setError(newError);
-                        //     }}
-                        //     placeholder="0"
-                        //     min={0}
-                        //     error={error?.prod[e.index]?.prc}
-                        //   />
-                        // ) : (
-                        <PrimeNumber
-                          price
-                          value={e.price && e.price}
-                          onChange={(u) => {
-                            let temp = [...so.sprod];
-                            temp[e.index].price = u.value;
+                    body={(e) => (
+                      <PrimeNumber
+                        price
+                        value={e.price && e.price}
+                        onChange={(u) => {
+                          let temp = [...so.sprod];
+                          temp[e.index].price = u.value;
+                          if (
+                            so?.pel_id &&
+                            checkCus(so.pel_id)?.cus_curren !== null
+                          ) {
                             if (
-                              so?.pel_id &&
-                              checkCus(so.pel_id)?.cus_curren !== null
+                              checkUnit(temp[e.index].unit_id)?.u_from !== null
                             ) {
-                              if (
-                                checkUnit(temp[e.index].unit_id)?.u_from !==
-                                null
-                              ) {
-                                temp[e.index].total_fc =
-                                  temp[e.index].konv_qty * temp[e.index].price;
+                              temp[e.index].total_fc =
+                                temp[e.index].konv_qty * temp[e.index].price;
 
-                                temp[e.index].total =
-                                  temp[e.index].total_fc * curConv();
-                              } else {
-                                temp[e.index].total_fc =
-                                  temp[e.index].order * temp[e.index].price;
-
-                                temp[e.index].total =
-                                  temp[e.index].total_fc * curConv();
-                              }
-                              temp[e.index].price_idr =
-                                temp[e.index].price * curConv();
+                              temp[e.index].total =
+                                temp[e.index].total_fc * curConv();
                             } else {
-                              if (
-                                checkUnit(temp[e.index].unit_id)?.u_from !==
-                                null
-                              ) {
-                                temp[e.index].total =
-                                  temp[e.index].konv_qty * u.value;
-                              } else {
-                                temp[e.index].total =
-                                  temp[e.index].order * u.value;
-                              }
+                              temp[e.index].total_fc =
+                                temp[e.index].order * temp[e.index].price;
+
+                              temp[e.index].total =
+                                temp[e.index].total_fc * curConv();
                             }
+                            temp[e.index].price_idr =
+                              temp[e.index].price * curConv();
+                          } else {
+                            if (
+                              checkUnit(temp[e.index].unit_id)?.u_from !== null
+                            ) {
+                              temp[e.index].total =
+                                temp[e.index].konv_qty * u.value;
+                            } else {
+                              temp[e.index].total =
+                                temp[e.index].order * u.value;
+                            }
+                          }
 
-                            updateSo({
-                              ...so,
-                              sprod: temp,
-                              total_bayar:
-                                getSubTotalBarang() +
-                                getSubTotalJasa() +
-                                ((getSubTotalBarang() + getSubTotalJasa()) *
-                                  pjk()) /
-                                  100,
-                            });
+                          updateSo({
+                            ...so,
+                            sprod: temp,
+                            total_bayar:
+                              getSubTotalBarang() +
+                              getSubTotalJasa() +
+                              ((getSubTotalBarang() + getSubTotalJasa()) *
+                                pjk()) /
+                                100,
+                          });
 
-                            let newError = error;
-                            newError.prod[e.index].prc = false;
-                            setError(newError);
-                          }}
-                          placeholder="0"
-                          min={0}
-                          error={error?.prod[e.index]?.prc}
-                        />
-                      )
-                      // )
-                    }
+                          let newError = error;
+                          newError.prod[e.index].prc = false;
+                          setError(newError);
+                        }}
+                        placeholder="0"
+                        min={0}
+                        error={error?.prod[e.index]?.prc}
+                      />
+                    )}
                   />
 
                   <Column

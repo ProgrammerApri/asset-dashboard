@@ -30,6 +30,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import PrimeCalendar from "src/jsx/components/PrimeCalendar/PrimeCalendar";
 import { current } from "@reduxjs/toolkit";
 import { InputSwitch } from "primereact/inputswitch";
+import { el } from "date-fns/locale";
 
 const def = {
   id: null,
@@ -43,6 +44,8 @@ const def = {
   konsinyasi: false,
   codeb: null,
   unit: null,
+  konv_qty: null,
+  konv_unit: null,
   weight: null,
   dm_panjang: null,
   dm_lebar: null,
@@ -381,7 +384,7 @@ const DataProduk = ({
       endpoint: endpoints.editProduct.endpoint + currentItem.id,
       data: {
         ...currentItem,
-        code: generateCodePreview(),
+        // code: generateCodePreview(),
         image: image,
       },
     };
@@ -781,7 +784,7 @@ const DataProduk = ({
                   await getCodeProd();
                   setCurrentItem({
                     ...def,
-                    // serialNumber: prodcode,
+                    code: generateCodePreview(),
                     suplier: [
                       {
                         id: 0,
@@ -1225,19 +1228,22 @@ const DataProduk = ({
     return <span>{props.placeholder}</span>;
   };
 
-  const getStock = () => {
+  const formatTh = (value) => {
+    return `${value?.toFixed(2)}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
+  const getStock = (id) => {
     let stock = 0;
-    product?.list?.forEach((element) => {
-      stcard?.forEach((elem) => {
-        if (element?.id === elem?.prod_id?.id) {
-          if (elem?.trx_dbcr === "d") {
-            stock += elem?.trx_qty;
-          } else {
-            stock -= elem?.trx_qty;
-          }
+    stcard?.forEach((elem) => {
+      if (id === elem?.prod_id?.id) {
+        if (elem?.trx_dbcr === "d") {
+          stock += elem?.trx_qty;
+        } else {
+          stock -= elem?.trx_qty;
         }
-      });
-      // console.log("hhhh", deptement);
+      }
     });
 
     return stock;
@@ -1287,14 +1293,14 @@ const DataProduk = ({
             field={(e) => e?.code ?? ""}
             body={load && <Skeleton />}
           />
-          <Column
+          {/* <Column
             header={tr[localStorage.getItem("language")].barcode}
             style={{
               minWidth: "8rem",
             }}
             field={(e) => e?.barcode ?? "-"}
             body={load && <Skeleton />}
-          />
+          /> */}
           <Column
             header={tr[localStorage.getItem("language")].nm_prod}
             field={(e) => e.name}
@@ -1314,8 +1320,24 @@ const DataProduk = ({
             body={load && <Skeleton />}
           />
           <Column
+            header={"Satuan"}
+            field={(e) => e?.unit?.name ?? "-"}
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
+            header={"Konversi Satuan"}
+            field={(e) =>
+              e?.konv_qty && e?.konv_unit
+                ? `${e?.konv_qty} (${e?.konv_unit})`
+                : "-"
+            }
+            style={{ minWidth: "8rem" }}
+            body={load && <Skeleton />}
+          />
+          <Column
             header={tr[localStorage.getItem("language")].stok}
-            field={(e) => e?.max_stock ?? "-"}
+            field={(e) => formatTh(getStock(e?.id))}
             style={{ minWidth: "8rem" }}
             body={load && <Skeleton />}
           />
@@ -1385,11 +1407,7 @@ const DataProduk = ({
                 <div className="col-4 ">
                   <PrimeInput
                     label={tr[localStorage.getItem("language")].kd_prod}
-                    value={
-                      !isEdit
-                        ? generateCodePreview(currentItem?.code)
-                        : currentItem?.code
-                    }
+                    value={currentItem?.code}
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     // error={error[0]?.code}
                     disabled
@@ -1643,7 +1661,7 @@ const DataProduk = ({
             >
               <div className="row mr-0 ml-0">
                 {" "}
-                <div className="col-4">
+                <div className="col-2">
                   <PrimeNumber
                     price
                     label={"Berat"}
@@ -1659,7 +1677,7 @@ const DataProduk = ({
                     min={0}
                   />
                 </div>
-                <div className="col-4">
+                <div className="col-2">
                   <PrimeDropdown
                     label={tr[localStorage.getItem("language")].satuan}
                     value={
@@ -1671,6 +1689,10 @@ const DataProduk = ({
                       setCurrentItem({
                         ...currentItem,
                         unit: e?.target.value?.id ?? null,
+                        konv_qty: e?.target.value?.qty ?? null,
+                        konv_unit: e?.target?.value?.u_from
+                          ? e?.target.value?.u_from?.name
+                          : e?.target.value?.name,
                       });
                       let newError = error;
                       newError[0].sat = false;
@@ -1682,6 +1704,35 @@ const DataProduk = ({
                     placeholder={tr[localStorage.getItem("language")].pilih}
                     errorMessage="Satuan Produk Belum Dipilih"
                     error={error[1]?.sat}
+                  />
+                </div>
+                <div className="col-2">
+                  <label className="text-label">Konversi Qty</label>
+                  <PrimeNumber
+                    price
+                    value={currentItem?.konv_qty ?? null}
+                    // onChange={(a) => {
+                    //   setCurrentItem({
+                    //     ...currentItem,
+                    //     konv_qty: a?.value ?? null,
+                    //   });
+                    // }}
+                    placeholder="0"
+                    disabled
+                  />
+                </div>
+                <div className="col-2">
+                  <label className="text-label">Konversi Unit</label>
+                  <PrimeInput
+                    value={currentItem?.konv_unit ?? null}
+                    // onChange={(a) => {
+                    //   setCurrentItem({
+                    //     ...currentItem,
+                    //     konv_unit: a?.value ?? null,
+                    //   });
+                    // }}
+                    placeholder="Konversi Unit"
+                    disabled
                   />
                 </div>
                 <div className="col-1">

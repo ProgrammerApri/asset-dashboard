@@ -34,6 +34,16 @@ const data = {
   cp_npwp: "",
   cp_coper: "",
   cp_logo: "",
+  cp_akun_name: "",
+  cp_bank_name: "",
+  cp_no_rek: "",
+  cp_branch: "",
+  cp_bank_addr: "",
+  cp_akun_name_usd: "",
+  cp_bank_name_usd: "",
+  cp_no_rek_usd: "",
+  cp_branch_usd: "",
+  cp_bank_addr_usd: "",
   multi_currency: false,
   appr_po: false,
   appr_payment: false,
@@ -43,6 +53,7 @@ const data = {
   rp: false,
   status_number_otomatis: false,
   over_po: false,
+  rak_option: false,
   cutoff: null,
   year_co: null,
 };
@@ -51,6 +62,8 @@ const Perusahaan = () => {
   const toast = useRef(null);
   const [displayDialog, setDisplayDialog] = useState(false);
   const [displayDialog2, setDisplayDialog2] = useState(false);
+  const [displayDialog3, setDisplayDialog3] = useState(false);
+  const [displayDialog4, setDisplayDialog4] = useState(false);
   const picker = useRef(null);
   const [file, setFile] = useState(null);
   const [fileUrl, setFileUrl] = useState(null);
@@ -135,6 +148,8 @@ const Perusahaan = () => {
   const onHide = () => {
     setDisplayDialog(false);
     setDisplayDialog2(false);
+    setDisplayDialog3(false);
+    setDisplayDialog4(false);
     setFile(null);
     getCompany(false);
   };
@@ -413,7 +428,11 @@ const Perusahaan = () => {
                       <div className="col-12 mb-3">
                         <img
                           className="cp-logo"
-                          src={ApiConfig.baseUrl +endpoints.getImage.endpoint + currentData.cp_logo}
+                          src={
+                            ApiConfig.baseUrl +
+                            endpoints.getImage.endpoint +
+                            currentData.cp_logo
+                          }
                           alt=""
                         />
                       </div>
@@ -460,6 +479,76 @@ const Perusahaan = () => {
               </div>
             </Accordion>
 
+            <Accordion className="accordion" defaultActiveKey="0">
+              <div className="accordion__item" key={2}>
+                <Accordion.Toggle
+                  as={Card.Text}
+                  eventKey={`0`}
+                  className={`accordion__header ${
+                    accor.other ? "collapsed" : ""
+                  }`}
+                  onClick={() => {
+                    setAccor({
+                      ...accor,
+                      other: !accor.other,
+                    });
+                  }}
+                >
+                  <span className="accordion__header--icon"></span>
+                  <span className="accordion__header--text">
+                    Informasi Bank (IDR)
+                  </span>
+                  <span className="accordion__header--indicator indicator_bordered"></span>
+                </Accordion.Toggle>
+                <Accordion.Collapse eventKey={"0"}>
+                  <div className="accordion__body--text">
+                    {renderDetail(
+                      "Nama Akun",
+                      currentData && currentData.cp_akun_name !== ""
+                        ? currentData.cp_akun_name
+                        : "-"
+                    )}
+                    {renderDetail(
+                      "Nama Bank",
+                      currentData && currentData.cp_bank_name !== ""
+                        ? currentData.cp_bank_name
+                        : "-"
+                    )}
+                    {renderDetail(
+                      "Nomor Rekening",
+                      currentData && currentData.cp_no_rek !== ""
+                        ? currentData.cp_no_rek
+                        : "-"
+                    )}
+                    {renderDetail(
+                      "Cabang Bank",
+                      currentData && currentData.cp_branch !== ""
+                        ? currentData.cp_branch
+                        : "-"
+                    )}
+                    {renderDetail(
+                      "Alamat Bank",
+                      currentData && currentData.cp_bank_addr !== ""
+                        ? currentData.cp_bank_addr
+                        : "-"
+                    )}
+
+                    <div className="mt-3 mb-1 flex justify-content-between">
+                      <div></div>
+                      <PButton
+                        label="Ubah"
+                        icon="pi pi-pencil"
+                        iconPos="right"
+                        onClick={() => {
+                          setDisplayDialog3(true);
+                        }}
+                      />
+                    </div>
+                  </div>
+                </Accordion.Collapse>
+              </div>
+            </Accordion>
+
             <Accordion className="acordion" defaultActiveKey="1">
               <div className="accordion__item" key={1}>
                 <Accordion.Toggle
@@ -476,7 +565,9 @@ const Perusahaan = () => {
                   }}
                 >
                   <span className="accordion__header--icon"></span>
-                  <span className="accordion__header--text">Approval</span>
+                  <span className="accordion__header--text">
+                    Setting Transaksi
+                  </span>
                   <span className="accordion__header--indicator indicator_bordered"></span>
                 </Accordion.Toggle>
                 <Accordion.Collapse eventKey={"0"}>
@@ -538,6 +629,27 @@ const Perusahaan = () => {
                       />
                       <label className="mr-3 mt-1" htmlFor="email">
                         {"Approval Pembayaran"}
+                      </label>
+                    </div>
+
+                    <div className="d-flex col-12 align-items-center">
+                      <InputSwitch
+                        className="mr-3"
+                        inputId="email"
+                        checked={currentData && currentData.rak_option}
+                        onChange={(e) => {
+                          setCurrentData({
+                            ...currentData,
+                            rak_option: e.value,
+                          });
+                          submitUpdate(false, {
+                            ...currentData,
+                            rak_option: e.value,
+                          });
+                        }}
+                      />
+                      <label className="mr-3 mt-1" htmlFor="email">
+                        {"Aktifkan Rak Untuk Semua Transaksi"}
                       </label>
                     </div>
                   </div>
@@ -602,6 +714,76 @@ const Perusahaan = () => {
                         iconPos="right"
                         onClick={() => {
                           setDisplayDialog2(true);
+                        }}
+                      />
+                    </div>
+                  </div>
+                </Accordion.Collapse>
+              </div>
+            </Accordion>
+
+            <Accordion className="accordion" defaultActiveKey="1">
+              <div className="accordion__item" key={2}>
+                <Accordion.Toggle
+                  as={Card.Text}
+                  eventKey={`0`}
+                  className={`accordion__header ${
+                    accor.other ? "collapsed" : ""
+                  }`}
+                  onClick={() => {
+                    setAccor({
+                      ...accor,
+                      other: !accor.other,
+                    });
+                  }}
+                >
+                  <span className="accordion__header--icon"></span>
+                  <span className="accordion__header--text">
+                    Informasi Bank (USD)
+                  </span>
+                  <span className="accordion__header--indicator indicator_bordered"></span>
+                </Accordion.Toggle>
+                <Accordion.Collapse eventKey={"0"}>
+                  <div className="accordion__body--text">
+                    {renderDetail(
+                      "Nama Akun",
+                      currentData && currentData.cp_akun_name_usd !== ""
+                        ? currentData.cp_akun_name_usd
+                        : "-"
+                    )}
+                    {renderDetail(
+                      "Nama Bank",
+                      currentData && currentData.cp_bank_name_usd !== ""
+                        ? currentData.cp_bank_name_usd
+                        : "-"
+                    )}
+                    {renderDetail(
+                      "Nomor Rekening",
+                      currentData && currentData.cp_no_rek_usd !== ""
+                        ? currentData.cp_no_rek_usd
+                        : "-"
+                    )}
+                    {renderDetail(
+                      "Cabang Bank",
+                      currentData && currentData.cp_branch_usd !== ""
+                        ? currentData.cp_branch_usd
+                        : "-"
+                    )}
+                    {renderDetail(
+                      "Alamat Bank",
+                      currentData && currentData.cp_bank_addr_usd !== ""
+                        ? currentData.cp_bank_addr_usd
+                        : "-"
+                    )}
+
+                    <div className="mt-3 mb-1 flex justify-content-between">
+                      <div></div>
+                      <PButton
+                        label="Ubah"
+                        icon="pi pi-pencil"
+                        iconPos="right"
+                        onClick={() => {
+                          setDisplayDialog4(true);
                         }}
                       />
                     </div>
@@ -929,6 +1111,192 @@ const Perusahaan = () => {
               }}
               placeholder="Kontak Person"
             />
+          </div>
+        </div>
+      </Dialog>
+
+      <Dialog
+        header={"Edit Informasi Bank (IDR)"}
+        visible={displayDialog3}
+        style={{ width: "40vw" }}
+        footer={renderFooter2()}
+        onHide={() => onHide()}
+      >
+        <div className="row">
+          <div className="col-6 mb-2">
+            <label className="text-label">Nama Akun</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={currentData ? currentData.cp_akun_name : null}
+                onChange={(e) => {
+                  setCurrentData({
+                    ...currentData,
+                    cp_akun_name: e.target.value,
+                  });
+                }}
+                placeholder="Nama Akun Bank"
+              />
+            </div>
+          </div>
+
+          <div className="col-6 mb-2">
+            <label className="text-label">Nama Bank</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={currentData ? currentData.cp_bank_name : null}
+                onChange={(e) => {
+                  setCurrentData({
+                    ...currentData,
+                    cp_bank_name: e.target.value,
+                  });
+                }}
+                placeholder="Nama Bank"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="row">
+          <div className="col-6 mb-2">
+            <label className="text-label">No. Rekening</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={currentData ? currentData.cp_no_rek : null}
+                onChange={(e) => {
+                  setCurrentData({
+                    ...currentData,
+                    cp_no_rek: e.target.value,
+                  });
+                }}
+                placeholder="No. Rekening"
+              />
+            </div>
+          </div>
+          <div className="col-6 mb-2">
+            <label className="text-label">Cabang Bank</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={currentData ? currentData.cp_branch : null}
+                onChange={(e) => {
+                  setCurrentData({
+                    ...currentData,
+                    cp_branch: e.target.value,
+                  });
+                }}
+                placeholder="Cabang Bank"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="row">
+          <div className="col-6 mb-2">
+            <label className="text-label">Alamat Bank</label>
+            <div className="p-inputgroup">
+              <InputTextarea
+                value={currentData ? currentData.cp_bank_addr : null}
+                onChange={(e) => {
+                  setCurrentData({
+                    ...currentData,
+                    cp_bank_addr: e.target.value,
+                  });
+                }}
+                placeholder="Alamat Bank"
+              />
+            </div>
+          </div>
+        </div>
+      </Dialog>
+
+      <Dialog
+        header={"Edit Informasi Bank (USD)"}
+        visible={displayDialog4}
+        style={{ width: "40vw" }}
+        footer={renderFooter2()}
+        onHide={() => onHide()}
+      >
+        <div className="row">
+          <div className="col-6 mb-2">
+            <label className="text-label">Nama Akun</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={currentData ? currentData.cp_akun_name_usd : null}
+                onChange={(e) => {
+                  setCurrentData({
+                    ...currentData,
+                    cp_akun_name_usd: e.target.value,
+                  });
+                }}
+                placeholder="Nama Akun Bank"
+              />
+            </div>
+          </div>
+
+          <div className="col-6 mb-2">
+            <label className="text-label">Nama Bank</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={currentData ? currentData.cp_bank_name_usd : null}
+                onChange={(e) => {
+                  setCurrentData({
+                    ...currentData,
+                    cp_bank_name_usd: e.target.value,
+                  });
+                }}
+                placeholder="Nama Bank"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="row">
+          <div className="col-6 mb-2">
+            <label className="text-label">No. Rekening</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={currentData ? currentData.cp_no_rek_usd : null}
+                onChange={(e) => {
+                  setCurrentData({
+                    ...currentData,
+                    cp_no_rek_usd: e.target.value,
+                  });
+                }}
+                placeholder="No. Rekening"
+              />
+            </div>
+          </div>
+          <div className="col-6 mb-2">
+            <label className="text-label">Cabang Bank</label>
+            <div className="p-inputgroup">
+              <InputText
+                value={currentData ? currentData.cp_branch_usd : null}
+                onChange={(e) => {
+                  setCurrentData({
+                    ...currentData,
+                    cp_branch_usd: e.target.value,
+                  });
+                }}
+                placeholder="Cabang Bank"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="row">
+          <div className="col-6 mb-2">
+            <label className="text-label">Alamat Bank</label>
+            <div className="p-inputgroup">
+              <InputTextarea
+                value={currentData ? currentData.cp_bank_addr_usd : null}
+                onChange={(e) => {
+                  setCurrentData({
+                    ...currentData,
+                    cp_bank_addr_usd: e.target.value,
+                  });
+                }}
+                placeholder="Alamat Bank"
+              />
+            </div>
           </div>
         </div>
       </Dialog>

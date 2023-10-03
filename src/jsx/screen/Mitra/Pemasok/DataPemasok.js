@@ -1064,7 +1064,6 @@ const DataSupplier = ({
   };
 
   const renderDialog = () => {
-    console.log("hellloo", currentItem?.supplier?.sup_country ?? null);
     return (
       <>
         <Toast ref={toast} />

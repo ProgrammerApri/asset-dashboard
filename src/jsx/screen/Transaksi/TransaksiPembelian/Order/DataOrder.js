@@ -34,7 +34,7 @@ const data = {
   dep_id: null,
   proj_id: null,
   sup_id: null,
-  unit_konv: null,
+  kurs: null,
   top: null,
   due_date: null,
   split_order: null,
@@ -46,6 +46,8 @@ const data = {
   ns: false,
   same_sup: false,
   note: null,
+  freight: null,
+  insurance: null,
   dprod: [],
   djasa: [],
 };
@@ -94,7 +96,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
       console.log(response);
       if (response.status) {
         const kode = response.data;
-        console.log("gra",kode);
+        console.log("gra", kode);
         onAdd();
         dispatch({
           type: SET_CURRENT_ODR,
@@ -163,11 +165,11 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
       console.log(response);
       if (response.status) {
         // if (response.status) {
-          const { data } = response;
-  
-          console.log("data Dibawah");
-          console.log(data);
-          const filteredData = data.filter((item) => item.modul !== "gra");
+        const { data } = response;
+
+        console.log("data Dibawah");
+        console.log(data);
+        const filteredData = data.filter((item) => item.modul !== "gra");
 
         dispatch({ type: SET_ODR, payload: filteredData });
       }
@@ -435,12 +437,15 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
                           prod_id: null,
                           unit_id: null,
                           location: null,
+                          rak_opt: null,
+                          rak_id: null,
                           req: null,
                           order: null,
                           remain: null,
                           konv_qty: null,
                           unit_konv: null,
                           price: null,
+                          idr: null,
                           disc: null,
                           nett_price: null,
                           total: null,
@@ -664,16 +669,19 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
                     id: 0,
                     do_id: null,
                     // preq_id: null,
-                    // pprod_id: null,
+                    pprod_id: null,
                     prod_id: null,
                     unit_id: null,
                     location: null,
+                    rak_opt: false,
+                    rak_id: null,
                     req: null,
                     order: null,
                     remain: null,
                     konv_qty: null,
                     unit_konv: null,
                     price: null,
+                    idr: null,
                     disc: null,
                     nett_price: null,
                     total_fc: null,
@@ -945,7 +953,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
             header="Harga Satuan (IDR)"
             field={(e) =>
               data.sup_id?.sup_curren
-                ? `Rp. ${formatIdr(e.price * rate)}`
+                ? `Rp. ${formatIdr(e.price * data?.kurs)}`
                 : `Rp. ${formatIdr(e.price)}`
             }
             style={{ minWidth: "10rem" }}

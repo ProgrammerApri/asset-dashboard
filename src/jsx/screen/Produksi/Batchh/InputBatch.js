@@ -24,6 +24,7 @@ import { Link } from "react-router-dom";
 import { Checkbox } from "primereact/checkbox";
 import { SelectButton } from "primereact/selectbutton";
 import DataSupplier from "../../Mitra/Pemasok/DataPemasok";
+import { MultiSelect } from "primereact/multiselect";
 
 const defError = {
   code: false,
@@ -81,7 +82,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
     getSupplier();
     getProduct();
     getSatuan();
-    getStatus()
+    getStatus();
     getFormula();
     getPlanning();
     getDept();
@@ -117,7 +118,6 @@ const InputBatch = ({ onCancel, onSuccess }) => {
       data: {},
     };
 
-
     let response = null;
     try {
       response = await request(null, config);
@@ -127,7 +127,8 @@ const InputBatch = ({ onCancel, onSuccess }) => {
 
         setNumb(data);
       }
-    } catch (error) {setNumb(false);
+    } catch (error) {
+      setNumb(false);
       console.error("Error:", error);
     }
   };
@@ -608,48 +609,54 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                 updateBTC({
                   ...btc,
                   plan_id: e?.value?.id ?? null,
-                  sequence: e?.value?.sequence?.map((v) => {
-                    return {
-                      ...v,
-                      seq: v.seq,
-                      wc_id: v.wc_id?.id ?? null,
-                      loc_id: v.loc_id?.id ?? null,
-                      mch_id: v?.mch_id?.id ?? null,
-                      work_id: v?.work_id?.id ?? null,
-                      sup_id: null,
-                      datetime_plan: v?.date ?? null,
-                      datetime_actual: v?.datetime_actual,
-                      datetime_end: v?.datetime_end,
-                      durasi: v?.durasi,
-                      proses: v?.proses ?? null,
-                    };
-                  }),
-                  product: e?.value?.product?.map((v) => {
-                    return {
-                      ...v,
-                      prod_id: v?.prod_id?.id ?? null,
-                      unit_id: v?.unit_id?.id ?? null,
-                      qty_making: v.qty_making ?? 0,
-                      aloc: v?.aloc ?? null,
-                      qty_receive: null,
-                      qty_reject: null,
-                      loc_reject: null,
-                      wc_mutation: null,
-                      remain: null,
-                    };
-                  }),
-                  material: e?.value?.material?.map((v) => {
-                    return {
-                      ...v,
-                      prod_id: v?.prod_id?.id ?? null,
-                      unit_id: v?.unit_id?.id ?? null,
-                      qty: v?.qty,
-                      mat_use: v?.mat_use,
-                      total_use: v?.total_use,
-                      price: v?.price,
-                      total_price: v?.total_price,
-                    };
-                  }),
+                  seq: e?.value
+                    ? e?.value?.sequence?.map((v) => {
+                        return {
+                          ...v,
+                          seq: v.seq,
+                          wc_id: v.wc_id?.id ?? null,
+                          loc_id: v.loc_id?.id ?? null,
+                          mch_id: v?.mch_id?.id ?? null,
+                          work_id: v?.work_id?.id ?? null,
+                          sup_id: v?.sup_id ?? null,
+                          datetime_plan: v?.date ?? null,
+                          datetime_actual: v?.datetime_actual,
+                          datetime_end: v?.datetime_end,
+                          durasi: v?.durasi,
+                          proses: v?.proses,
+                        };
+                      })
+                    : null,
+                  product: e?.value
+                    ? e?.value?.product?.map((v) => {
+                        return {
+                          ...v,
+                          prod_id: v?.prod_id?.id ?? null,
+                          unit_id: v?.unit_id?.id ?? null,
+                          qty_making: v.qty_making ?? 0,
+                          aloc: v?.aloc ?? null,
+                          qty_receive: null,
+                          qty_reject: null,
+                          loc_reject: null,
+                          wc_mutation: null,
+                          remain: null,
+                        };
+                      })
+                    : null,
+                  material: e?.value
+                    ? e?.value?.material?.map((v) => {
+                        return {
+                          ...v,
+                          prod_id: v?.prod_id?.id ?? null,
+                          unit_id: v?.unit_id?.id ?? null,
+                          qty: v?.qty,
+                          mat_use: v?.mat_use,
+                          total_use: v?.total_use,
+                          price: v?.price,
+                          total_price: v?.total_price,
+                        };
+                      })
+                    : null,
                 });
                 let newError = error;
                 newError.pl = false;
@@ -777,12 +784,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
               body={
                 <DataTable
                   responsiveLayout="scroll"
-                  value={btc.sequence?.map((v, i) => {
-                    return {
-                      ...v,
-                      index: i,
-                    };
-                  })}
+                  value={!isEdit ? btc.seq : btc.sequence}
                   className="display w-150 datatable-wrapper header-white no-border"
                   showGridlines={false}
                   emptyMessage={() => <div></div>}
@@ -943,26 +945,33 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                       minWidth: "15rem",
                     }}
                     body={(e) => (
-                      <CustomDropdown
-                        value={e.sup_id && checkSup(e.sup_id)}
-                        option={supplier}
-                        onChange={(u) => {
-                          let temp = [...btc.sequence];
-                          temp[e.index].sup_id = u?.supplier?.id;
-                          updateBTC({ ...btc, sequence: temp });
-                        }}
-                        detail
-                        onDetail={() => {
-                          setCurrentIndex(e.index);
-                          setShowSup(true);
-                        }}
-                        label={"[supplier.sup_name] ([supplier.sup_code])"}
-                        placeholder="Pilih Supplier"
-                        disabled={
-                          checkWork(e.work_id)?.maklon == false ||
-                          checkWork(e.work_id)?.maklon == null
-                        }
-                      />
+                      <div className="p-inputgroup">
+                        <MultiSelect
+                          value={
+                            e?.sup_id
+                              ? e?.sup_id?.map((v) => checkSup(v))
+                              : null
+                          }
+                          options={supplier}
+                          onChange={(u) => {
+                            let temp = [...btc.seq];
+                            temp[e.index].sup_id = u?.value?.map(
+                              (a) => a?.supplier?.id ?? null
+                            );
+                            updateBTC({ ...btc, seq: temp });
+                          }}
+                          placeholder="Pilih Supplier"
+                          optionLabel="supplier.sup_name"
+                          filterBy="supplier.sup_name"
+                          filter
+                          display="chip"
+                          maxSelectedLabels={3}
+                          disabled={
+                            checkWork(e.work_id)?.maklon == false ||
+                            checkWork(e.work_id)?.maklon == null
+                          }
+                        />
+                      </div>
                     )}
                   />
 
@@ -982,9 +991,9 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                               : e.datetime_plan
                           }
                           onChange={(t) => {
-                            let temp = [...btc.sequence];
+                            let temp = [...btc.seq];
                             temp[e.index].datetime_plan = t?.value ?? null;
-                            updateBTC({ ...btc, sequence: temp });
+                            updateBTC({ ...btc, seq: temp });
                           }}
                           placeholder="Pilih Tanggal"
                           dateFormat="dd-mm-yy"
@@ -1013,9 +1022,9 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                               : e.datetime_actual
                           }
                           onChange={(t) => {
-                            let temp = [...btc.sequence];
+                            let temp = [...btc.seq];
                             temp[e.index].datetime_actual = t?.value ?? null;
-                            updateBTC({ ...btc, sequence: temp });
+                            updateBTC({ ...btc, seq: temp });
                           }}
                           placeholder="Pilih Tanggal"
                           dateFormat="dd-mm-yy"
@@ -1043,9 +1052,9 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                               : e.datetime_end
                           }
                           onChange={(t) => {
-                            let temp = [...btc.sequence];
+                            let temp = [...btc.seq];
                             temp[e.index].datetime_end = t?.value ?? null;
-                            updateBTC({ ...btc, sequence: temp });
+                            updateBTC({ ...btc, seq: temp });
                           }}
                           placeholder="Pilih Tanggal"
                           dateFormat="dd-mm-yy"
@@ -1070,9 +1079,9 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                         price
                         value={e.durasi && e.durasi}
                         onChange={(t) => {
-                          let temp = [...btc.sequence];
+                          let temp = [...btc.seq];
                           temp[e.index].durasi = t?.value ?? null;
-                          updateBTC({ ...btc, sequence: temp });
+                          updateBTC({ ...btc, seq: temp });
                         }}
                         placeholder="0"
                         disabled={e.proses === 0}
@@ -1088,7 +1097,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                       minWidth: "15rem",
                     }}
                     body={(e) => (
-                      <div className="p-inputgroup">
+                      // <div className="p-inputgroup">
                         <SelectButton
                           value={
                             e.proses !== null && e.proses !== ""
@@ -1099,14 +1108,38 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                           }
                           options={proses}
                           onChange={(t) => {
-                            let temp = [...btc.sequence];
+                            let temp = [...btc.seq];
                             temp[e.index].proses = t?.value?.code ?? null;
-                            updateBTC({ ...btc, sequence: temp });
+
+                            let val = [];
+                            btc?.seq?.forEach((el) => {
+                              if (el?.proses != null) {
+                                val?.push(el);
+                              }
+                            });
+                            updateBTC({
+                              ...btc,
+                              seq: temp,
+                              sequence: val?.map((v) => ({
+                                ...v,
+                                seq: v.seq,
+                                wc_id: v.wc_id ?? null,
+                                loc_id: v.loc_id ?? null,
+                                mch_id: v?.mch_id ?? null,
+                                work_id: v?.work_id ?? null,
+                                sup_id: v?.sup_id ?? null,
+                                datetime_plan: v?.datetime_plan,
+                                datetime_actual: temp[e.index].datetime_actual,
+                                datetime_end: temp[e.index].datetime_end,
+                                durasi: temp[e.index].durasi,
+                                proses: t?.value?.code ?? null,
+                              })),
+                            });
                           }}
                           optionLabel="name"
                           // disabled={e.proses === 0}
                         />
-                      </div>
+                      // </div>
                     )}
                   />
 

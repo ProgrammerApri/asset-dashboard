@@ -25,6 +25,14 @@ const def = {
   password: null,
   active: true,
   menu: [],
+  previlage: [
+    {
+      div_id: null,
+      dep_id: null,
+      access_type: 0,
+      approver: false,
+    },
+  ],
 };
 const defError = {
   username: false,
@@ -95,10 +103,10 @@ const Pengguna = ({ onAdd, onEdit }) => {
             dispatch({
               type: SET_EDIT_USER,
               payload: true,
-            })
+            });
             dispatch({
               type: SET_CURRENT_USER,
-              payload: data
+              payload: def,
             });
           }}
           className={`btn btn-primary shadow btn-xs sharp ml-1`}
@@ -365,12 +373,12 @@ const Pengguna = ({ onAdd, onEdit }) => {
             dispatch({
               type: SET_EDIT_USER,
               payload: false,
-            })
+            });
             dispatch({
               type: SET_CURRENT_USER,
               payload: {
-                id: null
-              }
+                id: null,
+              },
             });
             onAdd();
             setShowInput(true);

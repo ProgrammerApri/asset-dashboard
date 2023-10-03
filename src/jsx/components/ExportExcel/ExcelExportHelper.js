@@ -82,7 +82,7 @@ const ExcelExportHelper = ({ json, filename, sheetname }) => {
     let final = [];
     let width = {};
     let style = [];
-    json.forEach((el) => {
+    json?.forEach((el) => {
       let idColumn = new StringIdGenerator();
       let title = [];
       let column = {};

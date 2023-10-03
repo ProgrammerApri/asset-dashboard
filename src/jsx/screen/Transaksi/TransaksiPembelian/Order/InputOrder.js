@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { request } from "src/utils";
 import { Row, Col, Card } from "react-bootstrap";
-import { Button as PButton } from "primereact/button";
+import { Button, Button as PButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
@@ -13,7 +13,12 @@ import { InputSwitch } from "primereact/inputswitch";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import CustomAccordion from "src/jsx/components/Accordion/Accordion";
-import { SET_CURRENT_ODR, SET_PRODUCT } from "src/redux/actions";
+import {
+  SET_CURRENT_ODR,
+  SET_FILT_RAK,
+  SET_PRODUCT,
+  SET_RAK,
+} from "src/redux/actions";
 import DataSupplier from "src/jsx/screen/Mitra/Pemasok/DataPemasok";
 import DataRulesPay from "src/jsx/screen/MasterLainnya/RulesPay/DataRulesPay";
 import DataProduk from "src/jsx/screen/Master/Produk/DataProduk";
@@ -72,6 +77,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
   const [numb, setNumb] = useState(true);
   const [lokasi, setLokasi] = useState(null);
   const [currency, setCur] = useState(null);
+  // const rak = useSelector((state) => state.rak.rak);
+  const [rak, setRak] = useState(null);
   const [setup, setSetup] = useState(null);
   const [grupP, setGrupP] = useState(null);
   const [apCard, setApCard] = useState(null);
@@ -90,6 +97,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
   const [isRp, setRp] = useState(true);
   const [isRpJasa, setRpJasa] = useState(true);
   const [error, setError] = useState(defError);
+  const [idrVer, setIdrVer] = useState(false);
   const dispatch = useDispatch();
   const [accor, setAccor] = useState({
     produk: true,
@@ -126,6 +134,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     getCur();
     getSetup();
     getApCard();
+    getRak();
   }, []);
 
   const editODR = async () => {
@@ -152,26 +161,6 @@ const InputOrder = ({ onCancel, onSuccess }) => {
           life: 3000,
         });
       }, 500);
-    }
-  };
-
-  const getStatus = async () => {
-    const config = {
-      ...endpoints.getStatusGRA,
-      data: {},
-    };
-    console.log("Data sebelum request:", config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log("Response:", response);
-      if (response.status) {
-        const { data } = response;
-        setNumb(data);
-      }
-    } catch (error) {
-      setNumb(false);
-      console.error("Error:", error);
     }
   };
 
@@ -214,6 +203,27 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     }
   };
 
+  const getStatus = async () => {
+    const config = {
+      ...endpoints.getNumber,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      if (response.status) {
+        const { data } = response;
+        let status = null;
+        data?.forEach((element) => {
+          if (element?.modul === "gra") {
+            status.push(element?.aktif);
+          }
+        });
+        setNumb(status);
+      }
+    } catch (error) {}
+  };
+
   const getPO = async () => {
     const config = {
       ...endpoints.po,
@@ -230,8 +240,9 @@ const InputOrder = ({ onCancel, onSuccess }) => {
           if (isEdit) {
             let prod = [];
             elem.pprod.forEach((el) => {
-              el.prod_id = el.prod_id.id;
-              el.unit_id = el.unit_id.id;
+              el.prod_id = el.prod_id?.id ?? null;
+              el.unit_id = el.unit_id?.id ?? null;
+              el.rak_id = el.rak_id?.id ?? null;
               prod.push({
                 ...el,
                 r_remain: el.remain,
@@ -275,6 +286,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                 if (el.remain > 0) {
                   el.prod_id = el.prod_id.id;
                   el.unit_id = el.unit_id.id;
+                  el.rak_id = el.rak_id.id;
                   prod.push({
                     ...el,
                     r_remain: el.remain,
@@ -507,6 +519,30 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     } catch (error) {}
   };
 
+  const getRak = async (loc) => {
+    const config = {
+      ...endpoints.getRak,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        let filt = [];
+
+        data?.forEach((element) => {
+          if (element?.lokasi_rak === loc) {
+            filt.push(element);
+          }
+        });
+
+        setRak(data);
+      }
+    } catch (error) {}
+  };
+
   const getSetup = async () => {
     const config = {
       ...endpoints.getCompany,
@@ -653,6 +689,17 @@ const InputOrder = ({ onCancel, onSuccess }) => {
     return selected;
   };
 
+  const checkRak = (value) => {
+    let selected = {};
+    rak?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
   const checRulPay = (value) => {
     let selected = {};
     rulesPay?.forEach((element) => {
@@ -686,19 +733,11 @@ const InputOrder = ({ onCancel, onSuccess }) => {
   const getSubTotalBarang = () => {
     let total = 0;
     order?.dprod?.forEach((el) => {
-      // if (checkSupp(order.sup_id)?.supplier?.sup_curren !== null) {
-      //   if (el.nett_price && el.nett_price > 0) {
-      //     total += parseInt(el.nett_price);
-      //   } else {
-      //     total += el.total_fc - (el.total_fc * el.disc) / 100;
-      //   }
-      // } else {
       if (el.nett_price && el.nett_price > 0) {
         total += parseInt(el.nett_price);
       } else {
         total += el.total - (el.total * el.disc) / 100;
       }
-      // }
     });
 
     return total;
@@ -707,17 +746,32 @@ const InputOrder = ({ onCancel, onSuccess }) => {
   const getSubTotalJasa = () => {
     let total = 0;
     order?.djasa?.forEach((el) => {
-      // if (
-      //   checkSupp(order.sup_id)?.supplier?.sup_curren !== null ||
-      //   checkSupp(el.sup_id)?.supplier?.sup_curren
-      // ) {
-      //   total += el.total_fc - (el.total_fc * el.disc) / 100;
-      // } else {
       total += el.total - (el.total * el.disc) / 100;
-      // }
     });
 
     return total;
+  };
+
+  const getSubTotalBarangFc = () => {
+    let totalfc = 0;
+    order?.dprod?.forEach((el) => {
+      if (el.nett_price && el.nett_price > 0) {
+        totalfc += parseInt(el.nett_price);
+      } else {
+        totalfc += el.total_fc - (el.total_fc * el.disc) / 100;
+      }
+    });
+
+    return totalfc;
+  };
+
+  const getSubTotalJasaFc = () => {
+    let totalfc = 0;
+    order?.djasa?.forEach((el) => {
+      totalfc += el.total_fc - (el.total_fc * el.disc) / 100;
+    });
+
+    return totalfc;
   };
 
   const getUangMuka = () => {
@@ -1116,6 +1170,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                             total: 0,
                             total_fc: 0,
                             location: null,
+                            rak_opt: v?.rak_opt ?? false,
+                            rak_id: v?.rak_id ?? null,
                           };
                         })
                       : [
@@ -1131,6 +1187,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                             total_fc: 0,
                             total: null,
                             location: null,
+                            rak_opt: null,
+                            rak_id: null,
                           },
                         ],
                     djasa: e.value?.id
@@ -1180,6 +1238,13 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             )}
           </div>
 
+          <div className="col-12 mt-3">
+            <span className="fs-14">
+              <b>{"Departemen & Pemasok"}</b>
+            </span>
+            <Divider className="mt-1"></Divider>
+          </div>
+
           <div className="col-3">
             <label className="text-label">
               {tr[localStorage.getItem("language")].dep}
@@ -1217,13 +1282,6 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             />
           </div>
 
-          <div className="col-3 mt-0">
-            {/* <span className="fs-14">
-              <b>Informasi Supplier</b>
-            </span> */}
-            {/* <Divider className="mt-1"></Divider> */}
-          </div>
-
           <div className="col-3">
             <label className="text-label">
               {tr[localStorage.getItem("language")].supplier}
@@ -1236,6 +1294,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                 updateORD({
                   ...order,
                   sup_id: e.supplier.id,
+                  kurs: checkCur(e.supplier.sup_curren)?.rate ?? null,
                   dprod: order.dprod.map((v) => ({
                     ...v,
                     price: null,
@@ -1257,12 +1316,14 @@ const InputOrder = ({ onCancel, onSuccess }) => {
               placeholder={tr[localStorage.getItem("language")].pilih}
               detail
               onDetail={() => setShowSupplier(true)}
-              label={"[supplier.sup_name]"}
+              label={"[supplier.sup_name] ([supplier.sup_code])"}
               disabled={order && order.po_id !== null}
               errorMessage="Supplier Belum Dipilih"
               error={error?.sup}
             />
           </div>
+
+          <div className="col-3 mt-0"></div>
 
           <div className="col-3">
             <label className="text-label">
@@ -1296,6 +1357,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
               disabled
             />
           </div>
+
+          <div className="col-1 mt-0"></div>
 
           <div className="col-2">
             <label className="text-label">
@@ -1331,6 +1394,30 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                 }
                 placeholder={tr[localStorage.getItem("language")].currency}
                 disabled
+              />
+            </div>
+          </div>
+          <div
+            className="col-2"
+            hidden={order?.sup_id == null || order?.kurs == null}
+          >
+            <label className="text-label">{"Kurs"}</label>
+            <div className="p-inputgroup">
+              <PrimeNumber
+                price
+                value={order.sup_id !== null ? order?.kurs : ""}
+                onChange={(e) => {
+                  updateORD({
+                    ...order,
+                    kurs: e?.value ?? null,
+                    dprod: order?.dprod?.map((v) => ({
+                      ...v,
+                      idr: v?.price * e?.value,
+                      total: v?.total_fc * e?.value,
+                    })),
+                  });
+                }}
+                placeholder={"Kurs"}
               />
             </div>
           </div>
@@ -1518,8 +1605,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                           temp[e.index].konv_qty = 0;
                           temp[e.index].unit_konv =
                             checkUnit(temp[e.index].unit_id)?.u_from !== null
-                              ? checkUnit(temp[e.index].unit_id)?.u_from?.code
-                              : checkUnit(temp[e.index].unit_id)?.code;
+                              ? checkUnit(temp[e.index].unit_id)?.u_from?.name
+                              : checkUnit(temp[e.index].unit_id)?.name;
                           updateORD({ ...order, dprod: temp });
                           let newError = error;
                           newError.prod[e.index].id = false;
@@ -1552,6 +1639,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                         onChange={(u) => {
                           let temp = [...order.dprod];
                           temp[e.index].location = u.id;
+
                           updateORD({ ...order, dprod: temp });
 
                           let newError = error;
@@ -1560,7 +1648,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                           setError(newError);
                         }}
                         option={lokasi}
-                        label={"[name]"}
+                        label={"[name] ([code])"}
                         placeholder={tr[localStorage.getItem("language")].pilih}
                         detail
                         onDetail={() => {
@@ -1570,6 +1658,64 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                         errorMessage="Lokasi Belum Dipilih"
                         error={error?.prod[e.index]?.lok}
                       />
+                    )}
+                  />
+
+                  <Column
+                    hidden
+                    header={"Rak Aktif"}
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "6rem",
+                    }}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <InputSwitch
+                          className="ml-0"
+                          checked={e.rak_opt ?? false}
+                          onChange={(u) => {
+                            let temp = [...order.dprod];
+                            temp[e.index].rak_opt = u?.value;
+                            temp[e.index].rak_id = null;
+                            updateORD({ ...order, dprod: temp });
+                          }}
+                          disabled={e?.location == null}
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    hidden={!setup?.rak_option}
+                    header={"Rak"}
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "10rem",
+                    }}
+                    body={(e) => (
+                      <>
+                        <PrimeDropdown
+                          value={e.rak_id && checkRak(e.rak_id)}
+                          onChange={(u) => {
+                            let temp = [...order.dprod];
+                            temp[e.index].rak_id = u?.value?.id ?? null;
+
+                            updateORD({ ...order, dprod: temp });
+                          }}
+                          options={rak?.filter(
+                            (el) => el?.lokasi_rak === e.location
+                          )}
+                          optionLabel={"rak_name"}
+                          filter
+                          filterBy={"rak_name"}
+                          placeholder={
+                            tr[localStorage.getItem("language")].pilih
+                          }
+                          showClear
+                        />
+                      </>
                     )}
                   />
 
@@ -1588,7 +1734,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                           temp[e.index].unit_id = u.id;
                           temp[e.index].konv_qty = temp[e.index].order * u?.qty;
                           temp[e.index].unit_konv =
-                            u?.u_from !== null ? u?.u_from?.code : u?.code;
+                            u?.u_from !== null ? u?.u_from?.name : u?.name;
                           updateORD({ ...order, dprod: temp });
                         }}
                         option={satuan}
@@ -1614,7 +1760,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                     field={""}
                     body={(e) => (
                       <PrimeNumber
-                        prc
+                        price
                         value={e.req && e.req}
                         onChange={(u) => {
                           let temp = [...order.dprod];
@@ -1661,7 +1807,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                                 temp[e.index].konv_qty * temp[e.index].price;
 
                               temp[e.index].total =
-                                temp[e.index].total_fc * curConv();
+                                temp[e.index].total_fc * order?.kurs;
 
                               if (temp[e.index].order > e.req) {
                                 temp[e.index].order = e.req;
@@ -1694,7 +1840,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                                 temp[e.index].konv_qty * temp[e.index].price;
 
                               temp[e.index].total =
-                                temp[e.index].total_fc * curConv();
+                                temp[e.index].total_fc * order?.kurs;
                             } else {
                               temp[e.index].total =
                                 temp[e.index].konv_qty * temp[e.index].price;
@@ -1738,7 +1884,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                     body={(e) => (
                       <div className="p-inputgroup">
                         <PrimeNumber
-                          prc
+                          price
                           value={e.remain ? e.remain : ""}
                           placeholder="0"
                           type="number"
@@ -1784,15 +1930,17 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                               null
                           ) {
                             temp[e.index].total_fc =
-                              temp[e.index].order * temp[e.index].price;
+                              temp[e.index].konv_qty * temp[e.index].price;
 
                             temp[e.index].total =
-                              temp[e.index].total_fc * curConv();
+                              temp[e.index].total_fc * order?.kurs;
 
-                            temp[e.index].idr = u?.value * curConv();
+                            temp[e.index].idr = u?.value * order?.kurs;
                           } else {
                             temp[e.index].total =
-                              temp[e.index].order * temp[e.index].price;
+                              temp[e.index].konv_qty * temp[e.index].price;
+
+                            temp[e.index].idr = u?.value;
                           }
 
                           updateORD({
@@ -1910,20 +2058,19 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                     }}
                     field={""}
                     body={(e) => (
-                      <div className="p-inputgroup">
-                        <InputText
-                          value={
-                            e.nett_price && e.nett_price !== 0
-                              ? e.nett_price
-                              : e.total_fc - (e.total_fc * e.disc) / 100
-                          }
-                          onChange={(u) => {}}
-                          placeholder="0"
-                          type="number"
-                          min={0}
-                          disabled
-                        />
-                      </div>
+                      <PrimeNumber
+                        price
+                        value={
+                          e.nett_price && e.nett_price !== 0
+                            ? e.nett_price
+                            : e.total_fc - (e.total_fc * e.disc) / 100
+                        }
+                        onChange={(u) => {}}
+                        placeholder="0"
+                        type="number"
+                        min={0}
+                        disabled
+                      />
                     )}
                   />
 
@@ -1984,6 +2131,9 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                           id: 0,
                           prod_id: null,
                           unit_id: null,
+                          location: null,
+                          rak_opt: null,
+                          rak_id: null,
                           request: null,
                           order: null,
                           remain: null,
@@ -2560,29 +2710,47 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             </div>
             <div className="row mt-4">
               {order.djasa?.length > 0 && order.dprod?.length > 0 && (
-                <div className="d-flex col-12 align-items-center">
-                  <label className="mt-1">{"Pisah Faktur"}</label>
-                  <InputSwitch
-                    className="ml-4"
-                    checked={order.split_inv}
-                    onChange={(e) => {
-                      if (e.value) {
-                        updateORD({
-                          ...order,
-                          split_inv: e.value,
-                          total_disc: null,
-                        });
-                      } else {
-                        updateORD({
-                          ...order,
-                          split_inv: e.value,
-                          prod_disc: null,
-                          jasa_disc: null,
-                        });
-                      }
-                    }}
-                  />
-                </div>
+                <>
+                  <div className="d-flex col-6 align-items-center">
+                    <label className="mt-1">{"Pisah Faktur"}</label>
+                    <InputSwitch
+                      className="ml-4"
+                      checked={order.split_inv}
+                      onChange={(e) => {
+                        if (e.value) {
+                          updateORD({
+                            ...order,
+                            split_inv: e.value,
+                            total_disc: null,
+                          });
+                        } else {
+                          updateORD({
+                            ...order,
+                            split_inv: e.value,
+                            prod_disc: null,
+                            jasa_disc: null,
+                          });
+                        }
+                      }}
+                    />
+                  </div>
+
+                  {order?.sup_id !== null &&
+                  checkSupp(order.sup_id)?.supplier?.sup_curren !== null ? (
+                    <div className="d-flex col-6 align-items-center">
+                      <label className="mt-1">{"Versi IDR"}</label>
+                      <InputSwitch
+                        className="ml-4"
+                        checked={idrVer}
+                        onChange={(e) => {
+                          setIdrVer(e?.value);
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <></>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -2599,15 +2767,24 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             <div className="col-6">
               <label className="text-label">
                 {order.split_inv ? (
-                  checkSupp(order.sup_id)?.supplier?.sup_curren !== null ? (
-                    <b>Rp. {formatIdr(getSubTotalBarang())}</b>
+                  checkSupp(order.sup_id)?.supplier?.sup_curren !== null &&
+                  !idrVer ? (
+                    <b>{`${
+                      checkCur(checkSupp(order.sup_id)?.supplier?.sup_curren)
+                        .code
+                    }. ${formatIdr(getSubTotalBarangFc())}`}</b>
                   ) : (
                     <b>Rp. {formatIdr(getSubTotalBarang())}</b>
                   )
-                ) : checkSupp(order.sup_id)?.supplier?.sup_curren !== null ? (
+                ) : checkSupp(order.sup_id)?.supplier?.sup_curren !== null &&
+                  !idrVer ? (
                   <b>
-                    {" "}
-                    Rp. {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
+                    {`${
+                      checkCur(checkSupp(order.sup_id)?.supplier?.sup_curren)
+                        .code
+                    }. ${formatIdr(
+                      getSubTotalBarangFc() + getSubTotalJasaFc()
+                    )}`}
                   </b>
                 ) : (
                   <b>
@@ -2626,14 +2803,24 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             <div className="col-6">
               <label className="text-label">
                 {order.split_inv ? (
-                  checkSupp(order.sup_id)?.supplier?.sup_curren !== null ? (
-                    <b>Rp. {formatIdr(getSubTotalBarang())}</b>
+                  checkSupp(order.sup_id)?.supplier?.sup_curren !== null &&
+                  !idrVer ? (
+                    <b>{`${
+                      checkCur(checkSupp(order.sup_id)?.supplier?.sup_curren)
+                        .code
+                    }. ${formatIdr(getSubTotalBarangFc())}`}</b>
                   ) : (
                     <b>Rp. {formatIdr(getSubTotalBarang())}</b>
                   )
-                ) : checkSupp(order.sup_id)?.supplier?.sup_curren !== null ? (
+                ) : checkSupp(order.sup_id)?.supplier?.sup_curren !== null &&
+                  !idrVer ? (
                   <b>
-                    Rp. {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
+                    {`${
+                      checkCur(checkSupp(order.sup_id)?.supplier?.sup_curren)
+                        .code
+                    }. ${formatIdr(
+                      getSubTotalBarangFc() + getSubTotalJasaFc()
+                    )}`}
                   </b>
                 ) : (
                   <b>
@@ -2656,17 +2843,27 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             <div className="col-6">
               <label className="text-label">
                 {order.split_inv ? (
-                  checkSupp(order.sup_id)?.supplier?.sup_curren !== null ? (
-                    <b>Rp. {formatIdr((getSubTotalBarang() * ppn()) / 100)}</b>
+                  checkSupp(order.sup_id)?.supplier?.sup_curren !== null &&
+                  !idrVer ? (
+                    <b>
+                      {`${
+                        checkCur(checkSupp(order.sup_id)?.supplier?.sup_curren)
+                          .code
+                      }. ${formatIdr((getSubTotalBarangFc() * ppn()) / 100)}`}
+                    </b>
                   ) : (
                     <b>Rp. {formatIdr((getSubTotalBarang() * ppn()) / 100)}</b>
                   )
-                ) : checkSupp(order.sup_id)?.supplier?.sup_curren !== null ? (
+                ) : checkSupp(order.sup_id)?.supplier?.sup_curren !== null &&
+                  !idrVer ? (
                   <b>
-                    Rp.
-                    {formatIdr(
-                      ((getSubTotalBarang() + getSubTotalJasa()) * ppn()) / 100
-                    )}
+                    {`${
+                      checkCur(checkSupp(order.sup_id)?.supplier?.sup_curren)
+                        .code
+                    }. ${formatIdr(
+                      ((getSubTotalBarangFc() + getSubTotalJasaFc()) * ppn()) /
+                        100
+                    )}`}
                   </b>
                 ) : (
                   <b>
@@ -2740,6 +2937,100 @@ const InputOrder = ({ onCancel, onSuccess }) => {
               </div>
             </div>
 
+            {order.sup_id &&
+            checkSupp(order.sup_id)?.supplier?.sup_curren !== null ? (
+              <>
+                <div className="col-6">
+                  <label className="text-label">
+                    <b>{`Freight Charge (${
+                      checkCur(checkSupp(order.sup_id)?.supplier?.sup_curren)
+                        .code
+                    })`}</b>
+                  </label>
+                </div>
+
+                <div className="col-3">
+                  <label className="text-label">
+                    <PrimeNumber
+                      price
+                      value={order.freight && order.freight}
+                      onChange={(u) => {
+                        updateORD({
+                          ...order,
+                          freight: u.value,
+                          total_b: getSubTotalBarang() + getSubTotalJasa(),
+                          total_bayar:
+                            getSubTotalBarang() +
+                            getSubTotalJasa() +
+                            u.value * order?.kurs +
+                            order?.insurance * order?.kurs +
+                            ((getSubTotalBarang() + getSubTotalJasa()) *
+                              ppn()) /
+                              100,
+                        });
+                      }}
+                      placeholder="0"
+                      type="number"
+                      min={0}
+                    />
+                  </label>
+                </div>
+
+                <div className="col-3 mt-3">
+                  <label className="text-label">
+                    <b>IDR. {formatIdr(order?.freight * order?.kurs)}</b>
+                  </label>
+                </div>
+
+                <div className="col-6">
+                  <label className="text-label">
+                    <b>
+                      {`Insurance (${
+                        checkCur(checkSupp(order.sup_id)?.supplier?.sup_curren)
+                          .code
+                      })
+                      `}
+                    </b>
+                  </label>
+                </div>
+
+                <div className="col-3">
+                  <label className="text-label">
+                    <PrimeNumber
+                      price
+                      value={order.insurance && order.insurance}
+                      onChange={(u) => {
+                        updateORD({
+                          ...order,
+                          insurance: u.value,
+                          total_b: getSubTotalBarang() + getSubTotalJasa(),
+                          total_bayar:
+                            getSubTotalBarang() +
+                            getSubTotalJasa() +
+                            u?.value * order?.kurs +
+                            order?.freight * order?.kurs +
+                            ((getSubTotalBarang() + getSubTotalJasa()) *
+                              ppn()) /
+                              100,
+                        });
+                      }}
+                      placeholder="0"
+                      type="number"
+                      min={0}
+                    />
+                  </label>
+                </div>
+
+                <div className="col-3 mt-3">
+                  <label className="text-label">
+                    <b>IDR. {formatIdr(order?.insurance * order?.kurs)}</b>
+                  </label>
+                </div>
+              </>
+            ) : (
+              <></>
+            )}
+
             <div className="col-12">
               <Divider className="ml-12"></Divider>
             </div>
@@ -2755,32 +3046,44 @@ const InputOrder = ({ onCancel, onSuccess }) => {
             <div className="col-6">
               <label className="text-label fs-14">
                 {order.split_inv ? (
-                  checkSupp(order.sup_id)?.supplier?.sup_curren !== null ? (
+                  checkSupp(order.sup_id)?.supplier?.sup_curren !== null &&
+                  !idrVer ? (
                     <b>
-                      Rp.
-                      {formatIdr(
-                        getSubTotalBarang() +
-                          (getSubTotalBarang() * ppn()) / 100
-                      )}
+                      {`${
+                        checkCur(checkSupp(order.sup_id)?.supplier?.sup_curren)
+                          .code
+                      }. ${formatIdr(
+                        getSubTotalBarangFc() +
+                          order?.freight +
+                          order?.insurance +
+                          (getSubTotalBarangFc() * ppn()) / 100
+                      )}`}
                     </b>
                   ) : (
                     <b>
                       Rp.{" "}
                       {formatIdr(
                         getSubTotalBarang() +
+                          order?.freight * order?.kurs +
+                          order?.insurance * order?.kurs +
                           (getSubTotalBarang() * ppn()) / 100
                       )}
                     </b>
                   )
-                ) : checkSupp(order.sup_id)?.supplier?.sup_curren !== null ? (
+                ) : checkSupp(order.sup_id)?.supplier?.sup_curren !== null &&
+                  !idrVer ? (
                   <b>
-                    Rp.
-                    {formatIdr(
-                      getSubTotalBarang() +
-                        getSubTotalJasa() +
-                        ((getSubTotalBarang() + getSubTotalJasa()) * ppn()) /
+                    {`${
+                      checkCur(checkSupp(order.sup_id)?.supplier?.sup_curren)
+                        .code
+                    }. ${formatIdr(
+                      getSubTotalBarangFc() +
+                        getSubTotalJasaFc() +
+                        order?.freight +
+                        order?.insurance +
+                        ((getSubTotalBarangFc() + getSubTotalJasa()) * ppn()) /
                           100
-                    )}
+                    )}`}
                   </b>
                 ) : (
                   <b>
@@ -2788,6 +3091,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                     {formatIdr(
                       getSubTotalBarang() +
                         getSubTotalJasa() +
+                        order?.freight * order?.kurs +
+                        order?.insurance * order?.kurs +
                         ((getSubTotalBarang() + getSubTotalJasa()) * ppn()) /
                           100
                     )}
@@ -2806,7 +3111,14 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
             <div className="col-6">
               <label className="text-label fs-14">
-                <b>Rp. {formatIdr(getUangMuka())}</b>
+                {checkSupp(order.sup_id)?.supplier?.sup_curren !== null &&
+                !idrVer ? (
+                  <b>{`${
+                    checkCur(checkSupp(order.sup_id)?.supplier?.sup_curren).code
+                  }. ${formatIdr(getUangMuka())}`}</b>
+                ) : (
+                  <b>Rp. {formatIdr(getUangMuka())}</b>
+                )}
               </label>
             </div>
 
@@ -2818,16 +3130,37 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
             <div className="col-6">
               <label className="text-label fs-14">
-                <b>
-                  Rp.{" "}
-                  {formatIdr(
-                    getSubTotalBarang() +
-                      getSubTotalJasa() +
-                      ((getSubTotalBarang() + getSubTotalJasa()) * ppn()) /
-                        100 -
-                      getUangMuka()
-                  )}
-                </b>
+                {checkSupp(order.sup_id)?.supplier?.sup_curren !== null &&
+                !idrVer ? (
+                  <b>
+                    {`${
+                      checkCur(checkSupp(order.sup_id)?.supplier?.sup_curren)
+                        .code
+                    }. ${formatIdr(
+                      getSubTotalBarangFc() +
+                        getSubTotalJasaFc() +
+                        order?.freight +
+                        order?.insurance +
+                        ((getSubTotalBarangFc() + getSubTotalJasaFc()) *
+                          ppn()) /
+                          100 -
+                        getUangMuka()
+                    )}`}
+                  </b>
+                ) : (
+                  <b>
+                    Rp.{" "}
+                    {formatIdr(
+                      getSubTotalBarang() +
+                        getSubTotalJasa() +
+                        order?.freight * order?.kurs +
+                        order?.insurance * order?.kurs +
+                        ((getSubTotalBarang() + getSubTotalJasa()) * ppn()) /
+                          100 -
+                        getUangMuka()
+                    )}
+                  </b>
+                )}
               </label>
             </div>
 

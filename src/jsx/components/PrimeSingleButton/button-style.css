@@ -3,26 +3,26 @@
     margin-right: 0.5rem;
 } */
 .p-buttonset .p-button {
-    margin-right: 0;
+    margin-right: 0 !important;
 }
 .template .p-button i {
-    line-height: 2.65rem;
+    line-height: 2.65rem !important;
 }
 
 .template .p-button.single {
-    background: linear-gradient(to left, var(--primary-button) 50%, #3098ff 50%);
-    background-size: 200% 100%;
-    background-position: right bottom;
-    transition: background-position 0.5s ease-out;
-    color: #fff;
-    border-color: transparent;
+    background: linear-gradient(to left, var(--primary-button) 50%, #3098ff 50%) !important;
+    background-size: 200% 100% !important;
+    background-position: right bottom !important;
+    transition: background-position 0.5s ease-out !important;
+    color: #fff !important;
+    border-color: transparent !important;
 }
 .template .p-button.single:hover {
-    background-position: left bottom;
+    background-position: left bottom !important;
 }
 .template .p-button.single i {
-    background-color: #3098ff;
+    background-color: #3098ff !important;
 }
 .template .p-button.single:focus {
-    box-shadow: 0 0 0 1px var(--blue-200);
+    box-shadow: 0 0 0 1px var(--blue-200) !important;
 }

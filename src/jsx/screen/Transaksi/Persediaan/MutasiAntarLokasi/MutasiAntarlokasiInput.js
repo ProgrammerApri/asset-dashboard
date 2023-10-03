@@ -23,6 +23,7 @@ import PrimeNumber from "src/jsx/components/PrimeNumber/PrimeNumber";
 import PrimeDropdown from "src/jsx/components/PrimeDropdown/PrimeDropdown";
 import endpoints from "../../../../../utils/endpoints";
 import { InputTextarea } from "primereact/inputtextarea";
+import DataRak from "src/jsx/screen/Master/Rak/DataRak";
 
 const defError = {
   code: false,
@@ -54,11 +55,16 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
   const [showSat, setShowSat] = useState(false);
   const [showLok, setShowLok] = useState(false);
   const [showLoks, setShowLoks] = useState(false);
+  const [showRakFrom, setShowRakFrom] = useState(false);
+  const [showRakTo, setShowRakTo] = useState(false);
   const [product, setProduct] = useState(null);
   const [numb, setNumb] = useState(true);
   const [proj, setProj] = useState(null);
   const [satuan, setSatuan] = useState(null);
   const [lokasi, setLokasi] = useState(null);
+  const [allRak, setAllRak] = useState(null);
+  const [rak, setRak] = useState(null);
+  const [rakTo, setRakTo] = useState(null);
   const [accor, setAccor] = useState({
     produk: true,
   });
@@ -77,6 +83,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
     if (isEdit) {
       getStoLoc(lm.loc_from);
     }
+    // getRak();
     getSetup();
   }, []);
 
@@ -158,6 +165,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
       }
     } catch (error) {}
   };
+
   const getStatus = async () => {
     const config = {
       ...endpoints.getstatus_mutasi,
@@ -175,7 +183,8 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
 
         setNumb(data);
       }
-    } catch (error) {setNumb(false);
+    } catch (error) {
+      setNumb(false);
       console.error("Error:", error);
     }
   };
@@ -193,6 +202,43 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
         const { data } = response;
 
         setLokasi(data);
+      }
+    } catch (error) {}
+  };
+
+  const getRak = async (loc, loc_to) => {
+    const config = {
+      ...endpoints.getRak,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        let filtLok = [];
+        let filtLokTo = [];
+
+        data?.forEach((element) => {
+          if (element?.lokasi_rak === loc) {
+            filtLok.push(element);
+          }
+
+          if (element?.lokasi_rak === loc_to) {
+            filtLokTo.push(element);
+          }
+        });
+
+        if (loc) {
+          setRak(filtLok);
+        }
+
+        if (loc_to) {
+          setRakTo(filtLokTo);
+        }
+
+        setAllRak(data);
       }
     } catch (error) {}
   };
@@ -383,7 +429,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
   };
 
   const checkUnit = (value) => {
-    let selected = null
+    let selected = null;
     satuan?.forEach((element) => {
       if (value === element.id) {
         selected = element;
@@ -396,6 +442,17 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
   const checkLok = (value) => {
     let selected = {};
     lokasi?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const checkRak = (value) => {
+    let selected = {};
+    allRak?.forEach((element) => {
       if (value === element.id) {
         selected = element;
       }
@@ -449,21 +506,16 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
     });
   };
 
- 
   const itemTempProd = (option) => {
     return (
-      <div>
-        {option !== null ? `${option.name} (${option.code})` : ""}
-      </div>
+      <div>{option !== null ? `${option.name} (${option.code})` : ""}</div>
     );
   };
 
   const valTempProd = (option, props) => {
     if (option) {
       return (
-        <div>
-          {option !== null ? `${option.name} (${option.code})` : ""}
-        </div>
+        <div>{option !== null ? `${option.name} (${option.code})` : ""}</div>
       );
     }
 
@@ -550,9 +602,11 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
               option={lokasi}
               onChange={(e) => {
                 getStoLoc(e.id);
+                getRak(e.id, false);
                 updateLM({
                   ...lm,
                   loc_from: e.id,
+                  rak_from: null,
                   mutasi: [
                     {
                       id: 0,
@@ -567,12 +621,40 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                 newError.asl = false;
                 setError(newError);
               }}
-              label={"[name] - [code]"}
+              label={"[name] ([code])"}
               placeholder="Lokasi Asal"
               detail
               onDetail={() => setShowLok(true)}
               errorMessage="Lokasi Asal Belum Dipilih"
               error={error?.asl}
+            />
+          </div>
+
+          <div className="col-3" hidden={!setup?.rak_option}>
+            <label className="text-label">Rak Asal</label>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
+              value={lm.rak_from ? checkRak(lm?.rak_from) : null}
+              option={rak}
+              onChange={(e) => {
+                // getStoLoc(e.id);
+                updateLM({
+                  ...lm,
+                  rak_from: e?.id ?? null,
+                  mutasi: [
+                    {
+                      id: 0,
+                      prod_id: null,
+                      unit_id: null,
+                      qty: 0,
+                    },
+                  ],
+                });
+              }}
+              label={"[rak_name] ([rak_code])"}
+              placeholder="Rak Asal"
+              detail
+              onDetail={() => setShowRakFrom(true)}
             />
           </div>
 
@@ -583,21 +665,42 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
               value={lm.loc_to ? checkLok(lm?.loc_to) : null}
               option={lokasi}
               onChange={(e) => {
+                getRak(false, e.id);
                 updateLM({
                   ...lm,
                   loc_to: e.id,
+                  rak_to: null,
                 });
 
                 let newError = error;
                 newError.tjn = false;
                 setError(newError);
               }}
-              label={"[name] - [code]"}
+              label={"[name] ([code])"}
               placeholder="Lokasi Tujuan"
               detail
               onDetail={() => setShowLoks(true)}
               errorMessage="Lokasi Tujuan Belum Dipilih"
               error={error?.tjn}
+            />
+          </div>
+
+          <div className="col-3" hidden={!setup?.rak_option}>
+            <label className="text-label">Rak Tujuan</label>
+            <div className="p-inputgroup"></div>
+            <CustomDropdown
+              value={lm.rak_to ? checkRak(lm?.rak_to) : null}
+              option={rakTo}
+              onChange={(e) => {
+                updateLM({
+                  ...lm,
+                  rak_to: e?.id ?? null,
+                });
+              }}
+              label={"[rak_name] ([rak_code])"}
+              placeholder="Rak Tujuan"
+              detail
+              onDetail={() => setShowRakTo(true)}
             />
           </div>
           {/* <div className="col-6"></div>  */}
@@ -818,6 +921,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
                                 prod_id: null,
                                 unit_id: null,
                                 qty: null,
+                                qty_terima: null,
                               },
                             ],
                           });
@@ -1037,7 +1141,7 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowLok(false);
-            updateLM({ ...lm, lok_asl: e.data.id });
+            updateLM({ ...lm, loc_from: e.data.id });
           }
 
           setDoubleClick(true);
@@ -1065,7 +1169,63 @@ const MutasiAntarInput = ({ onCancel, onSuccess }) => {
         onRowSelect={(e) => {
           if (doubleClick) {
             setShowLoks(false);
-            updateLM({ ...lm, lok_tjn: e.data.id });
+            updateLM({ ...lm, loc_to: e.data.id });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataRak
+        data={rak}
+        loading={false}
+        popUp={true}
+        show={showRakFrom}
+        onHide={() => {
+          setShowRakFrom(false);
+        }}
+        onInput={(e) => {
+          setShowRakFrom(!e);
+        }}
+        onSuccessInput={(e) => {
+          getRak(lm?.loc_from, false);
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowRakFrom(false);
+            updateLM({ ...lm, rak_from: e.data.id });
+          }
+
+          setDoubleClick(true);
+
+          setTimeout(() => {
+            setDoubleClick(false);
+          }, 2000);
+        }}
+      />
+
+      <DataRak
+        data={rakTo}
+        loading={false}
+        popUp={true}
+        show={showRakTo}
+        onHide={() => {
+          setShowRakTo(false);
+        }}
+        onInput={(e) => {
+          setShowRakTo(!e);
+        }}
+        onSuccessInput={(e) => {
+          getRak(false, lm?.loc_to);
+        }}
+        onRowSelect={(e) => {
+          if (doubleClick) {
+            setShowRakTo(false);
+            updateLM({ ...lm, rak_to: e.data.id });
           }
 
           setDoubleClick(true);

@@ -29,6 +29,7 @@ import DataWorkCenter from "../../Master/WorkCenter/DataWorkCenter";
 import DataJeniskerja from "../../Master/Jenis_kerja/DataJeniskerja";
 import { Checkbox } from "primereact/checkbox";
 import DataSupplier from "../../Mitra/Pemasok/DataPemasok";
+import { MultiSelect } from "primereact/multiselect";
 
 const defError = {
   code: false,
@@ -91,7 +92,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
     getProduct();
     getSatuan();
     getDept();
-    getStatus()
+    getStatus();
     getWorkCen();
     getWorkType();
     getMesin();
@@ -120,8 +121,8 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
       }
     } catch (error) {}
   };
-  
-  console.log("data formula",formula);
+
+  console.log("data formula", formula);
   const getStatus = async () => {
     const config = {
       ...endpoints.planning_status,
@@ -139,11 +140,11 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
 
         setNumb(data);
       }
-    } catch (error) {setNumb(false);
+    } catch (error) {
+      setNumb(false);
       console.error("Error:", error);
     }
   };
-
 
   const getProduct = async () => {
     const config = {
@@ -574,7 +575,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
   };
 
   const body = () => {
-    console.log("formula",plan.form_id !== null);
+    console.log("formula", plan.form_id !== null);
     return (
       <>
         {/* Put content body here */}
@@ -998,26 +999,33 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                         minWidth: "15rem",
                       }}
                       body={(e) => (
-                        <CustomDropdown
-                          value={e.sup_id && checkSup(e.sup_id)}
-                          option={supplier}
-                          onChange={(u) => {
-                            let temp = [...plan.sequence];
-                            temp[e.index].sup_id = u?.supplier?.id;
-                            updatePL({ ...plan, sequence: temp });
-                          }}
-                          detail
-                          onDetail={() => {
-                            setCurrentIndex(e.index);
-                            setShowSup(true);
-                          }}
-                          label={"[supplier.sup_name] ([supplier.sup_code])"}
-                          placeholder="Pilih Supplier"
-                          disabled={
-                            checkWork(e.work_id)?.maklon == false ||
-                            checkWork(e.work_id)?.maklon == null
-                          }
-                        />
+                        <div className="p-inputgroup">
+                          <MultiSelect
+                            value={
+                              e?.sup_id
+                                ? e?.sup_id?.map((v) => checkSup(v))
+                                : null
+                            }
+                            options={supplier}
+                            onChange={(u) => {
+                              let temp = [...plan.sequence];
+                              temp[e.index].sup_id = u?.value?.map(
+                                (a) => a?.supplier?.id ?? null
+                              );
+                              updatePL({ ...plan, sequence: temp });
+                            }}
+                            placeholder="Pilih Supplier"
+                            optionLabel="supplier.sup_name"
+                            filterBy="supplier.sup_name"
+                            filter
+                            display="chip"
+                            maxSelectedLabels={3}
+                            disabled={
+                              checkWork(e.work_id)?.maklon == false ||
+                              checkWork(e.work_id)?.maklon == null
+                            }
+                          />
+                        </div>
                       )}
                     />
 
@@ -1505,30 +1513,31 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
 
                   <Column
                     className="align-text-top"
-                    body={(e) =>
-                      e.index === plan.material.length - 1 ? (
-                        <Link
-                          onClick={() => {
-                            updatePL({
-                              ...plan,
-                              material: [
-                                ...plan.material,
-                                {
-                                  id: 0,
-                                  prod_id: null,
-                                  unit_id: null,
-                                  qty: null,
-                                  mat_use: null,
-                                  total_use: null,
-                                },
-                              ],
-                            });
-                          }}
-                          className="btn btn-primary shadow btn-xs sharp ml-1"
-                        >
-                          <i className="fa fa-plus"></i>
-                        </Link>
-                      ) : (
+                    body={
+                      (e) => (
+                        // e.index === plan.material.length - 1 ? (
+                        //   <Link
+                        //     onClick={() => {
+                        //       updatePL({
+                        //         ...plan,
+                        //         material: [
+                        //           ...plan.material,
+                        //           {
+                        //             id: 0,
+                        //             prod_id: null,
+                        //             unit_id: null,
+                        //             qty: null,
+                        //             mat_use: null,
+                        //             total_use: null,
+                        //           },
+                        //         ],
+                        //       });
+                        //     }}
+                        //     className="btn btn-primary shadow btn-xs sharp ml-1"
+                        //   >
+                        //     <i className="fa fa-plus"></i>
+                        //   </Link>
+                        // ) : (
                         <Link
                           onClick={() => {
                             let temp = [...plan.material];
@@ -1543,6 +1552,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                           <i className="fa fa-trash"></i>
                         </Link>
                       )
+                      // )
                     }
                   />
                 </DataTable>

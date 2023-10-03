@@ -95,10 +95,13 @@ export default function request(param, config, isUpload = false ,header = {} ) {
             );
           }
           if (err?.response?.status === 401) {
-            alert("Sesi anda sudah habis, silahkan login ulang");
+            if (localStorage.getItem("token")) {
               localStorage.removeItem("token");
+              alert("Sesi anda sudah habis, silahkan login ulang");
               window.location.reload();
               return;
+            }
+            
           }
 
   
